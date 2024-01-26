@@ -11,6 +11,6 @@
       "Count": 1
     }
   ],
-  "energy": 800,
+  "energyPerTick": 100,
   "time": 15
 }

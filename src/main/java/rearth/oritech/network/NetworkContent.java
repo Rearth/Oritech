@@ -21,6 +21,7 @@ public class NetworkContent {
         ReflectiveEndecBuilder.register(OritechRecipe.ORITECH_ENDEC, OritechRecipe.class);
 
         MACHINE_CHANNEL.registerClientbound(MachineSyncPacket.class, ((message, access) -> {
+
             var entity = access.player().clientWorld.getBlockEntity(message.position);
 
             if (entity instanceof PulverizerBlockEntity machine) {

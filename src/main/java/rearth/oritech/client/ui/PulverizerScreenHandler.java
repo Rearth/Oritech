@@ -9,12 +9,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ModScreenHandlers;
 import rearth.oritech.util.EnergyProvider;
 import rearth.oritech.util.ScreenProvider;
 import team.reborn.energy.api.EnergyStorage;
+
+import java.util.Objects;
 
 public class PulverizerScreenHandler extends ScreenHandler {
 
@@ -26,15 +29,19 @@ public class PulverizerScreenHandler extends ScreenHandler {
     protected final EnergyStorage energyStorage;
 
     @NotNull
+    protected final BlockPos blockPos;
+
+    @NotNull
     protected final ScreenProvider screenData;
 
     public PulverizerScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, inventory.player.getWorld().getBlockEntity(buf.readBlockPos()));
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
     }
 
     public PulverizerScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
         super(ModScreenHandlers.PULVERIZER_SCREEN, syncId);
 
+        this.blockPos = blockEntity.getPos();
         this.inventory = ((Inventory) blockEntity);
         inventory.onOpen(playerInventory.player);
         this.playerInventory = playerInventory;
@@ -99,5 +106,9 @@ public class PulverizerScreenHandler extends ScreenHandler {
     @Override
     public boolean canUse(PlayerEntity player) {
         return this.inventory.canPlayerUse(player);
+    }
+
+    public @NotNull BlockPos getBlockPos() {
+        return blockPos;
     }
 }

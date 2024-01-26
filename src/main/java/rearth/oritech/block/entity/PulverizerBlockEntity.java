@@ -9,6 +9,7 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.ScreenHandler;
@@ -46,7 +47,7 @@ public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreen
     private int progress;
     private OritechRecipe currentRecipe = OritechRecipe.DUMMY;
 
-    private boolean networkDirty = false;
+    private boolean networkDirty = true;
 
     public PulverizerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PULVERIZER_ENTITY, pos, state);
@@ -60,11 +61,12 @@ public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreen
 
         var recipeCandidate = getRecipe();
 
-        if (recipeCandidate.isPresent() && canOutput(recipeCandidate.get().value())) {
+        if (recipeCandidate.isPresent() && canOutput(recipeCandidate.get().value()) && hasEnoughEnergy(recipeCandidate.get().value())) {
             var activeRecipe = recipeCandidate.get().value();
             currentRecipe = activeRecipe;
 
             // check energy
+            useEnergy(activeRecipe);
 
             // increase progress
             progress++;
@@ -78,7 +80,7 @@ public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreen
 
         } else {
             // this happens if either the input slot is empty, or the output slot is blocked
-            if (progress < 0) resetProgress();
+            if (progress > 0) resetProgress();
         }
 
         if (networkDirty) {
@@ -86,8 +88,40 @@ public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreen
         }
     }
 
+    private boolean hasEnoughEnergy(OritechRecipe recipe) {
+        return energyStorage.amount > recipe.getEnergyPerTick();
+    }
+
+    private void useEnergy(OritechRecipe recipe) {
+        var used = recipe.getEnergyPerTick();
+        energyStorage.amount -= used;
+    }
+
     private void updateNetwork() {
+
+        if (!networkDirty) return;
+
+        var updateFrequency = 5;
+
+        // checks if a player has the inventory opened. In this case, update net every tick. In the screen we want to data to always be live, while otherwise it can be
+        // a few ticks old (e.g. for rendering), as this does not matter as much.
+        // Currently not perfect for multiplayer, as it doesn't track individual players. So all players that match the entity handle will receive the packets while
+        // the screen is open
+        if (isActivelyViewed()) updateFrequency = 1;
+
+        if (Objects.requireNonNull(this.world).getTime() % updateFrequency != 0) return;
+
+        sendNetworkEntry();
+    }
+
+    private boolean isActivelyViewed() {
+        var closestPlayer = Objects.requireNonNull(world).getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 5, false);
+        return closestPlayer != null && closestPlayer.currentScreenHandler instanceof PulverizerScreenHandler handler && getPos().equals(handler.getBlockPos());
+    }
+
+    private void sendNetworkEntry() {
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineSyncPacket(getPos(), energyStorage.amount, progress, currentRecipe));
+        networkDirty = false;
     }
 
     private void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
@@ -123,6 +157,7 @@ public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreen
 
     private void markNetDirty() {
         networkDirty = true;
+        markDirty();
     }
 
     // check if output slots are valid, meaning: each slot is either empty, or of the same type and can add the target amount without overfilling
@@ -181,6 +216,22 @@ public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreen
     }
 
     @Override
+    protected void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        Inventories.writeNbt(nbt, inventory);
+        nbt.putInt("oritech.machine_progress", progress);
+        nbt.putLong("oritech.machine_energy", energyStorage.amount);
+    }
+
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+        Inventories.readNbt(nbt, inventory);
+        progress = nbt.getInt("oritech.machine_progress");
+        energyStorage.amount = nbt.getLong("oritech.machine_energy");
+    }
+
+    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
 
     }
@@ -193,6 +244,7 @@ public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreen
     @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
         buf.writeBlockPos(this.getPos());
+        sendNetworkEntry();
     }
 
     @Override

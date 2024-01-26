@@ -1,19 +1,13 @@
 package rearth.oritech.init.recipes;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.wispforest.owo.serialization.Endec;
-import io.wispforest.owo.serialization.SerializationAttribute;
 import io.wispforest.owo.serialization.endec.BuiltInEndecs;
 import io.wispforest.owo.serialization.endec.StructEndecBuilder;
-import io.wispforest.owo.serialization.format.edm.EdmOps;
-import io.wispforest.owo.serialization.format.edm.EdmSerializer;
-import io.wispforest.owo.serialization.format.edm.LenientEdmDeserializer;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
@@ -32,16 +26,16 @@ public class OritechRecipe implements Recipe<Inventory> {
 
     private final List<Ingredient> inputs;
     private final List<ItemStack> results;
-    private final int energy;
+    private final int energyPerTick;
     private final int time;
 
-    public static final OritechRecipe DUMMY = new OritechRecipe(100, 10, DefaultedList.ofSize(1, Ingredient.EMPTY), DefaultedList.ofSize(1, ItemStack.EMPTY), RecipeContent.PULVERIZER);
+    public static final OritechRecipe DUMMY = new OritechRecipe(100, 10, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER);
 
     public OritechRecipe(int energy, int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type) {
         this.type = type;
         this.results = results;
         this.inputs = inputs;
-        this.energy = energy;
+        this.energyPerTick = energy;
         this.time = time;
     }
 
@@ -97,13 +91,13 @@ public class OritechRecipe implements Recipe<Inventory> {
                 "type=" + type +
                 ", inputs=" + inputs +
                 ", results=" + results +
-                ", energy=" + energy +
+                ", energy=" + energyPerTick +
                 ", time=" + time +
                 '}';
     }
 
-    public int getEnergy() {
-        return energy;
+    public int getEnergyPerTick() {
+        return energyPerTick;
     }
 
     public int getTime() {
@@ -123,7 +117,7 @@ public class OritechRecipe implements Recipe<Inventory> {
     }
 
     public static final Endec<OritechRecipe> ORITECH_ENDEC = StructEndecBuilder.of(
-            Endec.INT.fieldOf("energy", OritechRecipe::getEnergy),
+            Endec.INT.fieldOf("energyPerTick", OritechRecipe::getEnergyPerTick),
             Endec.INT.fieldOf("time", OritechRecipe::getTime),
             Endec.ofCodec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
             Endec.ofCodec(ItemStack.CODEC).listOf().fieldOf("results", OritechRecipe::getResults),
@@ -132,7 +126,7 @@ public class OritechRecipe implements Recipe<Inventory> {
     );
 
     public static final Codec<OritechRecipe> ORITECH_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("energy").forGetter(OritechRecipe::getEnergy),
+            Codec.INT.fieldOf("energyPerTick").forGetter(OritechRecipe::getEnergyPerTick),
             Codec.INT.fieldOf("time").forGetter(OritechRecipe::getTime),
             Ingredient.DISALLOW_EMPTY_CODEC.listOf().fieldOf("ingredients").forGetter(OritechRecipe::getInputs),
             ItemStack.CODEC.listOf().fieldOf("results").forGetter(OritechRecipe::getResults),
