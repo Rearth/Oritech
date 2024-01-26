@@ -1,0 +1,16 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "item": "minecraft:coal"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:diamond",
+      "Count": 1
+    }
+  ],
+  "energy": 800,
+  "time": 15
+}

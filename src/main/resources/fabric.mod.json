@@ -18,12 +18,14 @@
 		"main": [
 			"rearth.oritech.Oritech"
 		],
+		"client": [
+			"rearth.oritech.OritechClient"
+		],
 		"fabric-datagen": [
 			"rearth.oritech.OritechDataGenerator"
 		]
 	},
 	"mixins": [
-		"oritech.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.15.6",

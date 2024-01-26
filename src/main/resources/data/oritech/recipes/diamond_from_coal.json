@@ -1,0 +1,16 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "item": "minecraft:coal"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:diamond",
+      "Count": 1
+    }
+  ],
+  "energy": 1000,
+  "time": 80
+}
