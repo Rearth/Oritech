@@ -3,6 +3,7 @@ package rearth.oritech.block.entity;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
@@ -15,6 +16,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -39,7 +41,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, GeoBlockEntity, EnergyProvider, ScreenProvider {
+public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, GeoBlockEntity, EnergyProvider, ScreenProvider, BlockEntityTicker {
 
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(5, ItemStack.EMPTY);
     private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(5000, 100, 0) {
@@ -61,8 +63,9 @@ public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreen
 
         energyStorage.amount = 1000;
     }
-
-    public void tick(World world, BlockPos pos, BlockState state) {
+    
+    @Override
+    public void tick(World world, BlockPos pos, BlockState state, BlockEntity blockEntity) {
 
         if (world.isClient) return;
 
@@ -248,9 +251,11 @@ public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreen
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction side) {
-
-        // todo allow output to right side, disable input on right side
-        if (side != Direction.DOWN) return false;
+        
+        var forward = getFacing();
+        var right = forward.rotateYCounterclockwise();
+        
+        if (side != Direction.DOWN && side != right) return false;
 
         var config = getSlots();
         return slot >= config.outputStart() && slot < config.outputStart() + config.outputCount();
@@ -260,9 +265,12 @@ public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreen
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction side) {
         var mode = inventoryInputMode;
         var config = getSlots();
+        
+        var forward = getFacing();
+        var right = forward.rotateYCounterclockwise();
 
-        // insert from any side besides bottom
-        if (side == Direction.DOWN) return false;
+        // insert from any side besides bottom or right
+        if (side == Direction.DOWN || side == right) return false;
 
         var inv = this.getInputView();
 
@@ -330,7 +338,6 @@ public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreen
         var lowestIndex = -1;
         for (var slot : searchTargets) {
             var slotContent = inv.get(slot);
-            System.out.println(slot);
             if (slotContent.isEmpty()) return slot;
 
             if (slotContent.getCount() < lowestCount) {
@@ -399,6 +406,10 @@ public class PulverizerBlockEntity extends BlockEntity implements ExtendedScreen
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
         buf.writeBlockPos(this.getPos());
         sendNetworkEntry();
+    }
+    
+    private Direction getFacing() {
+        return Objects.requireNonNull(world).getBlockState(getPos()).get(Properties.HORIZONTAL_FACING);
     }
 
     @Override
