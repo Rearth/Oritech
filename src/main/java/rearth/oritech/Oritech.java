@@ -22,7 +22,6 @@ public class Oritech implements ModInitializer {
 		FieldRegistrationHandler.register(BlockContent.class, MOD_ID, false);
 		FieldRegistrationHandler.register(BlockEntitiesContent.class, MOD_ID, false);
 		ItemGroups.registerItemGroup();
-		ModRegistry.register();
 		RecipeContent.initialize();
 		NetworkContent.registerChannels();
 	}

@@ -7,12 +7,18 @@ import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.PulverizerBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.util.InventoryInputMode;
 
 public class NetworkContent {
 
     public static final OwoNetChannel MACHINE_CHANNEL = OwoNetChannel.create(new Identifier(Oritech.MOD_ID, "machine_data"));
+    public static final OwoNetChannel UI_CHANNEL = OwoNetChannel.create(new Identifier(Oritech.MOD_ID, "ui_interactions"));
 
-    public record MachineSyncPacket(BlockPos position, long energy, int progress, OritechRecipe activeRecipe) {}
+    // Server -> Client
+    public record MachineSyncPacket(BlockPos position, long energy, int progress, OritechRecipe activeRecipe, InventoryInputMode inputMode) {}
+
+    // Client -> Server (e.g. from UI interactions
+    public record InventoryInputModeSelectorPacket(BlockPos position) {}
 
     public static void registerChannels() {
 
@@ -28,9 +34,20 @@ public class NetworkContent {
                 machine.setProgress(message.progress);
                 machine.getEnergyStorage().amount = message.energy;
                 machine.setCurrentRecipe(message.activeRecipe);
+                machine.setInventoryInputMode(message.inputMode);
             }
 
         }));
+
+        UI_CHANNEL.registerServerbound(InventoryInputModeSelectorPacket.class, (message, access) -> {
+
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+
+            if (entity instanceof PulverizerBlockEntity machine) {
+                machine.cycleInputMode();
+            }
+
+        });
 
     }
 

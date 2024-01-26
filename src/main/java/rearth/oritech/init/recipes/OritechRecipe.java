@@ -29,7 +29,7 @@ public class OritechRecipe implements Recipe<Inventory> {
     private final int energyPerTick;
     private final int time;
 
-    public static final OritechRecipe DUMMY = new OritechRecipe(100, 10, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER);
+    public static final OritechRecipe DUMMY = new OritechRecipe(-1, 10, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER);
 
     public OritechRecipe(int energy, int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type) {
         this.type = type;
@@ -106,6 +106,12 @@ public class OritechRecipe implements Recipe<Inventory> {
 
     public List<Ingredient> getInputs() {
         return inputs;
+    }
+
+    // do not use this one, use getInputs if applicable to avoid unnecessary copy
+    @Override
+    public DefaultedList<Ingredient> getIngredients() {
+        return DefaultedList.copyOf(Ingredient.EMPTY, inputs.toArray(Ingredient[]::new));
     }
 
     public List<ItemStack> getResults() {

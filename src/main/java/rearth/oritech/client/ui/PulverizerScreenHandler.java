@@ -66,7 +66,7 @@ public class PulverizerScreenHandler extends ScreenHandler {
 
     private void buildItemSlots() {
 
-        for (var slot : screenData.getActiveSlots()) {
+        for (var slot : screenData.getGuiSlots()) {
             addMachineSlot(slot.index(), slot.x(), slot.y());
         }
 

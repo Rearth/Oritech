@@ -13,13 +13,15 @@ public interface ScreenProvider {
 
     record ArrowConfiguration(Identifier empty, Identifier full, int x, int y, int width, int height, boolean horizontal) {}
 
-    List<GuiSlot> getActiveSlots();
+    List<GuiSlot> getGuiSlots();
 
     default boolean showEnergy() {
         return true;
     }
 
     float getProgress();
+    
+    InventoryInputMode getInventoryInputMode();
 
     default EnergyConfiguration getEnergyConfiguration() {
         return new EnergyConfiguration(10, 11, 13, 50);

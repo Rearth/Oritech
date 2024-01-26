@@ -1,0 +1,8 @@
+{
+  "button.oritech.input_mode_fill_left_to_right": "Default",
+  "button.oritech.input_mode_fill_evenly": "Fill Evenly",
+  "button.oritech.input_mode_fill_matching_recipe": "Match Recipe",
+  "tooltip.oritech.input_mode_fill_left_to_right": "Fills the slots from left to right. Moves to the\nnext slot when the first has been filled.",
+  "tooltip.oritech.input_mode_fill_evenly": "Fills items evenly. New items are always\nput into the lowest matching slot.",
+  "tooltip.oritech.input_mode_fill_matching_recipe": "Inserts items balanced according to matching recipes.\nIf there is no recipe that uses an item, it will not be\ninserted."
+}
