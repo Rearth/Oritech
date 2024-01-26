@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import rearth.oritech.block.entity.GrinderBlockEntity;
 import rearth.oritech.block.entity.PulverizerBlockEntity;
 import rearth.oritech.util.EnergyProvider;
 import team.reborn.energy.api.EnergyStorage;
@@ -19,6 +20,9 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
 
     @AssignSidedEnergy
     public static final BlockEntityType<PulverizerBlockEntity> PULVERIZER_ENTITY = FabricBlockEntityTypeBuilder.create(PulverizerBlockEntity::new, BlockContent.PULVERIZER_BLOCK).build();
+    
+    @AssignSidedEnergy
+    public static final BlockEntityType<GrinderBlockEntity> GRINDER_ENTITY = FabricBlockEntityTypeBuilder.create(GrinderBlockEntity::new, BlockContent.GRINDER_BLOCK).build();
 
     @Override
     public Registry<BlockEntityType<?>> getRegistry() {

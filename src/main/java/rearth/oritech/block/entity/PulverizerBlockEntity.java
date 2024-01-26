@@ -25,17 +25,15 @@ public class PulverizerBlockEntity extends MachineBlockEntity {
     
     @Override
     public InventorySlotAssignment getSlots() {
-        return new InventorySlotAssignment(0, 4, 4, 1);
+        return new InventorySlotAssignment(0, 1, 1, 2);
     }
     
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
           new GuiSlot(0, 80, 11),
-          new GuiSlot(1, 100, 11),
-          new GuiSlot(2, 120, 11),
-          new GuiSlot(3, 140, 11),
-          new GuiSlot(4, 80, 59));
+          new GuiSlot(1, 80, 59),
+          new GuiSlot(2, 100, 59));
     }
     
     @Override
@@ -45,6 +43,6 @@ public class PulverizerBlockEntity extends MachineBlockEntity {
     
     @Override
     public int getInventorySize() {
-        return 5;
+        return 3;
     }
 }

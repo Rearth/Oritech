@@ -1,0 +1,16 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "item": "minecraft:apple"
+    }
+  ],
+  "results": [
+    {
+      "id": "oritech:banana",
+      "Count": 1
+    }
+  ],
+  "energyPerTick": 15,
+  "time": 80
+}

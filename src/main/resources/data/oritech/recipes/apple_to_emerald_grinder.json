@@ -1,0 +1,22 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "item": "minecraft:apple"
+    }, {
+      "item": "minecraft:apple"
+    }, {
+      "item": "minecraft:apple"
+    }, {
+      "item": "minecraft:stick"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:emerald",
+      "Count": 2
+    }
+  ],
+  "energyPerTick": 10,
+  "time": 40
+}

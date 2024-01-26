@@ -5,6 +5,7 @@ import io.wispforest.owo.serialization.endec.ReflectiveEndecBuilder;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.base.MachineBlockEntity;
 import rearth.oritech.block.entity.PulverizerBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.InventoryInputMode;
@@ -30,7 +31,7 @@ public class NetworkContent {
 
             var entity = access.player().clientWorld.getBlockEntity(message.position);
 
-            if (entity instanceof PulverizerBlockEntity machine) {
+            if (entity instanceof MachineBlockEntity machine) {
                 machine.setProgress(message.progress);
                 machine.getEnergyStorage().amount = message.energy;
                 machine.setCurrentRecipe(message.activeRecipe);
@@ -43,7 +44,7 @@ public class NetworkContent {
 
             var entity = access.player().getWorld().getBlockEntity(message.position);
 
-            if (entity instanceof PulverizerBlockEntity machine) {
+            if (entity instanceof MachineBlockEntity machine) {
                 machine.cycleInputMode();
             }
 

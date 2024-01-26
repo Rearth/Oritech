@@ -12,11 +12,12 @@ import rearth.oritech.client.ui.BasicMachineScreenHandler;
 public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
 
     public static final ExtendedScreenHandlerType<BasicMachineScreenHandler> PULVERIZER_SCREEN = new ExtendedScreenHandlerType<>(BasicMachineScreenHandler::new);
-
+    public static final ExtendedScreenHandlerType<BasicMachineScreenHandler> GRINDER_SCREEN = new ExtendedScreenHandlerType<>(BasicMachineScreenHandler::new);
 
     public static void assignScreens() {
         HandledScreens.register(PULVERIZER_SCREEN, BasicMachineScreen::new);
-    }
+        HandledScreens.register(GRINDER_SCREEN, BasicMachineScreen::new);
+            }
 
     @Override
     public Registry<ScreenHandlerType<?>> getRegistry() {

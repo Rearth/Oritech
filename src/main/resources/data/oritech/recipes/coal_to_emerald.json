@@ -7,10 +7,10 @@
   ],
   "results": [
     {
-      "id": "minecraft:diamond",
+      "id": "minecraft:emerald",
       "Count": 1
     }
   ],
-  "energyPerTick": 15,
-  "time": 80
+  "energyPerTick": 100,
+  "time": 15
 }
