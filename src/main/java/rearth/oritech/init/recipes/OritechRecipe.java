@@ -4,8 +4,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.wispforest.owo.serialization.Endec;
 import io.wispforest.owo.serialization.SerializationAttribute;
+import io.wispforest.owo.serialization.StructEndec;
 import io.wispforest.owo.serialization.endec.BuiltInEndecs;
 import io.wispforest.owo.serialization.endec.StructEndecBuilder;
+import io.wispforest.owo.serialization.util.EndecRecipeSerializer;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -15,6 +17,7 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
@@ -124,38 +127,34 @@ public class OritechRecipe implements Recipe<Inventory> {
     public OritechRecipeType getOriType() {
         return type;
     }
-
-    public record OritechRecipeType(Identifier identifier) implements RecipeType<OritechRecipe>, RecipeSerializer<OritechRecipe> {
+    
+    public static class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> implements RecipeType<OritechRecipe> {
         
         public static final Endec<OritechRecipe> ORI_RECIPE_ENDEC = StructEndecBuilder.of(
           Endec.INT.fieldOf("energyPerTick", OritechRecipe::getEnergyPerTick),
           Endec.INT.fieldOf("time", OritechRecipe::getTime),
           Endec.ofCodec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
           BuiltInEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
-          BuiltInEndecs.IDENTIFIER.xmap(OritechRecipeType::new, OritechRecipeType::identifier).fieldOf("type", OritechRecipe::getOriType),
+          BuiltInEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
           OritechRecipe::new
         );
         
-        public static final Codec<OritechRecipe> ORI_RECIPE_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-          Codec.INT.fieldOf("energyPerTick").forGetter(OritechRecipe::getEnergyPerTick),
-          Codec.INT.fieldOf("time").forGetter(OritechRecipe::getTime),
-          Ingredient.DISALLOW_EMPTY_CODEC.listOf().fieldOf("ingredients").forGetter(OritechRecipe::getInputs),
-          ItemStack.CODEC.listOf().fieldOf("results").forGetter(OritechRecipe::getResults),
-          Identifier.CODEC.xmap(OritechRecipeType::new, OritechRecipeType::identifier).fieldOf("type").forGetter(OritechRecipe::getOriType)
-        ).apply(instance, OritechRecipe::new));
-
-        @Override
-        public Codec<OritechRecipe> codec() {
-            return ORI_RECIPE_CODEC;
-            // return ORI_RECIPE_ENDEC.codec(SerializationAttribute.HUMAN_READABLE); // does not work, gives error
+        private final Identifier identifier;
+        
+        public Identifier getIdentifier() {
+            return identifier;
         }
-
-        @Override
-        public OritechRecipe read(PacketByteBuf buf) {
-            return buf.read(ORI_RECIPE_ENDEC);
+        
+        protected OritechRecipeType(Identifier identifier) {
+            super((StructEndec<OritechRecipe>) ORI_RECIPE_ENDEC);
+            this.identifier = identifier;
         }
-
+        
         @Override
-        public void write(PacketByteBuf buf, OritechRecipe recipe) { buf.write(ORI_RECIPE_ENDEC, recipe); }
+        public String toString() {
+            return "OritechRecipeType{" +
+                     "identifier=" + identifier +
+                     '}';
+        }
     }
 }
