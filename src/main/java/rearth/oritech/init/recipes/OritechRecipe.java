@@ -3,6 +3,7 @@ package rearth.oritech.init.recipes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.wispforest.owo.serialization.Endec;
+import io.wispforest.owo.serialization.SerializationAttribute;
 import io.wispforest.owo.serialization.endec.BuiltInEndecs;
 import io.wispforest.owo.serialization.endec.StructEndecBuilder;
 import net.minecraft.inventory.Inventory;
@@ -124,40 +125,37 @@ public class OritechRecipe implements Recipe<Inventory> {
         return type;
     }
 
-    public static final Endec<OritechRecipe> ORITECH_ENDEC = StructEndecBuilder.of(
-            Endec.INT.fieldOf("energyPerTick", OritechRecipe::getEnergyPerTick),
-            Endec.INT.fieldOf("time", OritechRecipe::getTime),
-            Endec.ofCodec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
-            BuiltInEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
-            BuiltInEndecs.IDENTIFIER.xmap(OritechRecipeType::new, OritechRecipeType::identifier).fieldOf("type", OritechRecipe::getOriType),
-            OritechRecipe::new
-    );
-
-    public static final Codec<OritechRecipe> ORITECH_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("energyPerTick").forGetter(OritechRecipe::getEnergyPerTick),
-            Codec.INT.fieldOf("time").forGetter(OritechRecipe::getTime),
-            Ingredient.DISALLOW_EMPTY_CODEC.listOf().fieldOf("ingredients").forGetter(OritechRecipe::getInputs),
-            ItemStack.CODEC.listOf().fieldOf("results").forGetter(OritechRecipe::getResults),
-            Identifier.CODEC.xmap(OritechRecipeType::new, OritechRecipeType::identifier).fieldOf("type").forGetter(OritechRecipe::getOriType)
-    ).apply(instance, OritechRecipe::new));
-
     public record OritechRecipeType(Identifier identifier) implements RecipeType<OritechRecipe>, RecipeSerializer<OritechRecipe> {
+        
+        public static final Endec<OritechRecipe> ORI_RECIPE_ENDEC = StructEndecBuilder.of(
+          Endec.INT.fieldOf("energyPerTick", OritechRecipe::getEnergyPerTick),
+          Endec.INT.fieldOf("time", OritechRecipe::getTime),
+          Endec.ofCodec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
+          BuiltInEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
+          BuiltInEndecs.IDENTIFIER.xmap(OritechRecipeType::new, OritechRecipeType::identifier).fieldOf("type", OritechRecipe::getOriType),
+          OritechRecipe::new
+        );
+        
+        public static final Codec<OritechRecipe> ORI_RECIPE_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+          Codec.INT.fieldOf("energyPerTick").forGetter(OritechRecipe::getEnergyPerTick),
+          Codec.INT.fieldOf("time").forGetter(OritechRecipe::getTime),
+          Ingredient.DISALLOW_EMPTY_CODEC.listOf().fieldOf("ingredients").forGetter(OritechRecipe::getInputs),
+          ItemStack.CODEC.listOf().fieldOf("results").forGetter(OritechRecipe::getResults),
+          Identifier.CODEC.xmap(OritechRecipeType::new, OritechRecipeType::identifier).fieldOf("type").forGetter(OritechRecipe::getOriType)
+        ).apply(instance, OritechRecipe::new));
 
         @Override
         public Codec<OritechRecipe> codec() {
-            return ORITECH_CODEC;
-            
-            // return ORITECH_ENDEC.codec(SerializationAttribute.HUMAN_READABLE);
+            return ORI_RECIPE_CODEC;
+            // return ORI_RECIPE_ENDEC.codec(SerializationAttribute.HUMAN_READABLE); // does not work, gives error
         }
 
         @Override
         public OritechRecipe read(PacketByteBuf buf) {
-            return buf.read(ORITECH_ENDEC);
+            return buf.read(ORI_RECIPE_ENDEC);
         }
 
         @Override
-        public void write(PacketByteBuf buf, OritechRecipe recipe) {
-            buf.write(ORITECH_ENDEC, recipe);
-        }
+        public void write(PacketByteBuf buf, OritechRecipe recipe) { buf.write(ORI_RECIPE_ENDEC, recipe); }
     }
 }
