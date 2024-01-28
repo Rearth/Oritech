@@ -5,6 +5,7 @@ import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
@@ -24,5 +25,6 @@ public class Oritech implements ModInitializer {
 		ItemGroups.registerItemGroup();
 		RecipeContent.initialize();
 		NetworkContent.registerChannels();
+		ParticleContent.registerParticles();
 	}
 }

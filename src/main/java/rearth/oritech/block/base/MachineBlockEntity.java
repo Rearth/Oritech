@@ -1,5 +1,7 @@
 package rearth.oritech.block.base;
 
+import io.wispforest.owo.particles.ClientParticles;
+import io.wispforest.owo.particles.systems.ParticleSystem;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -13,6 +15,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.ScreenHandler;
@@ -22,8 +25,12 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.custom.MachineCoreBlock;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
@@ -35,10 +42,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class MachineBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, GeoBlockEntity, EnergyProvider, ScreenProvider, BlockEntityTicker {
     
@@ -399,6 +403,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
         buf.writeBlockPos(this.getPos());
         sendNetworkEntry();
+        initMultiblock();
     }
     
     private Direction getFacing() {
@@ -471,4 +476,77 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     }
     
     public abstract int getInventorySize();
+    
+    // positive x = forward
+    // positive y = up
+    // positive z = right?
+    public List<Vec3i> getCorePositions() {
+        return List.of(
+          new Vec3i(1, 0,0),
+          new Vec3i(2, 0,0),
+          new Vec3i(0, 1, 0)
+        );
+    }
+    
+    private boolean assembled = false;
+    
+    public void initMultiblock() {
+        
+        // check if multiblock is already created, if so cancel
+        // call method the get a list of relative positions
+        // check all positions if the blocks there extend MachineCoreBlock
+        // if so, add them to list of used blocks
+        // if not (e.g. block wrong type or air), draw a small particle to indicate the missing position
+        // when all blocks are valid, multiblock is active
+        // update all multiblocks state to USED=true, write controller position to block state
+        
+        if (assembled) return;
+        
+        var ownFacing = getFacing();
+        
+        var targetPositions = getCorePositions();
+        var coreBlocks = new ArrayList<MultiBlockElement>(targetPositions.size());
+        
+        for (var targetPosition : targetPositions) {
+            var rotatedPos = rotatePosition(targetPosition, ownFacing); //todo
+            var checkPos = pos.add(rotatedPos);
+            var checkState = Objects.requireNonNull(world).getBlockState(checkPos);
+            
+            var blockType = checkState.getBlock();
+            if (blockType instanceof MachineCoreBlock coreBlock) {
+                coreBlocks.add(new MultiBlockElement(checkState, coreBlock, checkPos));
+            } else {
+                highlightBlock(checkPos);
+            }
+        }
+        
+        if (targetPositions.size() == coreBlocks.size()) {
+            // valid
+            assembled = true;
+            for (var core : coreBlocks) {
+                world.setBlockState(core.pos, core.state.with(MachineCoreBlock.USED, true));
+                System.out.println("multiblock valid");
+            }
+        } else {
+            // invalid
+            System.out.println("multiblock invalid");
+        }
+        
+    }
+    
+    private void highlightBlock(BlockPos block) {
+        ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3d.of(block), null);
+    }
+    
+    private Vec3i rotatePosition(Vec3i relativePos, Direction facing) {
+        return switch (facing) {
+            case NORTH -> new BlockPos(relativePos.getZ(), relativePos.getY(), relativePos.getX());
+            case EAST -> new BlockPos(-relativePos.getX(), relativePos.getY(), -relativePos.getZ());
+            case SOUTH -> new BlockPos(-relativePos.getZ(), relativePos.getY(), -relativePos.getX());
+            case WEST -> new BlockPos(relativePos.getX(), relativePos.getY(), relativePos.getZ());
+            default -> relativePos;
+        };
+    }
+    
+    private static record MultiBlockElement(BlockState state, MachineCoreBlock coreBlock, BlockPos pos) {}
 }

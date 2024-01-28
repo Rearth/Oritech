@@ -1,11 +1,14 @@
-// 1.20.4	2024-01-28T15:56:55.4471903	Oritech/Model Definitions
-c48da59250e22665d33524132de2dfd27f0c574f assets\oritech\models\block\grinder_block.json
+// 1.20.4	2024-01-28T18:29:04.8090958	Oritech/Model Definitions
+a5a8d2e834fc121777ed1a4c0df99e85a6f23613 assets\oritech\models\block\machine_core.json
 3d6f377b938592ac22aca17bd64561a6579ad217 assets\oritech\blockstates\grinder_block.json
-746b98d721e5ae0d96dd769e71b786afa8c2d142 assets\oritech\models\item\banana_block.json
 964457f56e25b66dfef2160c8618bcaba2b640aa assets\oritech\blockstates\pulverizer_block.json
 5462a2453fcdd2f8b99129894aec60f282d29ca9 assets\oritech\models\item\pulverizer_block.json
 eafe84c787830ab2a866e0878e9ed718d58659f5 assets\oritech\blockstates\banana_block.json
-95eae9b13fb2835f15057d2fd4d9550192064ca4 assets\oritech\models\item\grinder_block.json
 25864df3cd7786f2bf4fe6fa9855b3cf366c28ca assets\oritech\models\item\banana.json
 469ea8a66c529fe26bc029c21092e7f062ed0e40 assets\oritech\models\block\banana_block.json
+3bd3ce424e506dbbd4a45a0081e0f04b914abb27 assets\oritech\models\item\machine_core.json
+c48da59250e22665d33524132de2dfd27f0c574f assets\oritech\models\block\grinder_block.json
+746b98d721e5ae0d96dd769e71b786afa8c2d142 assets\oritech\models\item\banana_block.json
+95eae9b13fb2835f15057d2fd4d9550192064ca4 assets\oritech\models\item\grinder_block.json
+0ecc1bbf5d5fade225709596fe4c8fbbf0caf64f assets\oritech\blockstates\machine_core.json
 8169e036f9cc1d31d7f5da9f25c436dcf05e9df4 assets\oritech\models\block\pulverizer_block.json
