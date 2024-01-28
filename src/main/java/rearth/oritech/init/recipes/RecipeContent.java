@@ -9,6 +9,7 @@ public class RecipeContent {
 
     public static final OritechRecipe.OritechRecipeType PULVERIZER = register(new Identifier(Oritech.MOD_ID, "pulverizer"));
     public static final OritechRecipe.OritechRecipeType GRINDER = register(new Identifier(Oritech.MOD_ID, "grinder"));
+    public static final OritechRecipe.OritechRecipeType ASSEMBLER = register(new Identifier(Oritech.MOD_ID, "assembler"));
 
     private static OritechRecipe.OritechRecipeType register(Identifier name) {
 

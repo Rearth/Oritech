@@ -1,0 +1,18 @@
+{
+  "type": "oritech:assembler",
+  "ingredients": [
+    {
+      "item": "minecraft:coal"
+    }, {
+      "item": "minecraft:coal"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:emerald",
+      "Count": 3
+    }
+  ],
+  "energyPerTick": 100,
+  "time": 15
+}
