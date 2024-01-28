@@ -39,7 +39,6 @@ public class OritechRecipe implements Recipe<Inventory> {
         this.time = time;
     }
 
-    // todo
     @Override
     public boolean matches(Inventory machineInv, World world) {
 
@@ -58,8 +57,6 @@ public class OritechRecipe implements Recipe<Inventory> {
         return true;
 
     }
-
-    // todo
     @Override
     public ItemStack craft(Inventory inventory, DynamicRegistryManager registryManager) {
         return ItemStack.EMPTY;
@@ -79,7 +76,12 @@ public class OritechRecipe implements Recipe<Inventory> {
     public RecipeSerializer<?> getSerializer() {
         return type;
     }
-
+    
+    @Override
+    public boolean isIgnoredInRecipeBook() {
+        return true;
+    }
+    
     @Override
     public RecipeType<?> getType() {
         return type;
@@ -126,7 +128,7 @@ public class OritechRecipe implements Recipe<Inventory> {
             Endec.INT.fieldOf("energyPerTick", OritechRecipe::getEnergyPerTick),
             Endec.INT.fieldOf("time", OritechRecipe::getTime),
             Endec.ofCodec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
-            Endec.ofCodec(ItemStack.CODEC).listOf().fieldOf("results", OritechRecipe::getResults),
+            BuiltInEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
             BuiltInEndecs.IDENTIFIER.xmap(OritechRecipeType::new, OritechRecipeType::identifier).fieldOf("type", OritechRecipe::getOriType),
             OritechRecipe::new
     );
@@ -144,8 +146,7 @@ public class OritechRecipe implements Recipe<Inventory> {
         @Override
         public Codec<OritechRecipe> codec() {
             return ORITECH_CODEC;
-
-            // return toCodec(ORITECH_ENDEC, SerializationAttribute.HUMAN_READABLE);
+            
             // return ORITECH_ENDEC.codec(SerializationAttribute.HUMAN_READABLE);
         }
 

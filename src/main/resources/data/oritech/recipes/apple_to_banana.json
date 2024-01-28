@@ -9,6 +9,9 @@
     {
       "id": "oritech:banana",
       "Count": 1
+    },{
+      "id": "minecraft:stick",
+      "Count": 1
     }
   ],
   "energyPerTick": 15,

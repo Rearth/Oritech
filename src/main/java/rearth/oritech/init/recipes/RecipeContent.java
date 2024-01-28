@@ -17,8 +17,6 @@ public class RecipeContent {
         Registry.register(Registries.RECIPE_TYPE, name, type);
         Registry.register(Registries.RECIPE_SERIALIZER, name, type);
 
-        Oritech.LOGGER.info("Found recipe: " + name + " " + type);
-
         return type;
     }
 
