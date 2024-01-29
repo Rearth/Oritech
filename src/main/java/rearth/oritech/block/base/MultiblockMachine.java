@@ -1,6 +1,7 @@
 package rearth.oritech.block.base;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.StateManager;
@@ -14,6 +15,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public abstract class MultiblockMachine extends MachineBlock {
     
@@ -37,18 +39,32 @@ public abstract class MultiblockMachine extends MachineBlock {
             
             var entity = world.getBlockEntity(pos);
             if (!(entity instanceof MultiblockMachineEntity machineEntity)) {
-                return ActionResult.FAIL;
+                return ActionResult.SUCCESS;
             }
             
             var isAssembled = machineEntity.initMultiblock(state);
             
             if (!isAssembled) {
                 player.sendMessage(Text.literal("Machine is not assembled"));
-                return ActionResult.FAIL;
+                return ActionResult.SUCCESS;
             }
             
         }
         
         return super.onUse(state, world, pos, player, hand, hit);
+    }
+    
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        
+        if (!world.isClient() && state.get(ASSEMBLED)) {
+            
+            var entity = world.getBlockEntity(pos);
+            if (entity instanceof MultiblockMachineEntity machineEntity) {
+                machineEntity.onControllerBroken(state);
+            }
+        }
+        
+        return super.onBreak(world, pos, state, player);
     }
 }

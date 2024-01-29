@@ -1,7 +1,5 @@
 package rearth.oritech.block.base;
 
-import io.wispforest.owo.particles.ClientParticles;
-import io.wispforest.owo.particles.systems.ParticleSystem;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -15,7 +13,6 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.ScreenHandler;
@@ -25,12 +22,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.custom.MachineCoreBlock;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
@@ -68,7 +61,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     @Override
     public void tick(World world, BlockPos pos, BlockState state, BlockEntity blockEntity) {
         
-        if (world.isClient) return;
+        if (world.isClient || !isActive(state)) return;
         
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty()) currentRecipe = OritechRecipe.DUMMY;     // reset recipe when invalid or no input is given
@@ -260,6 +253,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction side) {
+        
         var mode = inventoryInputMode;
         var config = getSlots();
         
@@ -391,7 +385,6 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-    
     }
     
     @Override
@@ -475,5 +468,9 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     }
     
     public abstract int getInventorySize();
+    
+    public boolean isActive(BlockState state) {
+        return true;
+    }
     
 }

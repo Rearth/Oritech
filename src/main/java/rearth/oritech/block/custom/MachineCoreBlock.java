@@ -43,23 +43,14 @@ public class MachineCoreBlock extends Block {
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        
-        if (!world.isClient) {
-            world.setBlockState(pos, state.with(USED, !state.get(USED)));
-        }
-        
-        return ActionResult.SUCCESS;
-    }
-    
-    @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
 
-        if (state.get(USED)) {
+        if (!world.isClient() && state.get(USED)) {
             var offset = new Vec3i(state.get(CONTROLLER_X) - 4, state.get(CONTROLLER_Y) - 4, state.get(CONTROLLER_Z) - 4);
+            
             var controllerPos = pos.add(offset);
-            System.out.println("notifying machine controller that core has been removed");
             var controllerEntity = world.getBlockEntity(controllerPos);
+            
             if (controllerEntity instanceof MultiblockMachineEntity machineEntity) {
                 machineEntity.onCoreBroken(pos, state);
             }
