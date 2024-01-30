@@ -7,13 +7,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import rearth.oritech.block.base.MultiblockMachineEntity;
+import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 
 public class MachineCoreBlock extends Block {
     

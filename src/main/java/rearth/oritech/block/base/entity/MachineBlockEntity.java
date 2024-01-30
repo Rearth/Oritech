@@ -1,4 +1,4 @@
-package rearth.oritech.block.base;
+package rearth.oritech.block.base.entity;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;

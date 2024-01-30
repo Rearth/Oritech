@@ -1,4 +1,4 @@
-package rearth.oritech.block.base;
+package rearth.oritech.block.base.block;
 
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;

@@ -1,16 +1,11 @@
 package rearth.oritech.network;
 
 import io.wispforest.owo.network.OwoNetChannel;
-import io.wispforest.owo.particles.ClientParticles;
-import io.wispforest.owo.particles.systems.ParticleSystem;
 import io.wispforest.owo.serialization.endec.ReflectiveEndecBuilder;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.base.MachineBlockEntity;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.InventoryInputMode;
 
