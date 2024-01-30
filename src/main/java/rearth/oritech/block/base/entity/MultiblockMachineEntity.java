@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class MultiblockMachineEntity extends MachineBlockEntity {
+public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEntity {
     
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
@@ -147,7 +147,7 @@ public abstract class MultiblockMachineEntity extends MachineBlockEntity {
         ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3d.of(block), null);
     }
     
-    private Vec3i rotatePosition(Vec3i relativePos, Direction facing) {
+    public static Vec3i rotatePosition(Vec3i relativePos, Direction facing) {
         return switch (facing) {
             case NORTH -> new BlockPos(relativePos.getZ(), relativePos.getY(), relativePos.getX());
             case EAST -> new BlockPos(-relativePos.getX(), relativePos.getY(), -relativePos.getZ());

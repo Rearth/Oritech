@@ -100,8 +100,9 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
         return energyStorage.amount > recipe.getEnergyPerTick();
     }
     
+    @SuppressWarnings("lossy-conversions")
     private void useEnergy(OritechRecipe recipe) {
-        var used = recipe.getEnergyPerTick();
+        var used = recipe.getEnergyPerTick() * getEfficiencyMultiplier();
         energyStorage.amount -= used;
     }
     
@@ -120,6 +121,8 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
         if (Objects.requireNonNull(this.world).getTime() % updateFrequency != 0) return;
         
         sendNetworkEntry();
+        
+        // TODO implement networking for core / addon data. Only needs to be updated once on screen opening
     }
     
     private boolean isActivelyViewed() {
@@ -155,7 +158,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     }
     
     private boolean checkCraftingFinished(OritechRecipe activeRecipe) {
-        return progress >= activeRecipe.getTime();
+        return progress >= activeRecipe.getTime() * getSpeedMultiplier();
     }
     
     private void resetProgress() {
@@ -423,7 +426,9 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     
     @Override
     public float getProgress() {
-        return (float) progress / currentRecipe.getTime();
+        var res = (float) progress / (currentRecipe.getTime() * getSpeedMultiplier());
+        System.out.println("progress: " + res + " | " + getSpeedMultiplier());
+        return (float) progress / (currentRecipe.getTime() * getSpeedMultiplier());
     }
     
     public void setProgress(int progress) {
@@ -441,6 +446,10 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     public void setCurrentRecipe(OritechRecipe currentRecipe) {
         this.currentRecipe = currentRecipe;
     }
+    
+    // lower = better for both
+    public float getSpeedMultiplier() {return 1;}
+    public float getEfficiencyMultiplier() {return 1;}
     
     public void cycleInputMode() {
         switch (inventoryInputMode) {

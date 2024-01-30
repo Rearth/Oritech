@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import rearth.oritech.block.base.entity.AddonBlockEntity;
 import rearth.oritech.block.entity.AssemblerBlockEntity;
 import rearth.oritech.block.entity.GrinderBlockEntity;
 import rearth.oritech.block.entity.PulverizerBlockEntity;
@@ -27,6 +28,12 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedEnergy
     public static final BlockEntityType<AssemblerBlockEntity> ASSEMBLER_ENTITY = FabricBlockEntityTypeBuilder.create(AssemblerBlockEntity::new, BlockContent.ASSEMBLER_BLOCK).build();
+    
+    public static final BlockEntityType<AddonBlockEntity> ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(AddonBlockEntity::new,
+      BlockContent.MACHINE_SPEED_ADDON,
+      BlockContent.MACHINE_EFFICIENCY_ADDON,
+      BlockContent.MACHINE_EXTENDER
+    ).build();
 
     @Override
     public Registry<BlockEntityType<?>> getRegistry() {

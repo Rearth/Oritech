@@ -3,7 +3,9 @@ package rearth.oritech.block.entity;
 import net.minecraft.block.BlockState;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -12,7 +14,7 @@ import rearth.oritech.util.*;
 
 import java.util.List;
 
-public class PulverizerBlockEntity extends MachineBlockEntity {
+public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     
     public PulverizerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PULVERIZER_ENTITY, pos, state);
@@ -44,5 +46,14 @@ public class PulverizerBlockEntity extends MachineBlockEntity {
     @Override
     public int getInventorySize() {
         return 3;
+    }
+    
+    @Override
+    public List<Vec3i> getAddonSlots() {
+        return List.of(
+          new Vec3i(1, 0,0),
+          new Vec3i(0, 0,1),
+          new Vec3i(0, 0,-1)
+        );
     }
 }

@@ -63,7 +63,6 @@ public abstract class MachineBlock extends HorizontalFacingBlock implements Bloc
             Oritech.LOGGER.error("Unable to create blockEntity for " + getBlockEntityType().getSimpleName() + " at " + this);
             return new PulverizerBlockEntity(pos, state);
         }
-        
     }
     
     @NotNull

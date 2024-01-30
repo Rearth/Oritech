@@ -12,20 +12,12 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 
-public abstract class MultiblockMachine extends UpgradableMachineBlock {
+public abstract class UpgradableMachineBlock extends MachineBlock {
     
-    public static final BooleanProperty ASSEMBLED = BooleanProperty.of("machine_assembled");
-    
-    public MultiblockMachine(Settings settings) {
+    public UpgradableMachineBlock(Settings settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(ASSEMBLED, false));
-    }
-    
-    @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
-        builder.add(ASSEMBLED);
     }
     
     @Override
@@ -34,16 +26,11 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
         if (!world.isClient) {
             
             var entity = world.getBlockEntity(pos);
-            if (!(entity instanceof MultiblockMachineEntity machineEntity)) {
+            if (!(entity instanceof UpgradableMachineBlockEntity machineEntity)) {
                 return ActionResult.SUCCESS;
             }
             
-            var isAssembled = machineEntity.initMultiblock(state);
-            
-            if (!isAssembled) {
-                player.sendMessage(Text.literal("Machine is not assembled"));
-                return ActionResult.SUCCESS;
-            }
+            machineEntity.initAddons(state);
             
         }
         
@@ -52,15 +39,15 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
     
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        
-        if (!world.isClient() && state.get(ASSEMBLED)) {
-            
+
+        if (!world.isClient()) {
+
             var entity = world.getBlockEntity(pos);
-            if (entity instanceof MultiblockMachineEntity machineEntity) {
-                machineEntity.onControllerBroken(state);
+            if (entity instanceof UpgradableMachineBlockEntity machineEntity) {
+                machineEntity.resetAddons();
             }
         }
-        
+
         return super.onBreak(world, pos, state, player);
     }
 }
