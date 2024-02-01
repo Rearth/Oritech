@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.network.NetworkContent;
 
-public class BasicMachineScreen extends BaseOwoHandledScreen<FlowLayout, BasicMachineScreenHandler> {
+public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends BaseOwoHandledScreen<FlowLayout, S> {
     
     
     private static final Identifier BACKGROUND = new Identifier(Oritech.MOD_ID, "textures/gui/modular/gui_base.png");
@@ -25,7 +25,7 @@ public class BasicMachineScreen extends BaseOwoHandledScreen<FlowLayout, BasicMa
     private Component energy_tooltip;
     private ButtonComponent cycleInputButton;
     
-    public BasicMachineScreen(BasicMachineScreenHandler handler, PlayerInventory inventory, Text title) {
+    public BasicMachineScreen(S handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
     }
     
@@ -46,9 +46,9 @@ public class BasicMachineScreen extends BaseOwoHandledScreen<FlowLayout, BasicMa
           .verticalAlignment(VerticalAlignment.CENTER);
         
         rootComponent.child(
-          Containers.horizontalFlow(Sizing.fixed(176 + 250), Sizing.fixed(166 + 40))
+          Containers.horizontalFlow(Sizing.fixed(176 + 250), Sizing.fixed(166 + 40))        // span entire inner area
             .child(Containers.horizontalFlow(Sizing.content(), Sizing.content())
-                     .child(buildButtons())
+                     .child(buildExtensionPanel())
                      .surface(Surface.PANEL)
                      .positioning(Positioning.absolute(176 + 117, 30)))
             .positioning(Positioning.relative(50, 50))
@@ -106,27 +106,32 @@ public class BasicMachineScreen extends BaseOwoHandledScreen<FlowLayout, BasicMa
         cycleInputButton.tooltip(Text.translatable("tooltip.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)));
     }
     
-    private Component buildButtons() {
+    private Component buildExtensionPanel() {
         
         var container = Containers.verticalFlow(Sizing.content(), Sizing.content());
         container.surface(Surface.PANEL_INSET);
         container.horizontalAlignment(HorizontalAlignment.CENTER);
-        container.child(Components.label(Text.literal("Options")));
         
-        container.padding(Insets.of(3));
+        container.padding(Insets.of(1));
         container.margins(Insets.of(7));
         
-        cycleInputButton = Components.button(Text.literal("Match Recipe"),
-          button -> {
-            NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.InventoryInputModeSelectorPacket(handler.blockPos));
-        });
-        cycleInputButton.horizontalSizing(Sizing.fixed(75));
-        
-        container.child(cycleInputButton);
-        
+        addExtensionComponents(container);
         updateSettingsButtons();
         
         return container;
+    }
+    
+    public void addExtensionComponents(FlowLayout container) {
+        
+        cycleInputButton = Components.button(Text.literal("Match Recipe"),
+          button -> {
+              NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.InventoryInputModeSelectorPacket(handler.blockPos));
+          });
+        cycleInputButton.horizontalSizing(Sizing.fixed(73));
+        cycleInputButton.margins(Insets.of(3));
+        
+        container.child(Components.label(Text.literal("Options")).margins(Insets.of(3, 1, 1, 1)));
+        container.child(cycleInputButton);
     }
     
     private FlowLayout buildOverlay() {

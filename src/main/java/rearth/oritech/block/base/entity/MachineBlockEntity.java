@@ -1,5 +1,6 @@
 package rearth.oritech.block.base.entity;
 
+import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -97,13 +98,16 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     }
     
     private boolean hasEnoughEnergy(OritechRecipe recipe) {
-        return energyStorage.amount > recipe.getEnergyPerTick();
+        return energyStorage.amount > calculateEnergyUsage(recipe);
     }
     
     @SuppressWarnings("lossy-conversions")
     private void useEnergy(OritechRecipe recipe) {
-        var used = recipe.getEnergyPerTick() * getEfficiencyMultiplier();
-        energyStorage.amount -= used;
+        energyStorage.amount -= calculateEnergyUsage(recipe);
+    }
+    
+    private float calculateEnergyUsage(OritechRecipe recipe) {
+        return recipe.getEnergyPerTick() * getEfficiencyMultiplier() * (1 / getSpeedMultiplier());
     }
     
     private void updateNetwork() {
@@ -121,8 +125,6 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
         if (Objects.requireNonNull(this.world).getTime() % updateFrequency != 0) return;
         
         sendNetworkEntry();
-        
-        // TODO implement networking for core / addon data. Only needs to be updated once on screen opening
     }
     
     private boolean isActivelyViewed() {
@@ -426,8 +428,6 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     
     @Override
     public float getProgress() {
-        var res = (float) progress / (currentRecipe.getTime() * getSpeedMultiplier());
-        System.out.println("progress: " + res + " | " + getSpeedMultiplier());
         return (float) progress / (currentRecipe.getTime() * getSpeedMultiplier());
     }
     

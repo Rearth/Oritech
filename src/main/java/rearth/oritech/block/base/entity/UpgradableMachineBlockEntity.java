@@ -1,15 +1,28 @@
 package rearth.oritech.block.base.entity;
 
+import io.netty.buffer.Unpooled;
+import io.wispforest.owo.serialization.Endec;
+import io.wispforest.owo.serialization.endec.BuiltInEndecs;
+import io.wispforest.owo.serialization.endec.StructEndecBuilder;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.custom.MachineAddonBlock;
 import rearth.oritech.block.custom.MachineCoreBlock;
+import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.*;
@@ -188,6 +201,22 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
         return ownPos.add(rotated);
     }
     
+    @Override
+    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        super.writeScreenOpeningData(player, buf);
+        buf.write(ADDON_UI_ENDEC, getUiData());
+    }
+    
+    @Nullable
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+        return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData());
+    }
+    
+    private AddonUiData getUiData() {
+        return new AddonUiData(connectedAddons, combinedEfficiency, combinedSpeed, pos);
+    }
+    
     private static Set<BlockPos> getNeighbors(BlockPos pos) {
         return Set.of(
           pos.add(-1, 0, 0),
@@ -205,11 +234,28 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
     }
     
     @Override
-    public float getEfficiencyMultiplier() {
-        return combinedEfficiency;
+    public float getEfficiencyMultiplier() { return combinedEfficiency; }
+    
+    public void setCombinedSpeed(float combinedSpeed) {
+        this.combinedSpeed = combinedSpeed;
+    }
+    
+    public void setCombinedEfficiency(float combinedEfficiency) {
+        this.combinedEfficiency = combinedEfficiency;
     }
     
     public abstract List<Vec3i> getAddonSlots();
     
     private record AddonBlock(MachineAddonBlock addonBlock, BlockState state, BlockPos pos, AddonBlockEntity addonEntity) {}
+    
+    public record AddonUiData(List<BlockPos> positions, float efficiency, float speed, BlockPos ownPosition) {}
+    
+    public static Endec<AddonUiData> ADDON_UI_ENDEC = StructEndecBuilder.of(
+      BuiltInEndecs.BLOCK_POS.listOf().fieldOf("addon_positions", AddonUiData::positions),
+      Endec.FLOAT.fieldOf("efficiency", AddonUiData::efficiency),
+      Endec.FLOAT.fieldOf("speed", AddonUiData::speed),
+      BuiltInEndecs.BLOCK_POS.fieldOf("efficiency", AddonUiData::ownPosition),
+      AddonUiData::new
+    );
+    
 }

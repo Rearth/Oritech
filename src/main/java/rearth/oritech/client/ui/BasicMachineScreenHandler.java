@@ -13,11 +13,14 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
+import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity.AddonUiData;
 import rearth.oritech.util.EnergyProvider;
 import rearth.oritech.util.ScreenProvider;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class BasicMachineScreenHandler extends ScreenHandler {
 
@@ -34,10 +37,12 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     @NotNull
     protected final ScreenProvider screenData;
 
+    // on client, receiving data from writeScreenOpeningData
     public BasicMachineScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
         this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
     }
 
+    // on server, also called from client constructor
     public BasicMachineScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
         super(((ScreenProvider) blockEntity).getScreenHandlerType(), syncId);
 
@@ -56,9 +61,8 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         screenData = (ScreenProvider) blockEntity;
         
         buildItemSlots();
-
     }
-
+    
     private void buildItemSlots() {
 
         for (var slot : screenData.getGuiSlots()) {
