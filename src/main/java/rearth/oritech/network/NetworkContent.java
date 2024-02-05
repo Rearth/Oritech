@@ -16,7 +16,7 @@ public class NetworkContent {
     public static final OwoNetChannel UI_CHANNEL = OwoNetChannel.create(new Identifier(Oritech.MOD_ID, "ui_interactions"));
 
     // Server -> Client
-    public record MachineSyncPacket(BlockPos position, long energy, int progress, OritechRecipe activeRecipe, InventoryInputMode inputMode) {}
+    public record MachineSyncPacket(BlockPos position, long energy, long maxEnergy, long maxInsert, int progress, OritechRecipe activeRecipe, InventoryInputMode inputMode) {}
 
     // Client -> Server (e.g. from UI interactions
     public record InventoryInputModeSelectorPacket(BlockPos position) {}
@@ -32,10 +32,7 @@ public class NetworkContent {
             var entity = access.player().clientWorld.getBlockEntity(message.position);
 
             if (entity instanceof MachineBlockEntity machine) {
-                machine.setProgress(message.progress);
-                machine.getEnergyStorage().amount = message.energy;
-                machine.setCurrentRecipe(message.activeRecipe);
-                machine.setInventoryInputMode(message.inputMode);
+                machine.handleNetworkEntry(message);
             }
 
         }));

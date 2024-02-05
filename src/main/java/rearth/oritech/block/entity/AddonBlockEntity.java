@@ -1,7 +1,8 @@
-package rearth.oritech.block.base.entity;
+package rearth.oritech.block.entity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -13,6 +14,10 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
     
     public AddonBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ADDON_ENTITY, pos, state);
+    }
+    
+    public AddonBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
     }
     
     @Override

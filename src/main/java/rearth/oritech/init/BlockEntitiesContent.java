@@ -5,10 +5,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import rearth.oritech.block.base.entity.AddonBlockEntity;
-import rearth.oritech.block.entity.AssemblerBlockEntity;
-import rearth.oritech.block.entity.GrinderBlockEntity;
-import rearth.oritech.block.entity.PulverizerBlockEntity;
+import rearth.oritech.block.entity.*;
 import rearth.oritech.util.EnergyProvider;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -28,6 +25,9 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedEnergy
     public static final BlockEntityType<AssemblerBlockEntity> ASSEMBLER_ENTITY = FabricBlockEntityTypeBuilder.create(AssemblerBlockEntity::new, BlockContent.ASSEMBLER_BLOCK).build();
+    
+    @AssignSidedEnergy
+    public static final BlockEntityType<CapacitorAddonBlockEntity> CAPACITOR_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(CapacitorAddonBlockEntity::new, BlockContent.MACHINE_CAPACITOR_ADDON).build();
     
     public static final BlockEntityType<AddonBlockEntity> ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(AddonBlockEntity::new,
       BlockContent.MACHINE_SPEED_ADDON,

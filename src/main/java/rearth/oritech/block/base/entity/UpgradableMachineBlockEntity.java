@@ -1,10 +1,8 @@
 package rearth.oritech.block.base.entity;
 
-import io.netty.buffer.Unpooled;
 import io.wispforest.owo.serialization.Endec;
 import io.wispforest.owo.serialization.endec.BuiltInEndecs;
 import io.wispforest.owo.serialization.endec.StructEndecBuilder;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,9 +17,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.custom.CapacitorAddonBlock;
 import rearth.oritech.block.custom.MachineAddonBlock;
-import rearth.oritech.block.custom.MachineCoreBlock;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.block.entity.AddonBlockEntity;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 
@@ -33,6 +31,8 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
     
     private float combinedSpeed = 1;
     private float combinedEfficiency = 1;
+    private long combinedEnergyStorage = 0;
+    private long combinedEnergyInsert = 0;
     
     public UpgradableMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -54,6 +54,8 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
         
         nbt.putFloat("combined_speed", combinedSpeed);
         nbt.putFloat("combined_efficiency", combinedEfficiency);
+        nbt.putLong("combined_capacity", combinedEnergyStorage);
+        nbt.putLong("combined_insert", combinedEnergyInsert);
     }
     
     @Override
@@ -73,22 +75,33 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
         
         this.combinedSpeed = nbt.getFloat("combined_speed");
         this.combinedEfficiency = nbt.getFloat("combined_efficiency");
+        this.combinedEnergyStorage = nbt.getLong("combined_capacity");
+        this.combinedEnergyInsert = nbt.getLong("combined_insert");
+        
+        updateEnergyContainer();
     }
     
-    public void initAddons(BlockState state) {
+    private void updateEnergyContainer() {
+        energyStorage.capacity = 5000 + combinedEnergyStorage;
+        energyStorage.maxInsert = 100 + combinedEnergyInsert;
+        
+        energyStorage.amount = Math.min(energyStorage.amount, energyStorage.capacity);
+    }
+    
+    public void initAddons() {
         connectedAddons.clear();
         
         var foundAddons = getAllAddons();
         
         gatherAddonStats(foundAddons);
         writeAddons(foundAddons);
+        updateEnergyContainer();
         
         for (var addon : foundAddons) {
             connectedAddons.add(addon.pos);
         }
         
         System.out.println(connectedAddons.size() + " addons connected");
-        
     }
     
     public void resetAddons() {
@@ -102,6 +115,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
         }
         
         connectedAddons.clear();
+        updateEnergyContainer();
     }
     
     private List<AddonBlock> getAllAddons() {
@@ -141,13 +155,13 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
                 toRemove.add(candidatePos);
                 
                 var candidate = world.getBlockState(candidatePos);
-                var candidateEntity = world.getBlockEntity(candidatePos, BlockEntitiesContent.ADDON_ENTITY);
+                var candidateEntity = world.getBlockEntity(candidatePos);
                 
-                if (!(candidate.getBlock() instanceof MachineAddonBlock addonBlock) || candidateEntity.isEmpty()) continue;
+                if (!(candidate.getBlock() instanceof MachineAddonBlock addonBlock) || !(candidateEntity instanceof AddonBlockEntity addonEntity)) continue;
                 
-                if (candidate.get(MachineAddonBlock.ADDON_USED) && !candidateEntity.get().getControllerPos().equals(pos)) continue;
+                if (candidate.get(MachineAddonBlock.ADDON_USED) && !addonEntity.getControllerPos().equals(pos)) continue;
                 
-                var entry = new AddonBlock(addonBlock, candidate, candidatePos, candidateEntity.get());
+                var entry = new AddonBlock(addonBlock, candidate, candidatePos, addonEntity);
                 result.add(entry);
                 
                 if (addonBlock.isExtender()) {
@@ -172,16 +186,23 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
         
         var speed = 1f;
         var efficiency = 1f;
+        var energyAmount = 0L;
+        var energyInsert = 0L;
         
         for (var addon : addons) {
             speed *= addon.addonBlock.getSpeedMultiplier();
             efficiency *= addon.addonBlock.getEfficiencyMultiplier();
+            
+            if (addon.addonBlock instanceof CapacitorAddonBlock capacitorBlock) {
+                energyAmount += capacitorBlock.getAddedCapacity();
+                energyInsert += capacitorBlock.getAddedInsert();
+            }
         }
-        
-        System.out.println("speed: " + speed + " efficiency: " + efficiency);
         
         this.combinedSpeed = speed;
         this.combinedEfficiency = efficiency;
+        this.combinedEnergyStorage = energyAmount;
+        this.combinedEnergyInsert = energyInsert;
     }
     
     private void writeAddons(List<AddonBlock> addons) {

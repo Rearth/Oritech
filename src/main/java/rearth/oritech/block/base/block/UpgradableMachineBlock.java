@@ -30,7 +30,7 @@ public abstract class UpgradableMachineBlock extends MachineBlock {
                 return ActionResult.SUCCESS;
             }
             
-            machineEntity.initAddons(state);
+            machineEntity.initAddons();
             
         }
         

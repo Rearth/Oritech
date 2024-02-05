@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.base.entity.AddonBlockEntity;
+import rearth.oritech.block.entity.AddonBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.block.entity.PulverizerBlockEntity;
 
@@ -95,21 +95,4 @@ public class MachineAddonBlock extends Block implements BlockEntityProvider {
     public float getEfficiencyMultiplier() {
         return efficiencyMultiplier;
     }
-    
-    //    @Override
-//    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-//
-//        if (!world.isClient() && state.get(ADDON_USED)) {
-//            var offset = new Vec3i(state.get(CONTROLLER_X) - 4, state.get(CONTROLLER_Y) - 4, state.get(CONTROLLER_Z) - 4);
-//
-//            var controllerPos = pos.add(offset);
-//            var controllerEntity = world.getBlockEntity(controllerPos);
-//
-//            if (controllerEntity instanceof MultiblockMachineEntity machineEntity) {
-//                machineEntity.onCoreBroken(pos, state);
-//            }
-//        }
-//
-//        return super.onBreak(world, pos, state, player);
-//    }
 }

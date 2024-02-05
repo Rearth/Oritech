@@ -38,16 +38,18 @@ import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import java.util.*;
 
-public abstract class MachineBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, GeoBlockEntity, EnergyProvider, ScreenProvider, BlockEntityTicker {
+public abstract class MachineBlockEntity extends BlockEntity
+  implements ExtendedScreenHandlerFactory, ImplementedInventory, GeoBlockEntity, EnergyProvider, ScreenProvider, BlockEntityTicker<MachineBlockEntity> {
     
     protected final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(getInventorySize(), ItemStack.EMPTY);
-    protected final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(5000, 100, 0) {
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(5000, 100, 0) {
         @Override
         protected void onFinalCommit() {
             super.onFinalCommit();
             markNetDirty();
         }
     };
+    
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     protected int progress;
@@ -60,7 +62,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, BlockEntity blockEntity) {
+    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
         
         if (world.isClient || !isActive(state)) return;
         
@@ -133,8 +135,19 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     }
     
     private void sendNetworkEntry() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineSyncPacket(getPos(), energyStorage.amount, progress, currentRecipe, inventoryInputMode));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineSyncPacket(getPos(), energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, progress, currentRecipe, inventoryInputMode));
         networkDirty = false;
+    }
+    
+    // used to set relevant fields in client world
+    public void handleNetworkEntry(NetworkContent.MachineSyncPacket message) {
+        
+        this.setProgress(message.progress());
+        this.setEnergyStored(message.energy());
+        this.energyStorage.maxInsert = message.maxInsert();
+        this.energyStorage.capacity = message.maxEnergy();
+        this.setCurrentRecipe(message.activeRecipe());
+        this.setInventoryInputMode(message.inputMode());
     }
     
     private void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
@@ -435,7 +448,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
         this.progress = progress;
     }
     
-    public SimpleEnergyStorage getEnergyStorage() {
+    public DynamicEnergyStorage getEnergyStorage() {
         return energyStorage;
     }
     
@@ -480,6 +493,10 @@ public abstract class MachineBlockEntity extends BlockEntity implements Extended
     
     public boolean isActive(BlockState state) {
         return true;
+    }
+    
+    public void setEnergyStored(long amount) {
+        energyStorage.amount = amount;
     }
     
 }
