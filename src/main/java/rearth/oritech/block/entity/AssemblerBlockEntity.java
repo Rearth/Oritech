@@ -7,7 +7,7 @@ import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
 
@@ -20,7 +20,7 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    protected OritechRecipe.OritechRecipeType getOwnRecipeType() {
+    protected OritechRecipeType getOwnRecipeType() {
         return RecipeContent.ASSEMBLER;
     }
     

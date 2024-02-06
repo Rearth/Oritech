@@ -4,11 +4,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.*;
 
@@ -21,7 +20,7 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     }
     
     @Override
-    protected OritechRecipe.OritechRecipeType getOwnRecipeType() {
+    protected OritechRecipeType getOwnRecipeType() {
         return RecipeContent.PULVERIZER;
     }
     

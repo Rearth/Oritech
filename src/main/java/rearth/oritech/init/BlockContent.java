@@ -4,17 +4,29 @@ import io.wispforest.owo.registration.reflect.BlockRegistryContainer;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.ItemConvertible;
 import rearth.oritech.block.custom.*;
+import rearth.oritech.init.compat.OritechREIPlugin;
+import rearth.oritech.init.recipes.OritechRecipeType;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
 public class BlockContent implements BlockRegistryContainer {
 
     @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
     public static final Block BANANA_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
+    
+    @RegisterREIWorkstation("pulverizer")
     public static final Block PULVERIZER_BLOCK = new PulverizerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @RegisterREIWorkstation("grinder")
     public static final Block GRINDER_BLOCK = new GrinderBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @RegisterREIWorkstation("assembler")
     public static final Block ASSEMBLER_BLOCK = new AssemblerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    
     public static final Block MACHINE_CORE = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block MACHINE_SPEED_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 0.9f, 1.05f);
     public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 0.9f);
@@ -31,6 +43,16 @@ public class BlockContent implements BlockRegistryContainer {
         }
 
         ItemGroups.add(targetGroup, value);
+        
+        if (field.isAnnotationPresent(RegisterREIWorkstation.class)) {
+            OritechREIPlugin.workstationsToRegister.add(new OritechREIPlugin.OriREIWorkstation(field.getAnnotation(RegisterREIWorkstation.class).value(), value));
+        }
+    }
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    public @interface RegisterREIWorkstation {
+        String value(); // the name of the recipe type identifier, skipping the "oritech_". We cant directly reference the field because annotations dont allow that
     }
 
 }

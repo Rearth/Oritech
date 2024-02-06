@@ -6,7 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
 
@@ -19,7 +19,7 @@ public class GrinderBlockEntity extends MachineBlockEntity {
     }
     
     @Override
-    protected OritechRecipe.OritechRecipeType getOwnRecipeType() {
+    protected OritechRecipeType getOwnRecipeType() {
         return RecipeContent.GRINDER;
     }
     

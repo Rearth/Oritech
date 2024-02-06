@@ -1,6 +1,5 @@
 package rearth.oritech.block.base.entity;
 
-import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -27,6 +26,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -34,7 +34,6 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
-import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import java.util.*;
 
@@ -212,7 +211,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         return Objects.requireNonNull(world).getRecipeManager().getFirstMatch(getOwnRecipeType(), getInputInventory(), world);
     }
     
-    protected abstract OritechRecipe.OritechRecipeType getOwnRecipeType();
+    protected abstract OritechRecipeType getOwnRecipeType();
     
     public abstract InventorySlotAssignment getSlots();
     

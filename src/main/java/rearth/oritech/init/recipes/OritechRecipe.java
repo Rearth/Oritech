@@ -1,24 +1,13 @@
 package rearth.oritech.init.recipes;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.wispforest.owo.serialization.Endec;
-import io.wispforest.owo.serialization.SerializationAttribute;
-import io.wispforest.owo.serialization.StructEndec;
-import io.wispforest.owo.serialization.endec.BuiltInEndecs;
-import io.wispforest.owo.serialization.endec.StructEndecBuilder;
-import io.wispforest.owo.serialization.util.EndecRecipeSerializer;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
@@ -27,7 +16,6 @@ import java.util.List;
 public class OritechRecipe implements Recipe<Inventory> {
 
     private final OritechRecipeType type;
-
     private final List<Ingredient> inputs;
     private final List<ItemStack> results;
     private final int energyPerTick;
@@ -128,33 +116,4 @@ public class OritechRecipe implements Recipe<Inventory> {
         return type;
     }
     
-    public static class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> implements RecipeType<OritechRecipe> {
-        
-        public static final Endec<OritechRecipe> ORI_RECIPE_ENDEC = StructEndecBuilder.of(
-          Endec.INT.fieldOf("energyPerTick", OritechRecipe::getEnergyPerTick),
-          Endec.INT.fieldOf("time", OritechRecipe::getTime),
-          Endec.ofCodec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
-          BuiltInEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
-          BuiltInEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
-          OritechRecipe::new
-        );
-        
-        private final Identifier identifier;
-        
-        public Identifier getIdentifier() {
-            return identifier;
-        }
-        
-        protected OritechRecipeType(Identifier identifier) {
-            super((StructEndec<OritechRecipe>) ORI_RECIPE_ENDEC);
-            this.identifier = identifier;
-        }
-        
-        @Override
-        public String toString() {
-            return "OritechRecipeType{" +
-                     "identifier=" + identifier +
-                     '}';
-        }
-    }
 }

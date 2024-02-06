@@ -6,8 +6,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.InventoryInputMode;
 
 public class NetworkContent {
@@ -25,7 +25,7 @@ public class NetworkContent {
 
         Oritech.LOGGER.info("Registering oritech channels");
 
-        ReflectiveEndecBuilder.register(OritechRecipe.OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
+        ReflectiveEndecBuilder.register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
 
         MACHINE_CHANNEL.registerClientbound(MachineSyncPacket.class, ((message, access) -> {
 
