@@ -17,11 +17,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.custom.CapacitorAddonBlock;
-import rearth.oritech.block.custom.MachineAddonBlock;
-import rearth.oritech.block.entity.AddonBlockEntity;
+import rearth.oritech.block.custom.machines.addons.CapacitorAddonBlock;
+import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
+import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
-import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.*;
 

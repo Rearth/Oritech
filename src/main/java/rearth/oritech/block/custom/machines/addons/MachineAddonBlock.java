@@ -1,4 +1,4 @@
-package rearth.oritech.block.custom;
+package rearth.oritech.block.custom.machines.addons;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -13,9 +13,9 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.AddonBlockEntity;
+import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
-import rearth.oritech.block.entity.PulverizerBlockEntity;
+import rearth.oritech.block.entity.machines.PulverizerBlockEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;

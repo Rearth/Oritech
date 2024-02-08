@@ -8,8 +8,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.InventoryProxyAddonBlockEntity;
+import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.util.ScreenProvider;
 

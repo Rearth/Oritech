@@ -1,4 +1,4 @@
-package rearth.oritech.block.entity;
+package rearth.oritech.block.entity.machines.addons;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

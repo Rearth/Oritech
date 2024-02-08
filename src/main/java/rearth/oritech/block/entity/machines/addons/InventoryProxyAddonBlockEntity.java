@@ -1,4 +1,4 @@
-package rearth.oritech.block.entity;
+package rearth.oritech.block.entity.machines.addons;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
@@ -15,15 +15,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
-import rearth.oritech.block.custom.MachineAddonBlock;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.InventoryProxyScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.EnergyProvider;
 import rearth.oritech.util.ImplementedInventory;
-import rearth.oritech.util.ScreenProvider;
-import team.reborn.energy.api.EnergyStorage;
-import team.reborn.energy.api.base.DelegatingEnergyStorage;
 
 import java.util.Objects;
 

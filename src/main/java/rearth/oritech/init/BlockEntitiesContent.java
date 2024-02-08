@@ -5,7 +5,12 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import rearth.oritech.block.entity.*;
+import rearth.oritech.block.entity.machines.AssemblerBlockEntity;
+import rearth.oritech.block.entity.machines.GrinderBlockEntity;
+import rearth.oritech.block.entity.machines.PulverizerBlockEntity;
+import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
+import rearth.oritech.block.entity.machines.addons.CapacitorAddonBlockEntity;
+import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.util.EnergyProvider;
 import team.reborn.energy.api.EnergyStorage;
 

@@ -19,8 +19,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.PulverizerBlockEntity;
-import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.block.entity.machines.PulverizerBlockEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;

@@ -1,8 +1,8 @@
-package rearth.oritech.block.custom;
+package rearth.oritech.block.custom.machines.addons;
 
 import net.minecraft.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.block.entity.CapacitorAddonBlockEntity;
+import rearth.oritech.block.entity.machines.addons.CapacitorAddonBlockEntity;
 
 public class CapacitorAddonBlock extends MachineAddonBlock {
     

@@ -6,7 +6,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.block.entity.InventoryProxyAddonBlockEntity;
+import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.InventoryInputMode;

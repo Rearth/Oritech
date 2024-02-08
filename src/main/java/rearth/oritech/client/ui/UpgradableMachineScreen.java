@@ -10,8 +10,8 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.block.custom.CapacitorAddonBlock;
-import rearth.oritech.block.custom.MachineAddonBlock;
+import rearth.oritech.block.custom.machines.addons.CapacitorAddonBlock;
+import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.components.BlockPreviewComponent;
 
 

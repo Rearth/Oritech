@@ -1,9 +1,9 @@
-package rearth.oritech.block.entity;
+package rearth.oritech.block.entity.machines.addons;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
-import rearth.oritech.block.custom.MachineAddonBlock;
+import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.EnergyProvider;
 import team.reborn.energy.api.EnergyStorage;

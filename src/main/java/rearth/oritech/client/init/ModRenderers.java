@@ -2,7 +2,6 @@ package rearth.oritech.client.init;
 
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.PulverizerBlockEntity;
 import rearth.oritech.client.renderers.MachineRenderer;
 import rearth.oritech.init.BlockEntitiesContent;
 

@@ -1,10 +1,10 @@
-package rearth.oritech.block.custom;
+package rearth.oritech.block.custom.machines;
 
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.base.block.MultiblockMachine;
-import rearth.oritech.block.entity.AssemblerBlockEntity;
+import rearth.oritech.block.entity.machines.AssemblerBlockEntity;
 
 public class AssemblerBlock extends MultiblockMachine implements BlockEntityProvider {
     

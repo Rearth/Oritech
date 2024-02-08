@@ -1,4 +1,4 @@
-package rearth.oritech.block.custom;
+package rearth.oritech.block.custom.machines.addons;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
@@ -10,8 +10,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.block.entity.CapacitorAddonBlockEntity;
-import rearth.oritech.block.entity.InventoryProxyAddonBlockEntity;
+import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 
 public class InventoryProxyAddonBlock extends MachineAddonBlock {
     

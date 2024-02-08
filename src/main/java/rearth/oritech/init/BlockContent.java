@@ -1,15 +1,16 @@
 package rearth.oritech.init;
 
 import io.wispforest.owo.registration.reflect.BlockRegistryContainer;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemConvertible;
 import rearth.oritech.block.custom.*;
-import rearth.oritech.init.compat.OritechREIPlugin;
-import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.block.custom.machines.AssemblerBlock;
+import rearth.oritech.block.custom.machines.GrinderBlock;
+import rearth.oritech.block.custom.machines.PulverizerBlock;
+import rearth.oritech.block.custom.machines.addons.CapacitorAddonBlock;
+import rearth.oritech.block.custom.machines.addons.InventoryProxyAddonBlock;
+import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
