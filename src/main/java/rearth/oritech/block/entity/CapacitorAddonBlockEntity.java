@@ -39,7 +39,6 @@ public class CapacitorAddonBlockEntity extends AddonBlockEntity implements Energ
         if (cachedController != null && !cachedController.isRemoved())
             return cachedController;
         
-        System.out.println("cache miss");
         cachedController = (UpgradableMachineBlockEntity) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
         return cachedController;
     }

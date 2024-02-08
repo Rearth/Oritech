@@ -29,7 +29,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         super(handler, inventory, title);
     }
     
-    private static Component getItemFrame(int x, int y) {
+    protected static Component getItemFrame(int x, int y) {
         return Components.texture(ITEM_SLOT, 0, 0, 18, 17, 18, 17).positioning(Positioning.absolute(x - 2, y - 2));
     }
     

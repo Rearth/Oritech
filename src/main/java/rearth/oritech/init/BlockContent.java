@@ -1,6 +1,8 @@
 package rearth.oritech.init;
 
 import io.wispforest.owo.registration.reflect.BlockRegistryContainer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -31,6 +33,7 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block MACHINE_SPEED_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 0.9f, 1.05f);
     public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 0.9f);
     public static final Block MACHINE_CAPACITOR_ADDON = new CapacitorAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 5000, 100);
+    public static final Block MACHINE_INVENTORY_PROXY_ADDON = new InventoryProxyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f);
     public static final Block MACHINE_EXTENDER = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), true, 1, 1);
 
     @Override
@@ -43,16 +46,12 @@ public class BlockContent implements BlockRegistryContainer {
         }
 
         ItemGroups.add(targetGroup, value);
-        
-        if (field.isAnnotationPresent(RegisterREIWorkstation.class)) {
-            OritechREIPlugin.workstationsToRegister.add(new OritechREIPlugin.OriREIWorkstation(field.getAnnotation(RegisterREIWorkstation.class).value(), value));
-        }
     }
     
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface RegisterREIWorkstation {
-        String value(); // the name of the recipe type identifier, skipping the "oritech_". We cant directly reference the field because annotations dont allow that
+        String value(); // the name of the recipe type identifier, skipping the "oritech_". We can't directly reference the field because annotations don't allow that
     }
 
 }

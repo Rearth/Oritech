@@ -14,18 +14,16 @@ import java.util.function.BiFunction;
 
 public class RecipeContent {
 
-    public static final OritechRecipeType PULVERIZER = register(new Identifier(Oritech.MOD_ID, "pulverizer"), BlockContent.PULVERIZER_BLOCK, PulverizerScreen::new);
-    public static final OritechRecipeType GRINDER = register(new Identifier(Oritech.MOD_ID, "grinder"), BlockContent.GRINDER_BLOCK, BasicMachineScreen::new);
-    public static final OritechRecipeType ASSEMBLER = register(new Identifier(Oritech.MOD_ID, "assembler"), BlockContent.ASSEMBLER_BLOCK, BasicMachineScreen::new);
+    public static final OritechRecipeType PULVERIZER = register(new Identifier(Oritech.MOD_ID, "pulverizer"));
+    public static final OritechRecipeType GRINDER = register(new Identifier(Oritech.MOD_ID, "grinder"));
+    public static final OritechRecipeType ASSEMBLER = register(new Identifier(Oritech.MOD_ID, "assembler"));
 
-    private static OritechRecipeType register(Identifier name, ItemConvertible icon, BiFunction<OritechRecipeType, ItemConvertible, BasicMachineScreen> screenType) {
+    private static OritechRecipeType register(Identifier name) {
 
         var type = new OritechRecipeType(name);
 
         Registry.register(Registries.RECIPE_TYPE, name, type);
         Registry.register(Registries.RECIPE_SERIALIZER, name, type);
-        
-        OritechREIPlugin.categoriesToRegister.add(new OritechREIPlugin.OriREICategory(type, icon, screenType));
 
         return type;
     }

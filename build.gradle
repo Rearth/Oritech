@@ -53,7 +53,7 @@ dependencies {
 		transitive = false
 	}
 
-	// REI Runtime for Fabric
+	// REI for Fabric
 	modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
 	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:${rei_version}"
 	modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin:${rei_version}"

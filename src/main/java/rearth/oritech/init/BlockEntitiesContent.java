@@ -29,6 +29,8 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedEnergy
     public static final BlockEntityType<CapacitorAddonBlockEntity> CAPACITOR_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(CapacitorAddonBlockEntity::new, BlockContent.MACHINE_CAPACITOR_ADDON).build();
     
+    public static final BlockEntityType<InventoryProxyAddonBlockEntity> INVENTORY_PROXY_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(InventoryProxyAddonBlockEntity::new, BlockContent.MACHINE_INVENTORY_PROXY_ADDON).build();
+    
     public static final BlockEntityType<AddonBlockEntity> ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(AddonBlockEntity::new,
       BlockContent.MACHINE_SPEED_ADDON,
       BlockContent.MACHINE_EFFICIENCY_ADDON,

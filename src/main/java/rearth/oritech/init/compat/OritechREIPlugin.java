@@ -21,44 +21,28 @@ import java.util.function.BiFunction;
 
 public class OritechREIPlugin implements REIClientPlugin {
     
-    public record OriREICategory(OritechRecipeType type, ItemConvertible icon, BiFunction<OritechRecipeType, ItemConvertible, BasicMachineScreen> screenType) {}
-    public static final HashSet<OriREICategory> categoriesToRegister = new HashSet<>();
-    
-    public record OriREIWorkstation(String identifier, ItemConvertible machine) {}
-    public static final HashSet<OriREIWorkstation> workstationsToRegister = new HashSet<>();
-    
     @Override
     public void registerCategories(CategoryRegistry registry) {
         
-        for(var entry : categoriesToRegister) {
-            registerOritechCategory(registry, entry.type, entry.icon, entry.screenType);
-        }
+        // recipe types
+        registerOritechCategory(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK, PulverizerScreen::new);
+        registerOritechCategory(registry, RecipeContent.GRINDER, BlockContent.GRINDER_BLOCK, BasicMachineScreen::new);
+        registerOritechCategory(registry, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK, BasicMachineScreen::new);
         
-        for (var entry : workstationsToRegister) {
-            registerOriWorkstation(registry, getTypeByIdentifier(entry.identifier), entry.machine);
-        }
-    }
-    
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
-    private OritechRecipeType getTypeByIdentifier(String path) {
-        var result = categoriesToRegister.stream().findFirst().get().type;
-        
-        for (var entry : categoriesToRegister) {
-            if (entry.type.getIdentifier().equals(new Identifier(Oritech.MOD_ID, path)))
-                return entry.type;
-        }
-        
-        Oritech.LOGGER.error("Unable to find recipe type: " + path);
-        
-        return result;
+        // workstations
+        registerOriWorkstation(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK);
+        registerOriWorkstation(registry, RecipeContent.GRINDER, BlockContent.GRINDER_BLOCK);
+        registerOriWorkstation(registry, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK);
     }
     
     // creates a screen instance that displays all recipes of that recipe type
     @Override
     public void registerDisplays(DisplayRegistry registry) {
-        for (var entry : categoriesToRegister) {
-            registerMachineRecipeType(registry, entry.type);
-        }
+        
+        // recipes again
+        registerMachineRecipeType(registry, RecipeContent.PULVERIZER);
+        registerMachineRecipeType(registry, RecipeContent.ASSEMBLER);
+        registerMachineRecipeType(registry, RecipeContent.GRINDER);
     }
     
     private void registerOritechCategory(CategoryRegistry registry, OritechRecipeType recipeType, ItemConvertible machineIcon, BiFunction<OritechRecipeType, ItemConvertible, BasicMachineScreen> screenType) {

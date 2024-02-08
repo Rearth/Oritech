@@ -6,6 +6,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.entity.InventoryProxyAddonBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.InventoryInputMode;
@@ -20,6 +21,7 @@ public class NetworkContent {
 
     // Client -> Server (e.g. from UI interactions
     public record InventoryInputModeSelectorPacket(BlockPos position) {}
+    public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {}
 
     public static void registerChannels() {
 
@@ -45,6 +47,17 @@ public class NetworkContent {
                 machine.cycleInputMode();
             }
 
+        });
+        
+        UI_CHANNEL.registerServerbound(InventoryProxySlotSelectorPacket.class, (message, access) -> {
+            
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            
+            if (entity instanceof InventoryProxyAddonBlockEntity machine) {
+                machine.setTargetSlot(message.slot);
+                System.out.println(message.slot);
+            }
+            
         });
 
     }
