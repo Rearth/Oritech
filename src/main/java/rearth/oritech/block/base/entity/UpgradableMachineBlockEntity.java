@@ -157,11 +157,17 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
                 var candidate = world.getBlockState(candidatePos);
                 var candidateEntity = world.getBlockEntity(candidatePos);
                 
-                if (!(candidate.getBlock() instanceof MachineAddonBlock addonBlock) || !(candidateEntity instanceof AddonBlockEntity addonEntity)) continue;
+                // if the candidate is not an addon
+                if (!(candidate.getBlock() instanceof MachineAddonBlock addonBlock) || !(candidateEntity instanceof AddonBlockEntity candidateAddonEntity)) {
+                    continue;
+                }
                 
-                if (candidate.get(MachineAddonBlock.ADDON_USED) && !addonEntity.getControllerPos().equals(pos)) continue;
+                // if the candidate is in use with another controller
+                if (candidate.get(MachineAddonBlock.ADDON_USED) && !candidateAddonEntity.getControllerPos().equals(pos)) {
+                    continue;
+                }
                 
-                var entry = new AddonBlock(addonBlock, candidate, candidatePos, addonEntity);
+                var entry = new AddonBlock(addonBlock, candidate, candidatePos, candidateAddonEntity);
                 result.add(entry);
                 
                 if (addonBlock.isExtender()) {

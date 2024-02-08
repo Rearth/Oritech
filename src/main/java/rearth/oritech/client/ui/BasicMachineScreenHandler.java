@@ -1,6 +1,8 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.client.screens.SlotGenerator;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -36,6 +38,9 @@ public class BasicMachineScreenHandler extends ScreenHandler {
 
     @NotNull
     protected final ScreenProvider screenData;
+    
+    protected BlockState machineBlock;
+    protected BlockEntity blockEntity;
 
     // on client, receiving data from writeScreenOpeningData
     public BasicMachineScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
@@ -58,6 +63,9 @@ public class BasicMachineScreenHandler extends ScreenHandler {
             energyStorage = null;
         }
         
+        this.machineBlock = blockEntity.getCachedState();
+        this.blockEntity = blockEntity;
+        
         screenData = (ScreenProvider) blockEntity;
         
         buildItemSlots();
@@ -75,6 +83,14 @@ public class BasicMachineScreenHandler extends ScreenHandler {
 
     private void addMachineSlot(int inventorySlot, int x, int y) {
         this.addSlot(new Slot(inventory, inventorySlot, x, y));
+    }
+    
+    public void hideSlots() {
+        this.slots.clear();
+    }
+    
+    public void showSlots() {
+        buildItemSlots();
     }
 
     @Override

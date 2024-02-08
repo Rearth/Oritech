@@ -3,12 +3,27 @@ package rearth.oritech.client.ui;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.OverlayContainer;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3i;
+import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.block.custom.CapacitorAddonBlock;
+import rearth.oritech.block.custom.MachineAddonBlock;
+import rearth.oritech.client.ui.components.BlockPreviewComponent;
 
 
 public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachineScreenHandler> {
+    
+    private static final Color SPEED_COLOR = Color.ofRgb(0x219ebc);
+    private static final Color EFFICIENCY_COLOR = Color.ofRgb(0x8ecae6);
+    private static final Color CAPACITY_COLOR = Color.ofRgb(0x023047);
+    private static final Color THROUGPUT_COLOR = Color.ofRgb(0xffb703);
+    
+    private static final float rotationSpeed = 0.2f;
+    
     public UpgradableMachineScreen(UpgradableMachineScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
     }
@@ -24,5 +39,104 @@ public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachin
         container.child(Components.label(Text.literal("⌛ " + speed + "%")).tooltip(Text.literal("Processing Speed")).margins(Insets.of(3)));
         container.child(Components.label(Text.literal("⚡ " + efficiency + "%")).tooltip(Text.literal("Energy Efficiency")).margins(Insets.of(3)));
         
+        addMachinePreview(container);
+    }
+    
+    public void addMachinePreview(FlowLayout sidePanel) {
+        
+        var floatingContent = Containers.verticalFlow(Sizing.content(), Sizing.content());
+        
+        var holoPreviewContainer = Containers.horizontalFlow(Sizing.fixed(176), Sizing.fixed(96));
+        holoPreviewContainer.surface(Surface.PANEL);
+        holoPreviewContainer.margins(Insets.of(2));
+        
+        var detailsScrollPane = Containers.verticalFlow(Sizing.content(2), Sizing.content(2));
+        detailsScrollPane.padding(Insets.of(2));
+        var detailsContainer = Containers.verticalScroll(Sizing.fixed(176), Sizing.fixed(110), detailsScrollPane);
+        detailsContainer.surface(Surface.PANEL);
+        detailsContainer.margins(Insets.of(2));
+        detailsContainer.padding(Insets.of(4));
+        
+        floatingContent.child(holoPreviewContainer);
+        floatingContent.child(detailsContainer);
+        
+        var floatingPanel = new OverlayContainer<>(floatingContent) {
+            @Override
+            public void remove() {
+                super.remove();
+                handler.showSlots();
+            }
+        };
+        
+        floatingPanel
+          .horizontalAlignment(HorizontalAlignment.CENTER)
+          .verticalAlignment(VerticalAlignment.CENTER);
+        
+        // create block preview renderers
+        var previewX = 176 / 2 - 10;
+        var previewY = 96 / 2 - 10;
+        
+        for (var addonBlockPos : handler.addonUiData.positions()) {
+            var addonBlock = handler.worldAccess.getBlockState(addonBlockPos);
+            var addonBlockEntity = handler.worldAccess.getBlockEntity(addonBlockPos);
+            
+            var relativePos = MultiblockMachineEntity.worldToRelativePos(handler.blockPos, addonBlockPos, handler.machineBlock.get(Properties.HORIZONTAL_FACING));
+            
+            holoPreviewContainer.child(
+              new BlockPreviewComponent(addonBlock, addonBlockEntity, relativePos, rotationSpeed)
+                .sizing(Sizing.fixed(20))
+                .positioning(Positioning.absolute(previewX, previewY))
+            );
+            
+            
+            var addonBlockType = (MachineAddonBlock) addonBlock.getBlock();
+            var pattern = "%+.0f";
+            var speed = (1 - addonBlockType.getSpeedMultiplier()) * 100;
+            var efficiency = (1 - addonBlockType.getSpeedMultiplier()) * 100;
+            
+            var blockSize = addonBlockType.isExtender() ? 15 : 23;
+            
+            var detailPane = Containers.horizontalFlow(Sizing.fill(100), Sizing.content(2))
+                               .child(Components.block(addonBlock).sizing(Sizing.fixed(blockSize)).margins(Insets.of(4)))
+                               .child(Components.label(addonBlock.getBlock().getName()).margins(Insets.of(5, 2, 4, 2)).verticalSizing(Sizing.fixed(15)));
+            
+            detailPane.surface(Surface.PANEL_INSET);
+            
+            var bottomPanel = Containers.horizontalFlow(Sizing.content(2), Sizing.content(2));
+            
+            if (speed != 0) {
+                bottomPanel.child(Components.label(Text.of("⌛ " + String.format(pattern, speed) + "%  ")).color(SPEED_COLOR).tooltip(Text.of("Processing Speed")));
+            }
+            if (efficiency != 0) {
+                bottomPanel.child(Components.label(Text.of("⚡ " + String.format(pattern, efficiency) + "%  ")).color(EFFICIENCY_COLOR).tooltip(Text.of("Energy Efficiency")));
+            }
+            
+            if (addonBlockType instanceof CapacitorAddonBlock capacitorAddonBlock) {
+                bottomPanel.child(Components.label(Text.of("\uD83D\uDD0B " + capacitorAddonBlock.getAddedCapacity() + "RF  ")).color(CAPACITY_COLOR).tooltip(Text.of("Added Capacity")));
+                bottomPanel.child(Components.label(Text.of("\uD83D\uDCC8 " + capacitorAddonBlock.getAddedInsert() + "RF/t  ")).color(THROUGPUT_COLOR).tooltip(Text.of("Added Throughput")));
+            }
+            
+            detailPane.child(bottomPanel.positioning(Positioning.absolute(34, 18)));
+            
+            detailsScrollPane.child(detailPane);
+            
+        }
+        
+        if (handler.addonUiData.positions().isEmpty()) {
+            detailsScrollPane.child(Components.label(Text.of("No addons connected")));
+        }
+        
+        holoPreviewContainer.child(
+          new BlockPreviewComponent(handler.machineBlock, handler.blockEntity, new Vec3i(0, 0, 0), rotationSpeed)
+            .sizing(Sizing.fixed(20))
+            .positioning(Positioning.absolute(previewX, previewY))
+        );
+        
+        var openAddonsButton = Components.button(Text.of("Details"), button -> {
+            root.child(floatingPanel);
+            handler.hideSlots();
+        });
+        
+        sidePanel.child(openAddonsButton);
     }
 }

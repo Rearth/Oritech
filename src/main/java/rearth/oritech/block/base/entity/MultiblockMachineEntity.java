@@ -105,11 +105,9 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
             }
             
             Objects.requireNonNull(world).setBlockState(pos, state.with(MultiblockMachine.ASSEMBLED, true));
-            System.out.println("multiblock valid");
             return true;
         } else {
             // invalid
-            System.out.println("multiblock invalid");
             return false;
         }
         
@@ -155,6 +153,14 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
             case WEST -> new BlockPos(relativePos.getX(), relativePos.getY(), relativePos.getZ());
             default -> relativePos;
         };
+    }
+    
+    // this seems to work as expected for some reason?
+    public static Vec3i worldToRelativePos(Vec3i ownWorldPos, Vec3i worldPos, Direction ownFacing) {
+        var relativePos = worldPos.subtract(ownWorldPos);
+        return relativePos;
+//        var facingInverted = ownFacing.getOpposite();
+//        return rotatePosition(relativePos, facingInverted);
     }
     
     @Override

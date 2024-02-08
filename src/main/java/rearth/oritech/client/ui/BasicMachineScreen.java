@@ -24,6 +24,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     private BoxComponent energy_indicator;
     private Component energy_tooltip;
     private ButtonComponent cycleInputButton;
+    public FlowLayout root;
     
     public BasicMachineScreen(S handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -40,6 +41,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     @Override
     protected void build(FlowLayout rootComponent) {
+        this.root = rootComponent;
+        
         rootComponent
           .surface(Surface.VANILLA_TRANSLUCENT)
           .horizontalAlignment(HorizontalAlignment.CENTER)
@@ -137,6 +140,12 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     private FlowLayout buildOverlay() {
         
         var overlay = Containers.horizontalFlow(Sizing.fixed(176), Sizing.fixed(166));
+        fillOverlay(overlay);
+        
+        return overlay;
+    }
+    
+    public void fillOverlay(FlowLayout overlay) {
         
         for (var slot : handler.screenData.getGuiSlots()) {
             overlay.child(getItemFrame(slot.x(), slot.y()));
@@ -149,8 +158,6 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         addProgressArrow(overlay);
         updateProgressBar();
-        
-        return overlay;
     }
     
     private void addProgressArrow(FlowLayout panel) {

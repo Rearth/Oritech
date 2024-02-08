@@ -3,6 +3,7 @@ package rearth.oritech.client.ui;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.world.World;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 
 import java.util.Objects;
@@ -13,6 +14,7 @@ import static rearth.oritech.block.base.entity.UpgradableMachineBlockEntity.Addo
 public class UpgradableMachineScreenHandler extends BasicMachineScreenHandler {
     
     protected final AddonUiData addonUiData;
+    protected final World worldAccess;
     
     // on client, receiving data from writeScreenOpeningData
     public UpgradableMachineScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
@@ -29,6 +31,8 @@ public class UpgradableMachineScreenHandler extends BasicMachineScreenHandler {
             upgradableEntity.setCombinedSpeed(addonUiData.speed());
             upgradableEntity.setCombinedEfficiency(addonUiData.efficiency());
         }
+        
+        this.worldAccess = playerInventory.player.getWorld();
     }
     
 }
