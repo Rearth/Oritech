@@ -1,43 +1,38 @@
 package rearth.oritech.block.custom;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.base.block.MachineBlock;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.block.entity.machines.MachineCoreEntity;
 
-public class MachineCoreBlock extends Block {
+import java.util.Objects;
+
+public class MachineCoreBlock extends Block implements BlockEntityProvider {
     
     public static final BooleanProperty USED = BooleanProperty.of("core_used");
-    public static final IntProperty CONTROLLER_X = IntProperty.of("linked_x", 0, 7);
-    public static final IntProperty CONTROLLER_Y = IntProperty.of("linked_y", 0, 7);
-    public static final IntProperty CONTROLLER_Z = IntProperty.of("linked_z", 0, 7);
     
     public MachineCoreBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(getDefaultState()
-                               .with(USED, false)
-                               .with(CONTROLLER_X, 1)
-                               .with(CONTROLLER_Y, 1)
-                               .with(CONTROLLER_Z, 1)
-        );
+        this.setDefaultState(getDefaultState().with(USED, false));
     }
     
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(USED, CONTROLLER_X, CONTROLLER_Y, CONTROLLER_Z);
+        builder.add(USED);
     }
     
     @Override
@@ -49,7 +44,7 @@ public class MachineCoreBlock extends Block {
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
 
         if (!world.isClient() && state.get(USED)) {
-            var controllerEntity = getControllerEntity(world, pos, state);
+            var controllerEntity = getControllerEntity(world, pos);
             
             if (controllerEntity instanceof MultiblockMachineEntity machineEntity) {
                 machineEntity.onCoreBroken(pos, state);
@@ -59,12 +54,20 @@ public class MachineCoreBlock extends Block {
         return super.onBreak(world, pos, state, player);
     }
     
-    @Nullable
-    private static BlockEntity getControllerEntity(World world, BlockPos pos, BlockState state) {
-        var offset = new Vec3i(state.get(CONTROLLER_X) - 4, state.get(CONTROLLER_Y) - 4, state.get(CONTROLLER_Z) - 4);
-        
-        var controllerPos = pos.add(offset);
-        return world.getBlockEntity(controllerPos);
+    @NotNull
+    private static BlockPos getControllerPos(World world, BlockPos pos) {
+        var coreEntity = (MachineCoreEntity) world.getBlockEntity(pos);
+        return Objects.requireNonNull(coreEntity).getControllerPos();
+    }
+    
+    @NotNull
+    private static BlockEntity getControllerEntity(World world, BlockPos pos) {
+        return Objects.requireNonNull(world.getBlockEntity(getControllerPos(world, pos)));
+    }
+    
+    @NotNull
+    private static BlockState getControllerBlock(World world, BlockPos pos) {
+        return world.getBlockState(getControllerPos(world, pos));
     }
     
     @Override
@@ -73,15 +76,21 @@ public class MachineCoreBlock extends Block {
         if (!state.get(USED)) return ActionResult.PASS;
         
         if (!world.isClient) {
-            var controllerEntity = getControllerEntity(world, pos, state);
-            
-            if (controllerEntity instanceof MultiblockMachineEntity machineEntity) {
-                var handler = (ExtendedScreenHandlerFactory) machineEntity;
-                player.openHandledScreen(handler);
+            var controllerPos = getControllerPos(world, pos);
+            var controllerBlock = world.getBlockState(controllerPos);
+            if (Objects.requireNonNull(controllerBlock).getBlock() instanceof MachineBlock) {
+                System.out.println(controllerBlock);
+                return controllerBlock.getBlock().onUse(controllerBlock, world, controllerPos, player, hand, hit);
             }
         }
         
         return ActionResult.SUCCESS;
         
+    }
+    
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new MachineCoreEntity(pos, state);
     }
 }

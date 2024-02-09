@@ -7,6 +7,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import rearth.oritech.block.entity.machines.AssemblerBlockEntity;
 import rearth.oritech.block.entity.machines.GrinderBlockEntity;
+import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.PulverizerBlockEntity;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.CapacitorAddonBlockEntity;
@@ -41,6 +42,8 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
       BlockContent.MACHINE_EFFICIENCY_ADDON,
       BlockContent.MACHINE_EXTENDER
     ).build();
+    
+    public static final BlockEntityType<MachineCoreEntity> MACHINE_CORE_ENTITY = FabricBlockEntityTypeBuilder.create(MachineCoreEntity::new, BlockContent.MACHINE_CORE).build();
 
     @Override
     public Registry<BlockEntityType<?>> getRegistry() {

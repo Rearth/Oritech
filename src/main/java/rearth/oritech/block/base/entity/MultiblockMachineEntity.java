@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.custom.MachineCoreBlock;
+import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
@@ -94,12 +95,9 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
         if (targetPositions.size() == coreBlocks.size()) {
             // valid
             for (var core : coreBlocks) {
-                var offset = pos.subtract(core.pos);
-                var newState = core.state
-                                 .with(MachineCoreBlock.USED, true)
-                                 .with(MachineCoreBlock.CONTROLLER_X, offset.getX() + 4)
-                                 .with(MachineCoreBlock.CONTROLLER_Y, offset.getY() + 4)
-                                 .with(MachineCoreBlock.CONTROLLER_Z, offset.getZ() + 4);
+                var newState = core.state.with(MachineCoreBlock.USED, true);
+                var coreEntity = (MachineCoreEntity) world.getBlockEntity(core.pos());
+                coreEntity.setControllerPos(pos);
                 world.setBlockState(core.pos, newState);
                 coreBlocksConnected.add(core.pos);
             }
