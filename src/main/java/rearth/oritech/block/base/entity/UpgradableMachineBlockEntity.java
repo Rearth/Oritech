@@ -100,12 +100,9 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
         for (var addon : foundAddons) {
             connectedAddons.add(addon.pos);
         }
-        
-        System.out.println(connectedAddons.size() + " addons connected");
     }
     
     public void resetAddons() {
-        System.out.println("resetting addons");
         
         for (var addon : connectedAddons) {
             var state = Objects.requireNonNull(world).getBlockState(addon);
@@ -129,7 +126,6 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
         //   if valid and extender: add all neighboring positions to search set
         assert world != null;
         
-        System.out.println("initializing addon slots");
         openSlots.clear();
         
         var baseSlots = getAddonSlots();    // available addon slots on machine itself (includes multiblocks)
