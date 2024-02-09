@@ -50,8 +50,9 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(1, 0,0),
-          new Vec3i(2, 0,0)
+          new Vec3i(0, 0,1),
+          new Vec3i(0, 1,0),
+          new Vec3i(0, 1,1)
         );
     }
     
@@ -59,13 +60,9 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
     public List<Vec3i> getAddonSlots() {
         
         return List.of(
-          new Vec3i(0, 0,1),
           new Vec3i(0, 0,-1),
-          new Vec3i(1, 0,1),
-          new Vec3i(1, 0,-1),
-          new Vec3i(2, 0,1),
-          new Vec3i(2, 0,-1),
-          new Vec3i(3, 0,0)
+          new Vec3i(1, 0,0),
+          new Vec3i(-1, 0,0)
         );
     }
 }

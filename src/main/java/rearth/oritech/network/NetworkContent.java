@@ -22,6 +22,7 @@ public class NetworkContent {
     // Client -> Server (e.g. from UI interactions
     public record InventoryInputModeSelectorPacket(BlockPos position) {}
     public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {}
+    public record MachineEventPacket(BlockPos position) {}
 
     public static void registerChannels() {
 
@@ -37,6 +38,16 @@ public class NetworkContent {
                 machine.handleNetworkEntry(message);
             }
 
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(MachineEventPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof MachineBlockEntity machine) {
+                machine.playSetupAnimation();
+            }
+            
         }));
 
         UI_CHANNEL.registerServerbound(InventoryInputModeSelectorPacket.class, (message, access) -> {

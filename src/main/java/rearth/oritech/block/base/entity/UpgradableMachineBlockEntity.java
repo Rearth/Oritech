@@ -27,6 +27,7 @@ import java.util.*;
 public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
     
     private final List<BlockPos> connectedAddons = new ArrayList<>();
+    private final List<BlockPos> openSlots = new ArrayList<>();
     
     private float combinedSpeed = 1;
     private float combinedEfficiency = 1;
@@ -129,6 +130,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
         assert world != null;
         
         System.out.println("initializing addon slots");
+        openSlots.clear();
         
         var baseSlots = getAddonSlots();    // available addon slots on machine itself (includes multiblocks)
         var searchedPositions = new HashSet<BlockPos>(baseSlots.size()); // all positions ever checked, to avoid adding duplicates
@@ -158,11 +160,13 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
                 
                 // if the candidate is not an addon
                 if (!(candidate.getBlock() instanceof MachineAddonBlock addonBlock) || !(candidateEntity instanceof AddonBlockEntity candidateAddonEntity)) {
+                    openSlots.add(candidatePos);
                     continue;
                 }
                 
                 // if the candidate is in use with another controller
                 if (candidate.get(MachineAddonBlock.ADDON_USED) && !candidateAddonEntity.getControllerPos().equals(pos)) {
+                    openSlots.add(candidatePos);
                     continue;
                 }
                 
@@ -240,7 +244,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
     }
     
     private AddonUiData getUiData() {
-        return new AddonUiData(connectedAddons, combinedEfficiency, combinedSpeed, pos);
+        return new AddonUiData(connectedAddons, openSlots, combinedEfficiency, combinedSpeed, pos);
     }
     
     private static Set<BlockPos> getNeighbors(BlockPos pos) {
@@ -274,10 +278,11 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
     
     private record AddonBlock(MachineAddonBlock addonBlock, BlockState state, BlockPos pos, AddonBlockEntity addonEntity) {}
     
-    public record AddonUiData(List<BlockPos> positions, float efficiency, float speed, BlockPos ownPosition) {}
+    public record AddonUiData(List<BlockPos> positions, List<BlockPos> openSlots, float efficiency, float speed, BlockPos ownPosition) {}
     
     public static Endec<AddonUiData> ADDON_UI_ENDEC = StructEndecBuilder.of(
       BuiltInEndecs.BLOCK_POS.listOf().fieldOf("addon_positions", AddonUiData::positions),
+      BuiltInEndecs.BLOCK_POS.listOf().fieldOf("open_slots", AddonUiData::openSlots),
       Endec.FLOAT.fieldOf("efficiency", AddonUiData::efficiency),
       Endec.FLOAT.fieldOf("speed", AddonUiData::speed),
       BuiltInEndecs.BLOCK_POS.fieldOf("efficiency", AddonUiData::ownPosition),

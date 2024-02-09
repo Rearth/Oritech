@@ -18,13 +18,14 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.BANANA_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.PULVERIZER_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.GRINDER_BLOCK);
+        blockStateModelGenerator.registerSimpleState(BlockContent.ASSEMBLER_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_EFFICIENCY_ADDON);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CAPACITOR_ADDON);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_INVENTORY_PROXY_ADDON);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_EXTENDER);
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.ASSEMBLER_BLOCK);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.ADDON_INDICATOR_BLOCK);
     }
 
     @Override

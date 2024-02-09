@@ -148,9 +148,9 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     public static Vec3i rotatePosition(Vec3i relativePos, Direction facing) {
         return switch (facing) {
             case NORTH -> new BlockPos(relativePos.getZ(), relativePos.getY(), relativePos.getX());
-            case EAST -> new BlockPos(-relativePos.getX(), relativePos.getY(), -relativePos.getZ());
+            case WEST -> new BlockPos(-relativePos.getX(), relativePos.getY(), -relativePos.getZ());
             case SOUTH -> new BlockPos(-relativePos.getZ(), relativePos.getY(), -relativePos.getX());
-            case WEST -> new BlockPos(relativePos.getX(), relativePos.getY(), relativePos.getZ());
+            case EAST -> new BlockPos(relativePos.getX(), relativePos.getY(), relativePos.getZ());
             default -> relativePos;
         };
     }

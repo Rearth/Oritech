@@ -5,6 +5,7 @@ import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.OverlayContainer;
 import io.wispforest.owo.ui.core.*;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -13,6 +14,7 @@ import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.custom.machines.addons.CapacitorAddonBlock;
 import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.components.BlockPreviewComponent;
+import rearth.oritech.init.BlockContent;
 
 
 public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachineScreenHandler> {
@@ -88,7 +90,7 @@ public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachin
                 .positioning(Positioning.absolute(previewX, previewY))
             );
             
-            
+            // detailed list element
             var addonBlockType = (MachineAddonBlock) addonBlock.getBlock();
             var pattern = "%+.0f";
             var speed = (1 - addonBlockType.getSpeedMultiplier()) * 100;
@@ -122,10 +124,23 @@ public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachin
             
         }
         
+        for (var openPos : handler.addonUiData.openSlots()) {
+            
+            var relativePos = MultiblockMachineEntity.worldToRelativePos(handler.blockPos, openPos, handler.machineBlock.get(Properties.HORIZONTAL_FACING));
+            var dummyBlock = BlockContent.ADDON_INDICATOR_BLOCK.getDefaultState();
+            
+            holoPreviewContainer.child(
+              new BlockPreviewComponent(dummyBlock, null, relativePos, rotationSpeed)
+                .sizing(Sizing.fixed(20))
+                .positioning(Positioning.absolute(previewX, previewY))
+            );
+        }
+        
         if (handler.addonUiData.positions().isEmpty()) {
             detailsScrollPane.child(Components.label(Text.of("No addons connected")));
         }
         
+        // machine itself
         holoPreviewContainer.child(
           new BlockPreviewComponent(handler.machineBlock, handler.blockEntity, new Vec3i(0, 0, 0), rotationSpeed)
             .sizing(Sizing.fixed(20))

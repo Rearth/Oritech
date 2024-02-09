@@ -4,13 +4,19 @@ import io.wispforest.owo.registration.reflect.BlockRegistryContainer;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import rearth.oritech.block.custom.*;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
+import rearth.oritech.block.custom.MachineCoreBlock;
 import rearth.oritech.block.custom.machines.AssemblerBlock;
 import rearth.oritech.block.custom.machines.GrinderBlock;
 import rearth.oritech.block.custom.machines.PulverizerBlock;
 import rearth.oritech.block.custom.machines.addons.CapacitorAddonBlock;
 import rearth.oritech.block.custom.machines.addons.InventoryProxyAddonBlock;
 import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
+import rearth.oritech.util.item.OritechGeoItem;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,15 +25,16 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
 public class BlockContent implements BlockRegistryContainer {
-
+    
     @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
     public static final Block BANANA_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     
-    @RegisterREIWorkstation("pulverizer")
+    @NoBlockItem
+    public static final Block ADDON_INDICATOR_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS));
+    
     public static final Block PULVERIZER_BLOCK = new PulverizerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
-    @RegisterREIWorkstation("grinder")
     public static final Block GRINDER_BLOCK = new GrinderBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
-    @RegisterREIWorkstation("assembler")
+    @UseGeoBlockItem(scale = 0.8f)
     public static final Block ASSEMBLER_BLOCK = new AssemblerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block MACHINE_CORE = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
@@ -36,23 +43,34 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block MACHINE_CAPACITOR_ADDON = new CapacitorAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 5000, 100);
     public static final Block MACHINE_INVENTORY_PROXY_ADDON = new InventoryProxyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f);
     public static final Block MACHINE_EXTENDER = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), true, 1, 1);
-
+    
     @Override
     public void postProcessField(String namespace, Block value, String identifier, Field field) {
-        BlockRegistryContainer.super.postProcessField(namespace, value, identifier, field);
-
+        
+        if (field.isAnnotationPresent(NoBlockItem.class)) return;
+        
+        if (field.isAnnotationPresent(UseGeoBlockItem.class)) {
+            Registry.register(Registries.ITEM, new Identifier(namespace, identifier), getGeoBlockItem(value, identifier, field.getAnnotation(UseGeoBlockItem.class).scale()));
+        } else {
+            Registry.register(Registries.ITEM, new Identifier(namespace, identifier), createBlockItem(value, identifier));
+        }
+        
         var targetGroup = ItemGroups.GROUPS.first;
         if (field.isAnnotationPresent(ItemGroups.ItemGroupTarget.class)) {
             targetGroup = field.getAnnotation(ItemGroups.ItemGroupTarget.class).value();
         }
-
+        
         ItemGroups.add(targetGroup, value);
+    }
+    
+    private BlockItem getGeoBlockItem(Block block, String identifier, float scale) {
+        return new OritechGeoItem(block, new Item.Settings(), 0.7f, identifier);
     }
     
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
-    public @interface RegisterREIWorkstation {
-        String value(); // the name of the recipe type identifier, skipping the "oritech_". We can't directly reference the field because annotations don't allow that
+    public @interface UseGeoBlockItem {
+        float scale(); // scale
     }
-
+    
 }

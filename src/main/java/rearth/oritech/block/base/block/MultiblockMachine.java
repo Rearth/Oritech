@@ -12,6 +12,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.network.NetworkContent;
 
 public abstract class MultiblockMachine extends UpgradableMachineBlock {
     
@@ -38,7 +39,15 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
                 return ActionResult.SUCCESS;
             }
             
+            var wasAssembled = state.get(ASSEMBLED);
+            
             var isAssembled = machineEntity.initMultiblock(state);
+            
+            // first time created
+            if (isAssembled && !wasAssembled) {
+                NetworkContent.MACHINE_CHANNEL.serverHandle(machineEntity).send(new NetworkContent.MachineEventPacket(pos));
+                return ActionResult.SUCCESS;
+            }
             
             if (!isAssembled) {
                 player.sendMessage(Text.literal("Machine is not assembled"));

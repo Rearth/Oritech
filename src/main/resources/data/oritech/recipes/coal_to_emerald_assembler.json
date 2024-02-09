@@ -9,10 +9,10 @@
   ],
   "results": [
     {
-      "id": "minecraft:emerald",
-      "Count": 3
+      "id": "minecraft:coal",
+      "Count": 2
     }
   ],
   "energyPerTick": 100,
-  "time": 15
+  "time": 40
 }
