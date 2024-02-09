@@ -50,9 +50,7 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(1, 0,0),
-          new Vec3i(0, 0,1),
-          new Vec3i(0, 0,-1)
+          new Vec3i(0, 0,1)
         );
     }
 }

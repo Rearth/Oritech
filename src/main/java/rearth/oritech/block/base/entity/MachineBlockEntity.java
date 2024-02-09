@@ -418,9 +418,6 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        
-        if (getType() != BlockEntitiesContent.ASSEMBLER_ENTITY) return;
-        
         controllers.add(animationController);
         
     }

@@ -1,0 +1,43 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"idle": {
+			"loop": true
+		},
+		"working": {
+			"loop": true,
+			"animation_length": 3,
+			"bones": {
+				"wheel_a": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.5": {
+							"vector": [180, 0, 0],
+							"easing": "easeInQuad"
+						},
+						"3.0": {
+							"vector": [360, 0, 0],
+							"easing": "easeOutQuad"
+						}
+					}
+				},
+				"wheel_b": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.5": {
+							"vector": [270, 0, 0]
+						},
+						"3.0": {
+							"vector": [720, 0, 0]
+						}
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

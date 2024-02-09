@@ -32,7 +32,9 @@ public class BlockContent implements BlockRegistryContainer {
     @NoBlockItem
     public static final Block ADDON_INDICATOR_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS));
     
+    @UseGeoBlockItem(scale = 1f)
     public static final Block PULVERIZER_BLOCK = new PulverizerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @UseGeoBlockItem(scale = 0.6f)
     public static final Block GRINDER_BLOCK = new GrinderBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.8f)
     public static final Block ASSEMBLER_BLOCK = new AssemblerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());

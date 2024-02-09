@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "oritech:block/assembler_block"
+    "all": "oritech:block/models/assembler_block"
   }
 }
