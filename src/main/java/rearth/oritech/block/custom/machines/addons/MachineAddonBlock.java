@@ -1,14 +1,16 @@
 package rearth.oritech.block.custom.machines.addons;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.enums.BlockFace;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +22,7 @@ import rearth.oritech.block.entity.machines.PulverizerBlockEntity;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
-public class MachineAddonBlock extends Block implements BlockEntityProvider {
+public class MachineAddonBlock extends WallMountedBlock implements BlockEntityProvider {
     
     public static final BooleanProperty ADDON_USED = BooleanProperty.of("addon_used");
     
@@ -33,6 +35,8 @@ public class MachineAddonBlock extends Block implements BlockEntityProvider {
         super(settings);
         this.setDefaultState(getDefaultState()
                                .with(ADDON_USED, false)
+                               .with(FACING, Direction.NORTH)
+                               .with(FACE, BlockFace.WALL)
         );
         
         this.extender = extender;
@@ -43,6 +47,13 @@ public class MachineAddonBlock extends Block implements BlockEntityProvider {
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(ADDON_USED);
+        builder.add(FACING);
+        builder.add(FACE);
+    }
+    
+    @Override
+    protected MapCodec<? extends WallMountedBlock> getCodec() {
+        return null;
     }
     
     @Override
@@ -95,4 +106,5 @@ public class MachineAddonBlock extends Block implements BlockEntityProvider {
     public float getEfficiencyMultiplier() {
         return efficiencyMultiplier;
     }
+    
 }

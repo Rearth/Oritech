@@ -28,7 +28,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.network.NetworkContent;
@@ -38,7 +37,6 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
-import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -50,19 +48,25 @@ import java.util.Optional;
 public abstract class MachineBlockEntity extends BlockEntity
   implements ExtendedScreenHandlerFactory, ImplementedInventory, GeoBlockEntity, EnergyProvider, ScreenProvider, BlockEntityTicker<MachineBlockEntity> {
     
+    // animations
     public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("deploy");
     public static final RawAnimation IDLE = RawAnimation.begin().thenPlayAndHold("idle");
     public static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
-    
-    protected final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(getInventorySize(), ItemStack.EMPTY);
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     private final AnimationController<MachineBlockEntity> animationController = getAnimationController();
+    private int idleTicks = 0;
+    
+    // crafting / processing
     protected int progress;
     protected OritechRecipe currentRecipe = OritechRecipe.DUMMY;
     protected InventoryInputMode inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
+    
+    // network state
     protected boolean networkDirty = true;
-    private int idleTicks = 0;
+    
+    //own storage
+    protected final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(getInventorySize(), ItemStack.EMPTY);
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(5000, 100, 0) {
         @Override
         protected void onFinalCommit() {
@@ -73,17 +77,6 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-    }
-    
-    private static boolean recipeInputsStack(List<Ingredient> inputs, ItemStack stack) {
-        for (var ingredient : inputs) {
-            if (ingredient.test(stack)) {
-                // found recipe containing item
-                return true;
-            }
-        }
-        
-        return false;
     }
     
     @Override
@@ -344,7 +337,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         var matchingStackRecipes = new HashSet<OritechRecipe>(availableRecipes.size() / 2);
         
         for (var recipe : availableRecipes) {
-            if (recipeInputsStack(recipe.value().getInputs(), stack))
+            if (recipeUsesStack(recipe.value().getInputs(), stack))
                 matchingStackRecipes.add(recipe.value());
         }
         
@@ -382,6 +375,17 @@ public abstract class MachineBlockEntity extends BlockEntity
         }
         
         return lowestIndex;
+    }
+    
+    private boolean recipeUsesStack(List<Ingredient> inputs, ItemStack stack) {
+        for (var ingredient : inputs) {
+            if (ingredient.test(stack)) {
+                // found recipe containing item
+                return true;
+            }
+        }
+        
+        return false;
     }
     
     private boolean invCouldAllowRecipe(OritechRecipe recipe, List<ItemStack> inv) {

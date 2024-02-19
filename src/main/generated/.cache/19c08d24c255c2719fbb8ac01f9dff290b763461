@@ -1,5 +1,4 @@
-// 1.20.4	2024-02-08T22:10:56.3871519	Oritech/Model Definitions
-92028c311250b3f466dfb0d3e32bbda1ffea6db4 assets\oritech\models\block\machine_capacitor_addon.json
+// 1.20.4	2024-02-18T12:13:34.3124678	Oritech/Model Definitions
 3d6f377b938592ac22aca17bd64561a6579ad217 assets\oritech\blockstates\grinder_block.json
 90e28b721796ff7ee21c8eefe4525f03a251d2fb assets\oritech\models\block\machine_extender.json
 16b697f4a40bfdcd8c39629776b97696e80681c7 assets\oritech\blockstates\machine_efficiency_addon.json
@@ -8,7 +7,6 @@ eafe84c787830ab2a866e0878e9ed718d58659f5 assets\oritech\blockstates\banana_block
 b5ee97616ae0d2da17dfaecf45aa42f2cf19f691 assets\oritech\blockstates\machine_extender.json
 c9c5614f832a38e30b60d0a15d75292159b16455 assets\oritech\models\item\machine_speed_addon.json
 25864df3cd7786f2bf4fe6fa9855b3cf366c28ca assets\oritech\models\item\banana.json
-339d54da2345c657c8ecff8e8dbda1734fd88d8d assets\oritech\models\block\assembler_block.json
 b8bc03092cb1eb686ede01daffc7421253af860c assets\oritech\models\item\machine_extender.json
 3bd3ce424e506dbbd4a45a0081e0f04b914abb27 assets\oritech\models\item\machine_core.json
 63f14855c688ce7ec236097ce232dd381cbc1538 assets\oritech\blockstates\addon_indicator_block.json
@@ -17,8 +15,8 @@ b8bc03092cb1eb686ede01daffc7421253af860c assets\oritech\models\item\machine_exte
 95eae9b13fb2835f15057d2fd4d9550192064ca4 assets\oritech\models\item\grinder_block.json
 11d0ac231a96bb2c0b9b97a490750062630d37cf assets\oritech\blockstates\machine_capacitor_addon.json
 8169e036f9cc1d31d7f5da9f25c436dcf05e9df4 assets\oritech\models\block\pulverizer_block.json
-4f9effc04022c2a77254aba75fcc61198bc6e73e assets\oritech\models\item\machine_capacitor_addon.json
 a5a8d2e834fc121777ed1a4c0df99e85a6f23613 assets\oritech\models\block\machine_core.json
+4f9effc04022c2a77254aba75fcc61198bc6e73e assets\oritech\models\item\machine_capacitor_addon.json
 6c9c0c9fbf5c26f5e8146a956b9e0567572acb45 assets\oritech\blockstates\machine_inventory_proxy_addon.json
 f29468ff950a191567ab35557334666099ccd7cc assets\oritech\blockstates\assembler_block.json
 964457f56e25b66dfef2160c8618bcaba2b640aa assets\oritech\blockstates\pulverizer_block.json

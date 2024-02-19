@@ -117,10 +117,11 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
     
     private List<AddonBlock> getAllAddons() {
         
+        // make this number depend on machine core quality
         var maxIterationCount = 6;
         
         // start with base slots (on machine itself)
-        // repeat N times (dependant on core quality?):
+        // repeat N times (dependent on core quality?):
         //   go through all slots
         //   check if slot is occupied by MachineAddonBlock, check if block is not used
         //   if valid and extender: add all neighboring positions to search set
