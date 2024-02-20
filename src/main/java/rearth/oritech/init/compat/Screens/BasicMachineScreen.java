@@ -53,13 +53,13 @@ public class BasicMachineScreen implements DisplayCategory<Display> {
         List<EntryIngredient> inputEntries = display.getInputEntries();
         for (int i = 0; i < inputEntries.size(); i++) {
             var entry = inputEntries.get(i);
-            root.child(adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0))).positioning(Positioning.absolute(50 + i * 13, 11)));
+            root.child(adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0))).positioning(Positioning.absolute(50 + i * 19, 11)));
         }
         
         List<EntryIngredient> outputEntries = display.getOutputEntries();
         for (int i = 0; i < outputEntries.size(); i++) {
             var entry = outputEntries.get(i);
-            root.child(adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0))).positioning(Positioning.absolute(50 + i * 13, 40)));
+            root.child(adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0))).positioning(Positioning.absolute(50 + i * 19, 40)));
         }
     }
     

@@ -22,6 +22,8 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
+    private float coreQuality = 1f;
+    
     public MultiblockMachineEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
@@ -39,6 +41,7 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
             posList.add(posTag);
         }
         nbt.put("connectedCores", posList);
+        nbt.putFloat("coreQuality", coreQuality);
     }
     
     @Override
@@ -55,6 +58,8 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
             var pos = new BlockPos(x, y, z);
             coreBlocksConnected.add(pos);
         }
+        
+        coreQuality = nbt.getFloat("coreQuality");
     }
     
     // positive x = forward
@@ -79,6 +84,8 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
         var targetPositions = getCorePositions();
         var coreBlocks = new ArrayList<MultiBlockElement>(targetPositions.size());
         
+        var sumCoreQuality = 0f;
+        
         for (var targetPosition : targetPositions) {
             var rotatedPos = rotatePosition(targetPosition, ownFacing);
             var checkPos = pos.add(rotatedPos);
@@ -87,6 +94,7 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
             var blockType = checkState.getBlock();
             if (blockType instanceof MachineCoreBlock coreBlock && !checkState.get(MachineCoreBlock.USED)) {
                 coreBlocks.add(new MultiBlockElement(checkState, coreBlock, checkPos));
+                sumCoreQuality += coreBlock.getCoreQuality();
             } else {
                 highlightBlock(checkPos);
             }
@@ -102,6 +110,8 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
                 coreBlocksConnected.add(core.pos);
             }
             
+            this.coreQuality = sumCoreQuality / coreBlocks.size();
+            
             Objects.requireNonNull(world).setBlockState(pos, state.with(MultiblockMachine.ASSEMBLED, true));
             return true;
         } else {
@@ -109,6 +119,11 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
             return false;
         }
         
+    }
+    
+    @Override
+    public float getCoreQuality() {
+        return this.coreQuality;
     }
     
     public void onCoreBroken(BlockPos corePos, BlockState coreState) {

@@ -15,14 +15,15 @@ public class UpgradableMachineScreenHandler extends BasicMachineScreenHandler {
     
     protected final AddonUiData addonUiData;
     protected final World worldAccess;
+    protected final float quality;
     
     // on client, receiving data from writeScreenOpeningData
     public UpgradableMachineScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())), buf.read(ADDON_UI_ENDEC));
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())), buf.read(ADDON_UI_ENDEC), buf.readFloat());
     }
     
     // on server, also called from client constructor
-    public UpgradableMachineScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity, AddonUiData addonUiData) {
+    public UpgradableMachineScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity, AddonUiData addonUiData, float coreQuality) {
         super(syncId, playerInventory, blockEntity);
         this.addonUiData = addonUiData;
         
@@ -33,6 +34,7 @@ public class UpgradableMachineScreenHandler extends BasicMachineScreenHandler {
         }
         
         this.worldAccess = playerInventory.player.getWorld();
+        this.quality = coreQuality;
     }
     
 }

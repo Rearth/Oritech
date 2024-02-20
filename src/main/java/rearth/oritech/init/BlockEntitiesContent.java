@@ -44,7 +44,10 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     ).build();
     
     @AssignSidedEnergy
-    public static final BlockEntityType<MachineCoreEntity> MACHINE_CORE_ENTITY = FabricBlockEntityTypeBuilder.create(MachineCoreEntity::new, BlockContent.MACHINE_CORE).build();
+    public static final BlockEntityType<MachineCoreEntity> MACHINE_CORE_ENTITY = FabricBlockEntityTypeBuilder.create(MachineCoreEntity::new,
+      BlockContent.MACHINE_CORE_BASIC,
+      BlockContent.MACHINE_CORE_GOOD
+    ).build();
 
     @Override
     public Registry<BlockEntityType<?>> getRegistry() {

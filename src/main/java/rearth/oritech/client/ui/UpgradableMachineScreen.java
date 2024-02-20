@@ -9,8 +9,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.block.custom.machines.addons.CapacitorAddonBlock;
 import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.components.BlockPreviewComponent;
@@ -25,6 +28,8 @@ public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachin
     private static final Color THROUGPUT_COLOR = Color.ofRgb(0xffb703);
     
     private static final float rotationSpeed = 0.2f;
+    
+    private static final Identifier MACHINE_CORE_CENTER = new Identifier(Oritech.MOD_ID, "textures/gui/modular/machine_core/center.png");
     
     public UpgradableMachineScreen(UpgradableMachineScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -42,6 +47,58 @@ public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachin
         container.child(Components.label(Text.literal("⚡ " + efficiency + "%")).tooltip(Text.literal("Energy Efficiency")).margins(Insets.of(3)));
         
         addMachinePreview(container);
+    }
+    
+    @Override
+    public void fillOverlay(FlowLayout overlay) {
+        super.fillOverlay(overlay);
+        
+        var offsetX = -6;
+        var offsetY = -23;
+        
+        var x = handler.screenData.getEnergyConfiguration().x() + offsetX;
+        var y = handler.screenData.getEnergyConfiguration().y() + offsetY;
+        
+        var size = 25;
+        
+        var level = handler.quality;
+        var upgradeCount = level - 1;
+        
+        // the 6th upgrade needs to be rendered behind
+        if (upgradeCount == 6) {
+            overlay.child(
+              Components.texture(getRingIdentifier(6), 64, 64, 64, 64, 64, 64)
+                .sizing(Sizing.fixed(size))
+                .positioning(Positioning.absolute(x, y))
+            );
+            
+            upgradeCount = 5;
+        }
+        
+        overlay.child(
+          Components.texture(MACHINE_CORE_CENTER, 64, 64, 64, 64, 64, 64)
+            .sizing(Sizing.fixed(size))
+            .positioning(Positioning.absolute(x, y))
+            .tooltip(getQualityTooltip())
+        );
+        
+        for (int i = 1; i <= upgradeCount; i++) {
+             overlay.child(
+              Components.texture(getRingIdentifier(i), 64, 64, 64, 64, 64, 64)
+                .sizing(Sizing.fixed(size))
+                .positioning(Positioning.absolute(x, y))
+            );
+        }
+    }
+    
+    private Text getQualityTooltip() {
+        var quality = handler.quality;
+        var effectiveQuality = (int) handler.quality;
+        return Text.of(String.format("Machine Quality: %d\n\nControls how many layers of machine\naddons can be added to this block.\n\nUse better cores to increase this\n\nCurrent quality progress: %.2f", effectiveQuality, quality));
+    }
+    
+    private Identifier getRingIdentifier(int level) {
+        return new Identifier(Oritech.MOD_ID, "textures/gui/modular/machine_core/ring_" + level + ".png");
     }
     
     public void addMachinePreview(FlowLayout sidePanel) {
@@ -94,7 +151,7 @@ public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachin
             var addonBlockType = (MachineAddonBlock) addonBlock.getBlock();
             var pattern = "%+.0f";
             var speed = (1 - addonBlockType.getSpeedMultiplier()) * 100;
-            var efficiency = (1 - addonBlockType.getSpeedMultiplier()) * 100;
+            var efficiency = (1 - addonBlockType.getEfficiencyMultiplier()) * 100;
             
             var blockSize = addonBlockType.isExtender() ? 15 : 23;
             

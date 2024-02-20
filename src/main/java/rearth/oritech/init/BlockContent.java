@@ -32,17 +32,18 @@ public class BlockContent implements BlockRegistryContainer {
     @NoBlockItem
     public static final Block ADDON_INDICATOR_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS));
     
-    @UseGeoBlockItem(scale = 1f)
+    @UseGeoBlockItem(scale = 0.7f)
     public static final Block PULVERIZER_BLOCK = new PulverizerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
-    @UseGeoBlockItem(scale = 0.6f)
+    @UseGeoBlockItem(scale = 0.7f)
     public static final Block GRINDER_BLOCK = new GrinderBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
-    @UseGeoBlockItem(scale = 0.8f)
+    @UseGeoBlockItem(scale = 0.7f)
     public static final Block ASSEMBLER_BLOCK = new AssemblerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
-    public static final Block MACHINE_CORE = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
-    public static final Block MACHINE_SPEED_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 0.9f, 1.05f);
+    public static final Block MACHINE_CORE_BASIC = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 1);
+    public static final Block MACHINE_CORE_GOOD = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 6);
+    public static final Block MACHINE_SPEED_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 0.9f, 1.025f);
     public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 0.9f);
-    public static final Block MACHINE_CAPACITOR_ADDON = new CapacitorAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 5000, 100);
+    public static final Block MACHINE_CAPACITOR_ADDON = new CapacitorAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 10000, 500);
     public static final Block MACHINE_INVENTORY_PROXY_ADDON = new InventoryProxyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f);
     public static final Block MACHINE_EXTENDER = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), true, 1, 1);
     
@@ -66,7 +67,7 @@ public class BlockContent implements BlockRegistryContainer {
     }
     
     private BlockItem getGeoBlockItem(Block block, String identifier, float scale) {
-        return new OritechGeoItem(block, new Item.Settings(), 0.7f, identifier);
+        return new OritechGeoItem(block, new Item.Settings(), scale, identifier);
     }
     
     @Retention(RetentionPolicy.RUNTIME)

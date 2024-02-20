@@ -28,9 +28,16 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
     
     public static final BooleanProperty USED = BooleanProperty.of("core_used");
     
-    public MachineCoreBlock(Settings settings) {
+    private final float coreQuality;
+    
+    public MachineCoreBlock(Settings settings, float coreQuality) {
         super(settings);
         this.setDefaultState(getDefaultState().with(USED, false));
+        this.coreQuality = coreQuality;
+    }
+    
+    public float getCoreQuality() {
+        return coreQuality;
     }
     
     @Override

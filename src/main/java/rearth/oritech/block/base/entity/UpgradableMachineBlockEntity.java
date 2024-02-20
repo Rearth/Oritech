@@ -118,7 +118,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
     private List<AddonBlock> getAllAddons() {
         
         // make this number depend on machine core quality
-        var maxIterationCount = 6;
+        var maxIterationCount = (int) getCoreQuality();
         
         // start with base slots (on machine itself)
         // repeat N times (dependent on core quality?):
@@ -232,12 +232,13 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
         super.writeScreenOpeningData(player, buf);
         buf.write(ADDON_UI_ENDEC, getUiData());
+        buf.writeFloat(getCoreQuality());
     }
     
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData());
+        return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
     }
     
     private AddonUiData getUiData() {
@@ -269,6 +270,11 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
     
     public void setCombinedEfficiency(float combinedEfficiency) {
         this.combinedEfficiency = combinedEfficiency;
+    }
+    
+    // 1 = basic, higher=better, always rounded down
+    public float getCoreQuality() {
+        return 1f;
     }
     
     public abstract List<Vec3i> getAddonSlots();
