@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.custom.machines.addons.CapacitorAddonBlock;
+import rearth.oritech.block.custom.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
@@ -199,7 +199,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
             speed *= addon.addonBlock.getSpeedMultiplier();
             efficiency *= addon.addonBlock.getEfficiencyMultiplier();
             
-            if (addon.addonBlock instanceof CapacitorAddonBlock capacitorBlock) {
+            if (addon.addonBlock instanceof EnergyAddonBlock capacitorBlock) {
                 energyAmount += capacitorBlock.getAddedCapacity();
                 energyInsert += capacitorBlock.getAddedInsert();
             }

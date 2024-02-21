@@ -11,13 +11,13 @@ import team.reborn.energy.api.base.DelegatingEnergyStorage;
 
 import java.util.Objects;
 
-public class CapacitorAddonBlockEntity extends AddonBlockEntity implements EnergyProvider {
+public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements EnergyProvider {
     private final DelegatingEnergyStorage delegatedStorage = new DelegatingEnergyStorage(this::getMainStorage, this::isConnected);
     
     private UpgradableMachineBlockEntity cachedController;
     
-    public CapacitorAddonBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.CAPACITOR_ADDON_ENTITY, pos, state);
+    public EnergyAcceptorAddonBlockEntity(BlockPos pos, BlockState state) {
+        super(BlockEntitiesContent.ENERGY_ACCEPTOR_ADDON_ENTITY, pos, state);
     }
     
     private boolean isConnected() {

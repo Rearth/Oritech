@@ -5,7 +5,6 @@ import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.OverlayContainer;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -13,8 +12,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
-import rearth.oritech.block.custom.machines.addons.CapacitorAddonBlock;
+import rearth.oritech.block.custom.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.components.BlockPreviewComponent;
 import rearth.oritech.init.BlockContent;
@@ -123,9 +121,11 @@ public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachin
             @Override
             public void remove() {
                 super.remove();
-                handler.showSlots();
+                //handler.showSlots();
             }
         };
+        
+        floatingPanel.zIndex(2000);    // so it renders in front of itemslots
         
         floatingPanel
           .horizontalAlignment(HorizontalAlignment.CENTER)
@@ -170,7 +170,7 @@ public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachin
                 bottomPanel.child(Components.label(Text.of("⚡ " + String.format(pattern, efficiency) + "%  ")).color(EFFICIENCY_COLOR).tooltip(Text.of("Energy Efficiency")));
             }
             
-            if (addonBlockType instanceof CapacitorAddonBlock capacitorAddonBlock) {
+            if (addonBlockType instanceof EnergyAddonBlock capacitorAddonBlock) {
                 bottomPanel.child(Components.label(Text.of("\uD83D\uDD0B " + capacitorAddonBlock.getAddedCapacity() + "RF  ")).color(CAPACITY_COLOR).tooltip(Text.of("Added Capacity")));
                 bottomPanel.child(Components.label(Text.of("\uD83D\uDCC8 " + capacitorAddonBlock.getAddedInsert() + "RF/t  ")).color(THROUGPUT_COLOR).tooltip(Text.of("Added Throughput")));
             }
@@ -206,7 +206,7 @@ public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachin
         
         var openAddonsButton = Components.button(Text.of("Details"), button -> {
             root.child(floatingPanel);
-            handler.hideSlots();
+            // handler.hideSlots();
         });
         
         sidePanel.child(openAddonsButton);

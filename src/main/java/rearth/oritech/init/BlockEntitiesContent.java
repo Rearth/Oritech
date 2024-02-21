@@ -10,7 +10,7 @@ import rearth.oritech.block.entity.machines.GrinderBlockEntity;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.PulverizerBlockEntity;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
-import rearth.oritech.block.entity.machines.addons.CapacitorAddonBlockEntity;
+import rearth.oritech.block.entity.machines.addons.EnergyAcceptorAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.util.EnergyProvider;
 import team.reborn.energy.api.EnergyStorage;
@@ -33,14 +33,15 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     public static final BlockEntityType<AssemblerBlockEntity> ASSEMBLER_ENTITY = FabricBlockEntityTypeBuilder.create(AssemblerBlockEntity::new, BlockContent.ASSEMBLER_BLOCK).build();
     
     @AssignSidedEnergy
-    public static final BlockEntityType<CapacitorAddonBlockEntity> CAPACITOR_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(CapacitorAddonBlockEntity::new, BlockContent.MACHINE_CAPACITOR_ADDON).build();
+    public static final BlockEntityType<EnergyAcceptorAddonBlockEntity> ENERGY_ACCEPTOR_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(EnergyAcceptorAddonBlockEntity::new, BlockContent.MACHINE_ACCEPTOR_ADDON).build();
     
     public static final BlockEntityType<InventoryProxyAddonBlockEntity> INVENTORY_PROXY_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(InventoryProxyAddonBlockEntity::new, BlockContent.MACHINE_INVENTORY_PROXY_ADDON).build();
     
     public static final BlockEntityType<AddonBlockEntity> ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(AddonBlockEntity::new,
       BlockContent.MACHINE_SPEED_ADDON,
       BlockContent.MACHINE_EFFICIENCY_ADDON,
-      BlockContent.MACHINE_EXTENDER
+      BlockContent.MACHINE_EXTENDER,
+      BlockContent.MACHINE_CAPACITOR_ADDON
     ).build();
     
     @AssignSidedEnergy

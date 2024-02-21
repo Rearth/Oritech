@@ -12,8 +12,9 @@
   "block.oritech.assembler_block": "Assembler",
   "block.oritech.machine_core": "Machine core",
   "block.oritech.machine_speed_addon": "Speed Addon",
-  "block.oritech.machine_efficiency_addon": "Efficiency Addon",
+  "block.oritech.machine_efficiency_addon": "Energy Efficiency Addon",
   "block.oritech.machine_capacitor_addon": "Capacitor Addon",
+  "block.oritech.machine_acceptor_addon": "Energy Acceptor Addon",
   "block.oritech.machine_inventory_proxy_addon": "Inventory Proxy Addon",
   "block.oritech.machine_extender": "Machine Extender"
 }
