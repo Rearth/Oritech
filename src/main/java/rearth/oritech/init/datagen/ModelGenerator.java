@@ -27,7 +27,7 @@ public class ModelGenerator extends FabricModelProvider {
         
         // blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_EFFICIENCY_ADDON);
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_INVENTORY_PROXY_ADDON);
+        // blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_INVENTORY_PROXY_ADDON);
         
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_EXTENDER);
         

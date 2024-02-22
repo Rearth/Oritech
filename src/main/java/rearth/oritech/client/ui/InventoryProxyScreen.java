@@ -53,7 +53,7 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
             });
             buttons.add(button);
             overlay.child(getItemFrame(slot.x(), slot.y()));
-            overlay.child(button.sizing(Sizing.fixed(8)).positioning(Positioning.absolute(slot.x() + 3, slot.y() + 3)));
+            overlay.child(button.sizing(Sizing.fixed(10)).positioning(Positioning.absolute(slot.x() + 2, slot.y() + 2)));
         }
         
         for (int i = 0; i < buttons.size(); i++) {

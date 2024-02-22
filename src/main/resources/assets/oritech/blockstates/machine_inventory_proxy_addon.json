@@ -1,0 +1,58 @@
+{
+  "variants": {
+    "face=wall,facing=north": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "x": 90,
+      "y": 0
+    },
+    "face=wall,facing=south": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "x": 90,
+      "y": 180
+    },
+    "face=wall,facing=west": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "x": 90,
+      "y": 270
+    },
+    "face=wall,facing=east": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "x": 90,
+      "y": 90
+    },
+    "face=floor,facing=north": {
+      "model": "oritech:block/machine_inventory_proxy_addon"
+    },
+    "face=floor,facing=south": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "y": 180
+    },
+    "face=floor,facing=west": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "y": 270
+    },
+    "face=floor,facing=east": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "y": 90
+    },
+    "face=ceiling,facing=north": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "x": 0
+    },
+    "face=ceiling,facing=west": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "x": 180,
+      "y": 270
+    }
+  }
+}
