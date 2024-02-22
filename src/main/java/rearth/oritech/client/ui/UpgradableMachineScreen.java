@@ -51,8 +51,8 @@ public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachin
     public void fillOverlay(FlowLayout overlay) {
         super.fillOverlay(overlay);
         
-        var offsetX = -6;
-        var offsetY = -23;
+        var offsetX = -5;
+        var offsetY = -25;
         
         var x = handler.screenData.getEnergyConfiguration().x() + offsetX;
         var y = handler.screenData.getEnergyConfiguration().y() + offsetY;

@@ -27,7 +27,7 @@ public interface ScreenProvider {
     ScreenHandlerType<?> getScreenHandlerType();
 
     default EnergyConfiguration getEnergyConfiguration() {
-        return new EnergyConfiguration(10, 25, 13, 50);
+        return new EnergyConfiguration(7, 24, 15, 54);
     }
 
     default ArrowConfiguration getIndicatorConfiguration() {

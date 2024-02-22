@@ -13,6 +13,6 @@
       "Count": 2
     }
   ],
-  "energyPerTick": 100,
+  "energyPerTick": 25,
   "time": 40
 }

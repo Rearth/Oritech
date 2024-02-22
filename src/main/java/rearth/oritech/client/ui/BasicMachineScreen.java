@@ -1,7 +1,6 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
-import io.wispforest.owo.ui.component.BoxComponent;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.component.TextureComponent;
@@ -20,11 +19,12 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     private static final Identifier BACKGROUND = new Identifier(Oritech.MOD_ID, "textures/gui/modular/gui_base.png");
     private static final Identifier ITEM_SLOT = new Identifier(Oritech.MOD_ID, "textures/gui/modular/itemslot.png");
+    private static final Identifier GUI_COMPONENTS = new Identifier(Oritech.MOD_ID, "textures/gui/modular/machine_gui_components.png");
+    public FlowLayout root;
     private TextureComponent progress_indicator;
-    private BoxComponent energy_indicator;
+    private TextureComponent energy_indicator;
     private Component energy_tooltip;
     private ButtonComponent cycleInputButton;
-    public FlowLayout root;
     
     public BasicMachineScreen(S handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -84,14 +84,14 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     private void updateEnergyBar() {
         
-        var config = handler.screenData.getEnergyConfiguration();
         var capacity = handler.energyStorage.getCapacity();
         var amount = handler.energyStorage.getAmount();
         
         var fillAmount = (float) amount / capacity;
         var tooltipText = getEnergyTooltip(amount, capacity);
+        
         energy_tooltip.tooltip(tooltipText);
-        energy_indicator.verticalSizing(Sizing.fixed((int) ((config.height() - 2) * fillAmount)));
+        energy_indicator.visibleArea(PositionedRectangle.of(0, 96 - ((int) (96 * (fillAmount))), 24, (int) (96 * fillAmount)));
     }
     
     public Text getEnergyTooltip(long amount, long max) {
@@ -175,17 +175,31 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     private void addEnergyBar(FlowLayout panel) {
         
         var config = handler.screenData.getEnergyConfiguration();
+        var insetSize = 1;
         
-        var fillAmount = 0.1; // those will be overridden on tick
+        var frame = Containers.horizontalFlow(Sizing.fixed(config.width() + insetSize * 2), Sizing.fixed(config.height() + insetSize * 2));
+        frame.surface(Surface.PANEL_INSET);
+        frame.padding(Insets.of(insetSize));
+        frame.positioning(Positioning.absolute(config.x() - insetSize, config.y() - insetSize));
+        panel.child(frame);
+        
+        var fillAmount = 1f; // those will be overridden on tick
         var tooltipText = Text.literal("10/50 RF");
         
-        var energy_empty = Components.box(Sizing.fixed(config.width()), Sizing.fixed(config.height())).color(Color.BLACK).fill(true);
-        energy_indicator = Components.box(Sizing.fixed(config.width() - 2), Sizing.fixed((int) ((config.height() - 2) * fillAmount))).color(Color.RED).fill(true);
-        energy_tooltip = Components.box(Sizing.fixed(config.width()), Sizing.fixed(config.height())).tooltip(tooltipText);
+        energy_tooltip = Components.texture(GUI_COMPONENTS, 24, 0, 24, 96, 48, 96);
+        energy_tooltip.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
+        energy_tooltip.positioning(Positioning.absolute(config.x(), config.y()));
+        energy_tooltip.tooltip(tooltipText);
+        
+        var offset = (1 - fillAmount) * config.height();
+        
+        energy_indicator = Components.texture(GUI_COMPONENTS, 0, 0, 24, (int) (96 * fillAmount), 48, 96);
+        energy_indicator.sizing(Sizing.fixed(config.width()), Sizing.fixed((int) (config.height() * fillAmount)));
+        energy_indicator.positioning(Positioning.absolute(config.x(), (int) (config.y() + offset)));
         
         panel
-          .child(energy_empty.positioning(Positioning.absolute(config.x(), config.y())))
-          .child(energy_indicator.positioning(Positioning.absolute(config.x() + 1, config.y() + 1)))
-          .child(energy_tooltip.positioning(Positioning.absolute(config.x(), config.y())));
+          .child(energy_tooltip)
+          .child(energy_indicator)
+        ;
     }
 }
