@@ -12,6 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.network.NetworkContent;
 
 public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends BaseOwoHandledScreen<FlowLayout, S> {
@@ -97,7 +98,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     public Text getEnergyTooltip(long amount, long max) {
         var percentage = (float) amount / max;
         var energyFill = String.format("%.1f", percentage * 100);
-        return Text.literal(amount + " / " + max + " RF\n" + energyFill + "% Charged");
+        var energyUsage = ((MachineBlockEntity) handler.blockEntity).getEffectiveEnergyPerTick();
+        return Text.literal(amount + " / " + max + " RF\n" + energyFill + "% Charged\n\nMaximum Usage: " + energyUsage + " RF/t");
     }
     
     public void updateSettingsButtons() {

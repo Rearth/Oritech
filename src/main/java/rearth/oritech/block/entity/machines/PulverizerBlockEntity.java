@@ -16,7 +16,7 @@ import java.util.List;
 public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     
     public PulverizerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.PULVERIZER_ENTITY, pos, state);
+        super(BlockEntitiesContent.PULVERIZER_ENTITY, pos, state, 20);
     }
     
     @Override

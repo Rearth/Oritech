@@ -17,7 +17,7 @@ import java.util.List;
 public class GrinderBlockEntity extends MultiblockMachineEntity {
     
     public GrinderBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.GRINDER_ENTITY, pos, state);
+        super(BlockEntitiesContent.GRINDER_ENTITY, pos, state, 50);
     }
     
     @Override

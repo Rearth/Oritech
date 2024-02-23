@@ -52,10 +52,9 @@ public class PulverizerScreen extends BasicMachineScreen {
         );
         
         // data
-        var energyUsage = display.getEntry().value().getEnergyPerTick();
         var duration = String.format("%.0f", display.getEntry().value().getTime() / 20f);
         root.child(
-          Components.label(Text.of(duration + "s, " + energyUsage + " RF/t")).lineHeight(7)
+          Components.label(Text.of(duration + "s, ")).lineHeight(7)
             .positioning(Positioning.absolute(72, HEIGHT_BASE + 28))
         );
     

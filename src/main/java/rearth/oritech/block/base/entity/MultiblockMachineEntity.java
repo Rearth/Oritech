@@ -24,8 +24,26 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     
     private float coreQuality = 1f;
     
-    public MultiblockMachineEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state);
+    public MultiblockMachineEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
+        super(type, pos, state, energyPerTick);
+    }
+    
+    public static Vec3i rotatePosition(Vec3i relativePos, Direction facing) {
+        return switch (facing) {
+            case NORTH -> new BlockPos(relativePos.getZ(), relativePos.getY(), relativePos.getX());
+            case WEST -> new BlockPos(-relativePos.getX(), relativePos.getY(), -relativePos.getZ());
+            case SOUTH -> new BlockPos(-relativePos.getZ(), relativePos.getY(), -relativePos.getX());
+            case EAST -> new BlockPos(relativePos.getX(), relativePos.getY(), relativePos.getZ());
+            default -> relativePos;
+        };
+    }
+    
+    // this seems to work as expected for some reason?
+    public static Vec3i worldToRelativePos(Vec3i ownWorldPos, Vec3i worldPos, Direction ownFacing) {
+        var relativePos = worldPos.subtract(ownWorldPos);
+        return relativePos;
+//        var facingInverted = ownFacing.getOpposite();
+//        return rotatePosition(relativePos, facingInverted);
     }
     
     @Override
@@ -156,24 +174,6 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     
     private void highlightBlock(BlockPos block) {
         ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3d.of(block), null);
-    }
-    
-    public static Vec3i rotatePosition(Vec3i relativePos, Direction facing) {
-        return switch (facing) {
-            case NORTH -> new BlockPos(relativePos.getZ(), relativePos.getY(), relativePos.getX());
-            case WEST -> new BlockPos(-relativePos.getX(), relativePos.getY(), -relativePos.getZ());
-            case SOUTH -> new BlockPos(-relativePos.getZ(), relativePos.getY(), -relativePos.getX());
-            case EAST -> new BlockPos(relativePos.getX(), relativePos.getY(), relativePos.getZ());
-            default -> relativePos;
-        };
-    }
-    
-    // this seems to work as expected for some reason?
-    public static Vec3i worldToRelativePos(Vec3i ownWorldPos, Vec3i worldPos, Direction ownFacing) {
-        var relativePos = worldPos.subtract(ownWorldPos);
-        return relativePos;
-//        var facingInverted = ownFacing.getOpposite();
-//        return rotatePosition(relativePos, facingInverted);
     }
     
     @Override

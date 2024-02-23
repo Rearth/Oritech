@@ -59,6 +59,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     // crafting / processing
     protected int progress;
+    protected int energyPerTick;
     protected OritechRecipe currentRecipe = OritechRecipe.DUMMY;
     protected InventoryInputMode inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
     
@@ -75,8 +76,9 @@ public abstract class MachineBlockEntity extends BlockEntity
         }
     };
     
-    public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state);
+        this.energyPerTick = energyPerTick;
     }
     
     @Override
@@ -119,16 +121,16 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     private boolean hasEnoughEnergy(OritechRecipe recipe) {
-        return energyStorage.amount > calculateEnergyUsage(recipe);
+        return energyStorage.amount > calculateEnergyUsage();
     }
     
     @SuppressWarnings("lossy-conversions")
     private void useEnergy(OritechRecipe recipe) {
-        energyStorage.amount -= calculateEnergyUsage(recipe);
+        energyStorage.amount -= calculateEnergyUsage();
     }
     
-    private float calculateEnergyUsage(OritechRecipe recipe) {
-        return recipe.getEnergyPerTick() * getEfficiencyMultiplier() * (1 / getSpeedMultiplier());
+    private float calculateEnergyUsage() {
+        return energyPerTick * getEfficiencyMultiplier() * (1 / getSpeedMultiplier());
     }
     
     private void updateNetwork() {
@@ -323,7 +325,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         
         // find matching recipe
         // check if currently already using a recipe, if so use this one. This means that all slots are used, and we can just top the slots up
-        if (currentRecipe.getEnergyPerTick() != -1) {
+        if (currentRecipe.getTime() != -1) {
             return findLowestMatchingSlot(stack, inv, false);
         }
         
@@ -566,4 +568,11 @@ public abstract class MachineBlockEntity extends BlockEntity
         energyStorage.amount = amount;
     }
     
+    public int getBaseEnergyPerTick() {
+        return energyPerTick;
+    }
+    
+    public float getEffectiveEnergyPerTick() {
+        return calculateEnergyUsage();
+    }
 }

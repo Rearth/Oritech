@@ -13,7 +13,6 @@ import net.minecraft.util.Identifier;
 public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> implements RecipeType<OritechRecipe> {
     
     public static final Endec<OritechRecipe> ORI_RECIPE_ENDEC = StructEndecBuilder.of(
-      Endec.INT.fieldOf("energyPerTick", OritechRecipe::getEnergyPerTick),
       Endec.INT.fieldOf("time", OritechRecipe::getTime),
       Endec.ofCodec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
       BuiltInEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),

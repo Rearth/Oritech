@@ -16,7 +16,7 @@ import java.util.List;
 public class AssemblerBlockEntity extends MultiblockMachineEntity {
     
     public AssemblerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ASSEMBLER_ENTITY, pos, state);
+        super(BlockEntitiesContent.ASSEMBLER_ENTITY, pos, state, 30);
     }
     
     @Override

@@ -18,16 +18,14 @@ public class OritechRecipe implements Recipe<Inventory> {
     private final OritechRecipeType type;
     private final List<Ingredient> inputs;
     private final List<ItemStack> results;
-    private final int energyPerTick;
     private final int time;
 
-    public static final OritechRecipe DUMMY = new OritechRecipe(-1, 10, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER);
+    public static final OritechRecipe DUMMY = new OritechRecipe(-1, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER);
 
-    public OritechRecipe(int energy, int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type) {
+    public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type) {
         this.type = type;
         this.results = results;
         this.inputs = inputs;
-        this.energyPerTick = energy;
         this.time = time;
     }
 
@@ -85,13 +83,8 @@ public class OritechRecipe implements Recipe<Inventory> {
                 "type=" + type +
                 ", inputs=" + inputs +
                 ", results=" + results +
-                ", energy=" + energyPerTick +
                 ", time=" + time +
                 '}';
-    }
-
-    public int getEnergyPerTick() {
-        return energyPerTick;
     }
 
     public int getTime() {

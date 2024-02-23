@@ -34,8 +34,8 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
     private long combinedEnergyStorage = 0;
     private long combinedEnergyInsert = 0;
     
-    public UpgradableMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state);
+    public UpgradableMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
+        super(type, pos, state, energyPerTick);
     }
     
     @Override

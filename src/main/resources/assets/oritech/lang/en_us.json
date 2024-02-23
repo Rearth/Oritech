@@ -16,5 +16,7 @@
   "block.oritech.machine_capacitor_addon": "Capacitor Addon",
   "block.oritech.machine_acceptor_addon": "Energy Acceptor Addon",
   "block.oritech.machine_inventory_proxy_addon": "Inventory Proxy Addon",
-  "block.oritech.machine_extender": "Machine Extender"
+  "block.oritech.machine_extender": "Machine Extender",
+  "block.oritech.machine_core_basic": "Basic Machine Core",
+  "block.oritech.machine_core_good": "Good Machine Core"
 }
