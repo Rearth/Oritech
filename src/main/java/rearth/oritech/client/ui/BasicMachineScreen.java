@@ -99,7 +99,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         var percentage = (float) amount / max;
         var energyFill = String.format("%.1f", percentage * 100);
         var energyUsage = ((MachineBlockEntity) handler.blockEntity).getEffectiveEnergyPerTick();
-        return Text.literal(amount + " / " + max + " RF\n" + energyFill + "% Charged\n\nMaximum Usage: " + energyUsage + " RF/t");
+        var energyUsageText = String.format("%.1f", energyUsage);
+        return Text.literal(amount + " / " + max + " RF\n" + energyFill + "% Charged\n\nMaximum Usage: " + energyUsageText + " RF/t");
     }
     
     public void updateSettingsButtons() {
@@ -136,7 +137,9 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         cycleInputButton.margins(Insets.of(3));
         
         container.child(Components.label(Text.literal("Options")).margins(Insets.of(3, 1, 1, 1)));
-        container.child(cycleInputButton);
+        
+        if (handler.screenData.inputOptionsEnabled())
+            container.child(cycleInputButton);
     }
     
     private FlowLayout buildOverlay() {

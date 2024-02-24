@@ -25,6 +25,8 @@ public interface ScreenProvider {
     InventoryInputMode getInventoryInputMode();
     
     ScreenHandlerType<?> getScreenHandlerType();
+    
+    default boolean inputOptionsEnabled() {return true;}
 
     default EnergyConfiguration getEnergyConfiguration() {
         return new EnergyConfiguration(7, 24, 15, 54);

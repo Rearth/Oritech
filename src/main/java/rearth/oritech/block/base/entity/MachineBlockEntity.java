@@ -55,7 +55,6 @@ public abstract class MachineBlockEntity extends BlockEntity
     public static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     private final AnimationController<MachineBlockEntity> animationController = getAnimationController();
-    private int idleTicks = 0;
     
     // crafting / processing
     protected int progress;
@@ -92,12 +91,12 @@ public abstract class MachineBlockEntity extends BlockEntity
         
         if (recipeCandidate.isPresent() && canOutputRecipe(recipeCandidate.get().value())) {
             // this is separate so that progress is not reset when out of energy
-            if (hasEnoughEnergy(recipeCandidate.get().value())) {
+            if (hasEnoughEnergy()) {
                 var activeRecipe = recipeCandidate.get().value();
                 currentRecipe = activeRecipe;
                 
                 // check energy
-                useEnergy(activeRecipe);
+                useEnergy();
                 
                 // increase progress
                 progress++;
@@ -120,12 +119,12 @@ public abstract class MachineBlockEntity extends BlockEntity
         }
     }
     
-    private boolean hasEnoughEnergy(OritechRecipe recipe) {
+    protected boolean hasEnoughEnergy() {
         return energyStorage.amount > calculateEnergyUsage();
     }
     
     @SuppressWarnings("lossy-conversions")
-    private void useEnergy(OritechRecipe recipe) {
+    protected void useEnergy() {
         energyStorage.amount -= calculateEnergyUsage();
     }
     
@@ -133,7 +132,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         return energyPerTick * getEfficiencyMultiplier() * (1 / getSpeedMultiplier());
     }
     
-    private void updateNetwork() {
+    protected void updateNetwork() {
         
         if (!networkDirty) return;
         
@@ -175,6 +174,8 @@ public abstract class MachineBlockEntity extends BlockEntity
         
         var results = activeRecipe.getResults();
         var inputs = activeRecipe.getInputs();
+        
+        // create outputs
         for (int i = 0; i < results.size(); i++) {
             var result = results.get(i);
             var slot = outputInventory.get(i);
@@ -187,6 +188,7 @@ public abstract class MachineBlockEntity extends BlockEntity
             }
         }
         
+        // remove inputs
         for (int i = 0; i < inputs.size(); i++) {
             var taken = Inventories.splitStack(inputInventory, i, 1);  // amount is not configurable, because ingredient doesn't parse amount in recipe
         }
@@ -197,12 +199,12 @@ public abstract class MachineBlockEntity extends BlockEntity
         return progress >= activeRecipe.getTime() * getSpeedMultiplier();
     }
     
-    private void resetProgress() {
+    protected void resetProgress() {
         progress = 0;
         markNetDirty();
     }
     
-    private void markNetDirty() {
+    protected void markNetDirty() {
         networkDirty = true;
         markDirty();
     }
@@ -221,11 +223,17 @@ public abstract class MachineBlockEntity extends BlockEntity
             
             if (outSlot.isEmpty()) continue;
             
-            if (!result.getItem().equals(outSlot.getItem())) return false;                      // type mismatches
-            if (outSlot.getCount() + result.getCount() > outSlot.getMaxCount()) return false;   // count too high
+            if (!canAddToSlot(result, outSlot)) return false;
             
         }
         
+        return true;
+    }
+    
+    protected boolean canAddToSlot(ItemStack input, ItemStack slot) {
+        if (slot.isEmpty()) return true;
+        if (!slot.getItem().equals(input.getItem())) return false;  // type mismatch
+        if (slot.getCount() + input.getCount() > slot.getMaxCount()) return false;  // count too high
         return true;
     }
     
@@ -448,17 +456,8 @@ public abstract class MachineBlockEntity extends BlockEntity
             
             if (isActive(getCachedState())) {
                 
-                if (getProgress() == 0) {
-                    idleTicks++;
-                } else {
-                    idleTicks = 0;
-                }
-                
-                if (idleTicks < 3) {
-                    var recipeTicks = getCurrentRecipe().getTime() * getSpeedMultiplier();
-                    var animationTicks = 60f;    // 3s
-                    var animSpeed = animationTicks / recipeTicks;
-                    state.getController().setAnimationSpeed(animSpeed);
+                if (progress > 0) {
+                    state.getController().setAnimationSpeed(getAnimationSpeed());
                     return state.setAndContinue(WORKING);
                 } else {
                     return state.setAndContinue(IDLE);
@@ -467,6 +466,16 @@ public abstract class MachineBlockEntity extends BlockEntity
                 return state.setAndContinue(PACKAGED);
             }
         });
+    }
+    
+    protected float getAnimationSpeed() {
+        var recipeTicks = getRecipeDuration() * getSpeedMultiplier();
+        var animationTicks = 60f;    // 3s
+        return animationTicks / recipeTicks;
+    }
+    
+    protected int getRecipeDuration() {
+        return getCurrentRecipe().getTime();
     }
     
     @Override

@@ -12,6 +12,7 @@ import net.minecraft.util.Identifier;
 import rearth.oritech.block.custom.MachineCoreBlock;
 import rearth.oritech.block.custom.machines.AssemblerBlock;
 import rearth.oritech.block.custom.machines.GrinderBlock;
+import rearth.oritech.block.custom.machines.PoweredFurnaceBlock;
 import rearth.oritech.block.custom.machines.PulverizerBlock;
 import rearth.oritech.block.custom.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.custom.machines.addons.InventoryProxyAddonBlock;
@@ -38,6 +39,8 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block GRINDER_BLOCK = new GrinderBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block ASSEMBLER_BLOCK = new AssemblerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @UseGeoBlockItem(scale = 0.7f)
+    public static final Block POWERED_FURNACE_BLOCK = new PoweredFurnaceBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block MACHINE_CORE_BASIC = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 1);
     public static final Block MACHINE_CORE_GOOD = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 6);
