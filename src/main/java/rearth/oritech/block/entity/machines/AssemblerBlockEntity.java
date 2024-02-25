@@ -61,8 +61,8 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
         
         return List.of(
           new Vec3i(0, 0,-1),
-          new Vec3i(1, 0,0),
-          new Vec3i(-1, 0,0)
+          new Vec3i(0, 0,2),
+          new Vec3i(1, 0,0)
         );
     }
 }
