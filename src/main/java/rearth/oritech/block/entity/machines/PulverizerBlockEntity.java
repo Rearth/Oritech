@@ -33,8 +33,13 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     public List<GuiSlot> getGuiSlots() {
         return List.of(
           new GuiSlot(0, 80, 11),
-          new GuiSlot(1, 80, 59),
-          new GuiSlot(2, 100, 59));
+          new GuiSlot(1, 70, 59),
+          new GuiSlot(2, 90, 59));
+    }
+    
+    @Override
+    public boolean inputOptionsEnabled() {
+        return false;
     }
     
     @Override
@@ -50,7 +55,12 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, 0,1)
+          new Vec3i(-1, 0,0)
         );
+    }
+    
+    @Override
+    public float getCoreQuality() {
+        return 2;
     }
 }

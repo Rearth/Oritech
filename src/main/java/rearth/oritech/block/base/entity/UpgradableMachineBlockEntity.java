@@ -157,7 +157,10 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
                 
                 // if the candidate is not an addon
                 if (!(candidate.getBlock() instanceof MachineAddonBlock addonBlock) || !(candidateEntity instanceof AddonBlockEntity candidateAddonEntity)) {
-                    openSlots.add(candidatePos);
+                    
+                    // if the block is not part of the machine itself
+                    if (!candidatePos.equals(pos))
+                        openSlots.add(candidatePos);
                     continue;
                 }
                 
