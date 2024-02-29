@@ -2,14 +2,17 @@ package rearth.oritech.init;
 
 import io.wispforest.owo.registration.reflect.AutoRegistryContainer;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.entity.machines.*;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.EnergyAcceptorAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.util.EnergyProvider;
+import rearth.oritech.util.InventoryProvider;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.lang.annotation.ElementType;
@@ -34,6 +37,14 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedEnergy
     public static final BlockEntityType<EnergyAcceptorAddonBlockEntity> ENERGY_ACCEPTOR_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(EnergyAcceptorAddonBlockEntity::new, BlockContent.MACHINE_ACCEPTOR_ADDON).build();
+    
+    @AssignSidedInventory
+    @AssignSidedEnergy
+    public static final BlockEntityType<PlacerBlockEntity> PLACER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(PlacerBlockEntity::new, BlockContent.PLACER_BLOCK).build();
+    
+    @AssignSidedInventory
+    @AssignSidedEnergy
+    public static final BlockEntityType<DestroyerBlockEntity> DESTROYER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(DestroyerBlockEntity::new, BlockContent.DESTROYER_BLOCK).build();
     
     public static final BlockEntityType<InventoryProxyAddonBlockEntity> INVENTORY_PROXY_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(InventoryProxyAddonBlockEntity::new, BlockContent.MACHINE_INVENTORY_PROXY_ADDON).build();
     
@@ -64,13 +75,20 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @Override
     public void postProcessField(String namespace, BlockEntityType<?> value, String identifier, Field field) {
         AutoRegistryContainer.super.postProcessField(namespace, value, identifier, field);
-
+        
         if (field.isAnnotationPresent(AssignSidedEnergy.class))
             EnergyStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((EnergyProvider) blockEntity).getStorage(), value);
+        
+        if (field.isAnnotationPresent(AssignSidedInventory.class))
+            ItemStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((InventoryProvider) blockEntity).getInventory(), value);
 
     }
-
+    
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface AssignSidedEnergy {}
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    public @interface AssignSidedInventory {}
 }

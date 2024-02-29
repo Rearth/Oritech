@@ -1,4 +1,4 @@
-package rearth.oritech.block.custom;
+package rearth.oritech.block.blocks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -16,11 +16,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.block.MachineBlock;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
-import rearth.oritech.util.DelegatingInventory;
-import rearth.oritech.util.ImplementedInventory;
 
 import java.util.Objects;
 

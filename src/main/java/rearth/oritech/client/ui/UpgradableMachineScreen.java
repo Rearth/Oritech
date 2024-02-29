@@ -12,8 +12,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.block.custom.machines.addons.EnergyAddonBlock;
-import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
+import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
+import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.components.BlockPreviewComponent;
 import rearth.oritech.init.BlockContent;
 

@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
-import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
+import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.InventoryProxyScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ImplementedInventory;

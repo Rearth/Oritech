@@ -71,6 +71,10 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.release = 17
 }
 
+tasks.findByName("processResources").configure {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 java {
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 	// if it is present.

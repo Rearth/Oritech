@@ -1,4 +1,4 @@
-package rearth.oritech.block.custom.machines.addons;
+package rearth.oritech.block.blocks.machines.addons;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;

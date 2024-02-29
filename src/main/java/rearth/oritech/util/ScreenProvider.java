@@ -1,5 +1,6 @@
 package rearth.oritech.util;
 
+import net.minecraft.inventory.Inventory;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
@@ -19,10 +20,13 @@ public interface ScreenProvider {
     default boolean showEnergy() {
         return true;
     }
+    
+    float getDisplayedEnergyUsage();
 
     float getProgress();
     
     InventoryInputMode getInventoryInputMode();
+    Inventory getDisplayedInventory();
     
     ScreenHandlerType<?> getScreenHandlerType();
     
@@ -31,6 +35,7 @@ public interface ScreenProvider {
     default EnergyConfiguration getEnergyConfiguration() {
         return new EnergyConfiguration(7, 24, 15, 54);
     }
+    
 
     default ArrowConfiguration getIndicatorConfiguration() {
         return new ArrowConfiguration(

@@ -1,4 +1,4 @@
-package rearth.oritech.block.custom.machines;
+package rearth.oritech.block.blocks.machines;
 
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;

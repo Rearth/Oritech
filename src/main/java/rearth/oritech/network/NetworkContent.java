@@ -5,7 +5,9 @@ import io.wispforest.owo.serialization.endec.ReflectiveEndecBuilder;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -23,7 +25,9 @@ public class NetworkContent {
     public record InventoryInputModeSelectorPacket(BlockPos position) {}
     public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {}
     public record MachineEventPacket(BlockPos position) {}
-
+    public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget, BlockPos areaMin, BlockPos areaMax) {};   // times are in ticks
+    public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress){};
+    
     public static void registerChannels() {
 
         Oritech.LOGGER.info("Registering oritech channels");
@@ -46,6 +50,31 @@ public class NetworkContent {
             
             if (entity instanceof MachineBlockEntity machine) {
                 machine.playSetupAnimation();
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(MachineFrameMovementPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            if (entity instanceof FrameInteractionBlockEntity machine) {
+                machine.setCurrentTarget(message.currentTarget);
+                machine.setLastTarget(message.lastTarget);
+                machine.setMoveStartedAt(access.player().getWorld().getTime());
+                machine.setAreaMin(message.areaMin);
+                machine.setAreaMax(message.areaMax);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(MachineFrameGuiPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            if (entity instanceof ItemEnergyFrameInteractionBlockEntity machine) {
+                machine.setCurrentProgress(message.progress);
+                var energyStorage = machine.getEnergyStorage();
+                energyStorage.amount = message.currentEnergy;
+                energyStorage.capacity = message.maxEnergy;
             }
             
         }));

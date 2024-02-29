@@ -98,7 +98,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     public Text getEnergyTooltip(long amount, long max) {
         var percentage = (float) amount / max;
         var energyFill = String.format("%.1f", percentage * 100);
-        var energyUsage = ((MachineBlockEntity) handler.blockEntity).getEffectiveEnergyPerTick();
+        var energyUsage = handler.screenData.getDisplayedEnergyUsage();
         var energyUsageText = String.format("%.1f", energyUsage);
         return Text.literal(amount + " / " + max + " RF\n" + energyFill + "% Charged\n\nMaximum Usage: " + energyUsageText + " RF/t");
     }

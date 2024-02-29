@@ -9,14 +9,12 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import rearth.oritech.block.custom.MachineCoreBlock;
-import rearth.oritech.block.custom.machines.AssemblerBlock;
-import rearth.oritech.block.custom.machines.GrinderBlock;
-import rearth.oritech.block.custom.machines.PoweredFurnaceBlock;
-import rearth.oritech.block.custom.machines.PulverizerBlock;
-import rearth.oritech.block.custom.machines.addons.EnergyAddonBlock;
-import rearth.oritech.block.custom.machines.addons.InventoryProxyAddonBlock;
-import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
+import rearth.oritech.block.base.block.FrameInteractionBlock;
+import rearth.oritech.block.blocks.MachineCoreBlock;
+import rearth.oritech.block.blocks.machines.*;
+import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
+import rearth.oritech.block.blocks.machines.addons.InventoryProxyAddonBlock;
+import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.util.item.OritechGeoItem;
 
 import java.lang.annotation.ElementType;
@@ -30,8 +28,13 @@ public class BlockContent implements BlockRegistryContainer {
     @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
     public static final Block BANANA_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     
+    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
+    public static final Block MACHINE_FRAME_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
+    
     @NoBlockItem
     public static final Block ADDON_INDICATOR_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS));
+    @NoBlockItem
+    public static final Block FRAME_GANTRY_ARM = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN));
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block PULVERIZER_BLOCK = new PulverizerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
@@ -41,6 +44,9 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block ASSEMBLER_BLOCK = new AssemblerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block POWERED_FURNACE_BLOCK = new PoweredFurnaceBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    
+    public static final Block PLACER_BLOCK = new PlacerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block DESTROYER_BLOCK = new DestroyerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block MACHINE_CORE_BASIC = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 1);
     public static final Block MACHINE_CORE_GOOD = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 6);

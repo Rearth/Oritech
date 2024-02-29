@@ -50,7 +50,7 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
             }
             
             if (!isAssembled) {
-                player.sendMessage(Text.literal("Machine is not assembled"));
+                player.sendMessage(Text.literal("Machine is not assembled. Please add missing core blocks"));
                 return ActionResult.SUCCESS;
             }
             

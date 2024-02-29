@@ -31,7 +31,6 @@ public class ParticleContent {
         
         spawnLineInner(particle, origin, origin.add(size, 0, 0), segments, duration);
         spawnLineInner(particle, origin.add(size, 0, 0), origin.add(size, 0, size), segments, duration);
-        
         spawnLineInner(particle, origin, origin.add(0, 0, size), segments, duration);
         spawnLineInner(particle, origin.add(0, 0, size), origin.add(size, 0, size), segments, duration);
         

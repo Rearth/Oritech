@@ -577,11 +577,13 @@ public abstract class MachineBlockEntity extends BlockEntity
         energyStorage.amount = amount;
     }
     
-    public int getBaseEnergyPerTick() {
-        return energyPerTick;
+    @Override
+    public float getDisplayedEnergyUsage() {
+        return calculateEnergyUsage();
     }
     
-    public float getEffectiveEnergyPerTick() {
-        return calculateEnergyUsage();
+    @Override
+    public Inventory getDisplayedInventory() {
+        return this;
     }
 }

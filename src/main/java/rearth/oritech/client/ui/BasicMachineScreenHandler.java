@@ -50,9 +50,10 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     // on server, also called from client constructor
     public BasicMachineScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
         super(((ScreenProvider) blockEntity).getScreenHandlerType(), syncId);
-
+        
+        this.screenData = (ScreenProvider) blockEntity;
         this.blockPos = blockEntity.getPos();
-        this.inventory = ((Inventory) blockEntity);
+        this.inventory = screenData.getDisplayedInventory();
         inventory.onOpen(playerInventory.player);
         this.playerInventory = playerInventory;
 
@@ -66,7 +67,6 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         this.machineBlock = blockEntity.getCachedState();
         this.blockEntity = blockEntity;
         
-        screenData = (ScreenProvider) blockEntity;
         
         buildItemSlots();
     }

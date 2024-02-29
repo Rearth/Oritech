@@ -17,10 +17,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.custom.machines.addons.EnergyAddonBlock;
-import rearth.oritech.block.custom.machines.addons.MachineAddonBlock;
+import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
+import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.util.Geometry;
 
 import java.util.*;
 
@@ -136,7 +137,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
         
         // fill initial spots
         for (var initialSpot : baseSlots) {
-            queuedPositions.add((BlockPos) offsetToWorldPosition(getFacing(), initialSpot, pos));
+            queuedPositions.add((BlockPos) Geometry.offsetToWorldPosition(getFacing(), initialSpot, pos));
         }
         
         // to allow loops where we modify the content basically
@@ -226,11 +227,6 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
         
     }
     
-    private static Vec3i offsetToWorldPosition(Direction facing, Vec3i offset, Vec3i ownPos) {
-        var rotated = MultiblockMachineEntity.rotatePosition(offset, facing);
-        return ownPos.add(rotated);
-    }
-    
     @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
         super.writeScreenOpeningData(player, buf);
@@ -291,7 +287,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity {
       BuiltInEndecs.BLOCK_POS.listOf().fieldOf("open_slots", AddonUiData::openSlots),
       Endec.FLOAT.fieldOf("efficiency", AddonUiData::efficiency),
       Endec.FLOAT.fieldOf("speed", AddonUiData::speed),
-      BuiltInEndecs.BLOCK_POS.fieldOf("efficiency", AddonUiData::ownPosition),
+      BuiltInEndecs.BLOCK_POS.fieldOf("ownPosition", AddonUiData::ownPosition),
       AddonUiData::new
     );
     

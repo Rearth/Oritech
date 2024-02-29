@@ -1,9 +1,8 @@
-package rearth.oritech.block.custom.machines;
+package rearth.oritech.block.blocks.machines;
 
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.block.base.block.MachineBlock;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.entity.machines.GrinderBlockEntity;
 

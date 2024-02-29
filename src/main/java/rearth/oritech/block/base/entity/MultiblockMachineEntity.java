@@ -10,9 +10,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.block.MultiblockMachine;
-import rearth.oritech.block.custom.MachineCoreBlock;
+import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.util.Geometry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,16 +27,6 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     
     public MultiblockMachineEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state, energyPerTick);
-    }
-    
-    public static Vec3i rotatePosition(Vec3i relativePos, Direction facing) {
-        return switch (facing) {
-            case NORTH -> new BlockPos(relativePos.getZ(), relativePos.getY(), relativePos.getX());
-            case WEST -> new BlockPos(relativePos.getX(), relativePos.getY(), -relativePos.getZ());
-            case SOUTH -> new BlockPos(-relativePos.getZ(), relativePos.getY(), -relativePos.getX());
-            case EAST -> new BlockPos(-relativePos.getX(), relativePos.getY(), relativePos.getZ());
-            default -> relativePos;
-        };
     }
     
     // this seems to work as expected for some reason?
@@ -105,7 +96,7 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
         var sumCoreQuality = 0f;
         
         for (var targetPosition : targetPositions) {
-            var rotatedPos = rotatePosition(targetPosition, ownFacing);
+            var rotatedPos = Geometry.rotatePosition(targetPosition, ownFacing);
             var checkPos = pos.add(rotatedPos);
             var checkState = Objects.requireNonNull(world).getBlockState(checkPos);
             

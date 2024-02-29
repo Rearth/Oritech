@@ -1,14 +1,12 @@
-package rearth.oritech.block.custom.machines.addons;
+package rearth.oritech.block.blocks.machines.addons;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.BlockFace;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -18,7 +16,6 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
-import rearth.oritech.block.entity.machines.PulverizerBlockEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
@@ -69,7 +66,6 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        
         try {
             return getBlockEntityType().getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(pos, state);
         } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {

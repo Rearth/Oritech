@@ -1,4 +1,4 @@
-package rearth.oritech.block.custom.machines.addons;
+package rearth.oritech.block.blocks.machines.addons;
 
 import net.minecraft.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
