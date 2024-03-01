@@ -31,7 +31,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
         var passedTime = time - entity.getMoveStartedAt();
         
         // check if currently moving, otherwise we can skip those calculations
-        if (time < entity.getMoveStartedAt() + entity.getMoveTime()) {
+        if (time < entity.getMoveStartedAt() + entity.getMoveTime() && entity.getMoveStartedAt() > 1) {
             var movementDoneAmount = passedTime / (float) entity.getMoveTime();
             var offset = Vec3d.of(entity.getCurrentTarget().subtract(entity.getLastTarget())).multiply(movementDoneAmount);
             renderedPosition = Vec3d.of(entity.getLastTarget()).add(offset);

@@ -22,6 +22,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
+import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
+import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.Objects;
@@ -80,5 +82,17 @@ public abstract class FrameInteractionBlock extends HorizontalFacingBlock implem
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
         };
+    }
+    
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        
+        if (!world.isClient() && state.get(HAS_FRAME)) {
+            
+            var ownEntity = (FrameInteractionBlockEntity) world.getBlockEntity(pos);
+            ownEntity.cleanup();
+        }
+        
+        return super.onBreak(world, pos, state, player);
     }
 }

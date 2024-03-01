@@ -46,6 +46,10 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedEnergy
     public static final BlockEntityType<DestroyerBlockEntity> DESTROYER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(DestroyerBlockEntity::new, BlockContent.DESTROYER_BLOCK).build();
     
+    @AssignSidedInventory
+    @AssignSidedEnergy
+    public static final BlockEntityType<FertilizerBlockEntity> FERTILIZER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(FertilizerBlockEntity::new, BlockContent.FERTILIZER_BLOCK).build();
+    
     public static final BlockEntityType<InventoryProxyAddonBlockEntity> INVENTORY_PROXY_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(InventoryProxyAddonBlockEntity::new, BlockContent.MACHINE_INVENTORY_PROXY_ADDON).build();
     
     public static final BlockEntityType<AddonBlockEntity> ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(AddonBlockEntity::new,

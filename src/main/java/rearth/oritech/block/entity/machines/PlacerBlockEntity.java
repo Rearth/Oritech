@@ -49,7 +49,7 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
         if (Objects.requireNonNull(world).getBlockState(targetPosition).getBlock().equals(Blocks.AIR) && block.getDefaultState().canPlaceAt(world, targetPosition)) {
             world.setBlockState(targetPosition, block.getDefaultState());
             firstBlock.decrement(1);
-            world.playSound(null, targetPosition, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1f, 1f);
+            world.playSound(null, targetPosition, block.getDefaultState().getSoundGroup().getPlaceSound(), SoundCategory.BLOCKS, 1f, 1f);
             super.finishBlockWork(processed);
         }
     }

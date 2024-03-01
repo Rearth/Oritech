@@ -4,6 +4,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.enums.BlockFace;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
@@ -58,6 +59,7 @@ public class DestroyerBlockEntity extends ItemEnergyFrameInteractionBlockEntity 
             }
             
             world.addBlockBreakParticles(targetPosition, world.getBlockState(targetPosition));
+            world.playSound(null, targetPosition, targetState.getSoundGroup().getBreakSound(), SoundCategory.BLOCKS, 1f, 1f);
             world.breakBlock(targetPosition, false);
             super.finishBlockWork(processed);
         }

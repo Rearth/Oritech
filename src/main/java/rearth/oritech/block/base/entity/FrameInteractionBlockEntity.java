@@ -19,6 +19,7 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 import static rearth.oritech.util.Geometry.*;
@@ -26,7 +27,7 @@ import static rearth.oritech.util.Geometry.*;
 public abstract class FrameInteractionBlockEntity extends BlockEntity implements BlockEntityTicker<FrameInteractionBlockEntity> {
     
     private static final int MAX_SEARCH_LENGTH = 64;
-    
+    private static final HashMap<Vec3i, HashMap<Vec3i, Vec3i>> occupiedAreas = new HashMap<>();
     private BlockPos areaMin;       // both min and max are inclusive
     private BlockPos areaMax;
     private BlockPos currentTarget; // rendering is based just on this (and move time)
@@ -34,7 +35,6 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     private int currentProgress;    // not synced
     private boolean moving;    // not synced
     private Vec3i currentDirection = new Vec3i(1, 0, 0);    // not synced
-    
     @Environment(EnvType.CLIENT)
     private long moveStartedAt;
     
@@ -195,10 +195,11 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         
         if (!canProgress()) return;
         
-        if (!moving && currentProgress >= getWorkTime()) {
+        if (!moving && currentProgress >= getWorkTime() && moveBlock()) {
+            // if another machine occupies this position in the frame, we wait for it to move (with a timeout to avoid fully blocking everything)
             currentProgress = 0;
-            finishBlockWork(currentTarget);
-            moveBlock();
+            finishBlockWork(lastTarget);
+            updateBlockPosition();
             moving = true;
             updateNetwork();
             this.markDirty();
@@ -214,6 +215,27 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         currentProgress++;
     }
     
+    private boolean isBlockAvailable(BlockPos target) {
+        if (!occupiedAreas.containsKey(areaMin)) {
+            occupiedAreas.put(areaMin, new HashMap<>(1));
+            return true;
+        }
+        
+        var frameEntries = occupiedAreas.get(areaMin);
+        return !frameEntries.containsValue(target);
+    }
+    
+    private void updateBlockPosition() {
+        var frameEntries = occupiedAreas.get(areaMin);
+        frameEntries.put(pos, currentTarget);
+    }
+    
+    public void cleanup() {
+        var frameEntries = occupiedAreas.get(areaMin);
+        frameEntries.remove(pos);
+    }
+    
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     protected abstract boolean hasWorkAvailable(BlockPos toolPosition);
     
     protected abstract void doProgress();
@@ -249,29 +271,36 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         }
     }
     
-    private void moveBlock() {
-        lastTarget = currentTarget;
+    private boolean moveBlock() {
         
         var nextPos = currentTarget.add(currentDirection);
+        var nextDir = currentDirection;
         if (!isInBounds(nextPos)) {
             nextPos = currentTarget.add(0, 0, 1);
-            currentDirection = currentDirection.multiply(-1);
+            nextDir = currentDirection.multiply(-1);
             if (!isInBounds(nextPos)) {
                 nextPos = resetWorkPosition();
             }
         }
         
+        // tries to not put 2 tool heads in the same spot, but also allow overtaking if previous machine is too slow
+        if (!isBlockAvailable(nextPos) && currentProgress <= getWorkTime() * 5 + 10) return false;
+        
+        lastTarget = currentTarget;
         currentTarget = nextPos;
+        currentDirection = nextDir;
+        
+        return true;
     }
     
-    private BlockPos resetWorkPosition () {
+    private BlockPos resetWorkPosition() {
         currentDirection = new BlockPos(1, 0, 0);
         return areaMin;
     }
     
     private boolean isInBounds(BlockPos pos) {
         return pos.getX() >= areaMin.getX() && pos.getX() <= areaMax.getX()
-          && pos.getZ() >= areaMin.getZ() && pos.getZ() <= areaMax.getZ();
+                 && pos.getZ() >= areaMin.getZ() && pos.getZ() <= areaMax.getZ();
     }
     
     private void highlightBlock(BlockPos block) {
@@ -292,8 +321,16 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         return areaMin;
     }
     
+    public void setAreaMin(BlockPos areaMin) {
+        this.areaMin = areaMin;
+    }
+    
     public BlockPos getAreaMax() {
         return areaMax;
+    }
+    
+    public void setAreaMax(BlockPos areaMax) {
+        this.areaMax = areaMax;
     }
     
     public BlockPos getCurrentTarget() {
@@ -336,24 +373,17 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         this.currentDirection = currentDirection;
     }
     
-    public void setAreaMin(BlockPos areaMin) {
-        this.areaMin = areaMin;
-    }
-    
-    public void setAreaMax(BlockPos areaMax) {
-        this.areaMax = areaMax;
-    }
-    
     public abstract int getMoveTime();
-    public abstract int getWorkTime();
     
-    @Environment(EnvType.CLIENT)
-    public void setMoveStartedAt(long moveStartedAt) {
-        this.moveStartedAt = moveStartedAt;
-    }
+    public abstract int getWorkTime();
     
     @Environment(EnvType.CLIENT)
     public long getMoveStartedAt() {
         return moveStartedAt;
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public void setMoveStartedAt(long moveStartedAt) {
+        this.moveStartedAt = moveStartedAt;
     }
 }

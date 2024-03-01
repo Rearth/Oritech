@@ -7,6 +7,7 @@ import io.wispforest.owo.util.VectorRandomUtils;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
@@ -18,6 +19,11 @@ public class ParticleContent {
         spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, pos, 1, 120, 6);
         ClientParticles.reset();
     });
+    
+    public static final ParticleSystem<Integer> FERTILIZER_EFFECT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawnWithinBlock(ParticleTypes.HAPPY_VILLAGER, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z));
+    }));
     
     private static void spawnCubeOutline(ParticleEffect particle, Vec3d origin, float size, int duration, int segments) {
         
