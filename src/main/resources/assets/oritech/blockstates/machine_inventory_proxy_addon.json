@@ -42,7 +42,7 @@
     },
     "face=ceiling,facing=south": {
       "model": "oritech:block/machine_inventory_proxy_addon",
-      "x": 0
+      "x": 180
     },
     "face=ceiling,facing=west": {
       "model": "oritech:block/machine_inventory_proxy_addon",

@@ -19,6 +19,7 @@ import rearth.oritech.block.blocks.machines.processing.PoweredFurnaceBlock;
 import rearth.oritech.block.blocks.machines.processing.PulverizerBlock;
 import rearth.oritech.block.blocks.machines.worldInteraction.DestroyerBlock;
 import rearth.oritech.block.blocks.machines.worldInteraction.FertilizerBlock;
+import rearth.oritech.block.blocks.machines.worldInteraction.MachineFrameBlock;
 import rearth.oritech.block.blocks.machines.worldInteraction.PlacerBlock;
 import rearth.oritech.util.item.OritechGeoItem;
 
@@ -34,12 +35,13 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block BANANA_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     
     @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
-    public static final Block MACHINE_FRAME_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
+    public static final Block MACHINE_FRAME_BLOCK = new MachineFrameBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
+    
+    @NoBlockItem
+    public static final Block FRAME_GANTRY_ARM = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
     
     @NoBlockItem
     public static final Block ADDON_INDICATOR_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS));
-    @NoBlockItem
-    public static final Block FRAME_GANTRY_ARM = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN));
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block PULVERIZER_BLOCK = new PulverizerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());

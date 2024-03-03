@@ -16,7 +16,8 @@ public class ModelGenerator extends FabricModelProvider {
         
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.BANANA_BLOCK);
         
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_FRAME_BLOCK);
+        blockStateModelGenerator.registerSimpleState(BlockContent.MACHINE_FRAME_BLOCK);
+        
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.PLACER_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.DESTROYER_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.FERTILIZER_BLOCK);

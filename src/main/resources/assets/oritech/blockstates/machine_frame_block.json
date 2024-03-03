@@ -1,0 +1,27 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "oritech:block/machine_frame_inner"
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "oritech:block/machine_frame_outer",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "oritech:block/machine_frame_outer",
+        "y": 270
+      }
+    }
+  ]
+}

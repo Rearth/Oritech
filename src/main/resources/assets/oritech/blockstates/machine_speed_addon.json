@@ -82,11 +82,11 @@
     },
     "face=ceiling,facing=south,addon_used=true": {
       "model": "oritech:block/machine_speed_addon_on",
-      "x": 0
+      "x": 180
     },
     "face=ceiling,facing=south,addon_used=false": {
       "model": "oritech:block/machine_speed_addon",
-      "x": 0
+      "x": 180
     },
     "face=ceiling,facing=west,addon_used=true": {
       "model": "oritech:block/machine_speed_addon_on",

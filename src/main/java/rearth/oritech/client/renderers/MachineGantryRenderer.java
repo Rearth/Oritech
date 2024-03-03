@@ -17,6 +17,7 @@ import rearth.oritech.init.BlockContent;
 public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteractionBlockEntity> {
     
     private static final BlockState renderedBeam = BlockContent.FRAME_GANTRY_ARM.getDefaultState();
+    private static final float BEAM_DEPTH = 3/16f;
     
     @Override
     public void render(FrameInteractionBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
@@ -56,8 +57,8 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
         
         matrices.push();
         
-        var length = entity.getAreaMax().getX() - entity.getAreaMin().getX() + 1;
-        var target = new Vec3d(entity.getAreaMin().getX(), renderedPosition.y, renderedPosition.z).subtract(Vec3d.of(entity.getPos()));
+        var length = entity.getAreaMax().getX() - entity.getAreaMin().getX() + 2 - BEAM_DEPTH * 2f;
+        var target = new Vec3d(entity.getAreaMin().getX() - 0.5 + BEAM_DEPTH, renderedPosition.y, renderedPosition.z).subtract(Vec3d.of(entity.getPos()));
         
         matrices.translate(target.getX(), target.getY(), target.getZ());
         matrices.scale(length, 1, 1);
@@ -67,8 +68,8 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
           pos,
           entity.getWorld(),
           matrices,
-          vertexConsumers.getBuffer(RenderLayers.getBlockLayer(state)),
-          false,
+          vertexConsumers.getBuffer(RenderLayers.getBlockLayer(renderedBeam)),
+          true,
           entity.getWorld().random);
         
         matrices.pop();
