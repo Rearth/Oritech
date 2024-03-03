@@ -15,7 +15,7 @@ import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntit
 public class InventoryProxyAddonBlock extends MachineAddonBlock {
     
     public InventoryProxyAddonBlock(Settings settings, boolean extender, float speedMultiplier, float efficiencyMultiplier) {
-        super(settings, extender, speedMultiplier, efficiencyMultiplier);
+        super(settings, extender, speedMultiplier, efficiencyMultiplier, true);
     }
     
     @Override

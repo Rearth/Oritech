@@ -11,7 +11,7 @@ public class EnergyAddonBlock extends MachineAddonBlock {
     private final boolean acceptEnergy;
     
     public EnergyAddonBlock(Settings settings, boolean extender, float speedMultiplier, float efficiencyMultiplier, long addedCapacity, long addedInsert, boolean acceptEnergy) {
-        super(settings, extender, speedMultiplier, efficiencyMultiplier);
+        super(settings, extender, speedMultiplier, efficiencyMultiplier, true);
         this.addedCapacity = addedCapacity;
         this.addedInsert = addedInsert;
         this.acceptEnergy = acceptEnergy;
