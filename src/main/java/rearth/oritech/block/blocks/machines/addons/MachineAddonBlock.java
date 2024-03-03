@@ -13,9 +13,10 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.machines.MachineCoreEntity;
+import rearth.oritech.block.entity.machines.processing.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
+import rearth.oritech.util.MachineAddonController;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
@@ -88,7 +89,7 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
             
             var controllerEntity = world.getBlockEntity(Objects.requireNonNull(ownEntity).getControllerPos());
             
-            if (controllerEntity instanceof UpgradableMachineBlockEntity machineEntity) {
+            if (controllerEntity instanceof MachineAddonController machineEntity) {
                 machineEntity.resetAddons();
             }
         }

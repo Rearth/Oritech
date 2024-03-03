@@ -9,7 +9,9 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -53,7 +55,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         // then move forward, searching again till end
         // then move right again, searching till start position
         
-        var facing = Objects.requireNonNull(world).getBlockState(getPos()).get(Properties.HORIZONTAL_FACING);
+        var facing = getFacing();
         var backRelative = new Vec3i(getFrameOffset(), 0, 0);
         var searchStart = (BlockPos) Geometry.offsetToWorldPosition(facing, backRelative, pos);
         
@@ -116,6 +118,10 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         this.markDirty();
         
         return true;
+    }
+    
+    protected Direction getFacing() {
+        return Objects.requireNonNull(world).getBlockState(getPos()).get(Properties.HORIZONTAL_FACING);
     }
     
     private boolean checkInnerEmpty(BlockPos leftBack, BlockPos rightFront) {
@@ -195,7 +201,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         
         if (!canProgress()) return;
         
-        if (!moving && currentProgress >= getWorkTime() && moveBlock()) {
+        if (!moving && currentProgress >= getWorkTime() * getSpeedMultiplier() && moveBlock()) {
             // if another machine occupies this position in the frame, we wait for it to move (with a timeout to avoid fully blocking everything)
             currentProgress = 0;
             finishBlockWork(lastTarget);
@@ -203,7 +209,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
             moving = true;
             updateNetwork();
             this.markDirty();
-        } else if (moving && currentProgress >= getMoveTime()) {
+        } else if (moving && currentProgress >= getMoveTime() * getSpeedMultiplier()) {
             moving = false;
             currentProgress = 0;
             
@@ -279,12 +285,14 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
             nextPos = currentTarget.add(0, 0, 1);
             nextDir = currentDirection.multiply(-1);
             if (!isInBounds(nextPos)) {
-                nextPos = resetWorkPosition();
+                var data = resetWorkPosition();
+                nextPos = data.getLeft();
+                nextDir = data.getRight();
             }
         }
         
         // tries to not put 2 tool heads in the same spot, but also allow overtaking if previous machine is too slow
-        if (!isBlockAvailable(nextPos) && currentProgress <= getWorkTime() * 5 + 10) return false;
+        if (!isBlockAvailable(nextPos) && currentProgress <= getWorkTime() * getSpeedMultiplier() * 5 + 10) return false;
         
         lastTarget = currentTarget;
         currentTarget = nextPos;
@@ -293,9 +301,9 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         return true;
     }
     
-    private BlockPos resetWorkPosition() {
-        currentDirection = new BlockPos(1, 0, 0);
-        return areaMin;
+    // return start position + direction
+    private Pair<BlockPos, BlockPos> resetWorkPosition() {
+        return new Pair<>(areaMin, new BlockPos(1, 0, 0));
     }
     
     private boolean isInBounds(BlockPos pos) {
@@ -316,6 +324,8 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     public int getFrameOffset() {
         return 1;
     }
+    
+    public float getSpeedMultiplier() { return 1f; }
     
     public BlockPos getAreaMin() {
         return areaMin;

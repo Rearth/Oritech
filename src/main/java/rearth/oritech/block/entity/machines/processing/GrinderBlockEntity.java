@@ -1,4 +1,4 @@
-package rearth.oritech.block.entity.machines;
+package rearth.oritech.block.entity.machines.processing;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.screen.ScreenHandlerType;

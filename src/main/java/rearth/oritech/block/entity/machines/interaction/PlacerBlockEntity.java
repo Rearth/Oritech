@@ -1,4 +1,4 @@
-package rearth.oritech.block.entity.machines;
+package rearth.oritech.block.entity.machines.interaction;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -12,11 +12,13 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 
+import java.util.List;
 import java.util.Objects;
 
 public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
@@ -67,6 +69,13 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
     @Override
     public BlockState getMachineHead() {
         return BlockContent.MACHINE_SPEED_ADDON.getDefaultState().with(WallMountedBlock.FACE, BlockFace.FLOOR);
+    }
+    
+    @Override
+    public List<Vec3i> getAddonSlots() {
+        return List.of(
+          new Vec3i(0, -1,0)
+        );
     }
     
     @Override

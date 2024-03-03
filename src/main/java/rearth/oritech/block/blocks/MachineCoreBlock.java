@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.block.MachineBlock;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.block.entity.machines.MachineCoreEntity;
+import rearth.oritech.block.entity.machines.processing.MachineCoreEntity;
 
 import java.util.Objects;
 

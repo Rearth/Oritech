@@ -1,4 +1,4 @@
-package rearth.oritech.block.entity.machines;
+package rearth.oritech.block.entity.machines.processing;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.recipe.RecipeType;
@@ -146,7 +146,6 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public List<Vec3i> getAddonSlots() {
-        
         return List.of(
           new Vec3i(0, -1,0)
         );

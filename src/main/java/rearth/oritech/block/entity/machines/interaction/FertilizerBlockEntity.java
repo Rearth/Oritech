@@ -1,4 +1,4 @@
-package rearth.oritech.block.entity.machines;
+package rearth.oritech.block.entity.machines.interaction;
 
 import net.minecraft.block.*;
 import net.minecraft.block.enums.BlockFace;
@@ -10,12 +10,14 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 
+import java.util.List;
 import java.util.Objects;
 
 public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
@@ -59,6 +61,13 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     @Override
     public BlockState getMachineHead() {
         return BlockContent.MACHINE_CAPACITOR_ADDON.getDefaultState().with(WallMountedBlock.FACE, BlockFace.FLOOR);
+    }
+    
+    @Override
+    public List<Vec3i> getAddonSlots() {
+        return List.of(
+          new Vec3i(0, -1,0)
+        );
     }
     
     @Override

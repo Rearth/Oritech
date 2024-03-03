@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
+import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.Objects;
@@ -66,6 +67,9 @@ public abstract class FrameInteractionBlock extends HorizontalFacingBlock implem
             world.setBlockState(pos, state.with(HAS_FRAME, frameValid));
             
             if (frameValid) {
+                if (entity instanceof MachineAddonController addonController)
+                    addonController.initAddons();
+                
                 var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
                 player.openHandledScreen(handler);
             }
@@ -91,6 +95,10 @@ public abstract class FrameInteractionBlock extends HorizontalFacingBlock implem
             
             var ownEntity = (FrameInteractionBlockEntity) world.getBlockEntity(pos);
             ownEntity.cleanup();
+            
+            if (ownEntity instanceof MachineAddonController machineEntity) {
+                machineEntity.resetAddons();
+            }
         }
         
         return super.onBreak(world, pos, state, player);

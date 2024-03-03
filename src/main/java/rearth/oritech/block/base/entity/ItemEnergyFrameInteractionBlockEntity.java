@@ -2,9 +2,8 @@ package rearth.oritech.block.base.entity;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.enums.BlockFace;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -13,24 +12,23 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
-import rearth.oritech.util.InventoryProvider;
 import team.reborn.energy.api.EnergyStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity implements InventoryProvider, EnergyProvider, ExtendedScreenHandlerFactory, ScreenProvider {
+public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity implements InventoryProvider, EnergyProvider, ExtendedScreenHandlerFactory, ScreenProvider, MachineAddonController {
     
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(5000, 100, 0) {
         @Override
@@ -39,31 +37,35 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
             ItemEnergyFrameInteractionBlockEntity.this.markDirty();
         }
     };
-    
     protected final SimpleInventory inventory = new SimpleInventory(3) {
         @Override
         public void markDirty() {
             ItemEnergyFrameInteractionBlockEntity.this.markDirty();
         }
     };
-    
     public final InventoryStorage inventoryWrapper = InventoryStorage.of(inventory, null);
+    private final List<BlockPos> connectedAddons = new ArrayList<>();
+    private final List<BlockPos> openSlots = new ArrayList<>();
+    private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
     
     public ItemEnergyFrameInteractionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
     
     public abstract int getMoveEnergyUsage();
+    
     public abstract int getOperationEnergyUsage();
     
     @Override
     protected boolean canProgress() {
-        return energyStorage.amount >= getMoveEnergyUsage() && energyStorage.amount >= getOperationEnergyUsage();
+        return
+          energyStorage.amount >= getMoveEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()) &&
+            energyStorage.amount >= getOperationEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed());
     }
     
     @Override
     protected void doProgress() {
-        energyStorage.amount -= getMoveEnergyUsage();
+        energyStorage.amount -= (long) (getMoveEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()));
         this.markDirty();
     }
     
@@ -77,6 +79,9 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
         super.readNbt(nbt);
         inventory.readNbtList(nbt.getList("inventory", NbtElement.COMPOUND_TYPE));
         energyStorage.amount = nbt.getLong("energy_stored");
+        
+        getAddonNbtData(nbt);
+        updateEnergyContainer();
     }
     
     @Override
@@ -84,6 +89,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
         super.writeNbt(nbt);
         nbt.put("inventory", inventory.toNbtList());
         nbt.putLong("energy_stored", energyStorage.amount);
+        writeAddonToNbt(nbt);
     }
     
     @Override
@@ -99,17 +105,19 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
         buf.writeBlockPos(this.getPos());
-    }
-    
-    @Override
-    public Text getDisplayName() {
-        return Text.of("Invalid");
+        buf.write(ADDON_UI_ENDEC, getUiData());
+        buf.writeFloat(getCoreQuality());
     }
     
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new BasicMachineScreenHandler(syncId, playerInventory, this);
+        return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+    }
+    
+    @Override
+    public Text getDisplayName() {
+        return Text.of("Invalid");
     }
     
     @Override
@@ -137,7 +145,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public float getDisplayedEnergyUsage() {
-        return getOperationEnergyUsage();
+        return getOperationEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed());
     }
     
     @Override
@@ -159,7 +167,43 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
         return closestPlayer != null && closestPlayer.currentScreenHandler instanceof BasicMachineScreenHandler handler && getPos().equals(handler.getBlockPos());
     }
     
+    @Override
+    public float getSpeedMultiplier() {
+        return addonData.speed();
+    }
+    
     public DynamicEnergyStorage getEnergyStorage() {
         return energyStorage;
+    }
+    
+    @Override
+    public List<BlockPos> getConnectedAddons() {
+        return connectedAddons;
+    }
+    
+    @Override
+    public List<BlockPos> getOpenSlots() {
+        return openSlots;
+    }
+    
+    @Override
+    public Direction getFacingForAddon() {
+        return super.getFacing();
+    }
+    
+    @Override
+    public DynamicEnergyStorage getStorageForAddon() {
+        return getEnergyStorage();
+    }
+    
+    @Override
+    public BaseAddonData getBaseAddonData() {
+        return addonData;
+    }
+    
+    @Override
+    public void setBaseAddonData(BaseAddonData data) {
+        this.addonData = data;
+        this.markDirty();
     }
 }

@@ -5,6 +5,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.world.World;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
+import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;
 
@@ -28,9 +29,9 @@ public class UpgradableMachineScreenHandler extends BasicMachineScreenHandler {
         this.addonUiData = addonUiData;
         
         // sync speed and efficiency to client entity, so the getProgress method works correctly
-        if (playerInventory.player.getWorld().isClient() && blockEntity instanceof UpgradableMachineBlockEntity upgradableEntity) {
-            upgradableEntity.setCombinedSpeed(addonUiData.speed());
-            upgradableEntity.setCombinedEfficiency(addonUiData.efficiency());
+        if (playerInventory.player.getWorld().isClient() && blockEntity instanceof MachineAddonController upgradableEntity) {
+            var baseData = new MachineAddonController.BaseAddonData(addonUiData.speed(), addonUiData.efficiency(), 100, 100);
+            upgradableEntity.setBaseAddonData(baseData);
         }
         
         this.worldAccess = playerInventory.player.getWorld();

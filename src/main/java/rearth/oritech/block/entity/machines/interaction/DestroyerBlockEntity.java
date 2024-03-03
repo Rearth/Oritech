@@ -1,4 +1,4 @@
-package rearth.oritech.block.entity.machines;
+package rearth.oritech.block.entity.machines.interaction;
 
 import net.minecraft.block.*;
 import net.minecraft.block.enums.BlockFace;
@@ -6,12 +6,13 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 
+import java.util.List;
 import java.util.Objects;
 
 public class DestroyerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
@@ -68,6 +69,13 @@ public class DestroyerBlockEntity extends ItemEnergyFrameInteractionBlockEntity 
     @Override
     public BlockState getMachineHead() {
         return BlockContent.MACHINE_INVENTORY_PROXY_ADDON.getDefaultState().with(WallMountedBlock.FACE, BlockFace.FLOOR);
+    }
+    
+    @Override
+    public List<Vec3i> getAddonSlots() {
+        return List.of(
+          new Vec3i(0, -1,0)
+        );
     }
     
     @Override
