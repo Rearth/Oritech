@@ -2,20 +2,23 @@ package rearth.oritech.block.entity.machines.interaction;
 
 import net.minecraft.block.*;
 import net.minecraft.block.enums.BlockFace;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
+import rearth.oritech.block.base.entity.MultiblockFrameInteractionEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import team.reborn.energy.api.EnergyStorage;
 
 import java.util.List;
 import java.util.Objects;
 
-public class DestroyerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
+public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     public DestroyerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.DESTROYER_BLOCK_ENTITY, pos, state);
     }
@@ -101,5 +104,12 @@ public class DestroyerBlockEntity extends ItemEnergyFrameInteractionBlockEntity 
     @Override
     public ScreenHandlerType<?> getScreenHandlerType() {
         return ModScreens.DESTROYER_SCREEN;
+    }
+    
+    @Override
+    public List<Vec3i> getCorePositions() {
+        return List.of(
+          new Vec3i(0, 1,0)
+        );
     }
 }

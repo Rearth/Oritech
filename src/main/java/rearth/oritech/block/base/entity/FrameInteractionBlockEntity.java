@@ -197,7 +197,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, FrameInteractionBlockEntity blockEntity) {
-        if (world.isClient || !state.get(FrameInteractionBlock.HAS_FRAME) || getAreaMin() == null) return;
+        if (world.isClient || !isActive(state) || !state.get(FrameInteractionBlock.HAS_FRAME) || getAreaMin() == null) return;
         
         if (!canProgress()) return;
         
@@ -365,6 +365,10 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     
     public void setCurrentProgress(int currentProgress) {
         this.currentProgress = currentProgress;
+    }
+    
+    public boolean isActive(BlockState state) {
+        return true;
     }
     
     public boolean isMoving() {

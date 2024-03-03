@@ -4,6 +4,7 @@ import io.wispforest.owo.serialization.Endec;
 import io.wispforest.owo.serialization.endec.BuiltInEndecs;
 import io.wispforest.owo.serialization.endec.StructEndecBuilder;
 import net.minecraft.block.BlockState;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -16,6 +17,7 @@ import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.*;
 
 public interface MachineAddonController {

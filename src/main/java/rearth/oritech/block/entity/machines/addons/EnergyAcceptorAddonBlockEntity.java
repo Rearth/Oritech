@@ -6,6 +6,7 @@ import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.EnergyProvider;
+import rearth.oritech.util.MachineAddonController;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.DelegatingEnergyStorage;
 
@@ -14,7 +15,7 @@ import java.util.Objects;
 public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements EnergyProvider {
     private final DelegatingEnergyStorage delegatedStorage = new DelegatingEnergyStorage(this::getMainStorage, this::isConnected);
     
-    private UpgradableMachineBlockEntity cachedController;
+    private MachineAddonController cachedController;
     
     public EnergyAcceptorAddonBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ENERGY_ACCEPTOR_ADDON_ENTITY, pos, state);
@@ -31,15 +32,15 @@ public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements 
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
-        return controllerEntity.getEnergyStorage();
+        return controllerEntity.getStorageForAddon();
     }
     
-    private UpgradableMachineBlockEntity getCachedController() {
+    private MachineAddonController getCachedController() {
         
-        if (cachedController != null && !cachedController.isRemoved())
+        if (cachedController != null)
             return cachedController;
         
-        cachedController = (UpgradableMachineBlockEntity) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
+        cachedController = (MachineAddonController) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
         return cachedController;
     }
     

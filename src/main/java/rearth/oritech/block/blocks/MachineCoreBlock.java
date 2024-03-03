@@ -16,8 +16,10 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.block.MachineBlock;
+import rearth.oritech.block.base.block.MultiblockFrameInteractionBlock;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.entity.machines.processing.MachineCoreEntity;
+import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.Objects;
 
@@ -53,8 +55,8 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
         if (!world.isClient() && state.get(USED)) {
             var controllerEntity = getControllerEntity(world, pos);
             
-            if (controllerEntity instanceof MultiblockMachineEntity machineEntity) {
-                machineEntity.onCoreBroken(pos, state);
+            if (controllerEntity instanceof MultiblockMachineController machineEntity) {
+                machineEntity.onCoreBroken(pos);
             }
         }
 
@@ -72,11 +74,6 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
         return Objects.requireNonNull(world.getBlockEntity(getControllerPos(world, pos)));
     }
     
-    @NotNull
-    private static BlockState getControllerBlock(World world, BlockPos pos) {
-        return world.getBlockState(getControllerPos(world, pos));
-    }
-    
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         
@@ -86,6 +83,10 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
             var controllerPos = getControllerPos(world, pos);
             var controllerBlock = world.getBlockState(controllerPos);
             if (Objects.requireNonNull(controllerBlock).getBlock() instanceof MachineBlock) {
+                return controllerBlock.getBlock().onUse(controllerBlock, world, controllerPos, player, hand, hit);
+            }
+            
+            if (Objects.requireNonNull(controllerBlock).getBlock() instanceof MultiblockFrameInteractionBlock) {
                 return controllerBlock.getBlock().onUse(controllerBlock, world, controllerPos, player, hand, hit);
             }
         }

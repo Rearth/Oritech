@@ -2,14 +2,13 @@ package rearth.oritech.block.entity.machines.processing;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.DelegatingInventory;
-import rearth.oritech.util.EnergyProvider;
-import rearth.oritech.util.ImplementedInventory;
+import rearth.oritech.util.*;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.DelegatingEnergyStorage;
 
@@ -18,7 +17,7 @@ import java.util.Objects;
 public class MachineCoreEntity extends BlockEntity implements DelegatingInventory, EnergyProvider {
     
     private BlockPos controllerPos = BlockPos.ORIGIN;
-    private UpgradableMachineBlockEntity controllerEntity;
+    private MultiblockMachineController controllerEntity;
     private final DelegatingEnergyStorage delegatedStorage = new DelegatingEnergyStorage(this::getMainStorage, this::isEnabled);
     
     public MachineCoreEntity(BlockPos pos, BlockState state) {
@@ -48,18 +47,18 @@ public class MachineCoreEntity extends BlockEntity implements DelegatingInventor
         this.markDirty();
     }
     
-    private UpgradableMachineBlockEntity getCachedController() {
+    private MultiblockMachineController getCachedController() {
         if (!this.getCachedState().get(MachineCoreBlock.USED)) return null;
         
         if (controllerEntity == null)
-            controllerEntity = (UpgradableMachineBlockEntity) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
+            controllerEntity = (MultiblockMachineController) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
         
         return controllerEntity;
     }
     
     @Override
     public ImplementedInventory getDelegatedInventory() {
-        return getCachedController();
+        return Objects.requireNonNull(getCachedController()).getInventoryForLink();
     }
     
     private EnergyStorage getMainStorage() {
@@ -68,7 +67,7 @@ public class MachineCoreEntity extends BlockEntity implements DelegatingInventor
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
-        return Objects.requireNonNull(controllerEntity).getEnergyStorage();
+        return Objects.requireNonNull(controllerEntity).getEnergyStorageForLink();
     }
     
     @Override

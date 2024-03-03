@@ -1,25 +1,40 @@
 package rearth.oritech.block.base.block;
 
+import com.mojang.serialization.MapCodec;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.HorizontalFacingBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
 
-public abstract class MultiblockMachine extends UpgradableMachineBlock {
+import java.util.Objects;
+
+public abstract class MultiblockFrameInteractionBlock extends FrameInteractionBlock {
     
     public static final BooleanProperty ASSEMBLED = BooleanProperty.of("machine_assembled");
     
-    public MultiblockMachine(Settings settings) {
+    public MultiblockFrameInteractionBlock(Settings settings) {
         super(settings);
         setDefaultState(getDefaultState().with(ASSEMBLED, false));
     }
@@ -36,24 +51,13 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
         if (!world.isClient) {
             
             var entity = world.getBlockEntity(pos);
-            if (!(entity instanceof MultiblockMachineEntity machineEntity)) {
+            if (!(entity instanceof MultiblockMachineController machineEntity)) {
                 return ActionResult.SUCCESS;
             }
-            
-            var wasAssembled = state.get(ASSEMBLED);
             
             var isAssembled = machineEntity.initMultiblock(state);
-            
-            // first time created
-            if (isAssembled && !wasAssembled) {
-                NetworkContent.MACHINE_CHANNEL.serverHandle(machineEntity).send(new NetworkContent.MachineEventPacket(pos));
+            if (!isAssembled)
                 return ActionResult.SUCCESS;
-            }
-            
-            if (!isAssembled) {
-                player.sendMessage(Text.literal("Machine is not assembled. Please add missing core blocks"));
-                return ActionResult.SUCCESS;
-            }
             
         }
         
