@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.EnergyAcceptorAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
@@ -24,16 +25,20 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
 public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityType<?>> {
-
+    
+    @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<PulverizerBlockEntity> PULVERIZER_ENTITY = FabricBlockEntityTypeBuilder.create(PulverizerBlockEntity::new, BlockContent.PULVERIZER_BLOCK).build();
     
+    @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<GrinderBlockEntity> GRINDER_ENTITY = FabricBlockEntityTypeBuilder.create(GrinderBlockEntity::new, BlockContent.GRINDER_BLOCK).build();
     
+    @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<AssemblerBlockEntity> ASSEMBLER_ENTITY = FabricBlockEntityTypeBuilder.create(AssemblerBlockEntity::new, BlockContent.ASSEMBLER_BLOCK).build();
     
+    @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<PoweredFurnaceBlockEntity> POWERED_FURNACE_ENTITY = FabricBlockEntityTypeBuilder.create(PoweredFurnaceBlockEntity::new, BlockContent.POWERED_FURNACE_BLOCK).build();
     
@@ -61,6 +66,7 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
       BlockContent.MACHINE_CAPACITOR_ADDON
     ).build();
     
+    @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<MachineCoreEntity> MACHINE_CORE_ENTITY = FabricBlockEntityTypeBuilder.create(MachineCoreEntity::new,
       BlockContent.MACHINE_CORE_BASIC,
@@ -86,7 +92,7 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
             EnergyStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((EnergyProvider) blockEntity).getStorage(), value);
         
         if (field.isAnnotationPresent(AssignSidedInventory.class))
-            ItemStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((InventoryProvider) blockEntity).getInventory(), value);
+            ItemStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((InventoryProvider) blockEntity).getInventory(direction), value);
 
     }
     

@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -23,10 +24,7 @@ import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.util.DynamicEnergyStorage;
-import rearth.oritech.util.Geometry;
-import rearth.oritech.util.InventorySlotAssignment;
-import rearth.oritech.util.MachineAddonController;
+import rearth.oritech.util.*;
 
 import java.util.*;
 
@@ -96,6 +94,16 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+    }
+    
+    @Override
+    public SimpleInventory getInventoryForAddon() {
+        return inventory;
+    }
+    
+    @Override
+    public ScreenProvider getScreenProvider() {
+        return this;
     }
     
     @Override

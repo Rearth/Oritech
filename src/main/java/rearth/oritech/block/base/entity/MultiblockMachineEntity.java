@@ -2,26 +2,17 @@ package rearth.oritech.block.base.entity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.block.MultiblockMachine;
-import rearth.oritech.block.blocks.MachineCoreBlock;
-import rearth.oritech.block.entity.machines.processing.MachineCoreEntity;
-import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.util.Geometry;
 import rearth.oritech.util.ImplementedInventory;
+import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEntity implements MultiblockMachineController {
     
@@ -66,7 +57,7 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     }
     
     @Override
-    public ImplementedInventory getInventoryForLink() {
+    public InventoryProvider getInventoryForLink() {
         return this;
     }
     

@@ -19,12 +19,13 @@ import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.InventoryProxyScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ImplementedInventory;
+import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;
 
 public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements ImplementedInventory, ExtendedScreenHandlerFactory {
     
-    private UpgradableMachineBlockEntity cachedController;
+    private MachineAddonController cachedController;
     private int targetSlot = 0;
     
     public InventoryProxyAddonBlockEntity(BlockPos pos, BlockState state) {
@@ -36,12 +37,12 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
         return isUsed && getCachedController() != null;
     }
     
-    private UpgradableMachineBlockEntity getCachedController() {
+    private MachineAddonController getCachedController() {
         
-        if (cachedController != null && !cachedController.isRemoved())
+        if (cachedController != null)
             return cachedController;
         
-        cachedController = (UpgradableMachineBlockEntity) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
+        cachedController = (MachineAddonController) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
         return cachedController;
     }
     
@@ -50,7 +51,7 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
         if (!isConnected())
             return DefaultedList.of();
         
-        return getCachedController().getItems();
+        return getCachedController().getInventoryForAddon().heldStacks;
     }
     
     @Override
@@ -78,7 +79,7 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new InventoryProxyScreenHandler(syncId, playerInventory, this, getCachedController(), targetSlot);
+        return new InventoryProxyScreenHandler(syncId, playerInventory, this, getCachedController().getScreenProvider(), targetSlot);
     }
     
     public int getTargetSlot() {

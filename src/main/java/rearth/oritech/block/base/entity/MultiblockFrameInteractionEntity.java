@@ -12,6 +12,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.util.ImplementedInventory;
+import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -60,10 +61,9 @@ public abstract class MultiblockFrameInteractionEntity extends ItemEnergyFrameIn
         return this.coreQuality;
     }
     
-    // todo fix this
     @Override
-    public ImplementedInventory getInventoryForLink() {
-        return DefaultedList::of;
+    public InventoryProvider getInventoryForLink() {
+        return this;
     }
     
     @Override

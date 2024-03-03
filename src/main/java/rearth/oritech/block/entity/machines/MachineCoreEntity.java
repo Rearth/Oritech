@@ -1,10 +1,12 @@
-package rearth.oritech.block.entity.machines.processing;
+package rearth.oritech.block.entity.machines;
 
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -14,7 +16,7 @@ import team.reborn.energy.api.base.DelegatingEnergyStorage;
 
 import java.util.Objects;
 
-public class MachineCoreEntity extends BlockEntity implements DelegatingInventory, EnergyProvider {
+public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyProvider {
     
     private BlockPos controllerPos = BlockPos.ORIGIN;
     private MultiblockMachineController controllerEntity;
@@ -56,11 +58,6 @@ public class MachineCoreEntity extends BlockEntity implements DelegatingInventor
         return controllerEntity;
     }
     
-    @Override
-    public ImplementedInventory getDelegatedInventory() {
-        return Objects.requireNonNull(getCachedController()).getInventoryForLink();
-    }
-    
     private EnergyStorage getMainStorage() {
         
         var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
@@ -70,7 +67,6 @@ public class MachineCoreEntity extends BlockEntity implements DelegatingInventor
         return Objects.requireNonNull(controllerEntity).getEnergyStorageForLink();
     }
     
-    @Override
     public boolean isEnabled() {
         return this.getCachedState().get(MachineCoreBlock.USED);
     }
@@ -78,5 +74,14 @@ public class MachineCoreEntity extends BlockEntity implements DelegatingInventor
     @Override
     public EnergyStorage getStorage() {
         return delegatedStorage;
+    }
+    
+    @Override
+    public InventoryStorage getInventory(Direction direction) {
+        
+        var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
+        if (!isUsed || getCachedController() == null) return null;
+        
+        return getCachedController().getInventoryForLink().getInventory(direction);
     }
 }

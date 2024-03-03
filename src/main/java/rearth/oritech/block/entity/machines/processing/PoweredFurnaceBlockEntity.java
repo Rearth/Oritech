@@ -1,6 +1,7 @@
 package rearth.oritech.block.entity.machines.processing;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.SmeltingRecipe;
 import net.minecraft.screen.ScreenHandlerType;
@@ -14,6 +15,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +40,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
         
         var recipeCandidate = world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, getInputInventory(), world);
         
-        if (recipeCandidate.isPresent() && canAddToSlot(recipeCandidate.get().value().getResult(world.getRegistryManager()), this.getItems().get(1))) {
+        if (recipeCandidate.isPresent() && canAddToSlot(recipeCandidate.get().value().getResult(world.getRegistryManager()), inventory.heldStacks.get(1))) {
             if (hasEnoughEnergy()) {
                 
                 var activeRecipe = recipeCandidate.get().value();
@@ -65,12 +67,12 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     
     private void craftFurnaceItem(SmeltingRecipe activeRecipe) {
         var result = activeRecipe.getResult(world.getRegistryManager());
-        var outSlot = inventory.get(1);
-        var inSlot = inventory.get(0);
+        var outSlot = inventory.heldStacks.get(1);
+        var inSlot = inventory.heldStacks.get(0);
         
         inSlot.decrement(1);
         if (outSlot.isEmpty()) {
-            inventory.set(1, result.copy());
+            inventory.heldStacks.set(1, result.copy());
         } else {
             outSlot.increment(result.getCount());
         }

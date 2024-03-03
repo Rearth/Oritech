@@ -5,6 +5,7 @@ import io.wispforest.owo.serialization.endec.BuiltInEndecs;
 import io.wispforest.owo.serialization.endec.StructEndecBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -28,6 +29,8 @@ public interface MachineAddonController {
     World getWorld();
     Direction getFacingForAddon();
     DynamicEnergyStorage getStorageForAddon();
+    SimpleInventory getInventoryForAddon();
+    ScreenProvider getScreenProvider();
     List<Vec3i> getAddonSlots();
     BaseAddonData getBaseAddonData();
     void setBaseAddonData(BaseAddonData data);

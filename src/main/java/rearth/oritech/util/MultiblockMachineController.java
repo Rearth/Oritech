@@ -1,7 +1,6 @@
 package rearth.oritech.util;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -11,9 +10,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.block.base.block.MultiblockMachine;
-import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.blocks.MachineCoreBlock;
-import rearth.oritech.block.entity.machines.processing.MachineCoreEntity;
+import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.client.init.ParticleContent;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -30,7 +28,7 @@ public interface MultiblockMachineController {
     ArrayList<BlockPos> getConnectedCores();
     void setCoreQuality(float quality);
     float getCoreQuality();
-    ImplementedInventory getInventoryForLink();
+    InventoryProvider getInventoryForLink();
     EnergyStorage getEnergyStorageForLink();
     
     

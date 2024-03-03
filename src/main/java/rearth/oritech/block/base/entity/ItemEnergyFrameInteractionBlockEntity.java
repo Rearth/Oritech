@@ -37,13 +37,14 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
             ItemEnergyFrameInteractionBlockEntity.this.markDirty();
         }
     };
+    
     protected final SimpleInventory inventory = new SimpleInventory(3) {
         @Override
         public void markDirty() {
             ItemEnergyFrameInteractionBlockEntity.this.markDirty();
         }
     };
-    public final InventoryStorage inventoryWrapper = InventoryStorage.of(inventory, null);
+    
     private final List<BlockPos> connectedAddons = new ArrayList<>();
     private final List<BlockPos> openSlots = new ArrayList<>();
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
@@ -93,8 +94,8 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public InventoryStorage getInventory() {
-        return inventoryWrapper;
+    public InventoryStorage getInventory(Direction direction) {
+        return InventoryStorage.of(inventory, direction);
     }
     
     @Override
@@ -165,6 +166,16 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     private boolean isActivelyViewed() {
         var closestPlayer = Objects.requireNonNull(world).getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 5, false);
         return closestPlayer != null && closestPlayer.currentScreenHandler instanceof BasicMachineScreenHandler handler && getPos().equals(handler.getBlockPos());
+    }
+    
+    @Override
+    public SimpleInventory getInventoryForAddon() {
+        return inventory;
+    }
+    
+    @Override
+    public ScreenProvider getScreenProvider() {
+        return this;
     }
     
     @Override

@@ -3,6 +3,10 @@ package rearth.oritech.block.base.entity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -11,9 +15,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
@@ -40,13 +46,10 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class MachineBlockEntity extends BlockEntity
-  implements ExtendedScreenHandlerFactory, ImplementedInventory, GeoBlockEntity, EnergyProvider, ScreenProvider, BlockEntityTicker<MachineBlockEntity> {
+  implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyProvider, ScreenProvider, InventoryProvider, BlockEntityTicker<MachineBlockEntity> {
     
     // animations
     public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
@@ -66,7 +69,6 @@ public abstract class MachineBlockEntity extends BlockEntity
     protected boolean networkDirty = true;
     
     //own storage
-    protected final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(getInventorySize(), ItemStack.EMPTY);
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(5000, 100, 0) {
         @Override
         protected void onFinalCommit() {
@@ -74,6 +76,7 @@ public abstract class MachineBlockEntity extends BlockEntity
             markNetDirty();
         }
     };
+    protected final SimpleInventory inventory = new SimpleMachineInventory(getInventorySize());
     
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state);
@@ -247,12 +250,12 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     protected List<ItemStack> getInputView() {
         var slots = getSlots();
-        return this.inventory.subList(slots.inputStart(), slots.inputStart() + slots.inputCount());
+        return this.inventory.heldStacks.subList(slots.inputStart(), slots.inputStart() + slots.inputCount());
     }
     
     protected List<ItemStack> getOutputView() {
         var slots = getSlots();
-        return this.inventory.subList(slots.outputStart(), slots.outputStart() + slots.outputCount());
+        return this.inventory.heldStacks.subList(slots.outputStart(), slots.outputStart() + slots.outputCount());
     }
     
     protected Inventory getInputInventory() {
@@ -264,14 +267,9 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     @Override
-    public DefaultedList<ItemStack> getItems() {
-        return inventory;
-    }
-    
-    @Override
     public void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
-        Inventories.writeNbt(nbt, inventory);
+        nbt.put("inventory", inventory.toNbtList());
         nbt.putInt("oritech.machine_progress", progress);
         nbt.putLong("oritech.machine_energy", energyStorage.amount);
         nbt.putShort("oritech.machine_input_mode", (short) inventoryInputMode.ordinal());
@@ -280,53 +278,10 @@ public abstract class MachineBlockEntity extends BlockEntity
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
-        Inventories.readNbt(nbt, inventory);
+        inventory.readNbtList(nbt.getList("inventory", NbtElement.COMPOUND_TYPE));
         progress = nbt.getInt("oritech.machine_progress");
         energyStorage.amount = nbt.getLong("oritech.machine_energy");
         inventoryInputMode = InventoryInputMode.values()[nbt.getShort("oritech.machine_input_mode")];
-    }
-    
-    @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction side) {
-        
-        var forward = getFacing();
-        var right = forward.rotateYCounterclockwise();
-        
-        if (side != Direction.DOWN && side != right) return false;
-        
-        var config = getSlots();
-        return slot >= config.outputStart() && slot < config.outputStart() + config.outputCount();
-    }
-    
-    @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction side) {
-        
-        var mode = inventoryInputMode;
-        var config = getSlots();
-        
-        var forward = getFacing();
-        var right = forward.rotateYCounterclockwise();
-        
-        // insert from any side besides bottom or right
-        if (side == Direction.DOWN || side == right) return false;
-        
-        var inv = this.getInputView();
-        
-        // fill equally
-        // check all slots, find the one with the lowest (or empty) type
-        return switch (mode) {
-            case FILL_EVENLY -> {
-                var target = findLowestMatchingSlot(stack, inv, true);
-                yield target >= 0 && config.inputToRealSlot(target) == slot;
-            }
-            case FILL_LEFT_TO_RIGHT -> // fill left to right
-              true;
-            case FILL_MATCHING_RECIPE -> {
-                var recipeTargetSlot = slotRecipeSearch(stack, inv);
-                yield recipeTargetSlot >= 0 && config.inputToRealSlot(recipeTargetSlot) == slot;
-            }
-        };
-        
     }
     
     private int slotRecipeSearch(ItemStack stack, List<ItemStack> inv) {
@@ -569,6 +524,11 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     public abstract int getInventorySize();
     
+    @Override
+    public InventoryStorage getInventory(Direction direction) {
+        return InventoryStorage.of(inventory, direction);
+    }
+    
     public boolean isActive(BlockState state) {
         return true;
     }
@@ -584,6 +544,87 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     @Override
     public Inventory getDisplayedInventory() {
-        return this;
+        return inventory;
+    }
+    
+    private class SimpleMachineInventory extends SimpleInventory implements SidedInventory {
+        
+        public SimpleMachineInventory(int size) {
+            super(size);
+        }
+        
+        @Override
+        public void markDirty() {
+            MachineBlockEntity.this.markDirty();
+        }
+        
+        @Override
+        public int[] getAvailableSlots(Direction side) {
+            var forward = getFacing();
+            var right = forward.rotateYCounterclockwise();
+            
+            // return a list of slot indices. Down and right is output, all else is input
+            if (side == Direction.DOWN || side == right) {
+                var res = new int[getSlots().outputCount()];
+                for (int i = 0; i < getSlots().outputCount(); i++) {
+                    res[i] = getSlots().outputStart() + i;
+                }
+                System.out.println(Arrays.toString(res));
+                return res;
+            } else {
+                var res = new int[getSlots().inputCount()];
+                for (int i = 0; i < getSlots().inputCount(); i++) {
+                    res[i] = getSlots().inputStart() + i;
+                }
+                System.out.println("input" + Arrays.toString(res));
+                return res;
+            }
+        }
+        
+        @Override
+        public boolean canInsert(int slot, ItemStack stack, @Nullable Direction side) {
+            
+            var mode = inventoryInputMode;
+            var config = getSlots();
+            
+//            var forward = getFacing();
+//            var right = forward.rotateYCounterclockwise();
+//
+//            // insert from any side besides bottom or right
+//            if (side == Direction.DOWN || side == right) return false;
+            
+            var inv = getInputView();
+            
+            System.out.println(inv);
+            
+            // fill equally
+            // check all slots, find the one with the lowest (or empty) type
+            return switch (mode) {
+                case FILL_EVENLY -> {
+                    var target = findLowestMatchingSlot(stack, inv, true);
+                    yield target >= 0 && config.inputToRealSlot(target) == slot;
+                }
+                case FILL_LEFT_TO_RIGHT -> // fill left to right
+                  true;
+                case FILL_MATCHING_RECIPE -> {
+                    var recipeTargetSlot = slotRecipeSearch(stack, inv);
+                    yield recipeTargetSlot >= 0 && config.inputToRealSlot(recipeTargetSlot) == slot;
+                }
+            };
+        }
+        
+        @Override
+        public boolean canExtract(int slot, ItemStack stack, Direction side) {
+            return true;
+
+            // not needed anymore, since this is done in getAvailableSlots
+//            var forward = getFacing();
+//            var right = forward.rotateYCounterclockwise();
+//
+//            if (side != Direction.DOWN && side != right) return false;
+//
+//            var config = getSlots();
+//            return slot >= config.outputStart() && slot < config.outputStart() + config.outputCount();
+        }
     }
 }
