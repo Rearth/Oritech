@@ -7,6 +7,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Pair;
@@ -217,7 +218,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
             if (!hasWorkAvailable(currentTarget)) currentProgress = getWorkTime();
         }
         
-        doProgress();
+        doProgress(moving);
         currentProgress++;
     }
     
@@ -244,7 +245,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     protected abstract boolean hasWorkAvailable(BlockPos toolPosition);
     
-    protected abstract void doProgress();
+    protected abstract void doProgress(boolean moving);
     
     protected abstract boolean canProgress();
     
@@ -292,7 +293,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         }
         
         // tries to not put 2 tool heads in the same spot, but also allow overtaking if previous machine is too slow
-        if (!isBlockAvailable(nextPos) && currentProgress <= getWorkTime() * getSpeedMultiplier() * 5 + 10) return false;
+        if (!isBlockAvailable(nextPos) && currentProgress <= getWorkTime() * getSpeedMultiplier() * 2 + 4) return false;
         
         lastTarget = currentTarget;
         currentTarget = nextPos;
@@ -390,6 +391,10 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     public abstract int getMoveTime();
     
     public abstract int getWorkTime();
+    
+    public ItemStack getToolheadAdditionalRender() {
+        return null;
+    }
     
     @Environment(EnvType.CLIENT)
     public long getMoveStartedAt() {

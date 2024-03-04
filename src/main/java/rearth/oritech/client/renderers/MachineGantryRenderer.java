@@ -3,12 +3,19 @@ package rearth.oritech.client.renderers;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import rearth.oritech.block.base.block.FrameInteractionBlock;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.init.BlockContent;
@@ -17,7 +24,8 @@ import rearth.oritech.init.BlockContent;
 public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteractionBlockEntity> {
     
     private static final BlockState renderedBeam = BlockContent.FRAME_GANTRY_ARM.getDefaultState();
-    private static final float BEAM_DEPTH = 3/16f;
+    private static final float BEAM_DEPTH = 3 / 16f;
+    private static final Random renderRandom = Random.create(100);
     
     @Override
     public void render(FrameInteractionBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
@@ -28,30 +36,36 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
         
         
         var renderedPosition = Vec3d.of(entity.getCurrentTarget());
+        var movingOffset = new Vec3d(0, 0, 0);
         var time = entity.getWorld().getTime() + tickDelta;
         var passedTime = time - entity.getMoveStartedAt();
+        var random = entity.getWorld().random;
         
         // check if currently moving, otherwise we can skip those calculations
         if (time < entity.getMoveStartedAt() + entity.getMoveTime() && entity.getMoveStartedAt() > 1) {
             var movementDoneAmount = passedTime / (float) entity.getMoveTime();
             var offset = Vec3d.of(entity.getCurrentTarget().subtract(entity.getLastTarget())).multiply(movementDoneAmount);
             renderedPosition = Vec3d.of(entity.getLastTarget()).add(offset);
+        } else {
+            // apply slight movement while working
+            var offsetY = renderRandom.nextFloat() * 0.009 - 0.004;
+            movingOffset = new Vec3d(0, offsetY, 0);
         }
-        var targetOffset = renderedPosition.subtract(Vec3d.of(entity.getPos()));
+        var targetOffset = renderedPosition.subtract(Vec3d.of(entity.getPos())).add(movingOffset);
         
         matrices.push();
         matrices.translate(targetOffset.getX(), targetOffset.getY(), targetOffset.getZ());
         
-        var pos = entity.getCurrentTarget(); // relevant for correct lighting, actual position is determined by matrix
+        var pos = entity.getCurrentTarget(); // relevant for correct lighting, actual rendered position is determined by matrix
         
         MinecraftClient.getInstance().getBlockRenderManager().renderBlock(
           entity.getMachineHead(),
           pos,
           entity.getWorld(),
           matrices,
-          vertexConsumers.getBuffer(RenderLayers.getBlockLayer(state)),
+          vertexConsumers.getBuffer(RenderLayers.getBlockLayer(entity.getMachineHead())),
           false,
-          entity.getWorld().random);
+          random);
         
         matrices.pop();
         
@@ -70,10 +84,29 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
           matrices,
           vertexConsumers.getBuffer(RenderLayers.getBlockLayer(renderedBeam)),
           true,
-          entity.getWorld().random);
+          random);
         
         matrices.pop();
         
-        
+        var renderedItem = entity.getToolheadAdditionalRender();
+        if (renderedItem != null) {
+            matrices.push();
+            matrices.translate(targetOffset.getX() + 0.4, targetOffset.getY() - 0.3f, targetOffset.getZ() + 0.4);
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(30));
+            // matrices.scale(0.3f, 0.3f, 0.3f);
+            
+            MinecraftClient.getInstance().getItemRenderer().renderItem(
+              renderedItem,
+              ModelTransformationMode.FIRST_PERSON_RIGHT_HAND,
+              light,
+              OverlayTexture.DEFAULT_UV,
+              matrices,
+              vertexConsumers,
+              entity.getWorld(),
+              0
+            );
+            
+            matrices.pop();
+        }
     }
 }

@@ -7,10 +7,12 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockFrameInteractionEntity;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import team.reborn.energy.api.EnergyStorage;
@@ -70,8 +72,15 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     }
     
     @Override
+    protected void doProgress(boolean moving) {
+        super.doProgress(moving);
+        if (!moving && hasWorkAvailable(getCurrentTarget()))
+            ParticleContent.BLOCK_DESTROY_EFFECT.spawn(world, Vec3d.of(getCurrentTarget().down()), 4);
+    }
+    
+    @Override
     public BlockState getMachineHead() {
-        return BlockContent.MACHINE_INVENTORY_PROXY_ADDON.getDefaultState().with(WallMountedBlock.FACE, BlockFace.FLOOR);
+        return BlockContent.BLOCK_DESTROYER_HEAD.getDefaultState();
     }
     
     @Override
@@ -83,12 +92,12 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
     @Override
     public int getMoveTime() {
-        return 4;
+        return 20;
     }
     
     @Override
     public int getWorkTime() {
-        return 10;
+        return 40;
     }
     
     @Override

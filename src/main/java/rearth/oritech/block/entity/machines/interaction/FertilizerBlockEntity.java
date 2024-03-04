@@ -60,7 +60,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     
     @Override
     public BlockState getMachineHead() {
-        return BlockContent.MACHINE_CAPACITOR_ADDON.getDefaultState().with(WallMountedBlock.FACE, BlockFace.FLOOR);
+        return BlockContent.BLOCK_FERTILIZER_HEAD.getDefaultState();
     }
     
     @Override
@@ -71,13 +71,20 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     }
     
     @Override
+    protected void doProgress(boolean moving) {
+        super.doProgress(moving);
+        if (!moving && hasWorkAvailable(getCurrentTarget()))
+            ParticleContent.WATERING_EFFECT.spawn(world, Vec3d.of(getCurrentTarget().down()), 2);
+    }
+    
+    @Override
     public int getMoveTime() {
-        return 4;
+        return 10;
     }
     
     @Override
     public int getWorkTime() {
-        return 10;
+        return 20;
     }
     
     @Override

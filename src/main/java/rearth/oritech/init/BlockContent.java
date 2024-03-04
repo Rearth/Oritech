@@ -39,6 +39,12 @@ public class BlockContent implements BlockRegistryContainer {
     
     @NoBlockItem
     public static final Block FRAME_GANTRY_ARM = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    @NoBlockItem
+    public static final Block BLOCK_DESTROYER_HEAD = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    @NoBlockItem
+    public static final Block BLOCK_PLACER_HEAD = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    @NoBlockItem
+    public static final Block BLOCK_FERTILIZER_HEAD = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
     
     @NoBlockItem
     public static final Block ADDON_INDICATOR_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS));

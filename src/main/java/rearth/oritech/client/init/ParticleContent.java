@@ -25,6 +25,16 @@ public class ParticleContent {
         ClientParticles.spawnWithinBlock(ParticleTypes.HAPPY_VILLAGER, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z));
     }));
     
+    public static final ParticleSystem<Integer> BLOCK_DESTROY_EFFECT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawnCenteredOnBlock(ParticleTypes.SOUL_FIRE_FLAME, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
+    }));
+    
+    public static final ParticleSystem<Integer> WATERING_EFFECT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawnCenteredOnBlock(ParticleTypes.FALLING_WATER, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
+    }));
+    
     private static void spawnCubeOutline(ParticleEffect particle, Vec3d origin, float size, int duration, int segments) {
         
         spawnLineInner(particle, origin, origin.add(size, 0, 0), segments, duration);

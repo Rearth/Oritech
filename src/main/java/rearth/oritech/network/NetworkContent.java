@@ -2,6 +2,7 @@ package rearth.oritech.network;
 
 import io.wispforest.owo.network.OwoNetChannel;
 import io.wispforest.owo.serialization.endec.ReflectiveEndecBuilder;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
@@ -12,6 +13,10 @@ import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntit
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.InventoryProvider;
+import rearth.oritech.util.ScreenProvider;
+
+import java.util.List;
 
 public class NetworkContent {
 
@@ -27,6 +32,7 @@ public class NetworkContent {
     public record MachineEventPacket(BlockPos position) {}
     public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget, BlockPos areaMin, BlockPos areaMax) {};   // times are in ticks
     public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress){};
+    public record InventorySyncPacket(BlockPos position, List<ItemStack> heldStacks) {}
     
     public static void registerChannels() {
 
@@ -63,6 +69,19 @@ public class NetworkContent {
                 machine.setMoveStartedAt(access.player().getWorld().getTime());
                 machine.setAreaMin(message.areaMin);
                 machine.setAreaMax(message.areaMax);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(InventorySyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            if (entity instanceof ScreenProvider machine) {
+                List<ItemStack> heldStacks = message.heldStacks;
+                for (int i = 0; i < heldStacks.size(); i++) {
+                    var stack = heldStacks.get(i);
+                    machine.getDisplayedInventory().setStack(i, stack);
+                }
             }
             
         }));

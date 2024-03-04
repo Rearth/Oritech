@@ -38,7 +38,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
         }
     };
     
-    protected final SimpleInventory inventory = new SimpleInventory(3) {
+    protected final SimpleInventory inventory = new SimpleInventory(1) {
         @Override
         public void markDirty() {
             ItemEnergyFrameInteractionBlockEntity.this.markDirty();
@@ -65,7 +65,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    protected void doProgress() {
+    protected void doProgress(boolean moving) {
         energyStorage.amount -= (long) (getMoveEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()));
         this.markDirty();
     }
@@ -124,9 +124,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     @Override
     public List<ScreenProvider.GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 50, 11),
-          new GuiSlot(1, 68, 11),
-          new GuiSlot(2, 86, 11));
+          new GuiSlot(0, 50, 11));
     }
     
     @Override
@@ -163,7 +161,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
         }
     }
     
-    private boolean isActivelyViewed() {
+    protected boolean isActivelyViewed() {
         var closestPlayer = Objects.requireNonNull(world).getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 5, false);
         return closestPlayer != null && closestPlayer.currentScreenHandler instanceof BasicMachineScreenHandler handler && getPos().equals(handler.getBlockPos());
     }
