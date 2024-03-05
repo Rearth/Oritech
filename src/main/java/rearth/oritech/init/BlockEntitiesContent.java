@@ -40,6 +40,10 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedInventory
     @AssignSidedEnergy
+    public static final BlockEntityType<FoundryBlockEntity> FOUNDRY_ENTITY = FabricBlockEntityTypeBuilder.create(FoundryBlockEntity::new, BlockContent.FOUNDRY_BLOCK).build();
+    
+    @AssignSidedInventory
+    @AssignSidedEnergy
     public static final BlockEntityType<PoweredFurnaceBlockEntity> POWERED_FURNACE_ENTITY = FabricBlockEntityTypeBuilder.create(PoweredFurnaceBlockEntity::new, BlockContent.POWERED_FURNACE_BLOCK).build();
     
     @AssignSidedEnergy

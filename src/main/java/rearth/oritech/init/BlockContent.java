@@ -13,14 +13,11 @@ import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.InventoryProxyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
-import rearth.oritech.block.blocks.machines.processing.AssemblerBlock;
-import rearth.oritech.block.blocks.machines.processing.GrinderBlock;
-import rearth.oritech.block.blocks.machines.processing.PoweredFurnaceBlock;
-import rearth.oritech.block.blocks.machines.processing.PulverizerBlock;
-import rearth.oritech.block.blocks.machines.worldInteraction.DestroyerBlock;
-import rearth.oritech.block.blocks.machines.worldInteraction.FertilizerBlock;
-import rearth.oritech.block.blocks.machines.worldInteraction.MachineFrameBlock;
-import rearth.oritech.block.blocks.machines.worldInteraction.PlacerBlock;
+import rearth.oritech.block.blocks.machines.processing.*;
+import rearth.oritech.block.blocks.machines.interaction.DestroyerBlock;
+import rearth.oritech.block.blocks.machines.interaction.FertilizerBlock;
+import rearth.oritech.block.blocks.machines.interaction.MachineFrameBlock;
+import rearth.oritech.block.blocks.machines.interaction.PlacerBlock;
 import rearth.oritech.util.item.OritechGeoItem;
 
 import java.lang.annotation.ElementType;
@@ -55,6 +52,8 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block GRINDER_BLOCK = new GrinderBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block ASSEMBLER_BLOCK = new AssemblerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @UseGeoBlockItem(scale = 0.7f)
+    public static final Block FOUNDRY_BLOCK = new FoundryBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block POWERED_FURNACE_BLOCK = new PoweredFurnaceBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     

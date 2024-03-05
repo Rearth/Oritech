@@ -1,0 +1,17 @@
+{
+  "type": "oritech:foundry",
+  "ingredients": [
+    {
+      "item": "minecraft:copper_ingot"
+    }, {
+      "item": "minecraft:iron_ingot"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:diamond",
+      "Count": 1
+    }
+  ],
+  "time": 60
+}

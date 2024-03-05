@@ -1,6 +1,5 @@
-package rearth.oritech.block.blocks.machines.worldInteraction;
+package rearth.oritech.block.blocks.machines.interaction;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;

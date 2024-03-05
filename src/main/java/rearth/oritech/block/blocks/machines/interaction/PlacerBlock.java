@@ -1,4 +1,4 @@
-package rearth.oritech.block.blocks.machines.worldInteraction;
+package rearth.oritech.block.blocks.machines.interaction;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
