@@ -204,7 +204,7 @@ public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachin
             .positioning(Positioning.absolute(previewX, previewY))
         );
         
-        var openAddonsButton = Components.button(Text.of("Details"), button -> {
+        var openAddonsButton = Components.button(Text.of("Addons"), button -> {
             root.child(floatingPanel);
             // handler.hideSlots();
         });

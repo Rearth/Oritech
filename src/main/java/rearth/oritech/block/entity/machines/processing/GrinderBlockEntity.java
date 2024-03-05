@@ -58,47 +58,24 @@ public class GrinderBlockEntity extends MultiblockMachineEntity {
     public List<Vec3i> getCorePositions() {
         return List.of(
           new Vec3i(0, 1,0),    // middle
-          new Vec3i(0, 2,0),
           new Vec3i(0, 0,1),    // left
           new Vec3i(0, 1,1),
-          new Vec3i(0, 2,1),
-          new Vec3i(0, 0,-1),    // right
-          new Vec3i(0, 1,-1),
-          new Vec3i(0, 2,-1),
-          new Vec3i(1, 0,1),    // middle left
+          new Vec3i(1, 0,1),    // back left
           new Vec3i(1, 1,1),
-          new Vec3i(1, 2,1),
-          new Vec3i(1, 0, 0),    // middle middle
-          new Vec3i(1, 1,0),
-          new Vec3i(1, 2,0),
-          new Vec3i(1, 0, -1),    // middle right
-          new Vec3i(1, 1,-1),
-          new Vec3i(1, 2,-1),
-          new Vec3i(2, 0,1),    // back left
-          new Vec3i(2, 1,1),
-          new Vec3i(2, 2,1),
-          new Vec3i(2, 0, 0),    // back middle
-          new Vec3i(2, 1,0),
-          new Vec3i(2, 2,0),
-          new Vec3i(2, 0, -1),    // back right
-          new Vec3i(2, 1,-1),
-          new Vec3i(2, 2,-1)
+          new Vec3i(1, 0, 0),    // back middle
+          new Vec3i(1, 1,0)
         );
     }
     
+    // x = back, // z = left
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
           new Vec3i(0, 0,2),
           new Vec3i(1, 0,2),
-          new Vec3i(2, 0,2),
-          new Vec3i(1, 1,2),
-          new Vec3i(2, 1,2),
-          new Vec3i(0, 0,-2),
-          new Vec3i(1, 0,-2),
-          new Vec3i(2, 0,-2),
-          new Vec3i(1, 1,-2),
-          new Vec3i(2, 1,-2)
+          new Vec3i(2, 0,0),
+          new Vec3i(1, 0,-1),
+          new Vec3i(-1, 0,1)
         );
     }
 }

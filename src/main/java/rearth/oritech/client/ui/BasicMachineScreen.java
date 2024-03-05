@@ -118,7 +118,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         container.surface(Surface.PANEL_INSET);
         container.horizontalAlignment(HorizontalAlignment.CENTER);
         
-        container.padding(Insets.of(1));
+        container.padding(Insets.of(1, 4, 1, 1));
         container.margins(Insets.of(7));
         
         addExtensionComponents(container);

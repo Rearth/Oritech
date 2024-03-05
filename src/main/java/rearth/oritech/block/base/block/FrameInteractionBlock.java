@@ -14,6 +14,7 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -72,6 +73,8 @@ public abstract class FrameInteractionBlock extends HorizontalFacingBlock implem
                 
                 var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
                 player.openHandledScreen(handler);
+            } else {
+                player.sendMessage(Text.literal("Missing frame. Add an empty rectangular frame behind the machine using machine frame blocks"));
             }
             
         }

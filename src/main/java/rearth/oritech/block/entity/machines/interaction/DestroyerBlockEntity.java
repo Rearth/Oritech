@@ -15,6 +15,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.util.ScreenProvider;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.List;
@@ -81,6 +82,19 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     public BlockState getMachineHead() {
         return BlockContent.BLOCK_DESTROYER_HEAD.getDefaultState();
+    }
+    
+    @Override
+    public List<ScreenProvider.GuiSlot> getGuiSlots() {
+        return List.of(
+          new GuiSlot(0, 50, 11),
+          new GuiSlot(1, 70, 11),
+          new GuiSlot(2, 90, 11));
+    }
+    
+    @Override
+    public int getInventorySize() {
+        return 3;
     }
     
     @Override

@@ -269,7 +269,8 @@ public abstract class MachineBlockEntity extends BlockEntity
     @Override
     public void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
-        nbt.put("inventory", inventory.toNbtList());
+        Inventories.writeNbt(nbt, inventory.heldStacks, false);
+        // nbt.put("inventory", inventory.toNbtList());
         nbt.putInt("oritech.machine_progress", progress);
         nbt.putLong("oritech.machine_energy", energyStorage.amount);
         nbt.putShort("oritech.machine_input_mode", (short) inventoryInputMode.ordinal());
@@ -278,7 +279,8 @@ public abstract class MachineBlockEntity extends BlockEntity
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
-        inventory.readNbtList(nbt.getList("inventory", NbtElement.COMPOUND_TYPE));
+        // inventory.readNbtList(nbt.getList("inventory", NbtElement.COMPOUND_TYPE));
+        Inventories.readNbt(nbt, inventory.heldStacks);
         progress = nbt.getInt("oritech.machine_progress");
         energyStorage.amount = nbt.getLong("oritech.machine_energy");
         inventoryInputMode = InventoryInputMode.values()[nbt.getShort("oritech.machine_input_mode")];

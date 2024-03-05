@@ -38,7 +38,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
         }
     };
     
-    protected final SimpleInventory inventory = new SimpleInventory(1) {
+    protected final SimpleInventory inventory = new SimpleInventory(getInventorySize()) {
         @Override
         public void markDirty() {
             ItemEnergyFrameInteractionBlockEntity.this.markDirty();
@@ -125,6 +125,10 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     public List<ScreenProvider.GuiSlot> getGuiSlots() {
         return List.of(
           new GuiSlot(0, 50, 11));
+    }
+    
+    public int getInventorySize() {
+        return 1;
     }
     
     @Override
