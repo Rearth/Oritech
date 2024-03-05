@@ -31,6 +31,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleState(BlockContent.GRINDER_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.ASSEMBLER_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.FOUNDRY_BLOCK);
+        blockStateModelGenerator.registerSimpleState(BlockContent.CENTRIFUGE_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.POWERED_FURNACE_BLOCK);
         
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_BASIC);

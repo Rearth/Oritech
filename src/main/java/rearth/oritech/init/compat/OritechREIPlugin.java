@@ -29,12 +29,14 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerOritechCategory(registry, RecipeContent.GRINDER, BlockContent.GRINDER_BLOCK, BasicMachineScreen::new);
         registerOritechCategory(registry, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK, BasicMachineScreen::new);
         registerOritechCategory(registry, RecipeContent.FOUNDRY, BlockContent.FOUNDRY_BLOCK, BasicMachineScreen::new);
+        registerOritechCategory(registry, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK, BasicMachineScreen::new);
         
         // workstations
         registerOriWorkstation(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK);
         registerOriWorkstation(registry, RecipeContent.GRINDER, BlockContent.GRINDER_BLOCK);
         registerOriWorkstation(registry, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK);
         registerOriWorkstation(registry, RecipeContent.FOUNDRY, BlockContent.FOUNDRY_BLOCK);
+        registerOriWorkstation(registry, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK);
     }
     
     // creates a screen instance that displays all recipes of that recipe type
@@ -46,6 +48,7 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerMachineRecipeType(registry, RecipeContent.ASSEMBLER);
         registerMachineRecipeType(registry, RecipeContent.GRINDER);
         registerMachineRecipeType(registry, RecipeContent.FOUNDRY);
+        registerMachineRecipeType(registry, RecipeContent.CENTRIFUGE);
     }
     
     private void registerOritechCategory(CategoryRegistry registry, OritechRecipeType recipeType, ItemConvertible machineIcon, BiFunction<OritechRecipeType, ItemConvertible, BasicMachineScreen> screenType) {

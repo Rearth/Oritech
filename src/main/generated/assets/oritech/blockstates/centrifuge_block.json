@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/centrifuge_block"
+    }
+  }
+}

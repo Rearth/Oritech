@@ -18,6 +18,7 @@ public class RecipeContent {
     public static final OritechRecipeType GRINDER = register(new Identifier(Oritech.MOD_ID, "grinder"));
     public static final OritechRecipeType ASSEMBLER = register(new Identifier(Oritech.MOD_ID, "assembler"));
     public static final OritechRecipeType FOUNDRY = register(new Identifier(Oritech.MOD_ID, "foundry"));
+    public static final OritechRecipeType CENTRIFUGE = register(new Identifier(Oritech.MOD_ID, "centrifuge"));
 
     private static OritechRecipeType register(Identifier name) {
 

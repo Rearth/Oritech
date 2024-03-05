@@ -571,14 +571,12 @@ public abstract class MachineBlockEntity extends BlockEntity
                 for (int i = 0; i < getSlots().outputCount(); i++) {
                     res[i] = getSlots().outputStart() + i;
                 }
-                System.out.println(Arrays.toString(res));
                 return res;
             } else {
                 var res = new int[getSlots().inputCount()];
                 for (int i = 0; i < getSlots().inputCount(); i++) {
                     res[i] = getSlots().inputStart() + i;
                 }
-                System.out.println("input" + Arrays.toString(res));
                 return res;
             }
         }

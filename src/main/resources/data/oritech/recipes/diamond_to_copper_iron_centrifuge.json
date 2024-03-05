@@ -1,0 +1,19 @@
+{
+  "type": "oritech:centrifuge",
+  "ingredients": [
+    {
+      "item": "minecraft:diamond"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:copper_ingot",
+      "Count": 1
+    },
+    {
+      "id": "minecraft:iron_ingot",
+      "Count": 1
+    }
+  ],
+  "time": 60
+}
