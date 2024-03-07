@@ -34,6 +34,8 @@ public interface MachineAddonController {
     List<Vec3i> getAddonSlots();
     BaseAddonData getBaseAddonData();
     void setBaseAddonData(BaseAddonData data);
+    long getDefaultCapacity();
+    long getDefaultInsertRate();
     
     default float getCoreQuality() {
         return 1f;
@@ -188,8 +190,8 @@ public interface MachineAddonController {
     default void updateEnergyContainer() {
         var energyStorage = getStorageForAddon();
         var addonData = getBaseAddonData();
-        energyStorage.capacity = 5000 + addonData.energyBonusCapacity;
-        energyStorage.maxInsert = 100 + addonData.energyBonusTransfer;
+        energyStorage.capacity = getDefaultCapacity() + addonData.energyBonusCapacity;
+        energyStorage.maxInsert = getDefaultInsertRate() + addonData.energyBonusTransfer;
         
         energyStorage.amount = Math.min(energyStorage.amount, energyStorage.capacity);
     }

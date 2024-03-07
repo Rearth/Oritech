@@ -35,6 +35,16 @@ public class ParticleContent {
         ClientParticles.spawnCenteredOnBlock(ParticleTypes.FALLING_WATER, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
     }));
     
+    public static final ParticleSystem<Integer> FURNACE_BURNING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawnCenteredOnBlock(ParticleTypes.LAVA, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
+    }));
+    
+    public static final ParticleSystem<Integer> PULVERIZER_WORKING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawnCenteredOnBlock(ParticleTypes.DUST_PLUME, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
+    }));
+    
     private static void spawnCubeOutline(ParticleEffect particle, Vec3d origin, float size, int duration, int segments) {
         
         spawnLineInner(particle, origin, origin.add(size, 0, 0), segments, duration);

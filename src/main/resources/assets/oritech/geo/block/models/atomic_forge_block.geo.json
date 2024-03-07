@@ -83,7 +83,7 @@
 				{
 					"name": "bone3",
 					"parent": "rods",
-					"pivot": [8, 14.375, 10],
+					"pivot": [8, 7, 8],
 					"cubes": [
 						{"origin": [6, 7, 6], "size": [4, 9, 4], "uv": [46, 125]}
 					]
@@ -91,7 +91,7 @@
 				{
 					"name": "bone4",
 					"parent": "rods",
-					"pivot": [8, 14.375, -10],
+					"pivot": [8, 7, -8],
 					"cubes": [
 						{"origin": [6, 7, -10], "size": [4, 9, 4], "uv": [30, 125]}
 					]
@@ -99,7 +99,7 @@
 				{
 					"name": "bone5",
 					"parent": "rods",
-					"pivot": [-8, 14.375, -10],
+					"pivot": [-8, 7, -8],
 					"cubes": [
 						{"origin": [-10, 7, -10], "size": [4, 9, 4], "uv": [14, 125]}
 					]
@@ -107,7 +107,7 @@
 				{
 					"name": "bone6",
 					"parent": "rods",
-					"pivot": [-8, 14.375, 10],
+					"pivot": [-8, 7, 8],
 					"cubes": [
 						{"origin": [-10, 7, 6], "size": [4, 9, 4], "uv": [80, 47]}
 					]

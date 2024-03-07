@@ -15,6 +15,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> ASSEMBLER_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> FOUNDRY_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> CENTRIFUGE_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
+    public static final ExtendedScreenHandlerType<BasicMachineScreenHandler> ATOMIC_FORGE_SCREEN = new ExtendedScreenHandlerType<>(BasicMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> POWERED_FURNACE_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> DESTROYER_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> PLACER_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
@@ -28,6 +29,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
         HandledScreens.register(FOUNDRY_SCREEN, UpgradableMachineScreen::new);
         HandledScreens.register(CENTRIFUGE_SCREEN, UpgradableMachineScreen::new);
         HandledScreens.register(POWERED_FURNACE_SCREEN, UpgradableMachineScreen::new);
+        HandledScreens.register(ATOMIC_FORGE_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         HandledScreens.register(INVENTORY_PROXY_SCREEN, InventoryProxyScreen::new);
         HandledScreens.register(DESTROYER_SCREEN, UpgradableMachineScreen::new);
         HandledScreens.register(PLACER_SCREEN, UpgradableMachineScreen::new);

@@ -611,6 +611,180 @@
 					}
 				}
 			}
+		},
+		"working": {
+			"loop": true,
+			"animation_length": 3,
+			"bones": {
+				"bone3": {
+					"rotation": {
+						"0.1667": {
+							"vector": [0, 0, 0]
+						},
+						"0.5": {
+							"vector": [5, 0, 5.10071],
+							"easing": "easeInBack"
+						},
+						"0.7083": {
+							"vector": [-4.95744, -0.65182, -2.47178],
+							"easing": "easeInElastic"
+						},
+						"1.1667": {
+							"vector": [0, 0, 5],
+							"easing": "easeInElastic"
+						},
+						"1.4167": {
+							"vector": [-2.37097, -0.41763, -3.68801],
+							"easing": "easeInElastic"
+						},
+						"1.7083": {
+							"vector": [0, 0, 5],
+							"easing": "easeInElastic"
+						},
+						"2.0": {
+							"vector": [-4.95744, -0.65182, -2.47178],
+							"easing": "easeInElastic"
+						},
+						"2.25": {
+							"vector": [5, 0, 5.10071],
+							"easing": "easeInBack"
+						},
+						"2.5": {
+							"vector": [-2.37097, -0.41763, -3.68801],
+							"easing": "easeInElastic"
+						},
+						"2.9167": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"bone4": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.3333": {
+							"vector": [5, 0, 5.10071],
+							"easing": "easeInBack"
+						},
+						"0.5417": {
+							"vector": [-4.95744, -0.65182, -2.47178],
+							"easing": "easeInElastic"
+						},
+						"1.0": {
+							"vector": [0, 0, 5],
+							"easing": "easeInElastic"
+						},
+						"1.2083": {
+							"vector": [-2.37097, -0.41763, -3.68801],
+							"easing": "easeInElastic"
+						},
+						"1.5417": {
+							"vector": [0, 0, 5],
+							"easing": "easeInElastic"
+						},
+						"1.8333": {
+							"vector": [-4.95744, -0.65182, -2.47178],
+							"easing": "easeInElastic"
+						},
+						"2.0833": {
+							"vector": [5, 0, 5.10071],
+							"easing": "easeInBack"
+						},
+						"2.3333": {
+							"vector": [-2.37097, -0.41763, -3.68801],
+							"easing": "easeInElastic"
+						},
+						"2.75": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"bone5": {
+					"rotation": {
+						"0.2083": {
+							"vector": [0, 0, 0]
+						},
+						"0.5417": {
+							"vector": [5, 0, 5.10071],
+							"easing": "easeInBack"
+						},
+						"0.75": {
+							"vector": [-4.95744, -0.65182, -2.47178],
+							"easing": "easeInElastic"
+						},
+						"1.2083": {
+							"vector": [0, 0, 5],
+							"easing": "easeInElastic"
+						},
+						"1.4167": {
+							"vector": [-2.37097, -0.41763, -3.68801],
+							"easing": "easeInElastic"
+						},
+						"1.75": {
+							"vector": [0, 0, 5],
+							"easing": "easeInElastic"
+						},
+						"2.0417": {
+							"vector": [-4.95744, -0.65182, -2.47178],
+							"easing": "easeInElastic"
+						},
+						"2.2917": {
+							"vector": [5, 0, 5.10071],
+							"easing": "easeInBack"
+						},
+						"2.5417": {
+							"vector": [-2.37097, -0.41763, -3.68801],
+							"easing": "easeInElastic"
+						},
+						"2.9583": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"bone6": {
+					"rotation": {
+						"0.0833": {
+							"vector": [0, 0, 0]
+						},
+						"0.4167": {
+							"vector": [5, 0, 5.10071],
+							"easing": "easeInBack"
+						},
+						"0.625": {
+							"vector": [-4.95744, -0.65182, -2.47178],
+							"easing": "easeInElastic"
+						},
+						"1.0833": {
+							"vector": [0, 0, 5],
+							"easing": "easeInElastic"
+						},
+						"1.2917": {
+							"vector": [-2.37097, -0.41763, -3.68801],
+							"easing": "easeInElastic"
+						},
+						"1.625": {
+							"vector": [0, 0, 5],
+							"easing": "easeInElastic"
+						},
+						"1.9167": {
+							"vector": [-4.95744, -0.65182, -2.47178],
+							"easing": "easeInElastic"
+						},
+						"2.1667": {
+							"vector": [5, 0, 5.10071],
+							"easing": "easeInBack"
+						},
+						"2.4167": {
+							"vector": [-2.37097, -0.41763, -3.68801],
+							"easing": "easeInElastic"
+						},
+						"2.8333": {
+							"vector": [0, 0, 0]
+						}
+					}
+				}
+			}
 		}
 	},
 	"geckolib_format_version": 2

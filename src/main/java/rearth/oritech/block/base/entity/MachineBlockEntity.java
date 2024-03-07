@@ -69,7 +69,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     protected boolean networkDirty = true;
     
     //own storage
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(5000, 100, 0) {
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0) {
         @Override
         protected void onFinalCommit() {
             super.onFinalCommit();
@@ -123,7 +123,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     protected boolean hasEnoughEnergy() {
-        return energyStorage.amount > calculateEnergyUsage();
+        return energyStorage.amount >= calculateEnergyUsage();
     }
     
     @SuppressWarnings("lossy-conversions")
@@ -544,6 +544,9 @@ public abstract class MachineBlockEntity extends BlockEntity
         return calculateEnergyUsage();
     }
     
+    public long getDefaultCapacity() {return 5000;}
+    public long getDefaultInsertRate() {return 100;}
+    
     @Override
     public Inventory getDisplayedInventory() {
         return inventory;
@@ -587,12 +590,6 @@ public abstract class MachineBlockEntity extends BlockEntity
             var mode = inventoryInputMode;
             var config = getSlots();
             
-//            var forward = getFacing();
-//            var right = forward.rotateYCounterclockwise();
-//
-//            // insert from any side besides bottom or right
-//            if (side == Direction.DOWN || side == right) return false;
-            
             var inv = getInputView();
             
             System.out.println(inv);
@@ -616,15 +613,6 @@ public abstract class MachineBlockEntity extends BlockEntity
         @Override
         public boolean canExtract(int slot, ItemStack stack, Direction side) {
             return true;
-
-            // not needed anymore, since this is done in getAvailableSlots
-//            var forward = getFacing();
-//            var right = forward.rotateYCounterclockwise();
-//
-//            if (side != Direction.DOWN && side != right) return false;
-//
-//            var config = getSlots();
-//            return slot >= config.outputStart() && slot < config.outputStart() + config.outputCount();
         }
     }
 }

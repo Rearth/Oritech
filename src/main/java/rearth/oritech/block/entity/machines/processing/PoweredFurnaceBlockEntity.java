@@ -6,11 +6,13 @@ import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.SmeltingRecipe;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -46,6 +48,9 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
                 var activeRecipe = recipeCandidate.get().value();
                 useEnergy();
                 progress++;
+                
+                if (world.random.nextFloat() > 0.8)
+                    ParticleContent.FURNACE_BURNING.spawn(world, Vec3d.of(pos), 1);
                 
                 if (furnaceCraftingFinished(activeRecipe)) {
                     craftFurnaceItem(activeRecipe);

@@ -48,6 +48,10 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedInventory
     @AssignSidedEnergy
+    public static final BlockEntityType<AtomicForgeBlockEntity> ATOMIC_FORGE_ENTITY = FabricBlockEntityTypeBuilder.create(AtomicForgeBlockEntity::new, BlockContent.ATOMIC_FORGE_BLOCK).build();
+    
+    @AssignSidedInventory
+    @AssignSidedEnergy
     public static final BlockEntityType<PoweredFurnaceBlockEntity> POWERED_FURNACE_ENTITY = FabricBlockEntityTypeBuilder.create(PoweredFurnaceBlockEntity::new, BlockContent.POWERED_FURNACE_BLOCK).build();
     
     @AssignSidedEnergy
