@@ -9,11 +9,12 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
+import rearth.oritech.block.blocks.machines.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
+import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.InventoryInputMode;
-import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
@@ -29,9 +30,10 @@ public class NetworkContent {
     // Client -> Server (e.g. from UI interactions
     public record InventoryInputModeSelectorPacket(BlockPos position) {}
     public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {}
-    public record MachineEventPacket(BlockPos position) {}
+    public record MachineSetupEventPacket(BlockPos position) {}
     public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget, BlockPos areaMin, BlockPos areaMax) {};   // times are in ticks
     public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress){};
+    public record LaserArmSyncPacket(BlockPos position, BlockPos target){};
     public record InventorySyncPacket(BlockPos position, List<ItemStack> heldStacks) {}
     
     public static void registerChannels() {
@@ -50,12 +52,24 @@ public class NetworkContent {
 
         }));
         
-        MACHINE_CHANNEL.registerClientbound(MachineEventPacket.class, ((message, access) -> {
+        MACHINE_CHANNEL.registerClientbound(MachineSetupEventPacket.class, ((message, access) -> {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
             if (entity instanceof MachineBlockEntity machine) {
                 machine.playSetupAnimation();
+            } else if (entity instanceof LaserArmBlockEntity laserArmBlock) {
+                laserArmBlock.playSetupAnimation();
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(LaserArmSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof LaserArmBlockEntity laserArmBlock) {
+                laserArmBlock.setTarget(message.target);
             }
             
         }));

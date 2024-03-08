@@ -34,6 +34,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleState(BlockContent.CENTRIFUGE_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.ATOMIC_FORGE_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.POWERED_FURNACE_BLOCK);
+        blockStateModelGenerator.registerSimpleState(BlockContent.LASER_ARM_BLOCK);
         
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_BASIC);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_GOOD);
@@ -45,5 +46,6 @@ public class ModelGenerator extends FabricModelProvider {
     @Override
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
         itemModelGenerator.register(ItemContent.BANANA, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.TARGET_DESIGNATOR, Models.GENERATED);
     }
 }

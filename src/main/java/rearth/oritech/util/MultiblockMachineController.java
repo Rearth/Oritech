@@ -32,7 +32,7 @@ public interface MultiblockMachineController {
     EnergyStorage getEnergyStorageForLink();
     
     
-    default void addToNbt(NbtCompound nbt) {
+    default void addMultiblockToNbt(NbtCompound nbt) {
         
         var posList = new NbtList();
         for (var pos : getConnectedCores()) {
@@ -46,7 +46,7 @@ public interface MultiblockMachineController {
         nbt.putFloat("coreQuality", getCoreQuality());
     }
     
-    default void getFromNbt(NbtCompound nbt) {
+    default void loadMultiblockNbtData(NbtCompound nbt) {
         
         var posList = nbt.getList("connectedCores", NbtElement.COMPOUND_TYPE);
         var coreBlocksConnected = getConnectedCores();

@@ -1,0 +1,94 @@
+package rearth.oritech.client.renderers;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.*;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
+import rearth.oritech.client.init.ParticleContent;
+import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.renderer.GeoBlockRenderer;
+
+import java.text.DecimalFormat;
+import java.util.OptionalDouble;
+
+import static net.minecraft.client.render.RenderPhase.VIEW_OFFSET_Z_LAYERING;
+
+public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
+    
+    private static final float RENDER_DISTANCE = 100;
+    
+    public LaserArmRenderer(String modelPath) {
+        super(new LaserArmModel<>(modelPath));
+    }
+    
+    // Modified RenderLayer.LINES
+    public static final RenderLayer.MultiPhase CUSTOM_LINES = RenderLayer.of("lines", VertexFormats.LINES, VertexFormat.DrawMode.LINES, 1536, RenderLayer.MultiPhaseParameters.builder().program(RenderPhase.LINES_PROGRAM).layering(VIEW_OFFSET_Z_LAYERING).transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY).target(RenderPhase.ITEM_ENTITY_TARGET).writeMaskState(RenderPhase.ALL_MASK).cull(RenderPhase.DISABLE_CULLING).build(false));
+    
+    @Override
+    public void postRender(MatrixStack matrices, T laserEntity, BakedGeoModel model, VertexConsumerProvider bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        super.postRender(matrices, laserEntity, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+        
+        if (laserEntity.getTarget() == null) return;
+        
+        var startOffset = new Vector3f(0, 1.55f, 0);
+        var startPos = Vec3d.of(laserEntity.getPos()).add(0.5, 1.55, 0.5);
+        
+        var targetPos = Vec3d.of(laserEntity.getTarget()).add(0, 0.5, 0);   // convert to block center
+        var targetPosOffset = targetPos.subtract(Vec3d.of(laserEntity.getPos()));
+        
+        var forward = targetPos.subtract(startPos).normalize();
+        ParticleContent.LASER_BEAM_EFFECT.spawn(laserEntity.getWorld(), startPos.add(forward), new ParticleContent.LineData(startPos.add(forward), targetPos.add(0.5, 0, 0.5)));
+        
+        var cross = forward.crossProduct(new Vec3d(0, 1,0));
+        
+        matrices.push();
+        var lineConsumer = bufferSource.getBuffer(CUSTOM_LINES);
+        
+        // to prevent line from becoming too big when further away, as the size seems to be in screen space
+        var camPos = MinecraftClient.getInstance().cameraEntity.getPos();
+        var camDist = camPos.subtract(startPos).length();
+        var widthMultiplier = 1f;
+        if (camDist > 20)
+            widthMultiplier = (float) (camDist / 20f);
+        RenderSystem.lineWidth((float) (Math.sin((laserEntity.getWorld().getTime() + partialTick) * 0.1) * 4 + 8) / widthMultiplier);
+        
+        lineConsumer.vertex(matrices.peek().getPositionMatrix(), startOffset.x, startOffset.y, startOffset.z)
+          .color(138, 242, 223, 255)
+          .light(packedLight)
+          .overlay(packedOverlay)
+          .normal(0, 1, 0)
+          .next();
+        lineConsumer.vertex(matrices.peek().getPositionMatrix(), (float) targetPosOffset.x, (float) targetPosOffset.y, (float) targetPosOffset.z)
+          .color(19, 91, 80, 255)
+          .light(packedLight)
+          .overlay(packedOverlay)
+          .normal(1, 0, 0)
+          .next();
+        
+        // render a second one at right angle to first one
+        lineConsumer.vertex(matrices.peek().getPositionMatrix(), startOffset.x, startOffset.y, startOffset.z)
+          .color(138, 242, 223, 255)
+          .light(packedLight)
+          .overlay(packedOverlay)
+          .normal((float) cross.x, (float) cross.y, (float) cross.z)
+          .next();
+        lineConsumer.vertex(matrices.peek().getPositionMatrix(), (float) targetPosOffset.x, (float) targetPosOffset.y, (float) targetPosOffset.z)
+          .color(19, 91, 80, 255)
+          .light(packedLight)
+          .overlay(packedOverlay)
+          .normal((float) cross.x, (float) cross.y, (float) cross.z)
+          .next();
+        
+        matrices.pop();
+    }
+}
+
+

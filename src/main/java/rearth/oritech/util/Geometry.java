@@ -7,6 +7,8 @@ import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 
 public class Geometry {
     
+    public static final float DEG_TO_RAD = 0.017453292519943295769236907684886f;
+    
     public static Vec3i offsetToWorldPosition(Direction facing, Vec3i offset, Vec3i ownPos) {
         var rotated = rotatePosition(offset, facing);
         return ownPos.add(rotated);

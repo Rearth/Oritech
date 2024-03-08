@@ -12,6 +12,7 @@ import rearth.oritech.block.entity.machines.addons.EnergyAcceptorAddonBlockEntit
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.DestroyerBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.FertilizerBlockEntity;
+import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.PlacerBlockEntity;
 import rearth.oritech.block.entity.machines.processing.*;
 import rearth.oritech.util.EnergyProvider;
@@ -53,6 +54,10 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<PoweredFurnaceBlockEntity> POWERED_FURNACE_ENTITY = FabricBlockEntityTypeBuilder.create(PoweredFurnaceBlockEntity::new, BlockContent.POWERED_FURNACE_BLOCK).build();
+    
+    @AssignSidedInventory
+    @AssignSidedEnergy
+    public static final BlockEntityType<LaserArmBlockEntity> LASER_ARM_BLOCK = FabricBlockEntityTypeBuilder.create(LaserArmBlockEntity::new, BlockContent.LASER_ARM_BLOCK).build();
     
     @AssignSidedEnergy
     public static final BlockEntityType<EnergyAcceptorAddonBlockEntity> ENERGY_ACCEPTOR_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(EnergyAcceptorAddonBlockEntity::new, BlockContent.MACHINE_ACCEPTOR_ADDON).build();

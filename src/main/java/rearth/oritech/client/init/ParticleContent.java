@@ -7,6 +7,7 @@ import io.wispforest.owo.util.VectorRandomUtils;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -45,6 +46,11 @@ public class ParticleContent {
         ClientParticles.spawnCenteredOnBlock(ParticleTypes.DUST_PLUME, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
     }));
     
+    public static final ParticleSystem<LineData> LASER_BEAM_EFFECT = PARTICLE_CONTROLLER.register(LineData.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(1);
+        ClientParticles.spawnPrecise(ParticleTypes.SMALL_FLAME, world, pos, 0.4, 0.3, 0.4);
+    }));
+    
     private static void spawnCubeOutline(ParticleEffect particle, Vec3d origin, float size, int duration, int segments) {
         
         spawnLineInner(particle, origin, origin.add(size, 0, 0), segments, duration);
@@ -78,5 +84,7 @@ public class ParticleContent {
     public static void registerParticles() {
         Oritech.LOGGER.info("Registering Oritech particles");
     }
+    
+    public static record LineData(Vec3d start, Vec3d end) {};
     
 }

@@ -3,16 +3,14 @@ package rearth.oritech.client.renderers;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
@@ -91,7 +89,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
         var renderedItem = entity.getToolheadAdditionalRender();
         if (renderedItem != null) {
             matrices.push();
-            matrices.translate(targetOffset.getX() + 0.4, targetOffset.getY() - 0.3f, targetOffset.getZ() + 0.4);
+            matrices.translate(targetOffset.getX() + 0.4, targetOffset.getY(), targetOffset.getZ() + 0.4);
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(30));
             // matrices.scale(0.3f, 0.3f, 0.3f);
             

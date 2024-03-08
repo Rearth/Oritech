@@ -81,7 +81,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
         inventory.readNbtList(nbt.getList("inventory", NbtElement.COMPOUND_TYPE));
         energyStorage.amount = nbt.getLong("energy_stored");
         
-        getAddonNbtData(nbt);
+        loadAddonNbtData(nbt);
         updateEnergyContainer();
     }
     

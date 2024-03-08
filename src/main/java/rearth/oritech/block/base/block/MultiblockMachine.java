@@ -46,7 +46,7 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
             
             // first time created
             if (isAssembled && !wasAssembled) {
-                NetworkContent.MACHINE_CHANNEL.serverHandle(machineEntity).send(new NetworkContent.MachineEventPacket(pos));
+                NetworkContent.MACHINE_CHANNEL.serverHandle(machineEntity).send(new NetworkContent.MachineSetupEventPacket(pos));
                 return ActionResult.SUCCESS;
             }
             

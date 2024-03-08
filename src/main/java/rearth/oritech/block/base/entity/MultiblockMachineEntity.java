@@ -7,7 +7,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.block.MultiblockMachine;
-import rearth.oritech.util.ImplementedInventory;
 import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
 import team.reborn.energy.api.EnergyStorage;
@@ -42,13 +41,13 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     @Override
     public void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
-        addToNbt(nbt);
+        addMultiblockToNbt(nbt);
     }
     
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
-        getFromNbt(nbt);
+        loadMultiblockNbtData(nbt);
     }
     
     @Override

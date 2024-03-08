@@ -57,7 +57,7 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     @Override
     protected void useEnergy() {
         super.useEnergy();
-        if (world.random.nextFloat() > 0.8)
+        if (world.random.nextFloat() > 0.5)
             ParticleContent.PULVERIZER_WORKING.spawn(world, Vec3d.of(pos), 1);
     }
     

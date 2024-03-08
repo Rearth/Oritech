@@ -76,6 +76,7 @@ public abstract class MachineBlockEntity extends BlockEntity
             markNetDirty();
         }
     };
+    
     protected final SimpleInventory inventory = new SimpleMachineInventory(getInventorySize());
     
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {

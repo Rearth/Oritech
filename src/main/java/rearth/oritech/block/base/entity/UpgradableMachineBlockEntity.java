@@ -1,29 +1,18 @@
 package rearth.oritech.block.base.entity;
 
-import io.wispforest.owo.serialization.Endec;
-import io.wispforest.owo.serialization.endec.BuiltInEndecs;
-import io.wispforest.owo.serialization.endec.StructEndecBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
-import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
-import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
-import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.*;
 
 import java.util.*;
@@ -47,7 +36,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
-        getAddonNbtData(nbt);
+        loadAddonNbtData(nbt);
         
         updateEnergyContainer();
     }
