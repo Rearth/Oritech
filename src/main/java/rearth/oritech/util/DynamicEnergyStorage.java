@@ -36,6 +36,11 @@ public class DynamicEnergyStorage extends SnapshotParticipant<Long> implements E
     }
     
     @Override
+    public void onFinalCommit() {
+        super.onFinalCommit();
+    }
+    
+    @Override
     public long insert(long maxAmount, TransactionContext transaction) {
         StoragePreconditions.notNegative(maxAmount);
         

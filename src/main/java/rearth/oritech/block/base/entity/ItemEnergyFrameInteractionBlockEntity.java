@@ -32,7 +32,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0) {
         @Override
-        protected void onFinalCommit() {
+        public void onFinalCommit() {
             super.onFinalCommit();
             ItemEnergyFrameInteractionBlockEntity.this.markDirty();
         }

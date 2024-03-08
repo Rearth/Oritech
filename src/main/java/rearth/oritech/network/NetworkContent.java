@@ -9,7 +9,6 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
-import rearth.oritech.block.blocks.machines.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -33,7 +32,7 @@ public class NetworkContent {
     public record MachineSetupEventPacket(BlockPos position) {}
     public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget, BlockPos areaMin, BlockPos areaMax) {};   // times are in ticks
     public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress){};
-    public record LaserArmSyncPacket(BlockPos position, BlockPos target){};
+    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt){};
     public record InventorySyncPacket(BlockPos position, List<ItemStack> heldStacks) {}
     
     public static void registerChannels() {
@@ -69,7 +68,8 @@ public class NetworkContent {
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
             if (entity instanceof LaserArmBlockEntity laserArmBlock) {
-                laserArmBlock.setTarget(message.target);
+                laserArmBlock.setCurrentTarget(message.target);
+                laserArmBlock.setLastFiredAt(message.lastFiredAt);
             }
             
         }));

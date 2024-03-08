@@ -1,29 +1,20 @@
 package rearth.oritech.client.renderers;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Vector3d;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
 
-import java.text.DecimalFormat;
-import java.util.OptionalDouble;
-
 import static net.minecraft.client.render.RenderPhase.VIEW_OFFSET_Z_LAYERING;
 
 public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
-    
-    private static final float RENDER_DISTANCE = 100;
     
     public LaserArmRenderer(String modelPath) {
         super(new LaserArmModel<>(modelPath));
@@ -36,12 +27,24 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
     public void postRender(MatrixStack matrices, T laserEntity, BakedGeoModel model, VertexConsumerProvider bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         super.postRender(matrices, laserEntity, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
         
-        if (laserEntity.getTarget() == null) return;
+        if (laserEntity.getCurrentTarget() == null || !laserEntity.isFiring()) return;
         
         var startOffset = new Vector3f(0, 1.55f, 0);
         var startPos = Vec3d.of(laserEntity.getPos()).add(0.5, 1.55, 0.5);
         
-        var targetPos = Vec3d.of(laserEntity.getTarget()).add(0, 0.5, 0);   // convert to block center
+        var targetPos = Vec3d.of(laserEntity.getCurrentTarget()).add(0, 0.5, 0);   // convert to block center
+        if (laserEntity.isTargetingAtomicForge()) { // adjust so the beam end faces one of the corner pillars
+            var moveX = 0.5;
+            var moveZ = 0.5;
+            if (startPos.x < targetPos.x)  moveX = -0.5;
+            if (startPos.z < targetPos.z)  moveZ = -0.5;
+            targetPos = targetPos.add(moveX, 0.5, moveZ);
+        }
+        
+        if (laserEntity.lastRenderPosition == null) laserEntity.lastRenderPosition = targetPos;
+        targetPos = lerp(laserEntity.lastRenderPosition, targetPos, 0.05f);
+        laserEntity.lastRenderPosition = targetPos;
+        
         var targetPosOffset = targetPos.subtract(Vec3d.of(laserEntity.getPos()));
         
         var forward = targetPos.subtract(startPos).normalize();
@@ -58,7 +61,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         var widthMultiplier = 1f;
         if (camDist > 20)
             widthMultiplier = (float) (camDist / 20f);
-        RenderSystem.lineWidth((float) (Math.sin((laserEntity.getWorld().getTime() + partialTick) * 0.1) * 4 + 8) / widthMultiplier);
+        RenderSystem.lineWidth((float) (Math.sin((laserEntity.getWorld().getTime() + partialTick) * 0.3) * 2 + 7) / widthMultiplier);
         
         lineConsumer.vertex(matrices.peek().getPositionMatrix(), startOffset.x, startOffset.y, startOffset.z)
           .color(138, 242, 223, 255)
@@ -88,6 +91,14 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
           .next();
         
         matrices.pop();
+    }
+    
+    private static Vec3d lerp(Vec3d a, Vec3d b, float f) {
+        return new Vec3d(lerp(a.x, b.x, f), lerp(a.y, b.y, f), lerp(a.z, b.z, f));
+    }
+    
+    private static double lerp(double a, double b, double f) {
+        return a + f * (b - a);
     }
 }
 

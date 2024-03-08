@@ -23,29 +23,31 @@ public class LaserTargetDesignator extends Item {
     
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
-        if (!context.getWorld().isClient()) {
-            var targetBlockState = context.getWorld().getBlockState(context.getBlockPos());
+        if (context.getWorld().isClient()) {
+            return super.useOnBlock(context);
+        }
+        
+        var targetBlockState = context.getWorld().getBlockState(context.getBlockPos());
+        
+        if (targetBlockState.getBlock().equals(BlockContent.LASER_ARM_BLOCK)
+              && context.getWorld().getBlockEntity(context.getBlockPos()) instanceof LaserArmBlockEntity laserEntity
+              && context.getStack().hasNbt()) {
+            var target = BlockPos.fromLong(context.getStack().getNbt().getLong("target"));
             
-            if (targetBlockState.getBlock().equals(BlockContent.LASER_ARM_BLOCK)
-                  && context.getWorld().getBlockEntity(context.getBlockPos()) instanceof LaserArmBlockEntity laserEntity
-                  && context.getStack().hasNbt()) {
-                var target = BlockPos.fromLong(context.getStack().getNbt().getLong("target"));
-                
-                var success = laserEntity.setTargetFromDesignator(target);
-                if (success)
-                    context.getPlayer().sendMessage(Text.literal("Position saved to machine"));
-                return success ? ActionResult.SUCCESS : ActionResult.FAIL;
-            }
+            var success = laserEntity.setTargetFromDesignator(target);
+            if (success)
+                context.getPlayer().sendMessage(Text.literal("Position saved to machine"));
+            return success ? ActionResult.SUCCESS : ActionResult.FAIL;
+        }
+        
+        if (!targetBlockState.getBlock().equals(Blocks.AIR)) {
+            System.out.println(targetBlockState);
             
-            if (!targetBlockState.getBlock().equals(Blocks.AIR)) {
-                System.out.println(targetBlockState);
-                
-                var nbt = context.getStack().getOrCreateNbt();
-                nbt.putLong("target", context.getBlockPos().asLong());
-                context.getPlayer().sendMessage(Text.literal("Position stored"));
-                
-                return ActionResult.SUCCESS;
-            }
+            var nbt = context.getStack().getOrCreateNbt();
+            nbt.putLong("target", context.getBlockPos().asLong());
+            context.getPlayer().sendMessage(Text.literal("Position stored"));
+            
+            return ActionResult.SUCCESS;
         }
         
         return super.useOnBlock(context);

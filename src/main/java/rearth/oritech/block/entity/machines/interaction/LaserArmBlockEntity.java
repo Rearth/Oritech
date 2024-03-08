@@ -1,18 +1,31 @@
 package rearth.oritech.block.entity.machines.interaction;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.BlockStateRaycastContext;
 import net.minecraft.world.World;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.blocks.machines.interaction.LaserArmBlock;
+import rearth.oritech.block.entity.machines.MachineCoreEntity;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
@@ -25,13 +38,17 @@ import team.reborn.energy.api.EnergyStorage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyProvider, MultiblockMachineController, MachineAddonController, InventoryProvider {
+    
+    private static final int BLOCK_BREAK_ENERGY = 1000;
     
     // storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0) {
         @Override
-        protected void onFinalCommit() {
+        public void onFinalCommit() {
             super.onFinalCommit();
             LaserArmBlockEntity.this.markDirty();
         }
@@ -60,8 +77,14 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
     
     // working data
-    private BlockPos target;
+    private BlockPos targetDirection;
+    private BlockPos currentTarget;
+    private long lastFiredAt;
+    private int progress;
     private boolean networkDirty;
+    
+    @Environment(EnvType.CLIENT)
+    public Vec3d lastRenderPosition;
     
     public LaserArmBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.LASER_ARM_BLOCK, pos, state);
@@ -69,15 +92,126 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
-        if (world.isClient()) return;
+        if (world.isClient() ||!isActive(state) || currentTarget == null || energyStorage.getAmount() < energyRequiredToFire()) return;
+        
+        var targetBlock = currentTarget;
+        var targetBlockState = world.getBlockState(targetBlock);
+        var storageCandidate = EnergyStorage.SIDED.find(world, targetBlock, null);
+        
+        var fired = false;
+        
+        if (storageCandidate != null) {
+            var insertAmount = storageCandidate.getCapacity() - storageCandidate.getAmount();
+            if (insertAmount < 10) return;
+            fired = true;
+            
+            if (storageCandidate instanceof DynamicEnergyStorage dynamicStorage) {
+                var transferCapacity = Math.min(insertAmount, energyRequiredToFire());
+                dynamicStorage.amount += transferCapacity;  // direct transfer, allowing to insert into any container, even when inserting isnt allowed (e.g. atomic forge)
+                dynamicStorage.onFinalCommit(); // gross abuse of transaction system to force it to sync
+            } else {
+                // probably not how this should be used, but whatever
+                try (var tx = Transaction.openOuter()) {
+                    storageCandidate.insert(insertAmount, tx);
+                    tx.commit();
+                }
+            }
+        } else if (!targetBlockState.getBlock().equals(Blocks.AIR)) {
+            fired = true;
+            progress += energyRequiredToFire();
+            
+            if (progress >= BLOCK_BREAK_ENERGY) {
+                finishBlockBreaking(targetBlock, targetBlockState);
+            }
+        }
+        
+        if (fired) {
+            energyStorage.amount -= energyRequiredToFire();
+            networkDirty = true;
+            lastFiredAt = world.getTime();
+        }
         
         if (networkDirty)
             updateNetwork();
         
     }
     
+    private void finishBlockBreaking(BlockPos targetBlock, BlockState targetBlockState) {
+        progress -= BLOCK_BREAK_ENERGY;
+        
+        var targetEntity = world.getBlockEntity(targetBlock);
+        var dropped = Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetBlock, targetEntity);
+        
+        // yes, this will discord items that wont fit anymore
+        for (var stack : dropped) {
+            this.inventory.addStack(stack);
+        }
+        
+        world.addBlockBreakParticles(targetBlock, world.getBlockState(targetBlock));
+        world.playSound(null, targetBlock, targetBlockState.getSoundGroup().getBreakSound(), SoundCategory.BLOCKS, 1f, 1f);
+        world.breakBlock(targetBlock, false);
+        
+        findNextBlockBreakTarget();
+    }
+    
+    private void findNextBlockBreakTarget() {
+        
+        var direction = Vec3d.of(targetDirection.subtract(pos.up())).normalize();
+        var from = Vec3d.of(pos.up()).add(0.5, 0.55, 0.5).add(direction.multiply(1.5));
+        
+        var nextBlock = basicRaycast(from, direction, 64);
+        
+        if (nextBlock != null) {
+            trySetNewTarget(nextBlock, false);
+        }
+        
+    }
+    
+    private BlockPos basicRaycast(Vec3d from, Vec3d direction, int range) {
+        
+        var searchOffset = 0.45;
+        
+        for (float i = 0; i < range; i += 0.3f) {
+            var to = from.add(direction.multiply(i));
+            var targetBlockPos = BlockPos.ofFloored(to.add(0, 0.3f, 0));
+            var targetState = world.getBlockState(targetBlockPos);
+            if (targetState.isSolid()) return targetBlockPos;
+            
+            var offsetTop = to.add(0, -searchOffset, 0);
+            targetBlockPos = BlockPos.ofFloored(offsetTop);
+            targetState = world.getBlockState(targetBlockPos);
+            if (targetState.isSolid()) return targetBlockPos;
+            
+            var offsetLeft = to.add(-searchOffset, 0, 0);
+            targetBlockPos = BlockPos.ofFloored(offsetLeft);
+            targetState = world.getBlockState(targetBlockPos);
+            if (targetState.isSolid()) return targetBlockPos;
+            
+            var offsetRight = to.add(searchOffset, 0, 0);
+            targetBlockPos = BlockPos.ofFloored(offsetRight);
+            targetState = world.getBlockState(targetBlockPos);
+            if (targetState.isSolid()) return targetBlockPos;
+            
+            var offsetFront = to.add(0, 0, searchOffset);
+            targetBlockPos = BlockPos.ofFloored(offsetFront);
+            targetState = world.getBlockState(targetBlockPos);
+            if (targetState.isSolid()) return targetBlockPos;
+            
+            var offsetBack = to.add(0, 0, -searchOffset);
+            targetBlockPos = BlockPos.ofFloored(offsetBack);
+            targetState = world.getBlockState(targetBlockPos);
+            if (targetState.isSolid()) return targetBlockPos;
+        }
+        
+        return null;
+    }
+    
+    private int energyRequiredToFire() {
+        return 100;
+    }
+    
     private void updateNetwork() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, target));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, currentTarget, lastFiredAt));
         networkDirty = false;
     }
     
@@ -86,8 +220,21 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     public boolean setTargetFromDesignator(BlockPos targetPos) {
+        var success = trySetNewTarget(targetPos, true);
+        findNextBlockBreakTarget();
         
-        // todo if target is coreblock, adjust it to point to controller if connected
+        return  success;
+    }
+    
+    private boolean trySetNewTarget(BlockPos targetPos, boolean alsoSetDirection) {
+        
+        // if target is coreblock, adjust it to point to controller if connected
+        var targetState = Objects.requireNonNull(world).getBlockState(targetPos);
+        if (targetState.getBlock() instanceof MachineCoreBlock && targetState.get(MachineCoreBlock.USED)) {
+            var coreEntity = (MachineCoreEntity) world.getBlockEntity(targetPos);
+            var controllerPos = Objects.requireNonNull(coreEntity).getControllerPos();
+            if (controllerPos != null) targetPos = controllerPos;
+        }
         System.out.println("setting target: " + targetPos.toShortString());
         
         var distance = targetPos.getManhattanDistance(pos);
@@ -95,9 +242,13 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             return false;
         }
         
-        this.target = targetPos;
-        this.networkDirty = true;
+        this.currentTarget = targetPos;
+        if (alsoSetDirection) {
+            this.targetDirection = targetPos;
+            updateNetwork();
+        }
         this.markDirty();
+        
         return true;
     }
     
@@ -109,8 +260,10 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         writeAddonToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
         
-        if (target != null)
-            nbt.putLong("target_position", target.asLong());
+        if (targetDirection != null && currentTarget != null) {
+            nbt.putLong("target_position", currentTarget.asLong());
+            nbt.putLong("target_direction", targetDirection.asLong());
+        }
     }
     
     @Override
@@ -123,7 +276,8 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         updateEnergyContainer();
         
         energyStorage.amount = nbt.getLong("energy_stored");
-        target = BlockPos.fromLong(nbt.getLong("target_position"));
+        targetDirection = BlockPos.fromLong(nbt.getLong("target_direction"));
+        currentTarget = BlockPos.fromLong(nbt.getLong("target_position"));
     }
     
     //region multiblock
@@ -253,7 +407,11 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             }
             
             if (isActive(getCachedState())) {
-                return state.setAndContinue(MachineBlockEntity.IDLE);
+                if (isFiring()) {
+                    return state.setAndContinue(MachineBlockEntity.WORKING);
+                } else {
+                    return state.setAndContinue(MachineBlockEntity.IDLE);
+                }
             } else {
                 return state.setAndContinue(MachineBlockEntity.PACKAGED);
             }
@@ -275,11 +433,30 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     //endregion
     
-    public BlockPos getTarget() {
-        return target;
+    
+    public BlockPos getCurrentTarget() {
+        return currentTarget;
     }
     
-    public void setTarget(BlockPos target) {
-        this.target = target;
+    public void setCurrentTarget(BlockPos currentTarget) {
+        this.currentTarget = currentTarget;
     }
+    
+    public long getLastFiredAt() {
+        return lastFiredAt;
+    }
+    
+    public void setLastFiredAt(long lastFiredAt) {
+        this.lastFiredAt = lastFiredAt;
+    }
+    
+    public boolean isFiring() {
+        var idleTime = world.getTime() - lastFiredAt;
+        return idleTime < 3;
+    }
+    
+    public boolean isTargetingAtomicForge() {
+        return world.getBlockState(currentTarget).getBlock().equals(BlockContent.ATOMIC_FORGE_BLOCK);
+    }
+    
 }

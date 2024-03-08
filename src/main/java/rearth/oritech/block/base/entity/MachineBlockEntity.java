@@ -71,7 +71,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     //own storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0) {
         @Override
-        protected void onFinalCommit() {
+        public void onFinalCommit() {
             super.onFinalCommit();
             markNetDirty();
         }
@@ -111,6 +111,7 @@ public abstract class MachineBlockEntity extends BlockEntity
                 }
                 
                 markNetDirty();
+                markDirty();
             }
             
         } else {
@@ -208,9 +209,8 @@ public abstract class MachineBlockEntity extends BlockEntity
         markNetDirty();
     }
     
-    protected void markNetDirty() {
+    public void markNetDirty() {
         networkDirty = true;
-        markDirty();
     }
     
     // check if output slots are valid, meaning: each slot is either empty, or of the same type and can add the target amount without overfilling

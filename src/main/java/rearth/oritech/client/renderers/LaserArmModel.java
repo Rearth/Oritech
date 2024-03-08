@@ -1,10 +1,8 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2f;
-import org.joml.Vector3f;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.util.Geometry;
@@ -30,8 +28,8 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
     @Override
     public void setCustomAnimations(T laserEntity, long instanceId, AnimationState<T> animationState) {
         
-        if (laserEntity.getTarget() == null) return;
-        var target = Vec3d.of(laserEntity.getTarget());
+        if (laserEntity.getCurrentTarget() == null) return;
+        var target = Vec3d.of(laserEntity.getCurrentTarget());
         var ownPos = Vec3d.of(laserEntity.getPos());
         var offset = target.subtract(ownPos.add(0, 1.55 - 0.5, 0)); // add 1.55 to get to height of pivotX, minus block center offset
         
