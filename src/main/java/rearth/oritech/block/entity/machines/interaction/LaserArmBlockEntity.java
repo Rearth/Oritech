@@ -235,7 +235,6 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             var controllerPos = Objects.requireNonNull(coreEntity).getControllerPos();
             if (controllerPos != null) targetPos = controllerPos;
         }
-        System.out.println("setting target: " + targetPos.toShortString());
         
         var distance = targetPos.getManhattanDistance(pos);
         if (distance > 64) {

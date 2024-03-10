@@ -48,7 +48,8 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         var targetPosOffset = targetPos.subtract(Vec3d.of(laserEntity.getPos()));
         
         var forward = targetPos.subtract(startPos).normalize();
-        ParticleContent.LASER_BEAM_EFFECT.spawn(laserEntity.getWorld(), startPos.add(forward), new ParticleContent.LineData(startPos.add(forward), targetPos.add(0.5, 0, 0.5)));
+        if (!laserEntity.isTargetingAtomicForge())
+            ParticleContent.LASER_BEAM_EFFECT.spawn(laserEntity.getWorld(), startPos.add(forward), new ParticleContent.LineData(startPos.add(forward), targetPos.add(0.5, 0, 0.5).subtract(forward.multiply(0.6))));
         
         var cross = forward.crossProduct(new Vec3d(0, 1,0));
         

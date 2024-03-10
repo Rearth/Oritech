@@ -48,7 +48,7 @@ public class ParticleContent {
     
     public static final ParticleSystem<LineData> LASER_BEAM_EFFECT = PARTICLE_CONTROLLER.register(LineData.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(1);
-        ClientParticles.spawnPrecise(ParticleTypes.SMALL_FLAME, world, pos, 0.4, 0.3, 0.4);
+        ClientParticles.spawnPrecise(ParticleTypes.SMALL_FLAME, world, data.end, 0.4, 0.3, 0.4);
     }));
     
     private static void spawnCubeOutline(ParticleEffect particle, Vec3d origin, float size, int duration, int segments) {
