@@ -2,6 +2,7 @@ package rearth.oritech.init;
 
 import io.wispforest.owo.registration.reflect.AutoRegistryContainer;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
@@ -12,12 +13,10 @@ import rearth.oritech.block.entity.machines.addons.EnergyAcceptorAddonBlockEntit
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.generators.BasicGeneratorEntity;
 import rearth.oritech.block.entity.machines.generators.TestGeneratorEntity;
-import rearth.oritech.block.entity.machines.interaction.DestroyerBlockEntity;
-import rearth.oritech.block.entity.machines.interaction.FertilizerBlockEntity;
-import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
-import rearth.oritech.block.entity.machines.interaction.PlacerBlockEntity;
+import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.*;
 import rearth.oritech.util.EnergyProvider;
+import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventoryProvider;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -68,6 +67,10 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedEnergy
     public static final BlockEntityType<LaserArmBlockEntity> LASER_ARM_BLOCK = FabricBlockEntityTypeBuilder.create(LaserArmBlockEntity::new, BlockContent.LASER_ARM_BLOCK).build();
     
+//    @AssignSidedEnergy
+    @AssignSidedFluid
+    public static final BlockEntityType<PumpBlockEntity> PUMP_BLOCK = FabricBlockEntityTypeBuilder.create(PumpBlockEntity::new, BlockContent.PUMP_BLOCK).build();
+    
     @AssignSidedEnergy
     public static final BlockEntityType<EnergyAcceptorAddonBlockEntity> ENERGY_ACCEPTOR_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(EnergyAcceptorAddonBlockEntity::new, BlockContent.MACHINE_ACCEPTOR_ADDON).build();
     
@@ -117,6 +120,9 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
         if (field.isAnnotationPresent(AssignSidedEnergy.class))
             EnergyStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((EnergyProvider) blockEntity).getStorage(), value);
         
+        if (field.isAnnotationPresent(AssignSidedFluid.class))
+            FluidStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((FluidProvider) blockEntity).getFluidStorage(direction), value);
+        
         if (field.isAnnotationPresent(AssignSidedInventory.class))
             ItemStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((InventoryProvider) blockEntity).getInventory(direction), value);
 
@@ -129,4 +135,8 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface AssignSidedInventory {}
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    public @interface AssignSidedFluid {}
 }
