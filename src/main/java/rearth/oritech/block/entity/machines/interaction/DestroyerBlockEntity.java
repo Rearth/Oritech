@@ -46,6 +46,9 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         var targetPosition = processed.down();
         var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
         
+        var targetHardness = targetState.getBlock().getHardness();
+        if (targetHardness <= 0) return;    // skip undestoyable blocks, such as bedrock
+        
         // skip not grown crops
         if (targetState.getBlock() instanceof CropBlock cropBlock && !cropBlock.isMature(targetState)) {
             return;

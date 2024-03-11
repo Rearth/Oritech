@@ -1,0 +1,11 @@
+{
+  "type": "oritech:test_generator",
+  "ingredients": [
+    {
+      "item": "minecraft:coal"
+    }
+  ],
+  "results": [
+  ],
+  "time": 40
+}

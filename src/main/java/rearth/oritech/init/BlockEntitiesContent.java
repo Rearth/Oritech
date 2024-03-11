@@ -10,6 +10,8 @@ import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.EnergyAcceptorAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
+import rearth.oritech.block.entity.machines.generators.BasicGeneratorEntity;
+import rearth.oritech.block.entity.machines.generators.TestGeneratorEntity;
 import rearth.oritech.block.entity.machines.interaction.DestroyerBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.FertilizerBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
@@ -48,8 +50,15 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     public static final BlockEntityType<CentrifugeBlockEntity> CENTRIFUGE_ENTITY = FabricBlockEntityTypeBuilder.create(CentrifugeBlockEntity::new, BlockContent.CENTRIFUGE_BLOCK).build();
     
     @AssignSidedInventory
-    @AssignSidedEnergy
     public static final BlockEntityType<AtomicForgeBlockEntity> ATOMIC_FORGE_ENTITY = FabricBlockEntityTypeBuilder.create(AtomicForgeBlockEntity::new, BlockContent.ATOMIC_FORGE_BLOCK).build();
+    
+    @AssignSidedInventory
+    @AssignSidedEnergy
+    public static final BlockEntityType<TestGeneratorEntity> TEST_GENERATOR_ENTITY = FabricBlockEntityTypeBuilder.create(TestGeneratorEntity::new, BlockContent.TEST_GENERATOR_BLOCK).build();
+    
+    @AssignSidedInventory
+    @AssignSidedEnergy
+    public static final BlockEntityType<BasicGeneratorEntity> BASIC_GENERATOR_ENTITY = FabricBlockEntityTypeBuilder.create(BasicGeneratorEntity::new, BlockContent.BASIC_GENERATOR_BLOCK).build();
     
     @AssignSidedInventory
     @AssignSidedEnergy

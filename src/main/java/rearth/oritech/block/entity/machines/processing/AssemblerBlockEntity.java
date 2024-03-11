@@ -61,7 +61,6 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public List<Vec3i> getAddonSlots() {
-        
         return List.of(
           new Vec3i(0, 0,-1),
           new Vec3i(0, 0,2),

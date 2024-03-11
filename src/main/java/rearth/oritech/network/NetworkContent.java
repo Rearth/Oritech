@@ -9,6 +9,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
+import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -29,6 +30,7 @@ public class NetworkContent {
     // Client -> Server (e.g. from UI interactions
     public record InventoryInputModeSelectorPacket(BlockPos position) {}
     public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {}
+    public record GeneratorUISyncPacket(BlockPos position, int burnTime) {}
     public record MachineSetupEventPacket(BlockPos position) {}
     public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget, BlockPos areaMin, BlockPos areaMax) {};   // times are in ticks
     public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress){};
@@ -70,6 +72,16 @@ public class NetworkContent {
             if (entity instanceof LaserArmBlockEntity laserArmBlock) {
                 laserArmBlock.setCurrentTarget(message.target);
                 laserArmBlock.setLastFiredAt(message.lastFiredAt);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(GeneratorUISyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
+                generatorBlock.setCurrentMaxBurnTime(message.burnTime);
             }
             
         }));

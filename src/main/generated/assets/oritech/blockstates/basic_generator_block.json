@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/basic_generator_block"
+    }
+  }
+}

@@ -4,9 +4,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -19,7 +16,6 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
@@ -27,7 +23,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -46,7 +41,10 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public abstract class MachineBlockEntity extends BlockEntity
   implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyProvider, ScreenProvider, InventoryProvider, BlockEntityTicker<MachineBlockEntity> {
@@ -57,27 +55,23 @@ public abstract class MachineBlockEntity extends BlockEntity
     public static final RawAnimation IDLE = RawAnimation.begin().thenPlayAndHold("idle");
     public static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    private final AnimationController<MachineBlockEntity> animationController = getAnimationController();
-    
+    protected final SimpleInventory inventory = new SimpleMachineInventory(getInventorySize());
     // crafting / processing
     protected int progress;
+    private final AnimationController<MachineBlockEntity> animationController = getAnimationController();
     protected int energyPerTick;
     protected OritechRecipe currentRecipe = OritechRecipe.DUMMY;
     protected InventoryInputMode inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
-    
     // network state
     protected boolean networkDirty = true;
-    
     //own storage
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0) {
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate()) {
         @Override
         public void onFinalCommit() {
             super.onFinalCommit();
             markNetDirty();
         }
     };
-    
-    protected final SimpleInventory inventory = new SimpleMachineInventory(getInventorySize());
     
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state);
@@ -133,7 +127,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         energyStorage.amount -= calculateEnergyUsage();
     }
     
-    private float calculateEnergyUsage() {
+    protected float calculateEnergyUsage() {
         return energyPerTick * getEfficiencyMultiplier() * (1 / getSpeedMultiplier());
     }
     
@@ -159,7 +153,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         return closestPlayer != null && closestPlayer.currentScreenHandler instanceof BasicMachineScreenHandler handler && getPos().equals(handler.getBlockPos());
     }
     
-    private void sendNetworkEntry() {
+    protected void sendNetworkEntry() {
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineSyncPacket(getPos(), energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, progress, currentRecipe, inventoryInputMode));
         networkDirty = false;
     }
@@ -241,7 +235,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         return true;
     }
     
-    private Optional<RecipeEntry<OritechRecipe>> getRecipe() {
+    protected Optional<RecipeEntry<OritechRecipe>> getRecipe() {
         return Objects.requireNonNull(world).getRecipeManager().getFirstMatch(getOwnRecipeType(), getInputInventory(), world);
     }
     
@@ -545,8 +539,17 @@ public abstract class MachineBlockEntity extends BlockEntity
         return calculateEnergyUsage();
     }
     
-    public long getDefaultCapacity() {return 5000;}
-    public long getDefaultInsertRate() {return 100;}
+    public long getDefaultCapacity() {
+        return 5000;
+    }
+    
+    public long getDefaultInsertRate() {
+        return 100;
+    }
+    
+    public long getDefaultExtractionRate() {
+        return 0;
+    }
     
     @Override
     public Inventory getDisplayedInventory() {

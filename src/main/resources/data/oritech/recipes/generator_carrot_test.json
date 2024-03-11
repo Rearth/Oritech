@@ -1,0 +1,11 @@
+{
+  "type": "oritech:test_generator",
+  "ingredients": [
+    {
+      "item": "minecraft:carrot"
+    }
+  ],
+  "results": [
+  ],
+  "time": 20
+}

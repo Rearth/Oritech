@@ -20,6 +20,7 @@ public class RecipeContent {
     public static final OritechRecipeType FOUNDRY = register(new Identifier(Oritech.MOD_ID, "foundry"));
     public static final OritechRecipeType CENTRIFUGE = register(new Identifier(Oritech.MOD_ID, "centrifuge"));
     public static final OritechRecipeType ATOMIC_FORGE = register(new Identifier(Oritech.MOD_ID, "atomic_forge"));
+    public static final OritechRecipeType TEST_GENERATOR = register(new Identifier(Oritech.MOD_ID, "test_generator"));
 
     private static OritechRecipeType register(Identifier name) {
 

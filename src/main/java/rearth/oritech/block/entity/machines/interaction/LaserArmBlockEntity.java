@@ -43,7 +43,7 @@ import java.util.function.Predicate;
 
 public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyProvider, MultiblockMachineController, MachineAddonController, InventoryProvider {
     
-    private static final int BLOCK_BREAK_ENERGY = 1000;
+    private static final int BLOCK_BREAK_ENERGY = 3000;
     
     // storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0) {
@@ -81,6 +81,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     private BlockPos currentTarget;
     private long lastFiredAt;
     private int progress;
+    private int targetBlockEnergyNeeded = BLOCK_BREAK_ENERGY;
     private boolean networkDirty;
     
     @Environment(EnvType.CLIENT)
@@ -120,7 +121,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             fired = true;
             progress += energyRequiredToFire();
             
-            if (progress >= BLOCK_BREAK_ENERGY) {
+            if (progress >= targetBlockEnergyNeeded) {
                 finishBlockBreaking(targetBlock, targetBlockState);
             }
         }
@@ -137,7 +138,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     private void finishBlockBreaking(BlockPos targetBlock, BlockState targetBlockState) {
-        progress -= BLOCK_BREAK_ENERGY;
+        progress -= targetBlockEnergyNeeded;
         
         var targetEntity = world.getBlockEntity(targetBlock);
         var dropped = Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetBlock, targetEntity);
@@ -237,11 +238,14 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         }
         
         var distance = targetPos.getManhattanDistance(pos);
-        if (distance > 64) {
+        var blockHardness = targetState.getBlock().getHardness();
+        if (distance > 64 || blockHardness < 0.01) {
             return false;
         }
         
+        this.targetBlockEnergyNeeded = (int) (BLOCK_BREAK_ENERGY * blockHardness);
         this.currentTarget = targetPos;
+        
         if (alsoSetDirection) {
             this.targetDirection = targetPos;
             updateNetwork();
@@ -456,6 +460,11 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     public boolean isTargetingAtomicForge() {
         return world.getBlockState(currentTarget).getBlock().equals(BlockContent.ATOMIC_FORGE_BLOCK);
+    }
+    
+    public boolean isTargetingEnergyContainer() {
+        var storageCandidate = EnergyStorage.SIDED.find(world, currentTarget, null);
+        return storageCandidate != null;
     }
     
 }
