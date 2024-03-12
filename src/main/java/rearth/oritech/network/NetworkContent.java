@@ -32,9 +32,11 @@ public class NetworkContent {
     public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {}
     public record GeneratorUISyncPacket(BlockPos position, int burnTime) {}
     public record MachineSetupEventPacket(BlockPos position) {}
-    public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget, BlockPos areaMin, BlockPos areaMax) {};   // times are in ticks
-    public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress){};
-    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt){};
+    public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget, BlockPos areaMin, BlockPos areaMax) {}   // times are in ticks
+    public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress){}
+    
+    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt){}
+    
     public record InventorySyncPacket(BlockPos position, List<ItemStack> heldStacks) {}
     
     public static void registerChannels() {

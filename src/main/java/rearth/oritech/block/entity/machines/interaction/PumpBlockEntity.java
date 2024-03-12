@@ -128,7 +128,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     
     private void addLiquidToTank(FluidState targetState) {
         try (var tx = Transaction.openOuter()) {
-            var amountInserted = fluidStorage.insert(FluidVariant.of(targetState.getFluid()), FluidConstants.BUCKET, tx);
+            fluidStorage.insert(FluidVariant.of(targetState.getFluid()), FluidConstants.BUCKET, tx);
             tx.commit();
         }
     }

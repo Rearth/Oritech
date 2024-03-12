@@ -73,7 +73,7 @@ public class ParticleContent {
     }
     
     private static void spawnLineInner(ParticleEffect particle, Vec3d start, Vec3d end, float particleCount, int duration) {
-        Vec3d increment = end.subtract(start).multiply(1f / (float) particleCount);
+        Vec3d increment = end.subtract(start).multiply(1f / particleCount);
         
         for (int i = 0; i < particleCount; i++) {
             ClientParticles.spawnWithMaxAge(particle, start, duration);
@@ -85,6 +85,6 @@ public class ParticleContent {
         Oritech.LOGGER.info("Registering Oritech particles");
     }
     
-    public static record LineData(Vec3d start, Vec3d end) {};
+    public record LineData(Vec3d start, Vec3d end) {}
     
 }

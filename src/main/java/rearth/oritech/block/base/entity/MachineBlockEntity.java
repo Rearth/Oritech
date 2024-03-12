@@ -231,8 +231,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     protected boolean canAddToSlot(ItemStack input, ItemStack slot) {
         if (slot.isEmpty()) return true;
         if (!slot.getItem().equals(input.getItem())) return false;  // type mismatch
-        if (slot.getCount() + input.getCount() > slot.getMaxCount()) return false;  // count too high
-        return true;
+        return slot.getCount() + input.getCount() <= slot.getMaxCount();  // count too high
     }
     
     protected Optional<RecipeEntry<OritechRecipe>> getRecipe() {

@@ -41,7 +41,7 @@ public class Geometry {
         return rotatePosition(BlockDirection.LEFT.pos, facing);
     }
     
-    public static enum BlockDirection {
+    public enum BlockDirection {
         FORWARD(new BlockPos(-1, 0, 0)),
         BACKWARD(new BlockPos(1, 0, 0)),
         LEFT(new BlockPos(0, 0, 1)),
