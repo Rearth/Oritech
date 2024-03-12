@@ -43,7 +43,7 @@ import java.util.function.Predicate;
 
 public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyProvider, MultiblockMachineController, MachineAddonController, InventoryProvider {
     
-    private static final int BLOCK_BREAK_ENERGY = 3000;
+    private static final int BLOCK_BREAK_ENERGY = 2000;
     
     // storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0) {
@@ -243,7 +243,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             return false;
         }
         
-        this.targetBlockEnergyNeeded = (int) (BLOCK_BREAK_ENERGY * blockHardness);
+        this.targetBlockEnergyNeeded = (int) (BLOCK_BREAK_ENERGY * Math.sqrt(blockHardness));
         this.currentTarget = targetPos;
         
         if (alsoSetDirection) {

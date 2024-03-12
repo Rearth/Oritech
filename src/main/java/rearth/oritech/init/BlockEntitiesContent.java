@@ -67,8 +67,8 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedEnergy
     public static final BlockEntityType<LaserArmBlockEntity> LASER_ARM_BLOCK = FabricBlockEntityTypeBuilder.create(LaserArmBlockEntity::new, BlockContent.LASER_ARM_BLOCK).build();
     
-//    @AssignSidedEnergy
     @AssignSidedFluid
+    @AssignSidedEnergy
     public static final BlockEntityType<PumpBlockEntity> PUMP_BLOCK = FabricBlockEntityTypeBuilder.create(PumpBlockEntity::new, BlockContent.PUMP_BLOCK).build();
     
     @AssignSidedEnergy

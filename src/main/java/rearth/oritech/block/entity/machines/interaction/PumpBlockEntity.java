@@ -1,9 +1,7 @@
 package rearth.oritech.block.entity.machines.interaction;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
@@ -19,22 +17,20 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.util.EnergyProvider;
 import rearth.oritech.util.FluidProvider;
+import team.reborn.energy.api.EnergyStorage;
+import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 // todo add energy storage / usage
-public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidProvider {
+public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidProvider, EnergyProvider {
     
-    private static final int MAX_SEARCH_COUNT = 10000;
-    
-    private boolean initialized = false;
-    private boolean toolheadLowered = false;
-    private boolean searchActive = false;
-    private BlockPos toolheadPosition;
-    private FloodFillSearch searchInstance;
-    private Deque<BlockPos> pendingLiquidPositions;
+    private static final int MAX_SEARCH_COUNT = 100000;
+    private static final int ENERGY_USAGE = 1000;   // per block pumped
+    private static final int PUMP_RATE = 5; // pump every n ticks
     
     private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
         @Override
@@ -53,6 +49,13 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             PumpBlockEntity.this.markDirty();
         }
     };
+    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(20000, 1000, 0);
+    private boolean initialized = false;
+    private boolean toolheadLowered = false;
+    private boolean searchActive = false;
+    private BlockPos toolheadPosition;
+    private FloodFillSearch searchInstance;
+    private Deque<BlockPos> pendingLiquidPositions;
     
     public PumpBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PUMP_BLOCK, pos, state);
@@ -64,6 +67,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         nbt.putBoolean("initialized", initialized);
         nbt.put("fluidVariant", fluidStorage.variant.toNbt());
         nbt.putLong("amount", fluidStorage.amount);
+        nbt.putLong("energy", energyStorage.getAmount());
         nbt.putLongArray("pendingTargets", pendingLiquidPositions.stream().mapToLong(BlockPos::asLong).toArray());
     }
     
@@ -73,6 +77,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         initialized = nbt.getBoolean("initialized");
         fluidStorage.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
         fluidStorage.amount = nbt.getLong("amount");
+        energyStorage.amount = nbt.getLong("energy");
         pendingLiquidPositions = Arrays.stream(nbt.getLongArray("pendingTargets")).mapToObj(BlockPos::fromLong).collect(Collectors.toCollection(ArrayDeque::new));
     }
     
@@ -85,7 +90,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             return;
         }
         
-        if (world.getTime() % 10 == 0) {
+        if (world.getTime() % PUMP_RATE == 0 && hasEnoughEnergy()) {
             
             if (pendingLiquidPositions.isEmpty() || tankIsFull()) return;
             
@@ -100,13 +105,21 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             if (!targetState.getFluid().matchesType(Fluids.WATER)) {
                 drainSourceBlock(targetBlock);
                 pendingLiquidPositions.pollLast();
-                System.out.println("pumped and removed block: " + targetState.getFluid());
             }
             
             addLiquidToTank(targetState);
+            useEnergy();
             this.markDirty();
         }
         
+    }
+    
+    private boolean hasEnoughEnergy() {
+        return energyStorage.getAmount() >= ENERGY_USAGE;
+    }
+    
+    private void useEnergy() {
+        energyStorage.amount -= ENERGY_USAGE;
     }
     
     private boolean tankIsFull() {
@@ -196,6 +209,11 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     @Override
     public Storage<FluidVariant> getFluidStorage(Direction direction) {
         return fluidStorage;
+    }
+    
+    @Override
+    public EnergyStorage getStorage() {
+        return energyStorage;
     }
     
     private static class FloodFillSearch {
