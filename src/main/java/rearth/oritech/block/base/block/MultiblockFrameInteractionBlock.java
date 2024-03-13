@@ -1,38 +1,20 @@
 package rearth.oritech.block.base.block;
 
-import com.mojang.serialization.MapCodec;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
-import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
 
-import java.util.Objects;
+import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 public abstract class MultiblockFrameInteractionBlock extends FrameInteractionBlock {
-    
-    public static final BooleanProperty ASSEMBLED = BooleanProperty.of("machine_assembled");
     
     public MultiblockFrameInteractionBlock(Settings settings) {
         super(settings);
@@ -56,9 +38,12 @@ public abstract class MultiblockFrameInteractionBlock extends FrameInteractionBl
             }
             
             var isAssembled = machineEntity.initMultiblock(state);
-            if (!isAssembled)
+            if (!isAssembled) {
+                player.sendMessage(Text.literal("Machine is not assembled. Please add missing core blocks"));
                 return ActionResult.SUCCESS;
+            }
             
+            state = state.with(ASSEMBLED, true);
         }
         
         return super.onUse(state, world, pos, player, hand, hit);

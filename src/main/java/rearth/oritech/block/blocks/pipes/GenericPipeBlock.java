@@ -179,12 +179,13 @@ public abstract class GenericPipeBlock extends Block {
         var lookup = pipeBlock.getSidesLookup();
         
         // transform to interface when machine is placed as neighbor
-        if (hasMachineInDirection(Direction.NORTH, world, pos, lookup)
+        if (!(state.getBlock() instanceof GenericPipeConnectionBlock) &&
+              (hasMachineInDirection(Direction.NORTH, world, pos, lookup)
               || hasMachineInDirection(Direction.EAST, world, pos, lookup)
               || hasMachineInDirection(Direction.SOUTH, world, pos, lookup)
               || hasMachineInDirection(Direction.WEST, world, pos, lookup)
               || hasMachineInDirection(Direction.UP, world, pos, lookup)
-              || hasMachineInDirection(Direction.DOWN, world, pos, lookup)) {
+              || hasMachineInDirection(Direction.DOWN, world, pos, lookup))) {
               
             var stateBase = getConnectionBlock();
             return GenericPipeConnectionBlock.addInterfaceState(stateBase, world, pos);

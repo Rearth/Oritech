@@ -21,7 +21,6 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.MachineCoreBlock;
-import rearth.oritech.block.blocks.machines.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -37,6 +36,8 @@ import team.reborn.energy.api.EnergyStorage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyProvider, MultiblockMachineController, MachineAddonController, InventoryProvider {
     
@@ -424,7 +425,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     public boolean isActive(BlockState state) {
-        return state.get(LaserArmBlock.ASSEMBLED);
+        return state.get(ASSEMBLED);
     }
     
     @Override

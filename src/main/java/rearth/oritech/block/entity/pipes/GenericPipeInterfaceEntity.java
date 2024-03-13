@@ -142,10 +142,6 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         super.markRemoved();
     }
     
-    public void reloadNetworkForInterface() {
-        System.out.println("searching network!");
-    }
-    
     private static class FloodFillSearch {
         
         final HashSet<BlockPos> checkedPositions = new HashSet<>();

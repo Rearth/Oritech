@@ -49,6 +49,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             PumpBlockEntity.this.markDirty();
         }
     };
+    
     private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(20000, 1000, 0);
     private boolean initialized = false;
     private boolean toolheadLowered = false;

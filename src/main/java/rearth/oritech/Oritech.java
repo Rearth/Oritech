@@ -40,7 +40,9 @@ public class Oritech implements ModInitializer {
     private void onServerStarted(MinecraftServer minecraftServer) {
         minecraftServer.getWorlds().forEach(world -> {
             if (world.isClient) return;
+            
             var regKey = world.getRegistryKey().getValue();
+            
             var dataId = "energy_" + regKey.getNamespace() + "_" + regKey.getPath();
             var result = world.getPersistentStateManager().getOrCreate(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, dataId);
             if (result.hashCode() != 0) {
@@ -49,7 +51,7 @@ public class Oritech implements ModInitializer {
             }
             
             
-            var fluidDataId = "energy_" + regKey.getNamespace() + "_" + regKey.getPath();
+            var fluidDataId = "fluid_" + regKey.getNamespace() + "_" + regKey.getPath();
             var fluidResult = world.getPersistentStateManager().getOrCreate(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, fluidDataId);
             if (fluidResult.hashCode() != 0) {
                 FluidPipeBlock.FLUID_PIPE_DATA = fluidResult;
