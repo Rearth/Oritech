@@ -7,7 +7,7 @@
 <h3 align="center">Oritech</h3>
 
   <p align="center">
-    A minecraft fabric tech mod, currently still WIP. As is this readme
+    A minecraft fabric tech mod, currently still WIP. Just like this readme.
     <br/>
     <br/>
     <a href="https://github.com/rearth/Oritech"><strong>Explore the docs »</strong></a>
