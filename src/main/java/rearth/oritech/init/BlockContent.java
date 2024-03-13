@@ -17,6 +17,10 @@ import rearth.oritech.block.blocks.machines.generators.BasicGeneratorBlock;
 import rearth.oritech.block.blocks.machines.generators.TestGeneratorBlock;
 import rearth.oritech.block.blocks.machines.interaction.*;
 import rearth.oritech.block.blocks.machines.processing.*;
+import rearth.oritech.block.blocks.pipes.EnergyPipeBlock;
+import rearth.oritech.block.blocks.pipes.EnergyPipeConnectionBlock;
+import rearth.oritech.block.blocks.pipes.FluidPipeBlock;
+import rearth.oritech.block.blocks.pipes.FluidPipeConnectionBlock;
 import rearth.oritech.util.item.OritechGeoItem;
 
 import java.lang.annotation.ElementType;
@@ -32,6 +36,14 @@ public class BlockContent implements BlockRegistryContainer {
     
     @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
     public static final Block MACHINE_FRAME_BLOCK = new MachineFrameBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
+    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
+    public static final Block FLUID_PIPE = new FluidPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
+    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
+    public static final Block ENERGY_PIPE = new EnergyPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
+    @NoBlockItem
+    public static final Block FLUID_PIPE_CONNECTION = new FluidPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
+    @NoBlockItem
+    public static final Block ENERGY_PIPE_CONNECTION = new EnergyPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
     
     @NoBlockItem
     public static final Block FRAME_GANTRY_ARM = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());

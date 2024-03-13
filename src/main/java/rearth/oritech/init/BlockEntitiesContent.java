@@ -15,6 +15,8 @@ import rearth.oritech.block.entity.machines.generators.BasicGeneratorEntity;
 import rearth.oritech.block.entity.machines.generators.TestGeneratorEntity;
 import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.*;
+import rearth.oritech.block.entity.pipes.EnergyPipeInterfaceEntity;
+import rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity;
 import rearth.oritech.util.EnergyProvider;
 import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventoryProvider;
@@ -87,6 +89,10 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     public static final BlockEntityType<FertilizerBlockEntity> FERTILIZER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(FertilizerBlockEntity::new, BlockContent.FERTILIZER_BLOCK).build();
     
     public static final BlockEntityType<InventoryProxyAddonBlockEntity> INVENTORY_PROXY_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(InventoryProxyAddonBlockEntity::new, BlockContent.MACHINE_INVENTORY_PROXY_ADDON).build();
+    public static final BlockEntityType<FluidPipeInterfaceEntity> FLUID_PIPE_ENTITY = FabricBlockEntityTypeBuilder.create(FluidPipeInterfaceEntity::new, BlockContent.FLUID_PIPE_CONNECTION).build();
+    
+    @AssignSidedEnergy
+    public static final BlockEntityType<EnergyPipeInterfaceEntity> ENERGY_PIPE_ENTITY = FabricBlockEntityTypeBuilder.create(EnergyPipeInterfaceEntity::new, BlockContent.ENERGY_PIPE_CONNECTION).build();
     
     public static final BlockEntityType<AddonBlockEntity> ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(AddonBlockEntity::new,
       BlockContent.MACHINE_SPEED_ADDON,

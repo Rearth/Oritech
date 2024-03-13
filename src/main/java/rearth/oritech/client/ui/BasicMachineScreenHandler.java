@@ -1,7 +1,6 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.client.screens.SlotGenerator;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -10,19 +9,15 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
-import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity.AddonUiData;
 import rearth.oritech.util.EnergyProvider;
 import rearth.oritech.util.ScreenProvider;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.Objects;
-import java.util.Optional;
 
 public class BasicMachineScreenHandler extends ScreenHandler {
 
