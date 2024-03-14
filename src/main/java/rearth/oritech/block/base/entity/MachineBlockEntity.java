@@ -595,8 +595,6 @@ public abstract class MachineBlockEntity extends BlockEntity
             
             var inv = getInputView();
             
-            System.out.println(inv);
-            
             // fill equally
             // check all slots, find the one with the lowest (or empty) type
             return switch (mode) {

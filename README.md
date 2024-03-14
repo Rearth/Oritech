@@ -6,17 +6,16 @@
 
 <h3 align="center">Oritech</h3>
 
-  <p align="center">
-    A minecraft fabric tech mod, currently still WIP. Just like this readme.
-    <br/>
-    <br/>
-    <a href="https://github.com/rearth/Oritech"><strong>Explore the docs »</strong></a>
-    <br/>
-    <br/>
-    <a href="https://github.com/rearth/Oritech/issues">Report Bug</a>
-    .
-    <a href="https://github.com/rearth/Oritech/issues">Request Feature</a>
-  </p>
+<p align="center">
+  A minecraft fabric tech mod, currently still WIP. Just like this readme.
+  <br/>
+  <br/>
+  <a href="https://github.com/rearth/Oritech"><strong>Explore the docs »</strong></a>
+  <br/>
+  <br/>
+  <a href="https://github.com/rearth/Oritech/issues">Report Bug</a>
+  .
+  <a href="https://github.com/rearth/Oritech/issues">Request Feature</a>
 </p>
 
 ![Downloads](https://img.shields.io/github/downloads/rearth/Oritech/total) ![Stargazers](https://img.shields.io/github/stars/rearth/Oritech?style=social) ![Issues](https://img.shields.io/github/issues/rearth/Oritech) ![License](https://img.shields.io/github/license/rearth/Oritech)
@@ -73,7 +72,8 @@ const API_KEY = 'ENTER YOUR API';
 
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos
+work well in this space. You may also link to more resources.
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
@@ -83,11 +83,16 @@ See the [open issues](https://github.com/rearth/Oritech/issues) for a list of pr
 
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/rearth/Oritech/issues/new) to discuss it, or directly create a pull request after you edit the *README.md* file with necessary changes.
+Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any
+contributions you make are **greatly appreciated**.
+
+* If you have suggestions for adding or removing projects, feel free
+  to [open an issue](https://github.com/rearth/Oritech/issues/new) to discuss it, or directly create a pull request
+  after you edit the *README.md* file with necessary changes.
 * Please make sure you check your spelling and grammar.
 * Create individual PR for each suggestion.
-* Please also read through the [Code Of Conduct](https://github.com/rearth/Oritech/blob/main/CODE_OF_CONDUCT.md) before posting your first idea as well.
+* Please also read through the [Code Of Conduct](https://github.com/rearth/Oritech/blob/main/CODE_OF_CONDUCT.md) before
+  posting your first idea as well.
 
 ### Creating A Pull Request
 
@@ -100,7 +105,8 @@ Contributions are what make the open source community such an amazing place to b
 ## License
 
 TODO
-Distributed under the CC BY-NC 4.0 DEED License. See [LICENSE](https://github.com/rearth/Oritech/blob/main/LICENSE.md) for more information.
+Distributed under the CC BY-NC 4.0 DEED License. See [LICENSE](https://creativecommons.org/licenses/by-nc/4.0/) for more
+information.
 
 ## Acknowledgements
 
