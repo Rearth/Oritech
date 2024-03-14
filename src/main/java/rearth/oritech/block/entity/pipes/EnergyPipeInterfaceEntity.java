@@ -54,7 +54,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
         
         if (world.isClient || energyStorage.getAmount() <= 0) return;
         
-        var data = EnergyPipeBlock.ENERGY_PIPE_DATA;
+        var data = EnergyPipeBlock.ENERGY_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
         var targets = findNetworkTargets(pos, data);
         
         var energyStorages = targets.stream()

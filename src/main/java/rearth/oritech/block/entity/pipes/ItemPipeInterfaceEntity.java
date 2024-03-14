@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.pipes;
 
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -9,6 +8,8 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -18,11 +19,13 @@ import rearth.oritech.block.blocks.pipes.ItemPipeConnectionBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ItemPipeInterfaceEntity extends GenericPipeInterfaceEntity {
     
-    private final HashMap<BlockPos, BlockApiCache<Storage<FluidVariant>, Direction>> lookupCache = new HashMap<>();
+    private static final int TRANSFER_AMOUNT = 8;
+    private static final int TRANSFER_PERIOD = 5;
+    
+    private final HashMap<BlockPos, BlockApiCache<Storage<ItemVariant>, Direction>> lookupCache = new HashMap<>();
     
     public ItemPipeInterfaceEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ITEM_PIPE_ENTITY, pos, state);
@@ -30,14 +33,12 @@ public class ItemPipeInterfaceEntity extends GenericPipeInterfaceEntity {
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
-        if (world.isClient || !state.get(ItemPipeConnectionBlock.EXTRACT)) return;
+        if (world.isClient || world.getTime() % TRANSFER_PERIOD != 0 || !state.get(ItemPipeConnectionBlock.EXTRACT)) return;
         
         // find first itemstack from connected invs (that can be extracted)
         // try to move it to one of the destinations
         
-        var maxTransferAmount = 8;
-        
-        var data = ItemPipeBlock.ITEM_PIPE_DATA;
+        var data = ItemPipeBlock.ITEM_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
         
         var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
         var stackToMove = ItemStack.EMPTY;
@@ -47,10 +48,10 @@ public class ItemPipeInterfaceEntity extends GenericPipeInterfaceEntity {
             for (var sourcePos : sources) {
                 var offset = pos.subtract(sourcePos);
                 var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
-                var inventory = ItemStorage.SIDED.find(world, sourcePos, direction);
+                var inventory = findFromCache(world, sourcePos, direction);
                 if (inventory == null || !inventory.supportsExtraction()) continue;
                 
-                var firstStack = getFromStorage(inventory, maxTransferAmount, mainTx);
+                var firstStack = getFromStorage(inventory, TRANSFER_AMOUNT, mainTx);
                 
                 if (!firstStack.isEmpty()) {
                     stackToMove = firstStack;
@@ -65,23 +66,20 @@ public class ItemPipeInterfaceEntity extends GenericPipeInterfaceEntity {
         
         if (stackToMove.isEmpty()) return;
         
-        System.out.println("found stack to move: " + stackToMove);
-        
         var targets = findNetworkTargets(pos, data);
         
         var itemStorages = targets.stream()
-                             .map(target -> ItemStorage.SIDED.find(world, target.getLeft(), target.getRight()))
-                             .filter(obj -> Objects.nonNull(obj) && obj.supportsInsertion())
-                             .collect(Collectors.toList());
-        
-        Collections.shuffle(itemStorages);
-        
+                             .map(target -> new Pair<>(findFromCache(world, target.getLeft(), target.getRight()), target.getLeft()))
+                             .filter(obj -> Objects.nonNull(obj.getLeft()) && obj.getLeft().supportsInsertion() && obj.getRight().getManhattanDistance(pos) > 1)
+                             .sorted(Comparator.comparingInt(a -> a.getRight().getManhattanDistance(pos)))
+                             .toList();
+                
         var moveCount = stackToMove.getCount();
         var moved = 0L;
         
         try (var tx = Transaction.openOuter()) {
             for (var targetStorage : itemStorages) {
-                var inserted = targetStorage.insert(ItemVariant.of(stackToMove), moveCount, tx);
+                var inserted = targetStorage.getLeft().insert(ItemVariant.of(stackToMove), moveCount, tx);
                 moveCount -= (int) inserted;
                 moved += inserted;
                 
@@ -99,6 +97,11 @@ public class ItemPipeInterfaceEntity extends GenericPipeInterfaceEntity {
             
         }
         
+    }
+    
+    private Storage<ItemVariant> findFromCache(World world, BlockPos pos, Direction direction) {
+        var cacheRes = lookupCache.computeIfAbsent(pos, elem -> BlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world, pos));
+        return cacheRes.find(direction);
     }
     
     private static ItemStack getFromStorage(Storage<ItemVariant> inventory, int maxTransferAmount, Transaction mainTx) {

@@ -80,7 +80,7 @@ public class FluidPipeConnectionBlock extends GenericPipeConnectionBlock {
     }
     
     @Override
-    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData() {
-        return FLUID_PIPE_DATA;
+    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
+        return FLUID_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 }

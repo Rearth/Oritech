@@ -6,18 +6,20 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
+import java.util.Map;
 
 public class NetworkContent {
 
@@ -34,16 +36,19 @@ public class NetworkContent {
     public record MachineSetupEventPacket(BlockPos position) {}
     public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget, BlockPos areaMin, BlockPos areaMax) {}   // times are in ticks
     public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress){}
+    public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {}   // this goes both ways
     
     public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt){}
     
     public record InventorySyncPacket(BlockPos position, List<ItemStack> heldStacks) {}
     
+    @SuppressWarnings("unchecked")
     public static void registerChannels() {
 
         Oritech.LOGGER.info("Registering oritech channels");
 
         ReflectiveEndecBuilder.register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
+        ReflectiveEndecBuilder.register(ItemFilterBlockEntity.FILTER_ITEMS_ENDEC, (Class<Map<Integer, ItemStack>>) (Object) Map.class); // I don't even know what kind of abomination this cast is, but it seems to work
 
         MACHINE_CHANNEL.registerClientbound(MachineSyncPacket.class, ((message, access) -> {
 
@@ -63,6 +68,16 @@ public class NetworkContent {
                 machine.playSetupAnimation();
             } else if (entity instanceof LaserArmBlockEntity laserArmBlock) {
                 laserArmBlock.playSetupAnimation();
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(ItemFilterSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof ItemFilterBlockEntity filter) {
+                filter.setFilterSettings(message.data);
             }
             
         }));
@@ -146,6 +161,16 @@ public class NetworkContent {
             }
             
         });
+        
+        UI_CHANNEL.registerServerbound(ItemFilterSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            
+            if (entity instanceof ItemFilterBlockEntity filter) {
+                filter.setFilterSettings(message.data);
+            }
+            
+        }));
 
     }
 

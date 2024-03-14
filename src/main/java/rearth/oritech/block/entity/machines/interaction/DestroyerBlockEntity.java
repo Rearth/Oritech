@@ -1,22 +1,21 @@
 package rearth.oritech.block.entity.machines.interaction;
 
-import net.minecraft.block.*;
-import net.minecraft.block.enums.BlockFace;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.CropBlock;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockFrameInteractionEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ScreenProvider;
-import team.reborn.energy.api.EnergyStorage;
 
 import java.util.List;
 import java.util.Objects;
@@ -47,7 +46,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
         
         var targetHardness = targetState.getBlock().getHardness();
-        if (targetHardness <= 0) return;    // skip undestoyable blocks, such as bedrock
+        if (targetHardness < 0) return;    // skip undestroyable blocks, such as bedrock
         
         // skip not grown crops
         if (targetState.getBlock() instanceof CropBlock cropBlock && !cropBlock.isMature(targetState)) {

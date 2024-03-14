@@ -80,7 +80,7 @@ public class ItemPipeConnectionBlock extends GenericPipeConnectionBlock {
     }
     
     @Override
-    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData() {
-        return ITEM_PIPE_DATA;
+    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
+        return ITEM_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 }

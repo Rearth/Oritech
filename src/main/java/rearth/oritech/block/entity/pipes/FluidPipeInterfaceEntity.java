@@ -69,7 +69,7 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
     public void tick(World world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
         if (world.isClient) return;
         
-        var data = FluidPipeBlock.FLUID_PIPE_DATA;
+        var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
         
         // try to fill internal storage from inputs (if extract true)
         // one transaction for each side

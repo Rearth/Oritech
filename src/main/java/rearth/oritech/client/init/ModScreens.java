@@ -9,7 +9,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import rearth.oritech.client.ui.*;
 
 public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
-
+    
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> PULVERIZER_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> GRINDER_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> ASSEMBLER_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
@@ -23,7 +23,8 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> PLACER_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> FERTILIZER_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<InventoryProxyScreenHandler> INVENTORY_PROXY_SCREEN = new ExtendedScreenHandlerType<>(InventoryProxyScreenHandler::new);
-
+    public static final ExtendedScreenHandlerType<ItemFilterScreenHandler> ITEM_FILTER_SCREEN = new ExtendedScreenHandlerType<>(ItemFilterScreenHandler::new);
+    
     public static void assignScreens() {
         HandledScreens.register(PULVERIZER_SCREEN, UpgradableMachineScreen::new);
         HandledScreens.register(GRINDER_SCREEN, UpgradableMachineScreen::new);
@@ -35,16 +36,17 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
         HandledScreens.register(BASIC_GENERATOR_SCREEN, UpgradableMachineScreen::new);
         HandledScreens.register(ATOMIC_FORGE_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         HandledScreens.register(INVENTORY_PROXY_SCREEN, InventoryProxyScreen::new);
+        HandledScreens.register(ITEM_FILTER_SCREEN, ItemFilterScreen::new);
         HandledScreens.register(DESTROYER_SCREEN, UpgradableMachineScreen::new);
         HandledScreens.register(PLACER_SCREEN, UpgradableMachineScreen::new);
         HandledScreens.register(FERTILIZER_SCREEN, UpgradableMachineScreen::new);
-            }
-
+    }
+    
     @Override
     public Registry<ScreenHandlerType<?>> getRegistry() {
         return Registries.SCREEN_HANDLER;
     }
-
+    
     @Override
     @SuppressWarnings("unchecked")
     public Class<ScreenHandlerType<?>> getTargetFieldType() {

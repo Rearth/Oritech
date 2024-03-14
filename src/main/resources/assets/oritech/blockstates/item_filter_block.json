@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "target_dir=south": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "x": 90
+    },
+    "target_dir=west": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "y": 90,
+      "x": 90
+    },
+    "target_dir=north": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "y": 180,
+      "x": 90
+    },
+    "target_dir=east": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "y": 270,
+      "x": 90
+    },
+    "target_dir=down": {
+      "model": "oritech:block/machine_inventory_proxy_addon"
+    },
+    "target_dir=up": {
+      "model": "oritech:block/machine_inventory_proxy_addon",
+      "x": 180
+    }
+  }
+}

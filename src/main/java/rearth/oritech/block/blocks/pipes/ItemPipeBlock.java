@@ -4,13 +4,17 @@ import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 
+import java.util.HashMap;
+
 public class ItemPipeBlock extends GenericPipeBlock {
     
-    public static GenericPipeInterfaceEntity.PipeNetworkData ITEM_PIPE_DATA = new GenericPipeInterfaceEntity.PipeNetworkData();
+    public static HashMap<Identifier, GenericPipeInterfaceEntity.PipeNetworkData> ITEM_PIPE_DATA = new HashMap<>();
     
     public ItemPipeBlock(Settings settings) {
         super(settings);
@@ -42,7 +46,7 @@ public class ItemPipeBlock extends GenericPipeBlock {
     }
     
     @Override
-    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData() {
-        return ITEM_PIPE_DATA;
+    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
+        return ITEM_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 }

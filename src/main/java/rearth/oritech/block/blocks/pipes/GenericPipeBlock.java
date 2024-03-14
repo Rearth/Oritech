@@ -63,7 +63,7 @@ public abstract class GenericPipeBlock extends Block {
     
     public abstract boolean connectToBlockType(Block block);
     
-    public abstract GenericPipeInterfaceEntity.PipeNetworkData getNetworkData();
+    public abstract GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world);
     
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
@@ -126,7 +126,7 @@ public abstract class GenericPipeBlock extends Block {
             var stateInterface = GenericPipeConnectionBlock.addInterfaceState(stateBase, world, pos);
             world.setBlockState(pos, stateInterface);
         } else {
-            GenericPipeInterfaceEntity.addNode(pos, false, state, getNetworkData());
+            GenericPipeInterfaceEntity.addNode(pos, false, state, getNetworkData(world));
         }
         
     }
@@ -143,13 +143,13 @@ public abstract class GenericPipeBlock extends Block {
         
         if (!state.isOf(newState.getBlock()) && !(newState.getBlock() instanceof GenericPipeBlock)) {
             // block was removed/replaced instead of updated
-            onBlockRemoved(pos, state);
+            onBlockRemoved(pos, state, world);
         }
         
     }
     
-    protected void onBlockRemoved(BlockPos pos, BlockState oldState) {
-        GenericPipeInterfaceEntity.removeNode(pos, false, oldState, getNetworkData());
+    protected void onBlockRemoved(BlockPos pos, BlockState oldState, World world) {
+        GenericPipeInterfaceEntity.removeNode(pos, false, oldState, getNetworkData(world));
     }
     
     protected VoxelShape[] createShapes() {

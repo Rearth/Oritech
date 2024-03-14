@@ -64,16 +64,16 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
         if (oldState.getBlock().equals(state.getBlock())) return;
-        GenericPipeInterfaceEntity.addNode(pos, true, state, getNetworkData());
+        GenericPipeInterfaceEntity.addNode(pos, true, state, getNetworkData(world));
         
         var regKey = world.getRegistryKey().getValue();
         var dataId = getPipeTypeName() + "_" + regKey.getNamespace() + "_" + regKey.getPath();
-        ((ServerWorld) world).getPersistentStateManager().set(dataId, getNetworkData());
+        ((ServerWorld) world).getPersistentStateManager().set(dataId, getNetworkData(world));
     }
     
     @Override
-    protected void onBlockRemoved(BlockPos pos, BlockState oldState) {
-        GenericPipeInterfaceEntity.removeNode(pos, true, oldState, getNetworkData());
+    protected void onBlockRemoved(BlockPos pos, BlockState oldState, World world) {
+        GenericPipeInterfaceEntity.removeNode(pos, true, oldState, getNetworkData(world));
     }
     
     @Override
