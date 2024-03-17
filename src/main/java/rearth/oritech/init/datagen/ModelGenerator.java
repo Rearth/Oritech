@@ -45,6 +45,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleState(BlockContent.LASER_ARM_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.TEST_GENERATOR_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.BASIC_GENERATOR_BLOCK);
+        blockStateModelGenerator.registerSimpleState(BlockContent.BIG_SOLAR_PANEL_BLOCK);
         
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_BASIC);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_GOOD);

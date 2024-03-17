@@ -16,7 +16,6 @@ import net.minecraft.world.World;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
 import team.reborn.energy.api.EnergyStorage;
-import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -199,7 +198,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             energyStorage.extract(totalInserted, tx);
             tx.commit();
         }
-        
     }
     
     @Override

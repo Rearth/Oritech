@@ -3,14 +3,14 @@ package rearth.oritech.block.entity.machines;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.*;
+import rearth.oritech.util.EnergyProvider;
+import rearth.oritech.util.InventoryProvider;
+import rearth.oritech.util.MultiblockMachineController;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.DelegatingEnergyStorage;
 
@@ -80,7 +80,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     public InventoryStorage getInventory(Direction direction) {
         
         var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
-        if (!isUsed || getCachedController() == null) return null;
+        if (!isUsed || getCachedController() == null || getCachedController().getInventoryForLink() == null) return null;
         
         return getCachedController().getInventoryForLink().getInventory(direction);
     }

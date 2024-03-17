@@ -11,6 +11,7 @@ import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
+import rearth.oritech.block.entity.machines.generators.BigSolarPanelEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -68,6 +69,8 @@ public class NetworkContent {
                 machine.playSetupAnimation();
             } else if (entity instanceof LaserArmBlockEntity laserArmBlock) {
                 laserArmBlock.playSetupAnimation();
+            } else if (entity instanceof BigSolarPanelEntity solarPanel) {
+                solarPanel.playSetupAnimation();
             }
             
         }));

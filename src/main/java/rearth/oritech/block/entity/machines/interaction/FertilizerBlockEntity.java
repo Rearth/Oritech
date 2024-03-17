@@ -1,14 +1,20 @@
 package rearth.oritech.block.entity.machines.interaction;
 
-import net.minecraft.block.*;
-import net.minecraft.block.enums.BlockFace;
-import net.minecraft.item.BoneMealItem;
-import net.minecraft.item.Items;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.CropBlock;
+import net.minecraft.block.Fertilizable;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
@@ -16,13 +22,59 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.util.FluidProvider;
 
 import java.util.List;
 import java.util.Objects;
 
-public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
+public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements FluidProvider {
+    
+    public static final long FLUID_USAGE = 1 * FluidConstants.BUCKET;   // per block, tick usage is this divided by work time
+    
+    // TODO create gui for water provider
+    private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
+        @Override
+        protected FluidVariant getBlankVariant() {
+            return FluidVariant.blank();
+        }
+        
+        @Override
+        protected long getCapacity(FluidVariant variant) {
+            return (4 * FluidConstants.BUCKET);
+        }
+        
+        @Override
+        public boolean supportsExtraction() {
+            return false;
+        }
+        
+        @Override
+        protected boolean canInsert(FluidVariant variant) {
+            return variant.getFluid().matchesType(Fluids.WATER);
+        }
+        
+        @Override
+        protected void onFinalCommit() {
+            super.onFinalCommit();
+            FertilizerBlockEntity.this.markDirty();
+        }
+    };
+    
     public FertilizerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.FERTILIZER_BLOCK_ENTITY, pos, state);
+    }
+    
+    private long getWaterUsagePerTick() {
+        return FLUID_USAGE / getWorkTime();
+    }
+    
+    private boolean hasEnoughWater() {
+        return fluidStorage.amount >= getWaterUsagePerTick();
+    }
+    
+    @Override
+    protected boolean canProgress() {
+        return hasEnoughWater() && super.canProgress();
     }
     
     @Override
@@ -73,8 +125,10 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     @Override
     protected void doProgress(boolean moving) {
         super.doProgress(moving);
-        if (!moving && hasWorkAvailable(getCurrentTarget()))
+        if (!moving && hasWorkAvailable(getCurrentTarget())) {
+            fluidStorage.amount -= getWaterUsagePerTick();
             ParticleContent.WATERING_EFFECT.spawn(world, Vec3d.of(getCurrentTarget().down()), 2);
+        }
     }
     
     @Override
@@ -100,5 +154,10 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     @Override
     public ScreenHandlerType<?> getScreenHandlerType() {
         return ModScreens.DESTROYER_SCREEN;
+    }
+    
+    @Override
+    public Storage<FluidVariant> getFluidStorage(Direction direction) {
+        return fluidStorage;
     }
 }

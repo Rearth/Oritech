@@ -66,11 +66,11 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
         
     }
     
-    private static float lerp(float a, float b, float f) {
+    public static float lerp(float a, float b, float f) {
         return a + f * (b - a);
     }
     
-    private static float determinant(Vector2f a, Vector2f b) {
+    public static float determinant(Vector2f a, Vector2f b) {
         return a.x * b.y - a.y * b.x;
     }
     

@@ -12,6 +12,7 @@ import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.EnergyAcceptorAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.generators.BasicGeneratorEntity;
+import rearth.oritech.block.entity.machines.generators.BigSolarPanelEntity;
 import rearth.oritech.block.entity.machines.generators.TestGeneratorEntity;
 import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.*;
@@ -62,6 +63,9 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<BasicGeneratorEntity> BASIC_GENERATOR_ENTITY = FabricBlockEntityTypeBuilder.create(BasicGeneratorEntity::new, BlockContent.BASIC_GENERATOR_BLOCK).build();
+    
+    @AssignSidedEnergy
+    public static final BlockEntityType<BigSolarPanelEntity> BIG_SOLAR_ENTITY = FabricBlockEntityTypeBuilder.create(BigSolarPanelEntity::new, BlockContent.BIG_SOLAR_PANEL_BLOCK).build();
     
     @AssignSidedInventory
     @AssignSidedEnergy

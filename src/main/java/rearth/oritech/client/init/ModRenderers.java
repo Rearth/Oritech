@@ -7,6 +7,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.LaserArmRenderer;
 import rearth.oritech.client.renderers.MachineGantryRenderer;
 import rearth.oritech.client.renderers.MachineRenderer;
+import rearth.oritech.client.renderers.SolarPanelRenderer;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 
@@ -26,6 +27,7 @@ public class ModRenderers {
         // generators
         BlockEntityRendererFactories.register(BlockEntitiesContent.TEST_GENERATOR_ENTITY, ctx -> new MachineRenderer<>("models/test_generator_block"));
         BlockEntityRendererFactories.register(BlockEntitiesContent.BASIC_GENERATOR_ENTITY, ctx -> new MachineRenderer<>("models/test_generator_block"));
+        BlockEntityRendererFactories.register(BlockEntitiesContent.BIG_SOLAR_ENTITY, ctx -> new SolarPanelRenderer<>("models/big_solar_panel_block"));
         
         // interactions
         BlockEntityRendererFactories.register(BlockEntitiesContent.LASER_ARM_BLOCK, ctx -> new LaserArmRenderer<>("models/laser_arm_block"));
