@@ -3,7 +3,7 @@
 	"texture_size": [64, 64],
 	"textures": {
 		"1": "oritech:block/machine_speed_addon_on",
-		"particle": "oritech:block/machine_speed_addon_on"
+		"particle": "oritech:block/machine_particle_texture"
 	},
 	"elements": [
 		{
