@@ -92,6 +92,7 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedInventory
     @AssignSidedEnergy
+    @AssignSidedFluid
     public static final BlockEntityType<FertilizerBlockEntity> FERTILIZER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(FertilizerBlockEntity::new, BlockContent.FERTILIZER_BLOCK).build();
     
     public static final BlockEntityType<InventoryProxyAddonBlockEntity> INVENTORY_PROXY_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(InventoryProxyAddonBlockEntity::new, BlockContent.MACHINE_INVENTORY_PROXY_ADDON).build();

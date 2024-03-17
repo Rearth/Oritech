@@ -9,6 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.CropBlock;
 import net.minecraft.block.Fertilizable;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -59,6 +60,20 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
             FertilizerBlockEntity.this.markDirty();
         }
     };
+    
+    @Override
+    protected void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        nbt.put("fluidVariant", fluidStorage.variant.toNbt());
+        nbt.putLong("fluidAmount", fluidStorage.amount);
+    }
+    
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+        fluidStorage.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
+        fluidStorage.amount = nbt.getLong("fluidAmount");
+    }
     
     public FertilizerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.FERTILIZER_BLOCK_ENTITY, pos, state);

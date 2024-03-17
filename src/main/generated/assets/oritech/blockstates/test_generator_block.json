@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "oritech:block/test_generator_block"
+      "model": "oritech:block/machine_speed_addon"
     }
   }
 }

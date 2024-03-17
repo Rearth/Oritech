@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.EnergyProvider;
+import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.ScreenProvider;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -33,6 +34,8 @@ public class BasicMachineScreenHandler extends ScreenHandler {
 
     @NotNull
     protected final ScreenProvider screenData;
+    
+    protected final FluidProvider fluidProvider;
     
     protected BlockState machineBlock;
     protected BlockEntity blockEntity;
@@ -57,6 +60,21 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         } else {
             Oritech.LOGGER.error("Opened oritech block interface without any energy data at " + blockEntity);
             energyStorage = null;
+        }
+        
+        if (blockEntity instanceof FluidProvider fluidProvider) {
+            var fluidIterator = fluidProvider.getFluidStorage(null).iterator();
+            if (fluidIterator.hasNext()) {
+                var fluidView = fluidIterator.next();
+                var variant = fluidView.getResource();
+                var amount = fluidView.getAmount();
+                System.out.println("found fluid data: " + variant + " " + amount);
+                this.fluidProvider = fluidProvider;
+            } else {
+                this.fluidProvider = null;
+            }
+        } else {
+            fluidProvider = null;
         }
         
         this.machineBlock = blockEntity.getCachedState();

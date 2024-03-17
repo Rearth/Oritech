@@ -23,7 +23,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     public FlowLayout root;
     private TextureComponent progress_indicator;
     private TextureComponent energy_indicator;
-    private Component energy_tooltip;
+    private Component energy_indicator_background;
     private ButtonComponent cycleInputButton;
     
     public BasicMachineScreen(S handler, PlayerInventory inventory, Text title) {
@@ -90,7 +90,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         var fillAmount = (float) amount / capacity;
         var tooltipText = getEnergyTooltip(amount, capacity);
         
-        energy_tooltip.tooltip(tooltipText);
+        energy_indicator_background.tooltip(tooltipText);
         energy_indicator.visibleArea(PositionedRectangle.of(0, 96 - ((int) (96 * (fillAmount))), 24, (int) (96 * fillAmount)));
     }
     
@@ -176,6 +176,10 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
           .child(progress_indicator.positioning(Positioning.absolute(config.x(), config.y())));
     }
     
+    private void addFluidBar() {
+    
+    }
+    
     private void addEnergyBar(FlowLayout panel) {
         
         var config = handler.screenData.getEnergyConfiguration();
@@ -190,19 +194,19 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         var fillAmount = 1f; // those will be overridden on tick
         var tooltipText = Text.literal("10/50 RF");
         
-        energy_tooltip = Components.texture(GUI_COMPONENTS, 24, 0, 24, 96, 48, 96);
-        energy_tooltip.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
-        energy_tooltip.positioning(Positioning.absolute(config.x(), config.y()));
-        energy_tooltip.tooltip(tooltipText);
+        energy_indicator_background = Components.texture(GUI_COMPONENTS, 24, 0, 24, 96, 98, 96);
+        energy_indicator_background.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
+        energy_indicator_background.positioning(Positioning.absolute(config.x(), config.y()));
+        energy_indicator_background.tooltip(tooltipText);
         
         var offset = (1 - fillAmount) * config.height();
         
-        energy_indicator = Components.texture(GUI_COMPONENTS, 0, 0, 24, (int) (96 * fillAmount), 48, 96);
+        energy_indicator = Components.texture(GUI_COMPONENTS, 0, 0, 24, (int) (96 * fillAmount), 98, 96);
         energy_indicator.sizing(Sizing.fixed(config.width()), Sizing.fixed((int) (config.height() * fillAmount)));
         energy_indicator.positioning(Positioning.absolute(config.x(), (int) (config.y() + offset)));
         
         panel
-          .child(energy_tooltip)
+          .child(energy_indicator_background)
           .child(energy_indicator)
         ;
     }

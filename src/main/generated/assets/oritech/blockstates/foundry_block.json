@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "oritech:block/foundry_block"
+      "model": "oritech:block/machine_speed_addon"
     }
   }
 }

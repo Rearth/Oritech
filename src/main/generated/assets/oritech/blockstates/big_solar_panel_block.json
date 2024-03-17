@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "oritech:block/big_solar_panel_block"
+      "model": "oritech:block/machine_speed_addon"
     }
   }
 }

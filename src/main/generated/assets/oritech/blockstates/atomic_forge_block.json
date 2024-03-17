@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "oritech:block/atomic_forge_block"
+      "model": "oritech:block/machine_speed_addon"
     }
   }
 }

@@ -2,7 +2,9 @@ package rearth.oritech.init.datagen;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
-import net.minecraft.data.client.*;
+import net.minecraft.data.client.BlockStateModelGenerator;
+import net.minecraft.data.client.ItemModelGenerator;
+import net.minecraft.data.client.Models;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 
@@ -35,17 +37,19 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.BLOCK_PLACER_HEAD);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.BLOCK_FERTILIZER_HEAD);
         
-        blockStateModelGenerator.registerSimpleState(BlockContent.PULVERIZER_BLOCK);
-        blockStateModelGenerator.registerSimpleState(BlockContent.GRINDER_BLOCK);
-        blockStateModelGenerator.registerSimpleState(BlockContent.ASSEMBLER_BLOCK);
-        blockStateModelGenerator.registerSimpleState(BlockContent.FOUNDRY_BLOCK);
-        blockStateModelGenerator.registerSimpleState(BlockContent.CENTRIFUGE_BLOCK);
-        blockStateModelGenerator.registerSimpleState(BlockContent.ATOMIC_FORGE_BLOCK);
-        blockStateModelGenerator.registerSimpleState(BlockContent.POWERED_FURNACE_BLOCK);
-        blockStateModelGenerator.registerSimpleState(BlockContent.LASER_ARM_BLOCK);
-        blockStateModelGenerator.registerSimpleState(BlockContent.TEST_GENERATOR_BLOCK);
-        blockStateModelGenerator.registerSimpleState(BlockContent.BASIC_GENERATOR_BLOCK);
-        blockStateModelGenerator.registerSimpleState(BlockContent.BIG_SOLAR_PANEL_BLOCK);
+        // these blocks all use geckolib to render/display, so the only thing this really adds are block particles (e.g. when breaking)
+        // the machine speed addon has a generic particle referneces that fits all machines well enough
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.PULVERIZER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.GRINDER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.ASSEMBLER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.FOUNDRY_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.CENTRIFUGE_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.ATOMIC_FORGE_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.POWERED_FURNACE_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.LASER_ARM_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.TEST_GENERATOR_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.BASIC_GENERATOR_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.BIG_SOLAR_PANEL_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_BASIC);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_GOOD);
