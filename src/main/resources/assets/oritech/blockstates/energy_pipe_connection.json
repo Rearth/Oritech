@@ -1,13 +1,17 @@
 {
   "multipart": [
     {
+      "when": {
+        "straight": "false"
+      },
       "apply": {
         "model": "oritech:block/energy_pipe_inner"
       }
     },
     {
       "when": {
-        "north": "true"
+        "north": "true",
+        "straight": "false"
       },
       "apply": {
         "model": "oritech:block/energy_pipe_outer"
@@ -15,7 +19,8 @@
     },
     {
       "when": {
-        "south": "true"
+        "south": "true",
+        "straight": "false"
       },
       "apply": {
         "model": "oritech:block/energy_pipe_outer",
@@ -24,7 +29,8 @@
     },
     {
       "when": {
-        "east": "true"
+        "east": "true",
+        "straight": "false"
       },
       "apply": {
         "model": "oritech:block/energy_pipe_outer",
@@ -33,7 +39,8 @@
     },
     {
       "when": {
-        "west": "true"
+        "west": "true",
+        "straight": "false"
       },
       "apply": {
         "model": "oritech:block/energy_pipe_outer",
@@ -42,7 +49,8 @@
     },
     {
       "when": {
-        "up": "true"
+        "up": "true",
+        "straight": "false"
       },
       "apply": {
         "model": "oritech:block/energy_pipe_outer",
@@ -51,11 +59,41 @@
     },
     {
       "when": {
-        "down": "true"
+        "down": "true",
+        "straight": "false"
       },
       "apply": {
         "model": "oritech:block/energy_pipe_outer",
         "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "true",
+        "straight": "true"
+      },
+      "apply": {
+        "model": "oritech:block/energy_pipe_straight",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "east": "true",
+        "straight": "true"
+      },
+      "apply": {
+        "model": "oritech:block/energy_pipe_straight",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "straight": "true"
+      },
+      "apply": {
+        "model": "oritech:block/energy_pipe_straight"
       }
     }
   ]
