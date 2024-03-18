@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public abstract class GenericPipeInterfaceEntity extends BlockEntity implements BlockEntityTicker<GenericPipeInterfaceEntity> {
     
-    public static final int MAX_SEARCH_COUNT = 128;
+    public static final int MAX_SEARCH_COUNT = 256;
     
     public GenericPipeInterfaceEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);

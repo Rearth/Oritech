@@ -15,6 +15,10 @@
     {
       "id": "minecraft:emerald",
       "Count": 2
+    },
+    {
+      "id": "minecraft:iron_nugget",
+      "Count": 1
     }
   ],
   "time": 40

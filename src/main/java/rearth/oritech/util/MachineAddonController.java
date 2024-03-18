@@ -162,10 +162,17 @@ public interface MachineAddonController {
                 energyAmount += capacitorBlock.getAddedCapacity();
                 energyInsert += capacitorBlock.getAddedInsert();
             }
+            
+            getAdditionalStatFromAddon(addon);
         }
         
         var baseData = new BaseAddonData(speed, efficiency, energyAmount, energyInsert);
         setBaseAddonData(baseData);
+    }
+    
+    // used to check for specific addons, or do something if a specific addon has been found
+    default void getAdditionalStatFromAddon(AddonBlock addonBlock) {
+    
     }
     
     // update state of the found addons

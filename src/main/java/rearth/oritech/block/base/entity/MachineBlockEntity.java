@@ -169,9 +169,13 @@ public abstract class MachineBlockEntity extends BlockEntity
         this.setInventoryInputMode(message.inputMode());
     }
     
+    public List<ItemStack> getCraftingResults(OritechRecipe activeRecipe) {
+        return activeRecipe.getResults();
+    }
+    
     private void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
         
-        var results = activeRecipe.getResults();
+        var results = getCraftingResults(activeRecipe);
         var inputs = activeRecipe.getInputs();
         
         // create outputs

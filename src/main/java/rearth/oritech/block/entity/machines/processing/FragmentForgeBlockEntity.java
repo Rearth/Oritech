@@ -1,19 +1,26 @@
 package rearth.oritech.block.entity.machines.processing;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
+    
+    private boolean hasByproductAddon;
     
     public FragmentForgeBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY, pos, state, 50);
@@ -25,8 +32,56 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
+    public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_ACCEPTOR_ADDON)) {
+            System.out.println("found desired addon");
+            hasByproductAddon = true;
+        }
+    }
+    
+    @Override
+    public void resetAddons() {
+        super.resetAddons();
+        hasByproductAddon = false;
+    }
+    
+    @Override
+    public void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        nbt.putBoolean("byproductAddon", hasByproductAddon);
+    }
+    
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+        hasByproductAddon = nbt.getBoolean("byproductAddon");
+    }
+    
+    @Override
+    public List<ItemStack> getCraftingResults(OritechRecipe activeRecipe) {
+        if (hasByproductAddon) {
+            var result = new ArrayList<ItemStack>(activeRecipe.getResults().size());
+            List<ItemStack> source = activeRecipe.getResults();
+            for (int i = 0; i < source.size(); i++) {
+                var item = source.get(i);
+                if (i == 0) {
+                    result.add(item);
+                } else {
+                    var newCount = item.getCount() * 2;
+                    var newItem = new ItemStack(item.getItem(), newCount);
+                    result.add(newItem);
+                }
+            }
+            System.out.println(result);
+            return result;
+        } else {
+            return super.getCraftingResults(activeRecipe);
+        }
+    }
+    
+    @Override
     public InventorySlotAssignment getSlots() {
-        return new InventorySlotAssignment(0, 4, 4, 1);
+        return new InventorySlotAssignment(0, 4, 4, 2);
     }
     
     @Override
@@ -36,7 +91,8 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
           new GuiSlot(1, 100, 11),
           new GuiSlot(2, 120, 11),
           new GuiSlot(3, 140, 11),
-          new GuiSlot(4, 80, 59));
+          new GuiSlot(4, 80, 59),
+          new GuiSlot(5, 100, 59));
     }
     
     @Override
@@ -46,7 +102,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public int getInventorySize() {
-        return 5;
+        return 6;
     }
     
     // x = back
