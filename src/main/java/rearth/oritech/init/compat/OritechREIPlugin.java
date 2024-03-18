@@ -4,12 +4,8 @@ import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
-import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.block.Block;
 import net.minecraft.item.ItemConvertible;
-import net.minecraft.util.Identifier;
-import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.compat.Screens.BasicMachineScreen;
 import rearth.oritech.init.compat.Screens.PulverizerScreen;
@@ -17,7 +13,6 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 
-import java.util.HashSet;
 import java.util.function.BiFunction;
 
 public class OritechREIPlugin implements REIClientPlugin {
@@ -27,7 +22,7 @@ public class OritechREIPlugin implements REIClientPlugin {
         
         // recipe types
         registerOritechCategory(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK, PulverizerScreen::new);
-        registerOritechCategory(registry, RecipeContent.GRINDER, BlockContent.GRINDER_BLOCK, BasicMachineScreen::new);
+        registerOritechCategory(registry, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK, BasicMachineScreen::new);
         registerOritechCategory(registry, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK, BasicMachineScreen::new);
         registerOritechCategory(registry, RecipeContent.FOUNDRY, BlockContent.FOUNDRY_BLOCK, BasicMachineScreen::new);
         registerOritechCategory(registry, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK, BasicMachineScreen::new);
@@ -35,7 +30,7 @@ public class OritechREIPlugin implements REIClientPlugin {
         
         // workstations
         registerOriWorkstation(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK);
-        registerOriWorkstation(registry, RecipeContent.GRINDER, BlockContent.GRINDER_BLOCK);
+        registerOriWorkstation(registry, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK);
         registerOriWorkstation(registry, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK);
         registerOriWorkstation(registry, RecipeContent.FOUNDRY, BlockContent.FOUNDRY_BLOCK);
         registerOriWorkstation(registry, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK);

@@ -10,6 +10,7 @@ import net.minecraft.block.CropBlock;
 import net.minecraft.block.Fertilizable;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -18,11 +19,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.FluidProvider;
 
 import java.util.List;
@@ -30,7 +33,7 @@ import java.util.Objects;
 
 public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements FluidProvider {
     
-    public static final long FLUID_USAGE = 1 * FluidConstants.BUCKET;   // per block, tick usage is this divided by work time
+    public static final long FLUID_USAGE = (long) (0.25f * FluidConstants.BUCKET);   // per block, tick usage is this divided by work time
     
     // TODO create gui for water provider
     private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
@@ -144,6 +147,17 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
             fluidStorage.amount -= getWaterUsagePerTick();
             ParticleContent.WATERING_EFFECT.spawn(world, Vec3d.of(getCurrentTarget().down()), 2);
         }
+    }
+    
+    @Override
+    public void updateNetwork() {
+        super.updateNetwork();
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SingleVariantFluidSyncPacket(pos, Registries.FLUID.getId(fluidStorage.variant.getFluid()).toString(), fluidStorage.amount));
+    }
+    
+    @Override
+    public @Nullable SingleVariantStorage<FluidVariant> getForDirectFluidAccess() {
+        return fluidStorage;
     }
     
     @Override

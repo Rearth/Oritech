@@ -39,7 +39,7 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedInventory
     @AssignSidedEnergy
-    public static final BlockEntityType<GrinderBlockEntity> GRINDER_ENTITY = FabricBlockEntityTypeBuilder.create(GrinderBlockEntity::new, BlockContent.GRINDER_BLOCK).build();
+    public static final BlockEntityType<FragmentForgeBlockEntity> FRAGMENT_FORGE_ENTITY = FabricBlockEntityTypeBuilder.create(FragmentForgeBlockEntity::new, BlockContent.FRAGMENT_FORGE_BLOCK).build();
     
     @AssignSidedInventory
     @AssignSidedEnergy

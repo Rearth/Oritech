@@ -36,7 +36,7 @@ public interface ScreenProvider {
         return new BarConfiguration(7, 24, 15, 54);
     }
     default BarConfiguration getFluidConfiguration() {
-        return new BarConfiguration(120, 24, 54, 54);
+        return new BarConfiguration(100, 18, 60, 62);
     }
     
     default ArrowConfiguration getIndicatorConfiguration() {

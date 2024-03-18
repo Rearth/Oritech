@@ -62,14 +62,10 @@ public class BasicMachineScreenHandler extends ScreenHandler {
             energyStorage = null;
         }
         
-        if (blockEntity instanceof FluidProvider fluidProvider) {
-            var fluidIterator = fluidProvider.getFluidStorage(null).iterator();
+        if (blockEntity instanceof FluidProvider blockFluidProvider && blockFluidProvider.getForDirectFluidAccess() != null) {
+            var fluidIterator = blockFluidProvider.getFluidStorage(null).iterator();
             if (fluidIterator.hasNext()) {
-                var fluidView = fluidIterator.next();
-                var variant = fluidView.getResource();
-                var amount = fluidView.getAmount();
-                System.out.println("found fluid data: " + variant + " " + amount);
-                this.fluidProvider = fluidProvider;
+                this.fluidProvider = blockFluidProvider;
             } else {
                 this.fluidProvider = null;
             }
@@ -96,14 +92,6 @@ public class BasicMachineScreenHandler extends ScreenHandler {
 
     private void addMachineSlot(int inventorySlot, int x, int y) {
         this.addSlot(new Slot(inventory, inventorySlot, x, y));
-    }
-    
-    public void hideSlots() {
-        this.slots.clear();
-    }
-    
-    public void showSlots() {
-        buildItemSlots();
     }
 
     @Override

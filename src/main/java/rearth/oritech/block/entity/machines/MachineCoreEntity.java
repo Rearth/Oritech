@@ -13,6 +13,7 @@ import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.DelegatingEnergyStorage;
+import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import java.util.Objects;
 
@@ -64,7 +65,8 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
-        return Objects.requireNonNull(controllerEntity).getEnergyStorageForLink();
+        if (controllerEntity == null) return new SimpleEnergyStorage(100, 0, 0);
+        return controllerEntity.getEnergyStorageForLink();
     }
     
     public boolean isEnabled() {

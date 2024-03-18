@@ -1,18 +1,23 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
-import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.TextureComponent;
+import io.wispforest.owo.ui.component.*;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
+import io.wispforest.owo.ui.util.SpriteUtilInvoker;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
+import rearth.oritech.client.renderers.LaserArmModel;
 import rearth.oritech.network.NetworkContent;
+
+import java.util.List;
 
 public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends BaseOwoHandledScreen<FlowLayout, S> {
     
@@ -25,6 +30,10 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     private TextureComponent energy_indicator;
     private Component energy_indicator_background;
     private ButtonComponent cycleInputButton;
+    private BoxComponent fluidFillStatusOverlay;
+    
+    private float lastFluidFill = 1;    // to allow smooth interpolation
+    private ColoredSpriteComponent fluidBackground;
     
     public BasicMachineScreen(S handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -69,6 +78,9 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         updateEnergyBar();
         updateProgressBar();
         updateSettingsButtons();
+        
+        if (handler.fluidProvider != null)
+            updateFluidBar();
     }
     
     private void updateProgressBar() {
@@ -151,6 +163,11 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     public void fillOverlay(FlowLayout overlay) {
         
+        if (handler.fluidProvider != null) {
+            addFluidBar(overlay);
+            updateFluidBar();
+        }
+        
         for (var slot : handler.screenData.getGuiSlots()) {
             overlay.child(getItemFrame(slot.x(), slot.y()));
         }
@@ -162,6 +179,21 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         addProgressArrow(overlay);
         updateProgressBar();
+    }
+    
+    private void updateFluidBar() {
+        if (fluidBackground == null) return;
+        var container = handler.fluidProvider.getForDirectFluidAccess();
+        var data = handler.screenData.getFluidConfiguration();
+        var fill = 1 - ((float) container.getAmount() / container.getCapacity());
+        
+        var targetFill = LaserArmModel.lerp(lastFluidFill, fill, 0.07f);
+        lastFluidFill = targetFill;
+        
+        fluidFillStatusOverlay.verticalSizing(Sizing.fixed((int) (data.height() * targetFill * 0.98f)));
+        
+        var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(container.getResource()).get(0)), Text.of((container.getAmount() * 1000 / FluidConstants.BUCKET) + " mb"));
+        fluidBackground.tooltip(tooltipText);
     }
     
     private void addProgressArrow(FlowLayout panel) {
@@ -176,8 +208,52 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
           .child(progress_indicator.positioning(Positioning.absolute(config.x(), config.y())));
     }
     
-    private void addFluidBar() {
-    
+    // only supports single variants, for more complex variants override this
+    protected void addFluidBar(FlowLayout panel) {
+        
+        var storage = handler.fluidProvider.getFluidStorage(null);
+        var hasContent = false;
+        fluidBackground = null;
+        var config = handler.screenData.getFluidConfiguration();
+        
+        var container = handler.fluidProvider.getForDirectFluidAccess();
+        lastFluidFill = 1 - ((float) container.getAmount() / container.getCapacity());
+        
+        
+        for (var it = storage.nonEmptyIterator(); it.hasNext(); ) {
+            
+            var fluid = it.next();
+            var sprite = FluidVariantRendering.getSprite(fluid.getResource());
+            var spriteColor = FluidVariantRendering.getColor(fluid.getResource());
+            
+            //var tooltipText = Text.of(fluid.getResource() + ": " + (fluid.getAmount() / FluidConstants.BUCKET * 1000) + "mb");
+            var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(fluid.getResource()).get(0)), Text.of(": " + (fluid.getAmount() * 1000 / FluidConstants.BUCKET) + " mb"));
+            
+            hasContent = true;
+            fluidBackground = new ColoredSpriteComponent(sprite);
+            fluidBackground.color = Color.ofArgb(spriteColor);
+            fluidBackground.sizing(Sizing.fixed(config.height()), Sizing.fixed(config.width()));
+            fluidBackground.positioning(Positioning.absolute(config.x(), config.y()));
+            fluidBackground.tooltip(tooltipText);
+            break;
+        }
+        
+        fluidFillStatusOverlay = Components.box(Sizing.fixed(config.height()), Sizing.fixed((int) (config.width() * lastFluidFill)));
+        fluidFillStatusOverlay.color(new Color(77.6f / 255f, 77.6f / 255f, 77.6f / 255f));
+        fluidFillStatusOverlay.fill(true);
+        fluidFillStatusOverlay.positioning(Positioning.absolute(config.x(), config.y()));
+        
+        
+        var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 50, 50, 98, 96);
+        foreGround.sizing(Sizing.fixed(config.height()), Sizing.fixed(config.width()));
+        foreGround.positioning(Positioning.absolute(config.x(), config.y()));
+        
+        if (hasContent)
+            panel.child(fluidBackground);
+        
+        panel.child(fluidFillStatusOverlay);
+        panel.child(foreGround);
+        
     }
     
     private void addEnergyBar(FlowLayout panel) {
@@ -209,5 +285,21 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
           .child(energy_indicator_background)
           .child(energy_indicator)
         ;
+    }
+    
+    protected static class ColoredSpriteComponent extends SpriteComponent {
+        
+        public Color color;
+        
+        protected ColoredSpriteComponent(Sprite sprite) {
+            super(sprite);
+        }
+        
+        @Override
+        public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+            SpriteUtilInvoker.markSpriteActive(this.sprite);
+            context.drawSprite(this.x, this.y, 0, this.width, this.height, this.sprite, this.color.red(), this.color.green(), this.color.blue(), this.color.alpha());
+        }
+        
     }
 }

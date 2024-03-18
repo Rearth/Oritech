@@ -2,7 +2,9 @@ package rearth.oritech.network;
 
 import io.wispforest.owo.network.OwoNetChannel;
 import io.wispforest.owo.serialization.endec.ReflectiveEndecBuilder;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
@@ -16,6 +18,7 @@ import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
 
@@ -40,6 +43,7 @@ public class NetworkContent {
     public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {}   // this goes both ways
     
     public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt){}
+    public record SingleVariantFluidSyncPacket(BlockPos position, String fluidType, long amount) {}
     
     public record InventorySyncPacket(BlockPos position, List<ItemStack> heldStacks) {}
     
@@ -92,6 +96,18 @@ public class NetworkContent {
             if (entity instanceof LaserArmBlockEntity laserArmBlock) {
                 laserArmBlock.setCurrentTarget(message.target);
                 laserArmBlock.setLastFiredAt(message.lastFiredAt);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(SingleVariantFluidSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof FluidProvider fluidProvider && fluidProvider.getForDirectFluidAccess() != null) {
+                var storage = fluidProvider.getForDirectFluidAccess();
+                storage.amount = message.amount;
+                storage.variant = FluidVariant.of(Registries.FLUID.get(new Identifier(message.fluidType)));
             }
             
         }));

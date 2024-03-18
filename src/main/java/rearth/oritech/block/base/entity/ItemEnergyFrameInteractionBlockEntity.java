@@ -133,6 +133,13 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public float getProgress() {
+        if (world.isClient) {
+            var time = world.getTime();
+            // do not update progress while entity is moving
+            if (time < this.getMoveStartedAt() + this.getMoveTime() && this.getMoveStartedAt() > 1) {
+                return 0;
+            }
+        }
         return (float) getCurrentProgress() / this.getWorkTime();
     }
     

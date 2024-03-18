@@ -4,7 +4,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -14,10 +13,10 @@ import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.List;
 
-public class GrinderBlockEntity extends MultiblockMachineEntity {
+public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     
-    public GrinderBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.GRINDER_ENTITY, pos, state, 50);
+    public FragmentForgeBlockEntity(BlockPos pos, BlockState state) {
+        super(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY, pos, state, 50);
     }
     
     @Override

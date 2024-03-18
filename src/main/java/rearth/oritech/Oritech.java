@@ -27,9 +27,13 @@ public class Oritech implements ModInitializer {
         
         LOGGER.info("Hello Fabric world!");
         
+        System.out.println("registering items");
         FieldRegistrationHandler.register(ItemContent.class, MOD_ID, false);
+        System.out.println("registering blocks");
         FieldRegistrationHandler.register(BlockContent.class, MOD_ID, false);
+        System.out.println("registering block entities");
         FieldRegistrationHandler.register(BlockEntitiesContent.class, MOD_ID, false);
+        System.out.println("registering others....");
         ItemGroups.registerItemGroup();
         RecipeContent.initialize();
         NetworkContent.registerChannels();
