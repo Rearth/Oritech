@@ -15,6 +15,15 @@ import java.util.List;
 
 public class CentrifugeBlockEntity extends MultiblockMachineEntity {
     
+    // todo create addon that enables different recipe type
+    // add fluid processing option, adding 2 tanks for input and output
+    // add different gui with two tanks
+    
+    // missing addon models:
+    // block destroyer crop filter - done
+    // fragment forge yield addon - done
+    // centrifuge fluid addon - done
+    
     public CentrifugeBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.CENTRIFUGE_ENTITY, pos, state, 32);
     }

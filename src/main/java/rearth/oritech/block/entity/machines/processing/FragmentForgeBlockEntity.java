@@ -33,8 +33,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_ACCEPTOR_ADDON)) {
-            System.out.println("found desired addon");
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON)) {
             hasByproductAddon = true;
         }
     }

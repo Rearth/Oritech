@@ -9,6 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.InventoryProxyAddonBlock;
@@ -92,6 +93,9 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block MACHINE_CORE_BASIC = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 1);
     public static final Block MACHINE_CORE_GOOD = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 7);
     public static final Block MACHINE_SPEED_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 0.9f, 1.05f, true);
+    public static final Block MACHINE_FLUID_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
+    public static final Block MACHINE_YIELD_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
+    public static final Block CROP_FILTER_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
     public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 0.9f, true);
     public static final Block MACHINE_CAPACITOR_ADDON = new EnergyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 20000, 500, false);
     public static final Block MACHINE_ACCEPTOR_ADDON = new EnergyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 5000, 50, true);
@@ -100,6 +104,8 @@ public class BlockContent implements BlockRegistryContainer {
     
     @Override
     public void postProcessField(String namespace, Block value, String identifier, Field field) {
+        
+        Oritech.LOGGER.info("Registering Block: " + value + " with id " + identifier);
         
         if (field.isAnnotationPresent(NoBlockItem.class)) return;
         

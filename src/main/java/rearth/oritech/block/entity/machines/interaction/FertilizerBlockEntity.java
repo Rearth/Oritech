@@ -35,7 +35,6 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     
     public static final long FLUID_USAGE = (long) (0.25f * FluidConstants.BUCKET);   // per block, tick usage is this divided by work time
     
-    // TODO create gui for water provider
     private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
         @Override
         protected FluidVariant getBlankVariant() {
