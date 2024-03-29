@@ -49,6 +49,7 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedEnergy
     public static final BlockEntityType<FoundryBlockEntity> FOUNDRY_ENTITY = FabricBlockEntityTypeBuilder.create(FoundryBlockEntity::new, BlockContent.FOUNDRY_BLOCK).build();
     
+    @AssignSidedFluid
     @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<CentrifugeBlockEntity> CENTRIFUGE_ENTITY = FabricBlockEntityTypeBuilder.create(CentrifugeBlockEntity::new, BlockContent.CENTRIFUGE_BLOCK).build();

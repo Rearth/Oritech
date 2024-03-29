@@ -9,7 +9,6 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.InventoryProxyAddonBlock;
@@ -105,8 +104,6 @@ public class BlockContent implements BlockRegistryContainer {
     @Override
     public void postProcessField(String namespace, Block value, String identifier, Field field) {
         
-        Oritech.LOGGER.info("Registering Block: " + value + " with id " + identifier);
-        
         if (field.isAnnotationPresent(NoBlockItem.class)) return;
         
         if (field.isAnnotationPresent(UseGeoBlockItem.class)) {
@@ -122,6 +119,8 @@ public class BlockContent implements BlockRegistryContainer {
         
         ItemGroups.add(targetGroup, value);
     }
+    
+    
     
     private BlockItem getGeoBlockItem(Block block, String identifier, float scale) {
         return new OritechGeoItem(block, new Item.Settings(), scale, identifier);

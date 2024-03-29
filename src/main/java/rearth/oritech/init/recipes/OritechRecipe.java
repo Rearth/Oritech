@@ -10,23 +10,31 @@ import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.util.FluidStack;
 
 import java.util.List;
 
 public class OritechRecipe implements Recipe<Inventory> {
-
+    
     private final OritechRecipeType type;
     private final List<Ingredient> inputs;
     private final List<ItemStack> results;
+    @Nullable
+    private final FluidStack fluidInput;
+    @Nullable
+    private final FluidStack fluidOutput;
     private final int time;
 
-    public static final OritechRecipe DUMMY = new OritechRecipe(-1, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER);
+    public static final OritechRecipe DUMMY = new OritechRecipe(-1, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER, null, null);
 
-    public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type) {
+    public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, @Nullable FluidStack fluidInput, @Nullable FluidStack fluidOutput) {
         this.type = type;
         this.results = results;
         this.inputs = inputs;
         this.time = time;
+        this.fluidInput = fluidInput;
+        this.fluidOutput = fluidOutput;
     }
 
     @Override
@@ -76,17 +84,19 @@ public class OritechRecipe implements Recipe<Inventory> {
     public RecipeType<?> getType() {
         return type;
     }
-
+    
     @Override
     public String toString() {
         return "OritechRecipe{" +
-                "type=" + type +
-                ", inputs=" + inputs +
-                ", results=" + results +
-                ", time=" + time +
-                '}';
+                 "type=" + type +
+                 ", inputs=" + inputs +
+                 ", results=" + results +
+                 ", fluidInput=" + fluidInput +
+                 ", fluidOutput=" + fluidOutput +
+                 ", time=" + time +
+                 '}';
     }
-
+    
     public int getTime() {
         return time;
     }
@@ -109,4 +119,11 @@ public class OritechRecipe implements Recipe<Inventory> {
         return type;
     }
     
+    public @Nullable FluidStack getFluidInput() {
+        return fluidInput;
+    }
+    
+    public @Nullable FluidStack getFluidOutput() {
+        return fluidOutput;
+    }
 }

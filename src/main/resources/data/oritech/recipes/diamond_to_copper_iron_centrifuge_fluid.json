@@ -1,0 +1,27 @@
+{
+  "type": "oritech:centrifuge_fluid",
+  "ingredients": [
+    {
+      "item": "minecraft:emerald"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:copper_ingot",
+      "Count": 1
+    }
+  ],
+  "time": 60,
+  "fluidInput": {
+    "amount": 81000,
+    "variant": {
+      "fluid": "minecraft:water"
+    }
+  },
+  "fluidOutput": {
+    "amount": 81000,
+    "variant": {
+      "fluid": "minecraft:lava"
+    }
+  }
+}

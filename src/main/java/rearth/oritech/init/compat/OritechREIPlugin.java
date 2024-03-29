@@ -26,6 +26,7 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerOritechCategory(registry, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK, BasicMachineScreen::new);
         registerOritechCategory(registry, RecipeContent.FOUNDRY, BlockContent.FOUNDRY_BLOCK, BasicMachineScreen::new);
         registerOritechCategory(registry, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK, BasicMachineScreen::new);
+        registerOritechCategory(registry, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK, BasicMachineScreen::new);
         registerOritechCategory(registry, RecipeContent.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE_BLOCK, BasicMachineScreen::new);
         
         // workstations
@@ -34,6 +35,7 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerOriWorkstation(registry, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK);
         registerOriWorkstation(registry, RecipeContent.FOUNDRY, BlockContent.FOUNDRY_BLOCK);
         registerOriWorkstation(registry, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK);
+        registerOriWorkstation(registry, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK);
         registerOriWorkstation(registry, RecipeContent.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE_BLOCK);
         
         registry.addWorkstations(CategoryIdentifier.of("minecraft", "plugins/smelting"), EntryStacks.of(BlockContent.POWERED_FURNACE_BLOCK));
@@ -49,6 +51,7 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerMachineRecipeType(registry, RecipeContent.GRINDER);
         registerMachineRecipeType(registry, RecipeContent.FOUNDRY);
         registerMachineRecipeType(registry, RecipeContent.CENTRIFUGE);
+        registerMachineRecipeType(registry, RecipeContent.CENTRIFUGE_FLUID);
         registerMachineRecipeType(registry, RecipeContent.ATOMIC_FORGE);
     }
     

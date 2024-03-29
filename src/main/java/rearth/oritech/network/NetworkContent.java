@@ -15,6 +15,7 @@ import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.generators.BigSolarPanelEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -26,43 +27,67 @@ import java.util.List;
 import java.util.Map;
 
 public class NetworkContent {
-
+    
     public static final OwoNetChannel MACHINE_CHANNEL = OwoNetChannel.create(new Identifier(Oritech.MOD_ID, "machine_data"));
     public static final OwoNetChannel UI_CHANNEL = OwoNetChannel.create(new Identifier(Oritech.MOD_ID, "ui_interactions"));
-
+    
     // Server -> Client
-    public record MachineSyncPacket(BlockPos position, long energy, long maxEnergy, long maxInsert, int progress, OritechRecipe activeRecipe, InventoryInputMode inputMode) {}
-
+    public record MachineSyncPacket(BlockPos position, long energy, long maxEnergy, long maxInsert, int progress,
+                                    OritechRecipe activeRecipe, InventoryInputMode inputMode) {
+    }
+    
     // Client -> Server (e.g. from UI interactions
-    public record InventoryInputModeSelectorPacket(BlockPos position) {}
-    public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {}
-    public record GeneratorUISyncPacket(BlockPos position, int burnTime) {}
-    public record MachineSetupEventPacket(BlockPos position) {}
-    public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget, BlockPos areaMin, BlockPos areaMax) {}   // times are in ticks
-    public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress){}
-    public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {}   // this goes both ways
+    public record InventoryInputModeSelectorPacket(BlockPos position) {
+    }
     
-    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt){}
-    public record SingleVariantFluidSyncPacket(BlockPos position, String fluidType, long amount) {}
+    public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {
+    }
     
-    public record InventorySyncPacket(BlockPos position, List<ItemStack> heldStacks) {}
+    public record GeneratorUISyncPacket(BlockPos position, int burnTime) {
+    }
+    
+    public record MachineSetupEventPacket(BlockPos position) {
+    }
+    
+    public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget,
+                                             BlockPos areaMin, BlockPos areaMax) {
+    }   // times are in ticks
+    
+    public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress) {
+    }
+    
+    public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {
+    }   // this goes both ways
+    
+    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt) {
+    }
+    
+    public record SingleVariantFluidSyncPacket(BlockPos position, String fluidType, long amount) {
+    }
+    
+    public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn, String fluidTypeOut,
+                                            long amountOut) {
+    }
+    
+    public record InventorySyncPacket(BlockPos position, List<ItemStack> heldStacks) {
+    }
     
     @SuppressWarnings("unchecked")
     public static void registerChannels() {
-
+        
         Oritech.LOGGER.info("Registering oritech channels");
-
+        
         ReflectiveEndecBuilder.register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
         ReflectiveEndecBuilder.register(ItemFilterBlockEntity.FILTER_ITEMS_ENDEC, (Class<Map<Integer, ItemStack>>) (Object) Map.class); // I don't even know what kind of abomination this cast is, but it seems to work
-
+        
         MACHINE_CHANNEL.registerClientbound(MachineSyncPacket.class, ((message, access) -> {
-
+            
             var entity = access.player().clientWorld.getBlockEntity(message.position);
-
+            
             if (entity instanceof MachineBlockEntity machine) {
                 machine.handleNetworkEntry(message);
             }
-
+            
         }));
         
         MACHINE_CHANNEL.registerClientbound(MachineSetupEventPacket.class, ((message, access) -> {
@@ -108,6 +133,22 @@ public class NetworkContent {
                 var storage = fluidProvider.getForDirectFluidAccess();
                 storage.amount = message.amount;
                 storage.variant = FluidVariant.of(Registries.FLUID.get(new Identifier(message.fluidType)));
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(CentrifugeFluidSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof CentrifugeBlockEntity centrifuge) {
+                centrifuge.hasFluidAddon = message.fluidAddon;
+                var inStorage = centrifuge.inputStorage;
+                var outStorage = centrifuge.outputStorage;
+                inStorage.amount = message.amountIn;
+                outStorage.amount = message.amountOut;
+                inStorage.variant = FluidVariant.of(Registries.FLUID.get(new Identifier(message.fluidTypeIn)));
+                outStorage.variant = FluidVariant.of(Registries.FLUID.get(new Identifier(message.fluidTypeOut)));
             }
             
         }));
@@ -159,15 +200,15 @@ public class NetworkContent {
             }
             
         }));
-
+        
         UI_CHANNEL.registerServerbound(InventoryInputModeSelectorPacket.class, (message, access) -> {
-
+            
             var entity = access.player().getWorld().getBlockEntity(message.position);
-
+            
             if (entity instanceof MachineBlockEntity machine) {
                 machine.cycleInputMode();
             }
-
+            
         });
         
         UI_CHANNEL.registerServerbound(InventoryProxySlotSelectorPacket.class, (message, access) -> {
@@ -190,7 +231,7 @@ public class NetworkContent {
             }
             
         }));
-
+        
     }
-
+    
 }

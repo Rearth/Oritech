@@ -1,5 +1,6 @@
 package rearth.oritech.client.ui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.component.*;
 import io.wispforest.owo.ui.container.Containers;
@@ -8,14 +9,20 @@ import io.wispforest.owo.ui.core.*;
 import io.wispforest.owo.ui.util.SpriteUtilInvoker;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.minecraft.client.render.*;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.LaserArmModel;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
 
@@ -181,17 +188,27 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         updateProgressBar();
     }
     
-    private void updateFluidBar() {
-        if (fluidBackground == null) return;
+    protected void updateFluidBar() {
+        
         var container = handler.fluidProvider.getForDirectFluidAccess();
         var data = handler.screenData.getFluidConfiguration();
+
+        if (fluidBackground.getSprite() == null && !container.isResourceBlank()) {
+            var parent = fluidBackground.parent();
+            var targetIndex = parent.children().indexOf(fluidBackground);
+            var newFluid = createFluidRenderer(container.getResource(), container.getAmount(), data);
+            parent.removeChild(fluidBackground);
+            ((FlowLayout) parent).child(targetIndex, newFluid);
+            fluidBackground = newFluid;
+        }
+
         var fill = 1 - ((float) container.getAmount() / container.getCapacity());
-        
-        var targetFill = LaserArmModel.lerp(lastFluidFill, fill, 0.07f);
+
+        var targetFill = LaserArmModel.lerp(lastFluidFill, fill, 0.15f);
         lastFluidFill = targetFill;
-        
+
         fluidFillStatusOverlay.verticalSizing(Sizing.fixed((int) (data.height() * targetFill * 0.98f)));
-        
+
         var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(container.getResource()).get(0)), Text.of((container.getAmount() * 1000 / FluidConstants.BUCKET) + " mb"));
         fluidBackground.tooltip(tooltipText);
     }
@@ -211,49 +228,56 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     // only supports single variants, for more complex variants override this
     protected void addFluidBar(FlowLayout panel) {
         
-        var storage = handler.fluidProvider.getFluidStorage(null);
-        var hasContent = false;
+        var container = handler.fluidProvider.getForDirectFluidAccess();
         fluidBackground = null;
         var config = handler.screenData.getFluidConfiguration();
-        
-        var container = handler.fluidProvider.getForDirectFluidAccess();
         lastFluidFill = 1 - ((float) container.getAmount() / container.getCapacity());
         
         
-        for (var it = storage.nonEmptyIterator(); it.hasNext(); ) {
-            
+        for (var it = container.nonEmptyIterator(); it.hasNext(); ) {
             var fluid = it.next();
-            var sprite = FluidVariantRendering.getSprite(fluid.getResource());
-            var spriteColor = FluidVariantRendering.getColor(fluid.getResource());
-            
-            //var tooltipText = Text.of(fluid.getResource() + ": " + (fluid.getAmount() / FluidConstants.BUCKET * 1000) + "mb");
-            var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(fluid.getResource()).get(0)), Text.of(": " + (fluid.getAmount() * 1000 / FluidConstants.BUCKET) + " mb"));
-            
-            hasContent = true;
-            fluidBackground = new ColoredSpriteComponent(sprite);
-            fluidBackground.color = Color.ofArgb(spriteColor);
-            fluidBackground.sizing(Sizing.fixed(config.height()), Sizing.fixed(config.width()));
-            fluidBackground.positioning(Positioning.absolute(config.x(), config.y()));
-            fluidBackground.tooltip(tooltipText);
+            fluidBackground = createFluidRenderer(fluid.getResource(), fluid.getAmount(), config);
             break;
         }
         
-        fluidFillStatusOverlay = Components.box(Sizing.fixed(config.height()), Sizing.fixed((int) (config.width() * lastFluidFill)));
+        if (fluidBackground == null) {
+            fluidBackground = createFluidRenderer(FluidVariant.of(Fluids.EMPTY), 0L, config);
+        }
+        
+        fluidFillStatusOverlay = Components.box(Sizing.fixed(config.width()), Sizing.fixed((int) (config.height() * lastFluidFill)));
         fluidFillStatusOverlay.color(new Color(77.6f / 255f, 77.6f / 255f, 77.6f / 255f));
         fluidFillStatusOverlay.fill(true);
         fluidFillStatusOverlay.positioning(Positioning.absolute(config.x(), config.y()));
         
         
-        var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 50, 50, 98, 96);
-        foreGround.sizing(Sizing.fixed(config.height()), Sizing.fixed(config.width()));
+        var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
+        foreGround.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
         foreGround.positioning(Positioning.absolute(config.x(), config.y()));
         
-        if (hasContent)
-            panel.child(fluidBackground);
-        
+        panel.child(fluidBackground);
         panel.child(fluidFillStatusOverlay);
         panel.child(foreGround);
         
+    }
+    
+    public static ColoredSpriteComponent createFluidRenderer(FluidVariant variant, long amount, ScreenProvider.BarConfiguration config) {
+        var sprite = FluidVariantRendering.getSprite(variant);
+        var spriteColor = FluidVariantRendering.getColor(variant);
+        
+        return getColoredSpriteComponent(variant, amount, config, sprite, spriteColor);
+    }
+    
+    @NotNull
+    private static ColoredSpriteComponent getColoredSpriteComponent(FluidVariant variant, long amount, ScreenProvider.BarConfiguration config, Sprite sprite, int spriteColor) {
+        var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(variant).get(0)), Text.of(": " + (amount * 1000 / FluidConstants.BUCKET) + " mb"));
+        
+        var result = new ColoredSpriteComponent(sprite);
+        result.widthMultiplier = config.width() / 60f;
+        result.color = Color.ofArgb(spriteColor);
+        result.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
+        result.positioning(Positioning.absolute(config.x(), config.y()));
+        result.tooltip(tooltipText);
+        return result;
     }
     
     private void addEnergyBar(FlowLayout panel) {
@@ -283,22 +307,52 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         panel
           .child(energy_indicator_background)
-          .child(energy_indicator)
-        ;
+          .child(energy_indicator);
     }
     
-    protected static class ColoredSpriteComponent extends SpriteComponent {
+    public static class ColoredSpriteComponent extends SpriteComponent {
         
         public Color color;
+        public float widthMultiplier = 1f;
         
         protected ColoredSpriteComponent(Sprite sprite) {
             super(sprite);
         }
         
+        public Sprite getSprite() {
+            return sprite;
+        }
+        
         @Override
         public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+            if (sprite == null) return;
             SpriteUtilInvoker.markSpriteActive(this.sprite);
-            context.drawSprite(this.x, this.y, 0, this.width, this.height, this.sprite, this.color.red(), this.color.green(), this.color.blue(), this.color.alpha());
+            drawSprite(this.x, this.y, 0, this.width, this.height, this.sprite, this.color.red(), this.color.green(), this.color.blue(), this.color.alpha(), context.getMatrices());
+        }
+        
+        // these 2 methods are copies from drawContext, width slight modifications
+        public void drawSprite(int x, int y, int z, int width, int height, Sprite sprite, float red, float green, float blue, float alpha, MatrixStack matrices) {
+            
+            var uvWidth = sprite.getMaxU() - sprite.getMinU();
+            var newMax = sprite.getMinU() + uvWidth * widthMultiplier;
+            
+            this.drawTexturedQuad(sprite.getAtlasId(), matrices, x, x + width, y, y + height, z, sprite.getMinU(), newMax, sprite.getMinV(), sprite.getMaxV(), red, green, blue, alpha);
+        }
+        
+        // direct copy of the method in drawContext, because I can't be called from here due to private access
+        private void drawTexturedQuad(Identifier texture, MatrixStack matrices, int x1, int x2, int y1, int y2, int z, float u1, float u2, float v1, float v2, float red, float green, float blue, float alpha) {
+            RenderSystem.setShaderTexture(0, texture);
+            RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
+            RenderSystem.enableBlend();
+            Matrix4f matrix4f = matrices.peek().getPositionMatrix();
+            BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+            bufferBuilder.vertex(matrix4f, x1, y1, z).color(red, green, blue, alpha).texture(u1, v1).next();
+            bufferBuilder.vertex(matrix4f, x1, y2, z).color(red, green, blue, alpha).texture(u1, v2).next();
+            bufferBuilder.vertex(matrix4f, x2, y2, z).color(red, green, blue, alpha).texture(u2, v2).next();
+            bufferBuilder.vertex(matrix4f, x2, y1, z).color(red, green, blue, alpha).texture(u2, v1).next();
+            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            RenderSystem.disableBlend();
         }
         
     }

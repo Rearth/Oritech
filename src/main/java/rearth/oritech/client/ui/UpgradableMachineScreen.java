@@ -18,7 +18,7 @@ import rearth.oritech.client.ui.components.BlockPreviewComponent;
 import rearth.oritech.init.BlockContent;
 
 
-public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachineScreenHandler> {
+public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> extends BasicMachineScreen<S> {
     
     private static final Color SPEED_COLOR = Color.ofRgb(0x219ebc);
     private static final Color EFFICIENCY_COLOR = Color.ofRgb(0x8ecae6);
@@ -29,7 +29,7 @@ public class UpgradableMachineScreen extends BasicMachineScreen<UpgradableMachin
     
     private static final Identifier MACHINE_CORE_CENTER = new Identifier(Oritech.MOD_ID, "textures/gui/modular/machine_core/center.png");
     
-    public UpgradableMachineScreen(UpgradableMachineScreenHandler handler, PlayerInventory inventory, Text title) {
+    public UpgradableMachineScreen(S handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
     }
     

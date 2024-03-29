@@ -87,7 +87,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         if (recipeCandidate.isEmpty())
             currentRecipe = OritechRecipe.DUMMY;     // reset recipe when invalid or no input is given
         
-        if (recipeCandidate.isPresent() && canOutputRecipe(recipeCandidate.get().value())) {
+        if (recipeCandidate.isPresent() && canOutputRecipe(recipeCandidate.get().value()) && canProceed(recipeCandidate.get().value())) {
             // this is separate so that progress is not reset when out of energy
             if (hasEnoughEnergy()) {
                 var activeRecipe = recipeCandidate.get().value();
@@ -116,6 +116,10 @@ public abstract class MachineBlockEntity extends BlockEntity
         if (networkDirty) {
             updateNetwork();
         }
+    }
+    
+    protected boolean canProceed(OritechRecipe value) {
+        return true;
     }
     
     protected boolean hasEnoughEnergy() {
@@ -173,7 +177,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         return activeRecipe.getResults();
     }
     
-    private void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
+    protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
         
         var results = getCraftingResults(activeRecipe);
         var inputs = activeRecipe.getInputs();

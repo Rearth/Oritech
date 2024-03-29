@@ -1,16 +1,9 @@
 package rearth.oritech.init.recipes;
 
-import net.minecraft.item.ItemConvertible;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.compat.OritechREIPlugin;
-import rearth.oritech.init.compat.Screens.BasicMachineScreen;
-import rearth.oritech.init.compat.Screens.PulverizerScreen;
-
-import java.util.function.BiFunction;
 
 public class RecipeContent {
 
@@ -19,6 +12,7 @@ public class RecipeContent {
     public static final OritechRecipeType ASSEMBLER = register(new Identifier(Oritech.MOD_ID, "assembler"));
     public static final OritechRecipeType FOUNDRY = register(new Identifier(Oritech.MOD_ID, "foundry"));
     public static final OritechRecipeType CENTRIFUGE = register(new Identifier(Oritech.MOD_ID, "centrifuge"));
+    public static final OritechRecipeType CENTRIFUGE_FLUID = register(new Identifier(Oritech.MOD_ID, "centrifuge_fluid"));
     public static final OritechRecipeType ATOMIC_FORGE = register(new Identifier(Oritech.MOD_ID, "atomic_forge"));
     public static final OritechRecipeType TEST_GENERATOR = register(new Identifier(Oritech.MOD_ID, "test_generator"));
 
