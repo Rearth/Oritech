@@ -1,0 +1,23 @@
+package rearth.oritech.init;
+
+import io.wispforest.owo.registration.reflect.AutoRegistryContainer;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import rearth.oritech.block.fluid.OilFluid;
+
+public class FluidContent implements AutoRegistryContainer<Fluid> {
+    
+    public static final Fluid STILL_OIL = new OilFluid.Still();
+    public static final Fluid FLOWING_OIL = new OilFluid.Flowing();
+    
+    @Override
+    public Registry<Fluid> getRegistry() {
+        return Registries.FLUID;
+    }
+    
+    @Override
+    public Class<Fluid> getTargetFieldType() {
+        return Fluid.class;
+    }
+}

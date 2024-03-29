@@ -38,7 +38,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.BLOCK_FERTILIZER_HEAD);
         
         // these blocks all use geckolib to render/display, so the only thing this really adds are block particles (e.g. when breaking)
-        // the machine speed addon has a generic particle referneces that fits all machines well enough
+        // the machine speed addon has a generic particle references that fits all machines well enough
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.PULVERIZER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.FRAGMENT_FORGE_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.ASSEMBLER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
@@ -53,7 +53,6 @@ public class ModelGenerator extends FabricModelProvider {
         
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_BASIC);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_GOOD);
-        
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_EXTENDER);
         
     }
@@ -62,5 +61,6 @@ public class ModelGenerator extends FabricModelProvider {
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
         itemModelGenerator.register(ItemContent.BANANA, Models.GENERATED);
         itemModelGenerator.register(ItemContent.TARGET_DESIGNATOR, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.OIL_BUCKET, Models.GENERATED);
     }
 }

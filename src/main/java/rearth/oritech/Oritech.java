@@ -11,10 +11,7 @@ import rearth.oritech.block.blocks.pipes.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.ItemPipeBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.ItemGroups;
+import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 
@@ -27,6 +24,8 @@ public class Oritech implements ModInitializer {
         
         LOGGER.info("Hello Fabric world!");
         
+        System.out.println("registering fluids");
+        FieldRegistrationHandler.register(FluidContent.class, MOD_ID, false);
         System.out.println("registering items");
         FieldRegistrationHandler.register(ItemContent.class, MOD_ID, false);
         System.out.println("registering blocks");

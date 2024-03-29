@@ -1,8 +1,11 @@
 package rearth.oritech.client.init;
 
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
+import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.LaserArmRenderer;
 import rearth.oritech.client.renderers.MachineGantryRenderer;
@@ -10,6 +13,7 @@ import rearth.oritech.client.renderers.MachineRenderer;
 import rearth.oritech.client.renderers.SolarPanelRenderer;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.FluidContent;
 
 public class ModRenderers {
 
@@ -43,6 +47,15 @@ public class ModRenderers {
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.BLOCK_FERTILIZER_HEAD, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.MACHINE_FLUID_ADDON, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.CROP_FILTER_ADDON, RenderLayer.getCutout());
+        
+        // fluids
+        FluidRenderHandlerRegistry.INSTANCE.register(FluidContent.STILL_OIL, FluidContent.FLOWING_OIL, new SimpleFluidRenderHandler(
+          new Identifier("oritech:block/fluid_gas_dark"),
+          new Identifier("oritech:block/fluid_gas_dark"),
+          0x7a7a7a
+        ));
+        
+        // BlockRenderLayerMap.INSTANCE.putFluids(RenderLayer.getTranslucent(), FluidContent.STILL_OIL, FluidContent.FLOWING_OIL);
 
         Oritech.LOGGER.info("Registering Entities Renderers for " + Oritech.MOD_ID);
     }

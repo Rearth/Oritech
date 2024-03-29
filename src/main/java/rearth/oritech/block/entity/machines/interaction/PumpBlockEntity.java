@@ -69,7 +69,9 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         nbt.put("fluidVariant", fluidStorage.variant.toNbt());
         nbt.putLong("amount", fluidStorage.amount);
         nbt.putLong("energy", energyStorage.getAmount());
-        nbt.putLongArray("pendingTargets", pendingLiquidPositions.stream().mapToLong(BlockPos::asLong).toArray());
+        
+        if (pendingLiquidPositions != null)
+            nbt.putLongArray("pendingTargets", pendingLiquidPositions.stream().mapToLong(BlockPos::asLong).toArray());
     }
     
     @Override
