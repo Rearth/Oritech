@@ -13,6 +13,7 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.network.NetworkContent;
 
 public class Oritech implements ModInitializer {
@@ -37,6 +38,7 @@ public class Oritech implements ModInitializer {
         RecipeContent.initialize();
         NetworkContent.registerChannels();
         ParticleContent.registerParticles();
+        FeatureContent.initialize();
         
         ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
     }

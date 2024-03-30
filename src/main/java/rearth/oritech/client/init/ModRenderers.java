@@ -55,7 +55,7 @@ public class ModRenderers {
           0x7a7a7a
         ));
         
-        // BlockRenderLayerMap.INSTANCE.putFluids(RenderLayer.getTranslucent(), FluidContent.STILL_OIL, FluidContent.FLOWING_OIL);
+        BlockRenderLayerMap.INSTANCE.putFluids(RenderLayer.getTranslucent(), FluidContent.STILL_OIL, FluidContent.FLOWING_OIL);
 
         Oritech.LOGGER.info("Registering Entities Renderers for " + Oritech.MOD_ID);
     }

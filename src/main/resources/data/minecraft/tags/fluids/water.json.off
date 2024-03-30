@@ -1,8 +1,0 @@
-{
-  "replace": false,
-  "values":
-  [
-    "oritech:test_still_oil",
-    "oritech:test_flowing_oil"
-  ]
-}

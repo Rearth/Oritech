@@ -25,7 +25,6 @@ import team.reborn.energy.api.base.SimpleEnergyStorage;
 import java.util.*;
 import java.util.stream.Collectors;
 
-// todo add energy storage / usage
 public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidProvider, EnergyProvider {
     
     private static final int MAX_SEARCH_COUNT = 100000;
