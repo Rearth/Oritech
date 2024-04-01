@@ -74,7 +74,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     }
     
     @Override
-    public EnergyStorage getStorage() {
+    public EnergyStorage getStorage(Direction direction) {
         return delegatedStorage;
     }
     

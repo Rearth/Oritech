@@ -56,7 +56,7 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         this.playerInventory = playerInventory;
 
         if (blockEntity instanceof EnergyProvider energyProvider) {
-            energyStorage = energyProvider.getStorage();
+            energyStorage = energyProvider.getStorage(null);
         } else {
             Oritech.LOGGER.error("Opened oritech block interface without any energy data at " + blockEntity);
             energyStorage = null;

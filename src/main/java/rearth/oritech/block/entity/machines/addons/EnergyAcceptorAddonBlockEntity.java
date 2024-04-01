@@ -2,7 +2,7 @@ package rearth.oritech.block.entity.machines.addons;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
+import net.minecraft.util.math.Direction;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.EnergyProvider;
@@ -45,7 +45,7 @@ public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements 
     }
     
     @Override
-    public EnergyStorage getStorage() {
+    public EnergyStorage getStorage(Direction direction) {
         return delegatedStorage;
     }
 }

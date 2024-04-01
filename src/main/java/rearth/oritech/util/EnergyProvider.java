@@ -1,10 +1,10 @@
 package rearth.oritech.util;
 
+import net.minecraft.util.math.Direction;
 import team.reborn.energy.api.EnergyStorage;
-import team.reborn.energy.api.EnergyStorageUtil;
 
 public interface EnergyProvider {
 
-    EnergyStorage getStorage();
+    EnergyStorage getStorage(Direction direction);
 
 }

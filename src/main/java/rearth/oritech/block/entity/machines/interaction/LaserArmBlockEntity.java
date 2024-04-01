@@ -322,7 +322,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     // energyprovider
     @Override
-    public EnergyStorage getStorage() {
+    public EnergyStorage getStorage(Direction direction) {
         return energyStorage;
     }
     

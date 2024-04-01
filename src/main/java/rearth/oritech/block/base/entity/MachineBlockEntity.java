@@ -464,7 +464,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     @Override
-    public EnergyStorage getStorage() {
+    public EnergyStorage getStorage(Direction direction) {
         return energyStorage;
     }
     

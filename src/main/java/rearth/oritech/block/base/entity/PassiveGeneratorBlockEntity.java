@@ -79,7 +79,7 @@ public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements
     }
     
     @Override
-    public EnergyStorage getStorage() {
+    public EnergyStorage getStorage(Direction direction) {
         return energyStorage;
     }
     

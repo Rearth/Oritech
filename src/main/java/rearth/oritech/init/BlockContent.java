@@ -20,6 +20,7 @@ import rearth.oritech.block.blocks.machines.generators.BigSolarPanelBlock;
 import rearth.oritech.block.blocks.machines.generators.TestGeneratorBlock;
 import rearth.oritech.block.blocks.machines.interaction.*;
 import rearth.oritech.block.blocks.machines.processing.*;
+import rearth.oritech.block.blocks.machines.storage.SmallStorageBlock;
 import rearth.oritech.block.blocks.pipes.*;
 import rearth.oritech.util.item.OritechGeoItem;
 
@@ -43,6 +44,7 @@ public class BlockContent implements BlockRegistryContainer {
     @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
     public static final Block ITEM_PIPE = new ItemPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
     @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
+    
     public static final Block ITEM_FILTER_BLOCK = new ItemFilterBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
     @NoBlockItem
     public static final Block FLUID_PIPE_CONNECTION = new FluidPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
@@ -85,6 +87,8 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block POWERED_FURNACE_BLOCK = new PoweredFurnaceBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.5f)
     public static final Block LASER_ARM_BLOCK = new LaserArmBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    
+    public static final Block SMALL_STORAGE_BLOCK = new SmallStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block PLACER_BLOCK = new PlacerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block DESTROYER_BLOCK = new DestroyerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());

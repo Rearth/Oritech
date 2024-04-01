@@ -3,7 +3,6 @@ package rearth.oritech.util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
-import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 
 public class Geometry {
     
@@ -19,6 +18,8 @@ public class Geometry {
             case WEST -> new BlockPos(relativePos.getX(), relativePos.getY(), -relativePos.getZ());
             case SOUTH -> new BlockPos(-relativePos.getZ(), relativePos.getY(), -relativePos.getX());
             case EAST -> new BlockPos(-relativePos.getX(), relativePos.getY(), relativePos.getZ());
+            case UP -> new BlockPos(relativePos.getZ(), -relativePos.getX(), -relativePos.getY());
+            case DOWN -> new BlockPos(relativePos.getZ(), relativePos.getX(), relativePos.getY());
             default -> relativePos;
         };
     }

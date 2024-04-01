@@ -41,7 +41,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     }
     
     @Override
-    public EnergyStorage getStorage() {
+    public EnergyStorage getStorage(Direction direction) {
         return energyStorage;
     }
     

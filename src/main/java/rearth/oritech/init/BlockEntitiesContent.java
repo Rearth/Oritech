@@ -16,6 +16,7 @@ import rearth.oritech.block.entity.machines.generators.BigSolarPanelEntity;
 import rearth.oritech.block.entity.machines.generators.TestGeneratorEntity;
 import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.*;
+import rearth.oritech.block.entity.machines.storage.SmallStorageBlockEntity;
 import rearth.oritech.block.entity.pipes.EnergyPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -98,6 +99,10 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     public static final BlockEntityType<InventoryProxyAddonBlockEntity> INVENTORY_PROXY_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(InventoryProxyAddonBlockEntity::new, BlockContent.MACHINE_INVENTORY_PROXY_ADDON).build();
     
+    
+    @AssignSidedEnergy
+    public static final BlockEntityType<SmallStorageBlockEntity> SMALL_STORAGE_ENTITY = FabricBlockEntityTypeBuilder.create(SmallStorageBlockEntity::new, BlockContent.SMALL_STORAGE_BLOCK).build();
+    
     @AssignSidedFluid
     public static final BlockEntityType<FluidPipeInterfaceEntity> FLUID_PIPE_ENTITY = FabricBlockEntityTypeBuilder.create(FluidPipeInterfaceEntity::new, BlockContent.FLUID_PIPE_CONNECTION).build();
     @AssignSidedEnergy
@@ -140,7 +145,7 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
         AutoRegistryContainer.super.postProcessField(namespace, value, identifier, field);
         
         if (field.isAnnotationPresent(AssignSidedEnergy.class))
-            EnergyStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((EnergyProvider) blockEntity).getStorage(), value);
+            EnergyStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((EnergyProvider) blockEntity).getStorage(direction), value);
         
         if (field.isAnnotationPresent(AssignSidedFluid.class))
             FluidStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((FluidProvider) blockEntity).getFluidStorage(direction), value);
