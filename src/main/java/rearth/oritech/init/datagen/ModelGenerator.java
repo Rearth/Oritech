@@ -27,6 +27,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleState(BlockContent.ITEM_PIPE_CONNECTION);
         blockStateModelGenerator.registerSimpleState(BlockContent.ITEM_FILTER_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.SMALL_STORAGE_BLOCK);
+        blockStateModelGenerator.registerSimpleState(BlockContent.LARGE_STORAGE_BLOCK);
         
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.PLACER_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.DESTROYER_BLOCK);

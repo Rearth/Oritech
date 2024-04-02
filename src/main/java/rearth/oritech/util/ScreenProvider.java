@@ -2,13 +2,16 @@ package rearth.oritech.util;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
 import rearth.oritech.Oritech;
 
 import java.util.List;
 
 public interface ScreenProvider {
-
+    
     record GuiSlot (int index, int x, int y) {}
 
     record BarConfiguration(int x, int y, int width, int height) {}
@@ -31,6 +34,14 @@ public interface ScreenProvider {
     ScreenHandlerType<?> getScreenHandlerType();
     
     default boolean inputOptionsEnabled() {return true;}
+    
+    default Property<Direction> getBlockFacingProperty() {
+        return Properties.HORIZONTAL_FACING;
+    }
+    
+    default boolean showProgress() {
+        return true;
+    }
 
     default BarConfiguration getEnergyConfiguration() {
         return new BarConfiguration(7, 24, 15, 54);

@@ -20,6 +20,7 @@ import rearth.oritech.block.blocks.machines.generators.BigSolarPanelBlock;
 import rearth.oritech.block.blocks.machines.generators.TestGeneratorBlock;
 import rearth.oritech.block.blocks.machines.interaction.*;
 import rearth.oritech.block.blocks.machines.processing.*;
+import rearth.oritech.block.blocks.machines.storage.LargeStorageBlock;
 import rearth.oritech.block.blocks.machines.storage.SmallStorageBlock;
 import rearth.oritech.block.blocks.pipes.*;
 import rearth.oritech.util.item.OritechGeoItem;
@@ -89,6 +90,7 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block LASER_ARM_BLOCK = new LaserArmBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block SMALL_STORAGE_BLOCK = new SmallStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block LARGE_STORAGE_BLOCK = new LargeStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block PLACER_BLOCK = new PlacerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block DESTROYER_BLOCK = new DestroyerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());

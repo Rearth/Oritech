@@ -1,21 +1,33 @@
 package rearth.oritech.block.base.entity;
 
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.property.Property;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.machines.storage.SmallStorageBlock;
-import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.DelegatingEnergyStorage;
@@ -25,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyProvider, MachineAddonController, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
+public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyProvider, MachineAddonController, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
     
     private final List<BlockPos> connectedAddons = new ArrayList<>();
     private final List<BlockPos> openSlots = new ArrayList<>();
@@ -97,9 +109,6 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         var res = new HashMap<Direction, BlockApiCache<EnergyStorage, Direction>>(6);
         var facing = getFacing();
         var blockInFront = (BlockPos) Geometry.offsetToWorldPosition(facing, new Vec3i(-1, 0, 0), pos);
-        
-        System.out.println(blockInFront.toCenterPos());
-        ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3d.of(blockInFront));
         
         var frontCache = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, blockInFront);
         res.put(Direction.DOWN, frontCache);
@@ -186,4 +195,73 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     }
     
     public abstract long getDefaultExtractionRate();
+    
+    @Override
+    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        buf.writeBlockPos(this.getPos());
+        buf.write(ADDON_UI_ENDEC, getUiData());
+        buf.writeFloat(getCoreQuality());
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
+    }
+    
+    @Override
+    public Text getDisplayName() {
+        return Text.literal("invalid");
+    }
+    
+    @Nullable
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+        return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+    }
+    
+    @Override
+    public List<GuiSlot> getGuiSlots() {
+        return List.of();
+    }
+    
+    @Override
+    public float getDisplayedEnergyUsage() {
+        return 0;
+    }
+    
+    @Override
+    public float getProgress() {
+        return 0;
+    }
+    
+    @Override
+    public InventoryInputMode getInventoryInputMode() {
+        return InventoryInputMode.FILL_LEFT_TO_RIGHT;
+    }
+    
+    @Override
+    public boolean inputOptionsEnabled() {
+        return false;
+    }
+    
+    @Override
+    public Inventory getDisplayedInventory() {
+        return new SimpleInventory();
+    }
+    
+    @Override
+    public ScreenHandlerType<?> getScreenHandlerType() {
+        return ModScreens.STORAGE_SCREEN;
+    }
+    
+    @Override
+    public BarConfiguration getEnergyConfiguration() {
+        return new BarConfiguration(80, 26, 15, 54);
+    }
+    
+    @Override
+    public boolean showProgress() {
+        return false;
+    }
+    
+    @Override
+    public Property<Direction> getBlockFacingProperty() {
+        return SmallStorageBlock.TARGET_DIR;
+    }
 }

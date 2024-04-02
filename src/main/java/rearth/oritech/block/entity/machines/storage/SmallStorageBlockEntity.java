@@ -36,4 +36,9 @@ public class SmallStorageBlockEntity extends ExpandableEnergyStorageBlockEntity 
     public long getDefaultExtractionRate() {
         return 1000;
     }
+    
+    @Override
+    public float getCoreQuality() {
+        return 3;
+    }
 }

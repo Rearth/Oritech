@@ -6,7 +6,6 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.OverlayContainer;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
@@ -139,7 +138,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             var addonBlock = handler.worldAccess.getBlockState(addonBlockPos);
             var addonBlockEntity = handler.worldAccess.getBlockEntity(addonBlockPos);
             
-            var relativePos = MultiblockMachineEntity.worldToRelativePos(handler.blockPos, addonBlockPos, handler.machineBlock.get(Properties.HORIZONTAL_FACING));
+            var relativePos = MultiblockMachineEntity.worldToRelativePos(handler.blockPos, addonBlockPos, handler.machineBlock.get(handler.screenData.getBlockFacingProperty()));
             
             holoPreviewContainer.child(
               new BlockPreviewComponent(addonBlock, addonBlockEntity, relativePos, rotationSpeed)
@@ -183,7 +182,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         
         for (var openPos : handler.addonUiData.openSlots()) {
             
-            var relativePos = MultiblockMachineEntity.worldToRelativePos(handler.blockPos, openPos, handler.machineBlock.get(Properties.HORIZONTAL_FACING));
+            var relativePos = MultiblockMachineEntity.worldToRelativePos(handler.blockPos, openPos, handler.machineBlock.get(handler.screenData.getBlockFacingProperty()));
             var dummyBlock = BlockContent.ADDON_INDICATOR_BLOCK.getDefaultState();
             
             holoPreviewContainer.child(

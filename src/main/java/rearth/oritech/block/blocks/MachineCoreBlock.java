@@ -15,10 +15,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.base.block.MachineBlock;
-import rearth.oritech.block.base.block.MultiblockFrameInteractionBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.ScreenProvider;
 
 import java.util.Objects;
 
@@ -81,11 +80,8 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
         if (!world.isClient) {
             var controllerPos = getControllerPos(world, pos);
             var controllerBlock = world.getBlockState(controllerPos);
-            if (Objects.requireNonNull(controllerBlock).getBlock() instanceof MachineBlock) {
-                return controllerBlock.getBlock().onUse(controllerBlock, world, controllerPos, player, hand, hit);
-            }
-            
-            if (Objects.requireNonNull(controllerBlock).getBlock() instanceof MultiblockFrameInteractionBlock) {
+            var controllerEntity = world.getBlockEntity(controllerPos);
+            if (controllerEntity instanceof ScreenProvider) {
                 return controllerBlock.getBlock().onUse(controllerBlock, world, controllerPos, player, hand, hit);
             }
         }

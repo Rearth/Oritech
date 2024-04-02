@@ -21,6 +21,7 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
@@ -55,6 +56,9 @@ public class NetworkContent {
     
     public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress) {
     }
+    
+    // for use with addon providers to sync energy state
+    public record GenericEnergySyncPacket(BlockPos position, long currentEnergy, long maxEnergy) {}
     
     public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {
     }   // this goes both ways
@@ -121,6 +125,18 @@ public class NetworkContent {
             if (entity instanceof LaserArmBlockEntity laserArmBlock) {
                 laserArmBlock.setCurrentTarget(message.target);
                 laserArmBlock.setLastFiredAt(message.lastFiredAt);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(GenericEnergySyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof MachineAddonController addonController) {
+                var storage = addonController.getStorageForAddon();
+                storage.capacity = message.maxEnergy;
+                storage.amount = message.currentEnergy;
             }
             
         }));

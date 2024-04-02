@@ -16,6 +16,7 @@ import rearth.oritech.block.entity.machines.generators.BigSolarPanelEntity;
 import rearth.oritech.block.entity.machines.generators.TestGeneratorEntity;
 import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.*;
+import rearth.oritech.block.entity.machines.storage.LargeStorageBlockEntity;
 import rearth.oritech.block.entity.machines.storage.SmallStorageBlockEntity;
 import rearth.oritech.block.entity.pipes.EnergyPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity;
@@ -102,6 +103,8 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedEnergy
     public static final BlockEntityType<SmallStorageBlockEntity> SMALL_STORAGE_ENTITY = FabricBlockEntityTypeBuilder.create(SmallStorageBlockEntity::new, BlockContent.SMALL_STORAGE_BLOCK).build();
+    @AssignSidedEnergy
+    public static final BlockEntityType<LargeStorageBlockEntity> LARGE_STORAGE_ENTITY = FabricBlockEntityTypeBuilder.create(LargeStorageBlockEntity::new, BlockContent.LARGE_STORAGE_BLOCK).build();
     
     @AssignSidedFluid
     public static final BlockEntityType<FluidPipeInterfaceEntity> FLUID_PIPE_ENTITY = FabricBlockEntityTypeBuilder.create(FluidPipeInterfaceEntity::new, BlockContent.FLUID_PIPE_CONNECTION).build();

@@ -1,5 +1,6 @@
 package rearth.oritech.block.blocks.machines.storage;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -66,9 +67,12 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
             
             machineEntity.initAddons();
             
+            var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
+            player.openHandledScreen(handler);
+            
         }
         
-        return super.onUse(state, world, pos, player, hand, hit);
+        return ActionResult.SUCCESS;
     }
     
     @Override

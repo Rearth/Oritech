@@ -82,8 +82,13 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     @Override
     protected void handledScreenTick() {
         super.handledScreenTick();
-        updateEnergyBar();
-        updateProgressBar();
+        
+        if (handler.screenData.showEnergy())
+            updateEnergyBar();
+        
+        if (handler.screenData.showProgress())
+            updateProgressBar();
+        
         updateSettingsButtons();
         
         if (handler.fluidProvider != null)
@@ -184,8 +189,10 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             updateEnergyBar();
         }
         
-        addProgressArrow(overlay);
-        updateProgressBar();
+        if (handler.screenData.showProgress()) {
+            addProgressArrow(overlay);
+            updateProgressBar();
+        }
     }
     
     protected void updateFluidBar() {

@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implements EnergyProvider {
     
-    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(50000, 50000, 50000);
+    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(5000, 5000, 5000);
     private final HashMap<BlockPos, BlockApiCache<EnergyStorage, Direction>> lookupCache = new HashMap<>();
     
     public EnergyPipeInterfaceEntity(BlockPos pos, BlockState state) {
