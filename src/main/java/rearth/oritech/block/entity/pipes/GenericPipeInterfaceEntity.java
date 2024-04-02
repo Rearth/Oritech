@@ -27,11 +27,11 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
     }
     
     public static void addNode(BlockPos pos, boolean isInterface, BlockState newState, PipeNetworkData data) {
-        System.out.println("registering node: " + pos);
+        System.out.println("registering/updating node: " + pos);
         
         data.pipes.add(pos);
         if (isInterface) {
-            var connectedMachines = new HashSet<BlockPos>(1);
+            var connectedMachines = new HashSet<BlockPos>(6);
             if (newState.get(GenericPipeConnectionBlock.INTERFACE_NORTH))
                 connectedMachines.add(pos.north());
             if (newState.get(GenericPipeConnectionBlock.INTERFACE_SOUTH))
@@ -45,9 +45,9 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
             if (newState.get(GenericPipeConnectionBlock.INTERFACE_DOWN))
                 connectedMachines.add(pos.down());
             
-            System.out.println(connectedMachines);
-            
             data.machineInterfaces.put(pos, connectedMachines);
+        } else {
+            data.machineInterfaces.remove(pos);
         }
         
         updateFromNode(pos, data);
@@ -88,8 +88,9 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         var searchInstance = new FloodFillSearch(pos, data.pipes);
         var foundNetwork = new HashSet<>(searchInstance.complete());
         var foundMachines = findConnectedMachines(foundNetwork, data);
+        
         System.out.println("Nodes:    " + foundNetwork.size() + " | " + foundNetwork);
-        System.out.println("Machines: " + foundMachines.size() + " | " + foundMachines);
+        System.out.println("Machines: " + foundMachines.size() + " | " + foundMachines.stream().map(elem -> elem.getLeft() + ":" + elem.getRight()).toList());
         
         var netID = foundNetwork.hashCode();
         data.pipeNetworks.put(netID, foundNetwork);
@@ -109,8 +110,6 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         });
         
         data.markDirty();
-        
-        System.out.println("Total Networks: " + data.pipeNetworks.keySet().size());
     }
     
     private static Set<Pair<BlockPos, Direction>> findConnectedMachines(Set<BlockPos> network, PipeNetworkData data) {

@@ -92,6 +92,11 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
             return normalPipeState;
         }
         
+        if (!interfaceState.equals(state)) {
+            // reload connection when state has changed (e.g. machine added/removed)
+            GenericPipeInterfaceEntity.addNode(pos, true, interfaceState, getNetworkData((World) world));
+        }
+        
         return interfaceState;
     }
     
