@@ -22,6 +22,7 @@ import net.minecraft.world.World;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
+import rearth.oritech.block.entity.machines.processing.AtomicForgeBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
@@ -95,7 +96,12 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         
         var targetBlock = currentTarget;
         var targetBlockState = world.getBlockState(targetBlock);
-        var storageCandidate = EnergyStorage.SIDED.find(world, targetBlock, null);
+        var targetBlockEntity = world.getBlockEntity(targetBlock);
+        var storageCandidate = EnergyStorage.SIDED.find(world, targetBlock, targetBlockState, targetBlockEntity, null);
+        
+        if (targetBlockEntity instanceof AtomicForgeBlockEntity atomicForgeEntity) {
+            storageCandidate = atomicForgeEntity.getEnergyStorage();
+        }
         
         var fired = false;
         
@@ -462,7 +468,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     public boolean isTargetingEnergyContainer() {
         var storageCandidate = EnergyStorage.SIDED.find(world, currentTarget, null);
-        return storageCandidate != null;
+        return storageCandidate != null || isTargetingAtomicForge();
     }
     
 }
