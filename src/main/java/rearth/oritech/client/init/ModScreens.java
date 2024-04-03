@@ -20,6 +20,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> POWERED_FURNACE_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> TEST_GENERATOR_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> BASIC_GENERATOR_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
+    public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> LAVA_GENERATOR_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> DESTROYER_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> PLACER_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> FERTILIZER_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
@@ -34,6 +35,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
         HandledScreens.register(CENTRIFUGE_SCREEN, CentrifugeScreen::new);
         HandledScreens.register(POWERED_FURNACE_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(TEST_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
+        HandledScreens.register(LAVA_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(BASIC_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(ATOMIC_FORGE_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         HandledScreens.register(STORAGE_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);

@@ -52,6 +52,7 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
 
         if (!world.isClient() && state.get(USED)) {
             var controllerEntity = getControllerEntity(world, pos);
+            if (controllerEntity == null) return state;
             
             if (controllerEntity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onCoreBroken(pos);
@@ -67,9 +68,9 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
         return Objects.requireNonNull(coreEntity).getControllerPos();
     }
     
-    @NotNull
+    @Nullable
     private static BlockEntity getControllerEntity(World world, BlockPos pos) {
-        return Objects.requireNonNull(world.getBlockEntity(getControllerPos(world, pos)));
+        return world.getBlockEntity(getControllerPos(world, pos));
     }
     
     @Override

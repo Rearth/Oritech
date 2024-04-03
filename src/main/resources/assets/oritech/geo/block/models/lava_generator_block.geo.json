@@ -1,0 +1,138 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "bottom",
+					"pivot": [0, 5, -0.5],
+					"cubes": [
+						{"origin": [-7, 1, -7], "size": [14, 8, 13], "uv": [0, 33]}
+					]
+				},
+				{
+					"name": "bone",
+					"parent": "bottom",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-8, 5, -8], "size": [16, 2, 14.1], "uv": [0, 17]}
+					]
+				},
+				{
+					"name": "bone2",
+					"parent": "bottom",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-8, 0, -8], "size": [16, 1, 16], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "back",
+					"pivot": [0, 16.16667, 7.00033],
+					"cubes": [
+						{"origin": [-8, 2, 6], "size": [16, 13, 2], "uv": [0, 54]}
+					]
+				},
+				{
+					"name": "bone3",
+					"parent": "back",
+					"pivot": [0, 20, 7.0005],
+					"cubes": [
+						{"origin": [-8, 17, 6], "size": [16, 14, 2], "uv": [48, 0]}
+					]
+				},
+				{
+					"name": "bone9",
+					"parent": "bone3",
+					"pivot": [0, 16, 7.001],
+					"cubes": [
+						{"origin": [-7, 0, 6.001], "size": [14, 32, 2], "uv": [52, 52]}
+					]
+				},
+				{
+					"name": "conductors",
+					"pivot": [0, 8.5, -1.5],
+					"cubes": [
+						{"origin": [-6, 7, -8], "size": [2, 3, 13], "uv": [54, 36]}
+					]
+				},
+				{
+					"name": "bone4",
+					"parent": "conductors",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [4, 7, -8], "size": [2, 3, 13], "uv": [47, 20]}
+					]
+				},
+				{
+					"name": "tanks",
+					"pivot": [0, 20.5, -1.5]
+				},
+				{
+					"name": "bone6",
+					"parent": "tanks",
+					"pivot": [0, 16, -1.5],
+					"cubes": [
+						{"origin": [-4, 12, -5], "size": [8, 8, 7], "uv": [64, 16]}
+					]
+				},
+				{
+					"name": "bone5",
+					"parent": "tanks",
+					"pivot": [0, 25, -1.5],
+					"cubes": [
+						{"origin": [-3, 22, -4.5], "size": [6, 6, 6], "uv": [0, 69]}
+					]
+				},
+				{
+					"name": "pipes",
+					"pivot": [0, 15.5, -1.5]
+				},
+				{
+					"name": "toppipes",
+					"parent": "pipes",
+					"pivot": [0, 25.75, 0.91667],
+					"rotation": [25, 0, 0],
+					"cubes": [
+						{"origin": [-6, 24.75, -1.75], "size": [12, 2, 2], "uv": [71, 42]},
+						{"origin": [-7.98, 24.75, -1.75], "size": [2, 2, 9], "uv": [71, 31]},
+						{"origin": [5.98, 24.75, -1.75], "size": [2, 2, 9], "uv": [15, 72]}
+					]
+				},
+				{
+					"name": "bone7",
+					"parent": "pipes",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-1.5, 9, -3], "size": [3, 13, 3], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "tankpanel",
+					"pivot": [0, 8, 6.1],
+					"cubes": [
+						{"origin": [-2, 13, 3.1], "size": [4, 12, 2], "uv": [0, 17]},
+						{"origin": [-3, 9, 5.1], "size": [6, 19, 1], "uv": [36, 54]}
+					]
+				},
+				{
+					"name": "bone8",
+					"parent": "tankpanel",
+					"pivot": [0, 19, 5.1],
+					"cubes": [
+						{"origin": [3, 11, 4.1], "size": [1, 16, 2], "uv": [37, 74]},
+						{"origin": [-4, 11, 4.1], "size": [1, 16, 2], "uv": [43, 74]}
+					]
+				}
+			]
+		}
+	]
+}
