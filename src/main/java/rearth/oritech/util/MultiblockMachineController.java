@@ -31,7 +31,6 @@ public interface MultiblockMachineController {
     InventoryProvider getInventoryForLink();
     EnergyStorage getEnergyStorageForLink();
     
-    
     default void addMultiblockToNbt(NbtCompound nbt) {
         
         var posList = new NbtList();

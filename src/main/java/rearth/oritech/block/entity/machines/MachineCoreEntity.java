@@ -75,7 +75,11 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     
     @Override
     public EnergyStorage getStorage(Direction direction) {
-        return delegatedStorage;
+        if (getCachedController() == null || getCachedController().getEnergyStorageForLink() == null) {
+            return null;
+        } else {
+            return delegatedStorage;
+        }
     }
     
     @Override

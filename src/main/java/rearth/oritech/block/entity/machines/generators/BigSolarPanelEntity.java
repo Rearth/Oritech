@@ -122,7 +122,7 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     
     @Override
     public EnergyStorage getEnergyStorageForLink() {
-        return energyStorage;
+        return null;
     }
     
     @Override
