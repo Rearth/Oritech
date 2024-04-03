@@ -108,8 +108,25 @@ TODO
 Distributed under the CC BY-NC 4.0 DEED License. See [LICENSE](https://creativecommons.org/licenses/by-nc/4.0/) for more
 information.
 
+## Credits
+
+This mod is heavily inspired by the original techarium mod, which sadly never got finished. A lot of the machine names and models
+were taken or strongly inspired by techarium. Huge thanks to the original techarium devs (YCar and Gecko and everyone else involved) for creating
+the assets and ideas, and also for making them available under the [CC BY-NC 4.0 DEED](https://creativecommons.org/licenses/by-nc/4.0/) license.
+
+Some blocks and item textures are also from malcolmriley's unused-textures repository. Huge thanks to him for making those available as well (under the [CC BY 4.0 DEED](https://creativecommons.org/licenses/by/4.0/) license).
+
+In detail, these are the following items that are from the above-mentioned sources:
+* From [ArtOfTecharium](https://github.com/Ycarx/artoftecharium) (animations and textures were slightly modified, e.g. addon ports added, etc.)
+  * Assembler Model
+  * Foundry Model
+  * Laser Arm Model
+  * Powered Furnace Model
+* From [malcolmriley's unused-textures repo](https://github.com/malcolmriley/unused-textures)
+  * Oil fluid textures (the dark gas texture)
+
 ## Acknowledgements
 
-* [Techarium Assets (details on usage soon)](https://github.com/Ycarx/artoftecharium)
-* [Lots of textures from malcolmriley, details soon)](https://github.com/malcolmriley/unused-textures)
-* [todo](https://to.do/)
+* Kekie6, for creating the energy pipe and big solar panel models
+* glisco, the creator of owo-lib, for creating this awesome library and supporting in its usage
+* The creators and maintainers of Geckolib for creating the great animation engine, and helping out in their discord
