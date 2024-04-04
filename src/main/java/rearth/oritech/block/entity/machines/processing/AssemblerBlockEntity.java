@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.machines.processing;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -11,9 +10,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
-import team.reborn.energy.api.EnergyStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AssemblerBlockEntity extends MultiblockMachineEntity {
@@ -35,8 +32,8 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 70, 11),
-          new GuiSlot(1, 90, 11),
+          new GuiSlot(0, 70, 21),
+          new GuiSlot(1, 90, 21),
           new GuiSlot(2, 80, 59));
     }
     

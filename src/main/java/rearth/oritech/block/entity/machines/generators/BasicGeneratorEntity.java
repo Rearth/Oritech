@@ -2,11 +2,7 @@ package rearth.oritech.block.entity.machines.generators;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
-import net.minecraft.block.entity.FurnaceBlockEntity;
-import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -17,7 +13,6 @@ import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +52,7 @@ public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 80, 11));
+          new GuiSlot(0, 80, 21));
     }
     
     @Override

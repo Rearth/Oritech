@@ -54,7 +54,7 @@ public interface ScreenProvider {
         return new ArrowConfiguration(
                 new Identifier(Oritech.MOD_ID, "textures/gui/modular/arrow_empty.png"),
                 new Identifier(Oritech.MOD_ID, "textures/gui/modular/arrow_full.png"),
-                84, 30, 7, 26, false);
+                84, 37, 7, 16, false);
     }
 
 }

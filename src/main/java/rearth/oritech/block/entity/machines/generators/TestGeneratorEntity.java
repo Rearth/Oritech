@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.machines.generators;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -33,7 +32,7 @@ public class TestGeneratorEntity extends UpgradableGeneratorBlockEntity {
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 75, 11),
+          new GuiSlot(0, 75, 21),
           new GuiSlot(1, 75, 59));
     }
     

@@ -123,6 +123,8 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         var title = Components.label(Text.of("Item Filter")).color(new Color(45 / 255f, 45 / 255f, 46 / 255f));
         overlay.child(title.positioning(Positioning.absolute(60, 7)));
         
+        addTitle(overlay);
+        
         rootComponent.child(
           overlay.positioning(Positioning.relative(50, 50))
         ).child(
@@ -131,6 +133,17 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         
         updateButtons();
         updateItemFilters();
+    }
+    
+    
+    private void addTitle(FlowLayout overlay) {
+        var blockTitle = handler.blockEntity.getCachedState().getBlock().getName();
+        var label = Components.label(blockTitle);
+        label.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
+        label.sizing(Sizing.fixed(176), Sizing.content(2));
+        label.horizontalTextAlignment(HorizontalAlignment.CENTER);
+        label.zIndex(1);
+        overlay.child(label.positioning(Positioning.relative(50, 2)));
     }
     
     private void sendUpdateToServer() {

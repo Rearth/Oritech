@@ -1,18 +1,14 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
-import io.wispforest.owo.ui.component.BoxComponent;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.Oritech;
 import rearth.oritech.network.NetworkContent;
 
 import java.util.ArrayList;
@@ -60,6 +56,18 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
             var button = buttons.get(i);
             button.active = i != handler.selectedSlot;
         }
+        
+        addTitle(overlay);
+    }
+    
+    private void addTitle(FlowLayout overlay) {
+        var blockTitle = handler.addonEntity.getCachedState().getBlock().getName();
+        var label = Components.label(blockTitle);
+        label.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
+        label.sizing(Sizing.fixed(176), Sizing.content(2));
+        label.horizontalTextAlignment(HorizontalAlignment.CENTER);
+        label.zIndex(1);
+        overlay.child(label.positioning(Positioning.relative(50, 2)));
     }
     
     private void setActiveSlot(int slot) {

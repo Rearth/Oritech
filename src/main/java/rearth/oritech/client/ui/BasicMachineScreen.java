@@ -175,6 +175,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     public void fillOverlay(FlowLayout overlay) {
         
+        addTitle(overlay);
+        
         if (handler.fluidProvider != null) {
             addFluidBar(overlay);
             updateFluidBar();
@@ -193,6 +195,16 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             addProgressArrow(overlay);
             updateProgressBar();
         }
+    }
+    
+    private void addTitle(FlowLayout overlay) {
+        var blockTitle = handler.machineBlock.getBlock().getName();
+        var label = Components.label(blockTitle);
+        label.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
+        label.sizing(Sizing.fixed(176), Sizing.content(2));
+        label.horizontalTextAlignment(HorizontalAlignment.CENTER);
+        label.zIndex(1);
+        overlay.child(label.positioning(Positioning.relative(50, 2)));
     }
     
     protected void updateFluidBar() {

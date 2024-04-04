@@ -86,10 +86,10 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 80, 11),
-          new GuiSlot(1, 100, 11),
-          new GuiSlot(2, 120, 11),
-          new GuiSlot(3, 140, 11),
+          new GuiSlot(0, 80, 21),
+          new GuiSlot(1, 100, 21),
+          new GuiSlot(2, 120, 21),
+          new GuiSlot(3, 140, 21),
           new GuiSlot(4, 80, 59),
           new GuiSlot(5, 100, 59));
     }

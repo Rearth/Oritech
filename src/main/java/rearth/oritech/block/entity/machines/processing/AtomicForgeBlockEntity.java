@@ -33,8 +33,8 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 70, 11),
-          new GuiSlot(1, 90, 11),
+          new GuiSlot(0, 70, 21),
+          new GuiSlot(1, 90, 21),
           new GuiSlot(2, 80, 59));
     }
     

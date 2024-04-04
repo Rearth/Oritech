@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.machines.processing;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.SmeltingRecipe;
 import net.minecraft.screen.ScreenHandlerType;
@@ -17,7 +16,6 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
-import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
 import java.util.Objects;
@@ -130,7 +128,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 80, 11),
+          new GuiSlot(0, 80, 21),
           new GuiSlot(1, 80, 59));
     }
     
