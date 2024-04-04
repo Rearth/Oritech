@@ -96,8 +96,11 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             // this is separate so that progress is not reset when out of energy
             var activeRecipe = recipeCandidate.get().value();
             currentRecipe = activeRecipe;
-            progress = activeRecipe.getTime();
-            currentMaxBurnTime = progress;
+            
+            // speed -> lower = faster, efficiency -> lower = better
+            var recipeTime = (int) (currentRecipe.getTime() * getSpeedMultiplier() * (1 / getEfficiencyMultiplier()));
+            progress = recipeTime;
+            currentMaxBurnTime = recipeTime;
             
             // remove inputs
             for (int i = 0; i < activeRecipe.getInputs().size(); i++) {
@@ -123,6 +126,17 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         }
         
         pendingOutputs.clear();
+    }
+    
+    // ensure that insertion is disabled, and instead upgrade extraction rates
+    @Override
+    public void updateEnergyContainer() {
+        super.updateEnergyContainer();
+        
+        var insert = energyStorage.maxInsert;
+        energyStorage.maxExtract = getDefaultExtractionRate() + insert;
+        energyStorage.maxInsert = 0;
+        
     }
     
     // check if the energy can fit
@@ -225,6 +239,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     
     @Override
     public long getDefaultExtractionRate() {
-        return 100;
+        return 128;
     }
 }

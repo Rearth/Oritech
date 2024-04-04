@@ -58,8 +58,9 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
             // this is separate so that progress is not reset when out of energy
             var activeRecipe = recipeCandidate.get().value();
             currentRecipe = activeRecipe;
-            progress = activeRecipe.getTime();
-            setCurrentMaxBurnTime(progress);
+            var recipeTime = (int) (currentRecipe.getTime() * getSpeedMultiplier() * (1 / getEfficiencyMultiplier()));
+            progress = recipeTime;
+            setCurrentMaxBurnTime(recipeTime);
             
             // remove inputs
             // correct amount and variant is already validated in getRecipe, so we can directly remove it
