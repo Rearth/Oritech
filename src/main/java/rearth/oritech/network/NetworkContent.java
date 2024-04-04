@@ -13,16 +13,12 @@ import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
-import rearth.oritech.block.entity.machines.generators.BigSolarPanelEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.util.FluidProvider;
-import rearth.oritech.util.InventoryInputMode;
-import rearth.oritech.util.MachineAddonController;
-import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.util.*;
 
 import java.util.List;
 import java.util.Map;
@@ -98,12 +94,8 @@ public class NetworkContent {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
-            if (entity instanceof MachineBlockEntity machine) {
+            if (entity instanceof MultiblockMachineController machine) {
                 machine.playSetupAnimation();
-            } else if (entity instanceof LaserArmBlockEntity laserArmBlock) {
-                laserArmBlock.playSetupAnimation();
-            } else if (entity instanceof BigSolarPanelEntity solarPanel) {
-                solarPanel.playSetupAnimation();
             }
             
         }));

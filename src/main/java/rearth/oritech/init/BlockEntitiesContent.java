@@ -64,7 +64,7 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedEnergy
     public static final BlockEntityType<TestGeneratorEntity> TEST_GENERATOR_ENTITY = FabricBlockEntityTypeBuilder.create(TestGeneratorEntity::new, BlockContent.TEST_GENERATOR_BLOCK).build();
     
-    @AssignSidedInventory
+    @AssignSidedFluid
     @AssignSidedEnergy
     public static final BlockEntityType<LavaGeneratorEntity> LAVA_GENERATOR_ENTITY = FabricBlockEntityTypeBuilder.create(LavaGeneratorEntity::new, BlockContent.LAVA_GENERATOR_BLOCK).build();
     

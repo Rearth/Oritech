@@ -5,7 +5,6 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
@@ -13,13 +12,13 @@ import team.reborn.energy.api.EnergyStorage;
 
 import java.util.ArrayList;
 
-public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEntity implements MultiblockMachineController {
+public abstract class MultiblockGeneratorBlockEntity extends UpgradableGeneratorBlockEntity implements MultiblockMachineController {
     
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
     private float coreQuality = 1f;
     
-    public MultiblockMachineEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
+    public MultiblockGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state, energyPerTick);
     }
     
@@ -68,15 +67,5 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     @Override
     public boolean isActive(BlockState state) {
         return state.get(MultiblockMachine.ASSEMBLED);
-    }
-    
-    // this seems to work as expected for some reason?
-    public static Vec3i worldToRelativePos(Vec3i ownWorldPos, Vec3i worldPos, Direction ownFacing) {
-        return worldPos.subtract(ownWorldPos);
-    }
-    
-    @Override
-    public void playSetupAnimation() {
-        super.playSetupAnimation();
     }
 }

@@ -158,6 +158,8 @@ public interface MultiblockMachineController {
         ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3d.of(block), null);
     }
     
+    void playSetupAnimation();
+    
     record MultiBlockElement(BlockState state, MachineCoreBlock coreBlock, BlockPos pos) {}
     
 }

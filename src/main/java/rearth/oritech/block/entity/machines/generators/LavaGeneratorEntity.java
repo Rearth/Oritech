@@ -4,41 +4,38 @@ import net.minecraft.block.BlockState;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
+import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class LavaGeneratorEntity extends UpgradableGeneratorBlockEntity {
+public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     public LavaGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.LAVA_GENERATOR_ENTITY, pos, state, 30);
+        super(BlockEntitiesContent.LAVA_GENERATOR_ENTITY, pos, state, 64);
     }
     
     @Override
     protected OritechRecipeType getOwnRecipeType() {
-        return RecipeContent.TEST_GENERATOR;
+        return RecipeContent.LAVA_GENERATOR;
     }
     
     @Override
     public InventorySlotAssignment getSlots() {
-        return new InventorySlotAssignment(0, 1, 1, 1);
+        return new InventorySlotAssignment(0, 0, 0, 0);
     }
     
     @Override
     public List<GuiSlot> getGuiSlots() {
-        return List.of(
-          new GuiSlot(0, 75, 11),
-          new GuiSlot(1, 75, 59));
+        return List.of();
     }
     
     @Override
     public ScreenHandlerType<?> getScreenHandlerType() {
-        return ModScreens.TEST_GENERATOR_SCREEN;
+        return ModScreens.LAVA_GENERATOR_SCREEN;
     }
     
     @Override
@@ -48,6 +45,17 @@ public class LavaGeneratorEntity extends UpgradableGeneratorBlockEntity {
     
     @Override
     public List<Vec3i> getAddonSlots() {
-        return new ArrayList<>();
+        
+        return List.of(
+          new Vec3i(1, 0, 0),
+          new Vec3i(1, 1, 0)
+        );
+    }
+    
+    @Override
+    public List<Vec3i> getCorePositions() {
+        return List.of(
+          new Vec3i(0, 1, 0)
+        );
     }
 }

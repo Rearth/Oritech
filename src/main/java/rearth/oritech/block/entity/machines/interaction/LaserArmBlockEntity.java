@@ -425,6 +425,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         });
     }
     
+    @Override
     public void playSetupAnimation() {
         animationController.setAnimation(MachineBlockEntity.SETUP);
         animationController.forceAnimationReset();

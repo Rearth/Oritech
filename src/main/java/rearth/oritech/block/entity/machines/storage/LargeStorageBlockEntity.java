@@ -111,4 +111,9 @@ public class LargeStorageBlockEntity extends ExpandableEnergyStorageBlockEntity 
         return energyStorage;
     }
     
+    @Override
+    public void playSetupAnimation() {
+        // this block has no animation
+    }
+    
 }

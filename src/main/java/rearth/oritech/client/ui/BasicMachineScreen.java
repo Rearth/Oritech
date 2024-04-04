@@ -200,7 +200,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         var container = handler.fluidProvider.getForDirectFluidAccess();
         var data = handler.screenData.getFluidConfiguration();
 
-        if (fluidBackground.getSprite() == null && !container.isResourceBlank()) {
+        if (fluidBackground.getSprite() == null && !container.isResourceBlank() && container.amount > 0) {
             var parent = fluidBackground.parent();
             var targetIndex = parent.children().indexOf(fluidBackground);
             var newFluid = createFluidRenderer(container.getResource(), container.getAmount(), data);

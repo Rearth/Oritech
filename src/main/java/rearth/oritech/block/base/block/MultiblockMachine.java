@@ -11,7 +11,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.MultiblockMachineController;
 
@@ -36,7 +35,7 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
         if (!world.isClient) {
             
             var entity = world.getBlockEntity(pos);
-            if (!(entity instanceof MultiblockMachineEntity machineEntity)) {
+            if (!(entity instanceof MultiblockMachineController machineEntity)) {
                 return ActionResult.SUCCESS;
             }
             
@@ -46,7 +45,7 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
             
             // first time created
             if (isAssembled && !wasAssembled) {
-                NetworkContent.MACHINE_CHANNEL.serverHandle(machineEntity).send(new NetworkContent.MachineSetupEventPacket(pos));
+                NetworkContent.MACHINE_CHANNEL.serverHandle(entity).send(new NetworkContent.MachineSetupEventPacket(pos));
                 return ActionResult.SUCCESS;
             }
             

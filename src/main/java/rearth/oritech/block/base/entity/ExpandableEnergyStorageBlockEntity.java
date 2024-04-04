@@ -26,6 +26,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.machines.storage.SmallStorageBlock;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
@@ -44,6 +45,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
     private HashMap<Direction, BlockApiCache<EnergyStorage, Direction>> directionCaches;
     
+    private boolean networkDirty = false;
     
     //own storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate()) {
@@ -77,6 +79,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         if (world.isClient) return;
         
         outputEnergy();
+        
+        if (networkDirty) sendNetworkEntry();
     }
     
     private void outputEnergy() {
@@ -100,7 +104,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
             tx.commit();
         }
         
-        this.markDirty();
+        // can be skipped, since the change to the energy storage will already mark this as dirty
+        //this.markDirty();
     }
     
     // defaults only to front block
@@ -201,7 +206,26 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         buf.writeBlockPos(this.getPos());
         buf.write(ADDON_UI_ENDEC, getUiData());
         buf.writeFloat(getCoreQuality());
+        sendNetworkEntry();
+    }
+    
+    @Override
+    public void markDirty() {
+        super.markDirty();
+        networkDirty = true;
+    }
+    
+    private boolean isActivelyViewed() {
+        var closestPlayer = Objects.requireNonNull(world).getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 5, false);
+        return closestPlayer != null && closestPlayer.currentScreenHandler instanceof BasicMachineScreenHandler handler && getPos().equals(handler.getBlockPos());
+    }
+    
+    protected void sendNetworkEntry() {
+        
+        if (world.getTime() % 5 != 0 && !isActivelyViewed()) return;
+        
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
+        networkDirty = false;
     }
     
     @Override
