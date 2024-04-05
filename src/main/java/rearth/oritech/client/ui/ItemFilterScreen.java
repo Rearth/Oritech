@@ -120,9 +120,6 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         nbtButton.horizontalSizing(Sizing.fixed(buttonWidth));
         overlay.child(nbtButton.positioning(Positioning.absolute(110, 46)));
         
-        var title = Components.label(Text.of("Item Filter")).color(new Color(45 / 255f, 45 / 255f, 46 / 255f));
-        overlay.child(title.positioning(Positioning.absolute(60, 7)));
-        
         addTitle(overlay);
         
         rootComponent.child(

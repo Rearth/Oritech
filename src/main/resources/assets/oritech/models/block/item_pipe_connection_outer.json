@@ -1,0 +1,23 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "oritech:block/item_pipe",
+		"particle": "oritech:block/item_pipe"
+	},
+	"elements": [
+		{
+			"name": "machine_interface",
+			"from": [4, 4, -0.25],
+			"to": [12, 12, 1.75],
+			"faces": {
+				"north": {"uv": [4, 4, 8, 8], "texture": "#0"},
+				"east": {"uv": [6, 10, 7, 14], "texture": "#0"},
+				"south": {"uv": [8, 0, 12, 4], "texture": "#0"},
+				"west": {"uv": [4, 12, 5, 16], "texture": "#0"},
+				"up": {"uv": [16, 3, 12, 2], "texture": "#0"},
+				"down": {"uv": [16, 3, 12, 4], "texture": "#0"}
+			}
+		}
+	]
+}
