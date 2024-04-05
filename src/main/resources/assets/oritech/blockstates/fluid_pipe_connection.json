@@ -1,113 +1,157 @@
 {
   "multipart": [
     {
+      "when": {
+        "straight": "false"
+      },
       "apply": {
-        "model": "oritech:block/generic_pipe_inner"
+        "model": "oritech:block/fluid_pipe_inner"
       }
     },
     {
       "when": {
-        "north": "true"
+        "north": "true",
+        "straight": "false"
       },
       "apply": {
-        "model": "oritech:block/generic_pipe_outer"
+        "model": "oritech:block/fluid_pipe_outer"
       }
     },
     {
       "when": {
-        "south": "true"
+        "south": "true",
+        "straight": "false"
       },
       "apply": {
-        "model": "oritech:block/generic_pipe_outer",
+        "model": "oritech:block/fluid_pipe_outer",
         "y": 180
       }
     },
     {
       "when": {
-        "east": "true"
+        "east": "true",
+        "straight": "false"
       },
       "apply": {
-        "model": "oritech:block/generic_pipe_outer",
+        "model": "oritech:block/fluid_pipe_outer",
         "y": 90
       }
     },
     {
       "when": {
-        "west": "true"
+        "west": "true",
+        "straight": "false"
       },
       "apply": {
-        "model": "oritech:block/generic_pipe_outer",
+        "model": "oritech:block/fluid_pipe_outer",
         "y": 270
       }
     },
     {
       "when": {
-        "up": "true"
+        "up": "true",
+        "straight": "false"
       },
       "apply": {
-        "model": "oritech:block/generic_pipe_outer",
+        "model": "oritech:block/fluid_pipe_outer",
         "x": -90
       }
     },
     {
       "when": {
-        "down": "true"
+        "down": "true",
+        "straight": "false"
       },
       "apply": {
-        "model": "oritech:block/generic_pipe_outer",
+        "model": "oritech:block/fluid_pipe_outer",
         "x": 90
       }
     },
     {
       "when": {
-        "con_north": "true"
+        "down": "true",
+        "straight": "true"
       },
       "apply": {
-        "model": "oritech:block/generic_pipe_connection_outer"
+        "model": "oritech:block/fluid_pipe_straight",
+        "x": 90
       }
     },
     {
       "when": {
-        "con_south": "true"
+        "east": "true",
+        "straight": "true"
       },
       "apply": {
-        "model": "oritech:block/generic_pipe_connection_outer",
-        "y": 180
-      }
-    },
-    {
-      "when": {
-        "con_east": "true"
-      },
-      "apply": {
-        "model": "oritech:block/generic_pipe_connection_outer",
+        "model": "oritech:block/fluid_pipe_straight",
         "y": 90
       }
     },
     {
       "when": {
-        "con_west": "true"
+        "north": "true",
+        "straight": "true"
       },
       "apply": {
-        "model": "oritech:block/generic_pipe_connection_outer",
+        "model": "oritech:block/fluid_pipe_straight"
+      }
+    },
+    {
+      "when": {
+        "con_north": "true",
+        "extract": true
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_connection_outer"
+      }
+    },
+    {
+      "when": {
+        "con_south": "true",
+        "extract": true
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_connection_outer",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "con_east": "true",
+        "extract": true
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_connection_outer",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "con_west": "true",
+        "extract": true
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_connection_outer",
         "y": 270
       }
     },
     {
       "when": {
-        "con_up": "true"
+        "con_up": "true",
+        "extract": true
       },
       "apply": {
-        "model": "oritech:block/generic_pipe_connection_outer",
+        "model": "oritech:block/fluid_pipe_connection_outer",
         "x": -90
       }
     },
     {
       "when": {
-        "con_down": "true"
+        "con_down": "true",
+        "extract": true
       },
       "apply": {
-        "model": "oritech:block/generic_pipe_connection_outer",
+        "model": "oritech:block/fluid_pipe_connection_outer",
         "x": 90
       }
     }
