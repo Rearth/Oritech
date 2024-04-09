@@ -23,7 +23,7 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 public class LargeStorageBlock extends SmallStorageBlock {
     
     public LargeStorageBlock(Settings settings) {
-        super(settings);
+        super(settings.luminance(value -> 2));
         setDefaultState(getDefaultState().with(ASSEMBLED, false));
     }
     
