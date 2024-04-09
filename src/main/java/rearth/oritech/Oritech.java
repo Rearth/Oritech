@@ -15,6 +15,7 @@ import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.tools.ToolsContent;
 
 public class Oritech implements ModInitializer {
     public static final String MOD_ID = "oritech";
@@ -34,6 +35,8 @@ public class Oritech implements ModInitializer {
         System.out.println("registering block entities");
         FieldRegistrationHandler.register(BlockEntitiesContent.class, MOD_ID, false);
         System.out.println("registering others....");
+        FieldRegistrationHandler.register(ToolsContent.class, MOD_ID, false);
+        ToolsContent.registerEventHandlers();
         ItemGroups.registerItemGroup();
         RecipeContent.initialize();
         NetworkContent.registerChannels();

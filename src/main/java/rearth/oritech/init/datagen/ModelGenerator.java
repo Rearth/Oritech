@@ -7,6 +7,7 @@ import net.minecraft.data.client.ItemModelGenerator;
 import net.minecraft.data.client.Models;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.tools.ToolsContent;
 
 public class ModelGenerator extends FabricModelProvider {
     public ModelGenerator(FabricDataOutput output) {
@@ -65,5 +66,12 @@ public class ModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(ItemContent.BANANA, Models.GENERATED);
         itemModelGenerator.register(ItemContent.TARGET_DESIGNATOR, Models.GENERATED);
         itemModelGenerator.register(ItemContent.OIL_BUCKET, Models.GENERATED);
+        
+        
+        itemModelGenerator.register(ToolsContent.EXO_HELMET, Models.GENERATED);
+        itemModelGenerator.register(ToolsContent.EXO_CHESTPLATE, Models.GENERATED);
+        itemModelGenerator.register(ToolsContent.EXO_LEGGINGS, Models.GENERATED);
+        itemModelGenerator.register(ToolsContent.EXO_BOOTS, Models.GENERATED);
+        // itemModelGenerator.registerArmor((ArmorItem) ToolsContent.EXO_HELMET);   // this would generate it compatible with armor trims
     }
 }
