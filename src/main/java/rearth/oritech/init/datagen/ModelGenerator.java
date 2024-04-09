@@ -34,12 +34,14 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.PLACER_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.DESTROYER_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.FERTILIZER_BLOCK);
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.PUMP_BLOCK);
+        
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.PUMP_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.ADDON_INDICATOR_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.BLOCK_DESTROYER_HEAD);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.BLOCK_PLACER_HEAD);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.BLOCK_FERTILIZER_HEAD);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.PUMP_TRUNK_BLOCK);
         
         // these blocks all use geckolib to render/display, so the only thing this really adds are block particles (e.g. when breaking)
         // the machine speed addon has a generic particle references that fits all machines well enough

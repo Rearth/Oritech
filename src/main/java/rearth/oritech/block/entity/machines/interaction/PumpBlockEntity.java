@@ -12,24 +12,42 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.FluidContent;
+import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.EnergyProvider;
 import rearth.oritech.util.FluidProvider;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidProvider, EnergyProvider {
+public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidProvider, EnergyProvider, GeoBlockEntity {
     
     private static final int MAX_SEARCH_COUNT = 100000;
     private static final int ENERGY_USAGE = 1000;   // per block pumped
     private static final int PUMP_RATE = 5; // pump every n ticks
+    
+    protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
+    private final AnimationController<PumpBlockEntity> animationController = getAnimationController();
+    
+    // client only
+    public FluidVariant lastPumpedVariant;
+    public long lastPumpTime;
     
     private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
         @Override
@@ -85,7 +103,11 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, PumpBlockEntity blockEntity) {
-        if (world.isClient) return;
+        if (world.isClient) {
+            if (isBusy())
+                spawnWorkingParticles();
+            return;
+        }
         
         if (!initialized) {
             progressStartup();
@@ -112,8 +134,20 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             addLiquidToTank(targetState);
             useEnergy();
             this.markDirty();
+            updateNetwork(fluidStorage.variant);
         }
         
+    }
+    
+    private void spawnWorkingParticles() {
+        if (world.getTime() % 5 != 0) return;
+        
+        var targetPos = pos.toCenterPos();
+        var targetType = ParticleTypes.BUBBLE_COLUMN_UP;
+        if (lastPumpedVariant.getFluid().equals(Fluids.LAVA)) targetType = ParticleTypes.LAVA;
+        if (lastPumpedVariant.getFluid().equals(FluidContent.STILL_OIL)) targetType = ParticleTypes.FALLING_OBSIDIAN_TEAR;
+        
+        world.addParticle(targetType, targetPos.getX(), targetPos.getY(), targetPos.getZ(), 0, 0.3, 0);
     }
     
     private boolean hasEnoughEnergy() {
@@ -178,7 +212,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         }
         
         toolheadPosition = toolheadPosition.down();
-        world.setBlockState(toolheadPosition, BlockContent.BANANA_BLOCK.getDefaultState());
+        world.setBlockState(toolheadPosition, BlockContent.PUMP_TRUNK_BLOCK.getDefaultState());
     }
     
     private boolean checkToolheadEnd(BlockPos newPosition) {
@@ -216,6 +250,40 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     @Override
     public EnergyStorage getStorage(Direction direction) {
         return energyStorage;
+    }
+    
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(animationController);
+    }
+    
+    private void updateNetwork(FluidVariant variant) {
+        var fluid = Registries.FLUID.getId(variant.getFluid()).toString();
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.PumpWorkSyncPacket(pos, fluid, world.getTime()));
+    }
+    
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animatableInstanceCache;
+    }
+    
+    private boolean isBusy() {
+        return world.getTime() - lastPumpTime < 40;
+    }
+    
+    private AnimationController<PumpBlockEntity> getAnimationController() {
+        return new AnimationController<>(this, state -> {
+            if (isBusy()) return state.setAndContinue(MachineBlockEntity.WORKING);
+            return PlayState.STOP;
+        });
+    }
+    
+    public void setLastPumpedVariant(FluidVariant lastPumpedVariant) {
+        this.lastPumpedVariant = lastPumpedVariant;
+    }
+    
+    public void setLastPumpTime(long lastPumpTime) {
+        this.lastPumpTime = lastPumpTime;
     }
     
     private static class FloodFillSearch {

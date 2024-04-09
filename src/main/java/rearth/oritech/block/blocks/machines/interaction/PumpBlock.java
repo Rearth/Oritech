@@ -7,20 +7,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.PumpBlockEntity;
-import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.MultiblockMachineController;
 
 public class PumpBlock extends Block implements BlockEntityProvider {
     
@@ -28,10 +18,11 @@ public class PumpBlock extends Block implements BlockEntityProvider {
         super(settings);
     }
     
-//    @Override
-//    public BlockRenderType getRenderType(BlockState state) {
-//        return BlockRenderType.ENTITYBLOCK_ANIMATED;
-//    }
+    
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.ENTITYBLOCK_ANIMATED;
+    }
     
     @Nullable
     @Override

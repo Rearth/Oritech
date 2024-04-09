@@ -14,6 +14,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.entity.machines.interaction.PumpBlockEntity;
 import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -63,6 +64,9 @@ public class NetworkContent {
     }
     
     public record SingleVariantFluidSyncPacket(BlockPos position, String fluidType, long amount) {
+    }
+    
+    public record PumpWorkSyncPacket(BlockPos position, String fluidType, long workedAt) {
     }
     
     public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn, String fluidTypeOut,
@@ -141,6 +145,18 @@ public class NetworkContent {
                 var storage = fluidProvider.getForDirectFluidAccess();
                 storage.amount = message.amount;
                 storage.variant = FluidVariant.of(Registries.FLUID.get(new Identifier(message.fluidType)));
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(PumpWorkSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof PumpBlockEntity pump) {
+                var variant = FluidVariant.of(Registries.FLUID.get(new Identifier(message.fluidType)));
+                pump.setLastPumpedVariant(variant);
+                pump.setLastPumpTime(message.workedAt);
             }
             
         }));
