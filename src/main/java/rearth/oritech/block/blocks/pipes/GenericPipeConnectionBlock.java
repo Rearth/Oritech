@@ -68,6 +68,7 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
         
         var regKey = world.getRegistryKey().getValue();
         var dataId = getPipeTypeName() + "_" + regKey.getNamespace() + "_" + regKey.getPath();
+        System.out.println("saving for: " + dataId);
         ((ServerWorld) world).getPersistentStateManager().set(dataId, getNetworkData(world));
     }
     

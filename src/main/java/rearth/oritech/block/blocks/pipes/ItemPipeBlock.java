@@ -47,6 +47,6 @@ public class ItemPipeBlock extends GenericPipeBlock {
     
     @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
-        return ITEM_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new GenericPipeInterfaceEntity.PipeNetworkData());
+        return ITEM_PIPE_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 }

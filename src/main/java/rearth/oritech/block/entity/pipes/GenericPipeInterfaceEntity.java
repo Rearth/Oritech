@@ -288,6 +288,8 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                 }
             }
             
+            result.markDirty();
+            
             return result;
         }
         
