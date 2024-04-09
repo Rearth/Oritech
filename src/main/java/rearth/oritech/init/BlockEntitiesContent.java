@@ -136,18 +136,18 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
       BlockContent.MACHINE_CORE_BASIC,
       BlockContent.MACHINE_CORE_GOOD
     ).build();
-
+    
     @Override
     public Registry<BlockEntityType<?>> getRegistry() {
         return Registries.BLOCK_ENTITY_TYPE;
     }
-
+    
     @Override
     @SuppressWarnings("unchecked")
     public Class<BlockEntityType<?>> getTargetFieldType() {
         return (Class<BlockEntityType<?>>) (Object) BlockEntityType.class;
     }
-
+    
     @Override
     public void postProcessField(String namespace, BlockEntityType<?> value, String identifier, Field field) {
         AutoRegistryContainer.super.postProcessField(namespace, value, identifier, field);
@@ -160,18 +160,21 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
         
         if (field.isAnnotationPresent(AssignSidedInventory.class))
             ItemStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((InventoryProvider) blockEntity).getInventory(direction), value);
-
+        
     }
     
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
-    public @interface AssignSidedEnergy {}
+    public @interface AssignSidedEnergy {
+    }
     
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
-    public @interface AssignSidedInventory {}
+    public @interface AssignSidedInventory {
+    }
     
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
-    public @interface AssignSidedFluid {}
+    public @interface AssignSidedFluid {
+    }
 }

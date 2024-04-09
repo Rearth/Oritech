@@ -114,9 +114,10 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         var res = new HashMap<Direction, BlockApiCache<EnergyStorage, Direction>>(6);
         var facing = getFacing();
         var blockInFront = (BlockPos) Geometry.offsetToWorldPosition(facing, new Vec3i(-1, 0, 0), pos);
+        var worldOffset = blockInFront.subtract(pos);
         
         var frontCache = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, blockInFront);
-        res.put(Direction.DOWN, frontCache);
+        res.put(Direction.fromVector(worldOffset.getX(), worldOffset.getY(), worldOffset.getZ()), frontCache);
         
         return res;
     }
