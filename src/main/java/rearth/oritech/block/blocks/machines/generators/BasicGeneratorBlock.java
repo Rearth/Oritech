@@ -4,7 +4,6 @@ import net.minecraft.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.base.block.UpgradableMachineBlock;
 import rearth.oritech.block.entity.machines.generators.BasicGeneratorEntity;
-import rearth.oritech.block.entity.machines.generators.TestGeneratorEntity;
 
 public class BasicGeneratorBlock extends UpgradableMachineBlock {
     public BasicGeneratorBlock(Settings settings) {

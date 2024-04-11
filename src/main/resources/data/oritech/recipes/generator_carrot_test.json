@@ -1,5 +1,5 @@
 {
-  "type": "oritech:test_generator",
+  "type": "oritech:bio_generator",
   "ingredients": [
     {
       "item": "minecraft:carrot"

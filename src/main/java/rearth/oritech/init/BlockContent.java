@@ -18,7 +18,7 @@ import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.block.blocks.machines.generators.BasicGeneratorBlock;
 import rearth.oritech.block.blocks.machines.generators.BigSolarPanelBlock;
 import rearth.oritech.block.blocks.machines.generators.LavaGeneratorBlock;
-import rearth.oritech.block.blocks.machines.generators.TestGeneratorBlock;
+import rearth.oritech.block.blocks.machines.generators.BioGeneratorBlock;
 import rearth.oritech.block.blocks.machines.interaction.*;
 import rearth.oritech.block.blocks.machines.processing.*;
 import rearth.oritech.block.blocks.machines.storage.LargeStorageBlock;
@@ -83,7 +83,7 @@ public class BlockContent implements BlockRegistryContainer {
     @UseGeoBlockItem(scale = 0.3f)
     public static final Block ATOMIC_FORGE_BLOCK = new AtomicForgeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
-    public static final Block TEST_GENERATOR_BLOCK = new TestGeneratorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block BIO_GENERATOR_BLOCK = new BioGeneratorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block LAVA_GENERATOR_BLOCK = new LavaGeneratorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)

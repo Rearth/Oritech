@@ -74,6 +74,8 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
                 }
                 markDirty();
                 markNetDirty();
+            } else {    // this will cause the progress to reset when it' still burning but the generator is full
+                progress = 0;
             }
         } else if (canFitEnergy()) {
             // try consume new item

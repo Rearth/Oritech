@@ -1,0 +1,30 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"idle": {
+			"animation_length": 0.125
+		},
+		"working": {
+			"loop": true,
+			"animation_length": 3,
+			"bones": {
+				"dynamo": {
+					"scale": {
+						"0.0": {
+							"vector": [1, 1, 1]
+						},
+						"1.75": {
+							"vector": [1, 1.7, 1],
+							"easing": "easeOutCubic"
+						},
+						"2.625": {
+							"vector": [1, 1, 1],
+							"easing": "easeInCubic"
+						}
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

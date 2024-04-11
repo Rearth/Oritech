@@ -26,7 +26,12 @@ public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
     
     @Override
     protected OritechRecipeType getOwnRecipeType() {
-        return RecipeContent.TEST_GENERATOR;
+        return RecipeContent.BIO_GENERATOR;
+    }
+    
+    @Override
+    protected float getAnimationSpeed() {
+        return 1 * getSpeedMultiplier();
     }
     
     @Override

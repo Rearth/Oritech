@@ -14,7 +14,7 @@ public class RecipeContent {
     public static final OritechRecipeType CENTRIFUGE = register(new Identifier(Oritech.MOD_ID, "centrifuge"));
     public static final OritechRecipeType CENTRIFUGE_FLUID = register(new Identifier(Oritech.MOD_ID, "centrifuge_fluid"));
     public static final OritechRecipeType ATOMIC_FORGE = register(new Identifier(Oritech.MOD_ID, "atomic_forge"));
-    public static final OritechRecipeType TEST_GENERATOR = register(new Identifier(Oritech.MOD_ID, "test_generator"));
+    public static final OritechRecipeType BIO_GENERATOR = register(new Identifier(Oritech.MOD_ID, "bio_generator"));
     public static final OritechRecipeType LAVA_GENERATOR = register(new Identifier(Oritech.MOD_ID, "lava_generator"));
 
     private static OritechRecipeType register(Identifier name) {
