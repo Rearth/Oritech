@@ -15,10 +15,7 @@ import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.InventoryProxyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
-import rearth.oritech.block.blocks.machines.generators.BasicGeneratorBlock;
-import rearth.oritech.block.blocks.machines.generators.BigSolarPanelBlock;
-import rearth.oritech.block.blocks.machines.generators.LavaGeneratorBlock;
-import rearth.oritech.block.blocks.machines.generators.BioGeneratorBlock;
+import rearth.oritech.block.blocks.machines.generators.*;
 import rearth.oritech.block.blocks.machines.interaction.*;
 import rearth.oritech.block.blocks.machines.processing.*;
 import rearth.oritech.block.blocks.machines.storage.LargeStorageBlock;
@@ -86,6 +83,8 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block BIO_GENERATOR_BLOCK = new BioGeneratorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block LAVA_GENERATOR_BLOCK = new LavaGeneratorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @UseGeoBlockItem(scale = 0.3f)
+    public static final Block FUEL_GENERATOR_BLOCK = new FuelGeneratorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block BASIC_GENERATOR_BLOCK = new BasicGeneratorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)

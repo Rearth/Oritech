@@ -11,10 +11,7 @@ import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.EnergyAcceptorAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
-import rearth.oritech.block.entity.machines.generators.BasicGeneratorEntity;
-import rearth.oritech.block.entity.machines.generators.BigSolarPanelEntity;
-import rearth.oritech.block.entity.machines.generators.BioGeneratorEntity;
-import rearth.oritech.block.entity.machines.generators.LavaGeneratorEntity;
+import rearth.oritech.block.entity.machines.generators.*;
 import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.*;
 import rearth.oritech.block.entity.machines.storage.LargeStorageBlockEntity;
@@ -67,6 +64,10 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedFluid
     @AssignSidedEnergy
     public static final BlockEntityType<LavaGeneratorEntity> LAVA_GENERATOR_ENTITY = FabricBlockEntityTypeBuilder.create(LavaGeneratorEntity::new, BlockContent.LAVA_GENERATOR_BLOCK).build();
+    
+    @AssignSidedFluid
+    @AssignSidedEnergy
+    public static final BlockEntityType<FuelGeneratorEntity> FUEL_GENERATOR_ENTITY = FabricBlockEntityTypeBuilder.create(FuelGeneratorEntity::new, BlockContent.FUEL_GENERATOR_BLOCK).build();
     
     @AssignSidedInventory
     @AssignSidedEnergy

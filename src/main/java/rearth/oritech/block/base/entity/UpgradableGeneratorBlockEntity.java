@@ -1,5 +1,7 @@
 package rearth.oritech.block.base.entity;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
@@ -18,14 +20,13 @@ import rearth.oritech.network.NetworkContent;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBlockEntity {
     
     private int currentMaxBurnTime; // needed only for progress display
     private List<ItemStack> pendingOutputs = new ArrayList<>(); // used if a recipe produces a byproduct at the end
-    private HashMap<Direction, BlockApiCache<EnergyStorage, Direction>> directionCaches;
+    private Multimap<Direction, BlockApiCache<EnergyStorage, Direction>> directionCaches;
     
     // speed multiplier increases output rate and reduces burn time by same percentage
     // efficiency multiplier only increases burn time
@@ -33,22 +34,22 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         super(type, pos, state, energyPerTick);
     }
     
-    private static HashMap<Direction, BlockApiCache<EnergyStorage, Direction>> getNeighborCaches(BlockPos pos, World world) {
+    protected Multimap<Direction, BlockApiCache<EnergyStorage, Direction>> getNeighborCaches(BlockPos pos, World world) {
         
-        var res = new HashMap<Direction, BlockApiCache<EnergyStorage, Direction>>(6);
+        var res = ArrayListMultimap.<Direction, BlockApiCache<EnergyStorage, Direction>>create();
         
         var topCache = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, pos.up());
-        res.put(Direction.DOWN, topCache);
+        res.put(Direction.UP, topCache);
         var botCache = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, pos.down());
-        res.put(Direction.UP, botCache);
+        res.put(Direction.DOWN, botCache);
         var northCache = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, pos.north());
-        res.put(Direction.SOUTH, northCache);
+        res.put(Direction.NORTH, northCache);
         var eastCache = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, pos.east());
-        res.put(Direction.WEST, eastCache);
+        res.put(Direction.EAST, eastCache);
         var southCache = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, pos.south());
-        res.put(Direction.NORTH, southCache);
+        res.put(Direction.SOUTH, southCache);
         var westCache = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, pos.west());
-        res.put(Direction.EAST, westCache);
+        res.put(Direction.WEST, westCache);
         
         return res;
     }
@@ -183,9 +184,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             var stack = ItemStack.fromNbt(compound);
             pendingOutputs.add(stack);
         }
-        
-        if (world != null)
-            directionCaches = getNeighborCaches(pos, world);
     }
     
     @Override
@@ -202,7 +200,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         if (directionCaches == null) directionCaches = getNeighborCaches(pos, world);
         
         try (var tx = Transaction.openOuter()) {
-            for (var entry : directionCaches.entrySet()) {
+            for (var entry : directionCaches.entries()) {
                 var insertDirection = entry.getKey().getOpposite();
                 var targetCandidate = entry.getValue().find(insertDirection);
                 if (targetCandidate == null) continue;
@@ -241,6 +239,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     
     @Override
     public long getDefaultExtractionRate() {
-        return 128;
+        return 512;
     }
 }
