@@ -46,6 +46,12 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
             }
             
             var wasAssembled = state.get(ASSEMBLED);
+            
+            if (!wasAssembled) {
+                var corePlaced = laserArm.tryPlaceNextCore(player);
+                if (corePlaced) return ActionResult.SUCCESS;
+            }
+            
             var isAssembled = laserArm.initMultiblock(state);
             
             // first time created

@@ -41,6 +41,11 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
             
             var wasAssembled = state.get(ASSEMBLED);
             
+            if (!wasAssembled) {
+                var corePlaced = machineEntity.tryPlaceNextCore(player);
+                if (corePlaced) return ActionResult.SUCCESS;
+            }
+            
             var isAssembled = machineEntity.initMultiblock(state);
             
             // first time created

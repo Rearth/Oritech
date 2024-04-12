@@ -1,9 +1,18 @@
 package rearth.oritech.util;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -13,6 +22,7 @@ import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.init.BlockContent;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.ArrayList;
@@ -60,6 +70,47 @@ public interface MultiblockMachineController {
         }
         
         setCoreQuality(nbt.getFloat("coreQuality"));
+    }
+    
+    default Boolean tryPlaceNextCore(PlayerEntity player) {
+        
+        var heldStack = player.getEquippedStack(EquipmentSlot.MAINHAND);
+        var heldItem = heldStack.getItem();
+        
+        if (heldItem.equals(BlockContent.MACHINE_CORE_GOOD.asItem())) {
+            var nextPosition = this.getNextMissingCore();
+            if (nextPosition != null && heldItem instanceof BlockItem blockItem) {
+                this.getWorld().setBlockState(nextPosition, blockItem.getBlock().getDefaultState());
+                if (!player.isCreative()) {
+                    heldStack.decrement(1);
+                    if (heldStack.getCount() == 0)
+                        player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    default BlockPos getNextMissingCore() {
+        
+        var world = getWorld();
+        var pos = getPos();
+        
+        var ownFacing = getFacingForMultiblock();
+        var targetPositions = getCorePositions();
+        
+        for (var targetPosition : targetPositions) {
+            var rotatedPos = Geometry.rotatePosition(targetPosition, ownFacing);
+            var checkPos = pos.add(rotatedPos);
+            var checkState = Objects.requireNonNull(world).getBlockState(checkPos);
+            
+            if (checkState.isOf(Blocks.AIR) || checkState.isIn(TagKey.of(RegistryKeys.BLOCK, new Identifier("minecraft", "replaceable")))) {
+                return checkPos;
+            }
+        }
+        
+        return null;
     }
     
     default boolean initMultiblock(BlockState state) {

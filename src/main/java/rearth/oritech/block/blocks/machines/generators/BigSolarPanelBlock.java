@@ -53,6 +53,12 @@ public class BigSolarPanelBlock extends PassiveGeneratorBlock {
             }
             
             var wasAssembled = state.get(ASSEMBLED);
+            
+            if (!wasAssembled) {
+                var corePlaced = solarPanel.tryPlaceNextCore(player);
+                if (corePlaced) return ActionResult.SUCCESS;
+            }
+            
             var isAssembled = solarPanel.initMultiblock(state);
             
             // first time created
