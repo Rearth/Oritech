@@ -123,9 +123,9 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         addTitle(overlay);
         
         rootComponent.child(
-          overlay.positioning(Positioning.relative(50, 50))
-        ).child(
           Components.texture(BasicMachineScreen.BACKGROUND, 0, 0, 176, 166, 176, 166)
+        ).child(
+          overlay.positioning(Positioning.relative(50, 50))
         );
         
         updateButtons();
