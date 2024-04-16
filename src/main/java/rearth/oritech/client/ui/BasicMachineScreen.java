@@ -34,8 +34,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     public static final Identifier GUI_COMPONENTS = new Identifier(Oritech.MOD_ID, "textures/gui/modular/machine_gui_components.png");
     public FlowLayout root;
     private TextureComponent progress_indicator;
-    private TextureComponent energy_indicator;
-    private Component energy_indicator_background;
+    private TextureComponent energyIndicator;
     private ButtonComponent cycleInputButton;
     private BoxComponent fluidFillStatusOverlay;
     
@@ -73,9 +72,9 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             .positioning(Positioning.relative(50, 50))
             .zIndex(-1)
         ).child(
-          buildOverlay().positioning(Positioning.relative(50, 50))
-        ).child(
           Components.texture(BACKGROUND, 0, 0, 176, 166, 176, 166)
+        ).child(
+          buildOverlay().positioning(Positioning.relative(50, 50))
         );
     }
     
@@ -114,8 +113,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         var fillAmount = (float) amount / capacity;
         var tooltipText = getEnergyTooltip(amount, capacity);
         
-        energy_indicator_background.tooltip(tooltipText);
-        energy_indicator.visibleArea(PositionedRectangle.of(0, 96 - ((int) (96 * (fillAmount))), 24, (int) (96 * fillAmount)));
+        energyIndicator.tooltip(tooltipText);
+        energyIndicator.visibleArea(PositionedRectangle.of(0, 96 - ((int) (96 * (fillAmount))), 24, (int) (96 * fillAmount)));
     }
     
     public Text getEnergyTooltip(long amount, long max) {
@@ -303,6 +302,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         var config = handler.screenData.getEnergyConfiguration();
         var insetSize = 1;
+        var tooltipText = Text.literal("10/50 RF");
         
         var frame = Containers.horizontalFlow(Sizing.fixed(config.width() + insetSize * 2), Sizing.fixed(config.height() + insetSize * 2));
         frame.surface(Surface.PANEL_INSET);
@@ -310,23 +310,17 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         frame.positioning(Positioning.absolute(config.x() - insetSize, config.y() - insetSize));
         panel.child(frame);
         
-        var fillAmount = 1f; // those will be overridden on tick
-        var tooltipText = Text.literal("10/50 RF");
+        var indicator_background = Components.texture(GUI_COMPONENTS, 24, 0, 24, 96, 98, 96);
+        indicator_background.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
         
-        energy_indicator_background = Components.texture(GUI_COMPONENTS, 24, 0, 24, 96, 98, 96);
-        energy_indicator_background.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
-        energy_indicator_background.positioning(Positioning.absolute(config.x(), config.y()));
-        energy_indicator_background.tooltip(tooltipText);
+        energyIndicator = Components.texture(GUI_COMPONENTS, 0, 0, 24, (96), 98, 96);
+        energyIndicator.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
+        energyIndicator.positioning(Positioning.absolute(0, 0));
+        energyIndicator.tooltip(tooltipText);
         
-        var offset = (1 - fillAmount) * config.height();
-        
-        energy_indicator = Components.texture(GUI_COMPONENTS, 0, 0, 24, (int) (96 * fillAmount), 98, 96);
-        energy_indicator.sizing(Sizing.fixed(config.width()), Sizing.fixed((int) (config.height() * fillAmount)));
-        energy_indicator.positioning(Positioning.absolute(config.x(), (int) (config.y() + offset)));
-        
-        panel
-          .child(energy_indicator_background)
-          .child(energy_indicator);
+        frame
+          .child(indicator_background)
+          .child(energyIndicator);
     }
     
     public static class ColoredSpriteComponent extends SpriteComponent {

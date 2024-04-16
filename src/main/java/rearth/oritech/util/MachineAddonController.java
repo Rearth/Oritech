@@ -22,8 +22,8 @@ public interface MachineAddonController {
     
     List<BlockPos> getConnectedAddons();
     List<BlockPos> getOpenSlots();
-    BlockPos getPos();
-    World getWorld();
+    BlockPos getMachinePos();
+    World getMachineWorld();
     Direction getFacingForAddon();
     DynamicEnergyStorage getStorageForAddon();
     SimpleInventory getInventoryForAddon();
@@ -57,9 +57,9 @@ public interface MachineAddonController {
     default void resetAddons() {
         
         for (var addon : getConnectedAddons()) {
-            var state = Objects.requireNonNull(getWorld()).getBlockState(addon);
+            var state = Objects.requireNonNull(getMachineWorld()).getBlockState(addon);
             if (state.getBlock() instanceof MachineAddonBlock) {
-                getWorld().setBlockState(addon, state.with(MachineAddonBlock.ADDON_USED, false));
+                getMachineWorld().setBlockState(addon, state.with(MachineAddonBlock.ADDON_USED, false));
             }
         }
         
@@ -77,8 +77,8 @@ public interface MachineAddonController {
         //   go through all slots
         //   check if slot is occupied by MachineAddonBlock, check if block is not used
         //   if valid and extender: add all neighboring positions to search set
-        var world = getWorld();
-        var pos = getPos();
+        var world = getMachineWorld();
+        var pos = getMachinePos();
         assert world != null;
         
         var openSlots = getOpenSlots();
@@ -178,8 +178,8 @@ public interface MachineAddonController {
     // update state of the found addons
     default void writeAddons(List<AddonBlock> addons) {
         
-        var world = getWorld();
-        var pos = getPos();
+        var world = getMachineWorld();
+        var pos = getMachinePos();
         assert world != null;
         
         for (var addon : addons) {
@@ -237,7 +237,7 @@ public interface MachineAddonController {
     
     default AddonUiData getUiData() {
         var data = getBaseAddonData();
-        return new AddonUiData(getConnectedAddons(), getOpenSlots(), data.efficiency, data.speed, getPos());
+        return new AddonUiData(getConnectedAddons(), getOpenSlots(), data.efficiency, data.speed, getMachinePos());
     }
     
     private static Set<BlockPos> getNeighbors(BlockPos pos) {

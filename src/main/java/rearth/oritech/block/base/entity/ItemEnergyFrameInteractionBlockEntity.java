@@ -103,6 +103,17 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
         return energyStorage;
     }
     
+    
+    @Override
+    public BlockPos getMachinePos() {
+        return getPos();
+    }
+    
+    @Override
+    public World getMachineWorld() {
+        return getWorld();
+    }
+    
     @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
         buf.writeBlockPos(this.getPos());

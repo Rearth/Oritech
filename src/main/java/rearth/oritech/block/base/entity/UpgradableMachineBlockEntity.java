@@ -11,11 +11,15 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
-import rearth.oritech.util.*;
+import rearth.oritech.util.DynamicEnergyStorage;
+import rearth.oritech.util.MachineAddonController;
+import rearth.oritech.util.ScreenProvider;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity implements MachineAddonController {
     
@@ -64,6 +68,17 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     @Override
     public BaseAddonData getBaseAddonData() {
         return addonData;
+    }
+    
+    
+    @Override
+    public BlockPos getMachinePos() {
+        return getPos();
+    }
+    
+    @Override
+    public World getMachineWorld() {
+        return getWorld();
     }
     
     @Override

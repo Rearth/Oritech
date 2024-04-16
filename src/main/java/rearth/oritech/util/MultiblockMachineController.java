@@ -33,8 +33,8 @@ public interface MultiblockMachineController {
     
     List<Vec3i> getCorePositions();
     Direction getFacingForMultiblock();
-    BlockPos getPos();
-    World getWorld();
+    BlockPos getMachinePos();
+    World getMachineWorld();
     ArrayList<BlockPos> getConnectedCores();
     void setCoreQuality(float quality);
     float getCoreQuality();
@@ -80,7 +80,7 @@ public interface MultiblockMachineController {
         if (heldItem.equals(BlockContent.MACHINE_CORE_GOOD.asItem())) {
             var nextPosition = this.getNextMissingCore();
             if (nextPosition != null && heldItem instanceof BlockItem blockItem) {
-                this.getWorld().setBlockState(nextPosition, blockItem.getBlock().getDefaultState());
+                this.getMachineWorld().setBlockState(nextPosition, blockItem.getBlock().getDefaultState());
                 if (!player.isCreative()) {
                     heldStack.decrement(1);
                     if (heldStack.getCount() == 0)
@@ -94,14 +94,14 @@ public interface MultiblockMachineController {
     
     default BlockPos getNextMissingCore() {
         
-        var world = getWorld();
-        var pos = getPos();
+        var world = getMachineWorld();
+        var pos = getMachinePos();
         
         var ownFacing = getFacingForMultiblock();
-        var targetPositions = getCorePositions();
+        var targetMachinePositions = getCorePositions();
         
-        for (var targetPosition : targetPositions) {
-            var rotatedPos = Geometry.rotatePosition(targetPosition, ownFacing);
+        for (var targetMachinePosition : targetMachinePositions) {
+            var rotatedPos = Geometry.rotatePosition(targetMachinePosition, ownFacing);
             var checkPos = pos.add(rotatedPos);
             var checkState = Objects.requireNonNull(world).getBlockState(checkPos);
             
@@ -124,19 +124,19 @@ public interface MultiblockMachineController {
         // update all multiblocks state to USED=true, write controller position to block state
         
         if (state.get(MultiblockMachine.ASSEMBLED)) return true;
-        var world = getWorld();
-        var pos = getPos();
+        var world = getMachineWorld();
+        var pos = getMachinePos();
         var coreBlocksConnected = getConnectedCores();
         
         var ownFacing = getFacingForMultiblock();
         
-        var targetPositions = getCorePositions();
-        var coreBlocks = new ArrayList<MultiBlockElement>(targetPositions.size());
+        var targetMachinePositions = getCorePositions();
+        var coreBlocks = new ArrayList<MultiBlockElement>(targetMachinePositions.size());
         
         var sumCoreQuality = 0f;
         
-        for (var targetPosition : targetPositions) {
-            var rotatedPos = Geometry.rotatePosition(targetPosition, ownFacing);
+        for (var targetMachinePosition : targetMachinePositions) {
+            var rotatedPos = Geometry.rotatePosition(targetMachinePosition, ownFacing);
             var checkPos = pos.add(rotatedPos);
             var checkState = Objects.requireNonNull(world).getBlockState(checkPos);
             
@@ -149,7 +149,7 @@ public interface MultiblockMachineController {
             }
         }
         
-        if (targetPositions.size() == coreBlocks.size()) {
+        if (targetMachinePositions.size() == coreBlocks.size()) {
             // valid
             for (var core : coreBlocks) {
                 var newState = core.state.with(MachineCoreBlock.USED, true);
@@ -172,8 +172,8 @@ public interface MultiblockMachineController {
     
     default void onCoreBroken(BlockPos corePos) {
         
-        var world = getWorld();
-        var pos = getPos();
+        var world = getMachineWorld();
+        var pos = getMachinePos();
         var coreBlocksConnected = getConnectedCores();
         
         Objects.requireNonNull(world).setBlockState(pos, world.getBlockState(pos).with(MultiblockMachine.ASSEMBLED, false));
@@ -192,7 +192,7 @@ public interface MultiblockMachineController {
     
     default void onControllerBroken() {
         
-        var world = getWorld();
+        var world = getMachineWorld();
         var coreBlocksConnected = getConnectedCores();
         
         for (var core : coreBlocksConnected) {

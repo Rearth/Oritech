@@ -57,7 +57,7 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
             button.active = i != handler.selectedSlot;
         }
         
-        addTitle(overlay);
+        // addTitle(overlay);
     }
     
     private void addTitle(FlowLayout overlay) {

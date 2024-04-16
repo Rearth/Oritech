@@ -454,6 +454,17 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         return lastFiredAt;
     }
     
+    
+    @Override
+    public BlockPos getMachinePos() {
+        return getPos();
+    }
+    
+    @Override
+    public World getMachineWorld() {
+        return getWorld();
+    }
+    
     public void setLastFiredAt(long lastFiredAt) {
         this.lastFiredAt = lastFiredAt;
     }

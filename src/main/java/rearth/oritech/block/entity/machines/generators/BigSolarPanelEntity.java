@@ -191,6 +191,16 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
         });
     }
     
+    @Override
+    public BlockPos getMachinePos() {
+        return getPos();
+    }
+    
+    @Override
+    public World getMachineWorld() {
+        return getWorld();
+    }
+    
     public long getAdjustedTimeOfDay() {
         return (world.getTimeOfDay() + getTimeOffset()) % 24000;
     }

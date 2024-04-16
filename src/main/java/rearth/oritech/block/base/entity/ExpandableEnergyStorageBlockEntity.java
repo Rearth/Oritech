@@ -255,6 +255,17 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         return 0;
     }
     
+    
+    @Override
+    public BlockPos getMachinePos() {
+        return getPos();
+    }
+    
+    @Override
+    public World getMachineWorld() {
+        return getWorld();
+    }
+    
     @Override
     public InventoryInputMode getInventoryInputMode() {
         return InventoryInputMode.FILL_LEFT_TO_RIGHT;
