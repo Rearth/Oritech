@@ -52,6 +52,7 @@ public class ModRenderers {
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.CROP_FILTER_ADDON, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.LARGE_STORAGE_BLOCK, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.FERTILIZER_BLOCK, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.PLACER_BLOCK, RenderLayer.getCutout());
         
         // fluids
         FluidRenderHandlerRegistry.INSTANCE.register(FluidContent.STILL_OIL, FluidContent.FLOWING_OIL, new SimpleFluidRenderHandler(
