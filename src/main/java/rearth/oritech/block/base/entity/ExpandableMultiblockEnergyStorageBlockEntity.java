@@ -55,7 +55,7 @@ public abstract class ExpandableMultiblockEnergyStorageBlockEntity extends Expan
     
     @Override
     public InventoryProvider getInventoryForLink() {
-        return null;
+        return this;
     }
     
     @Override

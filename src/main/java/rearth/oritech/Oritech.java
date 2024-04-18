@@ -15,7 +15,7 @@ import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.tools.ToolsContent;
+import rearth.oritech.item.tools.ToolsContent;
 
 public class Oritech implements ModInitializer {
     public static final String MOD_ID = "oritech";

@@ -7,7 +7,7 @@ import net.minecraft.data.client.ItemModelGenerator;
 import net.minecraft.data.client.Models;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
-import rearth.oritech.tools.ToolsContent;
+import rearth.oritech.item.tools.ToolsContent;
 
 public class ModelGenerator extends FabricModelProvider {
     public ModelGenerator(FabricDataOutput output) {
@@ -69,6 +69,7 @@ public class ModelGenerator extends FabricModelProvider {
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
         itemModelGenerator.register(ItemContent.BANANA, Models.GENERATED);
         itemModelGenerator.register(ItemContent.TARGET_DESIGNATOR, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.TEST_ENERGY_ITEM, Models.GENERATED);
         itemModelGenerator.register(ItemContent.OIL_BUCKET, Models.GENERATED);
         
         

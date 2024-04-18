@@ -106,9 +106,10 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     public static final BlockEntityType<InventoryProxyAddonBlockEntity> INVENTORY_PROXY_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(InventoryProxyAddonBlockEntity::new, BlockContent.MACHINE_INVENTORY_PROXY_ADDON).build();
     
-    
+    @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<SmallStorageBlockEntity> SMALL_STORAGE_ENTITY = FabricBlockEntityTypeBuilder.create(SmallStorageBlockEntity::new, BlockContent.SMALL_STORAGE_BLOCK).build();
+    @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<LargeStorageBlockEntity> LARGE_STORAGE_ENTITY = FabricBlockEntityTypeBuilder.create(LargeStorageBlockEntity::new, BlockContent.LARGE_STORAGE_BLOCK).build();
     

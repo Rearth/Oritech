@@ -1,4 +1,4 @@
-package rearth.oritech.tools;
+package rearth.oritech.item.tools;
 
 import io.wispforest.owo.registration.reflect.ItemRegistryContainer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -10,9 +10,9 @@ import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Item;
 import rearth.oritech.init.ItemGroups;
-import rearth.oritech.tools.armor.ExoArmorItem;
-import rearth.oritech.tools.armor.ExoArmorMaterial;
-import rearth.oritech.tools.util.ArmorEventHandler;
+import rearth.oritech.item.tools.armor.ExoArmorItem;
+import rearth.oritech.item.tools.armor.ExoArmorMaterial;
+import rearth.oritech.item.tools.util.ArmorEventHandler;
 
 import java.lang.reflect.Field;
 

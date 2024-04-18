@@ -2,7 +2,7 @@ package rearth.oritech.client.renderers;
 
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
-import rearth.oritech.tools.armor.ExoArmorItem;
+import rearth.oritech.item.tools.armor.ExoArmorItem;
 import software.bernie.geckolib.model.DefaultedEntityGeoModel;
 import software.bernie.geckolib.renderer.GeoArmorRenderer;
 

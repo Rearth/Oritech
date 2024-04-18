@@ -1,4 +1,4 @@
-package rearth.oritech.tools.armor;
+package rearth.oritech.item.tools.armor;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMultimap;
@@ -16,7 +16,7 @@ import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
-import rearth.oritech.tools.util.ArmorEventHandler;
+import rearth.oritech.item.tools.util.ArmorEventHandler;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.client.RenderProvider;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;

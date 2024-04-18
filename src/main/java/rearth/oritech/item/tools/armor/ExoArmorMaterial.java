@@ -1,4 +1,4 @@
-package rearth.oritech.tools.armor;
+package rearth.oritech.item.tools.armor;
 
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;

@@ -2,6 +2,8 @@ package rearth.oritech.block.base.entity;
 
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -12,6 +14,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -31,6 +34,7 @@ import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import team.reborn.energy.api.EnergyStorage;
+import team.reborn.energy.api.EnergyStorageUtil;
 import team.reborn.energy.api.base.DelegatingEnergyStorage;
 
 import java.util.ArrayList;
@@ -38,7 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyProvider, MachineAddonController, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
+public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyProvider, InventoryProvider, MachineAddonController, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
     
     private final List<BlockPos> connectedAddons = new ArrayList<>();
     private final List<BlockPos> openSlots = new ArrayList<>();
@@ -46,6 +50,15 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     private HashMap<Direction, BlockApiCache<EnergyStorage, Direction>> directionCaches;
     
     private boolean networkDirty = false;
+    
+    protected final SimpleInventory inventory = new SimpleInventory(1) {
+        @Override
+        public void markDirty() {
+            ExpandableEnergyStorageBlockEntity.this.markDirty();
+        }
+    };
+    
+    protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     //own storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate()) {
@@ -85,6 +98,9 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     private void outputEnergy() {
         if (energyStorage.amount <= 0) return;
+        
+        chargeItems();
+        
         var availableOutput = Math.min(energyStorage.amount, energyStorage.maxExtract);
         var totalInserted = 0L;
         
@@ -108,6 +124,13 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         //this.markDirty();
     }
     
+    private void chargeItems() {
+        EnergyStorageUtil.move(this.energyStorage,
+          ContainerItemContext.ofSingleSlot(getInventory(null).getSlots().get(0)).find(EnergyStorage.ITEM),
+          Long.MAX_VALUE,
+          null);
+    }
+    
     // defaults only to front block
     protected HashMap<Direction, BlockApiCache<EnergyStorage, Direction>> getNeighborCaches(BlockPos pos, World world) {
         
@@ -127,6 +150,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         super.writeNbt(nbt);
         writeAddonToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
+        nbt.put("inventory", inventory.toNbtList());
     }
     
     @Override
@@ -135,6 +159,12 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         loadAddonNbtData(nbt);
         updateEnergyContainer();
         energyStorage.amount = nbt.getLong("energy_stored");
+        inventory.readNbtList(nbt.getList("inventory", NbtElement.COMPOUND_TYPE));
+    }
+    
+    @Override
+    public InventoryStorage getInventory(Direction direction) {
+        return inventoryStorage;
     }
     
     public Direction getFacing() {
@@ -242,7 +272,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     @Override
     public List<GuiSlot> getGuiSlots() {
-        return List.of();
+        return List.of(new GuiSlot(0, 40, 21));
     }
     
     @Override
@@ -278,7 +308,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     @Override
     public Inventory getDisplayedInventory() {
-        return new SimpleInventory();
+        return inventory;
     }
     
     @Override
