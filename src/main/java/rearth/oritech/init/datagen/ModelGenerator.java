@@ -32,8 +32,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleState(BlockContent.LARGE_STORAGE_BLOCK);
         
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.PLACER_BLOCK);
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.DESTROYER_BLOCK);
-        // blockStateModelGenerator.registerSimpleState(BlockContent.FERTILIZER_BLOCK);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.DESTROYER_BLOCK);
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.FERTILIZER_BLOCK);
         
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.PUMP_BLOCK, BlockContent.MACHINE_SPEED_ADDON);

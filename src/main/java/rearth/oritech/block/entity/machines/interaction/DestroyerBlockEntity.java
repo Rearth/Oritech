@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CropBlock;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -21,8 +22,37 @@ import java.util.List;
 import java.util.Objects;
 
 public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
+    
+    public boolean hasCropFilterAddon;
+    
     public DestroyerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.DESTROYER_BLOCK_ENTITY, pos, state);
+    }
+    
+    @Override
+    public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
+        if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON)) {
+            hasCropFilterAddon = true;
+        }
+        super.getAdditionalStatFromAddon(addonBlock);
+    }
+    
+    @Override
+    public void resetAddons() {
+        super.resetAddons();
+        hasCropFilterAddon = false;
+    }
+    
+    @Override
+    public void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        nbt.putBoolean("cropAddon", hasCropFilterAddon);
+    }
+    
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+        hasCropFilterAddon = nbt.getBoolean("cropAddon");
     }
     
     @Override
@@ -32,7 +62,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
         
         // skip not grown crops
-        if (targetState.getBlock() instanceof CropBlock cropBlock && !cropBlock.isMature(targetState)) {
+        if (hasCropFilterAddon && targetState.getBlock() instanceof CropBlock cropBlock && !cropBlock.isMature(targetState)) {
             return false;
         }
         
@@ -49,7 +79,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         if (targetHardness < 0) return;    // skip undestroyable blocks, such as bedrock
         
         // skip not grown crops
-        if (targetState.getBlock() instanceof CropBlock cropBlock && !cropBlock.isMature(targetState)) {
+        if (hasCropFilterAddon && targetState.getBlock() instanceof CropBlock cropBlock && !cropBlock.isMature(targetState)) {
             return;
         }
         
@@ -102,7 +132,10 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, -1,0)
+          new Vec3i(0, 0,-2),
+          new Vec3i(-1, 0,-1),
+          new Vec3i(0, 0,2),
+          new Vec3i(-1, 0,1)
         );
     }
     
@@ -134,7 +167,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 1,0)
+          new Vec3i(0, 0,-1),
+          new Vec3i(0, 0,1)
         );
     }
     
