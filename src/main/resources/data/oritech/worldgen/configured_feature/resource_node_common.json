@@ -1,0 +1,26 @@
+{
+  "type": "oritech:resource_node",
+  "config": {
+    "nodeSize": 5,
+    "boulderRadius": 3,
+    "nodeOres": [
+      "minecraft:deepslate_iron_ore",
+      "minecraft:deepslate_iron_ore",
+      "minecraft:deepslate_iron_ore",
+      "minecraft:deepslate_copper_ore",
+      "minecraft:deepslate_copper_ore",
+      "minecraft:deepslate_coal_ore",
+      "minecraft:deepslate_gold_ore",
+      "minecraft:deepslate"
+    ],
+    "boulderOres": [
+      "minecraft:deepslate_iron_ore",
+      "minecraft:deepslate_copper_ore",
+      "minecraft:deepslate_iron_ore",
+      "minecraft:deepslate",
+      "minecraft:deepslate"
+    ],
+    "overlayBlock": "oritech:oil_fluid_block",
+    "overlayHeight": 3
+  }
+}

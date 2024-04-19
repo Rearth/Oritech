@@ -1,0 +1,25 @@
+{
+  "type": "oritech:resource_node",
+  "config": {
+    "nodeSize": 5,
+    "boulderRadius": 3,
+    "nodeOres": [
+      "minecraft:deepslate_diamond_ore",
+      "minecraft:deepslate_diamond_ore",
+      "minecraft:deepslate_gold_ore",
+      "minecraft:deepslate_gold_ore",
+      "minecraft:deepslate_emerald_ore",
+      "minecraft:deepslate",
+      "minecraft:deepslate"
+    ],
+    "boulderOres": [
+      "minecraft:deepslate_diamond_ore",
+      "minecraft:deepslate_gold_ore",
+      "minecraft:deepslate_emerald_ore",
+      "minecraft:deepslate",
+      "minecraft:deepslate"
+    ],
+    "overlayBlock": "oritech:oil_fluid_block",
+    "overlayHeight": 3
+  }
+}

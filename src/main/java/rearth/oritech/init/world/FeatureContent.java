@@ -10,13 +10,19 @@ import net.minecraft.registry.tag.BiomeTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.GenerationStep;
 import rearth.oritech.Oritech;
+import rearth.oritech.init.world.features.oil.OilSpringFeature;
+import rearth.oritech.init.world.features.oil.OilSpringFeatureConfig;
+import rearth.oritech.init.world.features.resourcenode.ResourceNodeFeature;
+import rearth.oritech.init.world.features.resourcenode.ResourceNodeFeatureConfig;
 
 public class FeatureContent {
     
     public static final OilSpringFeature OIL_SPRING_FEATURE = new OilSpringFeature(OilSpringFeatureConfig.OIL_FEATURE_ENDEC.codec());
+    public static final ResourceNodeFeature RESOURCE_NODE_FEATURE = new ResourceNodeFeature(ResourceNodeFeatureConfig.NODE_FEATURE_ENDEC.codec());
     
     public static void initialize() {
         Registry.register(Registries.FEATURE, new Identifier(Oritech.MOD_ID, "oil_spring"), OIL_SPRING_FEATURE);
+        Registry.register(Registries.FEATURE, new Identifier(Oritech.MOD_ID, "resource_node"), RESOURCE_NODE_FEATURE);
         
         BiomeModifications.addFeature(
           BiomeSelectors.foundInOverworld(),
@@ -27,6 +33,20 @@ public class FeatureContent {
           BiomeSelectors.tag(BiomeTags.VILLAGE_DESERT_HAS_STRUCTURE),
           GenerationStep.Feature.LAKES,
           RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "oil_spring_desert")));
+        
+        BiomeModifications.addFeature(
+          BiomeSelectors.foundInOverworld(),
+          GenerationStep.Feature.TOP_LAYER_MODIFICATION,
+          RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "resource_node_common")));
+        
+        BiomeModifications.addFeature(
+          BiomeSelectors.foundInOverworld(),
+          GenerationStep.Feature.TOP_LAYER_MODIFICATION,
+          RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "resource_node_rare")));
+        BiomeModifications.addFeature(
+          BiomeSelectors.foundInOverworld(),
+          GenerationStep.Feature.TOP_LAYER_MODIFICATION,
+          RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "resource_node_other")));
     }
     
 }

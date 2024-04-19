@@ -1,4 +1,4 @@
-package rearth.oritech.init.world;
+package rearth.oritech.init.world.features.oil;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.block.Blocks;
@@ -26,7 +26,7 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
         for (int y = 0; y < world.getHeight(); y++) {
             testPos = testPos.up();
             
-            if (world.getBlockState(testPos).isIn(BlockTags.DIRT)) {
+            if (world.getBlockState(testPos).isIn(BlockTags.DIRT) || world.getBlockState(testPos).isIn(BlockTags.SAND)) {
                 if (world.getBlockState(testPos.up()).isOf(Blocks.AIR)) {
                     placeStructure(testPos, context);
                     return true;
@@ -39,8 +39,6 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
     }
     
     private void placeStructure(BlockPos surfacePos, FeatureContext<OilSpringFeatureConfig> context) {
-        
-        System.out.println("placing at" + surfacePos);
         
         var random = context.getRandom();
         var config = context.getConfig();

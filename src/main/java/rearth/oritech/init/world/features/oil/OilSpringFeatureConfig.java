@@ -1,4 +1,4 @@
-package rearth.oritech.init.world;
+package rearth.oritech.init.world.features.oil;
 
 import io.wispforest.owo.serialization.Endec;
 import io.wispforest.owo.serialization.endec.BuiltInEndecs;
