@@ -93,7 +93,7 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block POWERED_FURNACE_BLOCK = new PoweredFurnaceBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.5f)
     public static final Block LASER_ARM_BLOCK = new LaserArmBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
-    @UseGeoBlockItem(scale = 0.3f)
+    @UseGeoBlockItem(scale = 0.25f)
     public static final Block DEEP_DRILL_BLOCK = new DeepDrillBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block SMALL_STORAGE_BLOCK = new SmallStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());

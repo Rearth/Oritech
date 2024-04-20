@@ -30,6 +30,7 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
         
         if (laserEntity.getCurrentTarget() == null) return;
         var target = Vec3d.of(laserEntity.getCurrentTarget());
+        if (laserEntity.isTargetingDeepdrill()) target = target.add(0, 1, 1);
         var ownPos = Vec3d.of(laserEntity.getPos());
         var offset = target.subtract(ownPos.add(0, 1.55 - 0.5, 0)); // add 1.55 to get to height of pivotX, minus block center offset
         

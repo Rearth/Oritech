@@ -125,6 +125,7 @@ In detail, these are the following items that are from the above-mentioned sourc
   * Energy Acceptor Model
   * Machine Extender Texture
   * Exosuit Model
+  * Deep Drill Model
 * From [malcolmriley's unused-textures repo](https://github.com/malcolmriley/unused-textures)
   * Oil fluid textures (the dark gas texture)
 

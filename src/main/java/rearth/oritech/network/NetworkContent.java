@@ -13,6 +13,7 @@ import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
+import rearth.oritech.block.entity.machines.interaction.DeepDrillEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.PumpBlockEntity;
 import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
@@ -61,6 +62,8 @@ public class NetworkContent {
     }   // this goes both ways
     
     public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt) {
+    }
+    public record DeepDrillSyncPacket(BlockPos position, long lastWorkTime) {
     }
     
     public record SingleVariantFluidSyncPacket(BlockPos position, String fluidType, long amount) {
@@ -121,6 +124,16 @@ public class NetworkContent {
             if (entity instanceof LaserArmBlockEntity laserArmBlock) {
                 laserArmBlock.setCurrentTarget(message.target);
                 laserArmBlock.setLastFiredAt(message.lastFiredAt);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(DeepDrillSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof DeepDrillEntity drillBlock) {
+                drillBlock.setLastWorkTime(message.lastWorkTime);
             }
             
         }));

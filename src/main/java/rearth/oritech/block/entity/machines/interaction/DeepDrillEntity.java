@@ -19,10 +19,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.DynamicEnergyStorage;
 import rearth.oritech.util.EnergyProvider;
 import rearth.oritech.util.InventoryProvider;
@@ -37,12 +37,17 @@ import team.reborn.energy.api.EnergyStorage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
+import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
+
 public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<DeepDrillEntity>, EnergyProvider, GeoBlockEntity, InventoryProvider, MultiblockMachineController {
     
     // work data
     private boolean initialized;
     private Block targetedOre;
     private int progress;
+    private long lastWorkTime;
+    private boolean networkDirty;
     
     // config
     private int worktime = 20;
@@ -80,7 +85,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     
     public boolean init() {
         
-        var startAt = pos.north().down();
+        var startAt = pos.south().down();
         var checkState = world.getBlockState(startAt);
         if (!checkState.isIn(BlockTags.DIAMOND_ORES)) return false;
         
@@ -93,13 +98,16 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     @Override
     public void tick(World world, BlockPos pos, BlockState state, DeepDrillEntity blockEntity) {
         if (world.isClient() || !initialized) return;
-        if (!inventory.isEmpty() && inventory.heldStacks.get(0).getCount() >= inventory.heldStacks.get(0).getMaxCount()) return;    // inv full
+        if (!inventory.isEmpty() && inventory.heldStacks.get(0).getCount() >= inventory.heldStacks.get(0).getMaxCount())
+            return;    // inv full
         
         if (energyStorage.amount >= energyPerStep) {
             progress++;
             energyStorage.amount -= energyPerStep;
+            lastWorkTime = world.getTime();
+            networkDirty = true;
             
-            var particlePos = pos.north().toCenterPos().subtract(0, 0.4f, 0);
+            var particlePos = pos.toCenterPos().subtract(0, 0.4f, 0);
             ParticleContent.FURNACE_BURNING.spawn(world, particlePos, 1);
         }
         
@@ -117,6 +125,15 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
             this.markDirty();
         }
         
+        updateNetwork();
+        
+    }
+    
+    private void updateNetwork() {
+        if (networkDirty && world.getTime() % 5 == 0) {
+            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.DeepDrillSyncPacket(pos, lastWorkTime));
+            networkDirty = false;
+        }
     }
     
     private void craftResult(World world, BlockPos pos) {
@@ -172,20 +189,38 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(1, 0, 1),
-          new Vec3i(1, 0, 0),
-          new Vec3i(1, 0, -1),
           new Vec3i(0, 0, 1),
           new Vec3i(0, 0, -1),
           new Vec3i(-1, 0, 1),
           new Vec3i(-1, 0, 0),
-          new Vec3i(-1, 0, -1)
+          new Vec3i(-1, 0, -1),
+          new Vec3i(-2, 0, 1),
+          new Vec3i(-2, 0, 0),
+          new Vec3i(-2, 0, -1),
+          new Vec3i(0, 1, 1),
+          new Vec3i(0, 1, 0),
+          new Vec3i(0, 1, -1),
+          new Vec3i(-1, 1, 1),
+          new Vec3i(-1, 1, 0),
+          new Vec3i(-1, 1, -1),
+          new Vec3i(-2, 1, 1),
+          new Vec3i(-2, 1, 0),
+          new Vec3i(-2, 1, -1),
+          new Vec3i(0, 2, 1),
+          new Vec3i(0, 2, 0),
+          new Vec3i(0, 2, -1),
+          new Vec3i(-1, 2, 1),
+          new Vec3i(-1, 2, 0),
+          new Vec3i(-1, 2, -1),
+          new Vec3i(-2, 2, 1),
+          new Vec3i(-2, 2, 0),
+          new Vec3i(-2, 2, -1)
         );
     }
     
     @Override
     public Direction getFacingForMultiblock() {
-        return Direction.NORTH;
+        return Direction.SOUTH;
     }
     
     @Override
@@ -225,7 +260,8 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     
     @Override
     public void playSetupAnimation() {
-    
+        animationController.setAnimation(SETUP);
+        animationController.forceAnimationReset();
     }
     
     @Override
@@ -240,7 +276,35 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     
     private AnimationController<DeepDrillEntity> getAnimationController() {
         return new AnimationController<>(this, state -> {
-            return state.setAndContinue(MachineBlockEntity.IDLE);
+            
+            if (state.isCurrentAnimation(SETUP)) {
+                if (state.getController().hasAnimationFinished()) {
+                    state.setAndContinue(IDLE);
+                } else {
+                    return state.setAndContinue(SETUP);
+                }
+            }
+            
+            if (isActive(getCachedState())) {
+                
+                var idleTime = world.getTime() - lastWorkTime;
+                
+                if (idleTime < 60) {
+                    return state.setAndContinue(WORKING);
+                } else {
+                    return state.setAndContinue(IDLE);
+                }
+            } else {
+                return state.setAndContinue(PACKAGED);
+            }
         });
+    }
+    
+    public void setLastWorkTime(long lastWorkTime) {
+        this.lastWorkTime = lastWorkTime;
+    }
+    
+    private boolean isActive(BlockState state) {
+        return state.get(ASSEMBLED);
     }
 }
