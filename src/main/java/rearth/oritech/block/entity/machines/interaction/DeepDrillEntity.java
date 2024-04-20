@@ -1,0 +1,246 @@
+package rearth.oritech.block.entity.machines.interaction;
+
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
+import rearth.oritech.Oritech;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.util.DynamicEnergyStorage;
+import rearth.oritech.util.EnergyProvider;
+import rearth.oritech.util.InventoryProvider;
+import rearth.oritech.util.MultiblockMachineController;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.util.GeckoLibUtil;
+import team.reborn.energy.api.EnergyStorage;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<DeepDrillEntity>, EnergyProvider, GeoBlockEntity, InventoryProvider, MultiblockMachineController {
+    
+    // work data
+    private boolean initialized;
+    private Block targetedOre;
+    private int progress;
+    
+    // config
+    private int worktime = 20;
+    private int energyPerStep = 1000;
+    
+    // storage
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(10000, 0, 0) {
+        @Override
+        public void onFinalCommit() {
+            super.onFinalCommit();
+            DeepDrillEntity.this.markDirty();
+        }
+    };
+    
+    protected final SimpleInventory inventory = new SimpleInventory(1) {
+        @Override
+        public void markDirty() {
+            DeepDrillEntity.this.markDirty();
+        }
+    };
+    
+    protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
+    
+    // multiblock
+    private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
+    private float coreQuality = 1f;
+    
+    // animation
+    protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
+    private final AnimationController<DeepDrillEntity> animationController = getAnimationController();
+    
+    public DeepDrillEntity(BlockPos pos, BlockState state) {
+        super(BlockEntitiesContent.DEEP_DRILL_ENTITY, pos, state);
+    }
+    
+    public boolean init() {
+        
+        var startAt = pos.north().down();
+        var checkState = world.getBlockState(startAt);
+        if (!checkState.isIn(BlockTags.DIAMOND_ORES)) return false;
+        
+        initialized = true;
+        targetedOre = checkState.getBlock();
+        
+        return true;
+    }
+    
+    @Override
+    public void tick(World world, BlockPos pos, BlockState state, DeepDrillEntity blockEntity) {
+        if (world.isClient() || !initialized) return;
+        if (!inventory.isEmpty() && inventory.heldStacks.get(0).getCount() >= inventory.heldStacks.get(0).getMaxCount()) return;    // inv full
+        
+        if (energyStorage.amount >= energyPerStep) {
+            progress++;
+            energyStorage.amount -= energyPerStep;
+            
+            var particlePos = pos.north().toCenterPos().subtract(0, 0.4f, 0);
+            ParticleContent.FURNACE_BURNING.spawn(world, particlePos, 1);
+        }
+        
+        // try increasing faster if too much energy is provided
+        for (int i = 0; i < 5; i++) {
+            if (energyStorage.amount >= energyPerStep) {
+                progress++;
+                energyStorage.amount -= energyPerStep;
+            }
+        }
+        
+        if (progress >= worktime) {
+            craftResult(world, pos);
+            progress -= worktime;
+            this.markDirty();
+        }
+        
+    }
+    
+    private void craftResult(World world, BlockPos pos) {
+        var nodeOreBlockItem = targetedOre.asItem();
+        var sampleInv = new SimpleInventory(new ItemStack(nodeOreBlockItem, 1));
+        
+        var recipeCandidate = world.getRecipeManager().getFirstMatch(RecipeContent.DEEP_DRILL, sampleInv, world);
+        if (recipeCandidate.isEmpty()) {
+            Oritech.LOGGER.warn("Deep drill works on ore node without a matching recipe! At " + pos + " for ore " + nodeOreBlockItem);
+            return;
+        }
+        
+        var output = recipeCandidate.get().value().getResults().get(0);
+        if (!inventory.canInsert(output)) return;
+        try (var tx = Transaction.openOuter()) {
+            inventoryStorage.insert(ItemVariant.of(output), output.getCount(), tx);
+            tx.commit();
+        }
+    }
+    
+    @Override
+    public void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        Inventories.writeNbt(nbt, inventory.heldStacks, false);
+        addMultiblockToNbt(nbt);
+        nbt.putLong("energy_stored", energyStorage.amount);
+        nbt.putBoolean("initialized", initialized);
+        if (initialized)
+            nbt.putString("nodeType", Registries.BLOCK.getId(targetedOre).toString());
+    }
+    
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+        Inventories.readNbt(nbt, inventory.heldStacks);
+        loadMultiblockNbtData(nbt);
+        energyStorage.amount = nbt.getLong("energy_stored");
+        initialized = nbt.getBoolean("initialized");
+        if (initialized)
+            targetedOre = Registries.BLOCK.get(new Identifier(nbt.getString("nodeType")));
+    }
+    
+    @Override
+    public EnergyStorage getStorage(Direction direction) {
+        return energyStorage;
+    }
+    
+    @Override
+    public InventoryStorage getInventory(Direction direction) {
+        return inventoryStorage;
+    }
+    
+    @Override
+    public List<Vec3i> getCorePositions() {
+        return List.of(
+          new Vec3i(1, 0, 1),
+          new Vec3i(1, 0, 0),
+          new Vec3i(1, 0, -1),
+          new Vec3i(0, 0, 1),
+          new Vec3i(0, 0, -1),
+          new Vec3i(-1, 0, 1),
+          new Vec3i(-1, 0, 0),
+          new Vec3i(-1, 0, -1)
+        );
+    }
+    
+    @Override
+    public Direction getFacingForMultiblock() {
+        return Direction.NORTH;
+    }
+    
+    @Override
+    public BlockPos getMachinePos() {
+        return pos;
+    }
+    
+    @Override
+    public World getMachineWorld() {
+        return world;
+    }
+    
+    @Override
+    public ArrayList<BlockPos> getConnectedCores() {
+        return coreBlocksConnected;
+    }
+    
+    @Override
+    public void setCoreQuality(float quality) {
+        this.coreQuality = quality;
+    }
+    
+    @Override
+    public float getCoreQuality() {
+        return coreQuality;
+    }
+    
+    @Override
+    public InventoryProvider getInventoryForLink() {
+        return this;
+    }
+    
+    @Override
+    public EnergyStorage getEnergyStorageForLink() {
+        return energyStorage;
+    }
+    
+    @Override
+    public void playSetupAnimation() {
+    
+    }
+    
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(animationController);
+    }
+    
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animatableInstanceCache;
+    }
+    
+    private AnimationController<DeepDrillEntity> getAnimationController() {
+        return new AnimationController<>(this, state -> {
+            return state.setAndContinue(MachineBlockEntity.IDLE);
+        });
+    }
+}

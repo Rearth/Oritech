@@ -87,7 +87,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     public Vec3d lastRenderPosition;
     
     public LaserArmBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.LASER_ARM_BLOCK, pos, state);
+        super(BlockEntitiesContent.LASER_ARM_ENTITY, pos, state);
     }
     
     @Override
@@ -101,6 +101,8 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         
         if (targetBlockEntity instanceof AtomicForgeBlockEntity atomicForgeEntity) {
             storageCandidate = atomicForgeEntity.getEnergyStorage();
+        } else if (targetBlockEntity instanceof DeepDrillEntity deepDrillEntity) {
+            storageCandidate = deepDrillEntity.getEnergyStorageForLink();
         }
         
         var fired = false;
@@ -478,9 +480,13 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         return world.getBlockState(currentTarget).getBlock().equals(BlockContent.ATOMIC_FORGE_BLOCK);
     }
     
+    public boolean isTargetingDeepdrill() {
+        return world.getBlockState(currentTarget).getBlock().equals(BlockContent.DEEP_DRILL_BLOCK);
+    }
+    
     public boolean isTargetingEnergyContainer() {
         var storageCandidate = EnergyStorage.SIDED.find(world, currentTarget, null);
-        return storageCandidate != null || isTargetingAtomicForge();
+        return storageCandidate != null || isTargetingAtomicForge() || isTargetingDeepdrill();
     }
     
 }

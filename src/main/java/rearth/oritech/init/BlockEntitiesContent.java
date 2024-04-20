@@ -82,7 +82,10 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedInventory
     @AssignSidedEnergy
-    public static final BlockEntityType<LaserArmBlockEntity> LASER_ARM_BLOCK = FabricBlockEntityTypeBuilder.create(LaserArmBlockEntity::new, BlockContent.LASER_ARM_BLOCK).build();
+    public static final BlockEntityType<LaserArmBlockEntity> LASER_ARM_ENTITY = FabricBlockEntityTypeBuilder.create(LaserArmBlockEntity::new, BlockContent.LASER_ARM_BLOCK).build();
+    
+    @AssignSidedInventory
+    public static final BlockEntityType<DeepDrillEntity> DEEP_DRILL_ENTITY = FabricBlockEntityTypeBuilder.create(DeepDrillEntity::new, BlockContent.DEEP_DRILL_BLOCK).build();
     
     @AssignSidedFluid
     @AssignSidedEnergy

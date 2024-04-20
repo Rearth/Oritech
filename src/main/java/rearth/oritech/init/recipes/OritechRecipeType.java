@@ -18,7 +18,7 @@ public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> impl
     public static final Endec<FluidStack> FLUID_STACK_ENDEC = NbtEndec.COMPOUND.xmap(FluidStack::fromNbt, stack -> stack.toNbt(new NbtCompound()));
     
     public static final Endec<OritechRecipe> ORI_RECIPE_ENDEC = StructEndecBuilder.of(
-      Endec.INT.fieldOf("time", OritechRecipe::getTime),
+      Endec.INT.optionalFieldOf("time", OritechRecipe::getTime, 60),
       Endec.ofCodec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
       BuiltInEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
       BuiltInEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
