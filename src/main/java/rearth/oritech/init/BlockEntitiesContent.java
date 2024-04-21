@@ -87,6 +87,10 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedInventory
     public static final BlockEntityType<DeepDrillEntity> DEEP_DRILL_ENTITY = FabricBlockEntityTypeBuilder.create(DeepDrillEntity::new, BlockContent.DEEP_DRILL_BLOCK).build();
     
+    @AssignSidedInventory
+    @AssignSidedEnergy
+    public static final BlockEntityType<DronePortEntity> DRONE_PORT_ENTITY = FabricBlockEntityTypeBuilder.create(DronePortEntity::new, BlockContent.DRONE_PORT_BLOCK).build();
+    
     @AssignSidedFluid
     @AssignSidedEnergy
     public static final BlockEntityType<PumpBlockEntity> PUMP_BLOCK = FabricBlockEntityTypeBuilder.create(PumpBlockEntity::new, BlockContent.PUMP_BLOCK).build();

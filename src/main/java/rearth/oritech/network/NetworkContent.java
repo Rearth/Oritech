@@ -14,6 +14,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.DeepDrillEntity;
+import rearth.oritech.block.entity.machines.interaction.DronePortEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.PumpBlockEntity;
 import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
@@ -67,6 +68,10 @@ public class NetworkContent {
     }
     
     public record SingleVariantFluidSyncPacket(BlockPos position, String fluidType, long amount) {
+    }
+    
+    public record DroneSendEventPacket(BlockPos position, boolean sendEvent, boolean receiveEvent) {
+    
     }
     
     public record PumpWorkSyncPacket(BlockPos position, String fluidType, long workedAt) {
@@ -146,6 +151,17 @@ public class NetworkContent {
                 var storage = addonController.getStorageForAddon();
                 storage.capacity = message.maxEnergy;
                 storage.amount = message.currentEnergy;
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(DroneSendEventPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof DronePortEntity dronePort) {
+                if (message.sendEvent) dronePort.playSendAnimation();
+                if (message.receiveEvent) dronePort.playReceiveAnimation();
             }
             
         }));

@@ -10,6 +10,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.entity.machines.interaction.DronePortEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.init.BlockContent;
 
@@ -37,6 +38,20 @@ public class LaserTargetDesignator extends Item {
             var success = laserEntity.setTargetFromDesignator(target);
             if (success)
                 context.getPlayer().sendMessage(Text.literal("Position saved to machine"));
+            return success ? ActionResult.SUCCESS : ActionResult.FAIL;
+        }
+        
+        if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT_BLOCK)
+              && context.getWorld().getBlockEntity(context.getBlockPos()) instanceof DronePortEntity dronePortEntity
+              && context.getStack().hasNbt()) {
+            var target = BlockPos.fromLong(context.getStack().getNbt().getLong("target"));
+            
+            var success = dronePortEntity.setTargetFromDesignator(target);
+            if (success) {
+                context.getPlayer().sendMessage(Text.literal("Position saved to machine"));
+            } else {
+                context.getPlayer().sendMessage(Text.literal("Invalid position for drone port, target port must be at least 50 blocks away"));
+            }
             return success ? ActionResult.SUCCESS : ActionResult.FAIL;
         }
         
