@@ -177,8 +177,11 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
         var arriveTime = world.getTime() + takeOffTime + landTime;
         var data = new DroneTransferData(inventory.heldStacks.stream().filter(stack -> !stack.isEmpty()).toList(), arriveTime);
         targetPort.setIncomingPacket(data);
+        
         inventory.clear();
         lastSentAt = world.getTime();
+        energyStorage.amount -= calculateEnergyUsage();
+        
         triggerNetworkSendAnimation();
         targetPort.markDirty();
         this.markDirty();
@@ -215,7 +218,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     
     private long calculateEnergyUsage() {
         var distance = pos.getManhattanDistance(targetPosition);
-        return (long) Math.sqrt(distance) + baseEnergyUsage;
+        return (long) Math.sqrt(distance) * 50 + baseEnergyUsage;
     }
     
     private void triggerNetworkSendAnimation() {
