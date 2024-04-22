@@ -1,15 +1,12 @@
 package rearth.oritech.block.blocks.pipes;
 
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -18,16 +15,9 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 
 public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implements BlockEntityProvider {
-    public static final BooleanProperty INTERFACE_NORTH = BooleanProperty.of("con_north");
-    public static final BooleanProperty INTERFACE_EAST = BooleanProperty.of("con_east");
-    public static final BooleanProperty INTERFACE_SOUTH = BooleanProperty.of("con_south");
-    public static final BooleanProperty INTERFACE_WEST = BooleanProperty.of("con_west");
-    public static final BooleanProperty INTERFACE_UP = BooleanProperty.of("con_up");
-    public static final BooleanProperty INTERFACE_DOWN = BooleanProperty.of("con_down");
     
     public GenericPipeConnectionBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(getDefaultState().with(INTERFACE_NORTH, false).with(INTERFACE_EAST, false).with(INTERFACE_SOUTH, false).with(INTERFACE_WEST, false).with(INTERFACE_UP, false).with(INTERFACE_DOWN, false));
     }
     
     public static BlockState addInterfaceState(BlockState state, World world, BlockPos pos) {
@@ -35,30 +25,24 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
         var baseState = GenericPipeBlock.addConnectionState(state, world, pos);
         var lookup = ((GenericPipeBlock) state.getBlock()).getSidesLookup();
         
-        var northConnected = checkConnection(pos.north(), world, Direction.SOUTH, lookup);
-        var eastConnected = checkConnection(pos.east(), world, Direction.WEST, lookup);
-        var southConnected = checkConnection(pos.south(), world, Direction.NORTH, lookup);
-        var westConnected = checkConnection(pos.west(), world, Direction.WEST, lookup);
-        var upConnected = checkConnection(pos.up(), world, Direction.DOWN, lookup);
-        var downConnected = checkConnection(pos.down(), world, Direction.UP, lookup);
+        var northConnected = checkConnection(pos.north(), world, Direction.SOUTH, lookup) ? 2 : baseState.get(NORTH);
+        var eastConnected = checkConnection(pos.east(), world, Direction.WEST, lookup) ? 2 : baseState.get(EAST);
+        var southConnected = checkConnection(pos.south(), world, Direction.NORTH, lookup) ? 2 : baseState.get(SOUTH);
+        var westConnected = checkConnection(pos.west(), world, Direction.EAST, lookup) ? 2 : baseState.get(WEST);
+        var upConnected = checkConnection(pos.up(), world, Direction.DOWN, lookup) ? 2 : baseState.get(UP);
+        var downConnected = checkConnection(pos.down(), world, Direction.UP, lookup) ? 2 : baseState.get(DOWN);
         
         return baseState
-                 .with(INTERFACE_NORTH, northConnected)
-                 .with(INTERFACE_EAST, eastConnected)
-                 .with(INTERFACE_SOUTH, southConnected)
-                 .with(INTERFACE_WEST, westConnected)
-                 .with(INTERFACE_UP, upConnected)
-                 .with(INTERFACE_DOWN, downConnected);
+                 .with(NORTH, northConnected)
+                 .with(EAST, eastConnected)
+                 .with(SOUTH, southConnected)
+                 .with(WEST, westConnected)
+                 .with(UP, upConnected)
+                 .with(DOWN, downConnected);
     }
     
     private static boolean checkConnection(BlockPos pos, World world, Direction direction, BlockApiLookup<?, Direction> lookup) {
         return lookup.find(world, pos, direction) != null && !(world.getBlockState(pos).getBlock() instanceof GenericPipeBlock);
-    }
-    
-    @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
-        builder.add(INTERFACE_NORTH, INTERFACE_EAST, INTERFACE_SOUTH, INTERFACE_WEST, INTERFACE_UP, INTERFACE_DOWN);
     }
     
     @Override
@@ -82,12 +66,12 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
         var baseState = super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
         var interfaceState = addInterfaceState(baseState, (World) world, pos);
         
-        if (!interfaceState.get(INTERFACE_NORTH)
-              && !interfaceState.get(INTERFACE_SOUTH)
-              && !interfaceState.get(INTERFACE_WEST)
-              && !interfaceState.get(INTERFACE_EAST)
-              && !interfaceState.get(INTERFACE_UP)
-              && !interfaceState.get(INTERFACE_DOWN)) {
+        if (interfaceState.get(NORTH) != 2
+              && interfaceState.get(SOUTH) != 2
+              && interfaceState.get(WEST) != 2
+              && interfaceState.get(EAST) != 2
+              && interfaceState.get(UP) != 2
+              && interfaceState.get(DOWN) != 2) {
             var normalPipeState = getNormalBlock();
             normalPipeState = GenericPipeBlock.addConnectionState(normalPipeState, (World) world, pos);
             return normalPipeState;

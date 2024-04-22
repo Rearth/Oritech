@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.pipes;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ConnectingBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -18,6 +17,8 @@ import rearth.oritech.block.blocks.pipes.GenericPipeConnectionBlock;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static rearth.oritech.block.blocks.pipes.GenericPipeBlock.*;
+
 public abstract class GenericPipeInterfaceEntity extends BlockEntity implements BlockEntityTicker<GenericPipeInterfaceEntity> {
     
     public static final int MAX_SEARCH_COUNT = 256;
@@ -32,17 +33,17 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         data.pipes.add(pos);
         if (isInterface) {
             var connectedMachines = new HashSet<BlockPos>(6);
-            if (newState.get(GenericPipeConnectionBlock.INTERFACE_NORTH))
+            if (newState.get(NORTH) == 2)
                 connectedMachines.add(pos.north());
-            if (newState.get(GenericPipeConnectionBlock.INTERFACE_SOUTH))
+            if (newState.get(SOUTH) == 2)
                 connectedMachines.add(pos.south());
-            if (newState.get(GenericPipeConnectionBlock.INTERFACE_EAST))
+            if (newState.get(EAST) == 2)
                 connectedMachines.add(pos.east());
-            if (newState.get(GenericPipeConnectionBlock.INTERFACE_WEST))
+            if (newState.get(GenericPipeConnectionBlock.WEST) == 2)
                 connectedMachines.add(pos.west());
-            if (newState.get(GenericPipeConnectionBlock.INTERFACE_UP))
+            if (newState.get(GenericPipeConnectionBlock.UP) == 2)
                 connectedMachines.add(pos.up());
-            if (newState.get(GenericPipeConnectionBlock.INTERFACE_DOWN))
+            if (newState.get(GenericPipeConnectionBlock.DOWN) == 2)
                 connectedMachines.add(pos.down());
             
             data.machineInterfaces.put(pos, connectedMachines);
@@ -66,17 +67,18 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         
         // re-calculate old network, is either shorter or split into multiple ones (starting from ones this block was connected to)
         if (oldNetwork != -1) {
-            if (oldState.get(ConnectingBlock.NORTH))
+            if (oldState.get(NORTH) != 0)
                 updateFromNode(pos.north(), data);
-            if (oldState.get(ConnectingBlock.SOUTH))
+            if (oldState.get(SOUTH) != 0)
                 updateFromNode(pos.south(), data);
-            if (oldState.get(ConnectingBlock.EAST))
+            if (oldState.get(EAST) != 0)
                 updateFromNode(pos.east(), data);
-            if (oldState.get(ConnectingBlock.WEST))
+            if (oldState.get(WEST) != 0) {
                 updateFromNode(pos.west(), data);
-            if (oldState.get(ConnectingBlock.UP))
+            }
+            if (oldState.get(UP) != 0)
                 updateFromNode(pos.up(), data);
-            if (oldState.get(ConnectingBlock.DOWN))
+            if (oldState.get(DOWN) != 0)
                 updateFromNode(pos.down(), data);
         }
         

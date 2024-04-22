@@ -10,7 +10,7 @@
     },
     {
       "when": {
-        "north": "true",
+        "north": "1|2",
         "straight": "false"
       },
       "apply": {
@@ -19,7 +19,7 @@
     },
     {
       "when": {
-        "south": "true",
+        "south": "1|2",
         "straight": "false"
       },
       "apply": {
@@ -29,7 +29,7 @@
     },
     {
       "when": {
-        "east": "true",
+        "east": "1|2",
         "straight": "false"
       },
       "apply": {
@@ -39,7 +39,7 @@
     },
     {
       "when": {
-        "west": "true",
+        "west": "1|2",
         "straight": "false"
       },
       "apply": {
@@ -49,7 +49,7 @@
     },
     {
       "when": {
-        "up": "true",
+        "up": "1|2",
         "straight": "false"
       },
       "apply": {
@@ -59,7 +59,7 @@
     },
     {
       "when": {
-        "down": "true",
+        "down": "1|2",
         "straight": "false"
       },
       "apply": {
@@ -69,7 +69,7 @@
     },
     {
       "when": {
-        "down": "true",
+        "down": "1|2",
         "straight": "true"
       },
       "apply": {
@@ -79,7 +79,7 @@
     },
     {
       "when": {
-        "east": "true",
+        "east": "1|2",
         "straight": "true"
       },
       "apply": {
@@ -89,7 +89,7 @@
     },
     {
       "when": {
-        "north": "true",
+        "north": "1|2",
         "straight": "true"
       },
       "apply": {
@@ -98,7 +98,7 @@
     },
     {
       "when": {
-        "con_north": "true",
+        "north": "2",
         "extract": true
       },
       "apply": {
@@ -107,7 +107,7 @@
     },
     {
       "when": {
-        "con_south": "true",
+        "south": "2",
         "extract": true
       },
       "apply": {
@@ -117,7 +117,7 @@
     },
     {
       "when": {
-        "con_east": "true",
+        "east": "2",
         "extract": true
       },
       "apply": {
@@ -127,7 +127,7 @@
     },
     {
       "when": {
-        "con_west": "true",
+        "west": "2",
         "extract": true
       },
       "apply": {
@@ -137,7 +137,7 @@
     },
     {
       "when": {
-        "con_up": "true",
+        "up": "2",
         "extract": true
       },
       "apply": {
@@ -147,7 +147,7 @@
     },
     {
       "when": {
-        "con_down": "true",
+        "down": "2",
         "extract": true
       },
       "apply": {

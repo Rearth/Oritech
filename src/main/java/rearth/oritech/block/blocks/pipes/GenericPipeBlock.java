@@ -5,6 +5,7 @@ import net.minecraft.block.*;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -17,29 +18,31 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 
 public abstract class GenericPipeBlock extends Block {
     
-    public static final BooleanProperty NORTH = ConnectingBlock.NORTH;
-    public static final BooleanProperty EAST = ConnectingBlock.EAST;
-    public static final BooleanProperty SOUTH = ConnectingBlock.SOUTH;
-    public static final BooleanProperty WEST = ConnectingBlock.WEST;
-    public static final BooleanProperty UP = ConnectingBlock.UP;
-    public static final BooleanProperty DOWN = ConnectingBlock.DOWN;
+    // 0 = no connection, 1 = pipe connection, 2 = pipe and machine connection
+    public static final IntProperty NORTH = IntProperty.of("north", 0, 2);
+    public static final IntProperty EAST = IntProperty.of("east", 0, 2);
+    public static final IntProperty SOUTH = IntProperty.of("south", 0, 2);
+    public static final IntProperty WEST = IntProperty.of("west", 0, 2);
+    public static final IntProperty UP = IntProperty.of("up", 0, 2);
+    public static final IntProperty DOWN = IntProperty.of("down", 0, 2);
+    
     public static final BooleanProperty STRAIGHT = BooleanProperty.of("straight");
     private static final Boolean USE_ACCURATE_OUTLINES = true;
     protected final VoxelShape[] boundingShapes;
     
     public GenericPipeBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(getDefaultState().with(NORTH, false).with(EAST, false).with(SOUTH, false).with(WEST, false).with(UP, false).with(DOWN, false).with(STRAIGHT, false));
+        this.setDefaultState(getDefaultState().with(NORTH, 0).with(EAST, 0).with(SOUTH, 0).with(WEST, 0).with(UP, 0).with(DOWN, 0).with(STRAIGHT, false));
         boundingShapes = createShapes();
     }
     
     public static BlockState addStraightState(BlockState state) {
-        boolean north = state.get(NORTH);
-        boolean south = state.get(SOUTH);
-        boolean east = state.get(EAST);
-        boolean west = state.get(WEST);
-        boolean up = state.get(UP);
-        boolean down = state.get(DOWN);
+        var north = state.get(NORTH) != 0;
+        var south = state.get(SOUTH) != 0;
+        var east = state.get(EAST) != 0;
+        var west = state.get(WEST) != 0;
+        var up = state.get(UP) != 0;
+        var down = state.get(DOWN) != 0;
         
         // Check for straight connections along each axis
         boolean straightX = north && south && !east && !west && !up && !down;
@@ -55,12 +58,12 @@ public abstract class GenericPipeBlock extends Block {
     public static BlockState addConnectionState(BlockState state, World world, BlockPos pos) {
         
         var ownBlock = (GenericPipeBlock) state.getBlock();
-        var northConnected = checkConnection(pos.north(), world, Direction.SOUTH, ownBlock);
-        var eastConnected = checkConnection(pos.east(), world, Direction.WEST, ownBlock);
-        var southConnected = checkConnection(pos.south(), world, Direction.NORTH, ownBlock);
-        var westConnected = checkConnection(pos.west(), world, Direction.WEST, ownBlock);
-        var upConnected = checkConnection(pos.up(), world, Direction.DOWN, ownBlock);
-        var downConnected = checkConnection(pos.down(), world, Direction.UP, ownBlock);
+        var northConnected = checkConnection(pos.north(), world, Direction.SOUTH, ownBlock) ? 1 : 0;
+        var eastConnected = checkConnection(pos.east(), world, Direction.WEST, ownBlock) ? 1 : 0;
+        var southConnected = checkConnection(pos.south(), world, Direction.NORTH, ownBlock) ? 1 : 0;
+        var westConnected = checkConnection(pos.west(), world, Direction.WEST, ownBlock) ? 1 : 0;
+        var upConnected = checkConnection(pos.up(), world, Direction.DOWN, ownBlock) ? 1 : 0;
+        var downConnected = checkConnection(pos.down(), world, Direction.UP, ownBlock) ? 1 : 0;
         var connectedState = state.with(NORTH, northConnected).with(EAST, eastConnected).with(SOUTH, southConnected).with(WEST, westConnected).with(UP, upConnected).with(DOWN, downConnected);
         
         return addStraightState(connectedState);
@@ -99,17 +102,17 @@ public abstract class GenericPipeBlock extends Block {
     private VoxelShape getShape(BlockState state) {
         var shape = boundingShapes[0];
         
-        if (state.get(NORTH))
+        if (state.get(NORTH) != 0)
             shape = VoxelShapes.union(shape, boundingShapes[1]);
-        if (state.get(EAST))
+        if (state.get(EAST) != 0)
             shape = VoxelShapes.union(shape, boundingShapes[2]);
-        if (state.get(SOUTH))
+        if (state.get(SOUTH) != 0)
             shape = VoxelShapes.union(shape, boundingShapes[3]);
-        if (state.get(WEST))
+        if (state.get(WEST) != 0)
             shape = VoxelShapes.union(shape, boundingShapes[4]);
-        if (state.get(UP))
+        if (state.get(UP) != 0)
             shape = VoxelShapes.union(shape, boundingShapes[5]);
-        if (state.get(DOWN))
+        if (state.get(DOWN) != 0)
             shape = VoxelShapes.union(shape, boundingShapes[6]);
         
         return shape;
