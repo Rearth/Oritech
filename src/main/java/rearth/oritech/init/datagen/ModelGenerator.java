@@ -65,6 +65,12 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_GOOD);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_EXTENDER);
         
+        // metals
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.NICKEL_ORE);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.DEEPSLATE_NICKEL_ORE);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.ENDSTONE_PLATINUM_ORE);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.DEEPSLATE_PLATINUM_ORE);
+        
     }
 
     @Override
@@ -80,5 +86,26 @@ public class ModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(ToolsContent.EXO_LEGGINGS, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.EXO_BOOTS, Models.GENERATED);
         // itemModelGenerator.registerArmor((ArmorItem) ToolsContent.EXO_HELMET);   // this seems to generate it compatible with armor trims
+        
+        // nickel
+        itemModelGenerator.register(ItemContent.NICKEL_INGOT, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.RAW_NICKEL, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.NICKEL_CLUMP, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.SMALL_NICKEL_CLUMP, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.NICKEL_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.SMALL_NICKEL_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.NICKEL_GEM, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.NICKEL_NUGGET, Models.GENERATED);
+        // platinum
+        itemModelGenerator.register(ItemContent.PLATINUM_INGOT, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.RAW_PLATINUM, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.PLATINUM_CLUMP, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.SMALL_PLATINUM_CLUMP, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.PLATINUM_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.SMALL_PLATINUM_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.PLATINUM_GEM, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.PLATINUM_NUGGET, Models.GENERATED);
+        // fluxite
+        itemModelGenerator.register(ItemContent.FLUXITE, Models.GENERATED);
     }
 }

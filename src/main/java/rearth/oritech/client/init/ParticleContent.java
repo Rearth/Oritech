@@ -3,14 +3,11 @@ package rearth.oritech.client.init;
 import io.wispforest.owo.particles.ClientParticles;
 import io.wispforest.owo.particles.systems.ParticleSystem;
 import io.wispforest.owo.particles.systems.ParticleSystemController;
-import io.wispforest.owo.util.VectorRandomUtils;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 
 public class ParticleContent {
@@ -44,6 +41,11 @@ public class ParticleContent {
     public static final ParticleSystem<Integer> PULVERIZER_WORKING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(data);
         ClientParticles.spawnCenteredOnBlock(ParticleTypes.DUST_PLUME, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
+    }));
+    
+    public static final ParticleSystem<Integer> CHARGING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawnCenteredOnBlock(ParticleTypes.SONIC_BOOM, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
     }));
     
     public static final ParticleSystem<LineData> LASER_BEAM_EFFECT = PARTICLE_CONTROLLER.register(LineData.class, ((world, pos, data) -> {

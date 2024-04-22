@@ -123,6 +123,13 @@ public class BlockContent implements BlockRegistryContainer {
     @NoBlockItem
     public static final Block OIL_FLUID_BLOCK = new FluidBlock((FlowableFluid) FluidContent.FLOWING_OIL, FabricBlockSettings.copyOf(Blocks.WATER));
     
+    //region metals
+    public static final Block NICKEL_ORE = new Block(FabricBlockSettings.copyOf(Blocks.IRON_ORE));
+    public static final Block DEEPSLATE_NICKEL_ORE = new Block(FabricBlockSettings.copyOf(Blocks.DEEPSLATE_IRON_ORE));
+    public static final Block ENDSTONE_PLATINUM_ORE = new Block(FabricBlockSettings.copyOf(Blocks.DIAMOND_ORE));
+    public static final Block DEEPSLATE_PLATINUM_ORE = new Block(FabricBlockSettings.copyOf(Blocks.DEEPSLATE_DIAMOND_ORE));
+    //endregion
+    
     @Override
     public void postProcessField(String namespace, Block value, String identifier, Field field) {
         

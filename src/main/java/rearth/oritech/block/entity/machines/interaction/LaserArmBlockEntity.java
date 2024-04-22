@@ -11,6 +11,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -23,8 +24,10 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.processing.AtomicForgeBlockEntity;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -149,7 +152,12 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         var targetEntity = world.getBlockEntity(targetBlock);
         var dropped = Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetBlock, targetEntity);
         
-        // yes, this will discord items that wont fit anymore
+        if (targetBlockState.getBlock().equals(Blocks.AMETHYST_CLUSTER)) {
+            dropped = List.of(new ItemStack(ItemContent.FLUXITE));
+            ParticleContent.CHARGING.spawn(world, targetBlock.toCenterPos(), 1);
+        }
+        
+        // yes, this will discard items that wont fit anymore
         for (var stack : dropped) {
             this.inventory.addStack(stack);
         }

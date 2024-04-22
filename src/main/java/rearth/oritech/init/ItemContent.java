@@ -21,6 +21,29 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item TEST_ENERGY_ITEM = new EnergyPickaxeTest(4, -2.5f, new SampleMaterial());
     @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
     public static final Item OIL_BUCKET = new BucketItem(FluidContent.STILL_OIL, new FabricItemSettings().recipeRemainder(Items.BUCKET).maxCount(1));
+    
+    // region metals
+    // nickel
+    public static final Item NICKEL_INGOT = new Item(new FabricItemSettings());
+    public static final Item RAW_NICKEL = new Item(new FabricItemSettings());
+    public static final Item NICKEL_CLUMP = new Item(new FabricItemSettings());
+    public static final Item SMALL_NICKEL_CLUMP = new Item(new FabricItemSettings());
+    public static final Item NICKEL_DUST = new Item(new FabricItemSettings());
+    public static final Item SMALL_NICKEL_DUST = new Item(new FabricItemSettings());
+    public static final Item NICKEL_GEM = new Item(new FabricItemSettings());
+    public static final Item NICKEL_NUGGET = new Item(new FabricItemSettings());
+    // platinum
+    public static final Item PLATINUM_INGOT = new Item(new FabricItemSettings());
+    public static final Item RAW_PLATINUM = new Item(new FabricItemSettings());
+    public static final Item PLATINUM_CLUMP = new Item(new FabricItemSettings());
+    public static final Item SMALL_PLATINUM_CLUMP = new Item(new FabricItemSettings());
+    public static final Item PLATINUM_DUST = new Item(new FabricItemSettings());
+    public static final Item SMALL_PLATINUM_DUST = new Item(new FabricItemSettings());
+    public static final Item PLATINUM_GEM = new Item(new FabricItemSettings());
+    public static final Item PLATINUM_NUGGET = new Item(new FabricItemSettings());
+    // fluxite
+    public static final Item FLUXITE = new Item(new FabricItemSettings());
+    //endregion
 
     @Override
     public void postProcessField(String namespace, Item value, String identifier, Field field) {
