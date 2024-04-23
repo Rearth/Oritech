@@ -133,6 +133,10 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             if (progress >= targetBlockEnergyNeeded) {
                 finishBlockBreaking(targetBlock, targetBlockState);
             }
+        } else {
+            // when targeting air
+            if (world.getTime() % 40 == 0)
+                findNextBlockBreakTarget();
         }
         
         if (fired) {
@@ -253,7 +257,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         
         var distance = targetPos.getManhattanDistance(pos);
         var blockHardness = targetState.getBlock().getHardness();
-        if (distance > 64 || blockHardness < 0.01) {
+        if (distance > 64 || blockHardness < 0.0) {
             return false;
         }
         
