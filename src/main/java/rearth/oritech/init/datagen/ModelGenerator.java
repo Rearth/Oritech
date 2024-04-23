@@ -105,7 +105,33 @@ public class ModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(ItemContent.SMALL_PLATINUM_DUST, Models.GENERATED);
         itemModelGenerator.register(ItemContent.PLATINUM_GEM, Models.GENERATED);
         itemModelGenerator.register(ItemContent.PLATINUM_NUGGET, Models.GENERATED);
-        // fluxite
+        // copper
+        itemModelGenerator.register(ItemContent.COPPER_CLUMP, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.SMALL_COPPER_CLUMP, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.COPPER_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.SMALL_COPPER_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.COPPER_GEM, Models.GENERATED);
+        // iron
+        itemModelGenerator.register(ItemContent.IRON_CLUMP, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.SMALL_IRON_CLUMP, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.IRON_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.SMALL_IRON_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.IRON_GEM, Models.GENERATED);
+        // alloys
         itemModelGenerator.register(ItemContent.FLUXITE, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.ADAMANT_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.ADAMANT_INGOT, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.BIOSTEEL_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.BIOSTEEL_INGOT, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.DURATIUM_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.DURATIUM_INGOT, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.ELECTRUM_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.ELECTRUM_INGOT, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.ENERGITE_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.ENERGITE_INGOT, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.PROMETHEUM_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.PROMETHEUM_INGOT, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.STEEL_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.STEEL_INGOT, Models.GENERATED);
     }
 }

@@ -41,8 +41,34 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item SMALL_PLATINUM_DUST = new Item(new FabricItemSettings());
     public static final Item PLATINUM_GEM = new Item(new FabricItemSettings());
     public static final Item PLATINUM_NUGGET = new Item(new FabricItemSettings());
-    // fluxite
+    // iron
+    public static final Item IRON_CLUMP = new Item(new FabricItemSettings());
+    public static final Item SMALL_IRON_CLUMP = new Item(new FabricItemSettings());
+    public static final Item IRON_DUST = new Item(new FabricItemSettings());
+    public static final Item SMALL_IRON_DUST = new Item(new FabricItemSettings());
+    public static final Item IRON_GEM = new Item(new FabricItemSettings());
+    // copper
+    public static final Item COPPER_CLUMP = new Item(new FabricItemSettings());
+    public static final Item SMALL_COPPER_CLUMP = new Item(new FabricItemSettings());
+    public static final Item COPPER_DUST = new Item(new FabricItemSettings());
+    public static final Item SMALL_COPPER_DUST = new Item(new FabricItemSettings());
+    public static final Item COPPER_GEM = new Item(new FabricItemSettings());
+    // alloys
     public static final Item FLUXITE = new Item(new FabricItemSettings());
+    public static final Item ADAMANT_INGOT = new Item(new FabricItemSettings());
+    public static final Item ADAMANT_DUST = new Item(new FabricItemSettings());
+    public static final Item BIOSTEEL_INGOT = new Item(new FabricItemSettings());
+    public static final Item BIOSTEEL_DUST = new Item(new FabricItemSettings());
+    public static final Item DURATIUM_INGOT = new Item(new FabricItemSettings());
+    public static final Item DURATIUM_DUST = new Item(new FabricItemSettings());
+    public static final Item ELECTRUM_INGOT = new Item(new FabricItemSettings());
+    public static final Item ELECTRUM_DUST = new Item(new FabricItemSettings());
+    public static final Item ENERGITE_INGOT = new Item(new FabricItemSettings());
+    public static final Item ENERGITE_DUST = new Item(new FabricItemSettings());
+    public static final Item PROMETHEUM_INGOT = new Item(new FabricItemSettings());
+    public static final Item PROMETHEUM_DUST = new Item(new FabricItemSettings());
+    public static final Item STEEL_INGOT = new Item(new FabricItemSettings());
+    public static final Item STEEL_DUST = new Item(new FabricItemSettings());
     //endregion
 
     @Override
