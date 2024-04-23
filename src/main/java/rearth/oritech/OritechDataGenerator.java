@@ -2,6 +2,7 @@ package rearth.oritech;
 
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import rearth.oritech.init.datagen.BlockLootGenerator;
 import rearth.oritech.init.datagen.ModelGenerator;
 
 public class OritechDataGenerator implements DataGeneratorEntrypoint {
@@ -10,5 +11,6 @@ public class OritechDataGenerator implements DataGeneratorEntrypoint {
 		var pack = fabricDataGenerator.createPack();
 
 		pack.addProvider(ModelGenerator::new);
+		pack.addProvider(BlockLootGenerator::new);
 	}
 }
