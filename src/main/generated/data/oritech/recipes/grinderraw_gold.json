@@ -1,0 +1,23 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "item": "minecraft:raw_gold"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:gold_clump"
+    },
+    {
+      "Count": 3,
+      "id": "oritech:small_gold_clump"
+    },
+    {
+      "Count": 3,
+      "id": "oritech:small_copper_clump"
+    }
+  ],
+  "time": 800
+}

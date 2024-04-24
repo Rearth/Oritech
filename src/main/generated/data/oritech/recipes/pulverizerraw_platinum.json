@@ -1,0 +1,19 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "item": "oritech:raw_platinum"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:platinum_dust"
+    },
+    {
+      "Count": 3,
+      "id": "oritech:small_platinum_dust"
+    }
+  ],
+  "time": 750
+}

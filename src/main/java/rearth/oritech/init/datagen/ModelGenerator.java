@@ -111,6 +111,13 @@ public class ModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(ItemContent.COPPER_DUST, Models.GENERATED);
         itemModelGenerator.register(ItemContent.SMALL_COPPER_DUST, Models.GENERATED);
         itemModelGenerator.register(ItemContent.COPPER_GEM, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.COPPER_NUGGET, Models.GENERATED);
+        // gold
+        itemModelGenerator.register(ItemContent.GOLD_CLUMP, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.SMALL_GOLD_CLUMP, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.GOLD_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.SMALL_GOLD_DUST, Models.GENERATED);
+        itemModelGenerator.register(ItemContent.GOLD_GEM, Models.GENERATED);
         // iron
         itemModelGenerator.register(ItemContent.IRON_CLUMP, Models.GENERATED);
         itemModelGenerator.register(ItemContent.SMALL_IRON_CLUMP, Models.GENERATED);

@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "oritech:small_nickel_clump"
+    },
+    {
+      "item": "oritech:small_nickel_clump"
+    },
+    {
+      "item": "oritech:small_nickel_clump"
+    },
+    {
+      "item": "oritech:small_nickel_clump"
+    },
+    {
+      "item": "oritech:small_nickel_clump"
+    },
+    {
+      "item": "oritech:small_nickel_clump"
+    },
+    {
+      "item": "oritech:small_nickel_clump"
+    },
+    {
+      "item": "oritech:small_nickel_clump"
+    },
+    {
+      "item": "oritech:small_nickel_clump"
+    }
+  ],
+  "result": {
+    "item": "oritech:nickel_clump"
+  }
+}

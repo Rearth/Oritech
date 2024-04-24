@@ -1,0 +1,18 @@
+{
+  "type": "oritech:foundry",
+  "ingredients": [
+    {
+      "item": "oritech:gold_gem"
+    },
+    {
+      "item": "oritech:gold_gem"
+    }
+  ],
+  "results": [
+    {
+      "Count": 4,
+      "id": "minecraft:gold_ingot"
+    }
+  ],
+  "time": 800
+}

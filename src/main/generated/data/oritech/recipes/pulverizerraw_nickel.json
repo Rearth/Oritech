@@ -1,0 +1,19 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "item": "oritech:raw_nickel"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:nickel_dust"
+    },
+    {
+      "Count": 3,
+      "id": "oritech:small_nickel_dust"
+    }
+  ],
+  "time": 500
+}

@@ -1,0 +1,18 @@
+{
+  "type": "oritech:atomic_forge",
+  "ingredients": [
+    {
+      "item": "oritech:iron_dust"
+    },
+    {
+      "item": "oritech:banana"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:iron_gem"
+    }
+  ],
+  "time": 3
+}

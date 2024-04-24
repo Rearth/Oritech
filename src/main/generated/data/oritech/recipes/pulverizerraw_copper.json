@@ -1,0 +1,19 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "item": "minecraft:raw_copper"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:copper_dust"
+    },
+    {
+      "Count": 3,
+      "id": "oritech:small_copper_dust"
+    }
+  ],
+  "time": 500
+}

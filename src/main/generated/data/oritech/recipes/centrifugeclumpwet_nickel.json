@@ -1,0 +1,21 @@
+{
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 81000,
+    "variant": {
+      "fluid": "minecraft:water"
+    }
+  },
+  "ingredients": [
+    {
+      "item": "oritech:nickel_clump"
+    }
+  ],
+  "results": [
+    {
+      "Count": 2,
+      "id": "oritech:nickel_dust"
+    }
+  ],
+  "time": 600
+}

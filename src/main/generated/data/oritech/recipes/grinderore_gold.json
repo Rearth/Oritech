@@ -1,0 +1,19 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "tag": "minecraft:gold_ores"
+    }
+  ],
+  "results": [
+    {
+      "Count": 2,
+      "id": "minecraft:raw_gold"
+    },
+    {
+      "Count": 1,
+      "id": "minecraft:raw_copper"
+    }
+  ],
+  "time": 400
+}

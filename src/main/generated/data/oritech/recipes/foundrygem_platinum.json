@@ -1,0 +1,18 @@
+{
+  "type": "oritech:foundry",
+  "ingredients": [
+    {
+      "item": "oritech:platinum_gem"
+    },
+    {
+      "item": "oritech:platinum_gem"
+    }
+  ],
+  "results": [
+    {
+      "Count": 4,
+      "id": "oritech:platinum_ingot"
+    }
+  ],
+  "time": 800
+}

@@ -1,0 +1,18 @@
+{
+  "type": "oritech:foundry",
+  "ingredients": [
+    {
+      "item": "oritech:iron_gem"
+    },
+    {
+      "item": "oritech:iron_gem"
+    }
+  ],
+  "results": [
+    {
+      "Count": 4,
+      "id": "minecraft:iron_ingot"
+    }
+  ],
+  "time": 800
+}

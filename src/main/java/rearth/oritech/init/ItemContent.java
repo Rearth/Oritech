@@ -53,6 +53,13 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item COPPER_DUST = new Item(new FabricItemSettings());
     public static final Item SMALL_COPPER_DUST = new Item(new FabricItemSettings());
     public static final Item COPPER_GEM = new Item(new FabricItemSettings());
+    public static final Item COPPER_NUGGET = new Item(new FabricItemSettings());
+    // gold
+    public static final Item GOLD_CLUMP = new Item(new FabricItemSettings());
+    public static final Item SMALL_GOLD_CLUMP = new Item(new FabricItemSettings());
+    public static final Item GOLD_DUST = new Item(new FabricItemSettings());
+    public static final Item SMALL_GOLD_DUST = new Item(new FabricItemSettings());
+    public static final Item GOLD_GEM = new Item(new FabricItemSettings());
     // alloys
     public static final Item FLUXITE = new Item(new FabricItemSettings());
     public static final Item ADAMANT_INGOT = new Item(new FabricItemSettings());

@@ -1,0 +1,18 @@
+{
+  "type": "oritech:foundry",
+  "ingredients": [
+    {
+      "item": "oritech:nickel_gem"
+    },
+    {
+      "item": "oritech:nickel_gem"
+    }
+  ],
+  "results": [
+    {
+      "Count": 4,
+      "id": "oritech:nickel_ingot"
+    }
+  ],
+  "time": 800
+}
