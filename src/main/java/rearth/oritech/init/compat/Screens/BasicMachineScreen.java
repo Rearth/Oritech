@@ -13,13 +13,13 @@ import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
-import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.text.Text;
 import rearth.oritech.init.compat.OritechDisplay;
 import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
 
@@ -50,17 +50,36 @@ public class BasicMachineScreen implements DisplayCategory<Display> {
     
     public void fillDisplay(FlowLayout root, OritechDisplay display, ReiUIAdapter<FlowLayout> adapter) {
         
-        List<EntryIngredient> inputEntries = display.getInputEntries();
+        var inputEntries = display.getInputEntries();
         for (int i = 0; i < inputEntries.size(); i++) {
             var entry = inputEntries.get(i);
             root.child(adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0))).positioning(Positioning.absolute(50 + i * 19, 11)));
         }
         
-        List<EntryIngredient> outputEntries = display.getOutputEntries();
+        var outputEntries = display.getOutputEntries();
         for (int i = 0; i < outputEntries.size(); i++) {
             var entry = outputEntries.get(i);
             root.child(adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0))).positioning(Positioning.absolute(50 + i * 19, 40)));
         }
+        
+        if (display.entry.value().getFluidInput() != null) {
+            var fluid = display.entry.value().getFluidInput().variant();
+            var fluidBackground = Containers.horizontalFlow(Sizing.fixed(22), Sizing.fixed(42));
+            fluidBackground.positioning(Positioning.absolute(10, 10));
+            fluidBackground.surface(Surface.PANEL_INSET);
+            root.child(fluidBackground);
+            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, 81000, new ScreenProvider.BarConfiguration(11, 11, 20, 40)));
+        }
+        
+        if (display.entry.value().getFluidOutput() != null) {
+            var fluid = display.entry.value().getFluidOutput().variant();
+            var fluidBackground = Containers.horizontalFlow(Sizing.fixed(22), Sizing.fixed(42));
+            fluidBackground.positioning(Positioning.absolute(80, 10));
+            fluidBackground.surface(Surface.PANEL_INSET);
+            root.child(fluidBackground);
+            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, 81000, new ScreenProvider.BarConfiguration(81, 11, 20, 40)));
+        }
+        
     }
     
     public static void addInputSlot(FlowLayout root, OritechDisplay display, ReiUIAdapter<FlowLayout> adapter, int x, int y, int slot) {

@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_raw_silicon": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "oritech:raw_silicon"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:silicon_from_smelting_raw_silicon"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_raw_silicon"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:silicon_from_smelting_raw_silicon"
+    ]
+  }
+}

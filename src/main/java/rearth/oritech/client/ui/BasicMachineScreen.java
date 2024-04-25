@@ -287,7 +287,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     @NotNull
     private static ColoredSpriteComponent getColoredSpriteComponent(FluidVariant variant, long amount, ScreenProvider.BarConfiguration config, Sprite sprite, int spriteColor) {
-        var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(variant).get(0)), Text.of(": " + (amount * 1000 / FluidConstants.BUCKET) + " mb"));
+        var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(variant).get(0)), Text.of((amount * 1000 / FluidConstants.BUCKET) + " mb"));
         
         var result = new ColoredSpriteComponent(sprite);
         result.widthMultiplier = config.width() / 60f;

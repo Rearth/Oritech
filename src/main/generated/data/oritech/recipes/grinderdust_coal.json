@@ -1,0 +1,15 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "item": "minecraft:coal"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:coal_dust"
+    }
+  ],
+  "time": 100
+}

@@ -106,11 +106,13 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item ENDERIC_LENS = new Item(new FabricItemSettings());
     public static final Item FLUX_GATE = new Item(new FabricItemSettings());
     public static final Item ADVANCED_BATTERY = new Item(new FabricItemSettings());
-    public static final Item SUPER_AI_CHIP = new Item(new FabricItemSettings());
-    public static final Item UNHOLY_INTELLIGENCE = new Item(new FabricItemSettings());
-    public static final Item HEISENBERG_COMPENSATOR = new Item(new FabricItemSettings());
-    public static final Item OVERCHARGED_CRYSTAL = new Item(new FabricItemSettings());
+    public static final Item SUPER_AI_CHIP = new Item(new FabricItemSettings().maxCount(4));
+    public static final Item UNHOLY_INTELLIGENCE = new Item(new FabricItemSettings().maxCount(1));
+    public static final Item HEISENBERG_COMPENSATOR = new Item(new FabricItemSettings().maxCount(1));
+    public static final Item OVERCHARGED_CRYSTAL = new Item(new FabricItemSettings().maxCount(1));
     public static final Item SUPERCONDUCTOR = new Item(new FabricItemSettings());
+    public static final Item PACKED_WHEAT = new Item(new FabricItemSettings());
+    public static final Item QUARTZ_DUST = new Item(new FabricItemSettings());
 
     @Override
     public void postProcessField(String namespace, Item value, String identifier, Field field) {

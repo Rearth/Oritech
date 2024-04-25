@@ -1,0 +1,15 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "item": "minecraft:quartz"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:quartz_dust"
+    }
+  ],
+  "time": 100
+}

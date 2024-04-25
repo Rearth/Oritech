@@ -1,0 +1,21 @@
+{
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 20250,
+    "variant": {
+      "fluid": "minecraft:water"
+    }
+  },
+  "ingredients": [
+    {
+      "item": "oritech:packed_wheat"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:raw_biopolymer"
+    }
+  ],
+  "time": 600
+}

@@ -1,0 +1,21 @@
+{
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 8100,
+    "variant": {
+      "fluid": "oritech:still_oil"
+    }
+  },
+  "ingredients": [
+    {
+      "tag": "minecraft:sand"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:polymer_resin"
+    }
+  ],
+  "time": 600
+}

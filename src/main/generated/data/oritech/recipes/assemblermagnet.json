@@ -1,0 +1,24 @@
+{
+  "type": "oritech:assembler",
+  "ingredients": [
+    {
+      "tag": "c:steel_ingots"
+    },
+    {
+      "item": "oritech:fine_wire"
+    },
+    {
+      "item": "oritech:fine_wire"
+    },
+    {
+      "item": "oritech:fine_wire"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:magnetic_coil"
+    }
+  ],
+  "time": 400
+}

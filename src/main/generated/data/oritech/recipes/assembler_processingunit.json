@@ -1,0 +1,24 @@
+{
+  "type": "oritech:assembler",
+  "ingredients": [
+    {
+      "item": "oritech:plastic_sheet"
+    },
+    {
+      "item": "oritech:carbon_fibre_strands"
+    },
+    {
+      "item": "oritech:electrum_ingot"
+    },
+    {
+      "item": "oritech:electrum_ingot"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:processing_unit"
+    }
+  ],
+  "time": 400
+}

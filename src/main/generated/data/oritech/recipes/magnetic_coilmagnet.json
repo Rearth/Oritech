@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "tag": "c:steel_ingots"
+    },
+    "i": {
+      "item": "oritech:fine_wire"
+    }
+  },
+  "pattern": [
+    "iii",
+    "ccc",
+    "iii"
+  ],
+  "result": {
+    "count": 2,
+    "item": "oritech:magnetic_coil"
+  }
+}

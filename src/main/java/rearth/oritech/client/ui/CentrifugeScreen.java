@@ -64,7 +64,7 @@ public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHa
         for (var it = storage.nonEmptyIterator(); it.hasNext(); ) {
 
             var fluid = it.next();
-            inFluidBackground = BasicMachineScreen.createFluidRenderer(fluid.getResource(), fluid.getAmount(), config);
+            inFluidBackground = createFluidRenderer(fluid.getResource(), fluid.getAmount(), config);
             break;
         }
 

@@ -14,6 +14,8 @@ public class TagContent {
     public static final TagKey<Item> COPPER_NUGGETS = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "copper_nuggets"));
     public static final TagKey<Item> IRON_DUSTS = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "iron_dusts"));
     public static final TagKey<Item> GOLD_DUSTS = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "gold_dusts"));
+    public static final TagKey<Item> QUARTZ_DUSTS = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "quartz_dusts"));
+    public static final TagKey<Item> COAL_DUSTS = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "coal_dusts"));
     
     public static final TagKey<Item> STEEL_INGOTS = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "steel_ingots"));
     

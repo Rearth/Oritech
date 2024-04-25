@@ -6,9 +6,7 @@ import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import me.shedaniel.math.Point;
-import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
-import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.text.Text;
@@ -54,7 +52,7 @@ public class PulverizerScreen extends BasicMachineScreen {
         // data
         var duration = String.format("%.0f", display.getEntry().value().getTime() / 20f);
         root.child(
-          Components.label(Text.of(duration + "s, ")).lineHeight(7)
+          Components.label(Text.of(duration + "s")).lineHeight(7)
             .positioning(Positioning.absolute(72, HEIGHT_BASE + 28))
         );
     
