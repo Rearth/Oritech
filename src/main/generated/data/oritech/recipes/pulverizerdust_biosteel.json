@@ -1,0 +1,15 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "item": "oritech:biosteel_ingot"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:biosteel_dust"
+    }
+  ],
+  "time": 300
+}

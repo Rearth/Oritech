@@ -1,0 +1,15 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "tag": "c:steel_ingots"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:steel_dust"
+    }
+  ],
+  "time": 100
+}

@@ -1,0 +1,15 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "tag": "c:platinum_ingots"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:platinum_dust"
+    }
+  ],
+  "time": 300
+}

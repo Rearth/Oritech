@@ -1,0 +1,15 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "item": "minecraft:copper_ingot"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:copper_dust"
+    }
+  ],
+  "time": 100
+}

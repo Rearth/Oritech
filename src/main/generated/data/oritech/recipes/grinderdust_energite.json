@@ -1,0 +1,15 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "item": "oritech:energite_ingot"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:energite_dust"
+    }
+  ],
+  "time": 100
+}
