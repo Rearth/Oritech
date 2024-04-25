@@ -1,0 +1,15 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "item": "minecraft:ender_pearl"
+    }
+  ],
+  "results": [
+    {
+      "Count": 12,
+      "id": "oritech:enderic_compound"
+    }
+  ],
+  "time": 100
+}

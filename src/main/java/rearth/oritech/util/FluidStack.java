@@ -2,9 +2,14 @@ package rearth.oritech.util;
 
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
 
 public record FluidStack(FluidVariant variant, long amount) {
+    
+    public FluidStack(Fluid variant, long amount) {
+        this(FluidVariant.of(variant), amount);
+    }
     
     @Override
     public String toString() {

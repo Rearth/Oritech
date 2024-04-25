@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Item;
+import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ItemGroups;
 import rearth.oritech.item.tools.armor.ExoArmorItem;
 import rearth.oritech.item.tools.armor.ExoArmorMaterial;
@@ -28,9 +29,9 @@ public class ToolsContent implements ItemRegistryContainer {
     public void postProcessField(String namespace, Item value, String identifier, Field field) {
         ItemRegistryContainer.super.postProcessField(namespace, value, identifier, field);
         
-        var targetGroup = ItemGroups.GROUPS.first;
-        if (field.isAnnotationPresent(ItemGroups.ItemGroupTarget.class)) {
-            targetGroup = field.getAnnotation(ItemGroups.ItemGroupTarget.class).value();
+        var targetGroup = ItemContent.Groups.equipment;
+        if (field.isAnnotationPresent(ItemContent.ItemGroupTarget.class)) {
+            targetGroup = field.getAnnotation(ItemContent.ItemGroupTarget.class).value();
         }
         
         ItemGroups.add(targetGroup, value);

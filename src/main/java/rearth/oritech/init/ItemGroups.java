@@ -10,47 +10,50 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ItemGroups {
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.FIELD})
-    public @interface ItemGroupTarget {
-        ItemGroups.GROUPS value();
-    }
-
-    public enum GROUPS {
-        first, second
-    }
-
-    private static final Map<GROUPS, List<ItemConvertible>> registered = new HashMap<>();
-    public static void add(GROUPS group, ItemConvertible item) {
+    
+    private static final Map<ItemContent.Groups, List<ItemConvertible>> registered = new HashMap<>();
+    public static void add(ItemContent.Groups group, ItemConvertible item) {
         registered.computeIfAbsent(group, k -> new ArrayList<>()).add(item);
     }
 
-    private static final ItemGroup ORITECH_GROUP = FabricItemGroup.builder().entries(((context, entries) -> {
-        for (var item : registered.get(GROUPS.first) ) {
+    private static final ItemGroup MACHINE_GROUP = FabricItemGroup.builder().entries(((context, entries) -> {
+        for (var item : registered.get(ItemContent.Groups.machines) ) {
             entries.add(item);
         }
-    })).displayName(Text.literal("Oritech")).icon(() -> new ItemStack(ItemContent.BANANA)).build();
+    })).displayName(Text.translatable("itemgroup.oritech.machines")).icon(() -> new ItemStack(ItemContent.BANANA)).build();
 
-    private static final ItemGroup ORITECH_SECOND_GROUP = FabricItemGroup.builder().entries(((context, entries) -> {
-        for (var item : registered.get(GROUPS.second) ) {
+    private static final ItemGroup COMPONENT_GROUP = FabricItemGroup.builder().entries(((context, entries) -> {
+        for (var item : registered.get(ItemContent.Groups.components) ) {
             entries.add(item);
         }
-    })).displayName(Text.literal("More Oritech")).icon(() -> new ItemStack(ItemContent.BANANA)).build();
+    })).displayName(Text.translatable("itemgroup.oritech.components")).icon(() -> new ItemStack(ItemContent.BANANA)).build();
+
+    private static final ItemGroup EQUIPMENT_GROUP = FabricItemGroup.builder().entries(((context, entries) -> {
+        for (var item : registered.get(ItemContent.Groups.equipment) ) {
+            entries.add(item);
+        }
+    })).displayName(Text.translatable("itemgroup.oritech.equipment")).icon(() -> new ItemStack(ItemContent.BANANA)).build();
+
+    private static final ItemGroup DECORATIVE_GROUP = FabricItemGroup.builder().entries(((context, entries) -> {
+        for (var item : registered.get(ItemContent.Groups.decorative) ) {
+            entries.add(item);
+        }
+    })).displayName(Text.translatable("itemgroup.oritech.decorative")).icon(() -> new ItemStack(ItemContent.BANANA)).build();
 
     public static void registerItemGroup() {
 
         Oritech.LOGGER.info("Registering Oritech Items");
 
-        Registry.register(Registries.ITEM_GROUP, new Identifier(Oritech.MOD_ID, "main"), ORITECH_GROUP);
-        Registry.register(Registries.ITEM_GROUP, new Identifier(Oritech.MOD_ID, "second"), ORITECH_SECOND_GROUP);
+        Registry.register(Registries.ITEM_GROUP, new Identifier(Oritech.MOD_ID, "machines"), MACHINE_GROUP);
+        Registry.register(Registries.ITEM_GROUP, new Identifier(Oritech.MOD_ID, "components"), COMPONENT_GROUP);
+        Registry.register(Registries.ITEM_GROUP, new Identifier(Oritech.MOD_ID, "equipment"), EQUIPMENT_GROUP);
+        Registry.register(Registries.ITEM_GROUP, new Identifier(Oritech.MOD_ID, "decorative"), DECORATIVE_GROUP);
     }
 
 }

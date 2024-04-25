@@ -5,21 +5,26 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import rearth.oritech.init.datagen.ModelGenerator;
 import rearth.oritech.item.tools.harvesting.EnergyPickaxeTest;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 import rearth.oritech.item.tools.harvesting.SampleMaterial;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
 public class ItemContent implements ItemRegistryContainer {
 
-    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
+    @ItemGroupTarget(Groups.components)
     public static final Item BANANA = new Item(new FabricItemSettings());
-    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
+    @ItemGroupTarget(Groups.equipment)
     public static final Item TARGET_DESIGNATOR = new LaserTargetDesignator(new FabricItemSettings().maxCount(1));
-    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
+    @ItemGroupTarget(Groups.equipment)
     public static final Item TEST_ENERGY_ITEM = new EnergyPickaxeTest(4, -2.5f, new SampleMaterial());
-    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
+    @ItemGroupTarget(Groups.components)
     public static final Item OIL_BUCKET = new BucketItem(FluidContent.STILL_OIL, new FabricItemSettings().recipeRemainder(Items.BUCKET).maxCount(1));
     
     // region metals
@@ -77,16 +82,64 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item STEEL_INGOT = new Item(new FabricItemSettings());
     public static final Item STEEL_DUST = new Item(new FabricItemSettings());
     //endregion
+    
+    // region crafting components
+    public static final Item COAL_DUST = new Item(new FabricItemSettings());
+    public static final Item CARBON_FIBRE_STRANDS = new Item(new FabricItemSettings());
+    public static final Item ENDERIC_COMPOUND = new Item(new FabricItemSettings());
+    public static final Item STRANGE_MATTER = new Item(new FabricItemSettings());
+    public static final Item FINE_WIRE = new Item(new FabricItemSettings());
+    public static final Item INSULATED_WIRE = new Item(new FabricItemSettings());
+    public static final Item MAGNETIC_COIL = new Item(new FabricItemSettings());
+    public static final Item MOTOR = new Item(new FabricItemSettings());
+    public static final Item BASIC_BATTERY = new Item(new FabricItemSettings());
+    public static final Item MACHINE_PLATING = new Item(new FabricItemSettings());
+    public static final Item RAW_SILICON = new Item(new FabricItemSettings());
+    public static final Item SILICON = new Item(new FabricItemSettings());
+    public static final Item RAW_BIOPOLYMER = new Item(new FabricItemSettings());
+    public static final Item POLYMER_RESIN = new Item(new FabricItemSettings());
+    public static final Item PLASTIC_SHEET = new Item(new FabricItemSettings());
+    public static final Item PROCESSING_UNIT = new Item(new FabricItemSettings());
+    public static final Item ADVANCED_COMPUTING_ENGINE = new Item(new FabricItemSettings());
+    public static final Item SILICON_WAFER = new Item(new FabricItemSettings());
+    public static final Item DUBIOS_CONTAINER = new Item(new FabricItemSettings());
+    public static final Item ENDERIC_LENS = new Item(new FabricItemSettings());
+    public static final Item FLUX_GATE = new Item(new FabricItemSettings());
+    public static final Item ADVANCED_BATTERY = new Item(new FabricItemSettings());
+    public static final Item SUPER_AI_CHIP = new Item(new FabricItemSettings());
+    public static final Item UNHOLY_INTELLIGENCE = new Item(new FabricItemSettings());
+    public static final Item HEISENBERG_COMPENSATOR = new Item(new FabricItemSettings());
+    public static final Item OVERCHARGED_CRYSTAL = new Item(new FabricItemSettings());
+    public static final Item SUPERCONDUCTOR = new Item(new FabricItemSettings());
 
     @Override
     public void postProcessField(String namespace, Item value, String identifier, Field field) {
         ItemRegistryContainer.super.postProcessField(namespace, value, identifier, field);
 
-        var targetGroup = ItemGroups.GROUPS.first;
-        if (field.isAnnotationPresent(ItemGroups.ItemGroupTarget.class)) {
-            targetGroup = field.getAnnotation(ItemGroups.ItemGroupTarget.class).value();
+        var targetGroup = Groups.components;
+        if (field.isAnnotationPresent(ItemGroupTarget.class)) {
+            targetGroup = field.getAnnotation(ItemGroupTarget.class).value();
+        }
+        
+        if (!field.isAnnotationPresent(NoModelGeneration.class)) {
+            ModelGenerator.autoRegisteredModels.add(value);
         }
 
         ItemGroups.add(targetGroup, value);
+    }
+    
+    public enum Groups {
+        machines, components, equipment, decorative
+    }
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    public @interface NoModelGeneration {
+    }
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    public @interface ItemGroupTarget {
+        Groups value();
     }
 }

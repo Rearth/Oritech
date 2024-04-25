@@ -1,0 +1,24 @@
+{
+  "type": "oritech:assembler",
+  "ingredients": [
+    {
+      "tag": "c:nickel_ingots"
+    },
+    {
+      "tag": "c:nickel_ingots"
+    },
+    {
+      "tag": "c:nickel_ingots"
+    },
+    {
+      "tag": "c:copper_ingots"
+    }
+  ],
+  "results": [
+    {
+      "Count": 8,
+      "id": "oritech:fine_wire"
+    }
+  ],
+  "time": 400
+}

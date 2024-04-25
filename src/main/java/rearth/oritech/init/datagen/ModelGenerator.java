@@ -5,11 +5,17 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.data.client.BlockStateModelGenerator;
 import net.minecraft.data.client.ItemModelGenerator;
 import net.minecraft.data.client.Models;
+import net.minecraft.item.Item;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.ItemContent;
 import rearth.oritech.item.tools.ToolsContent;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ModelGenerator extends FabricModelProvider {
+    
+    public static Set<Item> autoRegisteredModels = new HashSet<>();
+    
     public ModelGenerator(FabricDataOutput output) {
         super(output);
     }
@@ -75,11 +81,6 @@ public class ModelGenerator extends FabricModelProvider {
 
     @Override
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
-        itemModelGenerator.register(ItemContent.BANANA, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.TARGET_DESIGNATOR, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.TEST_ENERGY_ITEM, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.OIL_BUCKET, Models.GENERATED);
-        
         
         itemModelGenerator.register(ToolsContent.EXO_HELMET, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.EXO_CHESTPLATE, Models.GENERATED);
@@ -87,58 +88,9 @@ public class ModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(ToolsContent.EXO_BOOTS, Models.GENERATED);
         // itemModelGenerator.registerArmor((ArmorItem) ToolsContent.EXO_HELMET);   // this seems to generate it compatible with armor trims
         
-        // nickel
-        itemModelGenerator.register(ItemContent.NICKEL_INGOT, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.RAW_NICKEL, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.NICKEL_CLUMP, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.SMALL_NICKEL_CLUMP, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.NICKEL_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.SMALL_NICKEL_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.NICKEL_GEM, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.NICKEL_NUGGET, Models.GENERATED);
-        // platinum
-        itemModelGenerator.register(ItemContent.PLATINUM_INGOT, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.RAW_PLATINUM, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.PLATINUM_CLUMP, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.SMALL_PLATINUM_CLUMP, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.PLATINUM_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.SMALL_PLATINUM_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.PLATINUM_GEM, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.PLATINUM_NUGGET, Models.GENERATED);
-        // copper
-        itemModelGenerator.register(ItemContent.COPPER_CLUMP, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.SMALL_COPPER_CLUMP, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.COPPER_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.SMALL_COPPER_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.COPPER_GEM, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.COPPER_NUGGET, Models.GENERATED);
-        // gold
-        itemModelGenerator.register(ItemContent.GOLD_CLUMP, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.SMALL_GOLD_CLUMP, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.GOLD_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.SMALL_GOLD_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.GOLD_GEM, Models.GENERATED);
-        // iron
-        itemModelGenerator.register(ItemContent.IRON_CLUMP, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.SMALL_IRON_CLUMP, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.IRON_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.SMALL_IRON_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.IRON_GEM, Models.GENERATED);
-        // alloys
-        itemModelGenerator.register(ItemContent.FLUXITE, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.ADAMANT_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.ADAMANT_INGOT, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.BIOSTEEL_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.BIOSTEEL_INGOT, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.DURATIUM_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.DURATIUM_INGOT, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.ELECTRUM_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.ELECTRUM_INGOT, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.ENERGITE_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.ENERGITE_INGOT, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.PROMETHEUM_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.PROMETHEUM_INGOT, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.STEEL_DUST, Models.GENERATED);
-        itemModelGenerator.register(ItemContent.STEEL_INGOT, Models.GENERATED);
+        for (var item : autoRegisteredModels) {
+            itemModelGenerator.register(item, Models.GENERATED);
+        }
+        
     }
 }

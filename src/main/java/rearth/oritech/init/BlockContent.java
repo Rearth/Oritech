@@ -31,21 +31,16 @@ import java.lang.reflect.Field;
 
 public class BlockContent implements BlockRegistryContainer {
     
-    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block BANANA_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     
-    
-    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
     public static final Block MACHINE_FRAME_BLOCK = new MachineFrameBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
-    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
-    public static final Block FLUID_PIPE = new FluidPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
-    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
-    public static final Block ENERGY_PIPE = new EnergyPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
-    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
-    public static final Block ITEM_PIPE = new ItemPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
-    @ItemGroups.ItemGroupTarget(ItemGroups.GROUPS.second)
     
+    public static final Block FLUID_PIPE = new FluidPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
+    public static final Block ENERGY_PIPE = new EnergyPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
+    public static final Block ITEM_PIPE = new ItemPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
     public static final Block ITEM_FILTER_BLOCK = new ItemFilterBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
+    
     @NoBlockItem
     public static final Block FLUID_PIPE_CONNECTION = new FluidPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
     @NoBlockItem
@@ -141,9 +136,9 @@ public class BlockContent implements BlockRegistryContainer {
             Registry.register(Registries.ITEM, new Identifier(namespace, identifier), createBlockItem(value, identifier));
         }
         
-        var targetGroup = ItemGroups.GROUPS.first;
-        if (field.isAnnotationPresent(ItemGroups.ItemGroupTarget.class)) {
-            targetGroup = field.getAnnotation(ItemGroups.ItemGroupTarget.class).value();
+        var targetGroup = ItemContent.Groups.machines;
+        if (field.isAnnotationPresent(ItemContent.ItemGroupTarget.class)) {
+            targetGroup = field.getAnnotation(ItemContent.ItemGroupTarget.class).value();
         }
         
         ItemGroups.add(targetGroup, value);
