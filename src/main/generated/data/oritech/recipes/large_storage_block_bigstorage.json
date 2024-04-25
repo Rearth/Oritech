@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:advanced_battery"
+    },
+    "c": {
+      "item": "oritech:dubios_container"
+    },
+    "f": {
+      "item": "oritech:insulated_wire"
+    },
+    "m": {
+      "item": "oritech:steel_ingot"
+    },
+    "s": {
+      "item": "oritech:flux_gate"
+    }
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "item": "oritech:large_storage_block"
+  }
+}

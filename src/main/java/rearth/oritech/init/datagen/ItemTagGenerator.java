@@ -29,7 +29,6 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.NICKEL_DUST)
           .add(ItemContent.PLATINUM_DUST)
           .add(ItemContent.BIOSTEEL_DUST)
-          .add(ItemContent.PROMETHEUM_DUST)
           .add(ItemContent.DURATIUM_DUST)
           .add(ItemContent.ELECTRUM_DUST)
           .add(ItemContent.ADAMANT_DUST)

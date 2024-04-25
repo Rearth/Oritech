@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:machine_plating"
+    },
+    "c": {
+      "item": "oritech:motor"
+    },
+    "f": {
+      "tag": "c:copper_ingots"
+    },
+    "s": {
+      "item": "oritech:silicon"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "item": "oritech:pump_block"
+  }
+}

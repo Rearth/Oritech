@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:machine_plating"
+    },
+    "c": {
+      "item": "oritech:strange_matter"
+    },
+    "f": {
+      "item": "oritech:flux_gate"
+    },
+    "m": {
+      "item": "oritech:plastic_sheet"
+    },
+    "s": {
+      "item": "oritech:duratium_ingot"
+    }
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "item": "oritech:atomic_forge_block"
+  }
+}

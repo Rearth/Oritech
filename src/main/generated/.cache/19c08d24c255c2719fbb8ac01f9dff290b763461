@@ -1,4 +1,4 @@
-// 1.20.4	2024-04-25T17:29:49.4712751	Oritech/Model Definitions
+// 1.20.4	2024-04-25T19:02:41.6392448	Oritech/Model Definitions
 2e964d91a46577bf6a179afb1ded52a0d5deaaaa assets\oritech\models\item\copper_gem.json
 1973c3ab5f3a5478532d293c932515332a78064f assets\oritech\models\item\raw_silicon.json
 90e28b721796ff7ee21c8eefe4525f03a251d2fb assets\oritech\models\block\machine_extender.json
@@ -11,8 +11,8 @@ ce0b514b85fbf542c6e0daf035a33eab617259ab assets\oritech\models\item\steel_dust.j
 d7223c34ce81a014f8cda158d07979f4adb4a597 assets\oritech\models\item\dubios_container.json
 3d38f55d19807ed4a1366f6264d0beeb287e0b2c assets\oritech\models\item\small_gold_clump.json
 21a85f7686269b5fdd33e5ad42e3e09f76ace9e9 assets\oritech\models\item\duratium_ingot.json
-8734efad9e993873bdcbe5d2f2f1842d2eac4035 assets\oritech\models\item\nickel_dust.json
 e6f197ee5ac22cd68bc502a86d40b65bfe40884a assets\oritech\models\item\target_designator.json
+8734efad9e993873bdcbe5d2f2f1842d2eac4035 assets\oritech\models\item\nickel_dust.json
 7eb395cd65df72caf43bedc54067cbf53940fd6c assets\oritech\blockstates\lava_generator_block.json
 7eb395cd65df72caf43bedc54067cbf53940fd6c assets\oritech\blockstates\centrifuge_block.json
 d4a5c1925098af237db4b3c7876002401f06de33 assets\oritech\models\item\super_ai_chip.json
@@ -20,8 +20,8 @@ d4a5c1925098af237db4b3c7876002401f06de33 assets\oritech\models\item\super_ai_chi
 8ef5ff056a3d2fa26393ec9ccb4b6f3b410f8be8 assets\oritech\models\item\item_pipe.json
 b91305cbccecb97f9d74e2b92787ae9fa6387786 assets\oritech\blockstates\fluid_pipe.json
 7eb395cd65df72caf43bedc54067cbf53940fd6c assets\oritech\blockstates\fragment_forge_block.json
-98d62a615b70fca694eb00c6b8aa9297c4a92b62 assets\oritech\blockstates\energy_pipe_connection.json
 7eb395cd65df72caf43bedc54067cbf53940fd6c assets\oritech\blockstates\big_solar_panel_block.json
+98d62a615b70fca694eb00c6b8aa9297c4a92b62 assets\oritech\blockstates\energy_pipe_connection.json
 ff8c539de2afd50edaef11008239ffb8e08c66de assets\oritech\models\block\pump_trunk_block.json
 f91b43b62b76500ec341a894f6377e3c9eaa1a2e assets\oritech\models\item\prometheum_ingot.json
 7d47946b694d63a4f71c96f9856a37abae94e5c5 assets\oritech\models\item\small_iron_dust.json
@@ -83,15 +83,14 @@ b4ceb9480bcbb6a9a97df60aa6c8a74023f89202 assets\oritech\models\item\processing_u
 7eb395cd65df72caf43bedc54067cbf53940fd6c assets\oritech\blockstates\deep_drill_block.json
 3166a5959c87c4465c5eed82034d3178c4b8b518 assets\oritech\models\block\machine_core_good.json
 4c313901ab3f2ac9a926aaa6d4d7311050bb57c5 assets\oritech\models\item\basic_battery.json
+0ea8315aed10abcf90ec950fee0062aed26075cb assets\oritech\models\item\energy_pipe.json
 b4b5bb16cd9934be2399058ea8772b23ac699345 assets\oritech\models\item\exo_chestplate.json
 8ede0997449fd1c3f65a07df184768a843b473ed assets\oritech\models\item\centrifuge_block.json
-0ea8315aed10abcf90ec950fee0062aed26075cb assets\oritech\models\item\energy_pipe.json
 7eb395cd65df72caf43bedc54067cbf53940fd6c assets\oritech\blockstates\fuel_generator_block.json
-43cb253240da44605351f81b623452d9d14fe166 assets\oritech\models\item\prometheum_dust.json
 0ddaf1b17cebb4ecfda9da8b7d7d8ea25dcd248d assets\oritech\models\item\adamant_ingot.json
 05e57c727b0f345279870ab96a1c68e77b18b766 assets\oritech\models\item\insulated_wire.json
-f8de6b758be35393ad3b7498d87dcf647eb83ae0 assets\oritech\models\item\copper_clump.json
 05055246d8778d9605a919bccfa66ccd7dc3761f assets\oritech\models\item\packed_wheat.json
+f8de6b758be35393ad3b7498d87dcf647eb83ae0 assets\oritech\models\item\copper_clump.json
 39ff24a652b7a17e3e9a5a25514e86d385bdbf66 assets\oritech\models\item\magnetic_coil.json
 086d7d3935f6006cf5d94fa9f46851caeafecab6 assets\oritech\models\item\drone_port_block.json
 6adb9f1610801085ae00d014a07bb37013e01353 assets\oritech\models\item\platinum_ingot.json
@@ -150,8 +149,8 @@ a5afa0ba8780ec08bd0a9284bc08e0c681fe7158 assets\oritech\blockstates\block_placer
 f38bcaafb1724024d072a57329230fe00a9d6f19 assets\oritech\models\item\flux_gate.json
 5054284e6d5fe0785ac93bdda5101c47337953cf assets\oritech\models\item\machine_frame_block.json
 5462a2453fcdd2f8b99129894aec60f282d29ca9 assets\oritech\models\item\pulverizer_block.json
-1b9cd3719105dc1e03398de41f2cab37337816fe assets\oritech\blockstates\machine_core_good.json
 ccd7e87c2ba5a5062bb88aa6e103d49d47cd56ff assets\oritech\blockstates\energy_pipe.json
+1b9cd3719105dc1e03398de41f2cab37337816fe assets\oritech\blockstates\machine_core_good.json
 ae8496aa356910304cb7036f1290ca3f7d76437e assets\oritech\models\item\item_filter_block.json
 a3f9b72f6f36d42af4e5c3a87d7e180b2e36a2ed assets\oritech\models\item\machine_core_good.json
 7eb395cd65df72caf43bedc54067cbf53940fd6c assets\oritech\blockstates\bio_generator_block.json

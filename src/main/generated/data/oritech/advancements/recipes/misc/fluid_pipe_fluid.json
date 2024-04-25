@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_fluid_pipe": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "oritech:fluid_pipe"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:fluid_pipe_fluid"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_fluid_pipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:fluid_pipe_fluid"
+    ]
+  }
+}

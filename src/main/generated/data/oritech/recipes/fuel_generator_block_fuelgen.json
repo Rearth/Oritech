@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:machine_plating"
+    },
+    "c": {
+      "item": "oritech:enderic_lens"
+    },
+    "f": {
+      "tag": "c:steel_ingots"
+    },
+    "s": {
+      "item": "oritech:basic_generator_block"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "item": "oritech:fuel_generator_block"
+  }
+}

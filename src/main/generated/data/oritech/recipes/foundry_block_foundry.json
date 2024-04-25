@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "minecraft:cauldron"
+    },
+    "c": {
+      "item": "oritech:processing_unit"
+    },
+    "f": {
+      "tag": "c:copper_ingots"
+    },
+    "s": {
+      "item": "oritech:electrum_ingot"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "item": "oritech:foundry_block"
+  }
+}

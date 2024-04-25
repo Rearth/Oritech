@@ -78,7 +78,6 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item ENERGITE_INGOT = new Item(new FabricItemSettings());
     public static final Item ENERGITE_DUST = new Item(new FabricItemSettings());
     public static final Item PROMETHEUM_INGOT = new Item(new FabricItemSettings());
-    public static final Item PROMETHEUM_DUST = new Item(new FabricItemSettings());
     public static final Item STEEL_INGOT = new Item(new FabricItemSettings());
     public static final Item STEEL_DUST = new Item(new FabricItemSettings());
     //endregion
