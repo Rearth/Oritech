@@ -26,15 +26,17 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public InventorySlotAssignment getSlots() {
-        return new InventorySlotAssignment(0, 2, 2, 1);
+        return new InventorySlotAssignment(0, 4, 4, 1);
     }
     
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 70, 21),
-          new GuiSlot(1, 90, 21),
-          new GuiSlot(2, 80, 59));
+          new GuiSlot(0, 50, 21),
+          new GuiSlot(1, 70, 21),
+          new GuiSlot(2, 90, 21),
+          new GuiSlot(3, 110, 21),
+          new GuiSlot(4, 80, 59));
     }
     
     @Override
@@ -44,7 +46,7 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public int getInventorySize() {
-        return 3;
+        return 5;
     }
     
     @Override

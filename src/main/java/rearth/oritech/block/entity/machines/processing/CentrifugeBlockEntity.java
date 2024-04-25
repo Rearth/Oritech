@@ -130,16 +130,15 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     @Override
     public InventorySlotAssignment getSlots() {
-        return new InventorySlotAssignment(0, 1, 1, 3);
+        return new InventorySlotAssignment(0, 1, 1, 2);
     }
     
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
           new GuiSlot(0, 80, 21),
-          new GuiSlot(1, 60, 59),
-          new GuiSlot(2, 80, 59),
-          new GuiSlot(3, 100, 59));
+          new GuiSlot(1, 70, 59),
+          new GuiSlot(2, 90, 59));
     }
     
     @Override
@@ -149,7 +148,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     @Override
     public int getInventorySize() {
-        return 4;
+        return 3;
     }
     
     @Override

@@ -27,15 +27,16 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public InventorySlotAssignment getSlots() {
-        return new InventorySlotAssignment(0, 2, 2, 1);
+        return new InventorySlotAssignment(0, 3, 3, 1);
     }
     
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 70, 21),
-          new GuiSlot(1, 90, 21),
-          new GuiSlot(2, 80, 59));
+          new GuiSlot(0, 60, 21),
+          new GuiSlot(1, 80, 21),
+          new GuiSlot(3, 100, 21),
+          new GuiSlot(4, 80, 59));
     }
     
     @Override

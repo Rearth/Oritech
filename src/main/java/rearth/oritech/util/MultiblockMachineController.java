@@ -22,7 +22,6 @@ import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.init.BlockContent;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.ArrayList;
@@ -77,9 +76,11 @@ public interface MultiblockMachineController {
         var heldStack = player.getEquippedStack(EquipmentSlot.MAINHAND);
         var heldItem = heldStack.getItem();
         
-        if (heldItem.equals(BlockContent.MACHINE_CORE_2.asItem())) {
+        if (!(heldItem instanceof BlockItem blockItem)) return false;
+        
+        if (blockItem.getBlock() instanceof MachineCoreBlock) {
             var nextPosition = this.getNextMissingCore();
-            if (nextPosition != null && heldItem instanceof BlockItem blockItem) {
+            if (nextPosition != null) {
                 this.getMachineWorld().setBlockState(nextPosition, blockItem.getBlock().getDefaultState());
                 if (!player.isCreative()) {
                     heldStack.decrement(1);

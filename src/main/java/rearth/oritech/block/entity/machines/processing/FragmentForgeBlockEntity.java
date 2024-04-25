@@ -71,7 +71,6 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
                     result.add(newItem);
                 }
             }
-            System.out.println(result);
             return result;
         } else {
             return super.getCraftingResults(activeRecipe);
@@ -80,18 +79,16 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public InventorySlotAssignment getSlots() {
-        return new InventorySlotAssignment(0, 4, 4, 2);
+        return new InventorySlotAssignment(0, 1, 1, 3);
     }
     
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
           new GuiSlot(0, 80, 21),
-          new GuiSlot(1, 100, 21),
-          new GuiSlot(2, 120, 21),
-          new GuiSlot(3, 140, 21),
-          new GuiSlot(4, 80, 59),
-          new GuiSlot(5, 100, 59));
+          new GuiSlot(1, 60, 59),
+          new GuiSlot(2, 80, 59),
+          new GuiSlot(3, 100, 59));
     }
     
     @Override
@@ -101,7 +98,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public int getInventorySize() {
-        return 6;
+        return 4;
     }
     
     // x = back
