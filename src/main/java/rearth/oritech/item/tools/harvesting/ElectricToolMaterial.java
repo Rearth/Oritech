@@ -4,7 +4,7 @@ import net.minecraft.item.Items;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
 
-public class SampleMaterial implements ToolMaterial {
+public class ElectricToolMaterial implements ToolMaterial {
     @Override
     public int getDurability() {
         return 1000;
@@ -12,7 +12,7 @@ public class SampleMaterial implements ToolMaterial {
     
     @Override
     public float getMiningSpeedMultiplier() {
-        return 8.0f;
+        return 9f;
     }
     
     @Override

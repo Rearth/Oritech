@@ -92,6 +92,8 @@ public class ModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(ToolsContent.EXO_CHESTPLATE, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.EXO_LEGGINGS, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.EXO_BOOTS, Models.GENERATED);
+        itemModelGenerator.register(ToolsContent.CHAINSAW, Models.GENERATED);
+        itemModelGenerator.register(ToolsContent.HAND_DRILL, Models.GENERATED);
         // itemModelGenerator.registerArmor((ArmorItem) ToolsContent.EXO_HELMET);   // this seems to generate it compatible with armor trims
         
         for (var item : autoRegisteredModels) {

@@ -1,9 +1,11 @@
 package rearth.oritech.init.datagen.data;
 
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
+import rearth.oritech.Oritech;
 
 public class TagContent {
     
@@ -33,5 +35,6 @@ public class TagContent {
     public static final TagKey<Item> PLATINUM_ORES = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "platinum_ores"));
     
     // blocks
+    public static final TagKey<Block> DRILL_MINEABLE = TagKey.of(RegistryKeys.BLOCK, new Identifier(Oritech.MOD_ID, "mineable/drill"));
     
 }

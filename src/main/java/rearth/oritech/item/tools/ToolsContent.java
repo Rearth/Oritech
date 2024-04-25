@@ -13,6 +13,9 @@ import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ItemGroups;
 import rearth.oritech.item.tools.armor.ExoArmorItem;
 import rearth.oritech.item.tools.armor.ExoArmorMaterial;
+import rearth.oritech.item.tools.harvesting.ChainsawItem;
+import rearth.oritech.item.tools.harvesting.DrillItem;
+import rearth.oritech.item.tools.harvesting.ElectricToolMaterial;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 
 import java.lang.reflect.Field;
@@ -20,10 +23,14 @@ import java.lang.reflect.Field;
 public class ToolsContent implements ItemRegistryContainer {
     
     public static final ArmorMaterial EXOSUIT_MATERIAL = new ExoArmorMaterial();
+    
     public static final Item EXO_HELMET = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings());
     public static final Item EXO_CHESTPLATE = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings());
     public static final Item EXO_LEGGINGS = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.LEGGINGS, new Item.Settings());
     public static final Item EXO_BOOTS = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings());
+    
+    public static final Item CHAINSAW = new ChainsawItem(new ElectricToolMaterial(), 5, -2.5f, new Item.Settings().maxDamage(-1).maxCount(1));
+    public static final Item HAND_DRILL = new DrillItem(2.5f, -2.8f, new ElectricToolMaterial());
     
     @Override
     public void postProcessField(String namespace, Item value, String identifier, Field field) {

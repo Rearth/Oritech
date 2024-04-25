@@ -1,31 +1,34 @@
 package rearth.oritech.item.tools.harvesting;
 
+import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.ToolMaterial;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.datagen.data.TagContent;
 import team.reborn.energy.api.base.SimpleEnergyItem;
 
 import java.util.List;
 
-public class EnergyPickaxeTest extends MiningToolItem implements SimpleEnergyItem {
+public class DrillItem extends MiningToolItem implements SimpleEnergyItem {
     
     public static final int BAR_STEP_COUNT = 13;
     private final float energyUsageMultiplier = 10f;
     
-    public EnergyPickaxeTest(float attackDamage, float attackSpeed, ToolMaterial material) {
-        super(attackDamage, attackSpeed, material, BlockTags.PICKAXE_MINEABLE, new Settings().maxDamage(-1).maxCount(1));
+    public DrillItem(float attackDamage, float attackSpeed, ToolMaterial material) {
+        super(attackDamage, attackSpeed, material, TagContent.DRILL_MINEABLE, new Settings().maxDamage(-1).maxCount(1));
     }
     
     @Override
@@ -58,12 +61,12 @@ public class EnergyPickaxeTest extends MiningToolItem implements SimpleEnergyIte
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return 1000;
+        return 10000;
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return 20;
+        return 500;
     }
     
     @Override
@@ -90,6 +93,11 @@ public class EnergyPickaxeTest extends MiningToolItem implements SimpleEnergyIte
     public int getItemBarStep(ItemStack stack) {
         var energyItem = (SimpleEnergyItem) stack.getItem();
         return Math.round((energyItem.getStoredEnergy(stack) * 100f / energyItem.getEnergyCapacity(stack)) * BAR_STEP_COUNT) / 100;
+    }
+    
+    @Override
+    public boolean canBeEnchantedWith(ItemStack stack, Enchantment enchantment, EnchantingContext context) {
+        return enchantment.target == EnchantmentTarget.WEAPON || enchantment.target == EnchantmentTarget.BREAKABLE || super.canBeEnchantedWith(stack, enchantment, context);
     }
     
     @Override

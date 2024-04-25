@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.datagen.data.TagContent;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -36,5 +37,9 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
         getOrCreateTagBuilder(BlockTags.NEEDS_IRON_TOOL)
           .add(BlockContent.DEEPSLATE_PLATINUM_ORE)
           .add(BlockContent.ENDSTONE_PLATINUM_ORE);
+        
+        getOrCreateTagBuilder(TagContent.DRILL_MINEABLE)
+          .addOptionalTag(BlockTags.PICKAXE_MINEABLE)
+          .addOptionalTag(BlockTags.SHOVEL_MINEABLE);
     }
 }

@@ -6,9 +6,7 @@ import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import rearth.oritech.init.datagen.ModelGenerator;
-import rearth.oritech.item.tools.harvesting.EnergyPickaxeTest;
 import rearth.oritech.item.tools.LaserTargetDesignator;
-import rearth.oritech.item.tools.harvesting.SampleMaterial;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,8 +20,6 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item BANANA = new Item(new FabricItemSettings());
     @ItemGroupTarget(Groups.equipment)
     public static final Item TARGET_DESIGNATOR = new LaserTargetDesignator(new FabricItemSettings().maxCount(1));
-    @ItemGroupTarget(Groups.equipment)
-    public static final Item TEST_ENERGY_ITEM = new EnergyPickaxeTest(4, -2.5f, new SampleMaterial());
     @ItemGroupTarget(Groups.components)
     public static final Item OIL_BUCKET = new BucketItem(FluidContent.STILL_OIL, new FabricItemSettings().recipeRemainder(Items.BUCKET).maxCount(1));
     

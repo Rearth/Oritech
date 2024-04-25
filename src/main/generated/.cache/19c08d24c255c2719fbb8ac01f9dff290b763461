@@ -1,12 +1,13 @@
-// 1.20.4	2024-04-25T21:05:57.7751665	Oritech/Model Definitions
+// 1.20.4	2024-04-25T21:50:36.665511	Oritech/Model Definitions
 2e964d91a46577bf6a179afb1ded52a0d5deaaaa assets\oritech\models\item\copper_gem.json
 1973c3ab5f3a5478532d293c932515332a78064f assets\oritech\models\item\raw_silicon.json
 cbaa2704b7ac8615111960eec8945623807c7b65 assets\oritech\models\item\machine_core_2.json
 90e28b721796ff7ee21c8eefe4525f03a251d2fb assets\oritech\models\block\machine_extender.json
 7a539b18d7ddf30a3908cb895e622c8216cc86f1 assets\oritech\models\item\small_gold_dust.json
+d83f00d15d54fb178e4a4f9ba12506b9c9ff12ed assets\oritech\models\item\hand_drill.json
 b6eb2448e4092954342cf871ee1afb7e6bc61c90 assets\oritech\blockstates\machine_core_1.json
-99f4f80042b40067653e620b77f5ca451025babf assets\oritech\models\item\small_nickel_dust.json
 6a46f0eb5360efc34c7a5ba9cdf76b7775f1a256 assets\oritech\models\item\strange_matter.json
+99f4f80042b40067653e620b77f5ca451025babf assets\oritech\models\item\small_nickel_dust.json
 94b9d2dadcfb3282492ebff0d46eadc058cda52a assets\oritech\blockstates\destroyer_block.json
 ce0b514b85fbf542c6e0daf035a33eab617259ab assets\oritech\models\item\steel_dust.json
 4516c012b579252d997760735fbc7c64d4d9c88e assets\oritech\models\item\unholy_intelligence.json
@@ -41,6 +42,7 @@ fb03aa413ddd02d32aca58d75003db4dbc224080 assets\oritech\models\item\exo_leggings
 7eb395cd65df72caf43bedc54067cbf53940fd6c assets\oritech\blockstates\basic_generator_block.json
 e5f76c24313a756a5eb97751c2b377f6cbdc8b5b assets\oritech\models\block\machine_core_1.json
 4941899baefe58d34d65d43a0155573e4a96d867 assets\oritech\models\block\endstone_platinum_ore.json
+097c37d02ca79c4afc8079e525fe8014952791b2 assets\oritech\models\item\chainsaw.json
 916518d02ec246510e238d7e4a707827ee0cc402 assets\oritech\models\block\deepslate_platinum_ore.json
 437880cd562d0a628c4f8df51f91644c34da48a6 assets\oritech\models\item\enderic_compound.json
 fec5280fe44efeefb44946be9ac4d9626b060ce6 assets\oritech\models\item\copper_dust.json
@@ -123,8 +125,8 @@ f590ac4a8b7ba13bfcadb9b1e5aa6ef8d5b269c1 assets\oritech\models\item\gold_gem.jso
 7eb395cd65df72caf43bedc54067cbf53940fd6c assets\oritech\blockstates\pump_block.json
 69b70a9ed5cdd7f49ca6c6765568f1ee840d712b assets\oritech\models\item\carbon_fibre_strands.json
 0a2d7c770028469395a7de7a0e5c1f2388c895b1 assets\oritech\models\block\machine_core_4.json
-17c1863ab68aaf33bc2e5df8139136c682720981 assets\oritech\models\item\small_nickel_clump.json
 6bef52fac87d1aa123f63bd88ce709707fda84b1 assets\oritech\models\item\polymer_resin.json
+17c1863ab68aaf33bc2e5df8139136c682720981 assets\oritech\models\item\small_nickel_clump.json
 dd9df6bcdee5187a35374e59f85f7bbfa2401f70 assets\oritech\models\item\deep_drill_block.json
 eb64414662cd6f580cf2dcb7bae7268b518b2c65 assets\oritech\models\block\deepslate_nickel_ore.json
 057648c76c3724fff0c6564cdec56b7c4b985104 assets\oritech\models\item\raw_platinum.json
@@ -132,7 +134,6 @@ eb64414662cd6f580cf2dcb7bae7268b518b2c65 assets\oritech\models\block\deepslate_n
 f1cc0a5efbb99d896db1845b29e678f2e3c5a926 assets\oritech\models\item\nickel_clump.json
 f910fc4e8c0661da68cc5a1813bb30d0bd1c54d9 assets\oritech\models\block\machine_core_7.json
 a5bcc52397f53e02db0b9f96fcf5faa8c43e7d65 assets\oritech\models\item\fluxite.json
-c6d21338006ebc36d1bd59b60793aec53507865c assets\oritech\models\item\test_energy_item.json
 3740e06ad5ab30d4f40ecf54d0071ad34761f0c2 assets\oritech\models\block\nickel_ore.json
 a294c894ced9b8c12123ea07302139a9fc105104 assets\oritech\models\item\machine_plating.json
 f4f2c78bc448794239f53404b7844b156fa1980e assets\oritech\models\item\small_platinum_clump.json
