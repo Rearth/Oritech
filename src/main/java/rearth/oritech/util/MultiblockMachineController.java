@@ -77,7 +77,7 @@ public interface MultiblockMachineController {
         var heldStack = player.getEquippedStack(EquipmentSlot.MAINHAND);
         var heldItem = heldStack.getItem();
         
-        if (heldItem.equals(BlockContent.MACHINE_CORE_GOOD.asItem())) {
+        if (heldItem.equals(BlockContent.MACHINE_CORE_2.asItem())) {
             var nextPosition = this.getNextMissingCore();
             if (nextPosition != null && heldItem instanceof BlockItem blockItem) {
                 this.getMachineWorld().setBlockState(nextPosition, blockItem.getBlock().getDefaultState());

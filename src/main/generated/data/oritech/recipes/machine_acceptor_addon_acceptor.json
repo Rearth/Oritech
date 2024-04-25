@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:machine_plating"
+    },
+    "c": {
+      "item": "oritech:energite_ingot"
+    },
+    "f": {
+      "item": "oritech:plastic_sheet"
+    },
+    "s": {
+      "item": "oritech:electrum_ingot"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "item": "oritech:machine_acceptor_addon"
+  }
+}

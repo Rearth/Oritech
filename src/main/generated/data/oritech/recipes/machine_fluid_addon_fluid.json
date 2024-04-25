@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:silicon"
+    },
+    "c": {
+      "item": "oritech:strange_matter"
+    },
+    "f": {
+      "item": "oritech:carbon_fibre_strands"
+    },
+    "s": {
+      "item": "oritech:electrum_ingot"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "item": "oritech:machine_fluid_addon"
+  }
+}

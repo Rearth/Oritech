@@ -128,6 +128,7 @@ In detail, these are the following items that are from the above-mentioned sourc
   * Deep Drill Model
 * From [malcolmriley's unused-textures repo](https://github.com/malcolmriley/unused-textures)
   * Oil fluid textures (the dark gas texture)
+  * Most of the crafting component textures
 
 ## Acknowledgements
 

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "minecraft:lapis_lazuli"
+    },
+    "s": {
+      "tag": "c:iron_ingots"
+    }
+  },
+  "pattern": [
+    "sss",
+    "scs",
+    "sss"
+  ],
+  "result": {
+    "item": "oritech:machine_core_2"
+  }
+}

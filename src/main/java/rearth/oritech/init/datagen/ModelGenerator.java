@@ -67,8 +67,14 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.DEEP_DRILL_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.DRONE_PORT_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_BASIC);
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_GOOD);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_1);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_2);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_3);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_4);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_5);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_6);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_7);
+        
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_EXTENDER);
         
         // metals

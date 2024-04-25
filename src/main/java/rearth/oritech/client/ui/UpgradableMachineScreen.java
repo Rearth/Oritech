@@ -124,7 +124,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             }
         };
         
-        floatingPanel.zIndex(2000);    // so it renders in front of itemslots
+        floatingPanel.zIndex(9000);    // so it renders in front of itemslots
         
         floatingPanel
           .horizontalAlignment(HorizontalAlignment.CENTER)
@@ -132,10 +132,10 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         
         // create block preview renderers
         var previewX = 176 / 2 - 10;
-        var previewY = 96 / 2 - 10;
+        var previewY = 96 / 2 - 7;
         
         for (var addonBlockPos : handler.addonUiData.positions()) {
-            var addonBlock = handler.worldAccess.getBlockState(addonBlockPos);
+            var addonBlock = handler.worldAccess.getBlockState(addonBlockPos).getBlock().getDefaultState();
             var addonBlockEntity = handler.worldAccess.getBlockEntity(addonBlockPos);
             
             var relativePos = MultiblockMachineEntity.worldToRelativePos(handler.blockPos, addonBlockPos, handler.machineBlock.get(handler.screenData.getBlockFacingProperty()));
