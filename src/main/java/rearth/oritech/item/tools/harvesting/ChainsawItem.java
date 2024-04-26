@@ -55,7 +55,7 @@ public class ChainsawItem extends AxeItem implements SimpleEnergyItem {
     
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        var text = Text.literal(String.format("%o/%o RF", this.getStoredEnergy(stack), this.getEnergyCapacity(stack)));
+        var text = Text.literal(String.format("%d/%d RF", this.getStoredEnergy(stack), this.getEnergyCapacity(stack)));
         tooltip.add(text.formatted(Formatting.GOLD));
     }
     

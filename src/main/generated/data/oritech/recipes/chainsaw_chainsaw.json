@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "oritech:strange_matter"
+    },
+    "e": {
+      "item": "oritech:adamant_ingot"
+    },
+    "m": {
+      "item": "oritech:motor"
+    },
+    "s": {
+      "item": "oritech:steel_ingot"
+    }
+  },
+  "pattern": [
+    "aa ",
+    "ae ",
+    "mss"
+  ],
+  "result": {
+    "item": "oritech:chainsaw"
+  }
+}

@@ -24,6 +24,7 @@ import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.datagen.data.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.item.tools.ToolsContent;
 import rearth.oritech.util.FluidStack;
 
 import java.util.ArrayList;
@@ -37,6 +38,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
     
     @Override
     public void generate(RecipeExporter exporter) {
+        
+        // tools / armor
+        offerDrillRecipe(exporter, ToolsContent.HAND_DRILL, Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), "_handdrill");
+        offerChainsawRecipe(exporter, ToolsContent.CHAINSAW, Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), "_chainsaw");
+        
         
         addMachines(exporter);
         addComponents(exporter);
@@ -522,6 +528,22 @@ public class RecipeGenerator extends FabricRecipeProvider {
                         .pattern("sss")
                         .pattern("scs")
                         .pattern("sss");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
+    }
+    
+    public void offerDrillRecipe(RecipeExporter exporter, Item output, Ingredient core, Ingredient motor, Ingredient center, Ingredient head, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', core).input('m', motor).input('a', center).input('e', head)
+                        .pattern(" a ")
+                        .pattern("aea")
+                        .pattern("mss");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
+    }
+    
+    public void offerChainsawRecipe(RecipeExporter exporter, Item output, Ingredient core, Ingredient motor, Ingredient center, Ingredient head, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', core).input('m', motor).input('a', center).input('e', head)
+                        .pattern("aa ")
+                        .pattern("ae ")
+                        .pattern("mss");
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
     }
 }

@@ -11,6 +11,7 @@ import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Item;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ItemGroups;
+import rearth.oritech.item.tools.armor.BackstorageExoArmorItem;
 import rearth.oritech.item.tools.armor.ExoArmorItem;
 import rearth.oritech.item.tools.armor.ExoArmorMaterial;
 import rearth.oritech.item.tools.harvesting.ChainsawItem;
@@ -25,7 +26,7 @@ public class ToolsContent implements ItemRegistryContainer {
     public static final ArmorMaterial EXOSUIT_MATERIAL = new ExoArmorMaterial();
     
     public static final Item EXO_HELMET = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings());
-    public static final Item EXO_CHESTPLATE = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings());
+    public static final Item EXO_CHESTPLATE = new BackstorageExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings());
     public static final Item EXO_LEGGINGS = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.LEGGINGS, new Item.Settings());
     public static final Item EXO_BOOTS = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings());
     
