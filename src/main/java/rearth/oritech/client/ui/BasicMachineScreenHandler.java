@@ -12,7 +12,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.Oritech;
 import rearth.oritech.util.EnergyProvider;
 import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.ScreenProvider;
@@ -58,7 +57,6 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         if (blockEntity instanceof EnergyProvider energyProvider) {
             energyStorage = energyProvider.getStorage(null);
         } else {
-            Oritech.LOGGER.error("Opened oritech block interface without any energy data at " + blockEntity);
             energyStorage = null;
         }
         

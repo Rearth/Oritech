@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fuel_generator",
+  "fluidInput": {
+    "amount": 81000,
+    "variant": {
+      "fluid": "oritech:still_fuel"
+    }
+  },
+  "ingredients": [],
+  "results": [],
+  "time": 4000
+}
