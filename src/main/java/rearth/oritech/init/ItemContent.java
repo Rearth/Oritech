@@ -2,10 +2,12 @@ package rearth.oritech.init;
 
 import io.wispforest.owo.registration.reflect.ItemRegistryContainer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import rearth.oritech.init.datagen.ModelGenerator;
+import rearth.oritech.item.other.MobCaptureItem;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 
 import java.lang.annotation.ElementType;
@@ -13,6 +15,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.util.List;
 
 public class ItemContent implements ItemRegistryContainer {
 
@@ -97,7 +100,7 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item PROCESSING_UNIT = new Item(new FabricItemSettings());
     public static final Item ADVANCED_COMPUTING_ENGINE = new Item(new FabricItemSettings());
     public static final Item SILICON_WAFER = new Item(new FabricItemSettings());
-    public static final Item DUBIOS_CONTAINER = new Item(new FabricItemSettings());
+    public static final Item DUBIOS_CONTAINER = new MobCaptureItem(new FabricItemSettings().maxCount(16), List.of(EntityType.VEX, EntityType.ALLAY));
     public static final Item ENDERIC_LENS = new Item(new FabricItemSettings());
     public static final Item FLUX_GATE = new Item(new FabricItemSettings());
     public static final Item ADVANCED_BATTERY = new Item(new FabricItemSettings());
