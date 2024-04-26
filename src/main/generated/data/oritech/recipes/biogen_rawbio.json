@@ -1,0 +1,10 @@
+{
+  "type": "oritech:bio_generator",
+  "ingredients": [
+    {
+      "tag": "oritech:biomass"
+    }
+  ],
+  "results": [],
+  "time": 300
+}

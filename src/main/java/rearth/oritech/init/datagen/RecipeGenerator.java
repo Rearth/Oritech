@@ -40,8 +40,20 @@ public class RecipeGenerator extends FabricRecipeProvider {
     public void generate(RecipeExporter exporter) {
         
         // add fuels
+        // bio
+        addBioGenRecipe(exporter, Ingredient.fromTag(TagContent.BIOMASS), 15, "_rawbio");
+        addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.PACKED_WHEAT), 200, "_packedwheat");
+        addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.BIOMASS), 25, "_biomass");
+        addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.SOLID_BIOFUEL), 160, "_solidbiomass");
+        addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.RAW_BIOPOLYMER), 300, "_polymer");
+        addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), 3000, "_vex");
+        // fuel
+        addLavaGen(exporter, new FluidStack(Fluids.LAVA, 81000), 120, "_lava");
+        // lava
+        addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_OIL, 81000), 120, "_crude");
+        addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_FUEL, 81000), 200, "_fuel");
         
-        
+        addBiomass(exporter);
         addEquipment(exporter);
         addMachines(exporter);
         addComponents(exporter);
@@ -49,6 +61,13 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addAlloys(exporter);
         addDusts(exporter);
         
+    }
+    
+    private void addBiomass(RecipeExporter exporter) {
+        // biomass
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.BIOMASS), ItemContent.BIOMASS, 1, "_biobasic");
+        addPulverizerRecipe(exporter, Ingredient.ofItems(ItemContent.PACKED_WHEAT), ItemContent.BIOMASS, 16, "_packagedwheatbio");
+        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.BIOMASS), Ingredient.ofItems(ItemContent.BIOMASS), Ingredient.ofItems(ItemContent.BIOMASS), Ingredient.fromTag(ItemTags.PLANKS), ItemContent.SOLID_BIOFUEL, 1, "_solidbiofuel");
     }
     
     private void addEquipment(RecipeExporter exporter) {
@@ -62,9 +81,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // chestplate (advanced battery + machine plating)
         offerChestplateRecipe(exporter, ToolsContent.EXO_CHESTPLATE, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), "_exochest");
         // legs (motor + plating)
-        offerHelmetRecipe(exporter, ToolsContent.EXO_LEGGINGS, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), "_exolegs");
+        offerLegsRecipe(exporter, ToolsContent.EXO_LEGGINGS, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), "_exolegs");
         // feet (silicon + plating)
-        offerHelmetRecipe(exporter, ToolsContent.EXO_BOOTS, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.SILICON), "_exoboots");
+        offerFeetRecipe(exporter, ToolsContent.EXO_BOOTS, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.SILICON), "_exoboots");
     }
     
     private void addMachines(RecipeExporter exporter) {
@@ -219,6 +238,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerMotorRecipe(exporter, ItemContent.DUBIOS_CONTAINER, Ingredient.ofItems(ItemContent.PLASTIC_SHEET), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.STRANGE_MATTER), "_dubios");
         // adv battery
         offerMotorRecipe(exporter, ItemContent.ADVANCED_BATTERY, Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_advbattery");
+        
+        // fuel
+        addCentrifugeFluidRecipe(exporter, Ingredient.fromTag(TagContent.COAL_DUSTS), null, FluidContent.STILL_OIL, 1f, FluidContent.STILL_FUEL, 1f, 1f, "_fuel");
         
         // endgame components
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.SUPER_AI_CHIP), ItemContent.HEISENBERG_COMPENSATOR, 100, "_compensator");
@@ -405,6 +427,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
     }
     
     private void addCentrifugeRecipe(RecipeExporter exporter, Ingredient input, Item result, float timeMultiplier, String suffix) {
+        addCentrifugeRecipe(exporter, input, result, 1, timeMultiplier, suffix);
+    }
+    private void addCentrifugeRecipe(RecipeExporter exporter, Ingredient input, Item result, int count, float timeMultiplier, String suffix) {
         var defaultSpeed = 600;
         var speed = (int) (defaultSpeed * timeMultiplier);
         var entry = new OritechRecipe(speed, List.of(input), List.of(new ItemStack(result)), RecipeContent.CENTRIFUGE, null, null);
@@ -416,7 +441,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         var speed = (int) (defaultSpeed * timeMultiplier);
         var inputStack = in != null ? new FluidStack(in, (long) (bucketsIn * 81000)) : null;
         var outputStack = out != null ? new FluidStack(out, (long) (bucketsOut * 81000)) : null;
-        var entry = new OritechRecipe(speed, List.of(input), List.of(new ItemStack(result)), RecipeContent.CENTRIFUGE_FLUID, inputStack, outputStack);
+        List<ItemStack> outputItem = result != null ? List.of(new ItemStack(result)) : List.of();
+        var entry = new OritechRecipe(speed, List.of(input), outputItem, RecipeContent.CENTRIFUGE_FLUID, inputStack, outputStack);
         exporter.accept(new Identifier(Oritech.MOD_ID, "centrifugefluid" + suffix), entry, null);
     }
     
@@ -434,6 +460,21 @@ public class RecipeGenerator extends FabricRecipeProvider {
     private void addAtomicForgeRecipe(RecipeExporter exporter, Ingredient A, Ingredient B, Item result, int time, String suffix) {
         var entry = new OritechRecipe(time, List.of(A, B, A), List.of(new ItemStack(result)), RecipeContent.ATOMIC_FORGE, null, null);
         exporter.accept(new Identifier(Oritech.MOD_ID, "atomicforge" + suffix), entry, null);
+    }
+    
+    private void addBioGenRecipe(RecipeExporter exporter, Ingredient A, int timeInSeconds, String suffix) {
+        var entry = new OritechRecipe(timeInSeconds * 20, List.of(A), List.of(), RecipeContent.BIO_GENERATOR, null, null);
+        exporter.accept(new Identifier(Oritech.MOD_ID, "biogen" + suffix), entry, null);
+    }
+    
+    private void addFuelGenRecipe(RecipeExporter exporter, FluidStack input, int timeInSeconds, String suffix) {
+        var entry = new OritechRecipe(timeInSeconds * 20, List.of(), List.of(), RecipeContent.FUEL_GENERATOR, input, null);
+        exporter.accept(new Identifier(Oritech.MOD_ID, "fuelgen" + suffix), entry, null);
+    }
+    
+    private void addLavaGen(RecipeExporter exporter, FluidStack input, int timeInSeconds, String suffix) {
+        var entry = new OritechRecipe(timeInSeconds * 20, List.of(), List.of(), RecipeContent.LAVA_GENERATOR, input, null);
+        exporter.accept(new Identifier(Oritech.MOD_ID, "lavagen" + suffix), entry, null);
     }
     
     private void addMetalProcessingChain(RecipeExporter exporter, Ingredient oreInput, Ingredient rawOre, Item rawMain, Item rawSecondary, Item clump, Item smallClump,

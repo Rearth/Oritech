@@ -3,7 +3,9 @@ package rearth.oritech.init.datagen;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.tag.ItemTags;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.datagen.data.TagContent;
@@ -70,5 +72,12 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(TagContent.PLATINUM_DUSTS).add(ItemContent.PLATINUM_DUST);
         getOrCreateTagBuilder(TagContent.PLATINUM_NUGGETS).add(ItemContent.PLATINUM_NUGGET);
         getOrCreateTagBuilder(TagContent.PLATINUM_INGOTS).add(ItemContent.PLATINUM_INGOT);
+        
+        // biomass
+        getOrCreateTagBuilder(TagContent.BIOMASS)
+          .addOptionalTag(ItemTags.VILLAGER_PLANTABLE_SEEDS)
+          .addOptionalTag(ItemTags.SAPLINGS)
+          .addOptionalTag(ConventionalItemTags.FOODS)
+          .add(Items.WHEAT);
     }
 }

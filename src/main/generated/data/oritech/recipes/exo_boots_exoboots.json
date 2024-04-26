@@ -10,9 +10,9 @@
     }
   },
   "pattern": [
-    "ppp",
-    "pcp",
-    "   "
+    "   ",
+    "p p",
+    "c c"
   ],
   "result": {
     "item": "oritech:exo_boots"

@@ -1,0 +1,22 @@
+{
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 81000,
+    "variant": {
+      "fluid": "oritech:still_oil"
+    }
+  },
+  "fluidOutput": {
+    "amount": 81000,
+    "variant": {
+      "fluid": "oritech:still_fuel"
+    }
+  },
+  "ingredients": [
+    {
+      "tag": "c:coal_dusts"
+    }
+  ],
+  "results": [],
+  "time": 600
+}

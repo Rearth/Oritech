@@ -123,6 +123,8 @@ public class BlockContent implements BlockRegistryContainer {
     
     @NoBlockItem
     public static final Block OIL_FLUID_BLOCK = new FluidBlock((FlowableFluid) FluidContent.FLOWING_OIL, FabricBlockSettings.copyOf(Blocks.WATER));
+    @NoBlockItem
+    public static final Block FUEL_FLUID_BLOCK = new FluidBlock((FlowableFluid) FluidContent.FLOWING_FUEL, FabricBlockSettings.copyOf(Blocks.WATER));
     
     //region metals
     public static final Block NICKEL_ORE = new Block(FabricBlockSettings.copyOf(Blocks.IRON_ORE));

@@ -25,6 +25,7 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item TARGET_DESIGNATOR = new LaserTargetDesignator(new FabricItemSettings().maxCount(1));
     @ItemGroupTarget(Groups.components)
     public static final Item OIL_BUCKET = new BucketItem(FluidContent.STILL_OIL, new FabricItemSettings().recipeRemainder(Items.BUCKET).maxCount(1));
+    public static final Item FUEL_BUCKET = new BucketItem(FluidContent.STILL_FUEL, new FabricItemSettings().recipeRemainder(Items.BUCKET).maxCount(1));
     
     // region metals
     // nickel
@@ -111,6 +112,10 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item SUPERCONDUCTOR = new Item(new FabricItemSettings());
     public static final Item PACKED_WHEAT = new Item(new FabricItemSettings());
     public static final Item QUARTZ_DUST = new Item(new FabricItemSettings());
+    
+    // bio
+    public static final Item BIOMASS = new Item(new FabricItemSettings());
+    public static final Item SOLID_BIOFUEL = new Item(new FabricItemSettings());
 
     @Override
     public void postProcessField(String namespace, Item value, String identifier, Field field) {
