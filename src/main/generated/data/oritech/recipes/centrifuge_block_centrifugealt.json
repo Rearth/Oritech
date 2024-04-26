@@ -3,19 +3,19 @@
   "category": "misc",
   "key": {
     "b": {
-      "item": "oritech:machine_plating"
+      "item": "oritech:motor"
     },
     "c": {
-      "item": "oritech:steel_ingot"
+      "item": "oritech:motor"
     },
     "f": {
       "item": "minecraft:glass_bottle"
     },
     "m": {
-      "item": "oritech:motor"
+      "item": "minecraft:copper_ingot"
     },
     "s": {
-      "item": "oritech:processing_unit"
+      "item": "minecraft:iron_block"
     }
   },
   "pattern": [

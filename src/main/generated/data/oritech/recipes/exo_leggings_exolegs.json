@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "oritech:motor"
+    },
+    "p": {
+      "item": "oritech:machine_plating"
+    }
+  },
+  "pattern": [
+    "ppp",
+    "pcp",
+    "   "
+  ],
+  "result": {
+    "item": "oritech:exo_leggings"
+  }
+}

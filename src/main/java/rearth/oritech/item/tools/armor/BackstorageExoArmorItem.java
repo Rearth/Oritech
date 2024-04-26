@@ -28,7 +28,6 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements SimpleEnerg
         if (world.getTime() % tickPeriod != 0) return;
         
         if (this.getSlotType() == EquipmentSlot.CHEST && entity instanceof PlayerEntity player && player.getEquippedStack(EquipmentSlot.CHEST).equals(stack)) {
-            System.out.println("ticking armor!");
             Helpers.distributePower(player, stack, 2000);
         }
     }

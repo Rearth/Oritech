@@ -39,17 +39,32 @@ public class RecipeGenerator extends FabricRecipeProvider {
     @Override
     public void generate(RecipeExporter exporter) {
         
-        // tools / armor
-        offerDrillRecipe(exporter, ToolsContent.HAND_DRILL, Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), "_handdrill");
-        offerChainsawRecipe(exporter, ToolsContent.CHAINSAW, Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), "_chainsaw");
+        // add fuels
         
         
+        addEquipment(exporter);
         addMachines(exporter);
         addComponents(exporter);
         addOreChains(exporter);
         addAlloys(exporter);
         addDusts(exporter);
         
+    }
+    
+    private void addEquipment(RecipeExporter exporter) {
+        
+        // tools / armor
+        offerDrillRecipe(exporter, ToolsContent.HAND_DRILL, Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), "_handdrill");
+        offerChainsawRecipe(exporter, ToolsContent.CHAINSAW, Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), "_chainsaw");
+        
+        // helmet (enderic lens + machine plating)
+        offerHelmetRecipe(exporter, ToolsContent.EXO_HELMET, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.ENDERIC_LENS), "_exohelm");
+        // chestplate (advanced battery + machine plating)
+        offerChestplateRecipe(exporter, ToolsContent.EXO_CHESTPLATE, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), "_exochest");
+        // legs (motor + plating)
+        offerHelmetRecipe(exporter, ToolsContent.EXO_LEGGINGS, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), "_exolegs");
+        // feet (silicon + plating)
+        offerHelmetRecipe(exporter, ToolsContent.EXO_BOOTS, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.SILICON), "_exoboots");
     }
     
     private void addMachines(RecipeExporter exporter) {
@@ -67,7 +82,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // foundry
         offerGeneratorRecipe(exporter, BlockContent.FOUNDRY_BLOCK.asItem(), Ingredient.ofItems(Blocks.CAULDRON.asItem()), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_foundry");
         // centrifuge
-        offerFurnaceRecipe(exporter, BlockContent.CENTRIFUGE_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(Items.COPPER_INGOT), Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(Items.GLASS_BOTTLE), "_centrifuge");
+        offerFurnaceRecipe(exporter, BlockContent.CENTRIFUGE_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(Items.GLASS_BOTTLE), "_centrifuge");
+        offerFurnaceRecipe(exporter, BlockContent.CENTRIFUGE_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(Items.IRON_BLOCK), Ingredient.ofItems(Items.COPPER_INGOT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(Items.GLASS_BOTTLE), "_centrifugealt");
         // laser arm
         offerAtomicForgeRecipe(exporter, BlockContent.LASER_ARM_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.ofItems(ItemContent.ENDERIC_LENS), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), "_atomicforge");
         // crusher
@@ -544,6 +560,38 @@ public class RecipeGenerator extends FabricRecipeProvider {
                         .pattern("aa ")
                         .pattern("ae ")
                         .pattern("mss");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
+    }
+    
+    public void offerHelmetRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('p', plating).input('c', core)
+                        .pattern("ppp")
+                        .pattern("pcp")
+                        .pattern("   ");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
+    }
+    
+    public void offerChestplateRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('p', plating).input('c', core)
+                        .pattern("p p")
+                        .pattern("ppp")
+                        .pattern("pcp");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
+    }
+    
+    public void offerLegsRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('p', plating).input('c', core)
+                        .pattern("ppp")
+                        .pattern("pcp")
+                        .pattern("p p");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
+    }
+    
+    public void offerFeetRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('p', plating).input('c', core)
+                        .pattern("   ")
+                        .pattern("p p")
+                        .pattern("c c");
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
     }
 }
