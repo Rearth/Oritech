@@ -15,11 +15,13 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
@@ -73,6 +75,22 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     
     public SmallFluidTankEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.SMALL_TANK_ENTITY, pos, state);
+    }
+    
+    @Override
+    protected void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        nbt.put("fluidVariant", fluidStorage.variant.toNbt());
+        nbt.putLong("amount", fluidStorage.amount);
+        Inventories.writeNbt(nbt, inventory.heldStacks, false);
+    }
+    
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+        fluidStorage.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
+        fluidStorage.amount = nbt.getLong("amount");
+        Inventories.readNbt(nbt, inventory.heldStacks);
     }
     
     @Override
@@ -131,6 +149,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     }
     
     private void updateNetwork() {
+        netDirty = false;
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SingleVariantFluidSyncPacket(pos, Registries.FLUID.getId(fluidStorage.variant.getFluid()).toString(), fluidStorage.amount));
     }
     

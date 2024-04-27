@@ -41,6 +41,18 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         // add fuels
         // bio
+        addFuels(exporter);
+        addBiomass(exporter);
+        addEquipment(exporter);
+        addMachines(exporter);
+        addComponents(exporter);
+        addOreChains(exporter);
+        addAlloys(exporter);
+        addDusts(exporter);
+        
+    }
+    
+    private void addFuels(RecipeExporter exporter) {
         addBioGenRecipe(exporter, Ingredient.fromTag(TagContent.BIOMASS), 15, "_rawbio");
         addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.PACKED_WHEAT), 200, "_packedwheat");
         addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.BIOMASS), 25, "_biomass");
@@ -52,15 +64,6 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // lava
         addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_OIL, 81000), 120, "_crude");
         addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_FUEL, 81000), 200, "_fuel");
-        
-        addBiomass(exporter);
-        addEquipment(exporter);
-        addMachines(exporter);
-        addComponents(exporter);
-        addOreChains(exporter);
-        addAlloys(exporter);
-        addDusts(exporter);
-        
     }
     
     private void addBiomass(RecipeExporter exporter) {
@@ -124,6 +127,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // large storage
         offerAtomicForgeRecipe(exporter, BlockContent.LARGE_STORAGE_BLOCK.asItem(), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(ItemContent.DUBIOS_CONTAINER), Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.ofItems(ItemContent.INSULATED_WIRE), "_bigstorage");
         
+        // fluid tank
+        offerTankRecipe(exporter, BlockContent.SMALL_TANK_BLOCK.asItem(), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), Ingredient.ofItems(BlockContent.FLUID_PIPE.asItem()), "_stank");
         // pump
         offerGeneratorRecipe(exporter, BlockContent.PUMP_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_pump");
         // block placer
@@ -633,6 +638,14 @@ public class RecipeGenerator extends FabricRecipeProvider {
                         .pattern("   ")
                         .pattern("p p")
                         .pattern("c c");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
+    }
+    
+    public void offerTankRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('p', plating).input('c', core)
+                        .pattern("ppp")
+                        .pattern("pcp")
+                        .pattern("ppp");
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
     }
 }
