@@ -99,9 +99,20 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         
         if (world.isClient) return;
         
+        if (world.getTime() % 100 == 0) netDirty = true;    // to ensure this syncs when no charged are triggered, and inventory isn't opened
+        
         var inStack = inventory.getStack(0);
         var outStack = inventory.getStack(1);
         
+        processBuckets(inStack, outStack);
+        
+        if (netDirty) {
+            updateNetwork();
+        }
+        
+    }
+    
+    private void processBuckets(ItemStack inStack, ItemStack outStack) {
         if (inStack != ItemStack.EMPTY && inStack.getItem().equals(Items.BUCKET) && fluidStorage.amount >= FluidConstants.BUCKET && outStack == ItemStack.EMPTY) {
             // try fill bucket
             var filledBucketType = fluidStorage.variant.getFluid().getBucketItem();
@@ -141,11 +152,6 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
             
             this.markDirty();
         }
-        
-        if (netDirty) {
-            updateNetwork();
-        }
-        
     }
     
     private void updateNetwork() {

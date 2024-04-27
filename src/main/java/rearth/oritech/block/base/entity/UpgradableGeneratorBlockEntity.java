@@ -229,7 +229,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     
     @Override
     public long getDefaultCapacity() {
-        return 5000;
+        return 20000;
     }
     
     @Override
@@ -240,5 +240,10 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     @Override
     public long getDefaultExtractionRate() {
         return 512;
+    }
+    
+    @Override
+    protected float getAnimationSpeed() {
+        return super.getAnimationSpeed() * 6;
     }
 }
