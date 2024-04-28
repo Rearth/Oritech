@@ -22,6 +22,7 @@ import rearth.oritech.block.blocks.machines.storage.LargeStorageBlock;
 import rearth.oritech.block.blocks.machines.storage.SmallFluidTank;
 import rearth.oritech.block.blocks.machines.storage.SmallStorageBlock;
 import rearth.oritech.block.blocks.pipes.*;
+import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.util.item.OritechGeoItem;
 
 import java.lang.annotation.ElementType;
@@ -142,6 +143,8 @@ public class BlockContent implements BlockRegistryContainer {
         
         if (field.isAnnotationPresent(UseGeoBlockItem.class)) {
             Registry.register(Registries.ITEM, new Identifier(namespace, identifier), getGeoBlockItem(value, identifier, field.getAnnotation(UseGeoBlockItem.class).scale()));
+        } else if (value.equals(BlockContent.SMALL_TANK_BLOCK)) {
+            Registry.register(Registries.ITEM, new Identifier(namespace, identifier), new SmallFluidTankBlockItem(value, new Item.Settings()));
         } else {
             Registry.register(Registries.ITEM, new Identifier(namespace, identifier), createBlockItem(value, identifier));
         }
@@ -153,7 +156,6 @@ public class BlockContent implements BlockRegistryContainer {
         
         ItemGroups.add(targetGroup, value);
     }
-    
     
     
     private BlockItem getGeoBlockItem(Block block, String identifier, float scale) {

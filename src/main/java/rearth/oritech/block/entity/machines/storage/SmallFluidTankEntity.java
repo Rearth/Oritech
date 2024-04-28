@@ -63,7 +63,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         
         @Override
         protected long getCapacity(FluidVariant variant) {
-            return (64 * FluidConstants.BUCKET);
+            return (256 * FluidConstants.BUCKET);
         }
         
         @Override
@@ -78,7 +78,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt) {
+    public void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
         nbt.put("fluidVariant", fluidStorage.variant.toNbt());
         nbt.putLong("amount", fluidStorage.amount);
