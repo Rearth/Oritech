@@ -1,5 +1,6 @@
 package rearth.oritech.block.blocks.machines.interaction;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -75,6 +76,9 @@ public class DronePortBlock extends Block implements BlockEntityProvider {
                 player.sendMessage(Text.literal("Machine is not assembled. Please add missing core blocks"));
                 return ActionResult.SUCCESS;
             }
+            
+            var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
+            player.openHandledScreen(handler);
             
         }
         

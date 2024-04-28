@@ -1,30 +1,40 @@
 package rearth.oritech.block.entity.machines.interaction;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.blocks.machines.interaction.DronePortBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
+import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.ui.DroneScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.DynamicEnergyStorage;
-import rearth.oritech.util.EnergyProvider;
-import rearth.oritech.util.InventoryProvider;
-import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -41,7 +51,7 @@ import java.util.Objects;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
-public class DronePortEntity extends BlockEntity implements InventoryProvider, EnergyProvider, GeoBlockEntity, BlockEntityTicker<DronePortEntity>, MultiblockMachineController {
+public class DronePortEntity extends BlockEntity implements InventoryProvider, EnergyProvider, GeoBlockEntity, BlockEntityTicker<DronePortEntity>, MultiblockMachineController, ExtendedScreenHandlerFactory, ScreenProvider {
     
     public record DroneTransferData(List<ItemStack> transferredStacks, long arrivesAt) {
     }
@@ -68,6 +78,19 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
         }
     };
     
+    // not persisted, only to assign targets
+    protected final SimpleInventory cardInventory = new SimpleInventory(2) {
+        @Override
+        public void markDirty() {
+            DronePortEntity.this.markDirty();
+        }
+        
+        @Override
+        public boolean canInsert(ItemStack stack) {
+            return stack.getItem().equals(ItemContent.TARGET_DESIGNATOR);
+        }
+    };
+    
     protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     private float coreQuality = 1f;
     
@@ -89,6 +112,9 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     private final int takeOffTime = 300;
     private final int landTime = 260;
     
+    // client only
+    private String statusMessage;
+    
     public DronePortEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.DRONE_PORT_ENTITY, pos, state);
     }
@@ -97,6 +123,8 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     public void tick(World world, BlockPos pos, BlockState state, DronePortEntity blockEntity) {
         
         if (world.isClient) return;
+        
+        checkPositionCard();
         
         if (incomingPacket != null)
             checkIncomingAnimation();
@@ -108,6 +136,23 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
                 sendDrone();
             }
         }
+    }
+    
+    private void checkPositionCard() {
+        
+        var source = cardInventory.heldStacks.get(0);
+        if (source.getItem().equals(ItemContent.TARGET_DESIGNATOR) && source.hasNbt()) {
+            var target = BlockPos.fromLong(source.getNbt().getLong("target"));
+            setTargetFromDesignator(target);
+        } else {
+            return;
+        }
+        
+        cardInventory.heldStacks.set(1, source);
+        cardInventory.heldStacks.set(0, ItemStack.EMPTY);
+        cardInventory.markDirty();
+        this.markDirty();
+        
     }
     
     @Override
@@ -217,6 +262,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     }
     
     private long calculateEnergyUsage() {
+        if (targetPosition == null) return baseEnergyUsage;
         var distance = pos.getManhattanDistance(targetPosition);
         return (long) Math.sqrt(distance) * 50 + baseEnergyUsage;
     }
@@ -227,6 +273,10 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     
     private void triggerNetworkReceiveAnimation() {
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.DroneSendEventPacket(pos, false, true));
+    }
+    
+    private void sendNetworkStatusMessage(String statusMessage) {
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.DroneCardEventPacket(pos, statusMessage));
     }
     
     public boolean setTargetFromDesignator(BlockPos targetPos) {
@@ -241,16 +291,18 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
         
         var distance = targetPos.getManhattanDistance(pos);
         if (distance < 50) {
+            sendNetworkStatusMessage("Target must be at least 50 blocks away.\n(current distance: " + distance + ")");
             return false;
         }
         
         if (world.getBlockState(targetPos).getBlock() instanceof DronePortBlock) {
             // store position
-            System.out.println("target port stored: " + targetPos);
             this.targetPosition = targetPos;
+            sendNetworkStatusMessage("Target port set.\nDrone will deliver whenever the inventory is not empty.");
             return true;
         }
         
+        sendNetworkStatusMessage("Target is not a valid drone port.\nEnsure that the target port is loaded and active.");
         return false;
         
     }
@@ -397,5 +449,91 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
                 return state.setAndContinue(PACKAGED);
             }
         });
+    }
+    
+    @Override
+    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        buf.writeBlockPos(pos);
+    }
+    
+    @Override
+    public Text getDisplayName() {
+        return Text.of("");
+    }
+    
+    @Nullable
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+        return new DroneScreenHandler(syncId, playerInventory, this);
+    }
+    
+    @Override
+    public List<GuiSlot> getGuiSlots() {
+        
+        var startX = 30;
+        var startY = 26;
+        var distance = 18;
+        
+        var list = new ArrayList<GuiSlot>();
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 5; x++) {
+                var index = y * 5 + x;
+                list.add(new GuiSlot(index, startX + x * distance, startY + y * distance));
+            }
+        }
+        
+        return list;
+    }
+    
+    @Override
+    public float getDisplayedEnergyUsage() {
+        return calculateEnergyUsage();
+    }
+    
+    @Override
+    public float getProgress() {
+        return 0;
+    }
+    
+    @Override
+    public InventoryInputMode getInventoryInputMode() {
+        return InventoryInputMode.FILL_LEFT_TO_RIGHT;
+    }
+    
+    @Override
+    public Inventory getDisplayedInventory() {
+        return inventory;
+    }
+    
+    @Override
+    public ScreenHandlerType<?> getScreenHandlerType() {
+        return ModScreens.DRONE_SCREEN;
+    }
+    
+    @Override
+    public boolean inputOptionsEnabled() {
+        return false;
+    }
+    
+    @Override
+    public boolean showProgress() {
+        return false;
+    }
+    
+    @Override
+    public boolean showEnergy() {
+        return false;
+    }
+    
+    public SimpleInventory getCardInventory() {
+        return cardInventory;
+    }
+    
+    public void setStatusMessage(String statusMessage) {
+        this.statusMessage = statusMessage;
+    }
+    
+    public String getStatusMessage() {
+        return statusMessage;
     }
 }

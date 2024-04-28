@@ -49,6 +49,9 @@ public class NetworkContent {
     public record MachineSetupEventPacket(BlockPos position) {
     }
     
+    public record DroneCardEventPacket(BlockPos position, String message) {
+    }
+    
     public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget,
                                              BlockPos areaMin, BlockPos areaMax) {
     }   // times are in ticks
@@ -162,6 +165,16 @@ public class NetworkContent {
             if (entity instanceof DronePortEntity dronePort) {
                 if (message.sendEvent) dronePort.playSendAnimation();
                 if (message.receiveEvent) dronePort.playReceiveAnimation();
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(DroneCardEventPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof DronePortEntity dronePort) {
+                dronePort.setStatusMessage(message.message);
             }
             
         }));

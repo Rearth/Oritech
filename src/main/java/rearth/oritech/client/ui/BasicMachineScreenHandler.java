@@ -88,7 +88,7 @@ public class BasicMachineScreenHandler extends ScreenHandler {
                 .playerInventory(playerInventory);
     }
 
-    private void addMachineSlot(int inventorySlot, int x, int y) {
+    public void addMachineSlot(int inventorySlot, int x, int y) {
         this.addSlot(new Slot(inventory, inventorySlot, x, y));
     }
 
