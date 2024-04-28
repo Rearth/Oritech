@@ -32,6 +32,8 @@ import rearth.oritech.util.ScreenProvider;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
+
 public class BasicMachineScreen implements DisplayCategory<Display> {
     
     protected final OritechRecipeType recipeType;
@@ -100,26 +102,30 @@ public class BasicMachineScreen implements DisplayCategory<Display> {
         if (display.entry.value().getFluidInput() != null) {
             var fluid = display.entry.value().getFluidInput().variant();
             var amount = display.entry.value().getFluidInput().amount();
-            var fluidBackground = Containers.horizontalFlow(Sizing.fixed(18), Sizing.fixed(52));
-            fluidBackground.positioning(Positioning.absolute(3, 4));
-            fluidBackground.surface(Surface.PANEL_INSET);
             
-            var text = Text.literal(amount / FluidConstants.BUCKET * 1000 + " mB " + FluidVariantAttributes.getName(fluid).getString()).formatted(Formatting.DARK_AQUA);
-            root.child(fluidBackground.tooltip(text));
             root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, 81000, new ScreenProvider.BarConfiguration(4, 5, 16, 50)));
+            
+            
+            var text = Text.literal(amount * 1000 / FluidConstants.BUCKET + " mB " + FluidVariantAttributes.getName(fluid).getString()).formatted(Formatting.DARK_AQUA);
+            var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
+            foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));
+            foreGround.positioning(Positioning.absolute(3, 4));
+            foreGround.tooltip(text);
+            root.child(foreGround);
         }
         
         if (display.entry.value().getFluidOutput() != null) {
             var fluid = display.entry.value().getFluidOutput().variant();
             var amount = display.entry.value().getFluidOutput().amount();
-            var fluidBackground = Containers.horizontalFlow(Sizing.fixed(18), Sizing.fixed(52));
-            fluidBackground.positioning(Positioning.absolute(122, 4));
-            fluidBackground.surface(Surface.PANEL_INSET);
             
-            var text = Text.literal(amount / FluidConstants.BUCKET * 1000 + " mB " + FluidVariantAttributes.getName(fluid).getString()).formatted(Formatting.DARK_AQUA);
-            
-            root.child(fluidBackground.tooltip(text));
             root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, 81000, new ScreenProvider.BarConfiguration(123, 5, 16, 50)));
+            
+            var text = Text.literal(amount * 1000 / FluidConstants.BUCKET + " mB " + FluidVariantAttributes.getName(fluid).getString()).formatted(Formatting.DARK_AQUA);
+            var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
+            foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));
+            foreGround.positioning(Positioning.absolute(122, 4));
+            foreGround.tooltip(text);
+            root.child(foreGround);
         }
         
     }
