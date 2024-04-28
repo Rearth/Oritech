@@ -3,6 +3,7 @@ package rearth.oritech.init.datagen;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.server.recipe.CraftingRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.RecipeExporter;
@@ -39,8 +40,16 @@ public class RecipeGenerator extends FabricRecipeProvider {
     @Override
     public void generate(RecipeExporter exporter) {
         
-        // add fuels
-        // bio
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_REDSTONE, Items.REDSTONE, 1, "_redstone");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_LAPIS, Items.LAPIS_LAZULI, 1, "_lapis");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_IRON, Items.RAW_IRON, 1, "_iron");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_COPPER, Items.RAW_COPPER, 1, "_copper");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_GOLD, Items.RAW_GOLD, 1, "_gold");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_EMERALD, Items.EMERALD, 1, "_emerald");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_DIAMOND, Items.DIAMOND, 1, "_diamond");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_NICKEL, ItemContent.RAW_NICKEL, 1, "_nickel");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_PLATINUM, ItemContent.RAW_PLATINUM, 1, "_platinum");
+        
         addFuels(exporter);
         addBiomass(exporter);
         addEquipment(exporter);
@@ -53,6 +62,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
     }
     
     private void addFuels(RecipeExporter exporter) {
+        
+        // bio
         addBioGenRecipe(exporter, Ingredient.fromTag(TagContent.BIOMASS), 15, "_rawbio");
         addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.PACKED_WHEAT), 200, "_packedwheat");
         addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.BIOMASS), 25, "_biomass");
@@ -465,6 +476,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
     private void addAtomicForgeRecipe(RecipeExporter exporter, Ingredient A, Ingredient B, Item result, int time, String suffix) {
         var entry = new OritechRecipe(time, List.of(A, B, A), List.of(new ItemStack(result)), RecipeContent.ATOMIC_FORGE, null, null);
         exporter.accept(new Identifier(Oritech.MOD_ID, "atomicforge" + suffix), entry, null);
+    }
+    
+    private void addDeepDrillRecipe(RecipeExporter exporter, Block input, Item result, int time, String suffix) {
+        var entry = new OritechRecipe(time, List.of(Ingredient.ofItems(input.asItem())), List.of(new ItemStack(result)), RecipeContent.DEEP_DRILL, null, null);
+        exporter.accept(new Identifier(Oritech.MOD_ID, "deepdrill" + suffix), entry, null);
     }
     
     private void addBioGenRecipe(RecipeExporter exporter, Ingredient A, int timeInSeconds, String suffix) {

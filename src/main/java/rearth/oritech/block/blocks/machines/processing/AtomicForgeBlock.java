@@ -4,7 +4,6 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.base.block.MultiblockMachine;
-import rearth.oritech.block.entity.machines.processing.AssemblerBlockEntity;
 import rearth.oritech.block.entity.machines.processing.AtomicForgeBlockEntity;
 
 public class AtomicForgeBlock extends MultiblockMachine implements BlockEntityProvider {

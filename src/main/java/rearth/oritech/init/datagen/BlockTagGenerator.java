@@ -18,7 +18,14 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
     
     @Override
     protected void configure(RegistryWrapper.WrapperLookup arg) {
-        getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
+        
+        var pickaxeBuilder = getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE);
+        
+        for (var block : BlockLootGenerator.autoRegisteredDrops) {
+            pickaxeBuilder.add(block);
+        }
+        
+        pickaxeBuilder
           .add(BlockContent.NICKEL_ORE)
           .add(BlockContent.DEEPSLATE_NICKEL_ORE)
           .add(BlockContent.DEEPSLATE_PLATINUM_ORE)
@@ -41,5 +48,16 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
         getOrCreateTagBuilder(TagContent.DRILL_MINEABLE)
           .addOptionalTag(BlockTags.PICKAXE_MINEABLE)
           .addOptionalTag(BlockTags.SHOVEL_MINEABLE);
+        
+        getOrCreateTagBuilder(TagContent.RESOURCE_NODES)
+          .add(BlockContent.RESOURCE_NODE_COPPER)
+          .add(BlockContent.RESOURCE_NODE_IRON)
+          .add(BlockContent.RESOURCE_NODE_NICKEL)
+          .add(BlockContent.RESOURCE_NODE_GOLD)
+          .add(BlockContent.RESOURCE_NODE_REDSTONE)
+          .add(BlockContent.RESOURCE_NODE_LAPIS)
+          .add(BlockContent.RESOURCE_NODE_EMERALD)
+          .add(BlockContent.RESOURCE_NODE_DIAMOND)
+          .add(BlockContent.RESOURCE_NODE_PLATINUM);
     }
 }

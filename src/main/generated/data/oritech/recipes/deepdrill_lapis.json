@@ -1,0 +1,15 @@
+{
+  "type": "oritech:deep_drill",
+  "ingredients": [
+    {
+      "item": "oritech:resource_node_lapis"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "minecraft:lapis_lazuli"
+    }
+  ],
+  "time": 1
+}

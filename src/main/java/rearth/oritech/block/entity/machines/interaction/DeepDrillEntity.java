@@ -12,7 +12,6 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -21,6 +20,7 @@ import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.datagen.data.TagContent;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.DynamicEnergyStorage;
@@ -87,7 +87,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
         
         var startAt = pos.south().down();
         var checkState = world.getBlockState(startAt);
-        if (!checkState.isIn(BlockTags.DIAMOND_ORES)) return false;
+        if (!checkState.isIn(TagContent.RESOURCE_NODES)) return false;
         
         initialized = true;
         targetedOre = checkState.getBlock();
@@ -255,7 +255,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     
     @Override
     public EnergyStorage getEnergyStorageForLink() {
-        return energyStorage;
+        return null;
     }
     
     @Override

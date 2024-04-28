@@ -1,9 +1,6 @@
 package rearth.oritech.block.blocks.machines.interaction;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -33,6 +30,23 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
         builder.add(ASSEMBLED);
+    }
+    
+    @Override
+    public boolean emitsRedstonePower(BlockState state) {
+        return true;
+    }
+    
+    @Override
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        
+        var isPowered = world.isReceivingRedstonePower(pos);
+        System.out.println(isPowered);
+        
+        var laserEntity = (LaserArmBlockEntity) world.getBlockEntity(pos);
+        laserEntity.setRedstonePowered(isPowered);
+        
     }
     
     @Override

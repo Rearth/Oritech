@@ -4,12 +4,14 @@
     "nodeSize": 5,
     "boulderRadius": 3,
     "nodeOres": [
-      "minecraft:deepslate_gold_ore",
-      "minecraft:deepslate_lapis_ore",
-      "minecraft:deepslate_redstone_ore",
-      "minecraft:deepslate_redstone_ore",
-      "minecraft:deepslate",
-      "minecraft:deepslate"
+      "oritech:resource_node_gold",
+      "oritech:resource_node_nickel",
+      "oritech:resource_node_lapis",
+      "oritech:resource_node_lapis",
+      "oritech:resource_node_redstone",
+      "oritech:resource_node_redstone",
+      "oritech:resource_node_redstone",
+      "minecraft:bedrock"
     ],
     "boulderOres": [
       "minecraft:deepslate_gold_ore",

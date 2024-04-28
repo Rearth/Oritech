@@ -10,6 +10,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
+import team.reborn.energy.api.EnergyStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,11 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public long getDefaultCapacity() {
         return 1000;
+    }
+    
+    @Override
+    public EnergyStorage getEnergyStorageForLink() {
+        return null;
     }
     
     @Override

@@ -20,6 +20,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
@@ -85,6 +86,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     private int progress;
     private int targetBlockEnergyNeeded = BLOCK_BREAK_ENERGY;
     private boolean networkDirty;
+    private boolean redstonePowered;
     
     @Environment(EnvType.CLIENT)
     public Vec3d lastRenderPosition;
@@ -95,7 +97,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
-        if (world.isClient() ||!isActive(state) || currentTarget == null || energyStorage.getAmount() < energyRequiredToFire()) return;
+        if (world.isClient() ||!isActive(state) || redstonePowered || currentTarget == null || energyStorage.getAmount() < energyRequiredToFire()) return;
         
         var targetBlock = currentTarget;
         var targetBlockState = world.getBlockState(targetBlock);
@@ -105,7 +107,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         if (targetBlockEntity instanceof AtomicForgeBlockEntity atomicForgeEntity) {
             storageCandidate = atomicForgeEntity.getEnergyStorage();
         } else if (targetBlockEntity instanceof DeepDrillEntity deepDrillEntity) {
-            storageCandidate = deepDrillEntity.getEnergyStorageForLink();
+            storageCandidate = deepDrillEntity.getStorage(null);
         }
         
         var fired = false;
@@ -150,25 +152,33 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         
     }
     
-    private void finishBlockBreaking(BlockPos targetBlock, BlockState targetBlockState) {
+    public void setRedstonePowered(boolean redstonePowered) {
+        this.redstonePowered = redstonePowered;
+    }
+    
+    private void finishBlockBreaking(BlockPos targetPos, BlockState targetBlockState) {
         progress -= targetBlockEnergyNeeded;
         
-        var targetEntity = world.getBlockEntity(targetBlock);
-        var dropped = Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetBlock, targetEntity);
+        var targetEntity = world.getBlockEntity(targetPos);
+        var dropped = Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetPos, targetEntity);
         
         if (targetBlockState.getBlock().equals(Blocks.AMETHYST_CLUSTER)) {
             dropped = List.of(new ItemStack(ItemContent.FLUXITE));
-            ParticleContent.CHARGING.spawn(world, targetBlock.toCenterPos(), 1);
+            ParticleContent.CHARGING.spawn(world, targetPos.toCenterPos(), 1);
         }
         
         // yes, this will discard items that wont fit anymore
         for (var stack : dropped) {
             this.inventory.addStack(stack);
         }
-        
-        world.addBlockBreakParticles(targetBlock, world.getBlockState(targetBlock));
-        world.playSound(null, targetBlock, targetBlockState.getSoundGroup().getBreakSound(), SoundCategory.BLOCKS, 1f, 1f);
-        world.breakBlock(targetBlock, false);
+        try {
+            targetBlockState.getBlock().onBreak(world, targetPos, targetBlockState, null);
+        } catch (Exception exception) {
+            Oritech.LOGGER.warn("Laser arm block break event failure when breaking " + targetBlockState + " at " + targetPos + ": " + exception.getLocalizedMessage());
+        }
+        world.addBlockBreakParticles(targetPos, world.getBlockState(targetPos));
+        world.playSound(null, targetPos, targetBlockState.getSoundGroup().getBreakSound(), SoundCategory.BLOCKS, 1f, 1f);
+        world.breakBlock(targetPos, false);
         
         findNextBlockBreakTarget();
     }

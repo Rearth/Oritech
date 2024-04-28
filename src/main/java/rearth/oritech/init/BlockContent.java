@@ -22,6 +22,7 @@ import rearth.oritech.block.blocks.machines.storage.LargeStorageBlock;
 import rearth.oritech.block.blocks.machines.storage.SmallFluidTank;
 import rearth.oritech.block.blocks.machines.storage.SmallStorageBlock;
 import rearth.oritech.block.blocks.pipes.*;
+import rearth.oritech.init.datagen.BlockLootGenerator;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.util.item.OritechGeoItem;
 
@@ -65,7 +66,7 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block ADDON_INDICATOR_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS));
     
     @UseGeoBlockItem(scale = 0.7f)
-    public static final Block PULVERIZER_BLOCK = new PulverizerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block PULVERIZER_BLOCK = new PulverizerBlock(FabricBlockSettings.copyOf(Blocks.DIRT).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block FRAGMENT_FORGE_BLOCK = new FragmentForge(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
@@ -97,6 +98,7 @@ public class BlockContent implements BlockRegistryContainer {
     
     public static final Block SMALL_STORAGE_BLOCK = new SmallStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block LARGE_STORAGE_BLOCK = new LargeStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @NoAutoDrop
     public static final Block SMALL_TANK_BLOCK = new SmallFluidTank(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block PLACER_BLOCK = new PlacerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
@@ -130,11 +132,48 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block FUEL_FLUID_BLOCK = new FluidBlock((FlowableFluid) FluidContent.FLOWING_FUEL, FabricBlockSettings.copyOf(Blocks.WATER));
     
     //region metals
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block NICKEL_ORE = new Block(FabricBlockSettings.copyOf(Blocks.IRON_ORE));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block DEEPSLATE_NICKEL_ORE = new Block(FabricBlockSettings.copyOf(Blocks.DEEPSLATE_IRON_ORE));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block ENDSTONE_PLATINUM_ORE = new Block(FabricBlockSettings.copyOf(Blocks.DIAMOND_ORE));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block DEEPSLATE_PLATINUM_ORE = new Block(FabricBlockSettings.copyOf(Blocks.DEEPSLATE_DIAMOND_ORE));
     //endregion
+    
+    //region resource nodes
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RESOURCE_NODE_REDSTONE = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RESOURCE_NODE_LAPIS = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RESOURCE_NODE_IRON = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RESOURCE_NODE_GOLD = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RESOURCE_NODE_EMERALD = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RESOURCE_NODE_DIAMOND = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RESOURCE_NODE_COPPER = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RESOURCE_NODE_NICKEL = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RESOURCE_NODE_PLATINUM = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
     
     @Override
     public void postProcessField(String namespace, Block value, String identifier, Field field) {
@@ -154,6 +193,10 @@ public class BlockContent implements BlockRegistryContainer {
             targetGroup = field.getAnnotation(ItemContent.ItemGroupTarget.class).value();
         }
         
+        if (!field.isAnnotationPresent(NoAutoDrop.class)) {
+            BlockLootGenerator.autoRegisteredDrops.add(value);
+        }
+        
         ItemGroups.add(targetGroup, value);
     }
     
@@ -166,6 +209,11 @@ public class BlockContent implements BlockRegistryContainer {
     @Target({ElementType.FIELD})
     public @interface UseGeoBlockItem {
         float scale(); // scale
+    }
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    public @interface NoAutoDrop {
     }
     
 }

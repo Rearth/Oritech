@@ -39,5 +39,6 @@ public class TagContent {
     
     // blocks
     public static final TagKey<Block> DRILL_MINEABLE = TagKey.of(RegistryKeys.BLOCK, new Identifier(Oritech.MOD_ID, "mineable/drill"));
+    public static final TagKey<Block> RESOURCE_NODES = TagKey.of(RegistryKeys.BLOCK, new Identifier(Oritech.MOD_ID, "resource_nodes"));
     
 }
