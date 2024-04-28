@@ -270,7 +270,6 @@ public class NetworkContent {
             
             if (entity instanceof InventoryProxyAddonBlockEntity machine) {
                 machine.setTargetSlot(message.slot);
-                System.out.println(message.slot);
             }
             
         });

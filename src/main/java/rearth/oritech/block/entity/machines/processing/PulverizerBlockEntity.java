@@ -34,9 +34,9 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 80, 21),
-          new GuiSlot(1, 70, 59),
-          new GuiSlot(2, 90, 59));
+          new GuiSlot(0, 56, 38),
+          new GuiSlot(1, 117, 38),
+          new GuiSlot(2, 135, 38));
     }
     
     @Override

@@ -2,6 +2,7 @@ package rearth.oritech.init.compat.Screens;
 
 import io.wispforest.owo.compat.rei.ReiUIAdapter;
 import io.wispforest.owo.ui.base.BaseComponent;
+import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
@@ -15,21 +16,35 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryStacks;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.math.BlockPos;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.init.compat.OritechDisplay;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.ScreenProvider;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class BasicMachineScreen implements DisplayCategory<Display> {
     
     protected final OritechRecipeType recipeType;
+    protected final MachineBlockEntity screenProvider;
     protected final ItemConvertible icon;
     
-    public BasicMachineScreen(OritechRecipeType recipeType, ItemConvertible icon) {
+    public BasicMachineScreen(OritechRecipeType recipeType, Class<? extends MachineBlockEntity> screenProviderSource, ItemConvertible icon) {
         this.recipeType = recipeType;
+        try {
+            this.screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(new BlockPos(0, 0, 0), Blocks.AIR.getDefaultState());
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
         this.icon = icon;
     }
     
@@ -50,34 +65,61 @@ public class BasicMachineScreen implements DisplayCategory<Display> {
     
     public void fillDisplay(FlowLayout root, OritechDisplay display, ReiUIAdapter<FlowLayout> adapter) {
         
+        var slots = screenProvider.getGuiSlots();
+        var slotOffsets = screenProvider.getSlots();
+        var offsetX = 23;
+        var offsetY = 17;
+        
+        // inputs
         var inputEntries = display.getInputEntries();
         for (int i = 0; i < inputEntries.size(); i++) {
             var entry = inputEntries.get(i);
-            root.child(adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0))).positioning(Positioning.absolute(50 + i * 19, 11)));
+            var pos = slots.get(slotOffsets.inputStart() + i);
+            root.child(adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0))).positioning(Positioning.absolute(pos.x() - offsetX, pos.y() - offsetY)));
         }
         
+        // arrow
+        root.child(adapter.wrap(Widgets.createArrow(new Point(0, 0))).positioning(Positioning.absolute(80 - offsetX, 35 - offsetY)));
+        
+        // outputs
         var outputEntries = display.getOutputEntries();
         for (int i = 0; i < outputEntries.size(); i++) {
             var entry = outputEntries.get(i);
-            root.child(adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0))).positioning(Positioning.absolute(50 + i * 19, 40)));
+            var pos = slots.get(slotOffsets.outputStart() + i);
+            root.child(adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0))).positioning(Positioning.absolute(pos.x() - offsetX, pos.y() - offsetY)));
         }
         
+        // data
+        var duration = String.format("%.0f", display.getEntry().value().getTime() / 20f);
+        root.child(
+          Components.label(Text.of(duration + "s")).lineHeight(7)
+            .positioning(Positioning.relative(30, 97))
+        );
+        
+        // fluids
         if (display.entry.value().getFluidInput() != null) {
             var fluid = display.entry.value().getFluidInput().variant();
-            var fluidBackground = Containers.horizontalFlow(Sizing.fixed(22), Sizing.fixed(42));
-            fluidBackground.positioning(Positioning.absolute(10, 10));
+            var amount = display.entry.value().getFluidInput().amount();
+            var fluidBackground = Containers.horizontalFlow(Sizing.fixed(18), Sizing.fixed(52));
+            fluidBackground.positioning(Positioning.absolute(3, 4));
             fluidBackground.surface(Surface.PANEL_INSET);
-            root.child(fluidBackground);
-            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, 81000, new ScreenProvider.BarConfiguration(11, 11, 20, 40)));
+            
+            var text = Text.literal(amount / FluidConstants.BUCKET * 1000 + " mB " + FluidVariantAttributes.getName(fluid).getString()).formatted(Formatting.DARK_AQUA);
+            root.child(fluidBackground.tooltip(text));
+            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, 81000, new ScreenProvider.BarConfiguration(4, 5, 16, 50)));
         }
         
         if (display.entry.value().getFluidOutput() != null) {
             var fluid = display.entry.value().getFluidOutput().variant();
-            var fluidBackground = Containers.horizontalFlow(Sizing.fixed(22), Sizing.fixed(42));
-            fluidBackground.positioning(Positioning.absolute(80, 10));
+            var amount = display.entry.value().getFluidOutput().amount();
+            var fluidBackground = Containers.horizontalFlow(Sizing.fixed(18), Sizing.fixed(52));
+            fluidBackground.positioning(Positioning.absolute(122, 4));
             fluidBackground.surface(Surface.PANEL_INSET);
-            root.child(fluidBackground);
-            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, 81000, new ScreenProvider.BarConfiguration(81, 11, 20, 40)));
+            
+            var text = Text.literal(amount / FluidConstants.BUCKET * 1000 + " mB " + FluidVariantAttributes.getName(fluid).getString()).formatted(Formatting.DARK_AQUA);
+            
+            root.child(fluidBackground.tooltip(text));
+            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, 81000, new ScreenProvider.BarConfiguration(123, 5, 16, 50)));
         }
         
     }

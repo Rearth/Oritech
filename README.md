@@ -135,3 +135,4 @@ In detail, these are the following items that are from the above-mentioned sourc
 * Kekie6, for creating the energy pipe and big solar panel models
 * glisco, the creator of owo-lib, for creating this awesome library and supporting in its usage
 * The creators and maintainers of Geckolib for creating the great animation engine, and helping out in their discord
+* [LyFl0w's texture maker](https://github.com/LyFl0w/TextureMaker), which has been used for a lot of the other mod textures

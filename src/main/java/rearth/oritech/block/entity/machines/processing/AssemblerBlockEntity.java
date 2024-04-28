@@ -32,11 +32,11 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 50, 21),
-          new GuiSlot(1, 70, 21),
-          new GuiSlot(2, 90, 21),
-          new GuiSlot(3, 110, 21),
-          new GuiSlot(4, 80, 59));
+          new GuiSlot(0, 38, 26),
+          new GuiSlot(1, 56, 26),
+          new GuiSlot(2, 38, 44),
+          new GuiSlot(3, 56, 44),
+          new GuiSlot(4, 117, 36));
     }
     
     @Override

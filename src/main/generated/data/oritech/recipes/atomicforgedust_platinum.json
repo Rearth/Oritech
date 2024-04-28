@@ -2,10 +2,13 @@
   "type": "oritech:atomic_forge",
   "ingredients": [
     {
+      "item": "oritech:enderic_compound"
+    },
+    {
       "item": "oritech:platinum_dust"
     },
     {
-      "item": "oritech:banana"
+      "item": "oritech:enderic_compound"
     }
   ],
   "results": [

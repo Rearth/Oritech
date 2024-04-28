@@ -6,9 +6,9 @@ import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.item.ItemConvertible;
+import rearth.oritech.block.entity.machines.processing.*;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.compat.Screens.BasicMachineScreen;
-import rearth.oritech.init.compat.Screens.PulverizerScreen;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -21,13 +21,13 @@ public class OritechREIPlugin implements REIClientPlugin {
     public void registerCategories(CategoryRegistry registry) {
         
         // recipe types
-        registerOritechCategory(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK, PulverizerScreen::new);
-        registerOritechCategory(registry, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK, BasicMachineScreen::new);
-        registerOritechCategory(registry, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK, BasicMachineScreen::new);
-        registerOritechCategory(registry, RecipeContent.FOUNDRY, BlockContent.FOUNDRY_BLOCK, BasicMachineScreen::new);
-        registerOritechCategory(registry, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK, BasicMachineScreen::new);
-        registerOritechCategory(registry, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK, BasicMachineScreen::new);
-        registerOritechCategory(registry, RecipeContent.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE_BLOCK, BasicMachineScreen::new);
+        registerOritechCategory(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK, (recipeType, icon) -> new BasicMachineScreen(recipeType, PulverizerBlockEntity.class, icon));
+        registerOritechCategory(registry, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK, (recipeType, icon) -> new BasicMachineScreen(recipeType, FragmentForgeBlockEntity.class, icon));
+        registerOritechCategory(registry, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK, (recipeType, icon) -> new BasicMachineScreen(recipeType, AssemblerBlockEntity.class, icon));
+        registerOritechCategory(registry, RecipeContent.FOUNDRY, BlockContent.FOUNDRY_BLOCK, (recipeType, icon) -> new BasicMachineScreen(recipeType, FoundryBlockEntity.class, icon));
+        registerOritechCategory(registry, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK, (recipeType, icon) -> new BasicMachineScreen(recipeType, CentrifugeBlockEntity.class, icon));
+        registerOritechCategory(registry, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK, (recipeType, icon) -> new BasicMachineScreen(recipeType, CentrifugeBlockEntity.class, icon));
+        registerOritechCategory(registry, RecipeContent.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE_BLOCK, (recipeType, icon) -> new BasicMachineScreen(recipeType, AtomicForgeBlockEntity.class, icon));
         
         // workstations
         registerOriWorkstation(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK);

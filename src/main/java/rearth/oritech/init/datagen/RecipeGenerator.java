@@ -269,7 +269,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           ItemContent.SMALL_IRON_DUST,
           ItemContent.SMALL_NICKEL_DUST,
           ItemContent.IRON_GEM,
-          Ingredient.ofItems(ItemContent.BANANA),
+          Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND),
           Items.IRON_NUGGET,
           Items.IRON_INGOT,
           1f,
@@ -289,7 +289,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           ItemContent.SMALL_COPPER_DUST,
           ItemContent.SMALL_GOLD_DUST,
           ItemContent.COPPER_GEM,
-          Ingredient.ofItems(ItemContent.BANANA),
+          Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND),
           ItemContent.COPPER_NUGGET,
           Items.COPPER_INGOT,
           1f,
@@ -309,7 +309,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           ItemContent.SMALL_GOLD_DUST,
           ItemContent.SMALL_COPPER_DUST,
           ItemContent.GOLD_GEM,
-          Ingredient.ofItems(ItemContent.BANANA),
+          Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND),
           Items.GOLD_NUGGET,
           Items.GOLD_INGOT,
           1f,
@@ -329,7 +329,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           ItemContent.SMALL_NICKEL_DUST,
           ItemContent.SMALL_PLATINUM_DUST,
           ItemContent.NICKEL_GEM,
-          Ingredient.ofItems(ItemContent.BANANA),
+          Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND),
           ItemContent.NICKEL_NUGGET,
           ItemContent.NICKEL_INGOT,
           1f,
@@ -349,7 +349,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           ItemContent.SMALL_PLATINUM_DUST,
           Items.AMETHYST_SHARD,
           ItemContent.PLATINUM_GEM,
-          Ingredient.ofItems(ItemContent.BANANA),
+          Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND),
           ItemContent.PLATINUM_NUGGET,
           ItemContent.PLATINUM_INGOT,
           1.5f,
@@ -499,7 +499,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         var centrifugeClumpWet = new OritechRecipe((int) (600 * timeMultiplier), List.of(Ingredient.ofItems(clump)), List.of(new ItemStack(dust, 2)), RecipeContent.CENTRIFUGE_FLUID, new FluidStack(Fluids.WATER, 81000), null);
         
         // gems
-        var atomicForgeDust = new OritechRecipe(3, List.of(Ingredient.ofItems(dust), gemCatalyst), List.of(new ItemStack(gem, 1)), RecipeContent.ATOMIC_FORGE, null, null);
+        var atomicForgeDust = new OritechRecipe(3, List.of(gemCatalyst, Ingredient.ofItems(dust), gemCatalyst), List.of(new ItemStack(gem, 1)), RecipeContent.ATOMIC_FORGE, null, null);
         var foundryGem = new OritechRecipe(800, List.of(Ingredient.ofItems(gem), Ingredient.ofItems(gem)), List.of(new ItemStack(ingot, 4)), RecipeContent.FOUNDRY, null, null);
         
         // smelting/compacting

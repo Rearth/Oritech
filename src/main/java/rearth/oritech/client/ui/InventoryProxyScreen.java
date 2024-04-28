@@ -57,7 +57,13 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
             button.active = i != handler.selectedSlot;
         }
         
-        // addTitle(overlay);
+        addTitle(overlay);
+        
+        var hint = Components.label(Text.of("Select proxy target slot"));
+        hint.horizontalTextAlignment(HorizontalAlignment.CENTER);
+        hint.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
+        hint.sizing(Sizing.fixed(176), Sizing.content(2));
+        overlay.child(hint.positioning(Positioning.relative(50, 90)));
     }
     
     private void addTitle(FlowLayout overlay) {
@@ -71,7 +77,6 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
     }
     
     private void setActiveSlot(int slot) {
-        System.out.println("slot clicked: " + slot);
         
         handler.selectedSlot = slot;
         

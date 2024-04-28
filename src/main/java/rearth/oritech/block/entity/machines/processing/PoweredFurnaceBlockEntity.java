@@ -128,8 +128,8 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 80, 21),
-          new GuiSlot(1, 80, 59));
+          new GuiSlot(0, 56, 38),
+          new GuiSlot(1, 117, 38));
     }
     
     @Override
