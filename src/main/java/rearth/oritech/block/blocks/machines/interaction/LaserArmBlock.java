@@ -41,8 +41,9 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
     public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
         
+        if (world.isClient) return;
+        
         var isPowered = world.isReceivingRedstonePower(pos);
-        System.out.println(isPowered);
         
         var laserEntity = (LaserArmBlockEntity) world.getBlockEntity(pos);
         laserEntity.setRedstonePowered(isPowered);

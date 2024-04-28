@@ -290,6 +290,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         addMultiblockToNbt(nbt);
         writeAddonToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
+        nbt.putBoolean("redstone", redstonePowered);
         
         if (targetDirection != null && currentTarget != null) {
             nbt.putLong("target_position", currentTarget.asLong());
@@ -306,6 +307,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         
         updateEnergyContainer();
         
+        redstonePowered = nbt.getBoolean("redstone");
         energyStorage.amount = nbt.getLong("energy_stored");
         targetDirection = BlockPos.fromLong(nbt.getLong("target_direction"));
         currentTarget = BlockPos.fromLong(nbt.getLong("target_position"));
