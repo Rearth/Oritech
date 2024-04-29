@@ -3,13 +3,12 @@
 	"id": "oritech",
 	"version": "${version}",
 	"name": "Oritech",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Simple fabric tech mod",
 	"authors": [
-		"Me!"
+		"Me! - rearth"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/Rearth/Oritech"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/oritech/icon.png",

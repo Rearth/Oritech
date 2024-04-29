@@ -135,7 +135,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         var previewY = 96 / 2 - 7;
         
         for (var addonBlockPos : handler.addonUiData.positions()) {
-            var addonBlock = handler.worldAccess.getBlockState(addonBlockPos).getBlock().getDefaultState();
+            var addonBlock = handler.worldAccess.getBlockState(addonBlockPos);
             var addonBlockEntity = handler.worldAccess.getBlockEntity(addonBlockPos);
             
             var relativePos = MultiblockMachineEntity.worldToRelativePos(handler.blockPos, addonBlockPos, handler.machineBlock.get(handler.screenData.getBlockFacingProperty()));
@@ -145,6 +145,8 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
                 .sizing(Sizing.fixed(20))
                 .positioning(Positioning.absolute(previewX, previewY))
             );
+            
+            addonBlock = addonBlock.getBlock().getDefaultState();
             
             // detailed list element
             var addonBlockType = (MachineAddonBlock) addonBlock.getBlock();
