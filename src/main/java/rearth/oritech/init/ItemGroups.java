@@ -26,25 +26,25 @@ public class ItemGroups {
         for (var item : registered.get(ItemContent.Groups.machines) ) {
             entries.add(item);
         }
-    })).displayName(Text.translatable("itemgroup.oritech.machines")).icon(() -> new ItemStack(ItemContent.BANANA)).build();
+    })).displayName(Text.translatable("itemgroup.oritech.machines")).icon(() -> new ItemStack(BlockContent.FERTILIZER_BLOCK.asItem())).build();
 
     private static final ItemGroup COMPONENT_GROUP = FabricItemGroup.builder().entries(((context, entries) -> {
         for (var item : registered.get(ItemContent.Groups.components) ) {
             entries.add(item);
         }
-    })).displayName(Text.translatable("itemgroup.oritech.components")).icon(() -> new ItemStack(ItemContent.BANANA)).build();
+    })).displayName(Text.translatable("itemgroup.oritech.components")).icon(() -> new ItemStack(ItemContent.SUPER_AI_CHIP)).build();
 
     private static final ItemGroup EQUIPMENT_GROUP = FabricItemGroup.builder().entries(((context, entries) -> {
         for (var item : registered.get(ItemContent.Groups.equipment) ) {
             entries.add(item);
         }
-    })).displayName(Text.translatable("itemgroup.oritech.equipment")).icon(() -> new ItemStack(ItemContent.BANANA)).build();
+    })).displayName(Text.translatable("itemgroup.oritech.equipment")).icon(() -> new ItemStack(ToolsContent.CHAINSAW)).build();
 
     private static final ItemGroup DECORATIVE_GROUP = FabricItemGroup.builder().entries(((context, entries) -> {
         for (var item : registered.get(ItemContent.Groups.decorative) ) {
             entries.add(item);
         }
-    })).displayName(Text.translatable("itemgroup.oritech.decorative")).icon(() -> new ItemStack(ItemContent.BANANA)).build();
+    })).displayName(Text.translatable("itemgroup.oritech.decorative")).icon(() -> new ItemStack(BlockContent.RESOURCE_NODE_PLATINUM)).build();
 
     public static void registerItemGroup() {
 

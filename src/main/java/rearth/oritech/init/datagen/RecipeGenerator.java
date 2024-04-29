@@ -25,7 +25,7 @@ import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.datagen.data.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.item.tools.ToolsContent;
+import rearth.oritech.init.ToolsContent;
 import rearth.oritech.util.FluidStack;
 
 import java.util.ArrayList;

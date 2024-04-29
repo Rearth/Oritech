@@ -7,7 +7,7 @@ import net.minecraft.data.client.ItemModelGenerator;
 import net.minecraft.data.client.Models;
 import net.minecraft.item.Item;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.item.tools.ToolsContent;
+import rearth.oritech.init.ToolsContent;
 
 import java.util.HashSet;
 import java.util.Set;

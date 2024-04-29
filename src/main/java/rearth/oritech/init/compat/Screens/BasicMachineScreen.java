@@ -159,7 +159,7 @@ public class BasicMachineScreen implements DisplayCategory<Display> {
     
     @Override
     public Text getTitle() {
-        return Text.of(recipeType.getIdentifier());
+        return Text.translatable("rei.process." + recipeType.getIdentifier());
     }
     
     @Override
