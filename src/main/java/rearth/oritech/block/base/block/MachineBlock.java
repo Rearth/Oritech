@@ -6,6 +6,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
@@ -19,6 +20,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.machines.processing.PulverizerBlockEntity;
 
 import java.lang.reflect.InvocationTargetException;
@@ -62,6 +64,23 @@ public abstract class MachineBlock extends HorizontalFacingBlock implements Bloc
             Oritech.LOGGER.error("Unable to create blockEntity for " + getBlockEntityType().getSimpleName() + " at " + this);
             return new PulverizerBlockEntity(pos, state);
         }
+    }
+    
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        
+        if (!world.isClient) {
+            var entity = (MachineBlockEntity) world.getBlockEntity(pos);
+            var stacks = entity.inventory.heldStacks;
+            for (var stack : stacks) {
+                if (!stack.isEmpty()) {
+                    var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+                    world.spawnEntity(itemEntity);
+                }
+            }
+        }
+        
+        return super.onBreak(world, pos, state, player);
     }
     
     @NotNull

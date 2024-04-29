@@ -30,7 +30,7 @@ import java.util.Objects;
 
 public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity implements InventoryProvider, EnergyProvider, ExtendedScreenHandlerFactory, ScreenProvider, MachineAddonController {
     
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0) {
+    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0) {
         @Override
         public void onFinalCommit() {
             super.onFinalCommit();
@@ -38,7 +38,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
         }
     };
     
-    protected final SimpleInventory inventory = new SimpleInventory(getInventorySize()) {
+    public final SimpleInventory inventory = new SimpleInventory(getInventorySize()) {
         @Override
         public void markDirty() {
             ItemEnergyFrameInteractionBlockEntity.this.markDirty();

@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -61,6 +62,14 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
                 tankEntity.writeNbt(nbt);
                 stack.setNbt(nbt);
                 Block.dropStack(world, pos, stack);
+            }
+            
+            var stacks = tankEntity.inventory.heldStacks;
+            for (var heldStack : stacks) {
+                if (!heldStack.isEmpty()) {
+                    var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
+                    world.spawnEntity(itemEntity);
+                }
             }
             
         }

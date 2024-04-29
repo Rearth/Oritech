@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
@@ -19,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.machines.storage.SmallStorageBlockEntity;
 import rearth.oritech.util.MachineAddonController;
 
@@ -83,6 +85,16 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
             var entity = world.getBlockEntity(pos);
             if (entity instanceof MachineAddonController machineEntity) {
                 machineEntity.resetAddons();
+            }
+            
+            if (entity instanceof ExpandableEnergyStorageBlockEntity storageBlock) {
+                var stacks = storageBlock.inventory.heldStacks;
+                for (var heldStack : stacks) {
+                    if (!heldStack.isEmpty()) {
+                        var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
+                        world.spawnEntity(itemEntity);
+                    }
+                }
             }
         }
         

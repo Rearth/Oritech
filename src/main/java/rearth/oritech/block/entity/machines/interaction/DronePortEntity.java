@@ -65,7 +65,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
         }
     };
     
-    protected final SimpleInventory inventory = new SimpleInventory(15) {
+    public final SimpleInventory inventory = new SimpleInventory(15) {
         @Override
         public void markDirty() {
             DronePortEntity.this.markDirty();

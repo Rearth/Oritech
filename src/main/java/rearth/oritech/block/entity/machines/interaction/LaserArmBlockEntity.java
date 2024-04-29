@@ -57,7 +57,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         }
     };
     
-    protected final SimpleInventory inventory = new SimpleInventory(3) {
+    public final SimpleInventory inventory = new SimpleInventory(3) {
         @Override
         public void markDirty() {
             LaserArmBlockEntity.this.markDirty();

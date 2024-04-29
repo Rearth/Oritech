@@ -55,7 +55,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     public static final RawAnimation IDLE = RawAnimation.begin().thenPlayAndHold("idle");
     public static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    protected final SimpleInventory inventory = new SimpleMachineInventory(getInventorySize());
+    public final SimpleInventory inventory = new SimpleMachineInventory(getInventorySize());
     // crafting / processing
     protected int progress;
     private final AnimationController<MachineBlockEntity> animationController = getAnimationController();
@@ -65,7 +65,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     // network state
     protected boolean networkDirty = true;
     //own storage
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate()) {
+    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate()) {
         @Override
         public void onFinalCommit() {
             super.onFinalCommit();

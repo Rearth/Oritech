@@ -62,7 +62,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
         }
     };
     
-    protected final SimpleInventory inventory = new SimpleInventory(1) {
+    public final SimpleInventory inventory = new SimpleInventory(1) {
         @Override
         public void markDirty() {
             DeepDrillEntity.this.markDirty();

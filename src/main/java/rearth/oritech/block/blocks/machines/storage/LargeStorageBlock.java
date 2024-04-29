@@ -3,6 +3,7 @@ package rearth.oritech.block.blocks.machines.storage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
@@ -13,6 +14,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.machines.storage.LargeStorageBlockEntity;
 import rearth.oritech.util.MultiblockMachineController;
 
@@ -86,6 +88,16 @@ public class LargeStorageBlock extends SmallStorageBlock {
             var entity = world.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
+            }
+            
+            if (entity instanceof ExpandableEnergyStorageBlockEntity storageBlock) {
+                var stacks = storageBlock.inventory.heldStacks;
+                for (var heldStack : stacks) {
+                    if (!heldStack.isEmpty()) {
+                        var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
+                        world.spawnEntity(itemEntity);
+                    }
+                }
             }
         }
         

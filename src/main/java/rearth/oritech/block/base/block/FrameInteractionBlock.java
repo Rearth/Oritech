@@ -9,6 +9,7 @@ import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
@@ -23,16 +24,15 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
-import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
-import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
+import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.util.MachineAddonController;
-import rearth.oritech.util.ScreenProvider;
 
 import java.util.Objects;
 
 public abstract class FrameInteractionBlock extends HorizontalFacingBlock implements BlockEntityProvider {
     
     public static final BooleanProperty HAS_FRAME = BooleanProperty.of("has_frame");
+    
     public FrameInteractionBlock(Settings settings) {
         super(settings);
         setDefaultState(getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH).with(HAS_FRAME, false));
@@ -101,6 +101,16 @@ public abstract class FrameInteractionBlock extends HorizontalFacingBlock implem
             
             if (ownEntity instanceof MachineAddonController machineEntity) {
                 machineEntity.resetAddons();
+            }
+            
+            if (ownEntity instanceof ItemEnergyFrameInteractionBlockEntity itemContainer) {
+                var stacks = itemContainer.inventory.heldStacks;
+                for (var stack : stacks) {
+                    if (!stack.isEmpty()) {
+                        var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+                        world.spawnEntity(itemEntity);
+                    }
+                }
             }
         }
         

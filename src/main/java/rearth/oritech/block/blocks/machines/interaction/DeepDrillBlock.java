@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.text.Text;
@@ -84,6 +85,16 @@ public class DeepDrillBlock extends Block implements BlockEntityProvider {
             var entity = world.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
+            }
+            
+            if (entity instanceof DeepDrillEntity storageBlock) {
+                var stacks = storageBlock.inventory.heldStacks;
+                for (var heldStack : stacks) {
+                    if (!heldStack.isEmpty()) {
+                        var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
+                        world.spawnEntity(itemEntity);
+                    }
+                }
             }
         }
         

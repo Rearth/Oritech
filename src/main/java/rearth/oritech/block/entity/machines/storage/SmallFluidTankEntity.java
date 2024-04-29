@@ -47,7 +47,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     
     private boolean netDirty = false;
     
-    protected final SimpleInventory inventory = new SimpleInventory(2) {
+    public final SimpleInventory inventory = new SimpleInventory(2) {
         @Override
         public void markDirty() {
             SmallFluidTankEntity.this.markDirty();

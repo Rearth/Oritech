@@ -51,7 +51,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     private boolean networkDirty = false;
     
-    protected final SimpleInventory inventory = new SimpleInventory(1) {
+    public final SimpleInventory inventory = new SimpleInventory(1) {
         @Override
         public void markDirty() {
             ExpandableEnergyStorageBlockEntity.this.markDirty();
