@@ -77,6 +77,12 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
         fluidStorage.amount = nbt.getLong("fluidAmount");
     }
     
+    @Override
+    public List<GuiSlot> getGuiSlots() {
+        return List.of(
+          new GuiSlot(0, 56, 38));
+    }
+    
     public FertilizerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.FERTILIZER_BLOCK_ENTITY, pos, state);
     }

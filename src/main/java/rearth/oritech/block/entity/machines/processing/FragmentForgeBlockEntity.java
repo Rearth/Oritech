@@ -88,7 +88,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
           new GuiSlot(0, 56, 38),
           new GuiSlot(1, 117, 20),
           new GuiSlot(2, 117, 38),
-          new GuiSlot(2, 117, 56));
+          new GuiSlot(3, 117, 56));
     }
     
     @Override

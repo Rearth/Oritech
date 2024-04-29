@@ -28,6 +28,10 @@ public class BlockLootGenerator extends FabricBlockLootTableProvider {
         for (var block : autoRegisteredDrops) {
             addDrop(block);
         }
+        
+        addDrop(BlockContent.ITEM_PIPE_CONNECTION, BlockContent.ITEM_PIPE);
+        addDrop(BlockContent.FLUID_PIPE_CONNECTION, BlockContent.FLUID_PIPE);
+        addDrop(BlockContent.ENERGY_PIPE_CONNECTION, BlockContent.ENERGY_PIPE);
     }
     
     private void addOreDrop(Block block, Item item) {

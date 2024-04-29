@@ -85,6 +85,12 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
     }
     
     @Override
+    public List<GuiSlot> getGuiSlots() {
+        return List.of(
+          new GuiSlot(0, 56, 38));
+    }
+    
+    @Override
     public ItemStack getToolheadAdditionalRender() {
         return getFirstInInventory();
     }

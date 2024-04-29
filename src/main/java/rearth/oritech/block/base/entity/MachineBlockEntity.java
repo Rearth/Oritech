@@ -454,7 +454,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     @Override
     public Text getDisplayName() {
-        return Text.literal("Oritech Machine (you should not see this text");
+        return Text.literal("Ignored");
     }
     
     @Nullable
