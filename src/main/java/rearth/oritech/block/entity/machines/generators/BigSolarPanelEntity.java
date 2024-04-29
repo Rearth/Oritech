@@ -73,7 +73,7 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     
     @Override
     public boolean isProducing() {
-        return !world.isNight();
+        return !world.isNight() && isActive(getCachedState());
     }
     
     public void sendInfoMessageToPlayer(PlayerEntity player) {

@@ -8,12 +8,10 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -43,9 +41,6 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
         var offset = worldPosA.subtract(coreWorldPosA);
         
         var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
-        
-        ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3d.of(worldPosA));
-        ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3d.of(worldPosB));
         
         var cacheA = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, worldPosA);
         res.put(direction, cacheA);
@@ -78,11 +73,6 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     @Override
     public int getInventorySize() {
         return 0;
-    }
-    
-    @Override
-    protected float getAnimationSpeed() {
-        return super.getAnimationSpeed();
     }
     
     @Override

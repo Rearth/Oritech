@@ -244,6 +244,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     
     @Override
     protected float getAnimationSpeed() {
-        return super.getAnimationSpeed() * 6;
+        return super.getAnimationSpeed() * 20;
     }
 }

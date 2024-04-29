@@ -73,6 +73,11 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
     }
     
     @Override
+    public float getCoreQuality() {
+        return 3f;
+    }
+    
+    @Override
     public BlockState getMachineHead() {
         return BlockContent.BLOCK_PLACER_HEAD.getDefaultState();
     }

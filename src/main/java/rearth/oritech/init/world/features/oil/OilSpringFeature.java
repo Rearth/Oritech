@@ -74,7 +74,7 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
         }
         
         // down
-        for (int i = 1; i < depth; i++) {
+        for (int i = 1; i < depth + 5; i++) {
             world.setBlockState(surfacePos.down(i), state, 0x10);
         }
         
