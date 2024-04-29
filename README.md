@@ -10,7 +10,7 @@
   A minecraft fabric tech mod, currently still WIP. Just like this readme.
   <br/>
   <br/>
-  <a href="https://github.com/rearth/Oritech"><strong>Explore the docs »</strong></a>
+  <a href="https://github.com/rearth/Oritech"><strong>Explore the docs TODO»</strong></a>
   <br/>
   <br/>
   <a href="https://github.com/rearth/Oritech/issues">Report Bug</a>
@@ -24,7 +24,9 @@
 
 ![Screen Shot](images/screenshot.png)
 
-This is just a short description with an image
+An upcoming tech mod for minecraft fabric. Features advanced ore processing, powered tools and armor, and much much more.
+
+Currently in very early access, numerous bugs and issues are to be expected.
 
 ## Built With
 
@@ -33,49 +35,10 @@ This is just a short description with an image
 - Geckolib (for the animations)
 - Blockbench (to create and animate the models)
 
-## Getting Started
+## Installation
 
 This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
-
-### Prerequisites
-
-This is an example of how to list things you need to use the software and how to install them.
-
-* npm
-
-```sh
-npm install npm@latest -g
-```
-
-### Installation
-
-1. Get a free API Key at [https://example.com](https://example.com)
-
-2. Clone the repo
-
-```sh
-git clone https://github.com/your_username_/Project-Name.git
-```
-
-3. Install NPM packages
-
-```sh
-npm install
-```
-
-4. Enter your API in `config.js`
-
-```JS
-const API_KEY = 'ENTER YOUR API';
-```
-
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos
-work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
 
 ## Roadmap
 
@@ -101,12 +64,6 @@ contributions you make are **greatly appreciated**.
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## License
-
-TODO
-Distributed under the CC BY-NC 4.0 DEED License. See [LICENSE](https://creativecommons.org/licenses/by-nc/4.0/) for more
-information.
 
 ## Credits
 
