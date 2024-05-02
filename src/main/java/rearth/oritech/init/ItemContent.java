@@ -8,6 +8,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import rearth.oritech.init.datagen.ModelGenerator;
 import rearth.oritech.item.other.MobCaptureItem;
+import rearth.oritech.item.other.OverchargedCrystalItem;
+import rearth.oritech.item.other.UnholyIntelligenceItem;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 
 import java.lang.annotation.ElementType;
@@ -101,14 +103,14 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item PROCESSING_UNIT = new Item(new FabricItemSettings());
     public static final Item ADVANCED_COMPUTING_ENGINE = new Item(new FabricItemSettings());
     public static final Item SILICON_WAFER = new Item(new FabricItemSettings());
-    public static final Item DUBIOS_CONTAINER = new MobCaptureItem(new FabricItemSettings().maxCount(16), List.of(EntityType.VEX, EntityType.ALLAY));
+    public static final Item DUBIOS_CONTAINER = new MobCaptureItem(new FabricItemSettings().maxCount(16), List.of(EntityType.VEX, EntityType.ALLAY, EntityType.PHANTOM));
     public static final Item ENDERIC_LENS = new Item(new FabricItemSettings());
     public static final Item FLUX_GATE = new Item(new FabricItemSettings());
     public static final Item ADVANCED_BATTERY = new Item(new FabricItemSettings());
     public static final Item SUPER_AI_CHIP = new Item(new FabricItemSettings().maxCount(4));
-    public static final Item UNHOLY_INTELLIGENCE = new Item(new FabricItemSettings().maxCount(1));
+    public static final Item UNHOLY_INTELLIGENCE = new UnholyIntelligenceItem(new FabricItemSettings().maxCount(1));
     public static final Item HEISENBERG_COMPENSATOR = new Item(new FabricItemSettings().maxCount(1));
-    public static final Item OVERCHARGED_CRYSTAL = new Item(new FabricItemSettings().maxCount(1));
+    public static final Item OVERCHARGED_CRYSTAL = new OverchargedCrystalItem(new FabricItemSettings().maxCount(1));
     public static final Item SUPERCONDUCTOR = new Item(new FabricItemSettings());
     public static final Item PACKED_WHEAT = new Item(new FabricItemSettings());
     public static final Item QUARTZ_DUST = new Item(new FabricItemSettings());

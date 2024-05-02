@@ -13,6 +13,17 @@
   "tooltip.oritech.machine_rate_desc": "Energy Usage Rate: ",
   "tooltip.oritech.machine_capacity_desc": "Energy Capacity: ",
 
+  "tooltip.oritech.overchargedcrystal": "Any enchanted book will work when crafting this",
+  "tooltip.oritech.capture_item_desc": [
+    { "text": "Can capture the brain of a small, magical\nand intelligent flying creature.\nThe ", "italic":  true},
+    { "text": "Allay", "color": "#26d0ff", "italic":  true},
+    { "text": " might fit that description. Although\nthey always try to take the item from you.\nPerhaps you might also find another similar entity to capture.", "italic":  true}
+  ],
+  "tooltip.oritech.intelligence_item": [
+    { "text": "Gained by capturing a viable entity with the ", "italic":  true},
+    { "translate": "item.oritech.dubios_container", "italic": true }
+  ],
+
   "rei.process.oritech:pulverizer": "Pulverizing",
   "rei.process.oritech:grinder": "Fragmenting",
   "rei.process.oritech:assembler": "Assembling",
