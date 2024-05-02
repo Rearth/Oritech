@@ -6,6 +6,12 @@
   "tooltip.oritech.input_mode_fill_evenly": "Fills items evenly. New items are always\nput into the lowest matching slot.",
   "tooltip.oritech.input_mode_fill_matching_recipe": "Inserts items balanced according to matching recipes.\nIf there is no recipe that uses an item, it will not be\ninserted.",
 
+  "tooltip.oritech.item_extra_info": "Hold ctrl for more info",
+  "tooltip.oritech.addon_desc": "Addon slots: ",
+  "tooltip.oritech.core_desc": "Multiblock. Required Machine Cores: ",
+  "tooltip.oritech.generator_rate_desc": "Production Rate: ",
+  "tooltip.oritech.machine_rate_desc": "Energy Usage Rate: ",
+  "tooltip.oritech.machine_capacity_desc": "Energy Capacity: ",
 
   "rei.process.oritech:pulverizer": "Pulverizing",
   "rei.process.oritech:grinder": "Fragmenting",

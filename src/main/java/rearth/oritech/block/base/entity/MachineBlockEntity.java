@@ -558,6 +558,10 @@ public abstract class MachineBlockEntity extends BlockEntity
         return 0;
     }
     
+    public int getEnergyPerTick() {
+        return energyPerTick;
+    }
+    
     @Override
     public Inventory getDisplayedInventory() {
         return inventory;

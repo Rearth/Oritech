@@ -7,10 +7,18 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.item.TooltipContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.interaction.PumpBlockEntity;
+
+import java.util.List;
+
+import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 public class PumpBlock extends Block implements BlockEntityProvider {
     
@@ -38,5 +46,11 @@ public class PumpBlock extends Block implements BlockEntityProvider {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
         };
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
+        super.appendTooltip(stack, world, tooltip, options);
+        addMachineTooltip(tooltip, this, this);
     }
 }

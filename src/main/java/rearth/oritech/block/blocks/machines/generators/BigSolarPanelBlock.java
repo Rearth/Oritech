@@ -4,13 +4,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.block.PassiveGeneratorBlock;
@@ -18,7 +21,10 @@ import rearth.oritech.block.entity.machines.generators.BigSolarPanelEntity;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.MultiblockMachineController;
 
+import java.util.List;
+
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
+import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 public class BigSolarPanelBlock extends PassiveGeneratorBlock {
     
@@ -96,5 +102,11 @@ public class BigSolarPanelBlock extends PassiveGeneratorBlock {
     @Override
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.ENTITYBLOCK_ANIMATED;
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
+        super.appendTooltip(stack, world, tooltip, options);
+        addMachineTooltip(tooltip, this, this);
     }
 }
