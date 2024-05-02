@@ -146,6 +146,7 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedInventory
     @AssignSidedEnergy
+    @AssignSidedFluid
     public static final BlockEntityType<MachineCoreEntity> MACHINE_CORE_ENTITY = FabricBlockEntityTypeBuilder.create(MachineCoreEntity::new,
       BlockContent.MACHINE_CORE_1,
       BlockContent.MACHINE_CORE_2,

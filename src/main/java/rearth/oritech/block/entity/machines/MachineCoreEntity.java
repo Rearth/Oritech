@@ -1,6 +1,8 @@
 package rearth.oritech.block.entity.machines;
 
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -9,6 +11,7 @@ import net.minecraft.util.math.Direction;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.EnergyProvider;
+import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
 import team.reborn.energy.api.EnergyStorage;
@@ -17,7 +20,7 @@ import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import java.util.Objects;
 
-public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyProvider {
+public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyProvider, FluidProvider {
     
     private BlockPos controllerPos = BlockPos.ORIGIN;
     private MultiblockMachineController controllerEntity;
@@ -69,6 +72,16 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         return controllerEntity.getEnergyStorageForLink();
     }
     
+    private Storage<FluidVariant> getMainFluidStorage(Direction direction) {
+        
+        var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
+        if (!isUsed) return null;
+        
+        var controllerEntity = getCachedController();
+        if (!(controllerEntity instanceof FluidProvider fluidProvider)) return null;
+        return fluidProvider.getFluidStorage(direction);
+    }
+    
     public boolean isEnabled() {
         return this.getCachedState().get(MachineCoreBlock.USED);
     }
@@ -89,5 +102,10 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         if (!isUsed || getCachedController() == null || getCachedController().getInventoryForLink() == null) return null;
         
         return getCachedController().getInventoryForLink().getInventory(direction);
+    }
+    
+    @Override
+    public Storage<FluidVariant> getFluidStorage(Direction direction) {
+        return getMainFluidStorage(direction);
     }
 }

@@ -58,9 +58,14 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         
         // check if output fluid fits
         var output = recipe.getFluidOutput();
-        if (output.variant().getFluid().equals(Fluids.EMPTY) || outputStorage.amount == 0) return true;  // no output
-        if (outputStorage.amount + output.amount() > outputStorage.getCapacity()) return false; // output full
-        return outputStorage.variant.equals(output.variant());  // type check
+        if (output != null) {
+            if (output.variant().getFluid().equals(Fluids.EMPTY) || outputStorage.amount == 0)
+                return true;  // no output stored
+            if (outputStorage.amount + output.amount() > outputStorage.getCapacity()) return false; // output full
+            return outputStorage.variant.equals(output.variant());  // type check
+        }
+        
+        return true;
         
     }
     
@@ -79,8 +84,11 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         
         try (var tx = Transaction.openOuter()) {
             
-            inputStorage.extract(input.variant(), input.amount(), tx);
-            outputStorage.insert(output.variant(), output.amount(), tx);
+            if (input != null)
+                inputStorage.extract(input.variant(), input.amount(), tx);
+            if (output != null)
+                outputStorage.insert(output.variant(), output.amount(), tx);
+            
             tx.commit();
             
         }

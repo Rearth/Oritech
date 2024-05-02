@@ -203,7 +203,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         label.sizing(Sizing.fixed(176), Sizing.content(2));
         label.horizontalTextAlignment(HorizontalAlignment.CENTER);
         label.zIndex(1);
-        overlay.child(label.positioning(Positioning.relative(50, 2)));
+        overlay.child(label.positioning(Positioning.relative(54, 2)));
     }
     
     protected void updateFluidBar() {
