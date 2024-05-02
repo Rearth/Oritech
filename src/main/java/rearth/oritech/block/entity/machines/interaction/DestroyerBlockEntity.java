@@ -151,12 +151,12 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
     @Override
     public int getMoveEnergyUsage() {
-        return 5;
+        return 8;
     }
     
     @Override
     public int getOperationEnergyUsage() {
-        return 100;
+        return 128;
     }
     
     @Override

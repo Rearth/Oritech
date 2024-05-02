@@ -30,7 +30,7 @@ public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBl
     
     @Override
     public long getDefaultCapacity() {
-        return 5_000_000;
+        return 20_000_000;
     }
     
     @Override

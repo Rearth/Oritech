@@ -177,12 +177,12 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     
     @Override
     public int getMoveEnergyUsage() {
-        return 5;
+        return 8;
     }
     
     @Override
     public int getOperationEnergyUsage() {
-        return 50;
+        return 128;
     }
     
     @Override

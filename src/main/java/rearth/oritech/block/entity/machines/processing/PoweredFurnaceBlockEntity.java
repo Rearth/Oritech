@@ -25,7 +25,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     private final float FURNACE_SPEED_MULTIPLIER = 0.5f;
     
     public PoweredFurnaceBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.POWERED_FURNACE_ENTITY, pos, state, 30);
+        super(BlockEntitiesContent.POWERED_FURNACE_ENTITY, pos, state, 32);
     }
     
     @Override

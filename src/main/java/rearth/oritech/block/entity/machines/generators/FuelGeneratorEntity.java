@@ -23,7 +23,7 @@ import java.util.List;
 
 public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     public FuelGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FUEL_GENERATOR_ENTITY, pos, state, 64);
+        super(BlockEntitiesContent.FUEL_GENERATOR_ENTITY, pos, state, 256);
     }
     
     protected Multimap<Direction, BlockApiCache<EnergyStorage, Direction>> getNeighborCaches(BlockPos pos, World world) {

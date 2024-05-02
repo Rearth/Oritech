@@ -51,10 +51,10 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     
     // config
     private int worktime = 20;
-    private int energyPerStep = 1000;
+    private int energyPerStep = 1024;
     
     // storage
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(10000, 0, 0) {
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(1024 * 8, 0, 0) {
         @Override
         public void onFinalCommit() {
             super.onFinalCommit();

@@ -18,7 +18,7 @@ import java.util.List;
 public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     public AtomicForgeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ATOMIC_FORGE_ENTITY, pos, state, 1000);
+        super(BlockEntitiesContent.ATOMIC_FORGE_ENTITY, pos, state, 1024);
     }
     
     @Override

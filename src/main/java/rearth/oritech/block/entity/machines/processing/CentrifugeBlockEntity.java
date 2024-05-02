@@ -43,7 +43,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     public boolean hasFluidAddon;
     
     public CentrifugeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.CENTRIFUGE_ENTITY, pos, state, 32);
+        super(BlockEntitiesContent.CENTRIFUGE_ENTITY, pos, state, 64);
     }
     
     @Override

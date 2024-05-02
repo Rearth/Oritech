@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidProvider, EnergyProvider, GeoBlockEntity {
     
     private static final int MAX_SEARCH_COUNT = 100000;
-    private static final int ENERGY_USAGE = 1000;   // per block pumped
+    private static final int ENERGY_USAGE = 1024;   // per block pumped
     private static final int PUMP_RATE = 5; // pump every n ticks
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);

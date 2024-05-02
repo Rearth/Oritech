@@ -22,7 +22,7 @@ import java.util.List;
 
 public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     public BioGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BIO_GENERATOR_ENTITY, pos, state, 30);
+        super(BlockEntitiesContent.BIO_GENERATOR_ENTITY, pos, state, 64);
     }
     
     @Override

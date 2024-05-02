@@ -46,7 +46,7 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyProvider, MultiblockMachineController, MachineAddonController, InventoryProvider {
     
-    private static final int BLOCK_BREAK_ENERGY = 2000;
+    private static final int BLOCK_BREAK_ENERGY = 1024;
     
     // storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0) {
@@ -236,7 +236,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     private int energyRequiredToFire() {
-        return 100;
+        return 128;
     }
     
     private void updateNetwork() {

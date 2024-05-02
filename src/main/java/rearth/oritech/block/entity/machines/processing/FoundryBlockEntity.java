@@ -16,7 +16,7 @@ import java.util.List;
 public class FoundryBlockEntity extends MultiblockMachineEntity {
     
     public FoundryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FOUNDRY_ENTITY, pos, state, 50);
+        super(BlockEntitiesContent.FOUNDRY_ENTITY, pos, state, 128);
     }
     
     @Override

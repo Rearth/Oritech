@@ -86,7 +86,7 @@ public class BlockContent implements BlockRegistryContainer {
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block BASIC_GENERATOR_BLOCK = new BasicGeneratorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
-    public static final Block BIG_SOLAR_PANEL_BLOCK = new BigSolarPanelBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 50);
+    public static final Block BIG_SOLAR_PANEL_BLOCK = new BigSolarPanelBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 32);
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block POWERED_FURNACE_BLOCK = new PoweredFurnaceBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.5f)
@@ -121,8 +121,8 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block MACHINE_YIELD_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
     public static final Block CROP_FILTER_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
     public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 0.9f, true);
-    public static final Block MACHINE_CAPACITOR_ADDON = new EnergyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 20000, 500, false);
-    public static final Block MACHINE_ACCEPTOR_ADDON = new EnergyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 5000, 50, true);
+    public static final Block MACHINE_CAPACITOR_ADDON = new EnergyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 50000, 1000, false);
+    public static final Block MACHINE_ACCEPTOR_ADDON = new EnergyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 20000, 2000, true);
     public static final Block MACHINE_INVENTORY_PROXY_ADDON = new InventoryProxyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f);
     public static final Block MACHINE_EXTENDER = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), true, 1, 1, false);
     

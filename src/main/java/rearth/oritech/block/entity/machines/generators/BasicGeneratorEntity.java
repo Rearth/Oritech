@@ -21,7 +21,7 @@ public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
     public static final Map<Item, Integer> FUEL_MAP = AbstractFurnaceBlockEntity.createFuelTimeMap();
     
     public BasicGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BASIC_GENERATOR_ENTITY, pos, state, 30);
+        super(BlockEntitiesContent.BASIC_GENERATOR_ENTITY, pos, state, 32);
     }
     
     @Override

@@ -57,7 +57,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     }
     
     // storage
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 1000, 0) {
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(1024 * 32, 1000, 0) {
         @Override
         public void onFinalCommit() {
             super.onFinalCommit();
@@ -108,7 +108,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     private DroneAnimState animState = DroneAnimState.IDLE;
     
     // config
-    private final long baseEnergyUsage = 1000;
+    private final long baseEnergyUsage = 1024;
     private final int takeOffTime = 300;
     private final int landTime = 260;
     

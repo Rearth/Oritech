@@ -24,7 +24,7 @@ public class SmallStorageBlockEntity extends ExpandableEnergyStorageBlockEntity 
     
     @Override
     public long getDefaultCapacity() {
-        return 128_000;
+        return 1_000_000;
     }
     
     @Override

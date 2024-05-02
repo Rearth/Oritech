@@ -113,12 +113,12 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
     
     @Override
     public int getMoveEnergyUsage() {
-        return 10;
+        return 8;
     }
     
     @Override
     public int getOperationEnergyUsage() {
-        return 10;
+        return 64;
     }
     
     @Override

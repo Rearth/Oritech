@@ -23,7 +23,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     private boolean hasByproductAddon;
     
     public FragmentForgeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY, pos, state, 50);
+        super(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY, pos, state, 256);
     }
     
     @Override
