@@ -43,6 +43,7 @@ dependencies {
 
     // owo lib
     modImplementation "io.wispforest:owo-lib:${project.owo_version}"
+    modImplementation "io.wispforest:lavender:${project.lavender_version}"
     include "io.wispforest:owo-sentinel:${project.owo_version}"
 
     // gecko lib
