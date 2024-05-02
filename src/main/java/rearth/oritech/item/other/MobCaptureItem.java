@@ -28,7 +28,6 @@ public class MobCaptureItem extends Item {
         this.targets = targets;
     }
     
-    
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
         
@@ -65,6 +64,8 @@ public class MobCaptureItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
-        tooltip.add(Text.translatable("tooltip.oritech.capture_item_desc"));
+        tooltip.add(Text.translatable("tooltip.oritech.capture_item_desc_1"));
+        tooltip.add(Text.translatable("tooltip.oritech.capture_item_desc_2"));
+        tooltip.add(Text.translatable("tooltip.oritech.capture_item_desc_3"));
     }
 }

@@ -14,14 +14,45 @@
   "tooltip.oritech.machine_capacity_desc": "Energy Capacity: ",
 
   "tooltip.oritech.overchargedcrystal": "Any enchanted book will work when crafting this",
-  "tooltip.oritech.capture_item_desc": [
-    { "text": "Can capture the brain of a small, magical\nand intelligent flying creature.\nThe ", "italic":  true},
-    { "text": "Allay", "color": "#26d0ff", "italic":  true},
-    { "text": " might fit that description. Although\nthey always try to take the item from you.\nPerhaps you might also find another similar entity to capture.", "italic":  true}
-  ],
+
   "tooltip.oritech.intelligence_item": [
-    { "text": "Gained by capturing a viable entity with the ", "italic":  true},
-    { "translate": "item.oritech.dubios_container", "italic": true }
+    {
+      "text": "Gained by capturing a viable entity with the ",
+      "italic": true,
+      "color": "gray"
+    },
+    {
+      "translate": "item.oritech.dubios_container",
+      "italic": true,
+      "color": "gray"
+    }
+  ],
+
+  "tooltip.oritech.capture_item_desc_1": [
+    {
+      "text": "Can capture the brain of a small, magical intelligent flying creature. The",
+      "italic": true,
+      "color": "gray"
+    }
+  ],
+  "tooltip.oritech.capture_item_desc_2": [
+    {
+      "text": "Allay",
+      "color": "#26d0ff",
+      "italic": true
+    },
+    {
+      "text": " might fit that description. Although they always try to take the item",
+      "italic": true,
+      "color": "gray"
+    }
+  ],
+  "tooltip.oritech.capture_item_desc_3": [
+    {
+      "text": "from you. Perhaps you might also find another similar entity to capture.",
+      "italic": true,
+      "color": "gray"
+    }
   ],
 
   "rei.process.oritech:pulverizer": "Pulverizing",
@@ -187,7 +218,6 @@
   "item.oritech.quartz_dust": "Quartz Dust",
   "item.oritech.biomass": "Biomass",
   "item.oritech.solid_biofuel": "Solid Biofuel",
-
   "item.oritech.exo_helmet": "Exo Helmet",
   "item.oritech.exo_chestplate": "Exo Chestplate",
   "item.oritech.exo_leggings": "Exo Leggings",

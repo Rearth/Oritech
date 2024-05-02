@@ -19,6 +19,6 @@ public class OverchargedCrystalItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
-        tooltip.add(Text.translatable("tooltip.oritech.overchargedcrystal").formatted(Formatting.ITALIC));
+        tooltip.add(Text.translatable("tooltip.oritech.overchargedcrystal").formatted(Formatting.ITALIC, Formatting.GRAY));
     }
 }
