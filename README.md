@@ -1,7 +1,7 @@
 <br/>
 <p align="center">
   <a href="https://github.com/rearth/Oritech">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="https://github.com/Rearth/Oritech/assets/10100603/d459b3fa-ef6f-4675-99d7-c44a78a3cf71" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Oritech</h3>
@@ -37,8 +37,15 @@ Currently in very early access, numerous bugs and issues are to be expected.
 
 ## Installation
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+Install it just like any mod by dragging it into the mods folder. Make sure you have the following dependencies installed (newer version might work too):
+
+- Minecraft Version: fabric-1.20.4
+- Fabric loader 0.15.9
+- Fabric api 0.97.0+1.20.4
+- Owo lib 0.12.6+1.20.3
+- Lavender 0.1.7+1.20.3
+- Geckolib 1.20.4:4.4.4
+- Reborn Energy API 3.0.0
 
 ## Roadmap
 
