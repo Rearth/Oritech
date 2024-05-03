@@ -197,7 +197,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         
         // remove inputs
         for (int i = 0; i < inputs.size(); i++) {
-            var taken = Inventories.splitStack(inputInventory, i, 1);  // amount is not configurable, because ingredient doesn't parse amount in recipe
+            Inventories.splitStack(inputInventory, i, 1);
         }
         
     }
@@ -551,7 +551,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     public long getDefaultInsertRate() {
-        return 100;
+        return 1024;
     }
     
     public long getDefaultExtractionRate() {

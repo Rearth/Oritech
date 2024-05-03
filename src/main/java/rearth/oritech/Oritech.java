@@ -34,7 +34,7 @@ public class Oritech implements ModInitializer {
         FieldRegistrationHandler.register(BlockContent.class, MOD_ID, false);
         Oritech.LOGGER.debug("registering block entities");
         FieldRegistrationHandler.register(BlockEntitiesContent.class, MOD_ID, false);
-        Oritech.LOGGER.debug("registering others....");
+        Oritech.LOGGER.debug("registering others...");
         FieldRegistrationHandler.register(ToolsContent.class, MOD_ID, false);
         ToolsContent.registerEventHandlers();
         ItemGroups.registerItemGroup();

@@ -50,6 +50,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     
     public void setControllerPos(BlockPos controllerPos) {
         this.controllerPos = controllerPos;
+        this.controllerEntity = null;    // forces cache reload
         this.markDirty();
     }
     

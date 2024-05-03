@@ -107,6 +107,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     private long lastSentAt;
     private DroneTransferData incomingPacket;
     private DroneAnimState animState = DroneAnimState.IDLE;
+    private boolean networkDirty;
     
     // config
     private final long baseEnergyUsage = 1024;
@@ -136,6 +137,11 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
             } else if (canSend()) {
                 sendDrone();
             }
+        }
+        
+        if (networkDirty && world.getTime() % 10 == 0) {
+            networkDirty = false;
+            sendNetworkEnergyUpdate();
         }
     }
     
@@ -276,6 +282,10 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.DroneSendEventPacket(pos, false, true));
     }
     
+    private void sendNetworkEnergyUpdate() {
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
+    }
+    
     private void sendNetworkStatusMessage(String statusMessage) {
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.DroneCardEventPacket(pos, statusMessage));
     }
@@ -306,6 +316,12 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
         sendNetworkStatusMessage("Target is not a valid drone port.\nEnsure that the target port is loaded and active.");
         return false;
         
+    }
+    
+    @Override
+    public void markDirty() {
+        super.markDirty();
+        this.networkDirty = true;
     }
     
     @Override
@@ -357,7 +373,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     
     @Override
     public void setCoreQuality(float quality) {
-        this.coreQuality = coreQuality;
+        this.coreQuality = quality;
     }
     
     @Override
@@ -455,6 +471,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
         buf.writeBlockPos(pos);
+        sendNetworkEnergyUpdate();
     }
     
     @Override
@@ -518,11 +535,6 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     
     @Override
     public boolean showProgress() {
-        return false;
-    }
-    
-    @Override
-    public boolean showEnergy() {
         return false;
     }
     

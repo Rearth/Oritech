@@ -150,8 +150,7 @@ public class NetworkContent {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
-            if (entity instanceof MachineAddonController addonController) {
-                var storage = addonController.getStorageForAddon();
+            if (entity instanceof EnergyProvider energyProvider && energyProvider.getStorage(null) instanceof DynamicEnergyStorage storage) {
                 storage.capacity = message.maxEnergy;
                 storage.amount = message.currentEnergy;
             }
