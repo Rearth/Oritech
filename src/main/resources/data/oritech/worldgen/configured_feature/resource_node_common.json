@@ -11,6 +11,8 @@
       "oritech:resource_node_iron",
       "oritech:resource_node_nickel",
       "oritech:resource_node_nickel",
+      "oritech:resource_node_coal",
+      "oritech:resource_node_coal",
       "minecraft:bedrock"
     ],
     "boulderOres": [
@@ -19,8 +21,15 @@
       "minecraft:deepslate_copper_ore",
       "minecraft:deepslate_copper_ore",
       "minecraft:deepslate_iron_ore",
+      "minecraft:deepslate_coal_ore",
+      "minecraft:deepslate_coal_ore",
       "oritech:deepslate_nickel_ore",
       "oritech:deepslate_nickel_ore",
+      "minecraft:deepslate",
+      "minecraft:deepslate",
+      "minecraft:deepslate",
+      "minecraft:deepslate",
+      "minecraft:deepslate",
       "minecraft:deepslate",
       "minecraft:deepslate"
     ],

@@ -111,9 +111,5 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
                 }
             }
         }
-        
-        for (int i = 8; i < 20; i++) {
-            world.setBlockState(startPos.up(i), Blocks.DIAMOND_BLOCK.getDefaultState(), 0x10);
-        }
     }
 }

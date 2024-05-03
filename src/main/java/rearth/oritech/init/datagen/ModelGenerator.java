@@ -88,6 +88,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.RESOURCE_NODE_REDSTONE);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.RESOURCE_NODE_LAPIS);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.RESOURCE_NODE_IRON);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.RESOURCE_NODE_COAL);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.RESOURCE_NODE_GOLD);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.RESOURCE_NODE_EMERALD);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.RESOURCE_NODE_DIAMOND);

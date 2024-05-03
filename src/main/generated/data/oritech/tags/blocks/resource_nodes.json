@@ -9,6 +9,7 @@
     "oritech:resource_node_lapis",
     "oritech:resource_node_emerald",
     "oritech:resource_node_diamond",
+    "oritech:resource_node_coal",
     "oritech:resource_node_platinum"
   ]
 }

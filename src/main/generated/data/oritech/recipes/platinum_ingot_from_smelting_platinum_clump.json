@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 300,
+  "experience": 0.5,
+  "group": "platinumsmelting",
+  "ingredient": {
+    "item": "oritech:platinum_clump"
+  },
+  "result": "oritech:platinum_ingot"
+}

@@ -58,6 +58,7 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .add(BlockContent.RESOURCE_NODE_LAPIS)
           .add(BlockContent.RESOURCE_NODE_EMERALD)
           .add(BlockContent.RESOURCE_NODE_DIAMOND)
+          .add(BlockContent.RESOURCE_NODE_COAL)
           .add(BlockContent.RESOURCE_NODE_PLATINUM);
     }
 }

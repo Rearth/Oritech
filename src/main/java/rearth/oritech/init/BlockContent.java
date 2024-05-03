@@ -158,6 +158,9 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block RESOURCE_NODE_IRON = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
     @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RESOURCE_NODE_COAL = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block RESOURCE_NODE_GOLD = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
     @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)

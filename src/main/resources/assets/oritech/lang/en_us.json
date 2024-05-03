@@ -140,6 +140,7 @@
   "block.oritech.resource_node_redstone": "Resource Node Redstone",
   "block.oritech.resource_node_lapis": "Lapis Lazuli Resource Node",
   "block.oritech.resource_node_iron": "Iron Resource Node",
+  "block.oritech.resource_node_coal": "Coal Resource Node",
   "block.oritech.resource_node_gold": "Gold Resource Node",
   "block.oritech.resource_node_emerald": "Emerald Resource Node",
   "block.oritech.resource_node_diamond": "Diamond Resource Node",

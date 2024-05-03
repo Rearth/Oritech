@@ -56,6 +56,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_REDSTONE, Items.REDSTONE, 1, "_redstone");
         addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_LAPIS, Items.LAPIS_LAZULI, 1, "_lapis");
         addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_IRON, Items.RAW_IRON, 1, "_iron");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_COAL, Items.COAL, 1, "_coal");
         addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_COPPER, Items.RAW_COPPER, 1, "_copper");
         addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_GOLD, Items.RAW_GOLD, 1, "_gold");
         addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_EMERALD, Items.EMERALD, 1, "_emerald");
@@ -235,7 +236,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         // silicon
         offerManualAlloyRecipe(exporter, ItemContent.RAW_SILICON, Ingredient.fromTag(TagContent.QUARTZ_DUSTS), Ingredient.fromTag(ItemTags.SAND), 2, "manualrawsilicon");
-        offerSmelting(exporter, List.of(ItemContent.RAW_SILICON), RecipeCategory.MISC, ItemContent.SILICON, 0.5f, 30, "siliconfurnace");
+        offerSmelting(exporter, List.of(ItemContent.RAW_SILICON), RecipeCategory.MISC, ItemContent.SILICON, 0.5f, 100, "siliconfurnace");
         
         // plastic
         offerCompactingRecipe(exporter, RecipeCategory.MISC, ItemContent.PACKED_WHEAT, Items.WHEAT);
@@ -273,6 +274,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
     }
     
     private void addOreChains(RecipeExporter exporter) {
+        
+        // basic smelting for nickel + platinum
+        offerSmelting(exporter, List.of(ItemContent.NICKEL_CLUMP), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 0.5f, 300, "nickelsmelting");
+        offerSmelting(exporter, List.of(ItemContent.PLATINUM_CLUMP), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 0.5f, 300, "platinumsmelting");
+        
         // iron chain
         addMetalProcessingChain(exporter,
           Ingredient.fromTag(ItemTags.IRON_ORES),

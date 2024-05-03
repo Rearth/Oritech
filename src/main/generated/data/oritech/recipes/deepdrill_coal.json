@@ -1,0 +1,15 @@
+{
+  "type": "oritech:deep_drill",
+  "ingredients": [
+    {
+      "item": "oritech:resource_node_coal"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "minecraft:coal"
+    }
+  ],
+  "time": 1
+}
