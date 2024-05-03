@@ -13,6 +13,16 @@
   "tooltip.oritech.machine_rate_desc": "Energy Usage Rate: ",
   "tooltip.oritech.machine_capacity_desc": "Energy Capacity: ",
 
+  "tooltip.oritech.addon_speed_desc": "Operation Speed ",
+  "tooltip.oritech.addon_efficiency_desc": "Energy Efficiency ",
+  "tooltip.oritech.addon_yield_desc": "Doubles byproduct amount. Applicable to Fragment Forge",
+  "tooltip.oritech.addon_fluid_desc": "Allows fluid processing. Applicable to centrifuge",
+  "tooltip.oritech.addon_acceptor_desc": "Acts as energy proxy",
+  "tooltip.oritech.addon_crop_desc": "Applicable to block destroyer. Skips non-grown crops",
+  "tooltip.oritech.addon_proxy_desc": "Allows access to specific inventory slots",
+  "tooltip.oritech.addon_capacity_desc": "Energy Capacity ",
+  "tooltip.oritech.addon_transfer_desc": "Energy Transfer Rate ",
+
   "tooltip.oritech.overchargedcrystal": "Any enchanted book will work when crafting this",
 
   "tooltip.oritech.intelligence_item": [

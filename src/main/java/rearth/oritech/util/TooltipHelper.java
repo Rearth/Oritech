@@ -44,4 +44,15 @@ public class TooltipHelper {
         }
     }
     
+    public static Text getFormattedEnergyChangeTooltip(long amount, String unit) {
+        var text = amount > 0 ? "+" + amount : String.valueOf(amount);
+        return Text.literal(text).formatted(Formatting.GOLD).append(unit).formatted(Formatting.GOLD);
+    }
+    
+    public static Text getFormattedValueChangeTooltip(int amount) {
+        var text = amount > 0 ? "+" + amount : String.valueOf(amount);
+        var color = amount > 0 ? Formatting.GREEN : Formatting.RED;
+        return Text.literal(text).formatted(color).append("%").formatted(color);
+    }
+    
 }
