@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_nickel_clump": {
+    "has_raw_platinum": {
       "conditions": {
         "items": [
           {
             "items": [
-              "oritech:nickel_clump"
+              "oritech:raw_platinum"
             ]
           }
         ]
@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:nickel_ingot_from_smelting_nickel_clump"
+        "recipe": "minecraft:platinum_ingot_from_smelting_raw_platinum"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -23,12 +23,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_nickel_clump"
+      "has_raw_platinum"
     ]
   ],
   "rewards": {
     "recipes": [
-      "minecraft:nickel_ingot_from_smelting_nickel_clump"
+      "minecraft:platinum_ingot_from_smelting_raw_platinum"
     ]
   }
 }

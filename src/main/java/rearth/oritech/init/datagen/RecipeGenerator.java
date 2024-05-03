@@ -94,6 +94,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerDrillRecipe(exporter, ToolsContent.HAND_DRILL, Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), "_handdrill");
         offerChainsawRecipe(exporter, ToolsContent.CHAINSAW, Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), "_chainsaw");
         
+        // designator
+        offerDrillRecipe(exporter, ItemContent.TARGET_DESIGNATOR, Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_designator");
+        
         // helmet (enderic lens + machine plating)
         offerHelmetRecipe(exporter, ToolsContent.EXO_HELMET, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.ENDERIC_LENS), "_exohelm");
         // chestplate (advanced battery + machine plating)
@@ -192,6 +195,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_5.asItem(), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), "_core5");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_6.asItem(), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), Ingredient.ofItems(ItemContent.DUBIOS_CONTAINER), "_core6");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_7.asItem(), Ingredient.ofItems(ItemContent.PROMETHEUM_INGOT), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), "_core7");
+        
+        // machine extender
+        offerMachineCoreRecipe(exporter, BlockContent.MACHINE_EXTENDER.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(BlockContent.MACHINE_CORE_2.asItem()), "_extender");
     }
     
     private void addComponents(RecipeExporter exporter) {
@@ -239,11 +245,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerSmelting(exporter, List.of(ItemContent.RAW_SILICON), RecipeCategory.MISC, ItemContent.SILICON, 0.5f, 100, "siliconfurnace");
         
         // plastic
-        offerCompactingRecipe(exporter, RecipeCategory.MISC, ItemContent.PACKED_WHEAT, Items.WHEAT);
+        offer2x2CompactingRecipe(exporter, RecipeCategory.MISC, ItemContent.PACKED_WHEAT, Items.WHEAT);
         addCentrifugeFluidRecipe(exporter, Ingredient.ofItems(ItemContent.PACKED_WHEAT), ItemContent.RAW_BIOPOLYMER, Fluids.WATER, 0.25f, null, 0, 1f, "_biopolymer");
-        addCentrifugeFluidRecipe(exporter, Ingredient.fromTag(ItemTags.SAND), ItemContent.POLYMER_RESIN, FluidContent.STILL_OIL, 0.1f, null, 0, 1f, "_polymerresin");
+        addCentrifugeFluidRecipe(exporter, Ingredient.fromTag(ItemTags.SAND), ItemContent.POLYMER_RESIN, FluidContent.STILL_OIL, 0.1f, null, 0, 0.5f, "_polymerresin");
         addCentrifugeFluidRecipe(exporter, Ingredient.ofItems(ItemContent.RAW_BIOPOLYMER), ItemContent.PLASTIC_SHEET, Fluids.WATER, 0.5f, null, 0, 1f, "_plasticoil");
-        addCentrifugeFluidRecipe(exporter, Ingredient.ofItems(ItemContent.POLYMER_RESIN), ItemContent.PLASTIC_SHEET, Fluids.WATER, 0.5f, null, 0, 1f, "_plasticbio");
+        addCentrifugeFluidRecipe(exporter, Ingredient.ofItems(ItemContent.POLYMER_RESIN), ItemContent.PLASTIC_SHEET, Fluids.WATER, 0.5f, null, 0, 0.33f, "_plasticbio");
         
         // processing unit
         addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.PLASTIC_SHEET), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(Items.REDSTONE), ItemContent.PROCESSING_UNIT, 1f, "_processingunit");
@@ -265,6 +271,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // fuel
         addCentrifugeFluidRecipe(exporter, Ingredient.fromTag(TagContent.COAL_DUSTS), null, FluidContent.STILL_OIL, 1f, FluidContent.STILL_FUEL, 1f, 1f, "_fuel");
         
+        // biosteel
+        offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.BIOSTEEL_INGOT, 3), Ingredient.ofItems(Items.IRON_INGOT), Ingredient.ofItems(ItemContent.BIOMASS), "biosteel");
+        
         // endgame components
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.SUPER_AI_CHIP), ItemContent.HEISENBERG_COMPENSATOR, 100, "_compensator");
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), ItemContent.HEISENBERG_COMPENSATOR, 100, "_compensatoralt");
@@ -276,8 +285,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
     private void addOreChains(RecipeExporter exporter) {
         
         // basic smelting for nickel + platinum
-        offerSmelting(exporter, List.of(ItemContent.NICKEL_CLUMP), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 0.5f, 300, "nickelsmelting");
-        offerSmelting(exporter, List.of(ItemContent.PLATINUM_CLUMP), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 0.5f, 300, "platinumsmelting");
+        offerSmelting(exporter, List.of(ItemContent.RAW_NICKEL), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 0.5f, 300, "nickelsmelting");
+        offerSmelting(exporter, List.of(ItemContent.RAW_PLATINUM), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 0.5f, 300, "platinumsmelting");
         
         // iron chain
         addMetalProcessingChain(exporter,

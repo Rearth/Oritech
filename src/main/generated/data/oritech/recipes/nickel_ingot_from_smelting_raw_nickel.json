@@ -5,7 +5,7 @@
   "experience": 0.5,
   "group": "nickelsmelting",
   "ingredient": {
-    "item": "oritech:nickel_clump"
+    "item": "oritech:raw_nickel"
   },
   "result": "oritech:nickel_ingot"
 }

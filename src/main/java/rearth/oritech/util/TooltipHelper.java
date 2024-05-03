@@ -30,9 +30,9 @@ public class TooltipHelper {
             if (entity instanceof MachineBlockEntity machineEntity) {
                 var energyRate = machineEntity.getEnergyPerTick();
                 if (entity instanceof UpgradableGeneratorBlockEntity) {
-                    tooltip.add(Text.translatable("tooltip.oritech.generator_rate_desc").formatted(Formatting.GRAY).append(Text.literal(energyRate + " RF").formatted(Formatting.GOLD)));
+                    tooltip.add(Text.translatable("tooltip.oritech.generator_rate_desc").formatted(Formatting.GRAY).append(Text.literal(energyRate + " RF/t").formatted(Formatting.GOLD)));
                 } else if (entity instanceof MachineBlockEntity) {
-                    tooltip.add(Text.translatable("tooltip.oritech.machine_rate_desc").formatted(Formatting.GRAY).append(Text.literal(energyRate + " RF").formatted(Formatting.GOLD)));
+                    tooltip.add(Text.translatable("tooltip.oritech.machine_rate_desc").formatted(Formatting.GRAY).append(Text.literal(energyRate + " RF/t").formatted(Formatting.GOLD)));
                 }
             }
             if (entity instanceof EnergyProvider energyProvider) {

@@ -9,8 +9,8 @@
   "tooltip.oritech.item_extra_info": "Hold ctrl for more info",
   "tooltip.oritech.addon_desc": "Addon slots: ",
   "tooltip.oritech.core_desc": "Multiblock. Required Machine Cores: ",
-  "tooltip.oritech.generator_rate_desc": "Production Rate: ",
-  "tooltip.oritech.machine_rate_desc": "Energy Usage Rate: ",
+  "tooltip.oritech.generator_rate_desc": "Production: ",
+  "tooltip.oritech.machine_rate_desc": "Energy Usage: ",
   "tooltip.oritech.machine_capacity_desc": "Energy Capacity: ",
 
   "tooltip.oritech.addon_speed_desc": "Operation Speed ",

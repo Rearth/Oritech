@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_platinum_clump": {
+    "has_biosteel_ingot": {
       "conditions": {
         "items": [
           {
             "items": [
-              "oritech:platinum_clump"
+              "oritech:biosteel_ingot"
             ]
           }
         ]
@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:platinum_ingot_from_smelting_platinum_clump"
+        "recipe": "minecraft:biosteel_ingotbiosteel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -23,12 +23,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_platinum_clump"
+      "has_biosteel_ingot"
     ]
   ],
   "rewards": {
     "recipes": [
-      "minecraft:platinum_ingot_from_smelting_platinum_clump"
+      "minecraft:biosteel_ingotbiosteel"
     ]
   }
 }
