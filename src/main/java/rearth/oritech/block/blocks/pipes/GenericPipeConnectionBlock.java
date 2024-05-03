@@ -12,6 +12,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 
 public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implements BlockEntityProvider {
@@ -52,7 +53,7 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
         
         var regKey = world.getRegistryKey().getValue();
         var dataId = getPipeTypeName() + "_" + regKey.getNamespace() + "_" + regKey.getPath();
-        System.out.println("saving for: " + dataId);
+        Oritech.LOGGER.debug("saving for: " + dataId);
         ((ServerWorld) world).getPersistentStateManager().set(dataId, getNetworkData(world));
     }
     

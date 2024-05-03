@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 
 // how this block works:
@@ -48,7 +49,6 @@ public class ItemFilterBlock extends Block implements BlockEntityProvider {
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        System.out.println(ctx.getSide().getOpposite());
         return super.getPlacementState(ctx).with(TARGET_DIR, ctx.getSide().getOpposite());
     }
     

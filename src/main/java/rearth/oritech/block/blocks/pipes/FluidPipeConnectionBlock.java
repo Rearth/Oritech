@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
@@ -43,7 +44,7 @@ public class FluidPipeConnectionBlock extends GenericPipeConnectionBlock {
         
         var oldExtract = state.get(EXTRACT);
         world.setBlockState(pos, state.with(EXTRACT, !oldExtract));
-        System.out.println("changed extract to: " + !oldExtract);
+        Oritech.LOGGER.debug("changed extract to: " + !oldExtract);
         
         return ActionResult.SUCCESS;
     }

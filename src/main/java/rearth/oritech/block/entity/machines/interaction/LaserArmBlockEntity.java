@@ -245,7 +245,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     public void testTarget(BlockState state) {
-        System.out.println("hello world");
+        Oritech.LOGGER.debug("hello world");
     }
     
     public boolean setTargetFromDesignator(BlockPos targetPos) {

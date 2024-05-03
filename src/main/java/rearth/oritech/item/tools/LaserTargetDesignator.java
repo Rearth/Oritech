@@ -10,6 +10,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.machines.interaction.DronePortEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.init.BlockContent;
@@ -56,7 +57,7 @@ public class LaserTargetDesignator extends Item {
         }
         
         if (!targetBlockState.getBlock().equals(Blocks.AIR)) {
-            System.out.println(targetBlockState);
+            Oritech.LOGGER.debug(targetBlockState.toString());
             
             var nbt = context.getStack().getOrCreateNbt();
             nbt.putLong("target", context.getBlockPos().asLong());

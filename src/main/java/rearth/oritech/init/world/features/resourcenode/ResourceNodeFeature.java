@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.util.FeatureContext;
+import rearth.oritech.Oritech;
 
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
                 if (world.getBlockState(testPos.up()).isOf(Blocks.AIR)) {
                     placeSurfaceBoulder(testPos, context);
                     placeBedrockNode(deepNodePos, context);
-                    System.out.println("placing resource node at " + testPos + " with deep " + deepNodePos);
+                    Oritech.LOGGER.debug("placing resource node at " + testPos + " with deep " + deepNodePos);
                     return true;
                 }
             }

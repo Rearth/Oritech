@@ -17,6 +17,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -232,11 +233,11 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         searchInstance = new FloodFillSearch(start, world);
         searchActive = true;
         
-        System.out.println("starting search at: " + start + " " + state.getFluid() + " " + state.isStill());
+        Oritech.LOGGER.debug("starting search at: " + start + " " + state.getFluid() + " " + state.isStill());
     }
     
     private void finishSearch() {
-        System.out.println("search finished, found: " + searchInstance.foundTargets.size());
+        Oritech.LOGGER.debug("search finished, found: " + searchInstance.foundTargets.size());
         pendingLiquidPositions = searchInstance.foundTargets;
         initialized = true;
         searchInstance = null;

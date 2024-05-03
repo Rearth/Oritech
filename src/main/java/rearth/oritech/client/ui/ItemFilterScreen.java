@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.network.NetworkContent;
 
@@ -34,7 +35,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     
     private void updateItemFilters() {
         
-        System.out.println("loading item filters: " + handler.blockEntity.getFilterSettings().items());
+        Oritech.LOGGER.debug("loading item filters: " + handler.blockEntity.getFilterSettings().items());
         
         for (int i = 0; i < 8; i++) {
             var storedStack = handler.blockEntity.getFilterSettings().items().getOrDefault(i, ItemStack.EMPTY);
@@ -209,8 +210,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         var newData = new ItemFilterBlockEntity.FilterData(oldData.useNbt(), oldData.useWhitelist(), itemFilters);
         handler.blockEntity.setFilterSettings(newData);
         
-        System.out.println(displayStack.getNbt());
-        System.out.println("stored map: " + itemFilters);
+        Oritech.LOGGER.debug("stored map: " + itemFilters);
         sendUpdateToServer();
         
         return true;

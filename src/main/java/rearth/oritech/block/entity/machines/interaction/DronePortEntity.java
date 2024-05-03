@@ -26,6 +26,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.blocks.machines.interaction.DronePortBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
@@ -205,7 +206,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
         var hasArrived = world.getTime() - incomingPacket.arrivesAt > 0;
         if (!hasArrived) return;
         
-        System.out.println("receiving drone package: " + incomingPacket);
+        Oritech.LOGGER.debug("receiving drone package: " + incomingPacket);
         
         try (var tx = Transaction.openOuter()) {
             for (var stack : incomingPacket.transferredStacks) {
@@ -231,7 +232,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
         targetPort.markDirty();
         this.markDirty();
         
-        System.out.println("sending drone package: " + data);
+        Oritech.LOGGER.debug("sending drone package: " + data);
     }
     
     public boolean canAcceptItems(List<ItemStack> stacks) {

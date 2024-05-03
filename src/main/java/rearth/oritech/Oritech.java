@@ -1,12 +1,9 @@
 package rearth.oritech;
 
-import io.wispforest.lavender.book.LavenderBookItem;
 import io.wispforest.owo.registration.reflect.FieldRegistrationHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rearth.oritech.block.blocks.pipes.EnergyPipeBlock;
@@ -18,7 +15,6 @@ import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.init.ToolsContent;
 
 public class Oritech implements ModInitializer {
     
@@ -30,15 +26,15 @@ public class Oritech implements ModInitializer {
         
         LOGGER.info("Begin Oritech initialization");
         
-        System.out.println("registering fluids");
+        Oritech.LOGGER.debug("registering fluids");
         FieldRegistrationHandler.register(FluidContent.class, MOD_ID, false);
-        System.out.println("registering items");
+        Oritech.LOGGER.debug("registering items");
         FieldRegistrationHandler.register(ItemContent.class, MOD_ID, false);
-        System.out.println("registering blocks");
+        Oritech.LOGGER.debug("registering blocks");
         FieldRegistrationHandler.register(BlockContent.class, MOD_ID, false);
-        System.out.println("registering block entities");
+        Oritech.LOGGER.debug("registering block entities");
         FieldRegistrationHandler.register(BlockEntitiesContent.class, MOD_ID, false);
-        System.out.println("registering others....");
+        Oritech.LOGGER.debug("registering others....");
         FieldRegistrationHandler.register(ToolsContent.class, MOD_ID, false);
         ToolsContent.registerEventHandlers();
         ItemGroups.registerItemGroup();

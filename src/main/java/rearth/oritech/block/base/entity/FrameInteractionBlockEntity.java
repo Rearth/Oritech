@@ -16,6 +16,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.FrameInteractionBlock;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
@@ -47,7 +48,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     
     public boolean tryFindFrame() {
         
-        System.out.println("searching machine frame");
+        Oritech.LOGGER.debug("searching machine frame");
         
         // select block on back (or based on offset of machine)
         // from there on move right, till no more frame blocks are found
@@ -177,7 +178,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
             if (testForFrame(checkPos)) {
                 
                 if (checkPos.equals(searchEnd)) {
-                    System.out.println("found start, machine is valid");
+                    Oritech.LOGGER.debug("found start, machine is valid");
                     return checkPos;
                 }
                 
