@@ -40,16 +40,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
     @Override
     public void generate(RecipeExporter exporter) {
         
-        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_REDSTONE, Items.REDSTONE, 1, "_redstone");
-        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_LAPIS, Items.LAPIS_LAZULI, 1, "_lapis");
-        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_IRON, Items.RAW_IRON, 1, "_iron");
-        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_COPPER, Items.RAW_COPPER, 1, "_copper");
-        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_GOLD, Items.RAW_GOLD, 1, "_gold");
-        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_EMERALD, Items.EMERALD, 1, "_emerald");
-        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_DIAMOND, Items.DIAMOND, 1, "_diamond");
-        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_NICKEL, ItemContent.RAW_NICKEL, 1, "_nickel");
-        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_PLATINUM, ItemContent.RAW_PLATINUM, 1, "_platinum");
-        
+        addDeepDrillOres(exporter);
         addFuels(exporter);
         addBiomass(exporter);
         addEquipment(exporter);
@@ -59,6 +50,18 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addAlloys(exporter);
         addDusts(exporter);
         
+    }
+    
+    private void addDeepDrillOres(RecipeExporter exporter) {
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_REDSTONE, Items.REDSTONE, 1, "_redstone");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_LAPIS, Items.LAPIS_LAZULI, 1, "_lapis");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_IRON, Items.RAW_IRON, 1, "_iron");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_COPPER, Items.RAW_COPPER, 1, "_copper");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_GOLD, Items.RAW_GOLD, 1, "_gold");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_EMERALD, Items.EMERALD, 1, "_emerald");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_DIAMOND, Items.DIAMOND, 1, "_diamond");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_NICKEL, ItemContent.RAW_NICKEL, 1, "_nickel");
+        addDeepDrillRecipe(exporter, BlockContent.RESOURCE_NODE_PLATINUM, ItemContent.RAW_PLATINUM, 1, "_platinum");
     }
     
     private void addFuels(RecipeExporter exporter) {
@@ -98,6 +101,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerLegsRecipe(exporter, ToolsContent.EXO_LEGGINGS, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), "_exolegs");
         // feet (silicon + plating)
         offerFeetRecipe(exporter, ToolsContent.EXO_BOOTS, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.SILICON), "_exoboots");
+        
+        // guidebook (any ingot + cactus)
+        offerHelmetRecipe(exporter, ToolsContent.ORITECH_GUIDE, Ingredient.fromTag(ConventionalItemTags.INGOTS), Ingredient.ofItems(Items.LAPIS_LAZULI), "_guidebook");
     }
     
     private void addMachines(RecipeExporter exporter) {
