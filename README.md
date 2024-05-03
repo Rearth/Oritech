@@ -29,6 +29,8 @@ An upcoming tech mod for minecraft fabric. Features advanced ore processing, pow
 
 Currently in very early access, numerous bugs and issues are to be expected.
 
+If you want to contribute, suggest ideas or just see what's planned, make sure to check out the GitHub discussions for this project (https://github.com/Rearth/Oritech/discussions).
+
 ## Built With
 
 - Fabric API
