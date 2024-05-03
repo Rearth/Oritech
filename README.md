@@ -18,11 +18,12 @@
   <a href="https://github.com/rearth/Oritech/issues">Request Feature</a>
 </p>
 
-![Downloads](https://img.shields.io/github/downloads/rearth/Oritech/total) ![Stargazers](https://img.shields.io/github/stars/rearth/Oritech?style=social) ![Issues](https://img.shields.io/github/issues/rearth/Oritech) ![License](https://img.shields.io/github/license/rearth/Oritech)
+![Downloads](https://img.shields.io/github/downloads/rearth/Oritech/total) ![Stargazers](https://img.shields.io/github/stars/rearth/Oritech?style=social) ![Issues](https://img.shields.io/github/issues/rearth/Oritech) ![License](https://img.shields.io/github/license/rearth/Oritech) ![Discord](https://img.shields.io/discord/1233448016128512082)
+
 
 ## About The Project
 
-![Screen Shot](images/screenshot.png)
+![Screenshot](https://github.com/Rearth/Oritech/assets/10100603/e94db022-b835-4dcf-8392-7b753ec74b26)
 
 An upcoming tech mod for minecraft fabric. Features advanced ore processing, powered tools and armor, and much much more.
 
