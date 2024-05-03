@@ -38,6 +38,7 @@ public class ItemGroups {
         for (var item : registered.get(ItemContent.Groups.equipment) ) {
             entries.add(item);
         }
+        entries.add(ToolsContent.ORITECH_GUIDE);
     })).displayName(Text.translatable("itemgroup.oritech.equipment")).icon(() -> new ItemStack(ToolsContent.CHAINSAW)).build();
 
     private static final ItemGroup DECORATIVE_GROUP = FabricItemGroup.builder().entries(((context, entries) -> {

@@ -1,9 +1,12 @@
 package rearth.oritech;
 
+import io.wispforest.lavender.book.LavenderBookItem;
 import io.wispforest.owo.registration.reflect.FieldRegistrationHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rearth.oritech.block.blocks.pipes.EnergyPipeBlock;
@@ -18,13 +21,14 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.init.ToolsContent;
 
 public class Oritech implements ModInitializer {
+    
     public static final String MOD_ID = "oritech";
     public static final Logger LOGGER = LoggerFactory.getLogger("oritech");
     
     @Override
     public void onInitialize() {
         
-        LOGGER.info("Hello Fabric world!");
+        LOGGER.info("Begin Oritech initialization");
         
         System.out.println("registering fluids");
         FieldRegistrationHandler.register(FluidContent.class, MOD_ID, false);
@@ -55,7 +59,6 @@ public class Oritech implements ModInitializer {
             var dataId = "energy_" + regKey.getNamespace() + "_" + regKey.getPath();
             var result = world.getPersistentStateManager().getOrCreate(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, dataId);
             if (result.hashCode() != 0) {
-                System.out.println("setting data: " + result);
                 EnergyPipeBlock.ENERGY_PIPE_DATA.put(regKey, result);
             }
             

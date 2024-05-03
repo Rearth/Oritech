@@ -35,8 +35,8 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
         super(settings);
         this.setDefaultState(getDefaultState()
                                .with(ADDON_USED, false)
-                               .with(FACING, Direction.UP)
-                               .with(FACE, BlockFace.WALL)
+                               .with(FACING, Direction.NORTH)
+                               .with(FACE, BlockFace.FLOOR)
         );
         
         this.extender = extender;

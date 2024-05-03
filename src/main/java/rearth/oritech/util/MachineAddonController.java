@@ -70,7 +70,7 @@ public interface MachineAddonController {
     // addon loading algorithm, called during init
     default List<AddonBlock> getAllAddons() {
         
-        var maxIterationCount = (int) getCoreQuality();
+        var maxIterationCount = (int) getCoreQuality() + 1;
         
         // start with base slots (on machine itself)
         // repeat N times (dependent on core quality?):
