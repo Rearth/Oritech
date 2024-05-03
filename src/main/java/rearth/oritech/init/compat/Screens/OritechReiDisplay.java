@@ -1,7 +1,6 @@
 package rearth.oritech.init.compat.Screens;
 
 import io.wispforest.owo.compat.rei.ReiUIAdapter;
-import io.wispforest.owo.ui.base.BaseComponent;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
@@ -14,7 +13,6 @@ import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
-import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
@@ -34,17 +32,18 @@ import java.util.List;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 
-public class BasicMachineScreen implements DisplayCategory<Display> {
+public class OritechReiDisplay implements DisplayCategory<Display> {
     
     protected final OritechRecipeType recipeType;
     protected final MachineBlockEntity screenProvider;
     protected final ItemConvertible icon;
     
-    public BasicMachineScreen(OritechRecipeType recipeType, Class<? extends MachineBlockEntity> screenProviderSource, ItemConvertible icon) {
+    public OritechReiDisplay(OritechRecipeType recipeType, Class<? extends MachineBlockEntity> screenProviderSource, ItemConvertible icon) {
         this.recipeType = recipeType;
         try {
             this.screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(new BlockPos(0, 0, 0), Blocks.AIR.getDefaultState());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
         this.icon = icon;
@@ -77,7 +76,9 @@ public class BasicMachineScreen implements DisplayCategory<Display> {
         for (int i = 0; i < inputEntries.size(); i++) {
             var entry = inputEntries.get(i);
             var pos = slots.get(slotOffsets.inputStart() + i);
-            root.child(adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0))).positioning(Positioning.absolute(pos.x() - offsetX, pos.y() - offsetY)));
+            root.child(
+              adapter.wrap(Widgets.createSlot(new Point(0, 0)).entries(entry).markInput())
+                .positioning(Positioning.absolute(pos.x() - offsetX, pos.y() - offsetY)));
         }
         
         // arrow
@@ -88,7 +89,9 @@ public class BasicMachineScreen implements DisplayCategory<Display> {
         for (int i = 0; i < outputEntries.size(); i++) {
             var entry = outputEntries.get(i);
             var pos = slots.get(slotOffsets.outputStart() + i);
-            root.child(adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0))).positioning(Positioning.absolute(pos.x() - offsetX, pos.y() - offsetY)));
+            root.child(
+              adapter.wrap(Widgets.createSlot(new Point(0, 0)).entry(entry.get(0)).markOutput())
+                .positioning(Positioning.absolute(pos.x() - offsetX, pos.y() - offsetY)));
         }
         
         // data
@@ -128,28 +131,6 @@ public class BasicMachineScreen implements DisplayCategory<Display> {
             root.child(foreGround);
         }
         
-    }
-    
-    public static void addInputSlot(FlowLayout root, OritechDisplay display, ReiUIAdapter<FlowLayout> adapter, int x, int y, int slot) {
-        root.child(adapter.wrap(
-          Widgets.createSlot(new Point(0, 0)).markInput().entry(display.getInputEntries().get(slot).get(0))
-        ).positioning(Positioning.absolute(x, y)));
-    }
-    
-    public static void addOutputSlot(FlowLayout root, OritechDisplay display, ReiUIAdapter<FlowLayout> adapter, int x, int y, int slot) {
-        root.child(adapter.wrap(
-          Widgets.createSlot(new Point(0, 0)).markOutput().entry(display.getOutputEntries().get(slot).get(0))
-        ).positioning(Positioning.absolute(x, y)));
-    }
-    
-    public static BaseComponent getOutputSlotNoBackground(OritechDisplay display, ReiUIAdapter<FlowLayout> adapter, int slot) {
-        return getOutputSlotNoBackground(adapter, display.getOutputEntries().get(slot).get(0));
-    }
-    
-    public static BaseComponent getOutputSlotNoBackground(ReiUIAdapter<FlowLayout> adapter, EntryStack<?> stack) {
-        return adapter.wrap(
-          Widgets.createSlot(new Point(0, 0)).entry(stack).disableBackground()
-        );
     }
     
     @Override
