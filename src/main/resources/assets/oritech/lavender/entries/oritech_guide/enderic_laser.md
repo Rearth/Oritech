@@ -24,9 +24,10 @@ The dropped blocks are then placed in the inventory.
 To set the target direction of the laser, select a target with the target designator item. Then shift+right-click the **bottom** laser block to assign the target. The laser will 
 keep firing in the target direction as long as there is something to target. 
 
-*Note that you're only setting the target direction, not the target block. This means that the laser will also destroy blocks before and behind the target*.
+*Note that you're only setting the target direction. This means that the laser will also destroy blocks before and behind the target*.
+A redstone signal disables the laser.
 
-The maximum range is 64..
+The maximum range is 64.
 
 ;;;;;
 

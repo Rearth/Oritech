@@ -9,7 +9,10 @@
 }
 ```
 
-<block;oritech:deep_drill_block[machine_assembled=true]>
+![bedrock_extractor](oritech:textures/book/deep_drill.png,fit)
+
+;;;;;
+
 The bedrock extractor can mine ores from below bedrock at places where ore resource nodes are found. The multiblock machine can only operate when placed on resource nodes, and
 must be powered using enderic lasers.
 
