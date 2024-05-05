@@ -11,12 +11,13 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 
 import java.util.Objects;
 
 public class MachineFrameBlock extends Block {
     
-    private static final Boolean USE_ACCURATE_OUTLINES = false;
+    private static final Boolean USE_ACCURATE_OUTLINES = Oritech.CONFIG.tightMachineFrameHitboxes();
     
     public static final BooleanProperty NORTH = ConnectingBlock.NORTH;
     public static final BooleanProperty EAST = ConnectingBlock.EAST;

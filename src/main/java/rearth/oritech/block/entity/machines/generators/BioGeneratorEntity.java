@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -22,7 +23,7 @@ import java.util.List;
 
 public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     public BioGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BIO_GENERATOR_ENTITY, pos, state, 64);
+        super(BlockEntitiesContent.BIO_GENERATOR_ENTITY, pos, state, Oritech.CONFIG.generators.bioGeneratorData.energyPerTick());
     }
     
     @Override
@@ -88,6 +89,16 @@ public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
           new Vec3i(1, 0, 0),
           new Vec3i(1, 1, 0)
         );
+    }
+    
+    @Override
+    public long getDefaultExtractionRate() {
+        return Oritech.CONFIG.generators.bioGeneratorData.maxEnergyExtraction();
+    }
+    
+    @Override
+    public long getDefaultCapacity() {
+        return Oritech.CONFIG.generators.bioGeneratorData.energyCapacity();
     }
     
     @Override

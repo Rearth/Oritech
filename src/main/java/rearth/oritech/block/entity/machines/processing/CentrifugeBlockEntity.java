@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockContent;
@@ -32,7 +33,7 @@ import java.util.List;
 
 public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidProvider {
     
-    private static final long CAPACITY = 8 * FluidConstants.BUCKET;
+    private static final long CAPACITY = Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidConstants.BUCKET;
     
     public final SingleVariantStorage<FluidVariant> inputStorage = createBasicTank();
     public final SingleVariantStorage<FluidVariant> outputStorage = createBasicTank();
@@ -43,7 +44,17 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     public boolean hasFluidAddon;
     
     public CentrifugeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.CENTRIFUGE_ENTITY, pos, state, 64);
+        super(BlockEntitiesContent.CENTRIFUGE_ENTITY, pos, state, Oritech.CONFIG.processingMachines.centrifugeData.energyPerTick());
+    }
+    
+    @Override
+    public long getDefaultCapacity() {
+        return Oritech.CONFIG.processingMachines.centrifugeData.energyCapacity();
+    }
+    
+    @Override
+    public long getDefaultInsertRate() {
+        return Oritech.CONFIG.processingMachines.centrifugeData.maxEnergyInsertion();
     }
     
     @Override

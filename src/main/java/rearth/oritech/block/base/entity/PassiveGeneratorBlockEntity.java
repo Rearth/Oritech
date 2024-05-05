@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements EnergyProvider, BlockEntityTicker<PassiveGeneratorBlockEntity> {
     
-    protected final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(200000, 0, 1000);
+    protected final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(200_000, 0, 1000);
     private HashMap<Direction, BlockApiCache<EnergyStorage, Direction>> directionCaches;
     
     public PassiveGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

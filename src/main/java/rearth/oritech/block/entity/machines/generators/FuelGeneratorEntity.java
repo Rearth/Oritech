@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -23,7 +24,7 @@ import java.util.List;
 
 public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     public FuelGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FUEL_GENERATOR_ENTITY, pos, state, 256);
+        super(BlockEntitiesContent.FUEL_GENERATOR_ENTITY, pos, state, Oritech.CONFIG.generators.fuelGeneratorData.energyPerTick());
     }
     
     protected Multimap<Direction, BlockApiCache<EnergyStorage, Direction>> getNeighborCaches(BlockPos pos, World world) {
@@ -73,6 +74,16 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     @Override
     public int getInventorySize() {
         return 0;
+    }
+    
+    @Override
+    public long getDefaultExtractionRate() {
+        return Oritech.CONFIG.generators.fuelGeneratorData.maxEnergyExtraction();
+    }
+    
+    @Override
+    public long getDefaultCapacity() {
+        return Oritech.CONFIG.generators.fuelGeneratorData.energyCapacity();
     }
     
     @Override

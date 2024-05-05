@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -22,10 +23,20 @@ import java.util.Objects;
 
 public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     
-    private final float FURNACE_SPEED_MULTIPLIER = 0.5f;
+    private final float FURNACE_SPEED_MULTIPLIER = Oritech.CONFIG.processingMachines.furnaceData.speedMultiplier();
     
     public PoweredFurnaceBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.POWERED_FURNACE_ENTITY, pos, state, 32);
+        super(BlockEntitiesContent.POWERED_FURNACE_ENTITY, pos, state, Oritech.CONFIG.processingMachines.furnaceData.energyPerTick());
+    }
+    
+    @Override
+    public long getDefaultCapacity() {
+        return Oritech.CONFIG.processingMachines.furnaceData.energyCapacity();
+    }
+    
+    @Override
+    public long getDefaultInsertRate() {
+        return Oritech.CONFIG.processingMachines.furnaceData.maxEnergyInsertion();
     }
     
     @Override

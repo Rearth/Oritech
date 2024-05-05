@@ -6,6 +6,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockContent;
@@ -23,7 +24,17 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     private boolean hasByproductAddon;
     
     public FragmentForgeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY, pos, state, 256);
+        super(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY, pos, state, Oritech.CONFIG.processingMachines.fragmentForgeData.energyPerTick());
+    }
+    
+    @Override
+    public long getDefaultCapacity() {
+        return Oritech.CONFIG.processingMachines.fragmentForgeData.energyCapacity();
+    }
+    
+    @Override
+    public long getDefaultInsertRate() {
+        return Oritech.CONFIG.processingMachines.fragmentForgeData.maxEnergyInsertion();
     }
     
     @Override

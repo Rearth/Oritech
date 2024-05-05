@@ -50,11 +50,11 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     private boolean networkDirty;
     
     // config
-    private int worktime = 20;
-    private int energyPerStep = 1024;
+    private int worktime = Oritech.CONFIG.deepDrillConfig.stepsPerOre();
+    private int energyPerStep = Oritech.CONFIG.deepDrillConfig.energyPerStep();
     
     // storage
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(1024 * 8, 0, 0) {
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.deepDrillConfig.energyCapacity(), 0, 0) {
         @Override
         public void onFinalCommit() {
             super.onFinalCommit();

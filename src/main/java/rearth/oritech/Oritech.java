@@ -12,6 +12,7 @@ import rearth.oritech.block.blocks.pipes.ItemPipeBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.network.NetworkContent;
@@ -20,6 +21,7 @@ public class Oritech implements ModInitializer {
     
     public static final String MOD_ID = "oritech";
     public static final Logger LOGGER = LoggerFactory.getLogger("oritech");
+    public static final OritechConfig CONFIG = OritechConfig.createAndLoad();
     
     @Override
     public void onInitialize() {

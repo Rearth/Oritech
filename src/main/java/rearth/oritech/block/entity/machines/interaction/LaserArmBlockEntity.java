@@ -46,7 +46,7 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyProvider, MultiblockMachineController, MachineAddonController, InventoryProvider {
     
-    private static final int BLOCK_BREAK_ENERGY = 1024;
+    private static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
     
     // storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0) {
@@ -78,6 +78,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     private final List<BlockPos> openSlots = new ArrayList<>();
     private float coreQuality = 1f;
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
+    
+    // config
+    private final int range = Oritech.CONFIG.laserArmConfig.range();
     
     // working data
     private BlockPos targetDirection;
@@ -188,7 +191,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         var direction = Vec3d.of(targetDirection.subtract(pos.up())).normalize();
         var from = Vec3d.of(pos.up()).add(0.5, 0.55, 0.5).add(direction.multiply(1.5));
         
-        var nextBlock = basicRaycast(from, direction, 64);
+        var nextBlock = basicRaycast(from, direction, range);
         
         if (nextBlock != null) {
             trySetNewTarget(nextBlock, false);
@@ -236,7 +239,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     private int energyRequiredToFire() {
-        return 128;
+        return (int) Oritech.CONFIG.laserArmConfig.energyPerTick();
     }
     
     private void updateNetwork() {
@@ -267,7 +270,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         
         var distance = targetPos.getManhattanDistance(pos);
         var blockHardness = targetState.getBlock().getHardness();
-        if (distance > 64 || blockHardness < 0.0) {
+        if (distance > range || blockHardness < 0.0) {
             return false;
         }
         
@@ -408,12 +411,12 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     @Override
     public long getDefaultCapacity() {
-        return 20000;
+        return Oritech.CONFIG.laserArmConfig.energyCapacity();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return 100;
+        return Oritech.CONFIG.laserArmConfig.maxEnergyInsertion();
     }
     //endregion
     

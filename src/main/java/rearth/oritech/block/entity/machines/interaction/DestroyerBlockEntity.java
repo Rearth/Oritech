@@ -11,6 +11,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockFrameInteractionEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -141,22 +142,22 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
     @Override
     public int getMoveTime() {
-        return 20;
+        return Oritech.CONFIG.destroyerConfig.moveDuration();
     }
     
     @Override
     public int getWorkTime() {
-        return 40;
+        return Oritech.CONFIG.destroyerConfig.workDuration();
     }
     
     @Override
     public int getMoveEnergyUsage() {
-        return 8;
+        return Oritech.CONFIG.destroyerConfig.moveEnergyUsage();
     }
     
     @Override
     public int getOperationEnergyUsage() {
-        return 128;
+        return Oritech.CONFIG.destroyerConfig.workEnergyUsage();
     }
     
     @Override

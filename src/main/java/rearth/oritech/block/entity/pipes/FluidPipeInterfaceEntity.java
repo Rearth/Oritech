@@ -25,7 +25,8 @@ import java.util.stream.Collectors;
 
 public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity implements FluidProvider {
     
-    public static final int MAX_TRANSFER_RATE = (int) (FluidConstants.BUCKET * 0.5f);
+    public static final int MAX_TRANSFER_RATE = (int) (FluidConstants.BUCKET * Oritech.CONFIG.fluidPipeExtractAmountBuckets());
+    private static final int TRANSFER_PERIOD = Oritech.CONFIG.fluidPipeExtractIntervalDuration();
     
     private final HashMap<BlockPos, BlockApiCache<Storage<FluidVariant>, Direction>> lookupCache = new HashMap<>();
     
@@ -37,7 +38,7 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
         
         @Override
         protected long getCapacity(FluidVariant variant) {
-            return (MAX_TRANSFER_RATE * 2);
+            return (long) (MAX_TRANSFER_RATE * Oritech.CONFIG.fluidPipeInternalStorageBuckets());
         }
         
         @Override
@@ -67,7 +68,7 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
-        if (world.isClient) return;
+        if (world.isClient || world.getTime() % TRANSFER_PERIOD != 0) return;
         
         var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
         

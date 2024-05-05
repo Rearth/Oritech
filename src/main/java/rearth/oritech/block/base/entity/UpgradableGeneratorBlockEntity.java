@@ -15,6 +15,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
 import team.reborn.energy.api.EnergyStorage;
@@ -228,22 +229,12 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     }
     
     @Override
-    public long getDefaultCapacity() {
-        return 20000;
-    }
-    
-    @Override
     public long getDefaultInsertRate() {
         return 0;
     }
     
     @Override
-    public long getDefaultExtractionRate() {
-        return 512;
-    }
-    
-    @Override
     protected float getAnimationSpeed() {
-        return super.getAnimationSpeed() * 20;
+        return super.getAnimationSpeed() * Oritech.CONFIG.generators.animationSpeedMultiplier();
     }
 }

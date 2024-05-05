@@ -8,6 +8,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.pipes.EnergyPipeBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.EnergyProvider;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implements EnergyProvider {
     
-    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(10000, 10000, 10000);
+    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(Oritech.CONFIG.energyPipeTransferRate(), Oritech.CONFIG.energyPipeTransferRate(), Oritech.CONFIG.energyPipeTransferRate());
     private final HashMap<BlockPos, BlockApiCache<EnergyStorage, Direction>> lookupCache = new HashMap<>();
     
     public EnergyPipeInterfaceEntity(BlockPos pos, BlockState state) {

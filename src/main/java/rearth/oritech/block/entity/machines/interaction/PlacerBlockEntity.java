@@ -9,6 +9,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockContent;
@@ -102,23 +103,23 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
     
     @Override
     public int getMoveTime() {
-        return 10;
+        return Oritech.CONFIG.placerConfig.moveDuration();
     }
     
     @Override
     public int getWorkTime() {
-        return 5;
+        return Oritech.CONFIG.placerConfig.workDuration();
     }
     
     
     @Override
     public int getMoveEnergyUsage() {
-        return 8;
+        return Oritech.CONFIG.placerConfig.moveEnergyUsage();
     }
     
     @Override
     public int getOperationEnergyUsage() {
-        return 64;
+        return Oritech.CONFIG.placerConfig.workEnergyUsage();
     }
     
     @Override

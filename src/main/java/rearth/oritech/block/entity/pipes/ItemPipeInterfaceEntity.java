@@ -22,8 +22,8 @@ import java.util.*;
 
 public class ItemPipeInterfaceEntity extends GenericPipeInterfaceEntity {
     
-    private static final int TRANSFER_AMOUNT = 8;
-    private static final int TRANSFER_PERIOD = 5;
+    private static final int TRANSFER_AMOUNT = Oritech.CONFIG.itemPipeTransferAmount();
+    private static final int TRANSFER_PERIOD = Oritech.CONFIG.itemPipeIntervalDuration();
     
     private final HashMap<BlockPos, BlockApiCache<Storage<ItemVariant>, Direction>> lookupCache = new HashMap<>();
     

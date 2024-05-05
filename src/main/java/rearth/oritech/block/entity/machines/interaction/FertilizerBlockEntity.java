@@ -20,6 +20,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -33,7 +34,7 @@ import java.util.Objects;
 
 public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements FluidProvider {
     
-    public static final long FLUID_USAGE = (long) (0.25f * FluidConstants.BUCKET);   // per block, tick usage is this divided by work time
+    public static final long FLUID_USAGE = (long) (Oritech.CONFIG.fertilizerConfig.liquidPerBlockUsage() * FluidConstants.BUCKET);   // per block, tick usage is this divided by work time
     
     private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
         @Override
@@ -167,22 +168,22 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     
     @Override
     public int getMoveTime() {
-        return 10;
+        return Oritech.CONFIG.fertilizerConfig.moveDuration();
     }
     
     @Override
     public int getWorkTime() {
-        return 20;
+        return Oritech.CONFIG.fertilizerConfig.workDuration();
     }
     
     @Override
     public int getMoveEnergyUsage() {
-        return 8;
+        return Oritech.CONFIG.fertilizerConfig.moveEnergyUsage();
     }
     
     @Override
     public int getOperationEnergyUsage() {
-        return 128;
+        return Oritech.CONFIG.fertilizerConfig.workEnergyUsage();
     }
     
     @Override

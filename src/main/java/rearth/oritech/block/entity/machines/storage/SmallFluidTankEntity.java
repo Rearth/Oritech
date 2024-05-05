@@ -32,6 +32,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -63,7 +64,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         
         @Override
         protected long getCapacity(FluidVariant variant) {
-            return (256 * FluidConstants.BUCKET);
+            return (Oritech.CONFIG.portableTankCapacityBuckets() * FluidConstants.BUCKET);
         }
         
         @Override

@@ -30,7 +30,7 @@ import static rearth.oritech.util.Geometry.*;
 
 public abstract class FrameInteractionBlockEntity extends BlockEntity implements BlockEntityTicker<FrameInteractionBlockEntity> {
     
-    private static final int MAX_SEARCH_LENGTH = 64;
+    private static final int MAX_SEARCH_LENGTH = Oritech.CONFIG.processingMachines.machineFrameMaxLength();
     private static final HashMap<Vec3i, HashMap<Vec3i, Vec3i>> occupiedAreas = new HashMap<>();
     private BlockPos areaMin;       // both min and max are inclusive
     private BlockPos areaMax;

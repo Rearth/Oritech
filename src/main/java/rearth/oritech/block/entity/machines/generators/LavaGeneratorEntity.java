@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -22,7 +23,7 @@ import java.util.List;
 
 public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     public LavaGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.LAVA_GENERATOR_ENTITY, pos, state, 64);
+        super(BlockEntitiesContent.LAVA_GENERATOR_ENTITY, pos, state, Oritech.CONFIG.generators.lavaGeneratorData.energyPerTick());
     }
     
     @Override
@@ -77,6 +78,16 @@ public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     @Override
     public int getInventorySize() {
         return 0;
+    }
+    
+    @Override
+    public long getDefaultExtractionRate() {
+        return Oritech.CONFIG.generators.lavaGeneratorData.maxEnergyExtraction();
+    }
+    
+    @Override
+    public long getDefaultCapacity() {
+        return Oritech.CONFIG.generators.lavaGeneratorData.energyCapacity();
     }
     
     @Override

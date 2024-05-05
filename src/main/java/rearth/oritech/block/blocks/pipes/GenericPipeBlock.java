@@ -14,6 +14,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 
 public abstract class GenericPipeBlock extends Block {
@@ -27,7 +28,7 @@ public abstract class GenericPipeBlock extends Block {
     public static final IntProperty DOWN = IntProperty.of("down", 0, 2);
     
     public static final BooleanProperty STRAIGHT = BooleanProperty.of("straight");
-    private static final Boolean USE_ACCURATE_OUTLINES = true;
+    private static final Boolean USE_ACCURATE_OUTLINES = Oritech.CONFIG.tightCableHitboxes();
     protected final VoxelShape[] boundingShapes;
     
     public GenericPipeBlock(Settings settings) {

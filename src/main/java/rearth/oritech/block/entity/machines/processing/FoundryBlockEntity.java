@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -16,7 +17,17 @@ import java.util.List;
 public class FoundryBlockEntity extends MultiblockMachineEntity {
     
     public FoundryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FOUNDRY_ENTITY, pos, state, 128);
+        super(BlockEntitiesContent.FOUNDRY_ENTITY, pos, state, Oritech.CONFIG.processingMachines.foundryData.energyPerTick());
+    }
+    
+    @Override
+    public long getDefaultCapacity() {
+        return Oritech.CONFIG.processingMachines.foundryData.energyCapacity();
+    }
+    
+    @Override
+    public long getDefaultInsertRate() {
+        return Oritech.CONFIG.processingMachines.foundryData.maxEnergyInsertion();
     }
     
     @Override

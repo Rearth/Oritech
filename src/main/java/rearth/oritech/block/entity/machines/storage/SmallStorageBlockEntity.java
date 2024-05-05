@@ -3,6 +3,7 @@ package rearth.oritech.block.entity.machines.storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.init.BlockEntitiesContent;
 
@@ -24,17 +25,17 @@ public class SmallStorageBlockEntity extends ExpandableEnergyStorageBlockEntity 
     
     @Override
     public long getDefaultCapacity() {
-        return 1_000_000;
+        return Oritech.CONFIG.smallEnergyStorage.energyCapacity();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return 1000;
+        return Oritech.CONFIG.smallEnergyStorage.maxEnergyInsertion();
     }
     
     @Override
     public long getDefaultExtractionRate() {
-        return 1000;
+        return Oritech.CONFIG.smallEnergyStorage.maxEnergyExtraction();
     }
     
     @Override

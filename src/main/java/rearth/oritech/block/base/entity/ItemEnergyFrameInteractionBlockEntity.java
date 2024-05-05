@@ -171,12 +171,12 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public long getDefaultCapacity() {
-        return 5000;
+        return 10000;
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return 100;
+        return 512;
     }
     
     @Override

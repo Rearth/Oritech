@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -18,7 +19,17 @@ import java.util.List;
 public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     public AtomicForgeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ATOMIC_FORGE_ENTITY, pos, state, 1024);
+        super(BlockEntitiesContent.ATOMIC_FORGE_ENTITY, pos, state, Oritech.CONFIG.processingMachines.atomicForgeData.energyPerTick());
+    }
+    
+    @Override
+    public long getDefaultCapacity() {
+        return Oritech.CONFIG.processingMachines.atomicForgeData.energyCapacity();
+    }
+    
+    @Override
+    public long getDefaultInsertRate() {
+        return Oritech.CONFIG.processingMachines.atomicForgeData.maxEnergyInsertion();
     }
     
     @Override
@@ -48,16 +59,6 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public int getInventorySize() {
         return 4;
-    }
-    
-    @Override
-    public long getDefaultInsertRate() {
-        return 0;
-    }
-    
-    @Override
-    public long getDefaultCapacity() {
-        return 1000;
     }
     
     @Override

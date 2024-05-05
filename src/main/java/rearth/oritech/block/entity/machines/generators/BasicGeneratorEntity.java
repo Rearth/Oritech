@@ -6,6 +6,7 @@ import net.minecraft.item.Item;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -21,7 +22,7 @@ public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
     public static final Map<Item, Integer> FUEL_MAP = AbstractFurnaceBlockEntity.createFuelTimeMap();
     
     public BasicGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BASIC_GENERATOR_ENTITY, pos, state, 32);
+        super(BlockEntitiesContent.BASIC_GENERATOR_ENTITY, pos, state, Oritech.CONFIG.generators.basicGeneratorData.energyPerTick());
     }
     
     @Override
@@ -74,6 +75,16 @@ public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
     public List<Vec3i> getAddonSlots() {
         return List.of(
         );
+    }
+    
+    @Override
+    public long getDefaultExtractionRate() {
+        return Oritech.CONFIG.generators.basicGeneratorData.maxEnergyExtraction();
+    }
+    
+    @Override
+    public long getDefaultCapacity() {
+        return Oritech.CONFIG.generators.basicGeneratorData.energyCapacity();
     }
     
     @Override

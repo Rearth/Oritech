@@ -42,9 +42,10 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     // owo lib
-    modImplementation "io.wispforest:owo-lib:${project.owo_version}"
+    // modImplementation "io.wispforest:owo-lib:${project.owo_version}"
     modImplementation "io.wispforest:lavender:${project.lavender_version}"
     include "io.wispforest:owo-sentinel:${project.owo_version}"
+    annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_version}")
 
     // gecko lib
     modImplementation "software.bernie.geckolib:geckolib-fabric-${project.geckolib_version}"
