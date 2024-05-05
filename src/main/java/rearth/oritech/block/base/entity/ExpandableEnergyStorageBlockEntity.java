@@ -272,7 +272,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     @Override
     public List<GuiSlot> getGuiSlots() {
-        return List.of(new GuiSlot(0, 40, 21));
+        return List.of(new GuiSlot(0, 80, 35));
     }
     
     @Override
@@ -314,11 +314,6 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     @Override
     public ScreenHandlerType<?> getScreenHandlerType() {
         return ModScreens.STORAGE_SCREEN;
-    }
-    
-    @Override
-    public BarConfiguration getEnergyConfiguration() {
-        return new BarConfiguration(80, 26, 15, 54);
     }
     
     @Override

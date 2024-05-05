@@ -202,7 +202,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
     
     private void addComponents(RecipeExporter exporter) {
         // coal stuff (including basic steel)
-        addCentrifugeRecipe(exporter, Ingredient.fromTag(TagContent.COAL_DUSTS), ItemContent.CARBON_FIBRE_STRANDS, 1f, "_carbon");
+        addCentrifugeRecipe(exporter, Ingredient.fromTag(TagContent.COAL_DUSTS), ItemContent.CARBON_FIBRE_STRANDS, 0.5f, "_carbon");
         offerManualAlloyRecipe(exporter, ItemContent.STEEL_INGOT, Ingredient.ofItems(Items.IRON_INGOT), Ingredient.ofItems(Items.COAL), "manualsteel");
         
         // manual alloys
@@ -217,27 +217,27 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         // fine wires
         offerCableRecipe(exporter, new ItemStack(ItemContent.FINE_WIRE, 4), Ingredient.fromTag(TagContent.NICKEL_INGOTS));
-        addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), ItemContent.FINE_WIRE, 8, 1f, "_fwire");
+        addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), ItemContent.FINE_WIRE, 12, 0.5f, "_fwire");
         
         // insulated fine wires
         offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.INSULATED_WIRE, 4), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.ofItems(ItemContent.SILICON), "_base");
         offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.INSULATED_WIRE, 3), Ingredient.ofItems(ItemContent.FINE_WIRE), Ingredient.ofItems(ItemContent.SILICON), "_upgrade");
-        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.FINE_WIRE), Ingredient.ofItems(ItemContent.FINE_WIRE), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.SILICON), ItemContent.INSULATED_WIRE, 2, 0.5f, "_iwire");
+        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.FINE_WIRE), Ingredient.ofItems(ItemContent.FINE_WIRE), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.SILICON), ItemContent.INSULATED_WIRE, 3, 0.5f, "_iwire");
         
         // magnetic coils
         offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.MAGNETIC_COIL, 2), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.FINE_WIRE), "magnet");
-        addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.FINE_WIRE), Ingredient.ofItems(ItemContent.FINE_WIRE), Ingredient.ofItems(ItemContent.FINE_WIRE), ItemContent.MAGNETIC_COIL, 1, 1f, "magnet");
+        addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.FINE_WIRE), Ingredient.ofItems(ItemContent.FINE_WIRE), Ingredient.ofItems(ItemContent.FINE_WIRE), ItemContent.MAGNETIC_COIL, 1, 0.5f, "magnet");
         
         // motor
         offerMotorRecipe(exporter, ItemContent.MOTOR, Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_motorcraft");
-        addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), ItemContent.MOTOR, 1, 1f, "motor");
+        addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), ItemContent.MOTOR, 1, 0.5f, "motor");
         
         // machine plating
         addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), ItemContent.MACHINE_PLATING, 2, 1f, "plating");
         
         // basic battery
         offerMotorRecipe(exporter, ItemContent.BASIC_BATTERY, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "manualbattery");
-        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.PLASTIC_SHEET), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.fromTag(TagContent.STEEL_INGOTS), ItemContent.BASIC_BATTERY, 1, 1f, "battery");
+        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.PLASTIC_SHEET), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.fromTag(TagContent.STEEL_INGOTS), ItemContent.BASIC_BATTERY, 1, 0.5f, "battery");
         addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.PLASTIC_SHEET), Ingredient.ofItems(ItemContent.FLUXITE), Ingredient.ofItems(ItemContent.FLUXITE), Ingredient.fromTag(TagContent.STEEL_INGOTS), ItemContent.BASIC_BATTERY, 2, 1f, "batterybetter");
         
         // silicon
@@ -254,9 +254,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // processing unit
         addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.PLASTIC_SHEET), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(Items.REDSTONE), ItemContent.PROCESSING_UNIT, 1f, "_processingunit");
         // enderic lens
-        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.STRANGE_MATTER), ItemContent.ENDERIC_LENS, 1f, "_enderlens");
+        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.STRANGE_MATTER), ItemContent.ENDERIC_LENS, 1.5f, "_enderlens");
         // flux gate
-        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.FLUXITE), Ingredient.ofItems(ItemContent.FLUXITE), Ingredient.fromTag(TagContent.PLATINUM_INGOTS), ItemContent.FLUX_GATE, 1f, "_fluxgate");
+        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.FLUXITE), Ingredient.ofItems(ItemContent.FLUXITE), Ingredient.fromTag(TagContent.PLATINUM_INGOTS), ItemContent.FLUX_GATE, 1.5f, "_fluxgate");
         
         // ai processor tree
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), ItemContent.SILICON_WAFER, 5, "_wafer");
@@ -278,7 +278,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.SUPER_AI_CHIP), ItemContent.HEISENBERG_COMPENSATOR, 100, "_compensator");
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), ItemContent.HEISENBERG_COMPENSATOR, 100, "_compensatoralt");
         offerMotorRecipe(exporter, ItemContent.OVERCHARGED_CRYSTAL, Ingredient.ofItems(Items.ENCHANTED_BOOK), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), "_overchargedcrystal");
-        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.ofItems(ItemContent.INSULATED_WIRE), Ingredient.ofItems(ItemContent.DUBIOS_CONTAINER), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), ItemContent.SUPERCONDUCTOR, 1f, "_superconductor");
+        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.ofItems(ItemContent.INSULATED_WIRE), Ingredient.ofItems(ItemContent.DUBIOS_CONTAINER), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), ItemContent.SUPERCONDUCTOR, 2f, "_superconductor");
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.OVERCHARGED_CRYSTAL), Ingredient.ofItems(ItemContent.HEISENBERG_COMPENSATOR), ItemContent.PROMETHEUM_INGOT, 1000, "_prometheum");
     }
     
@@ -429,7 +429,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
     }
     
     private void addGrinderRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, int dustCount, String suffix) {
-        var grinderDefaultSpeed = 100;
+        var grinderDefaultSpeed = 200;
         
         var grinder = new OritechRecipe(grinderDefaultSpeed, List.of(ingot), List.of(new ItemStack(dust, dustCount)), RecipeContent.GRINDER, null, null);
         exporter.accept(new Identifier(Oritech.MOD_ID, "grinderdust" + suffix), grinder, null);
@@ -452,7 +452,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
     }
     
     private void addAssemblerRecipe(RecipeExporter exporter, Ingredient A, Ingredient B, Ingredient C, Ingredient D, Item result, int count, float timeMultiplier, String suffix) {
-        var defaultSpeed = 400;
+        var defaultSpeed = 300;
         var speed = (int) (defaultSpeed * timeMultiplier);
         var inputs = new ArrayList<Ingredient>();
         inputs.add(A);
@@ -467,14 +467,14 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addCentrifugeRecipe(exporter, input, result, 1, timeMultiplier, suffix);
     }
     private void addCentrifugeRecipe(RecipeExporter exporter, Ingredient input, Item result, int count, float timeMultiplier, String suffix) {
-        var defaultSpeed = 600;
+        var defaultSpeed = 300;
         var speed = (int) (defaultSpeed * timeMultiplier);
-        var entry = new OritechRecipe(speed, List.of(input), List.of(new ItemStack(result)), RecipeContent.CENTRIFUGE, null, null);
+        var entry = new OritechRecipe(speed, List.of(input), List.of(new ItemStack(result, count)), RecipeContent.CENTRIFUGE, null, null);
         exporter.accept(new Identifier(Oritech.MOD_ID, "centrifuge" + suffix), entry, null);
     }
     
     private void addCentrifugeFluidRecipe(RecipeExporter exporter, Ingredient input, Item result, Fluid in, float bucketsIn, Fluid out, float bucketsOut, float timeMultiplier, String suffix) {
-        var defaultSpeed = 600;
+        var defaultSpeed = 300;
         var speed = (int) (defaultSpeed * timeMultiplier);
         var inputStack = in != null ? new FluidStack(in, (long) (bucketsIn * 81000)) : null;
         var outputStack = out != null ? new FluidStack(out, (long) (bucketsOut * 81000)) : null;
