@@ -13,7 +13,7 @@ base {
 repositories {
 
     maven {
-        name = 'Owo'
+        name = 'WispForest' // owo-lib
         url 'https://maven.wispforest.io'
     }
 
@@ -23,8 +23,13 @@ repositories {
     }
 
     maven {
-        name = 'REI'
-        url "https://maven.shedaniel.me/"
+        name = 'Shedaniel' // REI
+        url 'https://maven.shedaniel.me/'
+    }
+
+    maven {
+        name = 'TerraformersMC' // EMI
+        url 'https://maven.terraformersmc.com/'
     }
 }
 
@@ -41,13 +46,13 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    // owo lib
+    // owo-lib
     // modImplementation "io.wispforest:owo-lib:${project.owo_version}"
     modImplementation "io.wispforest:lavender:${project.lavender_version}"
     include "io.wispforest:owo-sentinel:${project.owo_version}"
     annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_version}")
 
-    // gecko lib
+    // GeckoLib
     modImplementation "software.bernie.geckolib:geckolib-fabric-${project.geckolib_version}"
 
     // Energy API
@@ -55,10 +60,19 @@ dependencies {
         transitive = false
     }
 
+    // EMI for Fabric
+    modCompileOnly "dev.emi:emi-fabric:${project.emi_version}:api"
+
     // REI for Fabric
-    modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:${rei_version}"
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin:${rei_version}"
+    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"
+    modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}"
+
+    switch (project.recipe_viewer.toLowerCase(Locale.ROOT)) {
+        case "emi": modRuntimeOnly "dev.emi:emi-fabric:${project.emi_version}"; break
+        case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"; break
+        case "disabled": break
+        default: println("Unknown recipe viewer specified: ${project.recipe_viewer}. Must be EMI, REI, or disabled.")
+    }
 }
 
 processResources {

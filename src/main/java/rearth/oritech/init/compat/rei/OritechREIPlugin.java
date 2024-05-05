@@ -1,4 +1,4 @@
-package rearth.oritech.init.compat;
+package rearth.oritech.init.compat.rei;
 
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
@@ -8,7 +8,7 @@ import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.item.ItemConvertible;
 import rearth.oritech.block.entity.machines.processing.*;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.compat.Screens.OritechReiDisplay;
+import rearth.oritech.init.compat.rei.screens.OritechReiDisplay;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;

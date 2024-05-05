@@ -1,4 +1,4 @@
-package rearth.oritech.init.compat.Screens;
+package rearth.oritech.init.compat.rei.screens;
 
 import io.wispforest.owo.compat.rei.ReiUIAdapter;
 import io.wispforest.owo.ui.component.Components;
@@ -23,7 +23,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.init.compat.OritechDisplay;
+import rearth.oritech.init.compat.rei.OritechDisplay;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.ScreenProvider;
 

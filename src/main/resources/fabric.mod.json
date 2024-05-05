@@ -23,8 +23,11 @@
 		"fabric-datagen": [
 			"rearth.oritech.OritechDataGenerator"
 		],
+		"emi": [
+			"rearth.oritech.init.compat.emi.OritechEMIPlugin"
+		],
 		"rei_client": [
-			"rearth.oritech.init.compat.OritechREIPlugin"
+          "rearth.oritech.init.compat.rei.OritechREIPlugin"
 		]
 	},
 	"mixins": [
@@ -39,6 +42,7 @@
 		"geckolib": "*"
 	},
 	"suggests": {
-		"another-mod": "*"
+		"emi": "*",
+		"rei": "*"
 	}
 }
