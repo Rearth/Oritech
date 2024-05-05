@@ -46,7 +46,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     }
     
     public static Component getItemFrame(int x, int y) {
-        return Components.texture(ITEM_SLOT, 0, 0, 18, 17, 18, 17).positioning(Positioning.absolute(x - 2, y - 2));
+        return Components.texture(ITEM_SLOT, 0, 0, 18, 18, 18, 18).sizing(Sizing.fixed(18)).positioning(Positioning.absolute(x - 1, y - 1));
     }
     
     @Override
@@ -182,6 +182,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         }
         
         for (var slot : handler.screenData.getGuiSlots()) {
+            overlay.child(this.slotAsComponent(slot.index()).positioning(Positioning.absolute(slot.x(), slot.y())));
             overlay.child(getItemFrame(slot.x(), slot.y()));
         }
         

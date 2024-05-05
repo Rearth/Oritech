@@ -52,8 +52,8 @@ public class DroneScreen extends BasicMachineScreen<DroneScreenHandler> {
     public void fillOverlay(FlowLayout overlay) {
         super.fillOverlay(overlay);
         
-        overlay.child(BasicMachineScreen.getItemFrame(130, 26));
-        overlay.child(BasicMachineScreen.getItemFrame(130, 62));
+        overlay.child(BasicMachineScreen.getItemFrame(129, 26));
+        overlay.child(BasicMachineScreen.getItemFrame(129, 62));
         overlay.child(Components.texture(CARD_SLOT, 0, 0, 18, 40, 18, 40).positioning(Positioning.absolute(128, 25)));
         
     }

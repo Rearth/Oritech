@@ -34,8 +34,9 @@ If you want to contribute, suggest ideas or just see what's planned, make sure t
 ## Built With
 
 - Fabric API
-- Owo lib (for all the GUIs, and much more)
+- Owo lib (for all the GUIs, config, and much more)
 - Geckolib (for the animations)
+- Lavender (for the guide book)
 - Blockbench (to create and animate the models)
 
 ## Installation
