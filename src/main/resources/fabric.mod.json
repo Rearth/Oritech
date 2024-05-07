@@ -32,6 +32,7 @@
 	},
 	"mixins": [
 	],
+	"accessWidener": "oritech.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.15.9",
 		"minecraft": "~1.20.4",
