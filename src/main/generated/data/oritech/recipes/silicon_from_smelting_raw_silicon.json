@@ -1,7 +1,7 @@
 {
   "type": "minecraft:smelting",
   "category": "misc",
-  "cookingtime": 100,
+  "cookingtime": 60,
   "experience": 0.5,
   "group": "siliconfurnace",
   "ingredient": {

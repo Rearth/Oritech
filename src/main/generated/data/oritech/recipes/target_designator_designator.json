@@ -12,7 +12,7 @@
       "item": "oritech:electrum_ingot"
     },
     "s": {
-      "item": "oritech:steel_ingot"
+      "tag": "c:steel_ingots"
     }
   },
   "pattern": [

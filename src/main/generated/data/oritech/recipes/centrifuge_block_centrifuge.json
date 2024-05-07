@@ -6,7 +6,7 @@
       "item": "oritech:machine_plating"
     },
     "c": {
-      "item": "oritech:steel_ingot"
+      "tag": "c:steel_ingots"
     },
     "f": {
       "item": "minecraft:glass_bottle"

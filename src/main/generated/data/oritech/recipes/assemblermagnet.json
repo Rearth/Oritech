@@ -5,18 +5,18 @@
       "tag": "c:steel_ingots"
     },
     {
-      "item": "oritech:fine_wire"
+      "item": "oritech:insulated_wire"
     },
     {
-      "item": "oritech:fine_wire"
+      "item": "oritech:insulated_wire"
     },
     {
-      "item": "oritech:fine_wire"
+      "item": "oritech:insulated_wire"
     }
   ],
   "results": [
     {
-      "Count": 1,
+      "Count": 2,
       "id": "oritech:magnetic_coil"
     }
   ],
