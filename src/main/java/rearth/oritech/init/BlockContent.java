@@ -13,6 +13,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.MachineCoreBlock;
+import rearth.oritech.block.blocks.decorative.WallMountedLight;
 import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.InventoryProxyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
@@ -178,6 +179,13 @@ public class BlockContent implements BlockRegistryContainer {
     @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block RESOURCE_NODE_PLATINUM = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
+    
+    // region decorative
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block CEILING_LIGHT = new WallMountedLight(FabricBlockSettings.copyOf(Blocks.GLOWSTONE).nonOpaque(), 6);
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block CEILING_LIGHT_HANGING = new WallMountedLight(FabricBlockSettings.copyOf(Blocks.GLOWSTONE).nonOpaque(), 12);
+    //endregion
     
     @Override
     public void postProcessField(String namespace, Block value, String identifier, Field field) {
