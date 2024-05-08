@@ -2,9 +2,7 @@ package rearth.oritech.init;
 
 import io.wispforest.owo.registration.reflect.BlockRegistryContainer;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FluidBlock;
+import net.minecraft.block.*;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -13,6 +11,8 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.MachineCoreBlock;
+import rearth.oritech.block.blocks.decorative.TechLever;
+import rearth.oritech.block.blocks.decorative.TechRedstoneButton;
 import rearth.oritech.block.blocks.decorative.WallMountedLight;
 import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.InventoryProxyAddonBlock;
@@ -181,10 +181,15 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block RESOURCE_NODE_PLATINUM = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
     
     // region decorative
+    // TODO recipes, lang
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block CEILING_LIGHT = new WallMountedLight(FabricBlockSettings.copyOf(Blocks.GLOWSTONE).nonOpaque(), 6);
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block CEILING_LIGHT_HANGING = new WallMountedLight(FabricBlockSettings.copyOf(Blocks.GLOWSTONE).nonOpaque(), 12);
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block TECH_BUTTON = new TechRedstoneButton(BlockSetType.IRON, 50, FabricBlockSettings.copyOf(Blocks.STONE_BUTTON));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block TECH_LEVER = new TechLever(FabricBlockSettings.copyOf(Blocks.STONE_BUTTON));
     //endregion
     
     @Override
