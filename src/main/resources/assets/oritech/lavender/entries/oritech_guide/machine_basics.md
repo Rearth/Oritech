@@ -6,8 +6,7 @@
 }
 ```
 
-All oritech machines require energy to operate. Items can be automatically inserted to the input slots from the top, front, left and back side. This also applies
-to multiblocks and cannot be changed. Result slots can be accessed from the bottom and right side.
+All oritech machines require energy to operate. The top side is item-input only, while the sides can be used to insert and extract. The bottom only allows item extraction.
 
 ;;;;;
 

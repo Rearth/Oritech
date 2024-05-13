@@ -41,10 +41,7 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class MachineBlockEntity extends BlockEntity
   implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyProvider, ScreenProvider, InventoryProvider, BlockEntityTicker<MachineBlockEntity> {
@@ -580,22 +577,30 @@ public abstract class MachineBlockEntity extends BlockEntity
         
         @Override
         public int[] getAvailableSlots(Direction side) {
-            var forward = getFacing();
-            var right = forward.rotateYCounterclockwise();
             
-            // return a list of slot indices. Down and right is output, all else is input
-            if (side == Direction.DOWN || side == right) {
+            // return a list of slot indices
+            // top is input, sides are both, bottom is output
+            if (side == Direction.DOWN) {
                 var res = new int[getSlots().outputCount()];
                 for (int i = 0; i < getSlots().outputCount(); i++) {
                     res[i] = getSlots().outputStart() + i;
                 }
                 return res;
-            } else {
+            } if (side == Direction.UP) {
                 var res = new int[getSlots().inputCount()];
                 for (int i = 0; i < getSlots().inputCount(); i++) {
                     res[i] = getSlots().inputStart() + i;
                 }
                 return res;
+            } else {
+                var res = new ArrayList<Integer>();
+                for (int i = 0; i < getSlots().inputCount(); i++) {
+                    res.add(getSlots().inputStart() + i);
+                }
+                for (int i = 0; i < getSlots().outputCount(); i++) {
+                    res.add(getSlots().outputStart() + i);
+                }
+                return res.stream().mapToInt(Integer::intValue).toArray();
             }
         }
         
@@ -606,6 +611,9 @@ public abstract class MachineBlockEntity extends BlockEntity
             var config = getSlots();
             
             var inv = getInputView();
+            
+            // allow insert only to input slots
+            if (slot < config.inputStart() || slot >= config.inputStart() + config.inputCount()) return false;
             
             // fill equally
             // check all slots, find the one with the lowest (or empty) type
@@ -625,7 +633,9 @@ public abstract class MachineBlockEntity extends BlockEntity
         
         @Override
         public boolean canExtract(int slot, ItemStack stack, Direction side) {
-            return true;
+            
+            var config = getSlots();
+            return slot >= config.outputStart() && slot < config.outputStart() + config.outputCount();
         }
     }
 }
