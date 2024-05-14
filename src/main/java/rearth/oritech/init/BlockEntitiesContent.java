@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import rearth.oritech.block.entity.decorative.TechDoorBlockEntity;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.EnergyAcceptorAddonBlockEntity;
@@ -156,6 +157,8 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
       BlockContent.MACHINE_CORE_6,
       BlockContent.MACHINE_CORE_7
     ).build();
+    
+    public static final BlockEntityType<TechDoorBlockEntity> TECH_DOOR_ENTITY = FabricBlockEntityTypeBuilder.create(TechDoorBlockEntity::new, BlockContent.TECH_DOOR).build();
     
     @Override
     public Registry<BlockEntityType<?>> getRegistry() {

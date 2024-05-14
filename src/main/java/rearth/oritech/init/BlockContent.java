@@ -11,9 +11,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.MachineCoreBlock;
-import rearth.oritech.block.blocks.decorative.TechLever;
-import rearth.oritech.block.blocks.decorative.TechRedstoneButton;
-import rearth.oritech.block.blocks.decorative.WallMountedLight;
+import rearth.oritech.block.blocks.decorative.*;
 import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.InventoryProxyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
@@ -190,6 +188,12 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block TECH_BUTTON = new TechRedstoneButton(BlockSetType.IRON, 50, FabricBlockSettings.copyOf(Blocks.STONE_BUTTON));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block TECH_LEVER = new TechLever(FabricBlockSettings.copyOf(Blocks.STONE_BUTTON));
+    
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    @UseGeoBlockItem(scale = 0.5f)
+    public static final Block TECH_DOOR = new TechDoorBlock(FabricBlockSettings.copyOf(Blocks.IRON_DOOR).strength(8f));
+    @NoBlockItem
+    public static final Block TECH_DOOR_HINGE = new TechDoorBlockHinge(FabricBlockSettings.copyOf(Blocks.IRON_DOOR).strength(8f));
     //endregion
     
     @Override
