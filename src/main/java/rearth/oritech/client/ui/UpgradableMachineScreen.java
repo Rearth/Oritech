@@ -15,6 +15,7 @@ import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.components.BlockPreviewComponent;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.util.MachineAddonController;
 
 
 public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> extends BasicMachineScreen<S> {
@@ -43,7 +44,8 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         container.child(Components.label(Text.literal("⌛ " + speed + "%")).tooltip(Text.literal("Processing Speed")).margins(Insets.of(3)));
         container.child(Components.label(Text.literal("⚡ " + efficiency + "%")).tooltip(Text.literal("Energy Efficiency")).margins(Insets.of(3)));
         
-        addMachinePreview(container);
+        if (!((MachineAddonController) handler.blockEntity).getAddonSlots().isEmpty())
+            addMachinePreview(container);
     }
     
     @Override
