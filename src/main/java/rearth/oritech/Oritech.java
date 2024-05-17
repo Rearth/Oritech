@@ -3,6 +3,7 @@ package rearth.oritech;
 import io.wispforest.owo.registration.reflect.FieldRegistrationHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import rearth.oritech.init.*;
 import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
+import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import rearth.oritech.network.NetworkContent;
 
 public class Oritech implements ModInitializer {
@@ -46,6 +48,7 @@ public class Oritech implements ModInitializer {
         FeatureContent.initialize();
         
         ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
+        PlayerBlockBreakEvents.BEFORE.register(PromethiumPickaxeItem::preMine);
     }
     
     private void onServerStarted(MinecraftServer minecraftServer) {

@@ -8,16 +8,12 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Item;
+import net.minecraft.item.*;
 import net.minecraft.util.Identifier;
 import rearth.oritech.item.tools.armor.BackstorageExoArmorItem;
 import rearth.oritech.item.tools.armor.ExoArmorItem;
 import rearth.oritech.item.tools.armor.ExoArmorMaterial;
-import rearth.oritech.item.tools.harvesting.ChainsawItem;
-import rearth.oritech.item.tools.harvesting.DrillItem;
-import rearth.oritech.item.tools.harvesting.ElectricToolMaterial;
+import rearth.oritech.item.tools.harvesting.*;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 
 import java.lang.reflect.Field;
@@ -27,15 +23,20 @@ import static rearth.oritech.Oritech.MOD_ID;
 public class ToolsContent implements ItemRegistryContainer {
     
     public static final ArmorMaterial EXOSUIT_MATERIAL = new ExoArmorMaterial();
+    public static final ToolMaterial ELECTRIC_MATERIAL = new ElectricToolMaterial();
+    public static final ToolMaterial PROMETHIUM_MATERIAL = new PromethiumToolMaterial();
     
     public static final Item EXO_HELMET = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings());
     public static final Item EXO_CHESTPLATE = new BackstorageExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings());
     public static final Item EXO_LEGGINGS = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.LEGGINGS, new Item.Settings());
     public static final Item EXO_BOOTS = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings());
     
-    public static final Item CHAINSAW = new ChainsawItem(new ElectricToolMaterial(), 5, -2.5f, new Item.Settings().maxDamage(-1).maxCount(1));
+    public static final Item CHAINSAW = new ChainsawItem(ELECTRIC_MATERIAL, 5, -2.5f);
+    public static final Item HAND_DRILL = new DrillItem(2.5f, -2.8f, ELECTRIC_MATERIAL);
     
-    public static final Item HAND_DRILL = new DrillItem(2.5f, -2.8f, new ElectricToolMaterial());
+    public static final Item PROMETHIUM_AXE = new PromethiumAxeItem(PROMETHIUM_MATERIAL, 8, -2.2f);
+    public static final Item PROMETHIUM_PICKAXE = new PromethiumPickaxeItem(4, -2.4f, PROMETHIUM_MATERIAL);
+    
     @IterationIgnored
     public static final Item ORITECH_GUIDE = LavenderBookItem.registerForBook(new Identifier(MOD_ID, "oritech_guide"), new Item.Settings().maxCount(1));
     

@@ -8,10 +8,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.AxeItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.ToolMaterial;
+import net.minecraft.item.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -27,8 +24,8 @@ public class ChainsawItem extends AxeItem implements SimpleEnergyItem {
     public static final int BAR_STEP_COUNT = 13;
     private final float energyUsageMultiplier = 10f;
     
-    public ChainsawItem(ToolMaterial material, float attackDamage, float attackSpeed, Settings settings) {
-        super(material, attackDamage, attackSpeed, settings);
+    public ChainsawItem(ToolMaterial material, float attackDamage, float attackSpeed) {
+        super(material, attackDamage, attackSpeed, new Item.Settings().maxDamage(-1).maxCount(1));
     }
     
     @Override
