@@ -91,20 +91,20 @@ public class RecipeGenerator extends FabricRecipeProvider {
     private void addEquipment(RecipeExporter exporter) {
         
         // tools / armor
-        offerDrillRecipe(exporter, ToolsContent.HAND_DRILL, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), "_handdrill");
-        offerChainsawRecipe(exporter, ToolsContent.CHAINSAW, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), "_chainsaw");
+        offerDrillRecipe(exporter, ToolsContent.HAND_DRILL, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), "_handdrill");
+        offerChainsawRecipe(exporter, ToolsContent.CHAINSAW, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), "_chainsaw");
         
         // designator
         offerDrillRecipe(exporter, ItemContent.TARGET_DESIGNATOR, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_designator");
         
         // helmet (enderic lens + machine plating)
-        offerHelmetRecipe(exporter, ToolsContent.EXO_HELMET, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.ENDERIC_LENS), "_exohelm");
+        offerHelmetRecipe(exporter, ToolsContent.EXO_HELMET, Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.ENDERIC_LENS), "_exohelm");
         // chestplate (advanced battery + machine plating)
-        offerChestplateRecipe(exporter, ToolsContent.EXO_CHESTPLATE, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), "_exochest");
+        offerChestplateRecipe(exporter, ToolsContent.EXO_CHESTPLATE, Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), "_exochest");
         // legs (motor + plating)
-        offerLegsRecipe(exporter, ToolsContent.EXO_LEGGINGS, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), "_exolegs");
+        offerLegsRecipe(exporter, ToolsContent.EXO_LEGGINGS, Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), "_exolegs");
         // feet (silicon + plating)
-        offerFeetRecipe(exporter, ToolsContent.EXO_BOOTS, Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.SILICON), "_exoboots");
+        offerFeetRecipe(exporter, ToolsContent.EXO_BOOTS, Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.SILICON), "_exoboots");
         
         // guidebook (any ingot + cactus)
         offerHelmetRecipe(exporter, ToolsContent.ORITECH_GUIDE, Ingredient.fromTag(ConventionalItemTags.INGOTS), Ingredient.ofItems(Items.LAPIS_LAZULI), "_guidebook");
@@ -115,31 +115,31 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerGeneratorRecipe(exporter, BlockContent.BASIC_GENERATOR_BLOCK.asItem(), Ingredient.ofItems(Blocks.FURNACE.asItem()), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_basicgen");
         // pulverizer
         offerGeneratorRecipe(exporter, BlockContent.PULVERIZER_BLOCK.asItem(), Ingredient.ofItems(Blocks.IRON_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_pulverizer");
-        offerGeneratorRecipe(exporter, BlockContent.PULVERIZER_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_pulverizeralt");
+        offerGeneratorRecipe(exporter, BlockContent.PULVERIZER_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_pulverizeralt");
         // electric furnace
         offerFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE_BLOCK.asItem(), Ingredient.ofItems(Blocks.FURNACE.asItem()), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_electricfurnace");
         offerFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE_BLOCK.asItem(), Ingredient.ofItems(Blocks.FURNACE.asItem()), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.fromTag(TagContent.PLATINUM_INGOTS), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_electricfurnacealt");
         // assembler
         offerFurnaceRecipe(exporter, BlockContent.ASSEMBLER_BLOCK.asItem(), Ingredient.ofItems(Blocks.BLAST_FURNACE.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_assembler");
-        offerFurnaceRecipe(exporter, BlockContent.ASSEMBLER_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_assembleralt");
+        offerFurnaceRecipe(exporter, BlockContent.ASSEMBLER_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_assembleralt");
         // foundry
         offerGeneratorRecipe(exporter, BlockContent.FOUNDRY_BLOCK.asItem(), Ingredient.ofItems(Blocks.CAULDRON.asItem()), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_foundry");
         // centrifuge
-        offerFurnaceRecipe(exporter, BlockContent.CENTRIFUGE_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(Items.GLASS_BOTTLE), "_centrifuge");
+        offerFurnaceRecipe(exporter, BlockContent.CENTRIFUGE_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(Items.GLASS_BOTTLE), "_centrifuge");
         offerFurnaceRecipe(exporter, BlockContent.CENTRIFUGE_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(Items.IRON_BLOCK), Ingredient.ofItems(Items.COPPER_INGOT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(Items.GLASS_BOTTLE), "_centrifugealt");
         // laser arm
-        offerAtomicForgeRecipe(exporter, BlockContent.LASER_ARM_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ENDERIC_LENS), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), "_atomicforge");
+        offerAtomicForgeRecipe(exporter, BlockContent.LASER_ARM_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ENDERIC_LENS), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), "_atomicforge");
         // crusher
-        offerGeneratorRecipe(exporter, BlockContent.FRAGMENT_FORGE_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_crusher");
+        offerGeneratorRecipe(exporter, BlockContent.FRAGMENT_FORGE_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_crusher");
         // atomic forge
-        offerAtomicForgeRecipe(exporter, BlockContent.ATOMIC_FORGE_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), Ingredient.ofItems(ItemContent.FLUX_GATE), "_atomicforge");
+        offerAtomicForgeRecipe(exporter, BlockContent.ATOMIC_FORGE_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), Ingredient.ofItems(ItemContent.FLUX_GATE), "_atomicforge");
         
         // biofuel generator
         offerGeneratorRecipe(exporter, BlockContent.BIO_GENERATOR_BLOCK.asItem(), Ingredient.ofItems(BlockContent.BASIC_GENERATOR_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.ofItems(ItemContent.BIOSTEEL_INGOT), "_biogen");
         // lava generator
-        offerGeneratorRecipe(exporter, BlockContent.LAVA_GENERATOR_BLOCK.asItem(), Ingredient.ofItems(BlockContent.BASIC_GENERATOR_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), "_lavagen");
+        offerGeneratorRecipe(exporter, BlockContent.LAVA_GENERATOR_BLOCK.asItem(), Ingredient.ofItems(BlockContent.BASIC_GENERATOR_BLOCK.asItem()), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), "_lavagen");
         // diesel generator
-        offerGeneratorRecipe(exporter, BlockContent.FUEL_GENERATOR_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(BlockContent.BASIC_GENERATOR_BLOCK), Ingredient.ofItems(ItemContent.ENDERIC_LENS), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_fuelgen");
+        offerGeneratorRecipe(exporter, BlockContent.FUEL_GENERATOR_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(BlockContent.BASIC_GENERATOR_BLOCK), Ingredient.ofItems(ItemContent.ENDERIC_LENS), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_fuelgen");
         // large solar
         offerGeneratorRecipe(exporter, BlockContent.BIG_SOLAR_PANEL_BLOCK.asItem(), Ingredient.ofItems(BlockContent.BASIC_GENERATOR_BLOCK.asItem()), Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), Ingredient.ofItems(ItemContent.FLUXITE), "_solar");
         
@@ -151,13 +151,13 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // fluid tank
         offerTankRecipe(exporter, BlockContent.SMALL_TANK_BLOCK.asItem(), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), Ingredient.ofItems(BlockContent.FLUID_PIPE.asItem()), "_stank");
         // pump
-        offerGeneratorRecipe(exporter, BlockContent.PUMP_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_pump");
+        offerGeneratorRecipe(exporter, BlockContent.PUMP_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_pump");
         // block placer
-        offerFurnaceRecipe(exporter, BlockContent.PLACER_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(BlockContent.MACHINE_FRAME_BLOCK.asItem()), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_placer");
+        offerFurnaceRecipe(exporter, BlockContent.PLACER_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(BlockContent.MACHINE_FRAME_BLOCK.asItem()), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_placer");
         // block destroyer
-        offerAtomicForgeRecipe(exporter, BlockContent.DESTROYER_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), Ingredient.ofItems(ItemContent.ENDERIC_LENS), Ingredient.ofItems(ItemContent.FLUX_GATE), "_destroyer");
+        offerAtomicForgeRecipe(exporter, BlockContent.DESTROYER_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), Ingredient.ofItems(ItemContent.ENDERIC_LENS), Ingredient.ofItems(ItemContent.FLUX_GATE), "_destroyer");
         // fertilizer
-        offerFurnaceRecipe(exporter, BlockContent.FERTILIZER_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_fertilizer");
+        offerFurnaceRecipe(exporter, BlockContent.FERTILIZER_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_fertilizer");
         
         // machine frame
         offerMachineFrameRecipe(exporter, BlockContent.MACHINE_FRAME_BLOCK.asItem(), Ingredient.ofItems(Items.IRON_BARS), Ingredient.fromTag(TagContent.NICKEL_INGOTS), 16, "_frame");
@@ -166,24 +166,25 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // item pipe
         offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.ITEM_PIPE.asItem(), 6), Ingredient.ofItems(ItemContent.NICKEL_INGOT), Ingredient.fromTag(ItemTags.PLANKS), "_item");
         // item filter
-        offerGeneratorRecipe(exporter, BlockContent.ITEM_FILTER_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.INSULATED_WIRE), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.INSULATED_WIRE), "_itemfilter");
+        offerGeneratorRecipe(exporter, BlockContent.ITEM_FILTER_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.INSULATED_WIRE), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.INSULATED_WIRE), "_itemfilter");
         // fluid pipe
         offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.FLUID_PIPE.asItem(), 6), Ingredient.ofItems(ItemContent.SILICON), Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), "_fluid");
         
         // deep drill
-        offerAtomicForgeRecipe(exporter, BlockContent.DEEP_DRILL_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.HEISENBERG_COMPENSATOR), Ingredient.ofItems(ItemContent.OVERCHARGED_CRYSTAL), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), "_deepdrill");
+        offerAtomicForgeRecipe(exporter, BlockContent.DEEP_DRILL_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.HEISENBERG_COMPENSATOR), Ingredient.ofItems(ItemContent.OVERCHARGED_CRYSTAL), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), "_deepdrill");
         // drone port
-        offerAtomicForgeRecipe(exporter, BlockContent.DRONE_PORT_BLOCK.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), "_droneport");
+        offerAtomicForgeRecipe(exporter, BlockContent.DRONE_PORT_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), "_droneport");
+        offerAtomicForgeRecipe(exporter, BlockContent.DRONE_PORT_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), Ingredient.ofItems(ItemContent.SUPER_AI_CHIP), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), "_droneportalt");
         
         // addons
-        offerGeneratorRecipe(exporter, BlockContent.MACHINE_SPEED_ADDON.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.BIOSTEEL_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_speedaddon");
-        offerGeneratorRecipe(exporter, BlockContent.MACHINE_EFFICIENCY_ADDON.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_effaddon");
-        offerGeneratorRecipe(exporter, BlockContent.MACHINE_CAPACITOR_ADDON.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_capacitor");
-        offerGeneratorRecipe(exporter, BlockContent.MACHINE_ACCEPTOR_ADDON.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_acceptor");
-        offerGeneratorRecipe(exporter, BlockContent.MACHINE_YIELD_ADDON.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ENDERIC_LENS), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_yield");
-        offerGeneratorRecipe(exporter, BlockContent.MACHINE_FLUID_ADDON.asItem(), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), "_fluid");
+        offerGeneratorRecipe(exporter, BlockContent.MACHINE_SPEED_ADDON.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.BIOSTEEL_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_speedaddon");
+        offerGeneratorRecipe(exporter, BlockContent.MACHINE_EFFICIENCY_ADDON.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_effaddon");
+        offerGeneratorRecipe(exporter, BlockContent.MACHINE_CAPACITOR_ADDON.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_capacitor");
+        offerGeneratorRecipe(exporter, BlockContent.MACHINE_ACCEPTOR_ADDON.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_acceptor");
+        offerGeneratorRecipe(exporter, BlockContent.MACHINE_YIELD_ADDON.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ENDERIC_LENS), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_yield");
+        offerGeneratorRecipe(exporter, BlockContent.MACHINE_FLUID_ADDON.asItem(), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), "_fluid");
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_INVENTORY_PROXY_ADDON.asItem(), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.fromTag(ConventionalItemTags.CHESTS), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), "_invproxy");
-        offerGeneratorRecipe(exporter, BlockContent.CROP_FILTER_ADDON.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), "_cropfilter");
+        offerGeneratorRecipe(exporter, BlockContent.CROP_FILTER_ADDON.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), "_cropfilter");
         
         // cores
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_1.asItem(), Ingredient.fromTag(ItemTags.PLANKS), Ingredient.ofItems(Items.CRAFTING_TABLE), "_core1");
@@ -191,13 +192,13 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_2.asItem(), Ingredient.fromTag(ConventionalItemTags.IRON_INGOTS), Ingredient.ofItems(Items.LAPIS_LAZULI), "_core2alt");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_3.asItem(), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.ofItems(Items.REDSTONE), "_core3");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_3.asItem(), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.ofItems(Items.REDSTONE), "_core3alt");
-        offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_4.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.STRANGE_MATTER), "_core4");
+        offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_4.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), "_core4");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_5.asItem(), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), "_core5");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_6.asItem(), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), Ingredient.ofItems(ItemContent.DUBIOS_CONTAINER), "_core6");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_7.asItem(), Ingredient.ofItems(ItemContent.PROMETHEUM_INGOT), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), "_core7");
         
         // machine extender
-        offerMachineCoreRecipe(exporter, BlockContent.MACHINE_EXTENDER.asItem(), Ingredient.ofItems(ItemContent.MACHINE_PLATING), Ingredient.ofItems(BlockContent.MACHINE_CORE_2.asItem()), "_extender");
+        offerMachineCoreRecipe(exporter, BlockContent.MACHINE_EXTENDER.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(BlockContent.MACHINE_CORE_2.asItem()), "_extender");
     }
     
     private void addComponents(RecipeExporter exporter) {
@@ -213,7 +214,6 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addPulverizerRecipe(exporter, Ingredient.ofItems(Items.ENDER_PEARL), ItemContent.ENDERIC_COMPOUND, 8, "_pearl_enderic");
         addGrinderRecipe(exporter, Ingredient.ofItems(Items.ENDER_PEARL), ItemContent.ENDERIC_COMPOUND, 12, "_pearl_enderic");
         addGrinderRecipe(exporter, Ingredient.ofItems(Blocks.END_STONE), ItemContent.ENDERIC_COMPOUND, 1, "_stone_enderic");
-        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), Ingredient.ofItems(ItemContent.ELECTRUM_DUST), ItemContent.STRANGE_MATTER, 2f, "_strange");
         
         // fine wires
         offerCableRecipe(exporter, new ItemStack(ItemContent.INSULATED_WIRE, 4), Ingredient.fromTag(TagContent.NICKEL_INGOTS));
@@ -228,7 +228,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), ItemContent.MOTOR, 1, 0.5f, "motor");
         
         // machine plating
-        addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), ItemContent.MACHINE_PLATING, 2, 1f, "plating");
+        addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), BlockContent.MACHINE_PLATING_BLOCK.asItem(), 2, 1f, "plating");
         
         // basic battery
         offerMotorRecipe(exporter, ItemContent.BASIC_BATTERY, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "manualbattery");
@@ -249,7 +249,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // processing unit
         addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.PLASTIC_SHEET), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(Items.REDSTONE), ItemContent.PROCESSING_UNIT, 1f, "_processingunit");
         // enderic lens
-        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.ofItems(ItemContent.STRANGE_MATTER), Ingredient.ofItems(ItemContent.STRANGE_MATTER), ItemContent.ENDERIC_LENS, 1.5f, "_enderlens");
+        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), ItemContent.ENDERIC_LENS, 1.5f, "_enderlens");
         // flux gate
         addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.FLUXITE), Ingredient.ofItems(ItemContent.FLUXITE), Ingredient.fromTag(TagContent.PLATINUM_INGOTS), ItemContent.FLUX_GATE, 1.5f, "_fluxgate");
         
@@ -259,7 +259,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), ItemContent.SUPER_AI_CHIP, 50, "_aicomputer");
         
         // dubios container
-        offerMotorRecipe(exporter, ItemContent.DUBIOS_CONTAINER, Ingredient.ofItems(ItemContent.PLASTIC_SHEET), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.STRANGE_MATTER), "_dubios");
+        offerMotorRecipe(exporter, ItemContent.DUBIOS_CONTAINER, Ingredient.ofItems(ItemContent.PLASTIC_SHEET), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), "_dubios");
         // adv battery
         offerMotorRecipe(exporter, ItemContent.ADVANCED_BATTERY, Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_advbattery");
         
