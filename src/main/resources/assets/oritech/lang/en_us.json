@@ -154,6 +154,7 @@
   "block.oritech.tech_button": "Industrial Button",
   "block.oritech.tech_lever": "Industrial Lever",
   "block.oritech.tech_door": "Industrial Door",
+  "block.oritech.tech_door_hinge": "Industrial Door",
   "block.oritech.machine_plating_block": "Reinforced Plating",
   "block.oritech.capacitor_addon_extender": "Power Bank Addon",
 
