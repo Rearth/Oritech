@@ -205,7 +205,9 @@
   "item.oritech.electrum_dust": "Electrum Dust",
   "item.oritech.energite_ingot": "Energite Ingot",
   "item.oritech.energite_dust": "Energite Dust",
-  "item.oritech.prometheum_ingot": "Promethium",
+  "item.oritech.prometheum_ingot": [
+    { "text": "Prometheum", "color": "#ffd505" }
+  ],
   "item.oritech.steel_ingot": "Steel Ingot",
   "item.oritech.steel_dust": "Steel Dust",
   "item.oritech.coal_dust": "Coal Dust",

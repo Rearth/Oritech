@@ -191,7 +191,6 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block TECH_LEVER = new TechLever(FabricBlockSettings.copyOf(Blocks.STONE_BUTTON));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block MACHINE_PLATING_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
-    
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     @UseGeoBlockItem(scale = 0.5f)
     public static final Block TECH_DOOR = new TechDoorBlock(FabricBlockSettings.copyOf(Blocks.IRON_DOOR).strength(8f));
