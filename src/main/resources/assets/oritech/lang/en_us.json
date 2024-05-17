@@ -22,6 +22,7 @@
   "tooltip.oritech.addon_proxy_desc": "Allows access to specific inventory slots",
   "tooltip.oritech.addon_capacity_desc": "Energy Capacity ",
   "tooltip.oritech.addon_transfer_desc": "Energy Transfer Rate ",
+  "tooltip.oritech.addon_extender_desc": "Allows additional addons to be connected",
 
   "tooltip.oritech.overchargedcrystal": "Any enchanted book will work when crafting this",
 
@@ -147,6 +148,13 @@
   "block.oritech.resource_node_copper": "Copper Resource Node",
   "block.oritech.resource_node_nickel": "Nickel Resource Node",
   "block.oritech.resource_node_platinum": "Platinum Resource Node",
+  "block.oritech.ceiling_light": "Industrial Light",
+  "block.oritech.ceiling_light_hanging": "Hanging Light",
+  "block.oritech.tech_button": "Industrial Button",
+  "block.oritech.tech_lever": "Industrial Lever",
+  "block.oritech.tech_door": "Industrial Door",
+  "block.oritech.machine_plating_block": "Reinforced Plating",
+  "block.oritech.capacitor_addon_extender": "Power Bank Addon",
 
   "item.oritech.banana": "Banana",
   "item.oritech.target_designator": "Target Designator",

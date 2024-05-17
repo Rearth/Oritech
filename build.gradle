@@ -26,6 +26,11 @@ repositories {
         name = 'REI'
         url "https://maven.shedaniel.me/"
     }
+
+    maven {
+        name = 'teamresourceful'
+        url "https://maven.teamresourceful.com/repository/maven-public/"
+    }
 }
 
 fabricApi {
@@ -59,6 +64,9 @@ dependencies {
     modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:${rei_version}"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin:${rei_version}"
+
+    // athena (CTM)
+    modRuntimeOnly "earth.terrarium.athena:athena-fabric-${minecraft_version}:${athena_version}"
 }
 
 processResources {

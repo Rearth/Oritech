@@ -88,12 +88,10 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item COAL_DUST = new Item(new FabricItemSettings());
     public static final Item CARBON_FIBRE_STRANDS = new Item(new FabricItemSettings());
     public static final Item ENDERIC_COMPOUND = new Item(new FabricItemSettings());
-    public static final Item STRANGE_MATTER = new Item(new FabricItemSettings());
     public static final Item INSULATED_WIRE = new Item(new FabricItemSettings());
     public static final Item MAGNETIC_COIL = new Item(new FabricItemSettings());
     public static final Item MOTOR = new Item(new FabricItemSettings());
     public static final Item BASIC_BATTERY = new Item(new FabricItemSettings());
-    public static final Item MACHINE_PLATING = new Item(new FabricItemSettings());
     public static final Item RAW_SILICON = new Item(new FabricItemSettings());
     public static final Item SILICON = new Item(new FabricItemSettings());
     public static final Item RAW_BIOPOLYMER = new Item(new FabricItemSettings());

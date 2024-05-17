@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -18,6 +19,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -40,25 +42,55 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
     private final float efficiencyMultiplier;
     private final boolean needsSupport;
     
+    // because this parameter is needed in appendProperties, but we can't initialize or pass it to that
+    private static boolean constructorAssignmentSupportWorkaround = false;
+    
+    private static Settings doConstructorWorkaround(Settings settings, boolean needsSupport) {
+        constructorAssignmentSupportWorkaround = needsSupport;
+        return settings;
+    }
+    
     public MachineAddonBlock(Settings settings, boolean extender, float speedMultiplier, float efficiencyMultiplier, boolean needsSupport) {
-        super(settings);
-        this.setDefaultState(getDefaultState()
-                               .with(ADDON_USED, false)
-                               .with(FACING, Direction.NORTH)
-                               .with(FACE, BlockFace.FLOOR)
-        );
+        super(doConstructorWorkaround(settings, needsSupport));
         
         this.extender = extender;
         this.speedMultiplier = speedMultiplier;
         this.efficiencyMultiplier = efficiencyMultiplier;
         this.needsSupport = needsSupport;
+        
+        if (needsSupport) {
+            this.setDefaultState(getDefaultState()
+                                   .with(ADDON_USED, false)
+                                   .with(FACING, Direction.NORTH)
+                                   .with(FACE, BlockFace.FLOOR)
+            );
+        } else {
+            this.setDefaultState(getDefaultState().with(ADDON_USED, false));
+        }
     }
     
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(ADDON_USED);
-        builder.add(FACING);
-        builder.add(FACE);
+        if (constructorAssignmentSupportWorkaround) {
+            builder.add(FACING);
+            builder.add(FACE);
+        }
+    }
+    
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        if (needsSupport)
+            return super.getPlacementState(ctx);
+        return getDefaultState();
+    }
+    
+    @Override
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        if (needsSupport)
+            return super.canPlaceAt(state, world, pos);
+        return true;
     }
     
     @Override
@@ -90,7 +122,8 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         try {
             return getBlockEntityType().getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(pos, state);
-        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException |
+                 IllegalAccessException e) {
             Oritech.LOGGER.error("Unable to create blockEntity for " + getBlockEntityType().getSimpleName() + " at " + this);
             return new MachineCoreEntity(pos, state);
         }
@@ -159,6 +192,11 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
                 tooltip.add(Text.translatable("tooltip.oritech.addon_crop_desc").formatted(Formatting.DARK_GRAY));
             if (blockType == BlockContent.MACHINE_INVENTORY_PROXY_ADDON)
                 tooltip.add(Text.translatable("tooltip.oritech.addon_proxy_desc").formatted(Formatting.DARK_GRAY));
+            
+            if (extender) {
+                tooltip.add(Text.translatable("tooltip.oritech.addon_extender_desc").formatted(Formatting.DARK_GRAY));
+            }
+            
         } else {
             tooltip.add(Text.translatable("tooltip.oritech.item_extra_info").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
         }

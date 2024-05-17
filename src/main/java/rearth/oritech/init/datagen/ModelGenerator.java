@@ -105,9 +105,10 @@ public class ModelGenerator extends FabricModelProvider {
         //decorative
         blockStateModelGenerator.blockStateCollector.accept(createWallMountedState(BlockContent.CEILING_LIGHT));
         blockStateModelGenerator.blockStateCollector.accept(createWallMountedState(BlockContent.CEILING_LIGHT_HANGING));
-        blockStateModelGenerator.blockStateCollector.accept(createButtonBlockState(BlockContent.TECH_BUTTON,
-          Identifier.of(Oritech.MOD_ID, "block/tech_button"), Identifier.of(Oritech.MOD_ID, "block/tech_button_on")));
+        blockStateModelGenerator.blockStateCollector.accept(createButtonBlockState(BlockContent.TECH_BUTTON, Identifier.of(Oritech.MOD_ID, "block/tech_button"), Identifier.of(Oritech.MOD_ID, "block/tech_button_on")));
         registerLever(BlockContent.TECH_LEVER, blockStateModelGenerator);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_PLATING_BLOCK);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.CAPACITOR_ADDON_EXTENDER);
         
     }
     

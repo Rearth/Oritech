@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/capacitor_ctm"
+    }
+  },
+
+  "athena:loader": "athena:ctm",
+  "ctm_textures": {
+    "center": "oritech:block/capacitor_ctm/center",
+    "empty": "oritech:block/capacitor_ctm/empty",
+    "horizontal": "oritech:block/capacitor_ctm/horizontal",
+    "vertical": "oritech:block/capacitor_ctm/vertical",
+    "particle": "oritech:block/capacitor_ctm/particle"
+  }
+}

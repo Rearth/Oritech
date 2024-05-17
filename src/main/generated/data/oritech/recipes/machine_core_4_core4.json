@@ -3,10 +3,10 @@
   "category": "misc",
   "key": {
     "c": {
-      "item": "oritech:strange_matter"
+      "item": "oritech:enderic_compound"
     },
     "s": {
-      "item": "oritech:machine_plating"
+      "item": "oritech:machine_plating_block"
     }
   },
   "pattern": [
