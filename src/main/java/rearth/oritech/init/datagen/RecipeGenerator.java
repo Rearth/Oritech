@@ -5,10 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.data.server.recipe.CraftingRecipeJsonBuilder;
-import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.data.server.recipe.RecipeProvider;
-import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
+import net.minecraft.data.server.recipe.*;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
@@ -22,10 +19,10 @@ import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.ToolsContent;
 import rearth.oritech.init.datagen.data.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.init.ToolsContent;
 import rearth.oritech.util.FluidStack;
 
 import java.util.ArrayList;
@@ -120,7 +117,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerLeverRecipe(exporter, BlockContent.TECH_BUTTON.asItem(), Ingredient.ofItems(Items.COPPER_INGOT), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_techbutton");
         // tech lever
         offerLeverRecipe(exporter, BlockContent.TECH_LEVER.asItem(), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_techlever");
-        
+        // tech door
+        offerDoorRecipe(exporter, BlockContent.TECH_DOOR.asItem(), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_techdoor");
     }
     
     private void addMachines(RecipeExporter exporter) {
@@ -705,6 +703,13 @@ public class RecipeGenerator extends FabricRecipeProvider {
         var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('a', A).input('b', B)
                         .pattern("a  ")
                         .pattern("b  ");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
+    }
+    
+    public void offerDoorRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, 1).input('a', A)
+                        .pattern("aa ")
+                        .pattern("aa ");
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
     }
 }

@@ -7,9 +7,8 @@ import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import rearth.oritech.init.datagen.ModelGenerator;
+import rearth.oritech.item.other.CustomTooltipItem;
 import rearth.oritech.item.other.MobCaptureItem;
-import rearth.oritech.item.other.OverchargedCrystalItem;
-import rearth.oritech.item.other.UnholyIntelligenceItem;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 
 import java.lang.annotation.ElementType;
@@ -68,7 +67,7 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item SMALL_GOLD_DUST = new Item(new FabricItemSettings());
     public static final Item GOLD_GEM = new Item(new FabricItemSettings());
     // alloys
-    public static final Item FLUXITE = new Item(new FabricItemSettings());
+    public static final Item FLUXITE = new CustomTooltipItem(new FabricItemSettings(), "tooltip.oritech.fluxite");
     public static final Item ADAMANT_INGOT = new Item(new FabricItemSettings());
     public static final Item ADAMANT_DUST = new Item(new FabricItemSettings());
     public static final Item BIOSTEEL_INGOT = new Item(new FabricItemSettings());
@@ -105,9 +104,9 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item FLUX_GATE = new Item(new FabricItemSettings());
     public static final Item ADVANCED_BATTERY = new Item(new FabricItemSettings());
     public static final Item SUPER_AI_CHIP = new Item(new FabricItemSettings().maxCount(4));
-    public static final Item UNHOLY_INTELLIGENCE = new UnholyIntelligenceItem(new FabricItemSettings().maxCount(1));
+    public static final Item UNHOLY_INTELLIGENCE = new CustomTooltipItem(new FabricItemSettings().maxCount(1), "tooltip.oritech.intelligence_item");
     public static final Item HEISENBERG_COMPENSATOR = new Item(new FabricItemSettings().maxCount(1));
-    public static final Item OVERCHARGED_CRYSTAL = new OverchargedCrystalItem(new FabricItemSettings().maxCount(1));
+    public static final Item OVERCHARGED_CRYSTAL = new CustomTooltipItem(new FabricItemSettings().maxCount(1), "tooltip.oritech.overchargedcrystal");
     public static final Item SUPERCONDUCTOR = new Item(new FabricItemSettings());
     public static final Item PACKED_WHEAT = new Item(new FabricItemSettings());
     public static final Item QUARTZ_DUST = new Item(new FabricItemSettings());

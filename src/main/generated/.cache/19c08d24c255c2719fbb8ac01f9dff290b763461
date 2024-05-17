@@ -1,4 +1,4 @@
-// 1.20.4	2024-05-17T16:34:23.856116	Oritech/Model Definitions
+// 1.20.4	2024-05-17T16:46:56.1414938	Oritech/Model Definitions
 2e964d91a46577bf6a179afb1ded52a0d5deaaaa assets\oritech\models\item\copper_gem.json
 d83f00d15d54fb178e4a4f9ba12506b9c9ff12ed assets\oritech\models\item\hand_drill.json
 c2024fbd615435625032fe838bffa683cc1e8f32 assets\oritech\models\item\oritech_guide.json
@@ -72,8 +72,8 @@ f8de6b758be35393ad3b7498d87dcf647eb83ae0 assets\oritech\models\item\copper_clump
 49521256eef822b6931b2e4f7603d8032cbbca76 assets\oritech\models\item\tech_lever.json
 39ff24a652b7a17e3e9a5a25514e86d385bdbf66 assets\oritech\models\item\magnetic_coil.json
 a2b76728e000f928e0fcf1b51ff9fc43a2543acd assets\oritech\blockstates\machine_core_7.json
-6adb9f1610801085ae00d014a07bb37013e01353 assets\oritech\models\item\platinum_ingot.json
 086d7d3935f6006cf5d94fa9f46851caeafecab6 assets\oritech\models\item\drone_port_block.json
+6adb9f1610801085ae00d014a07bb37013e01353 assets\oritech\models\item\platinum_ingot.json
 e58446b077b49e29ee7be567b039cd8d66e2230d assets\oritech\blockstates\resource_node_redstone.json
 0d48513d812d5b5d28796cf58c2482ec104af81a assets\oritech\models\item\machine_core_7.json
 3a8039e2e6d09f627e913ee713637dcc8536a228 assets\oritech\models\item\nickel_gem.json
@@ -225,8 +225,8 @@ e00cfa7892647f3e1c720598a6417c4c5f2581a2 assets\oritech\blockstates\machine_core
 a5afa0ba8780ec08bd0a9284bc08e0c681fe7158 assets\oritech\blockstates\block_placer_head.json
 53deb7eda739033f1ae45369ec224f82fa3ef4bb assets\oritech\models\block\resource_node_coal.json
 f38bcaafb1724024d072a57329230fe00a9d6f19 assets\oritech\models\item\flux_gate.json
-7d8be42e25404011148774c5089d0af3c96f6830 assets\oritech\models\item\machine_core_4.json
 ccd7e87c2ba5a5062bb88aa6e103d49d47cd56ff assets\oritech\blockstates\energy_pipe.json
+7d8be42e25404011148774c5089d0af3c96f6830 assets\oritech\models\item\machine_core_4.json
 3aeb554487fae70d429f90c51e696f52914a47bf assets\oritech\models\item\ceiling_light_hanging.json
 ae8496aa356910304cb7036f1290ca3f7d76437e assets\oritech\models\item\item_filter_block.json
 470c9566f8f8479955120c210a190d1869cdf6b7 assets\oritech\models\item\tech_button.json
