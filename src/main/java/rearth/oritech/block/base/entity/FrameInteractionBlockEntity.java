@@ -1,7 +1,5 @@
 package rearth.oritech.block.base.entity;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -39,7 +37,8 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     private int currentProgress;    // not synced
     private boolean moving;    // not synced
     private Vec3i currentDirection = new Vec3i(1, 0, 0);    // not synced
-    @Environment(EnvType.CLIENT)
+    
+    // client only
     private long moveStartedAt;
     
     public FrameInteractionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -397,12 +396,10 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         return null;
     }
     
-    @Environment(EnvType.CLIENT)
     public long getMoveStartedAt() {
         return moveStartedAt;
     }
     
-    @Environment(EnvType.CLIENT)
     public void setMoveStartedAt(long moveStartedAt) {
         this.moveStartedAt = moveStartedAt;
     }

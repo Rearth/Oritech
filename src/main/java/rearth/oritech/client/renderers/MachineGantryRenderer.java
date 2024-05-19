@@ -1,7 +1,5 @@
 package rearth.oritech.client.renderers;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
@@ -17,7 +15,6 @@ import rearth.oritech.block.base.block.FrameInteractionBlock;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.init.BlockContent;
 
-@Environment(EnvType.CLIENT)
 public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteractionBlockEntity> {
     
     private static final BlockState renderedBeam = BlockContent.FRAME_GANTRY_ARM.getDefaultState();

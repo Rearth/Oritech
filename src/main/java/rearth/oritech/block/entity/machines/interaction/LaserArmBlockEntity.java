@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.machines.interaction;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
@@ -91,7 +89,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     private boolean networkDirty;
     private boolean redstonePowered;
     
-    @Environment(EnvType.CLIENT)
+    // needed only on client
     public Vec3d lastRenderPosition;
     
     public LaserArmBlockEntity(BlockPos pos, BlockState state) {

@@ -1,7 +1,5 @@
 package rearth.oritech.block.base.entity;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
@@ -397,7 +395,6 @@ public abstract class MachineBlockEntity extends BlockEntity
         animationController.forceAnimationReset();
     }
     
-    @Environment(EnvType.CLIENT)
     @NotNull
     public AnimationController<MachineBlockEntity> getAnimationController() {
         return new AnimationController<>(this, state -> {
