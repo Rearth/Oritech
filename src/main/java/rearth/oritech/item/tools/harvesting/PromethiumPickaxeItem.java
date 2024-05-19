@@ -3,6 +3,10 @@ package rearth.oritech.item.tools.harvesting;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
@@ -11,23 +15,45 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.client.renderers.PromethiumPickaxeRenderer;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.init.datagen.data.TagContent;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
+import software.bernie.geckolib.animatable.client.RenderProvider;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 // TODO from 1.20.5, reach is an attribute that can be modified. Use this here to extend the tools' reach
-public class PromethiumPickaxeItem extends MiningToolItem {
+public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
+    
+    private static final RawAnimation AREA_ANIM = RawAnimation.begin().thenLoop("area");
+    private static final RawAnimation SILK_ANIM = RawAnimation.begin().thenLoop("silk_touch");
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
     
     public PromethiumPickaxeItem(float attackDamage, float attackSpeed, ToolMaterial material) {
         super(attackDamage, attackSpeed, material, TagContent.DRILL_MINEABLE, new Settings().maxDamage(-1).maxCount(1));
+        
+        SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
     
     @Override
@@ -90,6 +116,8 @@ public class PromethiumPickaxeItem extends MiningToolItem {
             var enabled = !wasEnabled;
             tag.putBoolean("area", enabled);
             MinecraftClient.getInstance().player.sendMessage(Text.literal(enabled ? "Area Effect" : "Silk Touch"), true);
+            
+            triggerAnim(user, GeoItem.getOrAssignId(stack, (ServerWorld) world), "Pickaxe", enabled ? "area" : "silk");
         }
         
         return super.use(world, user, hand);
@@ -112,5 +140,57 @@ public class PromethiumPickaxeItem extends MiningToolItem {
         
         
         return true;
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        super.appendTooltip(stack, world, tooltip, context);
+        
+        var area = false;
+        if (stack.hasNbt()) {
+            area = stack.getNbt().getBoolean("area");
+        }
+        
+        tooltip.add(Text.literal("Mode: " + (area ? "Area" : "Single")).formatted(Formatting.GOLD));
+        
+    }
+    
+    @Override
+    public void createRenderer(Consumer<Object> consumer) {
+        consumer.accept(new RenderProvider() {
+            private PromethiumPickaxeRenderer renderer;
+            @Override
+            public BuiltinModelItemRenderer getCustomRenderer() {
+                if (this.renderer == null)
+                    this.renderer = new PromethiumPickaxeRenderer();
+                return renderer;
+            }
+        });
+    }
+    
+    @Override
+    public Supplier<Object> getRenderProvider() {
+        return renderProvider;
+    }
+    
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "Pickaxe", 5, state -> PlayState.CONTINUE).triggerableAnim("silk", SILK_ANIM).triggerableAnim("area", AREA_ANIM));
+    }
+    
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
+    }
+    
+    // client only
+    public void onHeldTick(ItemStack stack, ClientPlayerEntity player, ClientWorld world) {
+        
+        if (world.getTime() % 20 != 0) return;
+        
+        var area = false;
+        if (stack.hasNbt()) area = stack.getNbt().getBoolean("area");
+        triggerAnim(player, GeoItem.getId(stack), "Pickaxe", area ? "area" : "silk");
+        
     }
 }

@@ -4,8 +4,10 @@ import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.EnergyStorageUtil;
 
@@ -37,4 +39,14 @@ public class Helpers {
         
     }
     
+    public static void onClientTickEvent(MinecraftClient client) {
+        
+        if (client.player == null) return;
+        
+        var stack = client.player.getMainHandStack();
+        if (stack.getItem() instanceof PromethiumPickaxeItem pickaxeItem) {
+            pickaxeItem.onHeldTick(stack, client.player, client.world);
+        }
+        
+    }
 }
