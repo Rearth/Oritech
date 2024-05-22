@@ -3,75 +3,49 @@
 	"animations": {
 		"silk_touch": {
 			"loop": true,
-			"animation_length": 1,
-			"bones": {
-				"movingA": {
-					"position": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.5": {
-							"vector": [0, 0, 0.3]
-						},
-						"1.0": {
-							"vector": [0, 0, 0]
-						}
-					}
-				},
-				"movingB": {
-					"position": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.5": {
-							"vector": [0, 0, 0.3]
-						},
-						"1.0": {
-							"vector": [0, 0, 0]
-						}
-					}
-				}
-			}
+			"animation_length": 0.5
 		},
 		"area": {
-			"loop": true,
-			"animation_length": 1,
+			"animation_length": 0.5,
 			"bones": {
-				"moving": {
+				"centerTop2": {
 					"rotation": {
-						"vector": [90, 0, 0]
-					},
-					"position": {
-						"vector": [0, 1.25, 0]
-					},
-					"scale": {
-						"vector": [1, 1, 0.3]
+						"vector": [180, 0, 0]
 					}
 				},
-				"movingA": {
-					"position": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.5": {
-							"vector": [0, 0, 0.75]
-						},
-						"0.875": {
-							"vector": [0, 0, 0]
-						}
+				"rod2": {
+					"rotation": {
+						"vector": [0, -180, 0]
 					}
 				},
-				"movingB": {
-					"position": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.5": {
-							"vector": [0, 0, 0.75]
-						},
-						"0.875": {
-							"vector": [0, 0, 0]
-						}
+				"rod3": {
+					"rotation": {
+						"vector": [0, -180, 0]
+					}
+				},
+				"centerTop": {
+					"rotation": {
+						"vector": [-180, 0, 0]
+					}
+				},
+				"centerTop3": {
+					"rotation": {
+						"vector": [-180, 0, 0]
+					}
+				},
+				"centerTop4": {
+					"rotation": {
+						"vector": [-180, 0, 0]
+					}
+				},
+				"centerTop5": {
+					"rotation": {
+						"vector": [180, 0, 0]
+					}
+				},
+				"centerTop6": {
+					"rotation": {
+						"vector": [180, 0, 0]
 					}
 				}
 			}

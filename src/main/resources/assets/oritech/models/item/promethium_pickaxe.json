@@ -6,103 +6,42 @@
   ],
   "display": {
     "thirdperson_righthand": {
-      "translation": [
-        0,
-        1.25,
-        1
-      ]
+      "rotation": [0, 90, -1],
+      "translation": [0, 3.75, 0],
+      "scale": [0.85, 0.85, 0.85]
     },
     "thirdperson_lefthand": {
-      "translation": [
-        0,
-        1.5,
-        1.25
-      ]
+      "rotation": [0, 90, -1],
+      "translation": [0, 3.75, 0],
+      "scale": [0.85, 0.85, 0.85]
     },
     "firstperson_righthand": {
-      "rotation": [
-        -3.25,
-        0,
-        0
-      ],
-      "translation": [
-        0,
-        2.75,
-        1.75
-      ],
-      "scale": [
-        0.71,
-        0.71,
-        0.71
-      ]
+      "rotation": [0, 90, -1],
+      "translation": [0, -1, 0],
+      "scale": [0.7, 0.69, 0.71]
     },
     "firstperson_lefthand": {
-      "rotation": [
-        -3.25,
-        0,
-        0
-      ],
-      "translation": [
-        0,
-        2.75,
-        1.75
-      ],
-      "scale": [
-        0.71,
-        0.71,
-        0.71
-      ]
+      "rotation": [0, 90, -1],
+      "translation": [0, -1, 0],
+      "scale": [0.7, 0.69, 0.71]
     },
     "ground": {
-      "rotation": [
-        0,
-        0,
-        42
-      ],
-      "translation": [
-        -1,
-        1,
-        0.5
-      ],
-      "scale": [
-        0.41,
-        0.41,
-        0.4
-      ]
+      "translation": [0, 2, 0],
+      "scale": [0.5, 0.5, 0.5]
     },
     "gui": {
-      "rotation": [
-        80,
-        47,
-        -91
-      ],
-      "translation": [
-        2,
-        1.25,
-        0
-      ],
-      "scale": [
-        0.72219,
-        0.72219,
-        0.72219
-      ]
+      "rotation": [0, 0, -51],
+      "translation": [-2.5, -2.5, 1],
+      "scale": [0.7, 0.7, 0.7]
+    },
+    "head": {
+      "rotation": [0, 90, -1],
+      "translation": [0, 7.75, 0],
+      "scale": [0.85, 0.85, 0.85]
     },
     "fixed": {
-      "rotation": [
-        -90,
-        58.5,
-        90
-      ],
-      "translation": [
-        -4.5,
-        2.25,
-        -1.75
-      ],
-      "scale": [
-        2.03516,
-        2.03516,
-        2.03516
-      ]
+      "translation": [0, 3.25, 1],
+      "scale": [0.89, 0.86, 0.86]
     }
   }
 }
