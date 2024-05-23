@@ -1,0 +1,15 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "tag": "minecraft:redstone_ores"
+    }
+  ],
+  "results": [
+    {
+      "Count": 12,
+      "id": "minecraft:redstone"
+    }
+  ],
+  "time": 200
+}

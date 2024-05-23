@@ -53,8 +53,12 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
     }
     
-    private void addVanillaAdditions() {
+    private void addVanillaAdditions(RecipeExporter exporter) {
     
+        // slimeball from honey and biomass
+        
+        // skulk variants?
+        
     }
     
     private void addDeepDrillOres(RecipeExporter exporter) {
@@ -427,6 +431,23 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addDustRecipe(exporter, Ingredient.fromTag(TagContent.STEEL_INGOTS), ItemContent.STEEL_DUST, ItemContent.STEEL_INGOT, "_steel");
         addDustRecipe(exporter, Ingredient.ofItems(Items.COAL), ItemContent.COAL_DUST, "_coal");
         addDustRecipe(exporter, Ingredient.ofItems(Items.QUARTZ), ItemContent.QUARTZ_DUST, "_quartz");
+        
+        // raw ores without processing chains
+        // coal
+        addGrinderRecipe(exporter, Ingredient.fromTag(ItemTags.COAL_ORES), Items.COAL, 3, "_coaloregrinder");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(ItemTags.COAL_ORES), Items.COAL, 2, "coalorepulverizer");
+        // redstone
+        addGrinderRecipe(exporter, Ingredient.fromTag(ItemTags.REDSTONE_ORES), Items.REDSTONE, 12, "_redstoneoregrinder");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(ItemTags.REDSTONE_ORES), Items.REDSTONE, 8, "_redstoneorepulverizer");
+        // quartz
+        addGrinderRecipe(exporter, Ingredient.ofItems(Blocks.NETHER_QUARTZ_ORE), Items.QUARTZ, 3, "_quartzoregrinder");
+        addPulverizerRecipe(exporter, Ingredient.ofItems(Blocks.NETHER_QUARTZ_ORE), Items.QUARTZ, 2, "_quartzorepulverizer");
+        // glowstone
+        addGrinderRecipe(exporter, Ingredient.ofItems(Blocks.GLOWSTONE), Items.GLOWSTONE_DUST, 4, "_glowstoneoregrinder");
+        addPulverizerRecipe(exporter, Ingredient.ofItems(Blocks.GLOWSTONE), Items.GLOWSTONE_DUST, 3, "_glowstoneorepulverizer");
+        // lapis
+        addGrinderRecipe(exporter, Ingredient.fromTag(ItemTags.LAPIS_ORES), Items.LAPIS_LAZULI, 8, "_lapisoregrinder");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(ItemTags.LAPIS_ORES), Items.LAPIS_LAZULI, 6, "_lapisorepulverizer");
     }
     
     private void addDustRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, String suffix) {

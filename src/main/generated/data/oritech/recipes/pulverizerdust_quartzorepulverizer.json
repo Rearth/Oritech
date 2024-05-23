@@ -1,0 +1,15 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "item": "minecraft:nether_quartz_ore"
+    }
+  ],
+  "results": [
+    {
+      "Count": 2,
+      "id": "minecraft:quartz"
+    }
+  ],
+  "time": 300
+}

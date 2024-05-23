@@ -1,0 +1,15 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "tag": "minecraft:coal_ores"
+    }
+  ],
+  "results": [
+    {
+      "Count": 2,
+      "id": "minecraft:coal"
+    }
+  ],
+  "time": 300
+}
