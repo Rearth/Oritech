@@ -764,6 +764,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
     public void offerDoorRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
         var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, 1).input('a', A)
                         .pattern("aa ")
+                        .pattern("aa ")
                         .pattern("aa ");
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
     }
