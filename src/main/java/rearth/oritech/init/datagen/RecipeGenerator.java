@@ -50,15 +50,18 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addAlloys(exporter);
         addDusts(exporter);
         addDecorative(exporter);
+        addVanillaAdditions(exporter);
         
     }
     
     private void addVanillaAdditions(RecipeExporter exporter) {
     
         // slimeball from honey and biomass
-        
-        // skulk variants?
-        
+        addAssemblerRecipe(exporter, Ingredient.ofItems(Items.HONEYCOMB), Ingredient.ofItems(ItemContent.BIOMASS), Ingredient.ofItems(ItemContent.BIOMASS), Ingredient.ofItems(ItemContent.BIOMASS), Items.SLIME_BALL, 1f, "_assemblerslime");
+        // fireball in assembler (gunpowder, blaze powder + coal) = 5 charges
+        addAssemblerRecipe(exporter, Ingredient.ofItems(Items.GUNPOWDER), Ingredient.ofItems(Items.BLAZE_POWDER), Ingredient.fromTag(ItemTags.COALS), Ingredient.fromTag(ItemTags.COALS), Items.FIRE_CHARGE, 1f, "_assemblerfireball");
+        // blaze rod (4 powder in assembler)
+        addAssemblerRecipe(exporter, Ingredient.ofItems(Items.BLAZE_POWDER), Ingredient.ofItems(Items.BLAZE_POWDER), Ingredient.ofItems(Items.BLAZE_POWDER), Ingredient.ofItems(Items.BLAZE_POWDER), Items.BLAZE_ROD, 1f, "_assemblerblazerod");
     }
     
     private void addDeepDrillOres(RecipeExporter exporter) {
@@ -448,6 +451,12 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // lapis
         addGrinderRecipe(exporter, Ingredient.fromTag(ItemTags.LAPIS_ORES), Items.LAPIS_LAZULI, 8, "_lapisoregrinder");
         addPulverizerRecipe(exporter, Ingredient.fromTag(ItemTags.LAPIS_ORES), Items.LAPIS_LAZULI, 6, "_lapisorepulverizer");
+        // bone
+        addGrinderRecipe(exporter, Ingredient.ofItems(Items.BONE), Items.BONE_MEAL, 8, "_bonegrinder");
+        addPulverizerRecipe(exporter, Ingredient.ofItems(Items.BONE), Items.BONE_MEAL, 6, "bonepulverizer");
+        // blaze powder
+        addGrinderRecipe(exporter, Ingredient.ofItems(Items.BLAZE_ROD), Items.BLAZE_POWDER, 4, "_blazegrinder");
+        addPulverizerRecipe(exporter, Ingredient.ofItems(Items.BLAZE_ROD), Items.BLAZE_POWDER, 3, "blazepulverizer");
     }
     
     private void addDustRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, String suffix) {
