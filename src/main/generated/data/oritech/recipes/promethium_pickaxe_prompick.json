@@ -10,8 +10,8 @@
     }
   },
   "pattern": [
-    "pp ",
-    "pc ",
+    "ppp",
+    " c ",
     " c "
   ],
   "result": {
