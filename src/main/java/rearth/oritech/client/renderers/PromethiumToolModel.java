@@ -4,9 +4,9 @@ import net.minecraft.util.Identifier;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import software.bernie.geckolib.model.DefaultedItemGeoModel;
 
-public class PromethiumPickaxeModel extends DefaultedItemGeoModel<PromethiumPickaxeItem> {
+public class PromethiumToolModel extends DefaultedItemGeoModel<PromethiumPickaxeItem> {
     
-    public PromethiumPickaxeModel(Identifier assetSubpath) {
+    public PromethiumToolModel(Identifier assetSubpath) {
         super(assetSubpath);
     }
 }

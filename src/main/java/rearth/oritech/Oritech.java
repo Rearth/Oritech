@@ -51,7 +51,6 @@ public class Oritech implements ModInitializer {
         
         ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
         PlayerBlockBreakEvents.BEFORE.register(PromethiumPickaxeItem::preMine);
-        ClientTickEvents.START_CLIENT_TICK.register(Helpers::onClientTickEvent);
     }
     
     private void onServerStarted(MinecraftServer minecraftServer) {

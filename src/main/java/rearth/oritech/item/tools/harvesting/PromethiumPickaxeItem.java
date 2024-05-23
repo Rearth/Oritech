@@ -4,7 +4,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -24,7 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.client.renderers.PromethiumPickaxeRenderer;
+import rearth.oritech.client.renderers.PromethiumToolRenderer;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.init.datagen.data.TagContent;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -158,11 +157,11 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
     @Override
     public void createRenderer(Consumer<Object> consumer) {
         consumer.accept(new RenderProvider() {
-            private PromethiumPickaxeRenderer renderer;
+            private PromethiumToolRenderer renderer;
             @Override
             public BuiltinModelItemRenderer getCustomRenderer() {
                 if (this.renderer == null)
-                    this.renderer = new PromethiumPickaxeRenderer();
+                    this.renderer = new PromethiumToolRenderer("promethium_pickaxe");
                 return renderer;
             }
         });
@@ -184,7 +183,7 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
     }
     
     // client only
-    public void onHeldTick(ItemStack stack, ClientPlayerEntity player, ClientWorld world) {
+    public void onHeldTick(ItemStack stack, PlayerEntity player, ClientWorld world) {
         
         if (world.getTime() % 20 != 0) return;
         

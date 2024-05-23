@@ -248,6 +248,8 @@
   "item.oritech.chainsaw": "Chainsaw",
   "item.oritech.hand_drill": "Hand Drill",
   "item.oritech.oritech_guide": "Oritech Manual",
+  "item.oritech.promethium_axe": "Promethium Battleaxe",
+  "item.oritech.promethium_pickaxe": "Promethium Pickaxe",
 
   "text.config.oritech-config.title": "Oritech Settings",
   "text.config.oritech-config.section.machineSettings": "Machines",
