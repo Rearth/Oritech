@@ -1,6 +1,5 @@
 package rearth.oritech;
 
-import io.wispforest.owo.registration.reflect.FieldRegistrationHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import rearth.oritech.client.init.ModRenderers;
@@ -14,7 +13,6 @@ public class OritechClient implements ClientModInitializer {
         Oritech.LOGGER.info("Oritech client initialization");
 
         ModRenderers.registerRenderers();
-        FieldRegistrationHandler.register(ModScreens.class, Oritech.MOD_ID, false);
         ModScreens.assignScreens();
         
         

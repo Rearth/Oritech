@@ -157,7 +157,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         return List.of(
           new GuiSlot(0, 56, 38),
           new GuiSlot(1, 113, 38),
-          new GuiSlot(2, 131, 38));
+          new GuiSlot(2, 113, 56));
     }
     
     @Override

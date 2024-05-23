@@ -2,7 +2,6 @@ package rearth.oritech;
 
 import io.wispforest.owo.registration.reflect.FieldRegistrationHandler;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.server.MinecraftServer;
@@ -12,13 +11,12 @@ import rearth.oritech.block.blocks.pipes.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.ItemPipeBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
+import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
-import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
-import rearth.oritech.item.tools.util.Helpers;
 import rearth.oritech.network.NetworkContent;
 
 public class Oritech implements ModInitializer {
@@ -40,6 +38,8 @@ public class Oritech implements ModInitializer {
         FieldRegistrationHandler.register(BlockContent.class, MOD_ID, false);
         Oritech.LOGGER.debug("registering block entities");
         FieldRegistrationHandler.register(BlockEntitiesContent.class, MOD_ID, false);
+        Oritech.LOGGER.debug("registering screen handlers");
+        FieldRegistrationHandler.register(ModScreens.class, Oritech.MOD_ID, false);
         Oritech.LOGGER.debug("registering others...");
         FieldRegistrationHandler.register(ToolsContent.class, MOD_ID, false);
         ToolsContent.registerEventHandlers();
