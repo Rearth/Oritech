@@ -248,8 +248,12 @@
   "item.oritech.chainsaw": "Chainsaw",
   "item.oritech.hand_drill": "Hand Drill",
   "item.oritech.oritech_guide": "Oritech Manual",
-  "item.oritech.promethium_axe": "Promethium Battleaxe",
-  "item.oritech.promethium_pickaxe": "Promethium Pickaxe",
+  "item.oritech.promethium_axe": [
+    { "text": "Prometheum Battleaxe", "color": "#ffd505" }
+  ],
+  "item.oritech.promethium_pickaxe": [
+    { "text": "Prometheum Pickaxe", "color": "#ffd505" }
+  ],
 
   "text.config.oritech-config.title": "Oritech Settings",
   "text.config.oritech-config.section.machineSettings": "Machines",
