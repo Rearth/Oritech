@@ -50,6 +50,7 @@ Install it just like any mod by dragging it into the mods folder. Make sure you 
 - Lavender 0.1.7+1.20.3
 - Geckolib 1.20.4:4.4.4
 - Reborn Energy API 3.0.0
+- Athena 3.3.2
 
 ## Roadmap
 
