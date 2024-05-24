@@ -28,6 +28,9 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
     public static final int MAX_TRANSFER_RATE = (int) (FluidConstants.BUCKET * Oritech.CONFIG.fluidPipeExtractAmountBuckets());
     private static final int TRANSFER_PERIOD = Oritech.CONFIG.fluidPipeExtractIntervalDuration();
     
+    private List<Storage<FluidVariant>> filteredFluidTargetsCached;
+    private int filteredTargetsNetHash;
+    
     private final HashMap<BlockPos, BlockApiCache<Storage<FluidVariant>, Direction>> lookupCache = new HashMap<>();
     
     private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
@@ -115,20 +118,33 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
         if (fluidStorage.amount <= 0) return;
         
         var targets = findNetworkTargets(pos, data);
+        var netHash = targets.hashCode();
         
-        var fluidStorages = targets.stream()
-                              .filter(targetPos -> targetPos.getLeft().getManhattanDistance(pos) > 1)   // ignore neighbors basically, as this pipe is set to extract
-                              .map(target -> findFromCache(world, target.getLeft(), target.getRight()))
-                              .filter(obj -> Objects.nonNull(obj) && obj.supportsInsertion())
-                              .collect(Collectors.toList());
+        if (netHash != filteredTargetsNetHash) {
+            filteredFluidTargetsCached = targets.stream()
+                                           .filter(targetPos -> targetPos.getLeft().getManhattanDistance(pos) > 1)   // ignore neighbors basically, as this pipe is set to extract
+                                           .filter(target -> {
+                                               var pipePos = target.getLeft().add(target.getRight().getVector());
+                                               var pipeState = world.getBlockState(pipePos);
+                                               if (!(pipeState.getBlock() instanceof FluidPipeConnectionBlock))
+                                                   return true;   // edge case, this should never happen
+                                               var extracting = pipeState.get(FluidPipeConnectionBlock.EXTRACT);
+                                               return !extracting;
+                                           })
+                                           .map(target -> findFromCache(world, target.getLeft(), target.getRight()))
+                                           .filter(obj -> Objects.nonNull(obj) && obj.supportsInsertion())
+                                           .collect(Collectors.toList());
+            
+            filteredTargetsNetHash = netHash;
+        }
         
-        Collections.shuffle(fluidStorages);
+        Collections.shuffle(filteredFluidTargetsCached);
         
         var availableFluid = fluidStorage.getAmount();
         var ownType = fluidStorage.variant;
         
         try (var tx = Transaction.openOuter()) {
-            for (var targetStorage : fluidStorages) {
+            for (var targetStorage : filteredFluidTargetsCached) {
                 var transferred = targetStorage.insert(ownType, availableFluid, tx);
                 fluidStorage.extract(ownType, transferred, tx);
                 availableFluid -= transferred;

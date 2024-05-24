@@ -35,7 +35,7 @@ public class Config {
     public int itemPipeTransferAmount = 8;
     public int itemPipeIntervalDuration = 5;
     public float fluidPipeExtractAmountBuckets = 0.5f;
-    public int fluidPipeExtractIntervalDuration = 5;
+    public int fluidPipeExtractIntervalDuration = 3;
     public float fluidPipeInternalStorageBuckets = 2f;
     public long energyPipeTransferRate = 10_000;
     
