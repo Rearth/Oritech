@@ -13,6 +13,8 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
+import rearth.oritech.block.entity.machines.processing.FragmentForgeBlockEntity;
+import rearth.oritech.block.entity.machines.processing.PulverizerBlockEntity;
 import rearth.oritech.client.ui.components.BlockPreviewComponent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.MachineAddonController;
@@ -43,6 +45,10 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         container.child(Components.box(Sizing.fixed(73), Sizing.fixed(1)).color(new Color(0.8f, 0.8f, 0.8f)));
         container.child(Components.label(Text.literal("⌛ " + speed + "%")).tooltip(Text.literal("Processing Speed")).margins(Insets.of(3)));
         container.child(Components.label(Text.literal("⚡ " + efficiency + "%")).tooltip(Text.literal("Energy Efficiency")).margins(Insets.of(3)));
+        
+        if (handler.blockEntity instanceof PulverizerBlockEntity || handler.blockEntity instanceof FragmentForgeBlockEntity) {
+            container.child(Components.label(Text.literal("\uD83D\uDD28 Enabled")).tooltip(Text.literal("Auto-combines small dusts to ingots")).margins(Insets.of(3)));
+        }
         
         if (!((MachineAddonController) handler.blockEntity).getAddonSlots().isEmpty())
             addMachinePreview(container);

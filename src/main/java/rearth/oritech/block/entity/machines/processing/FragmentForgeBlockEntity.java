@@ -68,6 +68,12 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
+    protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
+        super.craftItem(activeRecipe, outputInventory, inputInventory);
+        PulverizerBlockEntity.combineSmallDusts(outputInventory, world);
+    }
+    
+    @Override
     public List<ItemStack> getCraftingResults(OritechRecipe activeRecipe) {
         if (hasByproductAddon) {
             var result = new ArrayList<ItemStack>(activeRecipe.getResults().size());
@@ -110,6 +116,11 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public int getInventorySize() {
         return 4;
+    }
+    
+    @Override
+    public boolean inputOptionsEnabled() {
+        return false;
     }
     
     // x = back
