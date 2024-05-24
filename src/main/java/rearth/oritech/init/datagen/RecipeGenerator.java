@@ -456,10 +456,13 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addPulverizerRecipe(exporter, Ingredient.fromTag(ItemTags.LAPIS_ORES), Items.LAPIS_LAZULI, 6, "_lapisorepulverizer");
         // bone
         addGrinderRecipe(exporter, Ingredient.ofItems(Items.BONE), Items.BONE_MEAL, 8, "_bonegrinder");
-        addPulverizerRecipe(exporter, Ingredient.ofItems(Items.BONE), Items.BONE_MEAL, 6, "bonepulverizer");
+        addPulverizerRecipe(exporter, Ingredient.ofItems(Items.BONE), Items.BONE_MEAL, 6, "_bonepulverizer");
         // blaze powder
         addGrinderRecipe(exporter, Ingredient.ofItems(Items.BLAZE_ROD), Items.BLAZE_POWDER, 4, "_blazegrinder");
-        addPulverizerRecipe(exporter, Ingredient.ofItems(Items.BLAZE_ROD), Items.BLAZE_POWDER, 3, "blazepulverizer");
+        addPulverizerRecipe(exporter, Ingredient.ofItems(Items.BLAZE_ROD), Items.BLAZE_POWDER, 3, "_blazepulverizer");
+        // wool
+        addGrinderRecipe(exporter, Ingredient.fromTag(ItemTags.WOOL), Items.STRING, 4, "_stringgrinder");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(ItemTags.WOOL), Items.STRING, 3, "_stringpulverizer");
     }
     
     private void addDustRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, String suffix) {

@@ -39,17 +39,17 @@ public class BlockContent implements BlockRegistryContainer {
     
     public static final Block MACHINE_FRAME_BLOCK = new MachineFrameBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
     
-    public static final Block FLUID_PIPE = new FluidPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
-    public static final Block ENERGY_PIPE = new EnergyPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
-    public static final Block ITEM_PIPE = new ItemPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
-    public static final Block ITEM_FILTER_BLOCK = new ItemFilterBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
+    public static final Block FLUID_PIPE = new FluidPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
+    public static final Block ENERGY_PIPE = new EnergyPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
+    public static final Block ITEM_PIPE = new ItemPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
+    public static final Block ITEM_FILTER_BLOCK = new ItemFilterBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     
     @NoBlockItem
-    public static final Block FLUID_PIPE_CONNECTION = new FluidPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
+    public static final Block FLUID_PIPE_CONNECTION = new FluidPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     @NoBlockItem
-    public static final Block ENERGY_PIPE_CONNECTION = new EnergyPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
+    public static final Block ENERGY_PIPE_CONNECTION = new EnergyPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     @NoBlockItem
-    public static final Block ITEM_PIPE_CONNECTION = new ItemPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
+    public static final Block ITEM_PIPE_CONNECTION = new ItemPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     
     @NoBlockItem
     public static final Block FRAME_GANTRY_ARM = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
