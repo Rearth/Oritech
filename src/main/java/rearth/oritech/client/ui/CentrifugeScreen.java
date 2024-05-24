@@ -2,8 +2,10 @@ package rearth.oritech.client.ui;
 
 import io.wispforest.owo.ui.component.BoxComponent;
 import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.Color;
+import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Positioning;
 import io.wispforest.owo.ui.core.Sizing;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
@@ -12,6 +14,8 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
 import rearth.oritech.client.renderers.LaserArmModel;
 import rearth.oritech.util.ScreenProvider;
@@ -24,6 +28,7 @@ public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHa
     private BoxComponent inFluidFillStatusOverlay;
     
     private static final ScreenProvider.BarConfiguration inputConfig = new ScreenProvider.BarConfiguration(28, 6, 21, 74);
+    public static final Identifier BUCKET_SLOT = new Identifier(Oritech.MOD_ID, "textures/gui/modular/bucket_indicator.png");
     
     public CentrifugeScreen(CentrifugeScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -86,5 +91,27 @@ public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHa
         panel.child(inFluidFillStatusOverlay);
         panel.child(foreGround);
         
+    }
+    
+    @Override
+    public void addExtensionComponents(FlowLayout container) {
+        super.addExtensionComponents(container);
+        
+        if (!((CentrifugeBlockEntity) handler.blockEntity).hasFluidAddon) return;
+        
+        var childLayout = Containers.horizontalFlow(Sizing.fixed(60), Sizing.fixed(20));
+        childLayout.margins(Insets.of(4, 1, 1, 1));
+        childLayout.padding(Insets.of(1));
+        
+        childLayout.child(BasicMachineScreen.getItemFrame(2, 0));
+        childLayout.child(BasicMachineScreen.getItemFrame(34, 0));
+        childLayout.child(Components.texture(BUCKET_SLOT, 0, 0, 27, 18, 27, 18).positioning(Positioning.absolute(2, -1)));
+        
+        // ids: 9 * 4 + 3 = 39 (count of slot from playinv + centrifuge normal inv)
+        childLayout.child(this.slotAsComponent(39).positioning(Positioning.absolute(2, 0)));
+        childLayout.child(this.slotAsComponent(40).positioning(Positioning.absolute(34, 0)));
+        
+        container.child(Components.box(Sizing.fixed(73), Sizing.fixed(1)).color(new Color(0.8f, 0.8f, 0.8f)));
+        container.child(childLayout);
     }
 }

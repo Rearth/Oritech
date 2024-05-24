@@ -4,7 +4,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.world.World;
-import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;

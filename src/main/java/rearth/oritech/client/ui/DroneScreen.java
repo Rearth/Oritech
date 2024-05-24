@@ -13,7 +13,6 @@ import rearth.oritech.block.entity.machines.interaction.DronePortEntity;
 
 public class DroneScreen extends BasicMachineScreen<DroneScreenHandler> {
     
-    
     public static final Identifier CARD_SLOT = new Identifier(Oritech.MOD_ID, "textures/gui/modular/designator_arrow.png");
     private final DronePortEntity dronePort;
     
