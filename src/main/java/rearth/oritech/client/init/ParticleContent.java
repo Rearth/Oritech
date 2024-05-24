@@ -18,6 +18,11 @@ public class ParticleContent {
         ClientParticles.reset();
     });
     
+    public static final ParticleSystem<Void> DEBUG_BLOCK = PARTICLE_CONTROLLER.register(Void.class, (world, pos, data) -> {
+        spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, pos, 1, 120, 2);
+        ClientParticles.reset();
+    });
+    
     public static final ParticleSystem<Integer> FERTILIZER_EFFECT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(data);
         ClientParticles.spawnWithinBlock(ParticleTypes.HAPPY_VILLAGER, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z));

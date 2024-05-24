@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:machine_plating_block"
+    },
+    "c": {
+      "item": "oritech:motor"
+    },
+    "f": {
+      "item": "oritech:electrum_ingot"
+    },
+    "s": {
+      "item": "minecraft:iron_axe"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "item": "oritech:treefeller_block"
+  }
+}

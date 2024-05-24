@@ -26,6 +26,9 @@
 
   "tooltip.oritech.overchargedcrystal": "Any enchanted book will work when crafting this",
   "tooltip.oritech.fluxite": "Can also be created by harvesting grown amethyst with an enderic laser",
+  "tooltip.oritech.promethium_axe": "Sneak while harvesting to break the entire tree",
+  "tooltip.oritech.promethium_pick": "Shift + right click to switch mode",
+  "tooltip.oritech.frame_needed": "Must be built on a machine frame",
 
   "tooltip.oritech.intelligence_item": [
     {
@@ -133,8 +136,8 @@
   "block.oritech.machine_acceptor_addon": "Machine Acceptor Addon",
   "block.oritech.machine_inventory_proxy_addon": "Machine Inventory Proxy Addon",
   "block.oritech.machine_extender": "Machine Extender",
-  "block.oritech.oil_fluid_block": "Oil Fluid Block",
-  "block.oritech.fuel_fluid_block": "Fuel Fluid Block",
+  "block.oritech.oil_fluid_block": "Oil",
+  "block.oritech.fuel_fluid_block": "Refined Fuel",
   "block.oritech.nickel_ore": "Nickel Ore",
   "block.oritech.deepslate_nickel_ore": "Deepslate Nickel Ore",
   "block.oritech.endstone_platinum_ore": "Endstone Platinum Ore",
@@ -157,6 +160,7 @@
   "block.oritech.tech_door_hinge": "Industrial Door",
   "block.oritech.machine_plating_block": "Reinforced Plating",
   "block.oritech.capacitor_addon_extender": "Power Bank Addon",
+  "block.oritech.treefeller_block": "Tree Cutter",
 
   "item.oritech.banana": "Banana",
   "item.oritech.target_designator": "Target Designator",

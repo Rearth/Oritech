@@ -151,6 +151,7 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
         }
         
         tooltip.add(Text.literal("Mode: " + (area ? "Area" : "Single")).formatted(Formatting.GOLD));
+        tooltip.add(Text.translatable("tooltip.oritech.promethium_pick").formatted(Formatting.DARK_GRAY));
         
     }
     

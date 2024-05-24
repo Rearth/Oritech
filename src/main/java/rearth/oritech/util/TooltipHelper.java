@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 
@@ -22,6 +23,9 @@ public class TooltipHelper {
             if (entity instanceof MultiblockMachineController multiblockController) {
                 var corePositions = multiblockController.getCorePositions();
                 tooltip.add(Text.translatable("tooltip.oritech.core_desc").formatted(Formatting.GRAY).append(Text.literal(String.valueOf(corePositions.size())).formatted(Formatting.GOLD)));
+            }
+            if (entity instanceof FrameInteractionBlockEntity) {
+                tooltip.add(Text.translatable("tooltip.oritech.frame_needed").formatted(Formatting.GRAY));
             }
             if (entity instanceof MachineAddonController addonProvider) {
                 var addonSlots = addonProvider.getAddonSlots();

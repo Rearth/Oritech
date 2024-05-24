@@ -1,4 +1,4 @@
-// 1.20.4	2024-05-24T14:10:45.2854751	Oritech/Model Definitions
+// 1.20.4	2024-05-24T20:28:42.0934638	Oritech/Model Definitions
 2e964d91a46577bf6a179afb1ded52a0d5deaaaa assets\oritech\models\item\copper_gem.json
 d83f00d15d54fb178e4a4f9ba12506b9c9ff12ed assets\oritech\models\item\hand_drill.json
 c2024fbd615435625032fe838bffa683cc1e8f32 assets\oritech\models\item\oritech_guide.json
@@ -75,6 +75,7 @@ a2b76728e000f928e0fcf1b51ff9fc43a2543acd assets\oritech\blockstates\machine_core
 086d7d3935f6006cf5d94fa9f46851caeafecab6 assets\oritech\models\item\drone_port_block.json
 6adb9f1610801085ae00d014a07bb37013e01353 assets\oritech\models\item\platinum_ingot.json
 e58446b077b49e29ee7be567b039cd8d66e2230d assets\oritech\blockstates\resource_node_redstone.json
+6cfb7adeb32c7bdd899265afb3a5313485776bc7 assets\oritech\models\item\treefeller_block.json
 0d48513d812d5b5d28796cf58c2482ec104af81a assets\oritech\models\item\machine_core_7.json
 3a8039e2e6d09f627e913ee713637dcc8536a228 assets\oritech\models\item\nickel_gem.json
 b0b2055caa3f84ee6c6d3bf82165b2e70413f5e0 assets\oritech\models\item\platinum_clump.json
@@ -155,6 +156,7 @@ f1b3f2f157db1262a21bb0139ade5947cad98a47 assets\oritech\models\item\resource_nod
 f2689a517716637aa895c96dee1b88d50a0f0d0b assets\oritech\models\item\resource_node_copper.json
 0aee777e83dcf089a1a8260761a69de53bf1e985 assets\oritech\blockstates\small_tank_block.json
 ff8c539de2afd50edaef11008239ffb8e08c66de assets\oritech\models\block\pump_trunk_block.json
+7eb395cd65df72caf43bedc54067cbf53940fd6c assets\oritech\blockstates\treefeller_block.json
 3ceff0ef4325bb269831205626285bc857c60de8 assets\oritech\models\item\destroyer_block.json
 07af1e5b324ae4fe74577ccea0e35726f3dc5f98 assets\oritech\models\block\resource_node_redstone.json
 7eb395cd65df72caf43bedc54067cbf53940fd6c assets\oritech\blockstates\laser_arm_block.json
@@ -217,8 +219,8 @@ a5bcc52397f53e02db0b9f96fcf5faa8c43e7d65 assets\oritech\models\item\fluxite.json
 746b98d721e5ae0d96dd769e71b786afa8c2d142 assets\oritech\models\item\banana_block.json
 e00cfa7892647f3e1c720598a6417c4c5f2581a2 assets\oritech\blockstates\machine_core_5.json
 2422ff7b51ccae980cf6a4f91678af915b114336 assets\oritech\models\item\resource_node_platinum.json
-85d49b11baedc83af456b97e1e204f12b29943e7 assets\oritech\models\item\energite_dust.json
 7eb395cd65df72caf43bedc54067cbf53940fd6c assets\oritech\blockstates\atomic_forge_block.json
+85d49b11baedc83af456b97e1e204f12b29943e7 assets\oritech\models\item\energite_dust.json
 907e1d1717c926ebc0455ebe3291c7e917eb74d2 assets\oritech\models\item\basic_generator_block.json
 78f4a2e5abfbdcb3a8cd6f797ad3aa776614617d assets\oritech\blockstates\pump_trunk_block.json
 70697ccfa1a498cc05976d9430fd48b911e745b2 assets\oritech\models\block\machine_core_2.json

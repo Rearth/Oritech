@@ -18,6 +18,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
     public static final ExtendedScreenHandlerType<BasicMachineScreenHandler> ATOMIC_FORGE_SCREEN = new ExtendedScreenHandlerType<>(BasicMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> STORAGE_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<BasicMachineScreenHandler> TANK_SCREEN = new ExtendedScreenHandlerType<>(BasicMachineScreenHandler::new);
+    public static final ExtendedScreenHandlerType<BasicMachineScreenHandler> TREEFELLER_SCREEN = new ExtendedScreenHandlerType<>(BasicMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<DroneScreenHandler> DRONE_SCREEN = new ExtendedScreenHandlerType<>(DroneScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> POWERED_FURNACE_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler> BIO_GENERATOR_SCREEN = new ExtendedScreenHandlerType<>(UpgradableMachineScreenHandler::new);
@@ -37,6 +38,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
         HandledScreens.register(FOUNDRY_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(CENTRIFUGE_SCREEN, CentrifugeScreen::new);
         HandledScreens.register(TANK_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
+        HandledScreens.register(TREEFELLER_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         HandledScreens.register(POWERED_FURNACE_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(BIO_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(LAVA_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
