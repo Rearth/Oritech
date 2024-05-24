@@ -1,0 +1,15 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "tag": "minecraft:wool"
+    }
+  ],
+  "results": [
+    {
+      "Count": 4,
+      "id": "minecraft:string"
+    }
+  ],
+  "time": 200
+}

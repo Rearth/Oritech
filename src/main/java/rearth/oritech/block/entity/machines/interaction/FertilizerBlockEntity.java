@@ -4,10 +4,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CropBlock;
-import net.minecraft.block.Fertilizable;
+import net.minecraft.block.*;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
@@ -15,6 +12,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -108,7 +106,21 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
         var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
         
         // skip not grown crops
+        if (canFertilizeFarmland(toolPosition)) return true;
         return targetState.getBlock() instanceof Fertilizable fertilizable && fertilizable.isFertilizable(world, targetPosition, targetState);
+    }
+    
+    private boolean canFertilizeFarmland(BlockPos toolPosition) {
+        var targetPosition = toolPosition.down(2);
+        var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
+        
+        if (targetState.getBlock() instanceof FarmlandBlock) {
+            var moistureStatus = targetState.get(Properties.MOISTURE);
+            return moistureStatus != 7;
+        }
+        
+        return false;
+        
     }
     
     @Override
@@ -125,9 +137,15 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
             var newAge = cropBlock.getAge(targetState) + fertilizerStrength;
             newAge = Math.min(newAge, cropBlock.getMaxAge());
             world.setBlockState(targetPosition, cropBlock.withAge(newAge), Block.NOTIFY_LISTENERS);
-        } else {
-            var fertilizable = (Fertilizable) targetState.getBlock();
+        } else if (targetState.getBlock() instanceof Fertilizable fertilizable) {
             fertilizable.grow((ServerWorld) world, world.random, targetPosition, targetState);
+        }
+        
+        var farmlandPosition = processed.down(2);
+        var farmlandState = world.getBlockState(farmlandPosition);
+        
+        if (farmlandState.getBlock() instanceof FarmlandBlock && farmlandState.get(Properties.MOISTURE) != 7) {
+            world.setBlockState(farmlandPosition, farmlandState.with(Properties.MOISTURE, 7));
         }
         
         ParticleContent.FERTILIZER_EFFECT.spawn(world, Vec3d.of(targetPosition), fertilizerStrength * 3 + 2);
@@ -142,7 +160,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, -1,0)
+          new Vec3i(0, -1, 0)
         );
     }
     
