@@ -62,6 +62,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addAssemblerRecipe(exporter, Ingredient.ofItems(Items.GUNPOWDER), Ingredient.ofItems(Items.BLAZE_POWDER), Ingredient.fromTag(ItemTags.COALS), Ingredient.fromTag(ItemTags.COALS), Items.FIRE_CHARGE, 1f, "_assemblerfireball");
         // blaze rod (4 powder in assembler)
         addAssemblerRecipe(exporter, Ingredient.ofItems(Items.BLAZE_POWDER), Ingredient.ofItems(Items.BLAZE_POWDER), Ingredient.ofItems(Items.BLAZE_POWDER), Ingredient.ofItems(Items.BLAZE_POWDER), Items.BLAZE_ROD, 1f, "_assemblerblazerod");
+        // enderic compound from sculk
+        addCentrifugeRecipe(exporter, Ingredient.ofItems(Items.SCULK), ItemContent.ENDERIC_COMPOUND, 4f, "_endericsculk");
     }
     
     private void addDeepDrillOres(RecipeExporter exporter) {
@@ -253,10 +255,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         // motor
         offerMotorRecipe(exporter, ItemContent.MOTOR, Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_motorcraft");
-        addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), ItemContent.MOTOR, 1, 0.5f, "motor");
+        addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), ItemContent.MOTOR, 2, 0.5f, "motor");
         
         // machine plating
-        addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), BlockContent.MACHINE_PLATING_BLOCK.asItem(), 2, 1f, "plating");
+        offerMachinePlatingRecipe(exporter, BlockContent.MACHINE_PLATING_BLOCK.asItem(), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(Blocks.STONE.asItem()), Ingredient.fromTag(TagContent.NICKEL_INGOTS), 2, "_platingmanual");
+        addAssemblerRecipe(exporter, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), BlockContent.MACHINE_PLATING_BLOCK.asItem(), 16, 1f, "plating");
         
         // basic battery
         offerMotorRecipe(exporter, ItemContent.BASIC_BATTERY, Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "manualbattery");
@@ -766,6 +769,14 @@ public class RecipeGenerator extends FabricRecipeProvider {
                         .pattern("aa ")
                         .pattern("aa ")
                         .pattern("aa ");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
+    }
+    
+    public void offerMachinePlatingRecipe(RecipeExporter exporter, Item output, Ingredient side, Ingredient edge, Ingredient core, int count, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, count).input('a', side).input('e', edge).input('c', core)
+                        .pattern("eae")
+                        .pattern("aca")
+                        .pattern("eae");
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
     }
 }
