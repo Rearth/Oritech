@@ -1,10 +1,12 @@
 package rearth.oritech.block.entity.machines.interaction;
 
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.BuddingAmethystBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.inventory.Inventories;
@@ -98,7 +100,8 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
-        if (world.isClient() ||!isActive(state) || redstonePowered || currentTarget == null || energyStorage.getAmount() < energyRequiredToFire()) return;
+        if (world.isClient() || !isActive(state) || redstonePowered || currentTarget == null || energyStorage.getAmount() < energyRequiredToFire())
+            return;
         
         var targetBlock = currentTarget;
         var targetBlockState = world.getBlockState(targetBlock);
@@ -129,7 +132,11 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
                     tx.commit();
                 }
             }
-        } else if (!targetBlockState.getBlock().equals(Blocks.AIR)) {
+        } else if (targetBlockState.getBlock() instanceof BuddingAmethystBlock amethystBlock && !canPassThrough(targetBlockState)) {
+            fired = true;
+            amethystBlock.randomTick(targetBlockState, (ServerWorld) world, targetBlock, world.random);
+            ParticleContent.ACCELERATING.spawn(world, Vec3d.of(targetBlock));
+        } else if (!canPassThrough(targetBlockState)) {
             fired = true;
             progress += energyRequiredToFire();
             
@@ -165,13 +172,14 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         
         if (targetBlockState.getBlock().equals(Blocks.AMETHYST_CLUSTER)) {
             dropped = List.of(new ItemStack(ItemContent.FLUXITE));
-            ParticleContent.CHARGING.spawn(world, targetPos.toCenterPos(), 1);
+            ParticleContent.CHARGING.spawn(world, Vec3d.of(targetPos), 1);
         }
         
         // yes, this will discard items that wont fit anymore
         for (var stack : dropped) {
             this.inventory.addStack(stack);
         }
+        
         try {
             targetBlockState.getBlock().onBreak(world, targetPos, targetBlockState, null);
         } catch (Exception exception) {
@@ -205,35 +213,43 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             var to = from.add(direction.multiply(i));
             var targetBlockPos = BlockPos.ofFloored(to.add(0, 0.3f, 0));
             var targetState = world.getBlockState(targetBlockPos);
-            if (!targetState.isAir()) return targetBlockPos;
+            if (!canPassThrough(targetState)) return targetBlockPos;
             
             var offsetTop = to.add(0, -searchOffset, 0);
             targetBlockPos = BlockPos.ofFloored(offsetTop);
             targetState = world.getBlockState(targetBlockPos);
-            if (!targetState.isAir()) return targetBlockPos;
+            if (!canPassThrough(targetState)) return targetBlockPos;
             
             var offsetLeft = to.add(-searchOffset, 0, 0);
             targetBlockPos = BlockPos.ofFloored(offsetLeft);
             targetState = world.getBlockState(targetBlockPos);
-            if (!targetState.isAir()) return targetBlockPos;
+            if (!canPassThrough(targetState)) return targetBlockPos;
             
             var offsetRight = to.add(searchOffset, 0, 0);
             targetBlockPos = BlockPos.ofFloored(offsetRight);
             targetState = world.getBlockState(targetBlockPos);
-            if (!targetState.isAir()) return targetBlockPos;
+            if (!canPassThrough(targetState)) return targetBlockPos;
             
             var offsetFront = to.add(0, 0, searchOffset);
             targetBlockPos = BlockPos.ofFloored(offsetFront);
             targetState = world.getBlockState(targetBlockPos);
-            if (!targetState.isAir()) return targetBlockPos;
+            if (!canPassThrough(targetState)) return targetBlockPos;
             
             var offsetBack = to.add(0, 0, -searchOffset);
             targetBlockPos = BlockPos.ofFloored(offsetBack);
             targetState = world.getBlockState(targetBlockPos);
-            if (!targetState.isAir()) return targetBlockPos;
+            if (!canPassThrough(targetState)) return targetBlockPos;
         }
         
         return null;
+    }
+    
+    private boolean canPassThrough(BlockState state) {
+        return state.isAir() || state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || isUnfinishedAmethyst(state);
+    }
+    
+    private boolean isUnfinishedAmethyst(BlockState state) {
+        return state.isOf(Blocks.SMALL_AMETHYST_BUD) || state.isOf(Blocks.MEDIUM_AMETHYST_BUD) || state.isOf(Blocks.LARGE_AMETHYST_BUD);
     }
     
     private int energyRequiredToFire() {
@@ -253,7 +269,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         var success = trySetNewTarget(targetPos, true);
         findNextBlockBreakTarget();
         
-        return  success;
+        return success;
     }
     
     private boolean trySetNewTarget(BlockPos targetPos, boolean alsoSetDirection) {
@@ -512,6 +528,10 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     public boolean isTargetingEnergyContainer() {
         var storageCandidate = EnergyStorage.SIDED.find(world, currentTarget, null);
         return storageCandidate != null || isTargetingAtomicForge() || isTargetingDeepdrill();
+    }
+    
+    public boolean isTargetingBuddingAmethyst() {
+        return world.getBlockState(currentTarget).getBlock() instanceof BuddingAmethystBlock;
     }
     
 }

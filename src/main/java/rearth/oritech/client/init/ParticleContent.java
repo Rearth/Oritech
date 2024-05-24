@@ -53,6 +53,11 @@ public class ParticleContent {
         ClientParticles.spawnCenteredOnBlock(ParticleTypes.SONIC_BOOM, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
     }));
     
+    public static final ParticleSystem<Void> ACCELERATING = PARTICLE_CONTROLLER.register(Void.class, (world, pos, data) -> {
+        spawnCubeOutline(ParticleTypes.SCULK_CHARGE_POP, pos, 1, 5, 3);
+        ClientParticles.reset();
+    });
+    
     public static final ParticleSystem<LineData> LASER_BEAM_EFFECT = PARTICLE_CONTROLLER.register(LineData.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(1);
         ClientParticles.spawnPrecise(ParticleTypes.SMALL_FLAME, world, data.end, 0.4, 0.3, 0.4);

@@ -37,9 +37,17 @@ The maximum range is 64.
 The huge amounts of energy from the enderic laser cause grown amethyst clusters to transform into fluxite when they are destroyed.
 <block;minecraft:amethyst_cluster>
 
+They also speed up amethyst growth when aimed at the budding amethyst itself.
+
 ;;;;;
 
 **Energy Transfer**
 
-When the enderic laser is target a block that can store energy (e.g. any machine), it will fill the energy storage of the machine.
+When the enderic laser is targeting a block that can store energy (e.g. any machine), it will fill the energy storage of the machine.
 The laser ignores all input and output limits, and can fill the energy storage of machines that may not accept energy from cables directly.
+
+;;;;;
+
+**More details**
+
+The laser beam will target any block, but it passes through glass (and not-grown amethysts).
