@@ -3,13 +3,16 @@ package rearth.oritech.block.entity.machines.processing;
 import net.minecraft.block.BlockState;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.List;
@@ -48,6 +51,20 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
           new GuiSlot(2, 38, 44),
           new GuiSlot(3, 56, 44),
           new GuiSlot(4, 117, 36));
+    }
+    
+    @Override
+    protected void useEnergy() {
+        super.useEnergy();
+        
+        if (world.random.nextFloat() > 0.4) return;
+        // emit particles
+        var facing = getFacing();
+        var offsetLocal = Geometry.rotatePosition(new Vec3d(0, 0.6, 0.5), facing);
+        var emitPosition = Vec3d.ofCenter(pos).add(offsetLocal);
+        
+        ParticleContent.ASSEMBLER_WORKING.spawn(world, emitPosition, 1);
+        
     }
     
     @Override

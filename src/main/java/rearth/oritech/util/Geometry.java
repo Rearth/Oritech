@@ -2,6 +2,7 @@ package rearth.oritech.util;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 
 public class Geometry {
@@ -12,6 +13,7 @@ public class Geometry {
         var rotated = rotatePosition(offset, facing);
         return ownPos.add(rotated);
     }
+    
     public static Vec3i rotatePosition(Vec3i relativePos, Direction facing) {
         return switch (facing) {
             case NORTH -> new BlockPos(relativePos.getZ(), relativePos.getY(), relativePos.getX());
@@ -23,8 +25,17 @@ public class Geometry {
             default -> relativePos;
         };
     }
-    
-    
+    public static Vec3d rotatePosition(Vec3d relativePos, Direction facing) {
+        return switch (facing) {
+            case NORTH -> new Vec3d(relativePos.getZ(), relativePos.getY(), relativePos.getX());
+            case WEST -> new Vec3d(relativePos.getX(), relativePos.getY(), -relativePos.getZ());
+            case SOUTH -> new Vec3d(-relativePos.getZ(), relativePos.getY(), -relativePos.getX());
+            case EAST -> new Vec3d(-relativePos.getX(), relativePos.getY(), relativePos.getZ());
+            case UP -> new Vec3d(relativePos.getZ(), -relativePos.getX(), -relativePos.getY());
+            case DOWN -> new Vec3d(relativePos.getZ(), relativePos.getX(), relativePos.getY());
+            default -> relativePos;
+        };
+    }
     
     public static Vec3i getForward(Direction facing) {
         return rotatePosition(BlockDirection.FORWARD.pos, facing);

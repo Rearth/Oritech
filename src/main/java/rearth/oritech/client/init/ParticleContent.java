@@ -48,6 +48,16 @@ public class ParticleContent {
         ClientParticles.spawnCenteredOnBlock(ParticleTypes.DUST_PLUME, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
     }));
     
+    public static final ParticleSystem<Integer> GRINDER_WORKING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawn(ParticleTypes.DUST_PLUME, world, pos, 0.8);
+    }));
+    
+    public static final ParticleSystem<Integer> ASSEMBLER_WORKING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawn(ParticleTypes.ENCHANTED_HIT, world, pos, 0.6);
+    }));
+    
     public static final ParticleSystem<Integer> CHARGING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(data);
         ClientParticles.spawnCenteredOnBlock(ParticleTypes.SONIC_BOOM, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
