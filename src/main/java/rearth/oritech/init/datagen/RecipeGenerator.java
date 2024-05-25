@@ -543,8 +543,12 @@ public class RecipeGenerator extends FabricRecipeProvider {
     
     private void addAlloyRecipe(RecipeExporter exporter, Ingredient A, Ingredient B, Item result, String suffix) {
         var foundryDefaultSpeed = 300;
+        
         var entry = new OritechRecipe(foundryDefaultSpeed, List.of(A, B), List.of(new ItemStack(result)), RecipeContent.FOUNDRY, null, null);
         exporter.accept(new Identifier(Oritech.MOD_ID, "foundryalloy" + suffix), entry, null);
+        
+        var entryInverse = new OritechRecipe(foundryDefaultSpeed, List.of(B, A), List.of(new ItemStack(result)), RecipeContent.FOUNDRY, null, null);
+        exporter.accept(new Identifier(Oritech.MOD_ID, "foundryalloyinv" + suffix), entryInverse, null);
     }
     
     // A is inserted twice, surrounding B

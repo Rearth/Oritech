@@ -1,0 +1,18 @@
+{
+  "type": "oritech:foundry",
+  "ingredients": [
+    {
+      "item": "minecraft:netherite_ingot"
+    },
+    {
+      "tag": "c:platinum_ingots"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "oritech:duratium_ingot"
+    }
+  ],
+  "time": 300
+}
