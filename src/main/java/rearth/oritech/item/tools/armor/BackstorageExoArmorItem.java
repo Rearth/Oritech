@@ -66,5 +66,7 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements SimpleEnerg
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         var text = Text.literal(String.format("%d/%d RF", this.getStoredEnergy(stack), this.getEnergyCapacity(stack)));
         tooltip.add(text.formatted(Formatting.GOLD));
+        
+        super.appendTooltip(stack, world, tooltip, context);
     }
 }

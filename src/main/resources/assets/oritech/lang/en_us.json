@@ -29,6 +29,10 @@
   "tooltip.oritech.promethium_axe": "Sneak while harvesting to break the entire tree",
   "tooltip.oritech.promethium_pick": "Shift + right click to switch mode",
   "tooltip.oritech.frame_needed": "Must be built on a machine frame",
+  "tooltip.oritech.exo_boots": "Prevents all fall damage",
+  "tooltip.oritech.exo_leggings": "Increases movement speed",
+  "tooltip.oritech.exo_chestplate": "Charges equipped energy items",
+  "tooltip.oritech.exo_helmet": "Grants night vision",
 
   "tooltip.oritech.intelligence_item": [
     {
