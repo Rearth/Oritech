@@ -6,7 +6,7 @@
 
 <h3 align="center">Oritech</h3>
 
-<p align="center">
+<div align="center">
   A minecraft fabric tech mod, currently still WIP. Just like this readme.
   <br/>
   <br/>
@@ -16,14 +16,31 @@
   <a href="https://github.com/rearth/Oritech/issues">Report Bug</a>
   .
   <a href="https://github.com/rearth/Oritech/issues">Request Feature</a>
+  <br/>
+  <br/>
+  <br/>
+
+  ![Downloads](https://img.shields.io/github/downloads/rearth/Oritech/total) ![Stargazers](https://img.shields.io/github/stars/rearth/Oritech?style=social) ![Issues](https://img.shields.io/github/issues/rearth/Oritech) ![License](https://img.shields.io/github/license/rearth/Oritech) ![Discord](https://img.shields.io/discord/1233448016128512082)
+
+
+  
+</div>
+
+---
+<p align="center">
+  <img src="https://github.com/Rearth/Oritech/assets/10100603/bb99651d-d9af-48e2-9b00-6fb980517e0a" />
+</p>
+<p align="center">
+  <img src="https://github.com/Rearth/Oritech/assets/10100603/be0fd041-40fc-40c3-a273-976140e89e90" />
+</p>
+<p align="center">
+  <img src="https://github.com/Rearth/Oritech/assets/10100603/b76bf232-74e7-4a17-8166-89d1c80f738e" />
 </p>
 
-![Downloads](https://img.shields.io/github/downloads/rearth/Oritech/total) ![Stargazers](https://img.shields.io/github/stars/rearth/Oritech?style=social) ![Issues](https://img.shields.io/github/issues/rearth/Oritech) ![License](https://img.shields.io/github/license/rearth/Oritech) ![Discord](https://img.shields.io/discord/1233448016128512082)
-
+---
 
 ## About The Project
 
-![Screenshot](https://github.com/Rearth/Oritech/assets/10100603/e94db022-b835-4dcf-8392-7b753ec74b26)
 
 An upcoming tech mod for minecraft fabric. Features advanced ore processing, powered tools and armor, and much much more.
 
