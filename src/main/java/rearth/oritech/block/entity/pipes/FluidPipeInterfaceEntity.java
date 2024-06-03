@@ -96,11 +96,12 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
                     var targetVariant = fluid.getResource();
                     try (var tx = Transaction.openOuter()) {
                         var extracted = sourceContainer.extract(targetVariant, availableInsert, tx);
+                        if (extracted == 0) continue;
                         var inserted = fluidStorage.insert(targetVariant, extracted, tx);
                         if (inserted != extracted) {
                             // this should never happen
                             tx.abort();
-                            Oritech.LOGGER.warn("Something weird has happened with fluid pipes. Working with them is just annoying. Caused at: " + pos);
+                            Oritech.LOGGER.warn("Something weird has happened with fluid pipes. Working with transaction APIs is just annoying. Caused at: " + pos);
                             continue;
                         } else {
                             tx.commit();
