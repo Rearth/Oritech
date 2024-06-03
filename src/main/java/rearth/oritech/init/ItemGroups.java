@@ -49,7 +49,7 @@ public class ItemGroups {
 
     public static void registerItemGroup() {
 
-        Oritech.LOGGER.info("Registering Oritech Items");
+        Oritech.LOGGER.debug("Registering Oritech item groups");
 
         Registry.register(Registries.ITEM_GROUP, new Identifier(Oritech.MOD_ID, "machines"), MACHINE_GROUP);
         Registry.register(Registries.ITEM_GROUP, new Identifier(Oritech.MOD_ID, "components"), COMPONENT_GROUP);

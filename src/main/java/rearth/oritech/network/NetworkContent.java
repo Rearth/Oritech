@@ -90,7 +90,7 @@ public class NetworkContent {
     @SuppressWarnings("unchecked")
     public static void registerChannels() {
         
-        Oritech.LOGGER.info("Registering oritech channels");
+        Oritech.LOGGER.debug("Registering oritech channels");
         
         ReflectiveEndecBuilder.register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
         ReflectiveEndecBuilder.register(ItemFilterBlockEntity.FILTER_ITEMS_ENDEC, (Class<Map<Integer, ItemStack>>) (Object) Map.class); // I don't even know what kind of abomination this cast is, but it seems to work

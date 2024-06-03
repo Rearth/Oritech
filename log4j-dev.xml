@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="DEBUG" packages="rearth.oritech">
+    <Loggers>
+        <Logger name="oritech" level="debug">
+            <AppenderRef ref="SysOut"/>
+            <AppenderRef ref="ServerGuiConsole"/>
+        </Logger>
+    </Loggers>
+</Configuration>

@@ -30,6 +30,6 @@ public class RecipeContent {
     }
 
     public static void initialize() {
-        Oritech.LOGGER.info("Adding oritech mod recipe types");
+        Oritech.LOGGER.debug("Adding oritech mod recipe types");
     }
 }

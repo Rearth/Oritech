@@ -104,7 +104,7 @@ public class ParticleContent {
     }
     
     public static void registerParticles() {
-        Oritech.LOGGER.info("Registering Oritech particles");
+        Oritech.LOGGER.debug("Registering Oritech particles");
     }
     
     public record LineData(Vec3d start, Vec3d end) {}
