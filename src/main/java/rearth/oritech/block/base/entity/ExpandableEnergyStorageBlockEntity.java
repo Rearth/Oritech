@@ -50,6 +50,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     private HashMap<Direction, BlockApiCache<EnergyStorage, Direction>> directionCaches;
     
     private boolean networkDirty = false;
+    private boolean redstonePowered;
     
     public final SimpleInventory inventory = new SimpleInventory(1) {
         @Override
@@ -91,7 +92,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     public void tick(World world, BlockPos pos, BlockState state, ExpandableEnergyStorageBlockEntity blockEntity) {
         if (world.isClient) return;
         
-        outputEnergy();
+        if (!redstonePowered)
+            outputEnergy();
         
         if (networkDirty) sendNetworkEntry();
     }
@@ -151,6 +153,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         writeAddonToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
         nbt.put("inventory", inventory.toNbtList());
+        nbt.putBoolean("redstone", redstonePowered);
     }
     
     @Override
@@ -160,6 +163,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         updateEnergyContainer();
         energyStorage.amount = nbt.getLong("energy_stored");
         inventory.readNbtList(nbt.getList("inventory", NbtElement.COMPOUND_TYPE));
+        redstonePowered = nbt.getBoolean("redstone");
     }
     
     @Override
@@ -324,5 +328,9 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     @Override
     public Property<Direction> getBlockFacingProperty() {
         return SmallStorageBlock.TARGET_DIR;
+    }
+    
+    public void setRedstonePowered(boolean isPowered) {
+        this.redstonePowered = isPowered;
     }
 }

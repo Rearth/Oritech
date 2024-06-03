@@ -65,6 +65,24 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
+    public boolean emitsRedstonePower(BlockState state) {
+        return true;
+    }
+    
+    @Override
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        
+        if (world.isClient) return;
+        
+        var isPowered = world.isReceivingRedstonePower(pos);
+        
+        var storageEntity = (ExpandableEnergyStorageBlockEntity) world.getBlockEntity(pos);
+        storageEntity.setRedstonePowered(isPowered);
+        
+    }
+    
+    @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         
         if (!world.isClient) {
