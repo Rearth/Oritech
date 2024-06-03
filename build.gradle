@@ -10,9 +10,10 @@ base {
     archivesName = project.archives_base_name
 }
 
-loom {
-    log4jConfigs.from file("log4j-dev.xml")
-}
+// un-comment this to enabled oritech debug logging
+//loom {
+//    log4jConfigs.from file("log4j-dev.xml")
+//}
 
 repositories {
 
