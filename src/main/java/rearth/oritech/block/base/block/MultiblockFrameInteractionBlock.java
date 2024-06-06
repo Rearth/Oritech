@@ -37,6 +37,13 @@ public abstract class MultiblockFrameInteractionBlock extends FrameInteractionBl
                 return ActionResult.SUCCESS;
             }
             
+            var wasAssembled = state.get(ASSEMBLED);
+            
+            if (!wasAssembled) {
+                var corePlaced = machineEntity.tryPlaceNextCore(player);
+                if (corePlaced) return ActionResult.SUCCESS;
+            }
+            
             var isAssembled = machineEntity.initMultiblock(state);
             if (!isAssembled) {
                 player.sendMessage(Text.literal("Machine is not assembled. Please add missing core blocks"));

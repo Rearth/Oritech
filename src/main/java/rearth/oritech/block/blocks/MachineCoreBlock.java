@@ -8,6 +8,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -16,6 +17,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
+import rearth.oritech.block.entity.machines.interaction.DeepDrillEntity;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.ScreenProvider;
 
@@ -49,7 +51,7 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
     
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-
+        
         if (!world.isClient() && state.get(USED)) {
             var controllerEntity = getControllerEntity(world, pos);
             if (controllerEntity == null) return state;
@@ -58,7 +60,7 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
                 machineEntity.onCoreBroken(pos);
             }
         }
-
+        
         return super.onBreak(world, pos, state, player);
     }
     
@@ -84,6 +86,9 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
             var controllerEntity = world.getBlockEntity(controllerPos);
             if (controllerEntity instanceof ScreenProvider) {
                 return controllerBlock.getBlock().onUse(controllerBlock, world, controllerPos, player, hand, hit);
+            } else if (controllerEntity instanceof DeepDrillEntity deepDrill && !deepDrill.init()) {
+                player.sendMessage(Text.literal("Machine must be placed on ore nodes"));
+                return ActionResult.SUCCESS;
             }
         }
         
