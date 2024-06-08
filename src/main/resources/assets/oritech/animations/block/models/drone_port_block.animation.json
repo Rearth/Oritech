@@ -336,6 +336,20 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:cable_moving"
+				},
+				"1.9583": {
+					"effect": "oritech:servo_noises"
+				},
+				"3.9167": {
+					"effect": "oritech:servo_noises"
+				},
+				"4.2917": {
+					"effect": "oritech:cable_moving"
+				}
 			}
 		},
 		"takeoff": {
@@ -510,10 +524,27 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:mechanical_click"
+				},
+				"1.4583": {
+					"effect": "oritech:quadcopter_takeoff|0.6|1"
+				},
+				"2.5833": {
+					"effect": "oritech:quadcopter_flying|0.4|1"
+				},
+				"5.5": {
+					"effect": "oritech:quadcopter_flying|0.3|1"
+				},
+				"8.4583": {
+					"effect": "oritech:quadcopter_flying|0.15|0.8"
+				}
 			}
 		},
 		"landing": {
-			"animation_length": 12.29167,
+			"animation_length": 12.2917,
 			"bones": {
 				"droneBody": {
 					"rotation": {
@@ -624,6 +655,11 @@
 							"easing": "easeOutBack"
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"9.9583": {
+					"effect": "oritech:cable_moving"
 				}
 			}
 		}

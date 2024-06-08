@@ -465,7 +465,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             } else {
                 return state.setAndContinue(MachineBlockEntity.PACKAGED);
             }
-        });
+        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>());
     }
     
     @Override

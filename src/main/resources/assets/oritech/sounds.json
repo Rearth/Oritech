@@ -24,9 +24,54 @@
       "oritech:welding2"
     ]
   },
+  "dynamo": {
+    "sounds": [
+      "oritech:dynamo"
+    ]
+  },
   "saw_working": {
     "sounds": [
       "oritech:saw_working"
+    ]
+  },
+  "furnace_burn": {
+    "sounds": [
+      "oritech:furnace_burn"
+    ]
+  },
+  "grinder_working": {
+    "sounds": [
+      "oritech:grinder_working"
+    ]
+  },
+  "lava_bubbles": {
+    "sounds": [
+      "oritech:lava_bubbles"
+    ]
+  },
+  "liquid_flow": {
+    "sounds": [
+      "oritech:liquid_flow"
+    ]
+  },
+  "quadcopter_flying": {
+    "sounds": [
+      "oritech:quadcopter_flying"
+    ]
+  },
+  "quadcopter_takeoff": {
+    "sounds": [
+      "oritech:quadcopter_takeoff"
+    ]
+  },
+  "sizzling_sound": {
+    "sounds": [
+      "oritech:sizzling_sound"
+    ]
+  },
+  "squish": {
+    "sounds": [
+      "oritech:squish"
     ]
   }
 }

@@ -408,9 +408,7 @@ public abstract class MachineBlockEntity extends BlockEntity
             }
             
             if (isActive(getCachedState())) {
-                
                 if (progress > 0) {
-                    state.getController().setAnimationSpeed(getAnimationSpeed());
                     return state.setAndContinue(WORKING);
                 } else {
                     return state.setAndContinue(IDLE);
@@ -418,7 +416,7 @@ public abstract class MachineBlockEntity extends BlockEntity
             } else {
                 return state.setAndContinue(PACKAGED);
             }
-        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>(this::getAnimationSpeed));
+        }).setAnimationSpeedHandler(animatable -> (double) getAnimationSpeed()).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>(this::getAnimationSpeed));
     }
     
     protected float getAnimationSpeed() {

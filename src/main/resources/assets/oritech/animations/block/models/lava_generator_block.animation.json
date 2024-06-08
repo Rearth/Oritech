@@ -2,7 +2,7 @@
 	"format_version": "1.8.0",
 	"animations": {
 		"idle": {
-			"animation_length": 0.45833
+			"animation_length": 0.4583
 		},
 		"working": {
 			"loop": true,
@@ -22,6 +22,14 @@
 							"easing": "easeInElastic"
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:dynamo"
+				},
+				"0.0417": {
+					"effect": "oritech:lava_bubbles"
 				}
 			}
 		},
@@ -263,6 +271,20 @@
 							"easing": "easeInOutBack"
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:cable_moving"
+				},
+				"0.5833": {
+					"effect": "oritech:servo_noises"
+				},
+				"1.5833": {
+					"effect": "oritech:servo_noises"
+				},
+				"2.5833": {
+					"effect": "oritech:metal_sounds"
 				}
 			}
 		}

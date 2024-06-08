@@ -6,7 +6,7 @@
 		},
 		"working": {
 			"loop": true,
-			"animation_length": 3.04167,
+			"animation_length": 3.0417,
 			"bones": {
 				"bone": {
 					"position": {
@@ -157,6 +157,20 @@
 							"easing": "easeOutBack"
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:dynamo"
+				},
+				"0.0417": {
+					"effect": "oritech:welding2"
+				},
+				"0.4167": {
+					"effect": "oritech:lava_bubbles"
+				},
+				"1.8333": {
+					"effect": "oritech:welding1"
 				}
 			}
 		},
@@ -629,6 +643,20 @@
 							"easing": "easeInOutQuart"
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:metal_sounds"
+				},
+				"0.5833": {
+					"effect": "oritech:servo_noises"
+				},
+				"2.0417": {
+					"effect": "oritech:cable_moving"
+				},
+				"2.375": {
+					"effect": "oritech:servo_noises"
 				}
 			}
 		}

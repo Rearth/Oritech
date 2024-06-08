@@ -42,17 +42,15 @@ public class AutoPlayingSoundKeyframeHandler<A extends GeoAnimatable> implements
             var volumeFalloff = Math.min(1f, 1f / (distance / 4f));
             if (distance > 25) return;
             var speed = speedSupplier.get();
-            speed = Math.min(Math.max(speed, 0.25f), 4f);
-            
-            System.out.println("playing: " + sound.getId());
+            speed = Math.min(Math.max(speed, 0.125f), 8f);
             
             var volume = segments.length > 1 ? Float.parseFloat(segments[1]) : 1f;
-            volume *= Oritech.CONFIG.machineVolumeMultiplier() * getPitchRandomMultiplier(entity.getWorld().random) * volumeFalloff;
+            volume *= (float) (Oritech.CONFIG.machineVolumeMultiplier() * getPitchRandomMultiplier(entity.getWorld().random) * volumeFalloff * 0.5f);
             var pitch = segments.length > 2 ? Float.parseFloat(segments[2]) : 1f;
             pitch *= speed * getPitchRandomMultiplier(entity.getWorld().random);
             var source = SoundCategory.BLOCKS;
             
-            MinecraftClient.getInstance().player.clientWorld.playSound(MinecraftClient.getInstance().player, pos.x, pos.y, pos.z, sound, source, volume, pitch);
+            MinecraftClient.getInstance().player.clientWorld.playSoundAtBlockCenter(entity.getPos(), sound, source, volume, pitch, true);
         }
     }
     

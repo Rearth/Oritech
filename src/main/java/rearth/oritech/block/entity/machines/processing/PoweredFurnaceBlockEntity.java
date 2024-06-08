@@ -118,7 +118,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
             return (int) (recipeCandidate.get().value().getCookingTime() * getSpeedMultiplier());
         }
         
-        return 1;
+        return 120;
     }
     
     @Override

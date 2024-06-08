@@ -2,7 +2,7 @@
 	"format_version": "1.8.0",
 	"animations": {
 		"deploy": {
-			"animation_length": 5.83333,
+			"animation_length": 5.8333,
 			"bones": {
 				"top": {
 					"position": {
@@ -198,6 +198,17 @@
 							"easing": "easeOutExpo"
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:cable_moving"
+				},
+				"0.5833": {
+					"effect": "oritech:servo_noises"
+				},
+				"2.375": {
+					"effect": "oritech:servo_noises"
 				}
 			}
 		},
@@ -524,6 +535,14 @@
 							"easing": "easeOutQuart"
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:liquid_flow"
+				},
+				"0.0833": {
+					"effect": "oritech:servo_noises"
 				}
 			}
 		}

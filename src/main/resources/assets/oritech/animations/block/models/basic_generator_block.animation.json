@@ -113,6 +113,11 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:furnace_burn|0.3|1"
+				}
 			}
 		}
 	},

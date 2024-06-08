@@ -691,6 +691,17 @@
 						"vector": [0, 0, 0]
 					}
 				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:cable_moving"
+				},
+				"0.6": {
+					"effect": "oritech:servo_noises"
+				},
+				"2.36": {
+					"effect": "oritech:servo_noises"
+				}
 			}
 		},
 		"idle": {
@@ -2213,6 +2224,11 @@
 							"easing": "easeOutBack"
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:lava_bubbles"
 				}
 			}
 		},

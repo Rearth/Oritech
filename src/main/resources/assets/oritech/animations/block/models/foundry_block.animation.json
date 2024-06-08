@@ -157,6 +157,14 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:liquid_flow"
+				},
+				"1.75": {
+					"effect": "oritech:sizzling_sound|0.4|1"
+				}
 			}
 		},
 		"packaged": {
@@ -333,7 +341,7 @@
 			}
 		},
 		"deploy": {
-			"animation_length": 4.45833,
+			"animation_length": 4.4583,
 			"bones": {
 				"manualseed_input": {
 					"rotation": {
@@ -850,6 +858,20 @@
 							"easing": "easeOutQuad"
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:metal_sounds"
+				},
+				"0.5833": {
+					"effect": "oritech:servo_noises"
+				},
+				"2.0417": {
+					"effect": "oritech:cable_moving"
+				},
+				"2.375": {
+					"effect": "oritech:servo_noises"
 				}
 			}
 		}

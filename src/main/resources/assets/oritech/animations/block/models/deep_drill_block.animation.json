@@ -2,7 +2,7 @@
 	"format_version": "1.8.0",
 	"animations": {
 		"deploy": {
-			"animation_length": 18.79167,
+			"animation_length": 18.7917,
 			"bones": {
 				"quarrysupport": {
 					"position": {
@@ -1853,6 +1853,32 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:cable_moving"
+				},
+				"0.625": {
+					"effect": "oritech:servo_noises"
+				},
+				"2.375": {
+					"effect": "oritech:servo_noises"
+				},
+				"4.5833": {
+					"effect": "oritech:cable_moving"
+				},
+				"6.9583": {
+					"effect": "oritech:servo_noises"
+				},
+				"9.1667": {
+					"effect": "oritech:servo_noises"
+				},
+				"12.2917": {
+					"effect": "oritech:cable_moving"
+				},
+				"15.4167": {
+					"effect": "oritech:servo_noises"
+				}
 			}
 		},
 		"packaged": {
@@ -2699,6 +2725,11 @@
 					"position": {
 						"vector": [0, 0, 16]
 					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:grinder_working"
 				}
 			}
 		},

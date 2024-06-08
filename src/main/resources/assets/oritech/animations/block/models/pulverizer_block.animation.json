@@ -223,6 +223,11 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:grinder_working|0.4|1"
+				}
 			}
 		}
 	},

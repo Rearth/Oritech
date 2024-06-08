@@ -164,10 +164,15 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:grinder_working|0.5|1"
+				}
 			}
 		},
 		"packaged": {
-			"animation_length": 0.95833,
+			"animation_length": 0.9583,
 			"bones": {
 				"base": {
 					"position": {
@@ -915,6 +920,20 @@
 							"vector": [1, 1, 1]
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:metal_sounds"
+				},
+				"0.5833": {
+					"effect": "oritech:servo_noises"
+				},
+				"2.0417": {
+					"effect": "oritech:cable_moving"
+				},
+				"3.8333": {
+					"effect": "oritech:servo_noises"
 				}
 			}
 		}

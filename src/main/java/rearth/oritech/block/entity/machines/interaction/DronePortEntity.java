@@ -465,7 +465,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
             } else {
                 return state.setAndContinue(PACKAGED);
             }
-        });
+        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>());
     }
     
     @Override

@@ -23,10 +23,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.datagen.data.TagContent;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.DynamicEnergyStorage;
-import rearth.oritech.util.EnergyProvider;
-import rearth.oritech.util.InventoryProvider;
-import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -297,7 +294,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
             } else {
                 return state.setAndContinue(PACKAGED);
             }
-        });
+        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>());
     }
     
     public void setLastWorkTime(long lastWorkTime) {
