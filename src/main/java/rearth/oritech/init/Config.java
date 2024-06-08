@@ -46,6 +46,8 @@ public class Config {
     @Sync(Option.SyncMode.NONE)
     @RestartRequired
     public boolean tightCableHitboxes = true;
+    @Sync(Option.SyncMode.NONE)
+    public float machineVolumeMultiplier = 1f;
     
     public static class ProcessingMachines {
         

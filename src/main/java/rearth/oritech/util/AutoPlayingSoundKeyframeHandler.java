@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Identifier;
+import rearth.oritech.Oritech;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.keyframe.event.SoundKeyframeEvent;
@@ -31,9 +32,8 @@ public class AutoPlayingSoundKeyframeHandler<A extends GeoAnimatable> implements
             var speed = speedSupplier.get();
             speed = Math.min(Math.max(speed, 0.25f), 4f);
             
-            System.out.println("playing sound: " + sound.getId());
-            
-            var volume = segments.length > 1 ? Float.parseFloat(segments[1]) : 1f;  // TODO config volume multiplier
+            var volume = segments.length > 1 ? Float.parseFloat(segments[1]) : 1f;
+            volume *= Oritech.CONFIG.machineVolumeMultiplier();
             var pitch = segments.length > 2 ? Float.parseFloat(segments[2]) : 1f;
             pitch *= speed;
             var source = SoundCategory.BLOCKS;
