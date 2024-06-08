@@ -18,6 +18,11 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:saw_working|0.2|1"
+				}
 			}
 		}
 	},

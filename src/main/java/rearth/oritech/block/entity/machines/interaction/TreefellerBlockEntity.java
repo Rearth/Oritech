@@ -232,7 +232,10 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "machine", 5, state -> PlayState.CONTINUE).triggerableAnim("work", MachineBlockEntity.WORKING).triggerableAnim("idle", MachineBlockEntity.IDLE));
+        controllers.add(new AnimationController<>(this, "machine", 5, state -> PlayState.CONTINUE)
+                          .triggerableAnim("work", MachineBlockEntity.WORKING)
+                          .triggerableAnim("idle", MachineBlockEntity.IDLE)
+                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
     }
     
     @Override

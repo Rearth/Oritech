@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.random.Random;
 import rearth.oritech.Oritech;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -21,6 +22,14 @@ public class AutoPlayingSoundKeyframeHandler<A extends GeoAnimatable> implements
         this.speedSupplier = speedSupplier;
     }
     
+    public AutoPlayingSoundKeyframeHandler() {
+        this.speedSupplier = AutoPlayingSoundKeyframeHandler::getDefaultSpeed;
+    }
+    
+    private static float getDefaultSpeed() {
+        return 1f;
+    }
+    
     @Override
     public void handle(SoundKeyframeEvent<A> event) {
         var segments = event.getKeyframeData().getSound().split("\\|");
@@ -29,16 +38,25 @@ public class AutoPlayingSoundKeyframeHandler<A extends GeoAnimatable> implements
         if (sound != null) {
             var entity = (BlockEntity) event.getAnimatable();
             var pos = entity.getPos().toCenterPos();
+            var distance = Math.sqrt(MinecraftClient.getInstance().gameRenderer.getCamera().getPos().squaredDistanceTo(pos));
+            var volumeFalloff = Math.min(1f, 1f / (distance / 4f));
+            if (distance > 25) return;
             var speed = speedSupplier.get();
             speed = Math.min(Math.max(speed, 0.25f), 4f);
             
+            System.out.println("playing: " + sound.getId());
+            
             var volume = segments.length > 1 ? Float.parseFloat(segments[1]) : 1f;
-            volume *= Oritech.CONFIG.machineVolumeMultiplier();
+            volume *= Oritech.CONFIG.machineVolumeMultiplier() * getPitchRandomMultiplier(entity.getWorld().random) * volumeFalloff;
             var pitch = segments.length > 2 ? Float.parseFloat(segments[2]) : 1f;
-            pitch *= speed;
+            pitch *= speed * getPitchRandomMultiplier(entity.getWorld().random);
             var source = SoundCategory.BLOCKS;
             
             MinecraftClient.getInstance().player.clientWorld.playSound(MinecraftClient.getInstance().player, pos.x, pos.y, pos.z, sound, source, volume, pitch);
         }
+    }
+    
+    private float getPitchRandomMultiplier(Random random) {
+        return random.nextFloat() * 0.15f + 1;
     }
 }

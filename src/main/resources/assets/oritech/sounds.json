@@ -23,5 +23,10 @@
     "sounds": [
       "oritech:welding2"
     ]
+  },
+  "saw_working": {
+    "sounds": [
+      "oritech:saw_working"
+    ]
   }
 }
