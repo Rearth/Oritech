@@ -125,7 +125,7 @@
   "block.oritech.laser_arm_block": "Enderic Laser",
   "block.oritech.deep_drill_block": "Bedrock Extractor",
   "block.oritech.drone_port_block": "Drone Port",
-  "block.oritech.small_storage_block": "Small Energy Storage",
+  "block.oritech.small_storage_block": "Portable Energy Storage",
   "block.oritech.large_storage_block": "Large Energy Storage",
   "block.oritech.small_tank_block": "Portable Tank",
   "block.oritech.placer_block": "Placer Block",

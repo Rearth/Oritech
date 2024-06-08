@@ -96,6 +96,7 @@ public class BlockContent implements BlockRegistryContainer {
     @UseGeoBlockItem(scale = 0.3f)
     public static final Block DRONE_PORT_BLOCK = new DronePortBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
+    @NoAutoDrop
     public static final Block SMALL_STORAGE_BLOCK = new SmallStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block LARGE_STORAGE_BLOCK = new LargeStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @NoAutoDrop

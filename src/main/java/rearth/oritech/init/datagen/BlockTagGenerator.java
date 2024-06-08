@@ -28,6 +28,7 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
         pickaxeBuilder.add(BlockContent.FLUID_PIPE_CONNECTION);
         pickaxeBuilder.add(BlockContent.ITEM_PIPE_CONNECTION);
         pickaxeBuilder.add(BlockContent.SMALL_TANK_BLOCK);
+        pickaxeBuilder.add(BlockContent.SMALL_STORAGE_BLOCK);
         
         pickaxeBuilder
           .add(BlockContent.NICKEL_ORE)

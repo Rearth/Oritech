@@ -10,13 +10,16 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -26,6 +29,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.machines.storage.SmallStorageBlockEntity;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.List;
@@ -120,10 +124,34 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
                         world.spawnEntity(itemEntity);
                     }
                 }
+                
+                // drop block with nbt
+                if (state.getBlock().equals(BlockContent.SMALL_STORAGE_BLOCK)) {
+                    var stack = new ItemStack(BlockContent.SMALL_STORAGE_BLOCK.asItem());
+                    var storedAmount = storageBlock.getStorageForAddon().amount;
+                    if (storedAmount > 0) {
+                        var nbt = new NbtCompound();
+                        storageBlock.writeNbt(nbt);
+                        stack.setNbt(nbt);
+                    }
+                    if (!player.isCreative())
+                        Block.dropStack(world, pos, stack);
+                }
             }
         }
         
         return super.onBreak(world, pos, state, player);
+    }
+    
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, placer, itemStack);
+        
+        var storageEntity = (ExpandableEnergyStorageBlockEntity) world.getBlockEntity(pos);
+        var nbt = itemStack.getNbt();
+        if (nbt != null)
+            storageEntity.readNbt(nbt);
+        
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -139,6 +167,15 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
         super.appendTooltip(stack, world, tooltip, options);
+        
+        if (stack.hasNbt()) {
+            var storedEnergy = stack.getNbt().getLong("energy_stored");
+            if (storedEnergy != 0) {
+                var text = Text.literal(String.format("Stored: %d RF", storedEnergy));
+                tooltip.add(text.formatted(Formatting.GOLD));
+            }
+        }
+        
         addMachineTooltip(tooltip, this, this);
     }
     

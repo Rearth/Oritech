@@ -61,10 +61,9 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
                 var nbt = new NbtCompound();
                 tankEntity.writeNbt(nbt);
                 stack.setNbt(nbt);
-                Block.dropStack(world, pos, stack);
-            } else {
-                Block.dropStack(world, pos, stack);
             }
+            if (!player.isCreative())
+                Block.dropStack(world, pos, stack);
             
             var stacks = tankEntity.inventory.heldStacks;
             for (var heldStack : stacks) {

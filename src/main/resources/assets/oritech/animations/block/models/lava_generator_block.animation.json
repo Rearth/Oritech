@@ -26,9 +26,6 @@
 			},
 			"sound_effects": {
 				"0.0": {
-					"effect": "oritech:dynamo"
-				},
-				"0.0417": {
 					"effect": "oritech:lava_bubbles"
 				}
 			}
