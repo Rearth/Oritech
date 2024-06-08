@@ -416,6 +416,20 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:metal_sounds"
+				},
+				"0.6": {
+					"effect": "oritech:servo_noises"
+				},
+				"2.04": {
+					"effect": "oritech:cable_moving"
+				},
+				"2.36": {
+					"effect": "oritech:servo_noises"
+				}
 			}
 		},
 		"idle": {
@@ -708,6 +722,17 @@
 							"vector": [0, 720, 0]
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"0.25": {
+					"effect": "oritech:servo_noises"
+				},
+				"0.8333": {
+					"effect": "oritech:welding1"
+				},
+				"2.1667": {
+					"effect": "oritech:welding2"
 				}
 			}
 		}

@@ -418,12 +418,12 @@ public abstract class MachineBlockEntity extends BlockEntity
             } else {
                 return state.setAndContinue(PACKAGED);
             }
-        });
+        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>(this::getAnimationSpeed));
     }
     
     protected float getAnimationSpeed() {
         var recipeTicks = getRecipeDuration() * getSpeedMultiplier();
-        var animationTicks = 60f;    // 3s
+        var animationTicks = 60f;    // 3s, length which all animations are defined as
         return animationTicks / recipeTicks;
     }
     

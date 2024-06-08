@@ -1,0 +1,27 @@
+{
+  "cable_moving": {
+    "sounds": [
+      "oritech:cable_moving"
+    ]
+  },
+  "mechanical_click": {
+    "sounds": [
+      "oritech:mechanical_click"
+    ]
+  },
+  "servo_noises": {
+    "sounds": [
+      "oritech:servo_noises"
+    ]
+  },
+  "welding1": {
+    "sounds": [
+      "oritech:welding1"
+    ]
+  },
+  "welding2": {
+    "sounds": [
+      "oritech:welding2"
+    ]
+  }
+}

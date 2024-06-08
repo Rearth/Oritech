@@ -42,6 +42,8 @@ public class Oritech implements ModInitializer {
         FieldRegistrationHandler.register(BlockEntitiesContent.class, MOD_ID, false);
         Oritech.LOGGER.debug("registering screen handlers");
         FieldRegistrationHandler.register(ModScreens.class, Oritech.MOD_ID, false);
+        Oritech.LOGGER.debug("registering sounds");
+        FieldRegistrationHandler.register(SoundContent.class, Oritech.MOD_ID, false);
         Oritech.LOGGER.debug("registering others...");
         FieldRegistrationHandler.register(ToolsContent.class, MOD_ID, false);
         ToolsContent.registerEventHandlers();
