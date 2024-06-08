@@ -139,6 +139,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerLeverRecipe(exporter, BlockContent.TECH_LEVER.asItem(), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_techlever");
         // tech door
         offerDoorRecipe(exporter, BlockContent.TECH_DOOR.asItem(), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_techdoor");
+        // tech glass
+        offerMachinePlatingRecipe(exporter, BlockContent.INDUSTRIAL_GLASS_BLOCK.asItem(), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.fromTag(ConventionalItemTags.GLASS_BLOCKS), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK), 4, "_industrialglass");
     }
     
     private void addMachines(RecipeExporter exporter) {
