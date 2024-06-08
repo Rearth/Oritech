@@ -24,11 +24,15 @@
 			"rearth.oritech.OritechDataGenerator"
 		],
 		"rei_client": [
-			"rearth.oritech.init.compat.OritechREIPlugin"
+			"rearth.oritech.init.compat.rei.OritechREIPlugin"
+		],
+		"emi": [
+			"rearth.oritech.init.compat.emi.OritechEMIPlugin"
 		]
 	},
 	"mixins": [
 	],
+	"accessWidener": "oritech.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.15.9",
 		"minecraft": "~1.20.4",

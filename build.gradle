@@ -10,6 +10,10 @@ base {
     archivesName = project.archives_base_name
 }
 
+loom {
+    accessWidenerPath = file('src/main/resources/oritech.accesswidener')
+}
+
 // un-comment this to enabled oritech debug logging
 //loom {
 //    log4jConfigs.from file("log4j-dev.xml")
@@ -27,14 +31,24 @@ repositories {
         url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
     }
 
-    maven {
+    maven { // for REI
         name = 'REI'
         url "https://maven.shedaniel.me/"
     }
 
-    maven {
+    maven { // for athena
         name = 'teamresourceful'
         url "https://maven.teamresourceful.com/repository/maven-public/"
+    }
+
+    maven { // for JEI
+        name = 'modrinth'
+        url "https://modmaven.dev"
+    }
+
+    maven { // for EMI
+        name = 'TerraformersMC'
+        url 'https://maven.terraformersmc.com/'
     }
 }
 
@@ -66,12 +80,22 @@ dependencies {
     }
 
     // REI for Fabric
-    modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:${rei_version}"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin:${rei_version}"
 
+    // EMI
+    modCompileOnly "dev.emi:emi-fabric:${project.emi_version}:api"
+
     // athena (CTM)
     modRuntimeOnly "earth.terrarium.athena:athena-fabric-${minecraft_version}:${athena_version}"
+
+    // recipe viewer runtime
+    switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
+        case "emi": modRuntimeOnly "dev.emi:emi-fabric:${emi_version}"; break
+        case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"; break
+        case "disabled": break
+        default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, or disabled.")
+    }
 }
 
 processResources {

@@ -1,4 +1,4 @@
-package rearth.oritech.init.compat;
+package rearth.oritech.init.compat.rei;
 
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;

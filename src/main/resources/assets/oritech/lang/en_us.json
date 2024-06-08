@@ -82,6 +82,14 @@
   "rei.process.oritech:centrifuge_fluid": "Fluid Separation",
   "rei.process.oritech:atomic_forge": "Engraving",
 
+  "emi.category.oritech.pulverizer": "Pulverizing",
+  "emi.category.oritech.grinder": "Fragmenting",
+  "emi.category.oritech.assembler": "Assembling",
+  "emi.category.oritech.foundry": "Alloying",
+  "emi.category.oritech.centrifuge": "Centrifuging",
+  "emi.category.oritech.centrifuge_fluid": "Fluid Separation",
+  "emi.category.oritech.atomic_forge": "Engraving",
+
   "itemgroup.oritech.machines": "Oritech Machines",
   "itemgroup.oritech.components": "Oritech Components",
   "itemgroup.oritech.decorative": "Oritech Blocks",
