@@ -11,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.entity.machines.interaction.DronePortEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.init.BlockContent;
@@ -29,10 +30,20 @@ public class LaserTargetDesignator extends Item {
             return super.useOnBlock(context);
         }
         
+        var targetPos = context.getBlockPos();
+        
         var targetBlockState = context.getWorld().getBlockState(context.getBlockPos());
+        if (targetBlockState.getBlock() instanceof MachineCoreBlock && targetBlockState.get(MachineCoreBlock.USED)) {
+            // target the base instead (on laser arms)
+            var machineEntity = MachineCoreBlock.getControllerEntity(context.getWorld(), context.getBlockPos());
+            if (machineEntity instanceof LaserArmBlockEntity) {
+                targetPos = context.getBlockPos().down();
+                targetBlockState = context.getWorld().getBlockState(targetPos);
+            }
+        }
         
         if (targetBlockState.getBlock().equals(BlockContent.LASER_ARM_BLOCK)
-              && context.getWorld().getBlockEntity(context.getBlockPos()) instanceof LaserArmBlockEntity laserEntity
+              && context.getWorld().getBlockEntity(targetPos) instanceof LaserArmBlockEntity laserEntity
               && context.getStack().hasNbt()) {
             var target = BlockPos.fromLong(context.getStack().getNbt().getLong("target"));
             

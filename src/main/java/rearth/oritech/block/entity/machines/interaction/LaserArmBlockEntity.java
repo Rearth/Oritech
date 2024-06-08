@@ -245,7 +245,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     private boolean canPassThrough(BlockState state) {
-        return state.isAir() || state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || isUnfinishedAmethyst(state);
+        return state.isAir() || state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || isUnfinishedAmethyst(state) || state.isLiquid();
     }
     
     private boolean isUnfinishedAmethyst(BlockState state) {

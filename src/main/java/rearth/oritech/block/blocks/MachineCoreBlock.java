@@ -65,13 +65,13 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
     }
     
     @NotNull
-    private static BlockPos getControllerPos(World world, BlockPos pos) {
+    public static BlockPos getControllerPos(World world, BlockPos pos) {
         var coreEntity = (MachineCoreEntity) world.getBlockEntity(pos);
         return Objects.requireNonNull(coreEntity).getControllerPos();
     }
     
     @Nullable
-    private static BlockEntity getControllerEntity(World world, BlockPos pos) {
+    public static BlockEntity getControllerEntity(World world, BlockPos pos) {
         return world.getBlockEntity(getControllerPos(world, pos));
     }
     

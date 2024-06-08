@@ -50,7 +50,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         }
         
         if (laserEntity.lastRenderPosition == null) laserEntity.lastRenderPosition = targetPos;
-        targetPos = lerp(laserEntity.lastRenderPosition, targetPos, 0.05f);
+        targetPos = lerp(laserEntity.lastRenderPosition, targetPos, 0.03f);
         laserEntity.lastRenderPosition = targetPos;
         
         var targetPosOffset = targetPos.subtract(Vec3d.of(laserEntity.getPos()));

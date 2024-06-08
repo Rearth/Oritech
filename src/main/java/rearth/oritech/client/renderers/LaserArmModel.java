@@ -56,8 +56,8 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
         var data = getById(instanceId);
         
         if (data.boneX != null) {
-            var newRotY = lerp(data.angleY, (float) angleY, 0.2f);
-            var newRotX = lerp(data.angleX, (float) angleX, 0.2f);
+            var newRotY = lerp(data.angleY, (float) angleY, 0.03f);
+            var newRotX = lerp(data.angleX, (float) angleX, 0.03f);
             data.boneY.setRotY(newRotY);
             data.boneX.setRotX(newRotX);
             
