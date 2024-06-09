@@ -158,10 +158,14 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         cycleInputButton.horizontalSizing(Sizing.fixed(73));
         cycleInputButton.margins(Insets.of(3));
         
-        container.child(Components.label(Text.literal("Options")).margins(Insets.of(3, 1, 1, 1)));
+        container.child(Components.label(Text.literal("Details")).margins(Insets.of(3, 1, 1, 1)));
         
         if (handler.screenData.inputOptionsEnabled())
             container.child(cycleInputButton);
+        
+        for (var label : handler.screenData.getExtraExtensionLabels()) {
+            container.child(Components.label(label.getLeft()).tooltip(label.getRight()).margins(Insets.of(3)));
+        }
     }
     
     private FlowLayout buildOverlay() {

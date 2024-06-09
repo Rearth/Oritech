@@ -8,6 +8,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.text.Text;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -17,6 +19,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
@@ -25,16 +28,34 @@ import java.util.Objects;
 public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
     public boolean hasCropFilterAddon;
+    public int range = 1;
+    
+    // non-persistent
+    public BlockPos quarryTarget = BlockPos.ORIGIN;
+    public float targetHardness = 1f;
     
     public DestroyerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.DESTROYER_BLOCK_ENTITY, pos, state);
     }
     
     @Override
+    public void gatherAddonStats(List<AddonBlock> addons) {
+        range = 1;
+        super.gatherAddonStats(addons);
+        
+        System.out.println("range: " + range);
+    }
+    
+    @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON)) {
+        if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON))
             hasCropFilterAddon = true;
+        
+        if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON)) {
+            range *= 8;
         }
+        
+        
         super.getAdditionalStatFromAddon(addonBlock);
     }
     
@@ -42,22 +63,29 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     public void resetAddons() {
         super.resetAddons();
         hasCropFilterAddon = false;
+        range = 1;
     }
     
     @Override
     public void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
         nbt.putBoolean("cropAddon", hasCropFilterAddon);
+        nbt.putInt("range", range);
     }
     
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
         hasCropFilterAddon = nbt.getBoolean("cropAddon");
+        range = nbt.getInt("range");
     }
     
     @Override
     protected boolean hasWorkAvailable(BlockPos toolPosition) {
+        
+        if (range > 1) {
+            return hasQuarryTarget(toolPosition);
+        }
         
         var targetPosition = toolPosition.down();
         var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
@@ -70,17 +98,49 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         return !targetState.getBlock().equals(Blocks.AIR);
     }
     
+    private boolean hasQuarryTarget(BlockPos toolPosition) {
+        return getQuarryDownwardState(toolPosition) != null;
+    }
+    
+    private Pair<BlockPos, BlockState> getQuarryDownwardState(BlockPos toolPosition) {
+        for (int i = 1; i <= range; i++) {
+            var checkPos = toolPosition.down(i);
+            var targetState = world.getBlockState(checkPos);
+            if (!targetState.getBlock().equals(Blocks.AIR) && !targetState.isLiquid()) {  // pass through both air and liquid
+                quarryTarget = checkPos;
+                targetHardness = targetState.getHardness(world, checkPos);
+                syncQuarryNetworkData();
+                return new Pair<>(checkPos, targetState);
+            }
+        }
+        
+        quarryTarget = BlockPos.ORIGIN;
+        return null;
+    }
+    
     @Override
     public void finishBlockWork(BlockPos processed) {
         
         var targetPosition = processed.down();
         var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
         
+        if (range > 1) {
+            var data = getQuarryDownwardState(processed);
+            if (data == null) return;
+            targetPosition = data.getLeft();
+            targetState = data.getRight();
+        }
+        
+        // remove fluids
+        if (targetState.isLiquid()) {
+            world.setBlockState(targetPosition, Blocks.AIR.getDefaultState());
+        }
+        
         var targetHardness = targetState.getBlock().getHardness();
         if (targetHardness < 0) return;    // skip undestroyable blocks, such as bedrock
         
         // skip not grown crops
-        if (hasCropFilterAddon && targetState.getBlock() instanceof CropBlock cropBlock && !cropBlock.isMature(targetState)) {
+        if (range == 1 && hasCropFilterAddon && targetState.getBlock() instanceof CropBlock cropBlock && !cropBlock.isMature(targetState)) {
             return;
         }
         
@@ -108,8 +168,23 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     protected void doProgress(boolean moving) {
         super.doProgress(moving);
-        if (!moving && hasWorkAvailable(getCurrentTarget()))
+        
+        if (moving)
+            return;
+        
+        if (range > 1 && quarryTarget != BlockPos.ORIGIN) {
+            ParticleContent.QUARRY_DESTROY_EFFECT.spawn(world, Vec3d.ofCenter(quarryTarget).add(0, 0.5, 0), 3);
+        } else if (hasWorkAvailable(getCurrentTarget())) {
             ParticleContent.BLOCK_DESTROY_EFFECT.spawn(world, Vec3d.of(getCurrentTarget().down()), 4);
+        }
+    }
+    
+    @Override
+    public List<Pair<Text, Text>> getExtraExtensionLabels() {
+        
+        if (range == 1) return super.getExtraExtensionLabels();
+        
+        return List.of(new Pair<>(Text.literal(range + " Range"), Text.literal("Maximum digging depth")));
     }
     
     @Override
@@ -133,21 +208,21 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, 0,-2),
-          new Vec3i(-1, 0,-1),
-          new Vec3i(0, 0,2),
-          new Vec3i(-1, 0,1)
+          new Vec3i(0, 0, -2),
+          new Vec3i(-1, 0, -1),
+          new Vec3i(0, 0, 2),
+          new Vec3i(-1, 0, 1)
         );
     }
     
     @Override
     public int getMoveTime() {
-        return Oritech.CONFIG.destroyerConfig.moveDuration();
+        return (int) (Oritech.CONFIG.destroyerConfig.moveDuration() * this.getSpeedMultiplier());
     }
     
     @Override
     public int getWorkTime() {
-        return Oritech.CONFIG.destroyerConfig.workDuration();
+        return (int) (Oritech.CONFIG.destroyerConfig.workDuration() * this.getSpeedMultiplier() * Math.pow(targetHardness,  0.3f));
     }
     
     @Override
@@ -168,9 +243,19 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 0,-1),
-          new Vec3i(0, 0,1)
+          new Vec3i(0, 0, -1),
+          new Vec3i(0, 0, 1)
         );
+    }
+    
+    @Override
+    public void updateNetwork() {
+        super.updateNetwork();
+        syncQuarryNetworkData();
+    }
+    
+    private void syncQuarryNetworkData() {
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.QuarryTargetPacket(pos, quarryTarget, range, getBaseAddonData().speed()));
     }
     
     @Override

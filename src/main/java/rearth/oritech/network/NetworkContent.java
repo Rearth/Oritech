@@ -13,10 +13,7 @@ import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
-import rearth.oritech.block.entity.machines.interaction.DeepDrillEntity;
-import rearth.oritech.block.entity.machines.interaction.DronePortEntity;
-import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
-import rearth.oritech.block.entity.machines.interaction.PumpBlockEntity;
+import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -55,6 +52,9 @@ public class NetworkContent {
     public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget,
                                              BlockPos areaMin, BlockPos areaMax) {
     }   // times are in ticks
+    
+    public record QuarryTargetPacket(BlockPos position, BlockPos quarryTarget, int range, float operationSpeed) {
+    }
     
     public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress) {
     }
@@ -237,6 +237,20 @@ public class NetworkContent {
                 machine.setMoveStartedAt(access.player().getWorld().getTime());
                 machine.setAreaMin(message.areaMin);
                 machine.setAreaMax(message.areaMax);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(QuarryTargetPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            if (entity instanceof DestroyerBlockEntity machine) {
+                machine.quarryTarget = message.quarryTarget;
+                machine.range = message.range;
+                
+                var oldData = machine.getBaseAddonData();
+                var newData = new MachineAddonController.BaseAddonData(message.operationSpeed, oldData.efficiency(), oldData.energyBonusCapacity(), oldData.energyBonusTransfer());
+                machine.setBaseAddonData(newData);
             }
             
         }));

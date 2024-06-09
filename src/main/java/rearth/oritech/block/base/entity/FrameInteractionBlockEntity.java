@@ -202,7 +202,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         
         if (!canProgress()) return;
         
-        if (!moving && currentProgress >= getWorkTime() * getSpeedMultiplier() && moveBlock()) {
+        if (!moving && currentProgress >= getWorkTime() && moveBlock()) {
             // if another machine occupies this position in the frame, we wait for it to move (with a timeout to avoid fully blocking everything)
             currentProgress = 0;
             finishBlockWork(lastTarget);
@@ -210,7 +210,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
             moving = true;
             updateNetwork();
             this.markDirty();
-        } else if (moving && currentProgress >= getMoveTime() * getSpeedMultiplier()) {
+        } else if (moving && currentProgress >= getMoveTime()) {
             moving = false;
             currentProgress = 0;
             

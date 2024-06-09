@@ -11,8 +11,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
 import rearth.oritech.block.base.block.FrameInteractionBlock;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
+import rearth.oritech.block.entity.machines.interaction.DestroyerBlockEntity;
 import rearth.oritech.init.BlockContent;
 
 public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteractionBlockEntity> {
@@ -58,7 +61,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
           entity.getWorld(),
           matrices,
           vertexConsumers.getBuffer(RenderLayers.getBlockLayer(entity.getMachineHead())),
-          false,
+          true,
           random);
         
         matrices.pop();
@@ -100,6 +103,65 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
               0
             );
             
+            matrices.pop();
+        }
+        
+        if (entity instanceof DestroyerBlockEntity destroyerBlock && destroyerBlock.range > 1) {
+            
+            var beamHeight = pos.getY() - destroyerBlock.quarryTarget.getY() - 1.3f;
+            
+            var beamInner = BlockContent.QUARRY_BEAM_INNER.getDefaultState();
+            var beamFrame = BlockContent.QUARRY_BEAM_TARGET.getDefaultState();
+            var beamRing = BlockContent.QUARRY_BEAM_RING.getDefaultState();
+            
+            var offset = targetOffset.add(0, -1, 0);
+            
+            matrices.push();
+            matrices.translate(offset.getX(), offset.getY() - beamHeight + 1, offset.getZ());
+            matrices.scale(1, beamHeight, 1);
+            
+            // outer beam
+            MinecraftClient.getInstance().getBlockRenderManager().renderBlock(
+              beamFrame,
+              pos,
+              entity.getWorld(),
+              matrices,
+              vertexConsumers.getBuffer(RenderLayers.getBlockLayer(beamFrame)),
+              true,
+              random);
+            
+            matrices.translate(0.5, 0, 0.5);
+            var rotation = new Quaternionf(new AxisAngle4f((entity.getWorld().getTime() / 3f) % 360, 0, 1, 0));
+            matrices.multiply(rotation);
+            matrices.translate(-0.5, 0, -0.5);
+            
+            // inner beam
+            MinecraftClient.getInstance().getBlockRenderManager().renderBlock(
+              beamInner,
+              pos,
+              entity.getWorld(),
+              matrices,
+              vertexConsumers.getBuffer(RenderLayers.getBlockLayer(beamInner)),
+              true,
+              random);
+            
+            matrices.pop();
+            
+            // beam ring
+            matrices.push();
+            var ringHeight = Math.sin((entity.getWorld().getTime() + tickDelta) / 4f);
+            var heightOffset = beamHeight * 0.5 * ringHeight + beamHeight * 0.5;
+            matrices.translate(offset.getX(), offset.getY() - heightOffset + 1, offset.getZ());
+            
+            // outer beam
+            MinecraftClient.getInstance().getBlockRenderManager().renderBlock(
+              beamRing,
+              pos,
+              entity.getWorld(),
+              matrices,
+              vertexConsumers.getBuffer(RenderLayers.getBlockLayer(beamRing)),
+              true,
+              random);
             matrices.pop();
         }
     }

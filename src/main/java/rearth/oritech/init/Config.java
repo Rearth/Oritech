@@ -18,7 +18,7 @@ public class Config {
     @Nest
     public DeepDrillConfig deepDrillConfig = new DeepDrillConfig();
     @Nest
-    public MachineFrameData destroyerConfig = new MachineFrameData(20, 40, 8, 128);
+    public MachineFrameData destroyerConfig = new MachineFrameData(15, 40, 8, 128);
     @Nest
     public FertilizerConfig fertilizerConfig = new FertilizerConfig();
     @Nest

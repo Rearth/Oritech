@@ -61,6 +61,12 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block BLOCK_FERTILIZER_HEAD = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
     @NoBlockItem
     public static final Block PUMP_TRUNK_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    @NoBlockItem
+    public static final Block QUARRY_BEAM_INNER = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque().luminance(5));
+    @NoBlockItem
+    public static final Block QUARRY_BEAM_RING = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque().luminance(5));
+    @NoBlockItem
+    public static final Block QUARRY_BEAM_TARGET = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
     
     @NoBlockItem
     public static final Block ADDON_INDICATOR_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS));
@@ -123,6 +129,7 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block MACHINE_FLUID_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
     public static final Block MACHINE_YIELD_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
     public static final Block CROP_FILTER_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
+    public static final Block QUARRY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
     public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 0.9f, true);
     public static final Block MACHINE_CAPACITOR_ADDON = new EnergyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 2_000_000, 1000, false, true);
     public static final Block MACHINE_ACCEPTOR_ADDON = new EnergyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 500_000, 2000, true, true);

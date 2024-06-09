@@ -4,13 +4,17 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.Direction;
 import rearth.oritech.Oritech;
 
 import java.util.List;
 
 public interface ScreenProvider {
+    
+    default List<Pair<Text, Text>> getExtraExtensionLabels() {return List.of();}
     
     record GuiSlot (int index, int x, int y) {}
 
