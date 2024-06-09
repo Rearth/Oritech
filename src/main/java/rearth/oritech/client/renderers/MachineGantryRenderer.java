@@ -121,14 +121,14 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
             matrices.scale(1, beamHeight, 1);
             
             // outer beam
-            MinecraftClient.getInstance().getBlockRenderManager().renderBlock(
-              beamFrame,
-              pos,
-              entity.getWorld(),
-              matrices,
-              vertexConsumers.getBuffer(RenderLayers.getBlockLayer(beamFrame)),
-              true,
-              random);
+//            MinecraftClient.getInstance().getBlockRenderManager().renderBlock(
+//              beamFrame,
+//              pos,
+//              entity.getWorld(),
+//              matrices,
+//              vertexConsumers.getBuffer(RenderLayers.getBlockLayer(beamFrame)),
+//              true,
+//              random);
             
             matrices.translate(0.5, 0, 0.5);
             var rotation = new Quaternionf(new AxisAngle4f((entity.getWorld().getTime() / 3f) % 360, 0, 1, 0));
