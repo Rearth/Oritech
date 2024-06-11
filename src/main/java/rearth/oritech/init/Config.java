@@ -39,6 +39,10 @@ public class Config {
     public float fluidPipeInternalStorageBuckets = 2f;
     public long energyPipeTransferRate = 10_000;
     
+    @SectionHeader("worldGeneration")
+    public boolean generateOres = true;
+    public boolean easyFindFeatures = true;
+    
     @SectionHeader("clientSettings")
     @Sync(Option.SyncMode.NONE)
     @RestartRequired

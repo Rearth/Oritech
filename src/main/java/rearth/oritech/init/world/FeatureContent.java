@@ -50,20 +50,22 @@ public class FeatureContent {
           RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "resource_node_other")));
         
         // ores
-        BiomeModifications.addFeature(
-          BiomeSelectors.foundInOverworld(),
-          GenerationStep.Feature.UNDERGROUND_ORES,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "ore_nickel")));
-        
-        BiomeModifications.addFeature(
-          BiomeSelectors.foundInOverworld(),
-          GenerationStep.Feature.UNDERGROUND_ORES,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "ore_platinum")));
-        
-        BiomeModifications.addFeature(
-          BiomeSelectors.foundInTheEnd(),
-          GenerationStep.Feature.UNDERGROUND_ORES,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "ore_platinum_end")));
+        if (Oritech.CONFIG.generateOres()) {
+            BiomeModifications.addFeature(
+              BiomeSelectors.foundInOverworld(),
+              GenerationStep.Feature.UNDERGROUND_ORES,
+              RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "ore_nickel")));
+            
+            BiomeModifications.addFeature(
+              BiomeSelectors.foundInOverworld(),
+              GenerationStep.Feature.UNDERGROUND_ORES,
+              RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "ore_platinum")));
+            
+            BiomeModifications.addFeature(
+              BiomeSelectors.foundInTheEnd(),
+              GenerationStep.Feature.UNDERGROUND_ORES,
+              RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "ore_platinum_end")));
+        }
     }
     
 }

@@ -7,6 +7,7 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.util.FeatureContext;
+import rearth.oritech.Oritech;
 
 public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
     public OilSpringFeature(Codec<OilSpringFeatureConfig> configCodec) {
@@ -69,8 +70,10 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
         }
         
         // fountain up
-        for (int i = 0; i < height; i++) {
-            world.setBlockState(surfacePos.up(i), state, 0x10);
+        if (Oritech.CONFIG.easyFindFeatures()) {
+            for (int i = 0; i < height; i++) {
+                world.setBlockState(surfacePos.up(i), state, 0x10);
+            }
         }
         
         // down

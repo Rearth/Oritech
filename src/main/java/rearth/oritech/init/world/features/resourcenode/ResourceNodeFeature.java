@@ -46,7 +46,8 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
             
             if (testState.isIn(BlockTags.DIRT) || testState.isIn(BlockTags.SAND)) {
                 if (world.getBlockState(testPos.up()).isOf(Blocks.AIR)) {
-                    placeSurfaceBoulder(testPos, context);
+                    if (Oritech.CONFIG.easyFindFeatures())
+                        placeSurfaceBoulder(testPos, context);
                     placeBedrockNode(deepNodePos, context);
                     Oritech.LOGGER.debug("placing resource node at " + testPos + " with deep " + deepNodePos);
                     return true;
