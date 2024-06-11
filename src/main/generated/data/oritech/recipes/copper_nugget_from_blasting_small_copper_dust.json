@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 150,
+  "experience": 0.5,
+  "group": "oritech",
+  "ingredient": {
+    "item": "oritech:small_copper_dust"
+  },
+  "result": "oritech:copper_nugget"
+}

@@ -320,6 +320,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // basic smelting for nickel + platinum
         offerSmelting(exporter, List.of(ItemContent.RAW_NICKEL), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 0.5f, 300, "nickelsmelting");
         offerSmelting(exporter, List.of(ItemContent.RAW_PLATINUM), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 0.5f, 300, "platinumsmelting");
+        offerBlasting(exporter, List.of(ItemContent.RAW_NICKEL), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 0.5f, 150, "nickelblasting");
+        offerBlasting(exporter, List.of(ItemContent.RAW_PLATINUM), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 0.5f, 150, "platinumblasting");
         
         // iron chain
         addMetalProcessingChain(exporter,
@@ -478,8 +480,10 @@ public class RecipeGenerator extends FabricRecipeProvider {
     private void addDustRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, Item ingotSmelted, String suffix) {
         addPulverizerRecipe(exporter, ingot, dust, suffix);
         addGrinderRecipe(exporter, ingot, dust, suffix);
-        if (ingotSmelted != null)
+        if (ingotSmelted != null) {
             RecipeProvider.offerSmelting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 0.5f, 300, Oritech.MOD_ID);
+            RecipeProvider.offerBlasting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 0.5f, 150, Oritech.MOD_ID);
+        }
     }
     
     
@@ -605,6 +609,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // smelting/compacting
         RecipeProvider.offerSmelting(exporter, List.of(dust), RecipeCategory.MISC, ingot, 0.5f, 300, Oritech.MOD_ID);
         RecipeProvider.offerSmelting(exporter, List.of(smallDust), RecipeCategory.MISC, nugget, 0.5f, 300, Oritech.MOD_ID);
+        RecipeProvider.offerBlasting(exporter, List.of(dust), RecipeCategory.MISC, ingot, 0.5f, 150, Oritech.MOD_ID);
+        RecipeProvider.offerBlasting(exporter, List.of(smallDust), RecipeCategory.MISC, nugget, 0.5f, 150, Oritech.MOD_ID);
         RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, clump, smallClump);
         RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, dust, smallDust);
         RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, ingot, nugget);

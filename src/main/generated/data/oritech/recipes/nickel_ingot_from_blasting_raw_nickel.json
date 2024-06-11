@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 150,
+  "experience": 0.5,
+  "group": "nickelblasting",
+  "ingredient": {
+    "item": "oritech:raw_nickel"
+  },
+  "result": "oritech:nickel_ingot"
+}

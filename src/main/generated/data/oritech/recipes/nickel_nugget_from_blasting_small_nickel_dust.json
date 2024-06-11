@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 150,
+  "experience": 0.5,
+  "group": "oritech",
+  "ingredient": {
+    "item": "oritech:small_nickel_dust"
+  },
+  "result": "oritech:nickel_nugget"
+}
