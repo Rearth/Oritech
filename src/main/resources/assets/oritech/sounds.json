@@ -14,6 +14,11 @@
       "oritech:servo_noises"
     ]
   },
+  "press": {
+    "sounds": [
+      "oritech:press"
+    ]
+  },
   "welding1": {
     "sounds": [
       "oritech:welding1"

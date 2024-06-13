@@ -24,6 +24,7 @@ public class SoundContent implements AutoRegistryContainer<SoundEvent> {
     public static final SoundEvent QUADCOPTER_TAKEOFF = SoundEvent.of(new Identifier(Oritech.MOD_ID, "quadcopter_takeoff"));
     public static final SoundEvent SIZZLING_SOUND = SoundEvent.of(new Identifier(Oritech.MOD_ID, "sizzling_sound"));
     public static final SoundEvent SQUISH = SoundEvent.of(new Identifier(Oritech.MOD_ID, "squish"));
+    public static final SoundEvent PRESS = SoundEvent.of(new Identifier(Oritech.MOD_ID, "press"));
     
     @Override
     public Registry<SoundEvent> getRegistry() {

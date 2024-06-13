@@ -9,6 +9,7 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
@@ -21,8 +22,10 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.decorative.TechDoorBlockEntity;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.SoundContent;
 
 import java.util.Objects;
 
@@ -67,6 +70,8 @@ public class TechDoorBlock extends HorizontalFacingBlock implements BlockEntityP
         var aboveState = world.getBlockState(pos.up());
         
         if (!aboveState.getBlock().equals(BlockContent.TECH_DOOR_HINGE)) return;
+        
+        world.playSound(null, pos, SoundContent.PRESS, SoundCategory.BLOCKS, Oritech.CONFIG.machineVolumeMultiplier() * 0.18f, 1.3f);
         
         world.setBlockState(pos, state.with(OPENED, isPowered));
         world.setBlockState(pos.up(), aboveState.with(OPENED, isPowered));
