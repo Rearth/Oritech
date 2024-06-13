@@ -1,0 +1,18 @@
+{
+  "type": "oritech:foundry",
+  "ingredients": [
+    {
+      "item": "minecraft:gold_ingot"
+    },
+    {
+      "item": "minecraft:netherite_scrap"
+    }
+  ],
+  "results": [
+    {
+      "Count": 1,
+      "id": "minecraft:netherite_ingot"
+    }
+  ],
+  "time": 300
+}

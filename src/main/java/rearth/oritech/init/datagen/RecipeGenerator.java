@@ -66,6 +66,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addCentrifugeRecipe(exporter, Ingredient.ofItems(Items.SCULK), ItemContent.ENDERIC_COMPOUND, 4f, "_endericsculk");
         // budding amethyst (amethyst shard x2, enderic compound, overcharged crystal)
         addAssemblerRecipe(exporter, Ingredient.ofItems(Items.AMETHYST_SHARD), Ingredient.ofItems(Items.AMETHYST_SHARD), Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), Ingredient.ofItems(ItemContent.OVERCHARGED_CRYSTAL), Items.BUDDING_AMETHYST, 1f, "_assembleramethystbud");
+        // netherite alloying (yes this is pretty OP)
+        addAlloyRecipe(exporter, Items.GOLD_INGOT, Items.NETHERITE_SCRAP, Items.NETHERITE_INGOT, "_netheritealloying");
     }
     
     private void addDeepDrillOres(RecipeExporter exporter) {
