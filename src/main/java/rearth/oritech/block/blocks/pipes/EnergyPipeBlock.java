@@ -3,14 +3,22 @@ package rearth.oritech.block.blocks.pipes;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.item.TooltipContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class EnergyPipeBlock extends GenericPipeBlock {
     
@@ -48,5 +56,12 @@ public class EnergyPipeBlock extends GenericPipeBlock {
     @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
         return ENERGY_PIPE_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
+        var text = Text.literal("Max Transfer Rate: ").formatted(Formatting.GRAY).append(Text.literal(Oritech.CONFIG.energyPipeTransferRate() + " RF/t").formatted(Formatting.GOLD));
+        tooltip.add(text);
+        super.appendTooltip(stack, world, tooltip, options);
     }
 }
