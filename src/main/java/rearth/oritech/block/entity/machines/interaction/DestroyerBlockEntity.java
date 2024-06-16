@@ -217,7 +217,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
     @Override
     public int getMoveTime() {
-        return (int) (Oritech.CONFIG.destroyerConfig.moveDuration() * this.getSpeedMultiplier());
+        return Math.max((int) (Oritech.CONFIG.destroyerConfig.moveDuration() * this.getSpeedMultiplier()), 1);
     }
     
     @Override
