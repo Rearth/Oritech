@@ -69,6 +69,10 @@ dependencies {
     // modImplementation "io.wispforest:owo-lib:${project.owo_version}"
     modImplementation "io.wispforest:lavender:${project.lavender_version}"
     include "io.wispforest:owo-sentinel:${project.owo_version}"
+    include api("io.wispforest:endec:${project.endec_version}")
+    include api("io.wispforest.endec:netty:${project.endec_version}")
+    include api("io.wispforest.endec:gson:${project.endec_version}")
+    include api("io.wispforest.endec:jankson:${project.endec_version}")
     annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_version}")
 
     // gecko lib
