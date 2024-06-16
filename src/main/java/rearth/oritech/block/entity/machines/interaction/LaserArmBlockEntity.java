@@ -91,7 +91,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     private final List<BlockPos> openSlots = new ArrayList<>();
     private float coreQuality = 1f;
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
-    public int areaSize = 2;
+    public int areaSize = 1;
     
     // config
     private final int range = Oritech.CONFIG.laserArmConfig.range();
@@ -322,11 +322,8 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     private void updateNetwork() {
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, currentTarget, lastFiredAt, areaSize));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
         networkDirty = false;
-    }
-    
-    public void testTarget(BlockState state) {
-        Oritech.LOGGER.debug("hello world");
     }
     
     public boolean setTargetFromDesignator(BlockPos targetPos) {
@@ -358,7 +355,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         if (alsoSetDirection) {
             this.targetDirection = targetPos;
             pendingArea = null;
-            updateNetwork();
+            networkDirty = true;
         }
         this.markDirty();
         
@@ -373,6 +370,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         writeAddonToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
         nbt.putBoolean("redstone", redstonePowered);
+        nbt.putInt("areaSize", areaSize);
         
         if (targetDirection != null && currentTarget != null) {
             nbt.putLong("target_position", currentTarget.asLong());
@@ -400,6 +398,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         energyStorage.amount = nbt.getLong("energy_stored");
         targetDirection = BlockPos.fromLong(nbt.getLong("target_direction"));
         currentTarget = BlockPos.fromLong(nbt.getLong("target_position"));
+        areaSize = nbt.getInt("areaSize");
         
         if (nbt.contains("pendingPositions")) {
             pendingArea = Arrays.stream(nbt.getLongArray("pendingPositions")).mapToObj(BlockPos::fromLong).collect(Collectors.toCollection(ArrayDeque::new));

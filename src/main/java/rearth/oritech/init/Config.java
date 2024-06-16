@@ -91,10 +91,10 @@ public class Config {
     
     public static class LaserArmConfig {
         public long energyCapacity = 20000;
-        public long maxEnergyInsertion = 128;
+        public long maxEnergyInsertion = 512;
         public long energyPerTick = 128;
         public int blockBreakEnergyBase = 1024; // multiplied by block hardness
-        public int range = 64;
+        public int range = 128;
     }
     
     public static class DeepDrillConfig {

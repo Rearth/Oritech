@@ -95,7 +95,6 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
             }
             
             laserArm.initAddons();
-            laserArm.testTarget(state);
             
             var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
             player.openHandledScreen(handler);
