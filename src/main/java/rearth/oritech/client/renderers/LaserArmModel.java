@@ -18,7 +18,7 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
     private static final HashMap<Long, ModelRenderData> additionalData = new HashMap<>();
     
     public LaserArmModel(String subpath) {
-        super(new Identifier(Oritech.MOD_ID, subpath));
+        super(Oritech.id(subpath));
     }
     
     private ModelRenderData getById(long id) {

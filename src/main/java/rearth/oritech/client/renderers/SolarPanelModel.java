@@ -21,7 +21,7 @@ public class SolarPanelModel<T extends BigSolarPanelEntity & GeoAnimatable> exte
     }
     
     public SolarPanelModel(String subpath) {
-        super(new Identifier(Oritech.MOD_ID, subpath));
+        super(Oritech.id(subpath));
     }
     
     @Override

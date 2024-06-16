@@ -1,11 +1,12 @@
 package rearth.oritech.init.recipes;
 
-import io.wispforest.owo.serialization.Endec;
-import io.wispforest.owo.serialization.StructEndec;
-import io.wispforest.owo.serialization.endec.BuiltInEndecs;
-import io.wispforest.owo.serialization.endec.StructEndecBuilder;
+import io.wispforest.endec.Endec;
+import io.wispforest.endec.StructEndec;
+import io.wispforest.endec.impl.StructEndecBuilder;
+import io.wispforest.owo.serialization.CodecUtils;
+import io.wispforest.owo.serialization.EndecRecipeSerializer;
+import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import io.wispforest.owo.serialization.format.nbt.NbtEndec;
-import io.wispforest.owo.serialization.util.EndecRecipeSerializer;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeType;
@@ -19,9 +20,9 @@ public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> impl
     
     public static final Endec<OritechRecipe> ORI_RECIPE_ENDEC = StructEndecBuilder.of(
       Endec.INT.optionalFieldOf("time", OritechRecipe::getTime, 60),
-      Endec.ofCodec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
-      BuiltInEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
-      BuiltInEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
+      CodecUtils.toEndec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
+      MinecraftEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
+      MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
       FLUID_STACK_ENDEC.optionalFieldOf("fluidInput", OritechRecipe::getFluidInput, (FluidStack) null),
       FLUID_STACK_ENDEC.optionalFieldOf("fluidOutput", OritechRecipe::getFluidOutput, (FluidStack) null),
       OritechRecipe::new

@@ -64,14 +64,14 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, registryLookup);
         nbt.put("fluidVariant", fluidStorage.variant.toNbt());
         nbt.putLong("fluidAmount", fluidStorage.amount);
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         fluidStorage.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
         fluidStorage.amount = nbt.getLong("fluidAmount");
     }

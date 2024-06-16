@@ -82,7 +82,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, registryLookup);
         nbt.putBoolean("initialized", initialized);
         nbt.put("fluidVariant", fluidStorage.variant.toNbt());
         nbt.putLong("amount", fluidStorage.amount);
@@ -93,8 +93,8 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         initialized = nbt.getBoolean("initialized");
         fluidStorage.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
         fluidStorage.amount = nbt.getLong("amount");

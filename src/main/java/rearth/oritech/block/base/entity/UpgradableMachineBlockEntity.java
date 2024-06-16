@@ -6,13 +6,14 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.util.DynamicEnergyStorage;
 import rearth.oritech.util.MachineAddonController;
@@ -32,14 +33,14 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     }
     
     @Override
-    public void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
         writeAddonToNbt(nbt);
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         loadAddonNbtData(nbt);
         
         updateEnergyContainer();
@@ -86,12 +87,10 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
         this.addonData = data;
         this.markDirty();
     }
-
+    
     @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        super.writeScreenOpeningData(player, buf);
-        buf.write(ADDON_UI_ENDEC, getUiData());
-        buf.writeFloat(getCoreQuality());
+    public Object getScreenOpeningData(ServerPlayerEntity player) {
+        return new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
     }
 
     @Nullable

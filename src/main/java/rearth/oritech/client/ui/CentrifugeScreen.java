@@ -28,7 +28,7 @@ public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHa
     private BoxComponent inFluidFillStatusOverlay;
     
     private static final ScreenProvider.BarConfiguration inputConfig = new ScreenProvider.BarConfiguration(28, 6, 21, 74);
-    public static final Identifier BUCKET_SLOT = new Identifier(Oritech.MOD_ID, "textures/gui/modular/bucket_indicator.png");
+    public static final Identifier BUCKET_SLOT = Oritech.id("textures/gui/modular/bucket_indicator.png");
     
     public CentrifugeScreen(CentrifugeScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);

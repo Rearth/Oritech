@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -162,27 +163,27 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     }
     
     @Override
-    public void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
         nbt.putInt("storedBurn", currentMaxBurnTime);
         
         var resList = new NbtList();
         for (var stack : pendingOutputs) {
-            var data = stack.writeNbt(new NbtCompound());
+            var data = stack.encode(registryLookup);
             resList.add(data);
         }
         nbt.put("pendingResults", resList);
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         currentMaxBurnTime = nbt.getInt("currentMaxBurnTime");
         
         var storedResults = nbt.getList("pendingResults", NbtElement.COMPOUND_TYPE);
         for (var elem : storedResults) {
             var compound = (NbtCompound) elem;
-            var stack = ItemStack.fromNbt(compound);
+            var stack = ItemStack.fromNbt(registryLookup, compound).get();
             pendingOutputs.add(stack);
         }
     }

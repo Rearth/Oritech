@@ -9,6 +9,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
@@ -91,17 +92,15 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
-    public void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
-        nbt.put("fluidVariant", inputTank.variant.toNbt());
-        nbt.putLong("fluidAmount", inputTank.amount);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
+        SingleVariantStorage.writeNbt(inputTank, FluidVariant.CODEC, nbt, registryLookup);
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        inputTank.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
-        inputTank.amount = nbt.getLong("fluidAmount");
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+        SingleVariantStorage.readNbt(inputTank, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
     }
     
     @Override

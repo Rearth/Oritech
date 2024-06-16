@@ -25,8 +25,8 @@ import java.util.Map;
 
 public class NetworkContent {
     
-    public static final OwoNetChannel MACHINE_CHANNEL = OwoNetChannel.create(new Identifier(Oritech.MOD_ID, "machine_data"));
-    public static final OwoNetChannel UI_CHANNEL = OwoNetChannel.create(new Identifier(Oritech.MOD_ID, "ui_interactions"));
+    public static final OwoNetChannel MACHINE_CHANNEL = OwoNetChannel.create(Oritech.id("machine_data"));
+    public static final OwoNetChannel UI_CHANNEL = OwoNetChannel.create(Oritech.id("ui_interactions"));
     
     // Server -> Client
     public record MachineSyncPacket(BlockPos position, long energy, long maxEnergy, long maxInsert, int progress,

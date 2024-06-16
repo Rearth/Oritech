@@ -32,15 +32,15 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
     
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, registryLookup);
         nbt.putInt("controller_x", controllerPos.getX());
         nbt.putInt("controller_y", controllerPos.getY());
         nbt.putInt("controller_z", controllerPos.getZ());
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         controllerPos = new BlockPos(nbt.getInt("controller_x"), nbt.getInt("controller_y"), nbt.getInt("controller_z"));
     }
 }

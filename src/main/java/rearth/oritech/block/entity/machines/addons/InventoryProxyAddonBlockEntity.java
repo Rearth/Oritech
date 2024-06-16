@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -14,7 +15,6 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.InventoryProxyScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -92,13 +92,13 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, registryLookup);
         nbt.putInt("target_slot", targetSlot);
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         targetSlot = nbt.getInt("target_slot");
     }
 }

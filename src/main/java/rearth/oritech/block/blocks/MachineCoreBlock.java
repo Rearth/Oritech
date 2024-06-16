@@ -75,7 +75,7 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
         if (!state.get(USED)) return ActionResult.PASS;
         

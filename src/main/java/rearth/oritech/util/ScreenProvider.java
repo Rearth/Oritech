@@ -56,8 +56,8 @@ public interface ScreenProvider {
     
     default ArrowConfiguration getIndicatorConfiguration() {
         return new ArrowConfiguration(
-                new Identifier(Oritech.MOD_ID, "textures/gui/modular/arrow_empty.png"),
-                new Identifier(Oritech.MOD_ID, "textures/gui/modular/arrow_full.png"),
+                Oritech.id("textures/gui/modular/arrow_empty.png"),
+                Oritech.id("textures/gui/modular/arrow_full.png"),
                 80, 35, 29, 16, true);
     }
 

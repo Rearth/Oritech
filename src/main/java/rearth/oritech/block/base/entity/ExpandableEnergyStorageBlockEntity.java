@@ -11,11 +11,11 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -148,21 +148,21 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     }
     
     @Override
-    public void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
         writeAddonToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
-        nbt.put("inventory", inventory.toNbtList());
+        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putBoolean("redstone", redstonePowered);
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         loadAddonNbtData(nbt);
         updateEnergyContainer();
         energyStorage.amount = nbt.getLong("energy_stored");
-        inventory.readNbtList(nbt.getList("inventory", NbtElement.COMPOUND_TYPE));
+        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
         redstonePowered = nbt.getBoolean("redstone");
     }
     
@@ -237,11 +237,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     public abstract long getDefaultExtractionRate();
     
     @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        buf.writeBlockPos(this.getPos());
-        buf.write(ADDON_UI_ENDEC, getUiData());
-        buf.writeFloat(getCoreQuality());
-        sendNetworkEntry();
+    public Object getScreenOpeningData(ServerPlayerEntity player) {
+        return new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
     }
     
     @Override

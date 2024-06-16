@@ -14,9 +14,10 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.Properties;
@@ -26,16 +27,17 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -238,7 +240,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     protected Optional<RecipeEntry<OritechRecipe>> getRecipe() {
-        return Objects.requireNonNull(world).getRecipeManager().getFirstMatch(getOwnRecipeType(), getInputInventory(), world);
+        return world.getRecipeManager().getFirstMatch(getOwnRecipeType(), getInputInventory(), world);
     }
     
     protected abstract OritechRecipeType getOwnRecipeType();
@@ -255,8 +257,8 @@ public abstract class MachineBlockEntity extends BlockEntity
         return this.inventory.heldStacks.subList(slots.outputStart(), slots.outputStart() + slots.outputCount());
     }
     
-    protected Inventory getInputInventory() {
-        return new SimpleInventory(getInputView().toArray(ItemStack[]::new));
+    protected RecipeInput getInputInventory() {
+        return new SimpleCraftingInventory(getInputView().toArray(ItemStack[]::new));
     }
     
     protected Inventory getOutputInventory() {
@@ -264,20 +266,17 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     @Override
-    public void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false);
-        // nbt.put("inventory", inventory.toNbtList());
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        
+        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putInt("oritech.machine_progress", progress);
         nbt.putLong("oritech.machine_energy", energyStorage.amount);
         nbt.putShort("oritech.machine_input_mode", (short) inventoryInputMode.ordinal());
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        // inventory.readNbtList(nbt.getList("inventory", NbtElement.COMPOUND_TYPE));
-        Inventories.readNbt(nbt, inventory.heldStacks);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
         progress = nbt.getInt("oritech.machine_progress");
         energyStorage.amount = nbt.getLong("oritech.machine_energy");
         inventoryInputMode = InventoryInputMode.values()[nbt.getShort("oritech.machine_input_mode")];
@@ -435,9 +434,9 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        buf.writeBlockPos(this.getPos());
+    public Object getScreenOpeningData(ServerPlayerEntity player) {
         sendNetworkEntry();
+        return new ModScreens.BasicData(pos);
     }
     
     protected Direction getFacing() {

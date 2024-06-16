@@ -6,11 +6,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -18,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.network.NetworkContent;
@@ -76,9 +77,9 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        inventory.readNbtList(nbt.getList("inventory", NbtElement.COMPOUND_TYPE));
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
         energyStorage.amount = nbt.getLong("energy_stored");
         
         loadAddonNbtData(nbt);
@@ -86,9 +87,9 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
-        nbt.put("inventory", inventory.toNbtList());
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
+        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putLong("energy_stored", energyStorage.amount);
         writeAddonToNbt(nbt);
     }
@@ -115,10 +116,8 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        buf.writeBlockPos(this.getPos());
-        buf.write(ADDON_UI_ENDEC, getUiData());
-        buf.writeFloat(getCoreQuality());
+    public Object getScreenOpeningData(ServerPlayerEntity player) {
+        return new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
     }
     
     @Nullable

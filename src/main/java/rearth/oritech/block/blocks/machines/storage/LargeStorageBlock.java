@@ -46,7 +46,7 @@ public class LargeStorageBlock extends SmallStorageBlock {
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
         if (!world.isClient) {
             
@@ -77,7 +77,7 @@ public class LargeStorageBlock extends SmallStorageBlock {
             
         }
         
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player, hit);
     }
     
     @Override

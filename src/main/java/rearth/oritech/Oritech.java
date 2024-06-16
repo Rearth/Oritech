@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rearth.oritech.block.blocks.pipes.EnergyPipeBlock;
@@ -26,6 +27,10 @@ public class Oritech implements ModInitializer {
     public static final String MOD_ID = "oritech";
     public static final Logger LOGGER = LoggerFactory.getLogger("oritech");
     public static final OritechConfig CONFIG = OritechConfig.createAndLoad();
+    
+    public static Identifier id(String path) {
+        return Identifier.of(MOD_ID, path);
+    }
     
     @Override
     public void onInitialize() {

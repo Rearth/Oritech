@@ -7,6 +7,6 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 public class PromethiumToolRenderer extends GeoItemRenderer<PromethiumPickaxeItem> {
     public PromethiumToolRenderer(String modelName) {
-        super(new PromethiumToolModel(new Identifier(Oritech.MOD_ID, "models/" + modelName)));
+        super(new PromethiumToolModel(Oritech.id("models/" + modelName)));
     }
 }

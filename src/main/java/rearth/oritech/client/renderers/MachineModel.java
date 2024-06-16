@@ -8,7 +8,7 @@ import software.bernie.geckolib.model.DefaultedBlockGeoModel;
 
 public class MachineModel<T extends BlockEntity & GeoAnimatable> extends DefaultedBlockGeoModel<T> {
     public MachineModel(String subpath) {
-        super(new Identifier(Oritech.MOD_ID, subpath));
+        super(Oritech.id(subpath));
     }
     
 }

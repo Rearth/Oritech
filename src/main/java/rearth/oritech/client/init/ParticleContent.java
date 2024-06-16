@@ -12,7 +12,7 @@ import rearth.oritech.Oritech;
 
 public class ParticleContent {
     
-    public static final ParticleSystemController PARTICLE_CONTROLLER = new ParticleSystemController(new Identifier(Oritech.MOD_ID, "particles"));
+    public static final ParticleSystemController PARTICLE_CONTROLLER = new ParticleSystemController(Oritech.id("particles"));
     public static final ParticleSystem<Void> HIGHLIGHT_BLOCK = PARTICLE_CONTROLLER.register(Void.class, (world, pos, data) -> {
         spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, pos, 1, 120, 6);
         ClientParticles.reset();

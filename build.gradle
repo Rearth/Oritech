@@ -23,7 +23,7 @@ repositories {
 
     maven {
         name = 'Owo'
-        url 'https://maven.wispforest.io'
+        url 'https://maven.wispforest.io/releases/'
     }
 
     maven {
@@ -62,17 +62,16 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+    // guava
+    implementation("com.google.guava:guava:33.2.1-jre")
+
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     // owo lib
-    // modImplementation "io.wispforest:owo-lib:${project.owo_version}"
+    modImplementation "io.wispforest:owo-lib:${project.owo_version}"
     modImplementation "io.wispforest:lavender:${project.lavender_version}"
     include "io.wispforest:owo-sentinel:${project.owo_version}"
-    include api("io.wispforest:endec:${project.endec_version}")
-    include api("io.wispforest.endec:netty:${project.endec_version}")
-    include api("io.wispforest.endec:gson:${project.endec_version}")
-    include api("io.wispforest.endec:jankson:${project.endec_version}")
     annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_version}")
 
     // gecko lib
@@ -111,7 +110,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 17
+    it.options.release = 21
 }
 
 tasks.withType(AbstractCopyTask).configureEach {
@@ -124,8 +123,8 @@ java {
     // If you remove this line, sources will not be generated.
     withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {

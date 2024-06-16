@@ -152,8 +152,8 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     }
     
     @Override
-    public void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
         Inventories.writeNbt(nbt, inventory.heldStacks, false);
         addMultiblockToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
@@ -163,8 +163,8 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         Inventories.readNbt(nbt, inventory.heldStacks);
         loadMultiblockNbtData(nbt);
         energyStorage.amount = nbt.getLong("energy_stored");

@@ -29,7 +29,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
     
     private static final float rotationSpeed = 0.2f;
     
-    private static final Identifier MACHINE_CORE_CENTER = new Identifier(Oritech.MOD_ID, "textures/gui/modular/machine_core/center.png");
+    private static final Identifier MACHINE_CORE_CENTER = Oritech.id("textures/gui/modular/machine_core/center.png");
     
     public UpgradableMachineScreen(S handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -103,7 +103,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
     }
     
     private Identifier getRingIdentifier(int level) {
-        return new Identifier(Oritech.MOD_ID, "textures/gui/modular/machine_core/ring_" + level + ".png");
+        return Oritech.id("textures/gui/modular/machine_core/ring_" + level + ".png");
     }
     
     public void addMachinePreview(FlowLayout sidePanel) {

@@ -51,10 +51,10 @@ public class ItemGroups {
 
         Oritech.LOGGER.debug("Registering Oritech item groups");
 
-        Registry.register(Registries.ITEM_GROUP, new Identifier(Oritech.MOD_ID, "machines"), MACHINE_GROUP);
-        Registry.register(Registries.ITEM_GROUP, new Identifier(Oritech.MOD_ID, "components"), COMPONENT_GROUP);
-        Registry.register(Registries.ITEM_GROUP, new Identifier(Oritech.MOD_ID, "equipment"), EQUIPMENT_GROUP);
-        Registry.register(Registries.ITEM_GROUP, new Identifier(Oritech.MOD_ID, "decorative"), DECORATIVE_GROUP);
+        Registry.register(Registries.ITEM_GROUP, Oritech.id("machines"), MACHINE_GROUP);
+        Registry.register(Registries.ITEM_GROUP, Oritech.id("components"), COMPONENT_GROUP);
+        Registry.register(Registries.ITEM_GROUP, Oritech.id("equipment"), EQUIPMENT_GROUP);
+        Registry.register(Registries.ITEM_GROUP, Oritech.id("decorative"), DECORATIVE_GROUP);
     }
 
 }

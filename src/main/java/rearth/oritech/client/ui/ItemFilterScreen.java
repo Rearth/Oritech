@@ -194,8 +194,8 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         
         var displayStack = new ItemStack(heldItem.getItem(), 1);
         
-        if (heldItem.getNbt() != null)
-            displayStack.setNbt(heldItem.getNbt());
+        if (heldItem.getComponents() != null)
+            displayStack.applyComponentsFrom(heldItem.getComponents());
         
         var itemComponent = Components.item(displayStack);
         itemComponent.positioning(Positioning.absolute(1, 1));

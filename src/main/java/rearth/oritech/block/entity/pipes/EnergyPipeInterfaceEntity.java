@@ -31,13 +31,13 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, registryLookup);
         nbt.putLong("energy", energyStorage.getAmount());
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         energyStorage.amount = nbt.getLong("energy");
     }
     

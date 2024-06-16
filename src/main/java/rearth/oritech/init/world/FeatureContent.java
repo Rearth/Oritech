@@ -21,50 +21,50 @@ public class FeatureContent {
     public static final ResourceNodeFeature RESOURCE_NODE_FEATURE = new ResourceNodeFeature(ResourceNodeFeatureConfig.NODE_FEATURE_ENDEC.codec());
     
     public static void initialize() {
-        Registry.register(Registries.FEATURE, new Identifier(Oritech.MOD_ID, "oil_spring"), OIL_SPRING_FEATURE);
-        Registry.register(Registries.FEATURE, new Identifier(Oritech.MOD_ID, "resource_node"), RESOURCE_NODE_FEATURE);
+        Registry.register(Registries.FEATURE, Oritech.id("oil_spring"), OIL_SPRING_FEATURE);
+        Registry.register(Registries.FEATURE, Oritech.id("resource_node"), RESOURCE_NODE_FEATURE);
         
         BiomeModifications.addFeature(
           BiomeSelectors.foundInOverworld(),
           GenerationStep.Feature.LAKES,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "oil_spring")));
+          RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("oil_spring")));
         
         BiomeModifications.addFeature(
           BiomeSelectors.tag(BiomeTags.VILLAGE_DESERT_HAS_STRUCTURE),
           GenerationStep.Feature.LAKES,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "oil_spring_desert")));
+          RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("oil_spring_desert")));
         
         BiomeModifications.addFeature(
           BiomeSelectors.foundInOverworld(),
           GenerationStep.Feature.TOP_LAYER_MODIFICATION,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "resource_node_common")));
+          RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("resource_node_common")));
         
         BiomeModifications.addFeature(
           BiomeSelectors.foundInOverworld(),
           GenerationStep.Feature.TOP_LAYER_MODIFICATION,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "resource_node_rare")));
+          RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("resource_node_rare")));
         
         BiomeModifications.addFeature(
           BiomeSelectors.foundInOverworld(),
           GenerationStep.Feature.TOP_LAYER_MODIFICATION,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "resource_node_other")));
+          RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("resource_node_other")));
         
         // ores
         if (Oritech.CONFIG.generateOres()) {
             BiomeModifications.addFeature(
               BiomeSelectors.foundInOverworld(),
               GenerationStep.Feature.UNDERGROUND_ORES,
-              RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "ore_nickel")));
+              RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_nickel")));
             
             BiomeModifications.addFeature(
               BiomeSelectors.foundInOverworld(),
               GenerationStep.Feature.UNDERGROUND_ORES,
-              RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "ore_platinum")));
+              RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_platinum")));
             
             BiomeModifications.addFeature(
               BiomeSelectors.foundInTheEnd(),
               GenerationStep.Feature.UNDERGROUND_ORES,
-              RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(Oritech.MOD_ID, "ore_platinum_end")));
+              RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_platinum_end")));
         }
     }
     

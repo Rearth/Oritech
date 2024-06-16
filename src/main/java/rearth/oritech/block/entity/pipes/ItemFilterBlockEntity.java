@@ -47,7 +47,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
     
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, registryLookup);
         Inventories.writeNbt(nbt, inventory.heldStacks, false);
         nbt.putBoolean("whitelist", filterSettings.useWhitelist);
         nbt.putBoolean("useNbt", filterSettings.useNbt);
@@ -65,8 +65,8 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         Inventories.readNbt(nbt, inventory.heldStacks);
         
         var whiteList = nbt.getBoolean("whitelist");

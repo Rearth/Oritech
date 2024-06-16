@@ -7,9 +7,9 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 import rearth.oritech.Oritech;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.keyframe.event.SoundKeyframeEvent;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.keyframe.event.SoundKeyframeEvent;
 
 import java.util.function.Supplier;
 
@@ -33,7 +33,7 @@ public class AutoPlayingSoundKeyframeHandler<A extends GeoAnimatable> implements
     @Override
     public void handle(SoundKeyframeEvent<A> event) {
         var segments = event.getKeyframeData().getSound().split("\\|");
-        var sound = Registries.SOUND_EVENT.get(new Identifier(segments[0]));
+        var sound = Registries.SOUND_EVENT.get(Oritech.id(segments[0]));
         
         if (sound != null) {
             var entity = (BlockEntity) event.getAnimatable();
@@ -57,4 +57,5 @@ public class AutoPlayingSoundKeyframeHandler<A extends GeoAnimatable> implements
     private float getPitchRandomMultiplier(Random random) {
         return random.nextFloat() * 0.15f + 1;
     }
+    
 }

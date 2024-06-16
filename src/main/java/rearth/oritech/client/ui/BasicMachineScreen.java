@@ -29,9 +29,9 @@ import java.util.List;
 public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends BaseOwoHandledScreen<FlowLayout, S> {
     
     
-    public static final Identifier BACKGROUND = new Identifier(Oritech.MOD_ID, "textures/gui/modular/gui_base.png");
-    public static final Identifier ITEM_SLOT = new Identifier(Oritech.MOD_ID, "textures/gui/modular/itemslot.png");
-    public static final Identifier GUI_COMPONENTS = new Identifier(Oritech.MOD_ID, "textures/gui/modular/machine_gui_components.png");
+    public static final Identifier BACKGROUND = Oritech.id("textures/gui/modular/gui_base.png");
+    public static final Identifier ITEM_SLOT = Oritech.id("textures/gui/modular/itemslot.png");
+    public static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
     public FlowLayout root;
     private TextureComponent progress_indicator;
     private TextureComponent energyIndicator;
@@ -215,7 +215,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         var container = handler.fluidProvider.getForDirectFluidAccess();
         var data = handler.screenData.getFluidConfiguration();
-
+        
         if (fluidBackground.getSprite() == null && !container.isResourceBlank() && container.amount > 0) {
             var parent = fluidBackground.parent();
             var targetIndex = parent.children().indexOf(fluidBackground);
@@ -224,14 +224,14 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             ((FlowLayout) parent).child(targetIndex, newFluid);
             fluidBackground = newFluid;
         }
-
+        
         var fill = 1 - ((float) container.getAmount() / container.getCapacity());
-
+        
         var targetFill = LaserArmModel.lerp(lastFluidFill, fill, 0.15f);
         lastFluidFill = targetFill;
-
+        
         fluidFillStatusOverlay.verticalSizing(Sizing.fixed((int) (data.height() * targetFill * 0.98f)));
-
+        
         var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(container.getResource()).get(0)), Text.of((container.getAmount() * 1000 / FluidConstants.BUCKET) + " mb"));
         fluidBackground.tooltip(tooltipText);
     }
@@ -357,18 +357,17 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             this.drawTexturedQuad(sprite.getAtlasId(), matrices, x, x + width, y, y + height, z, sprite.getMinU(), newMax, sprite.getMinV(), sprite.getMaxV(), red, green, blue, alpha);
         }
         
-        // direct copy of the method in drawContext, because I can't be called from here due to private access
+        // direct copy of the method in drawContext, because it can't be called from here due to private access
         private void drawTexturedQuad(Identifier texture, MatrixStack matrices, int x1, int x2, int y1, int y2, int z, float u1, float u2, float v1, float v2, float red, float green, float blue, float alpha) {
             RenderSystem.setShaderTexture(0, texture);
-            RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
+            RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
             RenderSystem.enableBlend();
             Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-            BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
-            bufferBuilder.vertex(matrix4f, x1, y1, z).color(red, green, blue, alpha).texture(u1, v1).next();
-            bufferBuilder.vertex(matrix4f, x1, y2, z).color(red, green, blue, alpha).texture(u1, v2).next();
-            bufferBuilder.vertex(matrix4f, x2, y2, z).color(red, green, blue, alpha).texture(u2, v2).next();
-            bufferBuilder.vertex(matrix4f, x2, y1, z).color(red, green, blue, alpha).texture(u2, v1).next();
+            BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+            bufferBuilder.vertex(matrix4f, (float) x1, (float) y1, (float) z).texture(u1, v1).color(red, green, blue, alpha);
+            bufferBuilder.vertex(matrix4f, (float) x1, (float) y2, (float) z).texture(u1, v2).color(red, green, blue, alpha);
+            bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, (float) z).texture(u2, v2).color(red, green, blue, alpha);
+            bufferBuilder.vertex(matrix4f, (float) x2, (float) y1, (float) z).texture(u2, v1).color(red, green, blue, alpha);
             BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             RenderSystem.disableBlend();
         }

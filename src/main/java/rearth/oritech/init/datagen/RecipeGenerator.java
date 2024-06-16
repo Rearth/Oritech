@@ -497,7 +497,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         var grinderDefaultSpeed = 200;
         
         var grinder = new OritechRecipe(grinderDefaultSpeed, List.of(ingot), List.of(new ItemStack(dust, dustCount)), RecipeContent.GRINDER, null, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "grinderdust" + suffix), grinder, null);
+        exporter.accept(Oritech.id("grinderdust" + suffix), grinder, null);
     }
     
     
@@ -509,7 +509,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         var pulverizerDefaultSpeed = 300;
         
         var pulverizer = new OritechRecipe(pulverizerDefaultSpeed, List.of(ingot), List.of(new ItemStack(dust, dustCount)), RecipeContent.PULVERIZER, null, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "pulverizerdust" + suffix), pulverizer, null);
+        exporter.accept(Oritech.id("pulverizerdust" + suffix), pulverizer, null);
     }
     
     private void addAssemblerRecipe(RecipeExporter exporter, Ingredient A, Ingredient B, Ingredient C, Ingredient D, Item result, float timeMultiplier, String suffix) {
@@ -525,7 +525,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         if (C != null) inputs.add(C);
         if (D != null) inputs.add(D);
         var entry = new OritechRecipe(speed, inputs, List.of(new ItemStack(result, count)), RecipeContent.ASSEMBLER, null, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "assembler" + suffix), entry, null);
+        exporter.accept(Oritech.id("assembler" + suffix), entry, null);
     }
     
     private void addCentrifugeRecipe(RecipeExporter exporter, Ingredient input, Item result, float timeMultiplier, String suffix) {
@@ -535,7 +535,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         var defaultSpeed = 300;
         var speed = (int) (defaultSpeed * timeMultiplier);
         var entry = new OritechRecipe(speed, List.of(input), List.of(new ItemStack(result, count)), RecipeContent.CENTRIFUGE, null, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "centrifuge" + suffix), entry, null);
+        exporter.accept(Oritech.id("centrifuge" + suffix), entry, null);
     }
     
     private void addCentrifugeFluidRecipe(RecipeExporter exporter, Ingredient input, Item result, Fluid in, float bucketsIn, Fluid out, float bucketsOut, float timeMultiplier, String suffix) {
@@ -545,7 +545,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         var outputStack = out != null ? new FluidStack(out, (long) (bucketsOut * 81000)) : null;
         List<ItemStack> outputItem = result != null ? List.of(new ItemStack(result)) : List.of();
         var entry = new OritechRecipe(speed, List.of(input), outputItem, RecipeContent.CENTRIFUGE_FLUID, inputStack, outputStack);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "centrifugefluid" + suffix), entry, null);
+        exporter.accept(Oritech.id("centrifugefluid" + suffix), entry, null);
     }
     
     private void addAlloyRecipe(RecipeExporter exporter, Item A, Item B, Item result, String suffix) {
@@ -556,36 +556,36 @@ public class RecipeGenerator extends FabricRecipeProvider {
         var foundryDefaultSpeed = 300;
         
         var entry = new OritechRecipe(foundryDefaultSpeed, List.of(A, B), List.of(new ItemStack(result)), RecipeContent.FOUNDRY, null, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "foundryalloy" + suffix), entry, null);
+        exporter.accept(Oritech.id("foundryalloy" + suffix), entry, null);
         
         var entryInverse = new OritechRecipe(foundryDefaultSpeed, List.of(B, A), List.of(new ItemStack(result)), RecipeContent.FOUNDRY, null, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "foundryalloyinv" + suffix), entryInverse, null);
+        exporter.accept(Oritech.id("foundryalloyinv" + suffix), entryInverse, null);
     }
     
     // A is inserted twice, surrounding B
     private void addAtomicForgeRecipe(RecipeExporter exporter, Ingredient A, Ingredient B, Item result, int time, String suffix) {
         var entry = new OritechRecipe(time, List.of(A, B, A), List.of(new ItemStack(result)), RecipeContent.ATOMIC_FORGE, null, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "atomicforge" + suffix), entry, null);
+        exporter.accept(Oritech.id("atomicforge" + suffix), entry, null);
     }
     
     private void addDeepDrillRecipe(RecipeExporter exporter, Block input, Item result, int time, String suffix) {
         var entry = new OritechRecipe(time, List.of(Ingredient.ofItems(input.asItem())), List.of(new ItemStack(result)), RecipeContent.DEEP_DRILL, null, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "deepdrill" + suffix), entry, null);
+        exporter.accept(Oritech.id("deepdrill" + suffix), entry, null);
     }
     
     private void addBioGenRecipe(RecipeExporter exporter, Ingredient A, int timeInSeconds, String suffix) {
         var entry = new OritechRecipe(timeInSeconds * 20, List.of(A), List.of(), RecipeContent.BIO_GENERATOR, null, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "biogen" + suffix), entry, null);
+        exporter.accept(Oritech.id("biogen" + suffix), entry, null);
     }
     
     private void addFuelGenRecipe(RecipeExporter exporter, FluidStack input, int timeInSeconds, String suffix) {
         var entry = new OritechRecipe(timeInSeconds * 20, List.of(), List.of(), RecipeContent.FUEL_GENERATOR, input, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "fuelgen" + suffix), entry, null);
+        exporter.accept(Oritech.id("fuelgen" + suffix), entry, null);
     }
     
     private void addLavaGen(RecipeExporter exporter, FluidStack input, int timeInSeconds, String suffix) {
         var entry = new OritechRecipe(timeInSeconds * 20, List.of(), List.of(), RecipeContent.LAVA_GENERATOR, input, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "lavagen" + suffix), entry, null);
+        exporter.accept(Oritech.id("lavagen" + suffix), entry, null);
     }
     
     private void addMetalProcessingChain(RecipeExporter exporter, Ingredient oreInput, Ingredient rawOre, Item rawMain, Item rawSecondary, Item clump, Item smallClump,
@@ -618,14 +618,14 @@ public class RecipeGenerator extends FabricRecipeProvider {
         RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, ingot, nugget);
         
         // registration
-        exporter.accept(new Identifier(Oritech.MOD_ID, "pulverizerore" + suffix), pulverizerOre, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "grinderore" + suffix), grinderOre, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "pulverizerraw" + suffix), pulverizerRaw, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "grinderraw" + suffix), grinderRaw, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "centrifugeclumpdry" + suffix), centrifugeClumpDry, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "centrifugeclumpwet" + suffix), centrifugeClumpWet, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "atomicforgedust" + suffix), atomicForgeDust, null);
-        exporter.accept(new Identifier(Oritech.MOD_ID, "foundrygem" + suffix), foundryGem, null);
+        exporter.accept(Oritech.id("pulverizerore" + suffix), pulverizerOre, null);
+        exporter.accept(Oritech.id("grinderore" + suffix), grinderOre, null);
+        exporter.accept(Oritech.id("pulverizerraw" + suffix), pulverizerRaw, null);
+        exporter.accept(Oritech.id("grinderraw" + suffix), grinderRaw, null);
+        exporter.accept(Oritech.id("centrifugeclumpdry" + suffix), centrifugeClumpDry, null);
+        exporter.accept(Oritech.id("centrifugeclumpwet" + suffix), centrifugeClumpWet, null);
+        exporter.accept(Oritech.id("atomicforgedust" + suffix), atomicForgeDust, null);
+        exporter.accept(Oritech.id("foundrygem" + suffix), foundryGem, null);
         
     }
     

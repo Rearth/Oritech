@@ -52,14 +52,14 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, registryLookup);
         addMultiblockToNbt(nbt);
         nbt.putBoolean("folded", isFolded);
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         loadMultiblockNbtData(nbt);
         isFolded = nbt.getBoolean("folded");
     }

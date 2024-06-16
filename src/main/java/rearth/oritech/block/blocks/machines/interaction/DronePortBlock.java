@@ -54,7 +54,7 @@ public class DronePortBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
         if (!world.isClient) {
             
@@ -136,7 +136,7 @@ public class DronePortBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         super.appendTooltip(stack, world, tooltip, options);
         addMachineTooltip(tooltip, this, this);
     }

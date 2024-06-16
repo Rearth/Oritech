@@ -36,7 +36,7 @@ public class OritechGeoItem extends BlockItem implements GeoItem {
             @Override
             public BuiltinModelItemRenderer getCustomRenderer() {
                 if (this.renderer == null)
-                    this.renderer = new GeoItemRenderer<>(new DefaultedBlockGeoModel<>(new Identifier(Oritech.MOD_ID, "models/" + name)));
+                    this.renderer = new GeoItemRenderer<>(new DefaultedBlockGeoModel<>(Oritech.id("models/" + name)));
                 
                 this.renderer.withScale(scale);
                 

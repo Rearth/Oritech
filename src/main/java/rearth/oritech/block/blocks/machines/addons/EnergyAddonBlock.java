@@ -2,13 +2,12 @@ package rearth.oritech.block.blocks.machines.addons;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.addons.EnergyAcceptorAddonBlockEntity;
 import rearth.oritech.util.TooltipHelper;
 
@@ -45,7 +44,7 @@ public class EnergyAddonBlock extends MachineAddonBlock {
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         
         var showExtra = Screen.hasControlDown();
         
@@ -62,7 +61,7 @@ public class EnergyAddonBlock extends MachineAddonBlock {
             }
         }
         
-        super.appendTooltip(stack, world, tooltip, options);
+        super.appendTooltip(stack, context, tooltip, options);
         
     }
 }

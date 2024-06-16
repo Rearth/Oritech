@@ -104,7 +104,7 @@ public class TechDoorBlock extends HorizontalFacingBlock implements BlockEntityP
         var belowState = world.getBlockState(pos.down());
         var aboveState = world.getBlockState(pos.up());
         var belowValid = belowState.isSideSolidFullSquare(world, pos.down(), Direction.UP);
-        var aboveValid = aboveState.isOf(Blocks.AIR) || aboveState.isIn(TagKey.of(RegistryKeys.BLOCK, new Identifier("minecraft", "replaceable")));
+        var aboveValid = aboveState.isOf(Blocks.AIR) || aboveState.isIn(TagKey.of(RegistryKeys.BLOCK, Identifier.of("minecraft", "replaceable")));
         return belowValid && aboveValid;
     }
     

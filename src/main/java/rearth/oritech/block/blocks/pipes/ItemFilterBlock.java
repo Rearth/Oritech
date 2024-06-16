@@ -59,7 +59,7 @@ public class ItemFilterBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
         if (!world.isClient) {
             var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);

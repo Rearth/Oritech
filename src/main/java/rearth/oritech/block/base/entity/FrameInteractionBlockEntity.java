@@ -7,6 +7,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
@@ -252,8 +253,8 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     public abstract void finishBlockWork(BlockPos processed);
     
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
         if (getCachedState().get(FrameInteractionBlock.HAS_FRAME)) {
             nbt.putLong("areaMin", areaMin.asLong());
             nbt.putLong("areaMax", areaMax.asLong());
@@ -265,8 +266,8 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         if (getCachedState().get(FrameInteractionBlock.HAS_FRAME)) {
             areaMin = BlockPos.fromLong(nbt.getLong("areaMin"));
             areaMax = BlockPos.fromLong(nbt.getLong("areaMax"));

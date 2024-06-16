@@ -24,7 +24,7 @@ public class InventoryProxyAddonBlock extends MachineAddonBlock {
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
         if (!world.isClient && state.get(ADDON_USED)) {
             var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);

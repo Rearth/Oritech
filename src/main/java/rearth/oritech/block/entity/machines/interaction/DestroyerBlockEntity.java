@@ -65,15 +65,15 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     }
     
     @Override
-    public void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
         nbt.putBoolean("cropAddon", hasCropFilterAddon);
         nbt.putInt("range", range);
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         hasCropFilterAddon = nbt.getBoolean("cropAddon");
         range = nbt.getInt("range");
     }

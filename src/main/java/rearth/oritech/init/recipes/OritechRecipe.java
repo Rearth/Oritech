@@ -1,13 +1,13 @@
 package rearth.oritech.init.recipes;
 
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +15,7 @@ import rearth.oritech.util.FluidStack;
 
 import java.util.List;
 
-public class OritechRecipe implements Recipe<Inventory> {
+public class OritechRecipe implements Recipe<RecipeInput> {
     
     private final OritechRecipeType type;
     private final List<Ingredient> inputs;
@@ -36,37 +36,37 @@ public class OritechRecipe implements Recipe<Inventory> {
         this.fluidInput = fluidInput;
         this.fluidOutput = fluidOutput;
     }
-
+    
     @Override
-    public boolean matches(Inventory machineInv, World world) {
-
+    public boolean matches(RecipeInput input, World world) {
+        
         if (world.isClient) return false;
-
-        if (machineInv.size() < inputs.size()) return false;
-
+        
+        if (input.getSize() < inputs.size()) return false;
+        
         var ingredients = getInputs();
         for (int i = 0; i < ingredients.size(); i++) {
             var entry = ingredients.get(i);
-            if (!entry.test(machineInv.getStack(i))) {
+            if (!entry.test(input.getStackInSlot(i))) {
                 return false;
             }
         }
-
+        
         return true;
-
     }
+    
     @Override
-    public ItemStack craft(Inventory inventory, DynamicRegistryManager registryManager) {
-        return ItemStack.EMPTY;
+    public ItemStack craft(RecipeInput input, RegistryWrapper.WrapperLookup lookup) {
+        return null;
     }
-
+    
     @Override
     public boolean fits(int width, int height) {
         return true;
     }
-
+    
     @Override
-    public ItemStack getResult(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(RegistryWrapper.WrapperLookup registriesLookup) {
         return ItemStack.EMPTY;
     }
 

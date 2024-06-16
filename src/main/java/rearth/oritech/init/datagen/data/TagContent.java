@@ -35,10 +35,10 @@ public class TagContent {
     public static final TagKey<Item> PLATINUM_ORES = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "platinum_ores"));
     
     // biomass
-    public static final TagKey<Item> BIOMASS = TagKey.of(RegistryKeys.ITEM, new Identifier(Oritech.MOD_ID, "biomass"));
+    public static final TagKey<Item> BIOMASS = TagKey.of(RegistryKeys.ITEM, Oritech.id("biomass"));
     
     // blocks
-    public static final TagKey<Block> DRILL_MINEABLE = TagKey.of(RegistryKeys.BLOCK, new Identifier(Oritech.MOD_ID, "mineable/drill"));
-    public static final TagKey<Block> RESOURCE_NODES = TagKey.of(RegistryKeys.BLOCK, new Identifier(Oritech.MOD_ID, "resource_nodes"));
+    public static final TagKey<Block> DRILL_MINEABLE = TagKey.of(RegistryKeys.BLOCK, Oritech.id("mineable/drill"));
+    public static final TagKey<Block> RESOURCE_NODES = TagKey.of(RegistryKeys.BLOCK, Oritech.id("resource_nodes"));
     
 }

@@ -49,7 +49,7 @@ public class PumpBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         super.appendTooltip(stack, world, tooltip, options);
         addMachineTooltip(tooltip, this, this);
     }

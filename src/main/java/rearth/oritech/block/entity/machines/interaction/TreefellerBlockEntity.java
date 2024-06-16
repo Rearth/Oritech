@@ -217,15 +217,15 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     }
     
     @Override
-    public void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
         Inventories.writeNbt(nbt, inventory.heldStacks, false);
         nbt.putLong("energy_stored", energyStorage.amount);
     }
     
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
         Inventories.readNbt(nbt, inventory.heldStacks);
         energyStorage.amount = nbt.getLong("energy_stored");
     }

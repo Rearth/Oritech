@@ -38,7 +38,7 @@ public class ItemPipeConnectionBlock extends GenericPipeConnectionBlock {
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
         if (world.isClient) return ActionResult.SUCCESS;
         

@@ -8,6 +8,6 @@ import software.bernie.geckolib.renderer.GeoArmorRenderer;
 
 public class ExosuitArmorRenderer extends GeoArmorRenderer<ExoArmorItem> {
     public ExosuitArmorRenderer() {
-        super(new DefaultedEntityGeoModel<>(new Identifier(Oritech.MOD_ID, "armor/exo_armor")));
+        super(new DefaultedEntityGeoModel<>(Oritech.id("armor/exo_armor")));
     }
 }
