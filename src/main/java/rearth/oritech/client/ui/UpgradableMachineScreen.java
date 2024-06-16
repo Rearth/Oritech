@@ -146,7 +146,8 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             var addonBlock = handler.worldAccess.getBlockState(addonBlockPos);
             var addonBlockEntity = handler.worldAccess.getBlockEntity(addonBlockPos);
             
-            var relativePos = MultiblockMachineEntity.worldToRelativePos(handler.blockPos, addonBlockPos, handler.machineBlock.get(handler.screenData.getBlockFacingProperty()));
+            var facing  = handler.machineBlock.get(handler.screenData.getBlockFacingProperty());
+            var relativePos = MultiblockMachineEntity.worldToRelativePos(handler.blockPos, addonBlockPos, facing);
             
             holoPreviewContainer.child(
               new BlockPreviewComponent(addonBlock, addonBlockEntity, relativePos, rotationSpeed)

@@ -20,7 +20,7 @@
   "tooltip.oritech.addon_acceptor_desc": "Acts as energy proxy",
   "tooltip.oritech.addon_crop_desc": "Applicable to block destroyer. Skips non-grown crops",
   "tooltip.oritech.addon_proxy_desc": "Allows access to specific inventory slots",
-  "tooltip.oritech.addon_quarry_desc": "Applicable to block destroyer. Multiplies range by 8",
+  "tooltip.oritech.addon_quarry_desc": "Applicable to block destroyer and Enderic Laser. Increases working area size",
   "tooltip.oritech.addon_capacity_desc": "Energy Capacity ",
   "tooltip.oritech.addon_transfer_desc": "Energy Transfer Rate ",
   "tooltip.oritech.addon_extender_desc": "Allows additional addons to be connected",

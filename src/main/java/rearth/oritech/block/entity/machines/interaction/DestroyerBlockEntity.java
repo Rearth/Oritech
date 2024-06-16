@@ -42,8 +42,6 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     public void gatherAddonStats(List<AddonBlock> addons) {
         range = 1;
         super.gatherAddonStats(addons);
-        
-        System.out.println("range: " + range);
     }
     
     @Override

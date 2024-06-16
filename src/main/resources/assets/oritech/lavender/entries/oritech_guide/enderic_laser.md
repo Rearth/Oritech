@@ -50,4 +50,6 @@ The laser ignores all input and output limits, and can fill the energy storage o
 
 **More details**
 
-The laser beam will target any block, but it passes through glass (and not-grown amethysts).
+The laser beam will target any block, but it passes through glass (and not-grown amethysts). Quarry addons will increase the width of the excavated area.
+
+The laser itself only has 1 addon slot available at the bottom. Addons will only affect the speed and efficiency of block breaking, energy transfer can only benefit from speed upgrades.

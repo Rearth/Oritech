@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.machines.interaction;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
@@ -9,23 +10,36 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.BuddingAmethystBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.state.property.Property;
+import net.minecraft.text.Text;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.processing.AtomicForgeBlockEntity;
+import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ItemContent;
@@ -38,13 +52,12 @@ import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
-public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyProvider, MultiblockMachineController, MachineAddonController, InventoryProvider {
+public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyProvider, ScreenProvider, ExtendedScreenHandlerFactory, MultiblockMachineController, MachineAddonController, InventoryProvider {
     
     private static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
     
@@ -78,6 +91,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     private final List<BlockPos> openSlots = new ArrayList<>();
     private float coreQuality = 1f;
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
+    public int areaSize = 2;
     
     // config
     private final int range = Oritech.CONFIG.laserArmConfig.range();
@@ -90,6 +104,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     private int targetBlockEnergyNeeded = BLOCK_BREAK_ENERGY;
     private boolean networkDirty;
     private boolean redstonePowered;
+    private ArrayDeque<BlockPos> pendingArea;
     
     // needed only on client
     public Vec3d lastRenderPosition;
@@ -106,8 +121,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         var targetBlock = currentTarget;
         var targetBlockState = world.getBlockState(targetBlock);
         var targetBlockEntity = world.getBlockEntity(targetBlock);
-        var storageCandidate = EnergyStorage.SIDED.find(world, targetBlock, targetBlockState, targetBlockEntity, null);
         
+        
+        var storageCandidate = EnergyStorage.SIDED.find(world, targetBlock, targetBlockState, targetBlockEntity, null);
         if (targetBlockEntity instanceof AtomicForgeBlockEntity atomicForgeEntity) {
             storageCandidate = atomicForgeEntity.getEnergyStorage();
         } else if (targetBlockEntity instanceof DeepDrillEntity deepDrillEntity) {
@@ -194,15 +210,45 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     private void findNextBlockBreakTarget() {
         
+        if (pendingArea != null && !pendingArea.isEmpty()) {
+            trySetNewTarget(pendingArea.pop(), false);
+            if (pendingArea.isEmpty()) pendingArea = null;
+            return;
+        }
+        
         var direction = Vec3d.of(targetDirection.subtract(pos.up())).normalize();
         var from = Vec3d.of(pos.up()).add(0.5, 0.55, 0.5).add(direction.multiply(1.5));
         
         var nextBlock = basicRaycast(from, direction, range);
+        if (nextBlock == null) return;
         
-        if (nextBlock != null) {
-            trySetNewTarget(nextBlock, false);
+        var maxSize = (int) from.distanceTo(nextBlock.toCenterPos()) - 1;
+        var scanDist = Math.min(areaSize, maxSize);
+        if (scanDist > 1)
+            pendingArea = findNextAreaBlockTarget(nextBlock, scanDist);
+        
+        
+        trySetNewTarget(nextBlock, false);
+        
+    }
+    
+    // returns the first block in an X*X*X cube, from the outside in
+    private ArrayDeque<BlockPos> findNextAreaBlockTarget(BlockPos center, int scanDist) {
+        
+        var targets = new ArrayList<BlockPos>();
+        
+        for (int x = -scanDist; x < scanDist; x++) {
+            for (int y = -scanDist; y < scanDist; y++) {
+                for (int z = -scanDist; z < scanDist; z++) {
+                    var pos = center.add(x, y, z);
+                    if (!canPassThrough(world.getBlockState(pos)) && !center.equals(pos))
+                        targets.add(pos);
+                }
+            }
         }
         
+        targets.sort(Comparator.comparingInt(pos::getManhattanDistance));
+        return new ArrayDeque<>(targets);
     }
     
     private BlockPos basicRaycast(Vec3d from, Vec3d direction, int range) {
@@ -248,16 +294,34 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         return state.isAir() || state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || isUnfinishedAmethyst(state) || state.isLiquid();
     }
     
+    @Override
+    public void gatherAddonStats(List<AddonBlock> addons) {
+        
+        areaSize = 1;
+        
+        MachineAddonController.super.gatherAddonStats(addons);
+    }
+    
+    @Override
+    public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
+        MachineAddonController.super.getAdditionalStatFromAddon(addonBlock);
+        
+        if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON)) {
+            areaSize++;
+        }
+        
+    }
+    
     private boolean isUnfinishedAmethyst(BlockState state) {
         return state.isOf(Blocks.SMALL_AMETHYST_BUD) || state.isOf(Blocks.MEDIUM_AMETHYST_BUD) || state.isOf(Blocks.LARGE_AMETHYST_BUD);
     }
     
     private int energyRequiredToFire() {
-        return (int) Oritech.CONFIG.laserArmConfig.energyPerTick();
+        return (int) (Oritech.CONFIG.laserArmConfig.energyPerTick() * (1 / addonData.speed()));
     }
     
     private void updateNetwork() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, currentTarget, lastFiredAt));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, currentTarget, lastFiredAt, areaSize));
         networkDirty = false;
     }
     
@@ -288,11 +352,12 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             return false;
         }
         
-        this.targetBlockEnergyNeeded = (int) (BLOCK_BREAK_ENERGY * Math.sqrt(blockHardness));
+        this.targetBlockEnergyNeeded = (int) (BLOCK_BREAK_ENERGY * Math.sqrt(blockHardness) *  addonData.efficiency());
         this.currentTarget = targetPos;
         
         if (alsoSetDirection) {
             this.targetDirection = targetPos;
+            pendingArea = null;
             updateNetwork();
         }
         this.markDirty();
@@ -313,6 +378,13 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             nbt.putLong("target_position", currentTarget.asLong());
             nbt.putLong("target_direction", targetDirection.asLong());
         }
+        
+        if (pendingArea != null && !pendingArea.isEmpty()) {
+            var positions = pendingArea.stream().mapToLong(BlockPos::asLong).toArray();
+            nbt.putLongArray("pendingPositions", positions);
+        } else {
+            nbt.remove("pendingPositions");
+        }
     }
     
     @Override
@@ -328,6 +400,10 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         energyStorage.amount = nbt.getLong("energy_stored");
         targetDirection = BlockPos.fromLong(nbt.getLong("target_direction"));
         currentTarget = BlockPos.fromLong(nbt.getLong("target_position"));
+        
+        if (nbt.contains("pendingPositions")) {
+            pendingArea = Arrays.stream(nbt.getLongArray("pendingPositions")).mapToObj(BlockPos::fromLong).collect(Collectors.toCollection(ArrayDeque::new));
+        }
     }
     
     //region multiblock
@@ -534,4 +610,78 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         return world.getBlockState(currentTarget).getBlock() instanceof BuddingAmethystBlock;
     }
     
+    @Override
+    public List<Pair<Text, Text>> getExtraExtensionLabels() {
+        
+        if (areaSize == 1) return ScreenProvider.super.getExtraExtensionLabels();
+        
+        return List.of(new Pair<>(Text.literal("Beam Size: " + areaSize), Text.literal("Maximum beam width")));
+    }
+    
+    @Override
+    public List<GuiSlot> getGuiSlots() {
+        return List.of(
+          new GuiSlot(0, 117, 20),
+          new GuiSlot(1, 117, 38),
+          new GuiSlot(2, 117, 56));
+    }
+    
+    @Override
+    public float getDisplayedEnergyUsage() {
+        return energyRequiredToFire();
+    }
+    
+    @Override
+    public float getProgress() {
+        return 0;
+    }
+    
+    @Override
+    public boolean showProgress() {
+        return false;
+    }
+    
+    @Override
+    public InventoryInputMode getInventoryInputMode() {
+        return InventoryInputMode.FILL_LEFT_TO_RIGHT;
+    }
+    
+    @Override
+    public boolean inputOptionsEnabled() {
+        return false;
+    }
+    
+    @Override
+    public Inventory getDisplayedInventory() {
+        return inventory;
+    }
+    
+    @Override
+    public ScreenHandlerType<?> getScreenHandlerType() {
+        return ModScreens.LASER_SCREEN;
+    }
+    
+    @Override
+    public Property<Direction> getBlockFacingProperty() {
+        return ScreenProvider.super.getBlockFacingProperty();
+    }
+    
+    @Override
+    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        buf.writeBlockPos(this.getPos());
+        buf.write(ADDON_UI_ENDEC, getUiData());
+        buf.writeFloat(getCoreQuality());
+        updateNetwork();
+    }
+    
+    @Nullable
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+        return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+    }
+    
+    @Override
+    public Text getDisplayName() {
+        return Text.literal("");
+    }
 }

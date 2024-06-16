@@ -65,7 +65,7 @@ public class NetworkContent {
     public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {
     }   // this goes both ways
     
-    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt) {
+    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize) {
     }
     public record DeepDrillSyncPacket(BlockPos position, long lastWorkTime) {
     }
@@ -132,6 +132,7 @@ public class NetworkContent {
             if (entity instanceof LaserArmBlockEntity laserArmBlock) {
                 laserArmBlock.setCurrentTarget(message.target);
                 laserArmBlock.setLastFiredAt(message.lastFiredAt);
+                laserArmBlock.areaSize = message.areaSize;
             }
             
         }));

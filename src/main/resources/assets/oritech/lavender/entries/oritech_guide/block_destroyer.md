@@ -20,3 +20,9 @@ This will cause the block destroyer to skip all non-finished crops.
 
 
 <block;oritech:crop_filter_addon>
+
+;;;;;
+
+By adding quarry addons, the block destroyer can also be used as a quarry. Each quarry addon multiplies the range by 8. 
+
+This means one addon gives it 8 range, 2 addons give 64 range, and 3 addons give 512 range.

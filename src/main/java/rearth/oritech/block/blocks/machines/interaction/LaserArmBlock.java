@@ -1,5 +1,6 @@
 package rearth.oritech.block.blocks.machines.interaction;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -12,11 +13,13 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -33,13 +36,14 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
     
     public LaserArmBlock(Settings settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(ASSEMBLED, false));
+        setDefaultState(getDefaultState().with(ASSEMBLED, false).with(Properties.HORIZONTAL_FACING, Direction.NORTH));
     }
     
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
         builder.add(ASSEMBLED);
+        builder.add(Properties.HORIZONTAL_FACING);
     }
     
     @Override
@@ -92,6 +96,9 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
             
             laserArm.initAddons();
             laserArm.testTarget(state);
+            
+            var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
+            player.openHandledScreen(handler);
             
         }
         
