@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.interaction.DeepDrillEntity;
 import rearth.oritech.util.MultiblockMachineController;
-import rearth.oritech.util.ScreenProvider;
 
 import java.util.Objects;
 
@@ -84,11 +83,11 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
             var controllerPos = getControllerPos(world, pos);
             var controllerBlock = world.getBlockState(controllerPos);
             var controllerEntity = world.getBlockEntity(controllerPos);
-            if (controllerEntity instanceof ScreenProvider) {
-                return controllerBlock.getBlock().onUse(controllerBlock, world, controllerPos, player, hand, hit);
-            } else if (controllerEntity instanceof DeepDrillEntity deepDrill && !deepDrill.init()) {
+            if (controllerEntity instanceof DeepDrillEntity deepDrill && !deepDrill.init()) {
                 player.sendMessage(Text.literal("Machine must be placed on ore nodes"));
                 return ActionResult.SUCCESS;
+            } else {
+                return controllerBlock.getBlock().onUse(controllerBlock, world, controllerPos, player, hand, hit);
             }
         }
         
