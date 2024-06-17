@@ -8,7 +8,6 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Direction;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
 
@@ -39,14 +38,14 @@ public class SmallTankRenderer implements BlockEntityRenderer<SmallFluidTankEnti
         // Draw the cube using quads
         for (Direction direction : Direction.values()) {
             if (direction.equals(Direction.DOWN)) continue; // skip bottom, as it's never visible
-            drawQuad(direction, consumer, modelMatrix, normalMatrix, sprite, spriteColor, light, overlay);
+            drawQuad(direction, consumer, modelMatrix, entry, sprite, spriteColor, light, overlay);
         }
         
         matrices.pop();
         
     }
     
-    private void drawQuad(Direction direction, VertexConsumer consumer, Matrix4f modelMatrix, Matrix3f normalMatrix, Sprite sprite, int color, int light, int overlay) {
+    private void drawQuad(Direction direction, VertexConsumer consumer, Matrix4f modelMatrix, MatrixStack.Entry normalMatrix, Sprite sprite, int color, int light, int overlay) {
         // Define the vertices of the quad based on the direction it's facing
         
         var normal = direction.getUnitVector();
@@ -64,8 +63,7 @@ public class SmallTankRenderer implements BlockEntityRenderer<SmallFluidTankEnti
               .texture(u, v)
               .light(light)
               .overlay(overlay)
-              .normal(normalMatrix, normal.x, normal.y, normal.z)
-              .next();
+              .normal(normalMatrix, normal.x, normal.y, normal.z);
         }
         
     }

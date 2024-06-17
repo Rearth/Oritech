@@ -6,7 +6,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -65,10 +64,8 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     }
     
     @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        buf.writeBlockPos(this.getPos());
-        buf.writeBlockPos(getControllerPos());
-        buf.writeInt(targetSlot);
+    public Object getScreenOpeningData(ServerPlayerEntity player) {
+        return new InventoryProxyScreenHandler.InvProxyData(pos, getControllerPos(), targetSlot);
     }
     
     @Override
@@ -82,16 +79,12 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
         return new InventoryProxyScreenHandler(syncId, playerInventory, this, getCachedController().getScreenProvider(), targetSlot);
     }
     
-    public int getTargetSlot() {
-        return targetSlot;
-    }
-    
     public void setTargetSlot(int targetSlot) {
         this.targetSlot = targetSlot;
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt) {
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         nbt.putInt("target_slot", targetSlot);
     }

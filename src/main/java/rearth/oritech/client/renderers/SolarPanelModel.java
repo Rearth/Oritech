@@ -1,22 +1,21 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.machines.generators.BigSolarPanelEntity;
 import rearth.oritech.util.Geometry;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
-import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
-import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.animation.AnimationState;
+import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.model.DefaultedBlockGeoModel;
 
 import java.util.HashMap;
 
 public class SolarPanelModel<T extends BigSolarPanelEntity & GeoAnimatable> extends DefaultedBlockGeoModel<T> {
     
-    private final HashMap<Long, Pair<CoreGeoBone, Float>> renderData = new HashMap<>();
+    private final HashMap<Long, Pair<GeoBone, Float>> renderData = new HashMap<>();
     
-    private Pair<CoreGeoBone, Float> getDataFromCache(long id) {
+    private Pair<GeoBone, Float> getDataFromCache(long id) {
         return renderData.computeIfAbsent(id, s -> new Pair<>(getAnimationProcessor().getBone("pivotZ"), 0f));
     }
     

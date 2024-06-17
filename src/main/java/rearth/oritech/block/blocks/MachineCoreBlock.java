@@ -10,7 +10,6 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -87,7 +86,7 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
                 player.sendMessage(Text.literal("Machine must be placed on ore nodes"));
                 return ActionResult.SUCCESS;
             } else {
-                return controllerBlock.getBlock().onUse(controllerBlock, world, controllerPos, player, hand, hit);
+                return controllerBlock.getBlock().onUse(controllerBlock, world, controllerPos, player, hit);
             }
         }
         

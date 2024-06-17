@@ -1,5 +1,6 @@
 package rearth.oritech.init.world;
 
+import io.wispforest.owo.serialization.CodecUtils;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.minecraft.registry.Registries;
@@ -17,8 +18,8 @@ import rearth.oritech.init.world.features.resourcenode.ResourceNodeFeatureConfig
 
 public class FeatureContent {
     
-    public static final OilSpringFeature OIL_SPRING_FEATURE = new OilSpringFeature(OilSpringFeatureConfig.OIL_FEATURE_ENDEC.codec());
-    public static final ResourceNodeFeature RESOURCE_NODE_FEATURE = new ResourceNodeFeature(ResourceNodeFeatureConfig.NODE_FEATURE_ENDEC.codec());
+    public static final OilSpringFeature OIL_SPRING_FEATURE = new OilSpringFeature(CodecUtils.toCodec(OilSpringFeatureConfig.OIL_FEATURE_ENDEC));
+    public static final ResourceNodeFeature RESOURCE_NODE_FEATURE = new ResourceNodeFeature(CodecUtils.toCodec(ResourceNodeFeatureConfig.NODE_FEATURE_ENDEC));
     
     public static void initialize() {
         Registry.register(Registries.FEATURE, Oritech.id("oil_spring"), OIL_SPRING_FEATURE);

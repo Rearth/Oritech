@@ -8,6 +8,7 @@ import net.minecraft.block.*;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -63,17 +64,15 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     };
     
     @Override
-    protected void writeNbt(NbtCompound nbt) {
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        nbt.put("fluidVariant", fluidStorage.variant.toNbt());
-        nbt.putLong("fluidAmount", fluidStorage.amount);
+        SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
     }
     
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        fluidStorage.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
-        fluidStorage.amount = nbt.getLong("fluidAmount");
+        SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
     }
     
     @Override

@@ -3,8 +3,9 @@ package rearth.oritech.item.tools.armor;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
+import net.minecraft.component.type.AttributeModifierSlot;
+import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
@@ -16,19 +17,22 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.animatable.client.RenderProvider;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.renderer.GeoArmorRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
@@ -48,15 +52,9 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
     };
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
     
-    public ExoArmorItem(ArmorMaterial material, Type type, Settings settings) {
+    public ExoArmorItem(RegistryEntry<ArmorMaterial> material, Type type, Settings settings) {
         super(material, type, settings.maxDamage(-1));
-    }
-    
-    @Override
-    public boolean isDamageable() {
-        return false;
     }
     
     @Override
@@ -70,9 +68,13 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
     }
     
     @Override
-    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
+    public AttributeModifiersComponent getAttributeModifiers() {
         
-        var modifiers = ArrayListMultimap.create(super.getAttributeModifiers(slot));
+        // TODO
+        
+        var modifiers = super.getAttributeModifiers().modifiers();
+        var identifier = Identifier.ofVanilla("armor." + type.getName());
+        modifiers.add(new AttributeModifiersComponent.Entry(EntityAttributes.GENERIC_MOVEMENT_SPEED, new EntityAttributeModifier(identifier, 1, EntityAttributeModifier.Operation.ADD_VALUE), AttributeModifierSlot.LEGS));
         
         var speed = 0.2f;
         
@@ -103,12 +105,12 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
     
     // Create our armor model/renderer for Fabric and return it
     @Override
-    public void createRenderer(Consumer<Object> consumer) {
-        consumer.accept(new RenderProvider() {
+    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+        consumer.accept(new GeoRenderProvider() {
             private GeoArmorRenderer<?> renderer;
             
             @Override
-            public BipedEntityModel<LivingEntity> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, BipedEntityModel<LivingEntity> original) {
+            public @Nullable <T extends LivingEntity> BipedEntityModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable BipedEntityModel<T> original) {
                 
                 if (this.renderer == null)
                     this.renderer = new ExosuitArmorRenderer();
@@ -117,14 +119,8 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
                 this.renderer.prepForRender(livingEntity, itemStack, equipmentSlot, original);
                 
                 return this.renderer;
-                
             }
         });
-    }
-    
-    @Override
-    public Supplier<Object> getRenderProvider() {
-        return this.renderProvider;
     }
     
     // Let's add our animation controller
@@ -139,8 +135,8 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        super.appendTooltip(stack, world, tooltip, context);
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, tooltip, type);
         tooltip.add(Text.translatable("tooltip.oritech." + Registries.ITEM.getId(stack.getItem()).getPath()).formatted(Formatting.GRAY));
     }
 }

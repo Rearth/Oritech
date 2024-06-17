@@ -3,6 +3,7 @@ package rearth.oritech.block.entity.machines.processing;
 import net.minecraft.block.BlockState;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.SmeltingRecipe;
+import net.minecraft.recipe.input.SingleStackRecipeInput;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -49,7 +50,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
         
         if (world.isClient || !isActive(state)) return;
         
-        var recipeCandidate = world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, getInputInventory(), world);
+        var recipeCandidate = world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, getFurnaceInput(), world);
         
         if (recipeCandidate.isPresent() && canAddToSlot(recipeCandidate.get().value().getResult(world.getRegistryManager()), inventory.heldStacks.get(1))) {
             if (hasEnoughEnergy()) {
@@ -97,12 +98,16 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
         return progress >= activeRecipe.getCookingTime() * getSpeedMultiplier();
     }
     
+    private SingleStackRecipeInput getFurnaceInput() {
+        return new SingleStackRecipeInput(getInputView().get(0));
+    }
+    
     @SuppressWarnings("OptionalIsPresent")
     @Override
     public float getProgress() {
         if (progress == 0) return 0;
         
-        var recipeCandidate = Objects.requireNonNull(world).getRecipeManager().getFirstMatch(RecipeType.SMELTING, getInputInventory(), world);
+        var recipeCandidate = Objects.requireNonNull(world).getRecipeManager().getFirstMatch(RecipeType.SMELTING, getFurnaceInput(), world);
         if (recipeCandidate.isPresent()) {
             return (float) progress / getRecipeDuration();
         }
@@ -113,7 +118,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     @SuppressWarnings("OptionalIsPresent")
     @Override
     protected int getRecipeDuration() {
-        var recipeCandidate = Objects.requireNonNull(world).getRecipeManager().getFirstMatch(RecipeType.SMELTING, getInputInventory(), world);
+        var recipeCandidate = Objects.requireNonNull(world).getRecipeManager().getFirstMatch(RecipeType.SMELTING, getFurnaceInput(), world);
         if (recipeCandidate.isPresent()) {
             return (int) (recipeCandidate.get().value().getCookingTime() * getSpeedMultiplier());
         }

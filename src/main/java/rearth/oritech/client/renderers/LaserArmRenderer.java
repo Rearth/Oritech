@@ -7,11 +7,12 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
 
 import java.util.HashMap;
@@ -29,8 +30,8 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
     private static final HashMap<LaserArmBlockEntity, Vec3d> cachedOffsets = new HashMap<>();
     
     @Override
-    public void postRender(MatrixStack matrices, T laserEntity, BakedGeoModel model, VertexConsumerProvider bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        super.postRender(matrices, laserEntity, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+    public void postRender(MatrixStack matrices, T laserEntity, BakedGeoModel model, VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int colour) {
+        super.postRender(matrices, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, colour);
         
         if (laserEntity.getCurrentTarget() == null || !laserEntity.isFiring()) return;
         
@@ -76,28 +77,24 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
           .color(138, 242, 223, 255)
           .light(packedLight)
           .overlay(packedOverlay)
-          .normal(0, 1, 0)
-          .next();
+          .normal(0, 1, 0);
         lineConsumer.vertex(matrices.peek().getPositionMatrix(), (float) targetPosOffset.x, (float) targetPosOffset.y, (float) targetPosOffset.z)
           .color(19, 91, 80, 255)
           .light(packedLight)
           .overlay(packedOverlay)
-          .normal(1, 0, 0)
-          .next();
+          .normal(1, 0, 0);
         
         // render a second one at right angle to first one
         lineConsumer.vertex(matrices.peek().getPositionMatrix(), startOffset.x, startOffset.y, startOffset.z)
           .color(138, 242, 223, 255)
           .light(packedLight)
           .overlay(packedOverlay)
-          .normal((float) cross.x, (float) cross.y, (float) cross.z)
-          .next();
+          .normal((float) cross.x, (float) cross.y, (float) cross.z);
         lineConsumer.vertex(matrices.peek().getPositionMatrix(), (float) targetPosOffset.x, (float) targetPosOffset.y, (float) targetPosOffset.z)
           .color(19, 91, 80, 255)
           .light(packedLight)
           .overlay(packedOverlay)
-          .normal((float) cross.x, (float) cross.y, (float) cross.z)
-          .next();
+          .normal((float) cross.x, (float) cross.y, (float) cross.z);
         
         matrices.pop();
     }

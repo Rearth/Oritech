@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry
 import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.*;
 import rearth.oritech.init.BlockContent;
@@ -64,13 +63,13 @@ public class ModRenderers {
         
         // fluids
         FluidRenderHandlerRegistry.INSTANCE.register(FluidContent.STILL_OIL, FluidContent.FLOWING_OIL, new SimpleFluidRenderHandler(
-          new Identifier("oritech:block/fluid/fluid_gas_dark"),
-          new Identifier("oritech:block/fluid/fluid_gas_dark"),
+          Oritech.id("block/fluid/fluid_gas_dark"),
+          Oritech.id("block/fluid/fluid_gas_dark"),
           0x7a7a7a
         ));
         FluidRenderHandlerRegistry.INSTANCE.register(FluidContent.STILL_FUEL, FluidContent.FLOWING_FUEL, new SimpleFluidRenderHandler(
-          new Identifier("oritech:block/fluid/fluid_strange_pale_2"),
-          new Identifier("oritech:block/fluid/fluid_strange_pale_2"),
+          Oritech.id("block/fluid/fluid_strange_pale_2"),
+          Oritech.id("block/fluid/fluid_strange_pale_2"),
           0x2D3D48
         ));
         

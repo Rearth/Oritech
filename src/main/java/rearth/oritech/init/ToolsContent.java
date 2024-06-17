@@ -8,8 +8,11 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
-import net.minecraft.util.Identifier;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ArmorMaterial;
+import net.minecraft.item.Item;
+import net.minecraft.item.ToolMaterial;
+import rearth.oritech.Oritech;
 import rearth.oritech.item.tools.armor.BackstorageExoArmorItem;
 import rearth.oritech.item.tools.armor.ExoArmorItem;
 import rearth.oritech.item.tools.armor.ExoArmorMaterial;
@@ -17,8 +20,6 @@ import rearth.oritech.item.tools.harvesting.*;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 
 import java.lang.reflect.Field;
-
-import static rearth.oritech.Oritech.MOD_ID;
 
 public class ToolsContent implements ItemRegistryContainer {
     
@@ -38,7 +39,7 @@ public class ToolsContent implements ItemRegistryContainer {
     public static final Item PROMETHIUM_PICKAXE = new PromethiumPickaxeItem(4, -2.4f, PROMETHIUM_MATERIAL);
     
     @IterationIgnored
-    public static final Item ORITECH_GUIDE = LavenderBookItem.registerForBook(new Identifier(MOD_ID, "oritech_guide"), new Item.Settings().maxCount(1));
+    public static final Item ORITECH_GUIDE = LavenderBookItem.registerForBook(Oritech.id("oritech_guide"), new Item.Settings().maxCount(1));
     
     @Override
     public void postProcessField(String namespace, Item value, String identifier, Field field) {
@@ -55,7 +56,7 @@ public class ToolsContent implements ItemRegistryContainer {
     public static void registerEventHandlers() {
         
         ServerEntityEvents.EQUIPMENT_CHANGE.register((livingEntity, equipmentSlot, previousStack, currentStack) -> {
-            if (livingEntity instanceof PlayerEntity playerEntity && equipmentSlot.getType() == EquipmentSlot.Type.ARMOR) {
+            if (livingEntity instanceof PlayerEntity playerEntity && equipmentSlot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
                 if (previousStack.getItem() instanceof ArmorEventHandler armorItem) {
                     armorItem.onUnequipped(playerEntity, previousStack);
                 }

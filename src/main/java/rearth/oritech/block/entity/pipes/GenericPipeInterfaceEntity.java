@@ -8,6 +8,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtLong;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -228,7 +229,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         
         public static PersistentState.Type<PipeNetworkData> TYPE = new Type<>(PipeNetworkData::new, PipeNetworkData::fromNbt, null);
         
-        public static PipeNetworkData fromNbt(NbtCompound nbt) {
+        public static PipeNetworkData fromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
             
             var result = new PipeNetworkData();
             
@@ -297,7 +298,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         }
         
         @Override
-        public NbtCompound writeNbt(NbtCompound nbt) {
+        public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
             
             // Serialize pipeNetworkLinks
             var pipeNetworkLinksList = new NbtList();

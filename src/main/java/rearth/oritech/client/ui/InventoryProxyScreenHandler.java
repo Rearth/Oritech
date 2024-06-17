@@ -30,16 +30,15 @@ public class InventoryProxyScreenHandler extends ScreenHandler {
     @NotNull
     protected final ScreenProvider controllerScreen;
     
-    public record InvProxyData(BlockPos pos, int slot) {
-        public static final Endec<InvProxyData> PACKET_ENDEC = StructEndecBuilder.of(MinecraftEndecs.BLOCK_POS.fieldOf("pos", InvProxyData::pos), Endec.INT.fieldOf("slot", InvProxyData::slot), InvProxyData::new);
+    public record InvProxyData(BlockPos ownPos, BlockPos controllerPos, int slot) {
+        public static final Endec<InvProxyData> PACKET_ENDEC = StructEndecBuilder.of(MinecraftEndecs.BLOCK_POS.fieldOf("ownPos", InvProxyData::ownPos), MinecraftEndecs.BLOCK_POS.fieldOf("controllerPos", InvProxyData::controllerPos), Endec.INT.fieldOf("slot", InvProxyData::slot), InvProxyData::new);
         public static final PacketCodec<RegistryByteBuf, InvProxyData> PACKET_CODEC = CodecUtils.toPacketCodec(PACKET_ENDEC);
     }
     
     public static class HandlerFactory implements ExtendedScreenHandlerType.ExtendedFactory<InventoryProxyScreenHandler, InvProxyData> {
-        
         @Override
         public InventoryProxyScreenHandler create(int syncId, PlayerInventory inventory, InvProxyData data) {
-            return new InventoryProxyScreenHandler(syncId, inventory, inventory.player.getWorld().getBlockEntity(data.pos), (ScreenProvider) inventory.player.getWorld().getBlockEntity(data.pos), data.slot);
+            return new InventoryProxyScreenHandler(syncId, inventory, inventory.player.getWorld().getBlockEntity(data.ownPos), (ScreenProvider) inventory.player.getWorld().getBlockEntity(data.controllerPos), data.slot);
         }
     }
 

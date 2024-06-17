@@ -12,6 +12,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -25,9 +26,9 @@ import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -135,7 +136,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     
     private void craftResult(World world, BlockPos pos) {
         var nodeOreBlockItem = targetedOre.asItem();
-        var sampleInv = new SimpleInventory(new ItemStack(nodeOreBlockItem, 1));
+        var sampleInv = new SimpleCraftingInventory(new ItemStack(nodeOreBlockItem, 1));
         
         var recipeCandidate = world.getRecipeManager().getFirstMatch(RecipeContent.DEEP_DRILL, sampleInv, world);
         if (recipeCandidate.isEmpty()) {
@@ -154,7 +155,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false);
+        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
         addMultiblockToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
         nbt.putBoolean("initialized", initialized);
@@ -165,12 +166,12 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        Inventories.readNbt(nbt, inventory.heldStacks);
+        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
         loadMultiblockNbtData(nbt);
         energyStorage.amount = nbt.getLong("energy_stored");
         initialized = nbt.getBoolean("initialized");
         if (initialized)
-            targetedOre = Registries.BLOCK.get(new Identifier(nbt.getString("nodeType")));
+            targetedOre = Registries.BLOCK.get(Identifier.of(nbt.getString("nodeType")));
     }
     
     @Override

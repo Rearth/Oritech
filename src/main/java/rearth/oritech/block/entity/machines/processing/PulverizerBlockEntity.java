@@ -5,6 +5,7 @@ import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -21,6 +22,7 @@ import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
@@ -42,8 +44,12 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
         if (smallDustStack.isEmpty() || smallDustStack.getCount() < 9 || baseResult.getCount() >= baseResult.getMaxCount())
             return;
         
-        var craftingInv = new SimpleRecipeInputInventory();
-        craftingInv.fill(smallDustStack);
+        var recipeInputStacks = new ArrayList<ItemStack>(9);
+        for (int i = 0; i < 9; i++) {
+            recipeInputStacks.set(i, smallDustStack.copyWithCount(1));
+        }
+        var craftingInv = CraftingRecipeInput.create(3, 3, recipeInputStacks);
+        
         var matches = world.getRecipeManager().getAllMatches(RecipeType.CRAFTING, craftingInv, world);
         
         if (matches.isEmpty()) return;
@@ -121,33 +127,5 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     @Override
     public float getCoreQuality() {
         return 2;
-    }
-    
-    public static class SimpleRecipeInputInventory extends SimpleInventory implements RecipeInputInventory {
-        
-        public SimpleRecipeInputInventory() {
-            super(9);
-        }
-        
-        public void fill(ItemStack item) {
-            for (int i = 0; i < 9; i++) {
-                this.heldStacks.set(i, item.copyWithCount(1));
-            }
-        }
-        
-        @Override
-        public DefaultedList<ItemStack> getHeldStacks() {
-            return super.getHeldStacks();
-        }
-        
-        @Override
-        public int getWidth() {
-            return 3;
-        }
-        
-        @Override
-        public int getHeight() {
-            return 3;
-        }
     }
 }

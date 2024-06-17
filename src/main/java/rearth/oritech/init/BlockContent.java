@@ -216,11 +216,11 @@ public class BlockContent implements BlockRegistryContainer {
         if (field.isAnnotationPresent(NoBlockItem.class)) return;
         
         if (field.isAnnotationPresent(UseGeoBlockItem.class)) {
-            Registry.register(Registries.ITEM, new Identifier(namespace, identifier), getGeoBlockItem(value, identifier, field.getAnnotation(UseGeoBlockItem.class).scale()));
+            Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), getGeoBlockItem(value, identifier, field.getAnnotation(UseGeoBlockItem.class).scale()));
         } else if (value.equals(BlockContent.SMALL_TANK_BLOCK)) {
-            Registry.register(Registries.ITEM, new Identifier(namespace, identifier), new SmallFluidTankBlockItem(value, new Item.Settings()));
+            Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), new SmallFluidTankBlockItem(value, new Item.Settings()));
         } else {
-            Registry.register(Registries.ITEM, new Identifier(namespace, identifier), createBlockItem(value, identifier));
+            Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), createBlockItem(value, identifier));
         }
         
         var targetGroup = ItemContent.Groups.machines;

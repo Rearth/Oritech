@@ -18,6 +18,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -46,9 +47,9 @@ import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -365,7 +366,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false);
+        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
         addMultiblockToNbt(nbt);
         writeAddonToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
@@ -388,7 +389,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        Inventories.readNbt(nbt, inventory.heldStacks);
+        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
         loadMultiblockNbtData(nbt);
         loadAddonNbtData(nbt);
         
@@ -666,11 +667,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        buf.writeBlockPos(this.getPos());
-        buf.write(ADDON_UI_ENDEC, getUiData());
-        buf.writeFloat(getCoreQuality());
+    public Object getScreenOpeningData(ServerPlayerEntity player) {
         updateNetwork();
+        return new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
     }
     
     @Nullable

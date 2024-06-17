@@ -4,18 +4,20 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.registry.RegistryWrapper;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public class BlockLootGenerator extends FabricBlockLootTableProvider {
     
     public static Set<Block> autoRegisteredDrops = new HashSet<>();
     
-    public BlockLootGenerator(FabricDataOutput dataOutput) {
-        super(dataOutput);
+    protected BlockLootGenerator(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
+        super(dataOutput, registryLookup);
     }
     
     @Override

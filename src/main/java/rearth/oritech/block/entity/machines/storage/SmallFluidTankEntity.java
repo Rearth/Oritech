@@ -24,6 +24,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -81,17 +82,15 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        nbt.put("fluidVariant", fluidStorage.variant.toNbt());
-        nbt.putLong("amount", fluidStorage.amount);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false);
+        SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
+        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
     }
     
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        fluidStorage.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
-        fluidStorage.amount = nbt.getLong("amount");
-        Inventories.readNbt(nbt, inventory.heldStacks);
+        SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
+        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
     }
     
     @Override
@@ -173,8 +172,8 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     }
     
     @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        buf.writeBlockPos(this.getPos());
+    public Object getScreenOpeningData(ServerPlayerEntity player) {
+        return new ModScreens.BasicData(pos);
     }
     
     @Override

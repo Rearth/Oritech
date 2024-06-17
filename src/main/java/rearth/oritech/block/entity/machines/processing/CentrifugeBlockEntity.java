@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
@@ -212,13 +213,14 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         super.writeNbt(nbt, registryLookup);
         nbt.putBoolean("fluidAddon", hasFluidAddon);
         
-        nbt.put("fluidVariantIn", inputStorage.variant.toNbt());
-        nbt.putLong("fluidAmountIn", inputStorage.amount);
-        nbt.put("fluidVariantOut", outputStorage.variant.toNbt());
-        nbt.putLong("fluidAmountOut", outputStorage.amount);
+        var inNbt = new NbtCompound();
+        var outNbt = new NbtCompound();
+        
+        SingleVariantStorage.writeNbt(inputStorage, FluidVariant.CODEC, inNbt, registryLookup);
+        SingleVariantStorage.writeNbt(outputStorage, FluidVariant.CODEC, outNbt, registryLookup);
         
         var bucketStorageNbt = new NbtCompound();
-        Inventories.writeNbt(bucketStorageNbt, bucketInventory.heldStacks, false);
+        Inventories.writeNbt(bucketStorageNbt, bucketInventory.heldStacks, false, registryLookup);
         nbt.put("bucket", bucketStorageNbt);
     }
     
@@ -228,12 +230,12 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         
         hasFluidAddon = nbt.getBoolean("fluidAddon");
         
-        inputStorage.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariantIn"));
-        inputStorage.amount = nbt.getLong("fluidAmountIn");
-        outputStorage.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariantOut"));
-        outputStorage.amount = nbt.getLong("fluidAmountOut");
+        var inNbt = nbt.getCompound("inputStorage");
+        var outNbt = nbt.getCompound("outputStorage");
+        SingleVariantStorage.readNbt(inputStorage, FluidVariant.CODEC, FluidVariant::blank, inNbt, registryLookup);
+        SingleVariantStorage.readNbt(outputStorage, FluidVariant.CODEC, FluidVariant::blank, outNbt, registryLookup);
         
-        Inventories.readNbt(nbt.getCompound("bucket"), bucketInventory.heldStacks);
+        Inventories.readNbt(nbt.getCompound("bucket"), bucketInventory.heldStacks, registryLookup);
     }
     
     @Override

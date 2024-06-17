@@ -1,14 +1,13 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2f;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.util.Geometry;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
-import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
-import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.animation.AnimationState;
+import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.model.DefaultedBlockGeoModel;
 
 import java.util.HashMap;
@@ -78,10 +77,10 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
     private static class ModelRenderData {
         protected float angleY;
         protected float angleX;
-        protected CoreGeoBone boneX;
-        protected CoreGeoBone boneY;
+        protected GeoBone boneX;
+        protected GeoBone boneY;
         
-        public ModelRenderData(float angleX, float angleY, CoreGeoBone boneX, CoreGeoBone boneY) {
+        public ModelRenderData(float angleX, float angleY, GeoBone boneX, GeoBone boneY) {
             this.angleY = angleY;
             this.angleX = angleX;
             this.boneX = boneX;

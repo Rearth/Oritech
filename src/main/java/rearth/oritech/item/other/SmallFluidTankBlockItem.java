@@ -1,16 +1,13 @@
 package rearth.oritech.item.other;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.block.Block;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -20,11 +17,11 @@ public class SmallFluidTankBlockItem extends BlockItem {
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        super.appendTooltip(stack, world, tooltip, context);
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, tooltip, type);
         
-        if (!stack.hasNbt()) return;
-        var nbt = stack.getNbt();
+        if (!stack.contains(DataComponentTypes.CUSTOM_DATA)) return;
+        var nbt = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
         
         var amount = nbt.getLong("amount");
         var amountTip = amount / FluidConstants.BUCKET + " B";
@@ -34,13 +31,16 @@ public class SmallFluidTankBlockItem extends BlockItem {
     @Override
     public Text getName(ItemStack stack) {
         
-        if (!stack.hasNbt()) return super.getName(stack);
+        if (!stack.contains(DataComponentTypes.CUSTOM_DATA)) return super.getName(stack);
         
-        var nbt = stack.getNbt();
-        
-        var variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
-        var titleFluid = FluidVariantAttributes.getName(variant).getString();
-        
-        return Text.of("Small " + titleFluid + " Tank");
+//        var nbt = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
+//        SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
+//
+//        var variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
+//        var titleFluid = FluidVariantAttributes.getName(variant).getString();
+//
+//        return Text.of("Small " + titleFluid + " Tank");
+        // TODO fix this
+        return super.getName(stack);
     }
 }

@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
@@ -14,7 +15,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -37,11 +38,11 @@ import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.RawAnimation;
-import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -148,8 +149,8 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     private void checkPositionCard() {
         
         var source = cardInventory.heldStacks.get(0);
-        if (source.getItem().equals(ItemContent.TARGET_DESIGNATOR) && source.hasNbt()) {
-            var target = BlockPos.fromLong(source.getNbt().getLong("target"));
+        if (source.getItem().equals(ItemContent.TARGET_DESIGNATOR) && source.contains(DataComponentTypes.CUSTOM_DATA)) {
+            var target = BlockPos.fromLong(source.get(DataComponentTypes.CUSTOM_DATA).copyNbt().getLong("target"));
             setTargetFromDesignator(target);
         } else {
             return;
@@ -163,9 +164,9 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt) {
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false);
+        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
         addMultiblockToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
         
@@ -177,7 +178,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
             var compound = new NbtCompound();
             DefaultedList<ItemStack> list = DefaultedList.ofSize(incomingPacket.transferredStacks.size());
             list.addAll(incomingPacket.transferredStacks);
-            Inventories.writeNbt(compound, list, false);
+            Inventories.writeNbt(compound, list, false, registryLookup);
             nbt.put("incoming", compound);
             nbt.putLong("incomingTime", incomingPacket.arrivesAt);
         } else {
@@ -188,7 +189,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        Inventories.readNbt(nbt, inventory.heldStacks);
+        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
         loadMultiblockNbtData(nbt);
         
         energyStorage.amount = nbt.getLong("energy_stored");
@@ -196,7 +197,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
         
         if (nbt.contains("incoming")) {
             DefaultedList<ItemStack> list = DefaultedList.ofSize(15);
-            Inventories.readNbt(nbt.getCompound("incoming"), list);
+            Inventories.readNbt(nbt.getCompound("incoming"), list, registryLookup);
             var arrivalTime = nbt.getLong("incomingTime");
             incomingPacket = new DroneTransferData(list, arrivalTime);
         }
@@ -469,9 +470,9 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     }
     
     @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        buf.writeBlockPos(pos);
+    public Object getScreenOpeningData(ServerPlayerEntity player) {
         sendNetworkEnergyUpdate();
+        return new ModScreens.BasicData(pos);
     }
     
     @Override

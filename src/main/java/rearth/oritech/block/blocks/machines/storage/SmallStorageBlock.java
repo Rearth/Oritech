@@ -166,7 +166,7 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
     
     @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
-        super.appendTooltip(stack, world, tooltip, options);
+        super.appendTooltip(stack, context, tooltip, options);
         
         if (stack.hasNbt()) {
             var storedEnergy = stack.getNbt().getLong("energy_stored");

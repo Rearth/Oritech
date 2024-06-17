@@ -1,6 +1,7 @@
 package rearth.oritech.block.entity.pipes;
 
-import io.wispforest.owo.serialization.Endec;
+import io.wispforest.endec.Endec;
+import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
@@ -11,6 +12,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
@@ -20,7 +22,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -30,6 +32,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.pipes.ItemFilterBlock;
+import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.ItemFilterScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
@@ -46,9 +49,9 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
     protected BlockApiCache<Storage<ItemVariant>, Direction> lookupCache;
     
     @Override
-    protected void writeNbt(NbtCompound nbt) {
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false);
+        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putBoolean("whitelist", filterSettings.useWhitelist);
         nbt.putBoolean("useNbt", filterSettings.useNbt);
         
@@ -56,9 +59,8 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
         var itemsNbtList = new NbtList();
         
         for (var item : filterItems) {
-            var compound = new NbtCompound();
-            item.writeNbt(compound);
-            itemsNbtList.add(compound);
+            var data = item.encode(registryLookup);
+            itemsNbtList.add(data);
         }
         
         nbt.put("filterItems", itemsNbtList);
@@ -67,7 +69,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        Inventories.readNbt(nbt, inventory.heldStacks);
+        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
         
         var whiteList = nbt.getBoolean("whitelist");
         var useNbt = nbt.getBoolean("useNbt");
@@ -75,8 +77,9 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
         var list = nbt.getList("filterItems", NbtElement.COMPOUND_TYPE);
         var itemsList = new HashMap<Integer, ItemStack>();
         for (int i = 0; i < list.size(); i++) {
-            var compound = list.getCompound(i);
-            var stack = ItemStack.fromNbt(compound);
+            var data = list.get(i);
+            var stack = ItemStack.fromNbt(registryLookup, data).orElse(ItemStack.EMPTY);
+            
             itemsList.put(i, stack);
         }
         
@@ -93,11 +96,10 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
     public InventoryStorage getInventory(Direction direction) {
         return InventoryStorage.of(inventory, direction);
     }
-    
     @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        buf.writeBlockPos(this.getPos());
+    public Object getScreenOpeningData(ServerPlayerEntity player) {
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.ItemFilterSyncPacket(pos, filterSettings));
+        return new ModScreens.BasicData(pos);
     }
     
     @Override
@@ -176,6 +178,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
             if (side.equals(outputSide)) return false;
             
             // then check filter settings
+            // todo add option to compare components and/or nbt (possibly third button?)
             var checkNbt = filterSettings.useNbt;
             var matchesFilterItems = false; // check if at least 1 item matches
             
@@ -186,13 +189,13 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
                 if (checkNbt) {
                     // check if both have nbt, if so compare them
                     // if not both check if neither has nbt, and type matches
-                    if (stack.hasNbt() && filterItem.hasNbt()) {
-                        var match = stack.getNbt().equals(filterItem.getNbt());
+                    if (stack.contains(DataComponentTypes.CUSTOM_DATA) && filterItem.contains(DataComponentTypes.CUSTOM_DATA)) {
+                        var match = stack.get(DataComponentTypes.CUSTOM_DATA).equals(filterItem.get(DataComponentTypes.CUSTOM_DATA));
                         if (match) {
                             matchesFilterItems = true;
                             break;
                         }
-                    } else if (!stack.hasNbt() && !filterItem.hasNbt()) {
+                    } else if (!stack.contains(DataComponentTypes.CUSTOM_DATA) && !filterItem.contains(DataComponentTypes.CUSTOM_DATA)) {
                         matchesFilterItems = true;
                         break;
                     }
@@ -220,5 +223,5 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
         }
     }
     
-    public static Endec<Map<Integer, ItemStack>> FILTER_ITEMS_ENDEC = Endec.map(Object::toString, Integer::valueOf, Endec.ofCodec(ItemStack.CODEC));
+    public static Endec<Map<Integer, ItemStack>> FILTER_ITEMS_ENDEC = Endec.map(Object::toString, Integer::valueOf, MinecraftEndecs.ITEM_STACK);
 }

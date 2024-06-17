@@ -14,6 +14,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -26,10 +27,10 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.EnergyProvider;
 import rearth.oritech.util.FluidProvider;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
@@ -81,11 +82,10 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt) {
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
+        SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
         nbt.putBoolean("initialized", initialized);
-        nbt.put("fluidVariant", fluidStorage.variant.toNbt());
-        nbt.putLong("amount", fluidStorage.amount);
         nbt.putLong("energy", energyStorage.getAmount());
         
         if (pendingLiquidPositions != null)
@@ -96,8 +96,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         initialized = nbt.getBoolean("initialized");
-        fluidStorage.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
-        fluidStorage.amount = nbt.getLong("amount");
+        SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
         energyStorage.amount = nbt.getLong("energy");
         pendingLiquidPositions = Arrays.stream(nbt.getLongArray("pendingTargets")).mapToObj(BlockPos::fromLong).collect(Collectors.toCollection(ArrayDeque::new));
     }
