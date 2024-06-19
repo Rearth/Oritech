@@ -1,0 +1,24 @@
+{
+  "type": "oritech:assembler",
+  "ingredients": [
+    {
+      "item": "oritech:processing_unit"
+    },
+    {
+      "item": "oritech:fluxite"
+    },
+    {
+      "item": "oritech:fluxite"
+    },
+    {
+      "tag": "c:platinum_ingots"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:flux_gate"
+    }
+  ],
+  "time": 450
+}

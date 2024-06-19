@@ -1,0 +1,24 @@
+{
+  "type": "oritech:assembler",
+  "ingredients": [
+    {
+      "item": "oritech:flux_gate"
+    },
+    {
+      "item": "oritech:insulated_wire"
+    },
+    {
+      "item": "oritech:dubios_container"
+    },
+    {
+      "item": "oritech:energite_ingot"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:superconductor"
+    }
+  ],
+  "time": 600
+}

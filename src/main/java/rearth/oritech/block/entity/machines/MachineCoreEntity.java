@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import rearth.oritech.block.blocks.MachineCoreBlock;
@@ -31,7 +32,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt) {
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         nbt.putInt("controller_x", controllerPos.getX());
         nbt.putInt("controller_y", controllerPos.getY());

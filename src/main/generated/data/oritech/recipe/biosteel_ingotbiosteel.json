@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "minecraft:iron_ingot"
+    },
+    "i": {
+      "item": "oritech:biomass"
+    }
+  },
+  "pattern": [
+    "iii",
+    "ccc",
+    "iii"
+  ],
+  "result": {
+    "count": 3,
+    "id": "oritech:biosteel_ingot"
+  }
+}

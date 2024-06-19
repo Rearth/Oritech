@@ -1,16 +1,8 @@
 package rearth.oritech.item.tools.armor;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
-import net.minecraft.component.type.AttributeModifierSlot;
-import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,8 +14,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
@@ -39,7 +29,6 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandler {
     
@@ -67,27 +56,27 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
         return false;
     }
     
-    @Override
-    public AttributeModifiersComponent getAttributeModifiers() {
-        
-        // TODO
-        
-        var modifiers = super.getAttributeModifiers().modifiers();
-        var identifier = Identifier.ofVanilla("armor." + type.getName());
-        modifiers.add(new AttributeModifiersComponent.Entry(EntityAttributes.GENERIC_MOVEMENT_SPEED, new EntityAttributeModifier(identifier, 1, EntityAttributeModifier.Operation.ADD_VALUE), AttributeModifierSlot.LEGS));
-        
-        var speed = 0.2f;
-        
-        if (slot == EquipmentSlot.LEGS && this.getSlotType() == EquipmentSlot.LEGS) {
-            modifiers.removeAll(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-            modifiers.removeAll(EntityAttributes.GENERIC_FLYING_SPEED);
-            modifiers.put(EntityAttributes.GENERIC_MOVEMENT_SPEED, new EntityAttributeModifier(MODIFIERS[slot.getEntitySlotId()], "Movement Speed", speed, EntityAttributeModifier.Operation.MULTIPLY_BASE));
-            modifiers.put(EntityAttributes.GENERIC_FLYING_SPEED, new EntityAttributeModifier(MODIFIERS[slot.getEntitySlotId()], "Flying Speed", speed, EntityAttributeModifier.Operation.MULTIPLY_BASE));
-        }
-        
-        return ImmutableMultimap.copyOf(modifiers);
-        
-    }
+//    @Override
+//    public AttributeModifiersComponent getAttributeModifiers() {
+//
+//        // TODO
+//
+//        var modifiers = super.getAttributeModifiers().modifiers();
+//        var identifier = Identifier.ofVanilla("armor." + type.getName());
+//        modifiers.add(new AttributeModifiersComponent.Entry(EntityAttributes.GENERIC_MOVEMENT_SPEED, new EntityAttributeModifier(identifier, 1, EntityAttributeModifier.Operation.ADD_VALUE), AttributeModifierSlot.LEGS));
+//
+//        var speed = 0.2f;
+//
+//        if (slot == EquipmentSlot.LEGS && this.getSlotType() == EquipmentSlot.LEGS) {
+//            modifiers.removeAll(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+//            modifiers.removeAll(EntityAttributes.GENERIC_FLYING_SPEED);
+//            modifiers.put(EntityAttributes.GENERIC_MOVEMENT_SPEED, new EntityAttributeModifier(MODIFIERS[slot.getEntitySlotId()], "Movement Speed", speed, EntityAttributeModifier.Operation.MULTIPLY_BASE));
+//            modifiers.put(EntityAttributes.GENERIC_FLYING_SPEED, new EntityAttributeModifier(MODIFIERS[slot.getEntitySlotId()], "Flying Speed", speed, EntityAttributeModifier.Operation.MULTIPLY_BASE));
+//        }
+//
+//        return ImmutableMultimap.copyOf(modifiers);
+//
+//    }
     
     @Override
     public void onEquipped(PlayerEntity playerEntity, ItemStack stack) {

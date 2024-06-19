@@ -1,0 +1,18 @@
+{
+  "type": "oritech:foundry",
+  "ingredients": [
+    {
+      "item": "oritech:copper_gem"
+    },
+    {
+      "item": "oritech:copper_gem"
+    }
+  ],
+  "results": [
+    {
+      "count": 4,
+      "id": "minecraft:copper_ingot"
+    }
+  ],
+  "time": 800
+}

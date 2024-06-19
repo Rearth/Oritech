@@ -3,22 +3,20 @@ package rearth.oritech.util.item;
 import net.minecraft.block.Block;
 import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.item.BlockItem;
-import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.animatable.client.RenderProvider;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.model.DefaultedBlockGeoModel;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class OritechGeoItem extends BlockItem implements GeoItem {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
-    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
     private final float scale;
     private final String name;
     
@@ -29,12 +27,13 @@ public class OritechGeoItem extends BlockItem implements GeoItem {
     }
     
     @Override
-    public void createRenderer(Consumer<Object> consumer) {
-        consumer.accept(new RenderProvider() {
+    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+        
+        consumer.accept(new GeoRenderProvider() {
             GeoItemRenderer<OritechGeoItem> renderer = null;
             
             @Override
-            public BuiltinModelItemRenderer getCustomRenderer() {
+            public @Nullable BuiltinModelItemRenderer getGeoItemRenderer() {
                 if (this.renderer == null)
                     this.renderer = new GeoItemRenderer<>(new DefaultedBlockGeoModel<>(Oritech.id("models/" + name)));
                 
@@ -43,11 +42,6 @@ public class OritechGeoItem extends BlockItem implements GeoItem {
                 return this.renderer;
             }
         });
-    }
-    
-    @Override
-    public Supplier<Object> getRenderProvider() {
-        return renderProvider;
     }
     
     @Override

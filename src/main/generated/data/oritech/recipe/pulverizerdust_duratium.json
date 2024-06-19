@@ -1,0 +1,15 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "item": "oritech:duratium_ingot"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:duratium_dust"
+    }
+  ],
+  "time": 300
+}

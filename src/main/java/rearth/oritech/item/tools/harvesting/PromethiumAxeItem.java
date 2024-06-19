@@ -3,7 +3,6 @@ package rearth.oritech.item.tools.harvesting;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -11,6 +10,7 @@ import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.ToolMaterial;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -25,33 +25,31 @@ import rearth.oritech.block.entity.machines.interaction.TreefellerBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
 import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.animatable.client.RenderProvider;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class PromethiumAxeItem extends AxeItem implements GeoItem {
     
     private static final Deque<Pair<World, BlockPos>> pendingBlocks = new ArrayDeque<>();
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
     
-    public PromethiumAxeItem(ToolMaterial material, float attackDamage, float attackSpeed) {
-        super(material, attackDamage, attackSpeed, new Settings().maxDamage(-1).maxCount(1));
+    public PromethiumAxeItem(ToolMaterial toolMaterial, Settings settings) {
+        super(toolMaterial, settings);
     }
     
     @Override
-    public boolean isSuitableFor(BlockState state) {
-        return Items.DIAMOND_AXE.isSuitableFor(state)
-                 || Items.DIAMOND_SWORD.isSuitableFor(state)
-                 || Items.SHEARS.isSuitableFor(state);
+    public boolean isCorrectForDrops(ItemStack stack, BlockState state) {
+        return Items.DIAMOND_AXE.isCorrectForDrops(stack, state)
+                 || Items.DIAMOND_SWORD.isCorrectForDrops(stack, state)
+                 || Items.SHEARS.isCorrectForDrops(stack, state);
     }
     
     @Override
@@ -101,32 +99,22 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
     }
     
     @Override
-    public boolean isDamageable() {
-        return false;
-    }
-    
-    @Override
     public boolean isEnchantable(ItemStack stack) {
         return true;
     }
     
     @Override
-    public void createRenderer(Consumer<Object> consumer) {
-        consumer.accept(new RenderProvider() {
+    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+        consumer.accept(new GeoRenderProvider() {
             private PromethiumToolRenderer renderer;
             
             @Override
-            public BuiltinModelItemRenderer getCustomRenderer() {
+            public @Nullable BuiltinModelItemRenderer getGeoItemRenderer() {
                 if (this.renderer == null)
                     this.renderer = new PromethiumToolRenderer("promethium_axe");
                 return renderer;
             }
         });
-    }
-    
-    @Override
-    public Supplier<Object> getRenderProvider() {
-        return renderProvider;
     }
     
     @Override
@@ -144,8 +132,8 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        super.appendTooltip(stack, world, tooltip, context);
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, tooltip, type);
         tooltip.add(Text.translatable("tooltip.oritech.promethium_axe").formatted(Formatting.DARK_GRAY));
     }
 }

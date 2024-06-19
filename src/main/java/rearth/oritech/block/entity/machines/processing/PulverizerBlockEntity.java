@@ -46,7 +46,7 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
         
         var recipeInputStacks = new ArrayList<ItemStack>(9);
         for (int i = 0; i < 9; i++) {
-            recipeInputStacks.set(i, smallDustStack.copyWithCount(1));
+            recipeInputStacks.add(i, smallDustStack.copyWithCount(1));
         }
         var craftingInv = CraftingRecipeInput.create(3, 3, recipeInputStacks);
         

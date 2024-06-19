@@ -90,6 +90,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     
     @Override
     public Object getScreenOpeningData(ServerPlayerEntity player) {
+        sendNetworkEntry();
         return new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
     }
 

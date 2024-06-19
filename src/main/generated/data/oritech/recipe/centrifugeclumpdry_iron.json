@@ -1,0 +1,19 @@
+{
+  "type": "oritech:centrifuge",
+  "ingredients": [
+    {
+      "item": "oritech:iron_clump"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:iron_dust"
+    },
+    {
+      "count": 3,
+      "id": "oritech:small_nickel_dust"
+    }
+  ],
+  "time": 400
+}

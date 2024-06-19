@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_big_solar_panel_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:big_solar_panel_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:big_solar_panel_block_solar"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_big_solar_panel_block"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:big_solar_panel_block_solar"
+    ]
+  }
+}

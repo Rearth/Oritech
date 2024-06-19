@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "oritech:carbon_fibre_strands"
+    },
+    "b": {
+      "tag": "c:steel_ingots"
+    }
+  },
+  "pattern": [
+    "a  ",
+    "b  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:tech_lever"
+  }
+}

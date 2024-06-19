@@ -33,7 +33,7 @@ public class AutoPlayingSoundKeyframeHandler<A extends GeoAnimatable> implements
     @Override
     public void handle(SoundKeyframeEvent<A> event) {
         var segments = event.getKeyframeData().getSound().split("\\|");
-        var sound = Registries.SOUND_EVENT.get(Oritech.id(segments[0]));
+        var sound = Registries.SOUND_EVENT.get(Identifier.of(segments[0]));
         
         if (sound != null) {
             var entity = (BlockEntity) event.getAnimatable();

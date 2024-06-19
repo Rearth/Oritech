@@ -106,7 +106,7 @@ public interface MultiblockMachineController {
             var checkPos = pos.add(rotatedPos);
             var checkState = Objects.requireNonNull(world).getBlockState(checkPos);
             
-            if (checkState.isOf(Blocks.AIR) || checkState.isIn(TagKey.of(RegistryKeys.BLOCK, new Identifier("minecraft", "replaceable")))) {
+            if (checkState.isOf(Blocks.AIR) || checkState.isIn(TagKey.of(RegistryKeys.BLOCK, Identifier.of("minecraft", "replaceable")))) {
                 return checkPos;
             }
         }

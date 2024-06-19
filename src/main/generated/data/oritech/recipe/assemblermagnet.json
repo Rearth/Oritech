@@ -1,0 +1,24 @@
+{
+  "type": "oritech:assembler",
+  "ingredients": [
+    {
+      "tag": "c:steel_ingots"
+    },
+    {
+      "item": "oritech:insulated_wire"
+    },
+    {
+      "item": "oritech:insulated_wire"
+    },
+    {
+      "item": "oritech:insulated_wire"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "oritech:magnetic_coil"
+    }
+  ],
+  "time": 150
+}

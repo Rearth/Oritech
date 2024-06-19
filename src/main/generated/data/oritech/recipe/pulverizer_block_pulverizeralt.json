@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:machine_plating_block"
+    },
+    "c": {
+      "tag": "c:nickel_ingots"
+    },
+    "f": {
+      "tag": "c:steel_ingots"
+    },
+    "s": {
+      "item": "oritech:motor"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:pulverizer_block"
+  }
+}

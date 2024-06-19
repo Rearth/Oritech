@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_tech_door": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:tech_door"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:tech_door_techdoor"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_tech_door"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:tech_door_techdoor"
+    ]
+  }
+}

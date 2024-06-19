@@ -1,0 +1,21 @@
+{
+  "type": "oritech:atomic_forge",
+  "ingredients": [
+    {
+      "item": "oritech:enderic_compound"
+    },
+    {
+      "item": "oritech:iron_dust"
+    },
+    {
+      "item": "oritech:enderic_compound"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:iron_gem"
+    }
+  ],
+  "time": 3
+}

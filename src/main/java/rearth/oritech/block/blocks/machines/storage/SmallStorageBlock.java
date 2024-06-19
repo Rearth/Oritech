@@ -8,23 +8,24 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
@@ -131,9 +132,10 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
                     var storedAmount = storageBlock.getStorageForAddon().amount;
                     if (storedAmount > 0) {
                         var nbt = new NbtCompound();
-                        storageBlock.writeNbt(nbt);
-                        stack.setNbt(nbt);
+                        storageBlock.writeNbt(nbt, world.getRegistryManager());
+                        stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
                     }
+                    
                     if (!player.isCreative())
                         Block.dropStack(world, pos, stack);
                 }
@@ -147,10 +149,12 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
         
+        if (!itemStack.contains(DataComponentTypes.CUSTOM_DATA)) return;
+        
         var storageEntity = (ExpandableEnergyStorageBlockEntity) world.getBlockEntity(pos);
-        var nbt = itemStack.getNbt();
+        var nbt = itemStack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
         if (nbt != null)
-            storageEntity.readNbt(nbt);
+            storageEntity.readNbt(nbt, world.getRegistryManager());
         
     }
     
@@ -168,8 +172,8 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         super.appendTooltip(stack, context, tooltip, options);
         
-        if (stack.hasNbt()) {
-            var storedEnergy = stack.getNbt().getLong("energy_stored");
+        if (stack.contains(DataComponentTypes.CUSTOM_DATA)) {
+            var storedEnergy = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt().getLong("energy_stored");
             if (storedEnergy != 0) {
                 var text = Text.literal(String.format("Stored: %d RF", storedEnergy));
                 tooltip.add(text.formatted(Formatting.GOLD));

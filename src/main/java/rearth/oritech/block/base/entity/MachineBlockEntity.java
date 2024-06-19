@@ -389,6 +389,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         
     }
     
+    // TODO fix this
     public void playSetupAnimation() {
         animationController.setAnimation(SETUP);
         animationController.forceAnimationReset();

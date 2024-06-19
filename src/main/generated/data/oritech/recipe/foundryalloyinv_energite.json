@@ -1,0 +1,18 @@
+{
+  "type": "oritech:foundry",
+  "ingredients": [
+    {
+      "item": "oritech:fluxite"
+    },
+    {
+      "tag": "c:nickel_ingots"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:energite_ingot"
+    }
+  ],
+  "time": 300
+}

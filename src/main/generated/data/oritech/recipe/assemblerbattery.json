@@ -1,0 +1,24 @@
+{
+  "type": "oritech:assembler",
+  "ingredients": [
+    {
+      "item": "oritech:plastic_sheet"
+    },
+    {
+      "item": "oritech:electrum_ingot"
+    },
+    {
+      "item": "oritech:electrum_ingot"
+    },
+    {
+      "tag": "c:steel_ingots"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:basic_battery"
+    }
+  ],
+  "time": 150
+}

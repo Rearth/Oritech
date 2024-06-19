@@ -1,0 +1,24 @@
+{
+  "type": "oritech:assembler",
+  "ingredients": [
+    {
+      "tag": "c:steel_ingots"
+    },
+    {
+      "tag": "c:steel_ingots"
+    },
+    {
+      "tag": "c:nickel_ingots"
+    },
+    {
+      "item": "oritech:plastic_sheet"
+    }
+  ],
+  "results": [
+    {
+      "count": 8,
+      "id": "oritech:machine_plating_block"
+    }
+  ],
+  "time": 300
+}

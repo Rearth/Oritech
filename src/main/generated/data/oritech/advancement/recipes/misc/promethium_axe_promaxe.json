@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_promethium_axe": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:promethium_axe"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:promethium_axe_promaxe"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_promethium_axe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:promethium_axe_promaxe"
+    ]
+  }
+}

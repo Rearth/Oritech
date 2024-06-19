@@ -17,7 +17,6 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -322,7 +321,8 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     private void updateNetwork() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, currentTarget, lastFiredAt, areaSize));
+        var sendTarget = currentTarget != null ? currentTarget : BlockPos.ORIGIN;
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
         networkDirty = false;
     }

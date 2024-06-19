@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "oritech:advanced_battery"
+    },
+    "s": {
+      "item": "minecraft:enchanted_book"
+    },
+    "w": {
+      "item": "oritech:superconductor"
+    }
+  },
+  "pattern": [
+    " s ",
+    "wcw",
+    "wcw"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:overcharged_crystal"
+  }
+}

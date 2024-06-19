@@ -1,0 +1,17 @@
+{
+  "values": [
+    {
+      "id": "#minecraft:villager_plantable_seeds",
+      "required": false
+    },
+    {
+      "id": "#minecraft:saplings",
+      "required": false
+    },
+    {
+      "id": "#c:foods",
+      "required": false
+    },
+    "minecraft:wheat"
+  ]
+}

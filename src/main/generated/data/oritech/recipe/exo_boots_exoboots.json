@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "oritech:silicon"
+    },
+    "p": {
+      "item": "oritech:machine_plating_block"
+    }
+  },
+  "pattern": [
+    "   ",
+    "p p",
+    "c c"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:exo_boots"
+  }
+}

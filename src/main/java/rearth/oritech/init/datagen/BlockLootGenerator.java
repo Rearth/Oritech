@@ -16,7 +16,7 @@ public class BlockLootGenerator extends FabricBlockLootTableProvider {
     
     public static Set<Block> autoRegisteredDrops = new HashSet<>();
     
-    protected BlockLootGenerator(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
+    public BlockLootGenerator(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
         super(dataOutput, registryLookup);
     }
     

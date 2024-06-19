@@ -148,7 +148,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+    public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         writeAddonToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
@@ -157,7 +157,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         loadAddonNbtData(nbt);
         updateEnergyContainer();

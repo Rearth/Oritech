@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_machine_inventory_proxy_addon": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:machine_inventory_proxy_addon"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:machine_inventory_proxy_addon_invproxy"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_machine_inventory_proxy_addon"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:machine_inventory_proxy_addon_invproxy"
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 package rearth.oritech.network;
 
+import io.wispforest.endec.impl.ReflectiveEndecBuilder;
 import io.wispforest.owo.network.OwoNetChannel;
-import io.wispforest.owo.serialization.endec.ReflectiveEndecBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -92,8 +92,10 @@ public class NetworkContent {
         
         Oritech.LOGGER.debug("Registering oritech channels");
         
-        ReflectiveEndecBuilder.register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
-        ReflectiveEndecBuilder.register(ItemFilterBlockEntity.FILTER_ITEMS_ENDEC, (Class<Map<Integer, ItemStack>>) (Object) Map.class); // I don't even know what kind of abomination this cast is, but it seems to work
+        // ReflectiveEndecBuilder.SHARED_INSTANCE.register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
+        ReflectiveEndecBuilder.SHARED_INSTANCE.register(ItemFilterBlockEntity.FILTER_ITEMS_ENDEC, (Class<Map<Integer, ItemStack>>) (Object) Map.class); // I don't even know what kind of abomination this cast is, but it seems to work
+        
+        MACHINE_CHANNEL.builder().register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
         
         MACHINE_CHANNEL.registerClientbound(MachineSyncPacket.class, ((message, access) -> {
             
@@ -110,6 +112,7 @@ public class NetworkContent {
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
             if (entity instanceof MultiblockMachineController machine) {
+                System.out.println("playing setup on client!");
                 machine.playSetupAnimation();
             }
             
@@ -186,7 +189,7 @@ public class NetworkContent {
             if (entity instanceof FluidProvider fluidProvider && fluidProvider.getForDirectFluidAccess() != null) {
                 var storage = fluidProvider.getForDirectFluidAccess();
                 storage.amount = message.amount;
-                storage.variant = FluidVariant.of(Registries.FLUID.get(new Identifier(message.fluidType)));
+                storage.variant = FluidVariant.of(Registries.FLUID.get(Identifier.of(message.fluidType)));
             }
             
         }));
@@ -196,7 +199,7 @@ public class NetworkContent {
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
             if (entity instanceof PumpBlockEntity pump) {
-                var variant = FluidVariant.of(Registries.FLUID.get(new Identifier(message.fluidType)));
+                var variant = FluidVariant.of(Registries.FLUID.get(Identifier.of(message.fluidType)));
                 pump.setLastPumpedVariant(variant);
                 pump.setLastPumpTime(message.workedAt);
             }
@@ -213,8 +216,8 @@ public class NetworkContent {
                 var outStorage = centrifuge.outputStorage;
                 inStorage.amount = message.amountIn;
                 outStorage.amount = message.amountOut;
-                inStorage.variant = FluidVariant.of(Registries.FLUID.get(new Identifier(message.fluidTypeIn)));
-                outStorage.variant = FluidVariant.of(Registries.FLUID.get(new Identifier(message.fluidTypeOut)));
+                inStorage.variant = FluidVariant.of(Registries.FLUID.get(Identifier.of(message.fluidTypeIn)));
+                outStorage.variant = FluidVariant.of(Registries.FLUID.get(Identifier.of(message.fluidTypeOut)));
             }
             
         }));

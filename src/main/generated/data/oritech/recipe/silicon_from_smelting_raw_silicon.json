@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 60,
+  "experience": 0.5,
+  "group": "siliconfurnace",
+  "ingredient": {
+    "item": "oritech:raw_silicon"
+  },
+  "result": {
+    "id": "oritech:silicon"
+  }
+}

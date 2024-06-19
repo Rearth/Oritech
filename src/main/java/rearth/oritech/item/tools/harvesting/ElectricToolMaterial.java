@@ -1,8 +1,11 @@
 package rearth.oritech.item.tools.harvesting;
 
+import net.minecraft.block.Block;
 import net.minecraft.item.Items;
 import net.minecraft.item.ToolMaterial;
+import net.minecraft.item.ToolMaterials;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.registry.tag.TagKey;
 
 public class ElectricToolMaterial implements ToolMaterial {
     @Override
@@ -21,8 +24,8 @@ public class ElectricToolMaterial implements ToolMaterial {
     }
     
     @Override
-    public int getMiningLevel() {
-        return 3;
+    public TagKey<Block> getInverseTag() {
+        return ToolMaterials.NETHERITE.getInverseTag();
     }
     
     @Override

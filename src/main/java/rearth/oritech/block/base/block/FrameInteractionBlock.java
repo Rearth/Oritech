@@ -60,7 +60,7 @@ public abstract class FrameInteractionBlock extends HorizontalFacingBlock implem
     }
     
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
         if (!world.isClient) {
             

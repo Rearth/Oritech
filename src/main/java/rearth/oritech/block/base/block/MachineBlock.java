@@ -103,7 +103,7 @@ public abstract class MachineBlock extends HorizontalFacingBlock implements Bloc
     }
     
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!world.isClient) {
             var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
             player.openHandledScreen(handler);

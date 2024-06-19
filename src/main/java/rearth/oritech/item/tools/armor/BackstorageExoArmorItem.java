@@ -5,17 +5,19 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import rearth.oritech.item.tools.util.Helpers;
 import team.reborn.energy.api.base.SimpleEnergyItem;
 
 import java.util.List;
 
 public class BackstorageExoArmorItem extends ExoArmorItem implements SimpleEnergyItem {
-    public BackstorageExoArmorItem(ArmorMaterial material, Type type, Settings settings) {
+    
+    public BackstorageExoArmorItem(RegistryEntry<ArmorMaterial> material, Type type, Settings settings) {
         super(material, type, settings);
     }
     
@@ -62,10 +64,9 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements SimpleEnerg
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, tooltip, type);
         var text = Text.literal(String.format("%d/%d RF", this.getStoredEnergy(stack), this.getEnergyCapacity(stack)));
         tooltip.add(text.formatted(Formatting.GOLD));
-        
-        super.appendTooltip(stack, world, tooltip, context);
     }
 }

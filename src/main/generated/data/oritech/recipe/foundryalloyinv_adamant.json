@@ -1,0 +1,18 @@
+{
+  "type": "oritech:foundry",
+  "ingredients": [
+    {
+      "tag": "c:nickel_ingots"
+    },
+    {
+      "item": "minecraft:diamond"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:adamant_ingot"
+    }
+  ],
+  "time": 300
+}

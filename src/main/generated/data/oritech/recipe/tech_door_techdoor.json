@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "a": {
+      "tag": "c:steel_ingots"
+    }
+  },
+  "pattern": [
+    "aa ",
+    "aa ",
+    "aa "
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:tech_door"
+  }
+}

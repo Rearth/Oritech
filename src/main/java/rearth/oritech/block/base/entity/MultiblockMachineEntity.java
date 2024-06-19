@@ -75,9 +75,4 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     public static Vec3i worldToRelativePos(Vec3i ownWorldPos, Vec3i worldPos, Direction ownFacing) {
         return worldPos.subtract(ownWorldPos);
     }
-    
-    @Override
-    public void playSetupAnimation() {
-        super.playSetupAnimation();
-    }
 }

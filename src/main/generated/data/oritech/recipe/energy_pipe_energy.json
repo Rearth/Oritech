@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "oritech:electrum_ingot"
+    },
+    "i": {
+      "item": "oritech:insulated_wire"
+    }
+  },
+  "pattern": [
+    "iii",
+    "ccc",
+    "iii"
+  ],
+  "result": {
+    "count": 6,
+    "id": "oritech:energy_pipe"
+  }
+}

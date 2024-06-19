@@ -125,10 +125,11 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
         @Override
         public T create(int syncId, PlayerInventory inventory, BasicData data) {
             try {
-                return target.getDeclaredConstructor(Integer.class, PlayerInventory.class, BlockEntity.class).newInstance(syncId, inventory, inventory.player.getWorld().getBlockEntity(data.pos()));
+                return target.getDeclaredConstructor(int.class, PlayerInventory.class, BlockEntity.class).newInstance(syncId, inventory, inventory.player.getWorld().getBlockEntity(data.pos()));
             } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-                Oritech.LOGGER.error("Yeah something went very very wrong registering mod screen for Oritech");
-                return null;
+                Oritech.LOGGER.error("Yeah something went very very wrong registering basic mod screen for Oritech");
+                e.printStackTrace();
+                return (T) new BasicMachineScreenHandler(1, inventory, new BasicData(BlockPos.ORIGIN));
             }
         }
     }
@@ -149,10 +150,11 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
         public T create(int syncId, PlayerInventory inventory, UpgradableData data) {
             
             try {
-                return target.getDeclaredConstructor(Integer.class, PlayerInventory.class, BlockEntity.class, MachineAddonController.AddonUiData.class, Float.class).newInstance(syncId, inventory, inventory.player.getWorld().getBlockEntity(data.pos()), data.addonUiData, data.coreQuality);
+                return target.getDeclaredConstructor(int.class, PlayerInventory.class, BlockEntity.class, MachineAddonController.AddonUiData.class, float.class).newInstance(syncId, inventory, inventory.player.getWorld().getBlockEntity(data.pos()), data.addonUiData, data.coreQuality);
             } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-                Oritech.LOGGER.error("Yeah something went very very wrong registering mod screen for Oritech");
-                return null;
+                Oritech.LOGGER.error("Yeah something went very very wrong registering upgradable mod screen for Oritech");
+                e.printStackTrace();
+                return (T) new BasicMachineScreenHandler(1, inventory, new BasicData(BlockPos.ORIGIN));
             }
         }
     }

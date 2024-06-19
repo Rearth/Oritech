@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "oritech:electrum_ingot"
+    },
+    "s": {
+      "tag": "c:steel_ingots"
+    },
+    "w": {
+      "item": "oritech:plastic_sheet"
+    }
+  },
+  "pattern": [
+    " s ",
+    "wcw",
+    "wcw"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:basic_battery"
+  }
+}

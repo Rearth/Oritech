@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "minecraft:furnace"
+    },
+    "c": {
+      "item": "oritech:electrum_ingot"
+    },
+    "f": {
+      "tag": "c:copper_ingots"
+    },
+    "m": {
+      "tag": "c:platinum_ingots"
+    },
+    "s": {
+      "item": "oritech:magnetic_coil"
+    }
+  },
+  "pattern": [
+    "fff",
+    "mcm",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:powered_furnace_block"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "oritech:assembler",
+  "ingredients": [
+    {
+      "item": "minecraft:honeycomb"
+    },
+    {
+      "item": "oritech:biomass"
+    },
+    {
+      "item": "oritech:biomass"
+    },
+    {
+      "item": "oritech:biomass"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:slime_ball"
+    }
+  ],
+  "time": 300
+}
