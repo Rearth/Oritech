@@ -21,6 +21,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
 import rearth.oritech.init.BlockContent;
@@ -58,16 +60,8 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         
         if (!world.isClient) {
-            var stack = new ItemStack(BlockContent.SMALL_TANK_BLOCK.asItem());
+            var stack = getStackWithData(world, pos);
             var tankEntity = (SmallFluidTankEntity) world.getBlockEntity(pos);
-            
-            if (tankEntity.getForDirectFluidAccess().amount > 0) {
-                var nbt = new NbtCompound();
-                tankEntity.writeNbt(nbt, world.getRegistryManager());
-                stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
-                var fluidName = FluidVariantAttributes.getName(tankEntity.getForDirectFluidAccess().variant);
-                stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable("block.oritech.small_tank_block")));
-            }
             
             if (!player.isCreative())
                 Block.dropStack(world, pos, stack);
@@ -83,6 +77,27 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
         }
         
         return super.onBreak(world, pos, state, player);
+    }
+    
+    @Override
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
+        return getStackWithData(world, pos);
+    }
+    
+    @NotNull
+    private static ItemStack getStackWithData(WorldView world, BlockPos pos) {
+        var stack = new ItemStack(BlockContent.SMALL_TANK_BLOCK.asItem());
+        var tankEntity = (SmallFluidTankEntity) world.getBlockEntity(pos);
+        
+        if (tankEntity.getForDirectFluidAccess().amount > 0) {
+            var nbt = new NbtCompound();
+            tankEntity.writeNbt(nbt, world.getRegistryManager());
+            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+            var fluidName = FluidVariantAttributes.getName(tankEntity.getForDirectFluidAccess().variant);
+            stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable("block.oritech.small_tank_block")));
+        }
+        
+        return stack;
     }
     
     @Override
