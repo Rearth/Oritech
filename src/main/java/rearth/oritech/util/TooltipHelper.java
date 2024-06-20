@@ -10,9 +10,30 @@ import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class TooltipHelper {
+    
+    public static String getEnergyText(long amount) {
+        if (amount < 1000) {
+            return String.valueOf(amount);
+        } else if (amount < 1_000_000) {
+            return getFormatted(amount / 1000.0) + "K";
+        } else if (amount < 1_000_000_000) {
+            return getFormatted(amount / 1000000.0) + "M";
+        } else {
+            return getFormatted(amount / 1000000000.0) + "B";
+        }
+    }
+    
+    private static String getFormatted(double number) {
+        var formatter = NumberFormat.getNumberInstance(Locale.ROOT);
+        formatter.setMinimumFractionDigits(0);
+        formatter.setMaximumFractionDigits(2);
+        return formatter.format(number);
+    }
     
     public static void addMachineTooltip(List<Text> tooltip, Block block, BlockEntityProvider entityProvider) {
         var showExtra = Screen.hasControlDown();
@@ -40,7 +61,7 @@ public class TooltipHelper {
                 }
             }
             if (entity instanceof EnergyProvider energyProvider) {
-                var maxStorage = energyProvider.getStorage(null).getCapacity();
+                var maxStorage = getEnergyText(energyProvider.getStorage(null).getCapacity());
                 tooltip.add(Text.translatable("tooltip.oritech.machine_capacity_desc").formatted(Formatting.GRAY).append(Text.literal(maxStorage + " RF").formatted(Formatting.GOLD)));
             }
         } else {
@@ -49,7 +70,8 @@ public class TooltipHelper {
     }
     
     public static Text getFormattedEnergyChangeTooltip(long amount, String unit) {
-        var text = amount > 0 ? "+" + amount : String.valueOf(amount);
+        var formatted = getEnergyText(amount);
+        var text = amount > 0 ? "+" + formatted : formatted;
         return Text.literal(text).formatted(Formatting.GOLD).append(unit).formatted(Formatting.GOLD);
     }
     

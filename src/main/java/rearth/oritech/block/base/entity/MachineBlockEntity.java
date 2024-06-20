@@ -401,7 +401,7 @@ public abstract class MachineBlockEntity extends BlockEntity
             
             if (state.isCurrentAnimation(SETUP)) {
                 if (state.getController().hasAnimationFinished()) {
-                    state.setAndContinue(IDLE);
+                    return state.setAndContinue(IDLE);
                 } else {
                     return state.setAndContinue(SETUP);
                 }

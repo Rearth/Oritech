@@ -23,6 +23,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.LaserArmModel;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;
 
@@ -122,7 +123,9 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         var energyFill = String.format("%.1f", percentage * 100);
         var energyUsage = handler.screenData.getDisplayedEnergyUsage();
         var energyUsageText = String.format("%.1f", energyUsage);
-        return Text.literal(amount + " / " + max + " RF\n" + energyFill + "% Charged\n\nMaximum Usage: " + energyUsageText + " RF/t");
+        var storedAmount = TooltipHelper.getEnergyText(amount);
+        var maxAmount = TooltipHelper.getEnergyText(max);
+        return Text.literal(storedAmount + " / " + maxAmount + " RF\n" + energyFill + "% Charged\n\nMaximum Usage: " + energyUsageText + " RF/t");
     }
     
     public void updateSettingsButtons() {

@@ -117,6 +117,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public Object getScreenOpeningData(ServerPlayerEntity player) {
+        updateNetwork();
         return new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
     }
     

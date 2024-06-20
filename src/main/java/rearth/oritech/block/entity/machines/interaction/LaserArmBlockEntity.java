@@ -210,10 +210,11 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     private void findNextBlockBreakTarget() {
         
-        if (pendingArea != null && !pendingArea.isEmpty()) {
-            trySetNewTarget(pendingArea.pop(), false);
-            if (pendingArea.isEmpty()) pendingArea = null;
-            return;
+        while (pendingArea != null && !pendingArea.isEmpty()) {
+            if (trySetNewTarget(pendingArea.pop(), false)) {
+                if (pendingArea.isEmpty()) pendingArea = null;
+                return;
+            }
         }
         
         var direction = Vec3d.of(targetDirection.subtract(pos.up())).normalize();
@@ -346,11 +347,11 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         
         var distance = targetPos.getManhattanDistance(pos);
         var blockHardness = targetState.getBlock().getHardness();
-        if (distance > range || blockHardness < 0.0) {
+        if (distance > range || blockHardness < 0.0 || targetState.getBlock().equals(Blocks.AIR)) {
             return false;
         }
         
-        this.targetBlockEnergyNeeded = (int) (BLOCK_BREAK_ENERGY * Math.sqrt(blockHardness) *  addonData.efficiency());
+        this.targetBlockEnergyNeeded = (int) (BLOCK_BREAK_ENERGY * Math.sqrt(blockHardness) * addonData.efficiency());
         this.currentTarget = targetPos;
         
         if (alsoSetDirection) {

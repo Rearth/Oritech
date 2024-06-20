@@ -71,21 +71,15 @@ public class Oritech implements ModInitializer {
             
             var dataId = "energy_" + regKey.getNamespace() + "_" + regKey.getPath();
             var result = world.getPersistentStateManager().getOrCreate(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, dataId);
-            if (result.hashCode() != 0) {
-                EnergyPipeBlock.ENERGY_PIPE_DATA.put(regKey, result);
-            }
+            EnergyPipeBlock.ENERGY_PIPE_DATA.put(regKey, result);
             
             var fluidDataId = "fluid_" + regKey.getNamespace() + "_" + regKey.getPath();
             var fluidResult = world.getPersistentStateManager().getOrCreate(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, fluidDataId);
-            if (fluidResult.hashCode() != 0) {
-                FluidPipeBlock.FLUID_PIPE_DATA.put(regKey, fluidResult);
-            }
+            FluidPipeBlock.FLUID_PIPE_DATA.put(regKey, fluidResult);
             
             var itemDataId = "item_" + regKey.getNamespace() + "_" + regKey.getPath();
             var itemResult = world.getPersistentStateManager().getOrCreate(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, itemDataId);
-            if (itemResult.hashCode() != 0) {
-                ItemPipeBlock.ITEM_PIPE_DATA.put(regKey, itemResult);
-            }
+            ItemPipeBlock.ITEM_PIPE_DATA.put(regKey, itemResult);
         });
     }
 }

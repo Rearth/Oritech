@@ -238,6 +238,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     @Override
     public Object getScreenOpeningData(ServerPlayerEntity player) {
+        sendNetworkEntry();
         return new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
     }
     
