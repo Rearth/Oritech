@@ -25,7 +25,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
@@ -34,10 +33,9 @@ import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -55,7 +53,6 @@ public abstract class MachineBlockEntity extends BlockEntity
     public final SimpleInventory inventory = new SimpleMachineInventory(getInventorySize());
     // crafting / processing
     protected int progress;
-    private final AnimationController<MachineBlockEntity> animationController = getAnimationController();
     protected int energyPerTick;
     protected OritechRecipe currentRecipe = OritechRecipe.DUMMY;
     protected InventoryInputMode inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
@@ -73,6 +70,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state);
         this.energyPerTick = energyPerTick;
+        SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
     
     @Override
@@ -385,41 +383,33 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(animationController);
+        controllers.add(new AnimationController<>(this, this::onAnimationUpdate)
+                          .triggerableAnim("setup", SETUP)
+                          .setAnimationSpeedHandler(animatable -> (double) getAnimationSpeed())
+                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>(this::getAnimationSpeed)));
+    }
+    
+    public PlayState onAnimationUpdate(final AnimationState<MachineBlockEntity> state) {
         
-    }
-    
-    // TODO fix this
-    public void playSetupAnimation() {
-        animationController.setAnimation(SETUP);
-        animationController.forceAnimationReset();
-    }
-    
-    @NotNull
-    public AnimationController<MachineBlockEntity> getAnimationController() {
-        return new AnimationController<>(this, state -> {
-            
-            if (state.isCurrentAnimation(SETUP)) {
-                if (state.getController().hasAnimationFinished()) {
-                    return state.setAndContinue(IDLE);
-                } else {
-                    return state.setAndContinue(SETUP);
-                }
-            }
-            
-            if (isActive(getCachedState())) {
-                if (progress > 0) {
-                    return state.setAndContinue(WORKING);
-                } else {
-                    return state.setAndContinue(IDLE);
-                }
+        if (state.getController().isPlayingTriggeredAnimation()) return PlayState.CONTINUE;
+        
+        if (isActive(getCachedState())) {
+            if (progress > 0) {
+                return state.setAndContinue(WORKING);
             } else {
-                return state.setAndContinue(PACKAGED);
+                return state.setAndContinue(IDLE);
             }
-        }).setAnimationSpeedHandler(animatable -> (double) getAnimationSpeed()).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>(this::getAnimationSpeed));
+        }
+        
+        return state.setAndContinue(PACKAGED);
+    }
+    
+    public void playSetupAnimation() {
+        triggerAnim("base_controller", "setup");
     }
     
     protected float getAnimationSpeed() {
+        if (getRecipeDuration() < 0) return 1;
         var recipeTicks = getRecipeDuration() * getSpeedMultiplier();
         var animationTicks = 60f;    // 3s, length which all animations are defined as
         return animationTicks / recipeTicks;
