@@ -51,6 +51,7 @@ public class Oritech implements ModInitializer {
         FieldRegistrationHandler.register(SoundContent.class, Oritech.MOD_ID, false);
         Oritech.LOGGER.debug("registering others...");
         FieldRegistrationHandler.register(ToolsContent.class, MOD_ID, false);
+        ComponentContent.init();
         ToolsContent.registerEventHandlers();
         ItemGroups.registerItemGroup();
         RecipeContent.initialize();

@@ -7,11 +7,14 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifierSlot;
+import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.MiningToolItem;
@@ -29,7 +32,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
+import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.init.datagen.data.TagContent;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -45,7 +50,6 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.List;
 import java.util.function.Consumer;
 
-// TODO from 1.20.5, reach is an attribute that can be modified. Use this here to extend the tools' reach
 public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
     
     private static final RawAnimation AREA_ANIM = RawAnimation.begin().thenLoop("area");
@@ -88,14 +92,15 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
             }
         }
         
-        return super.postMine(stack, world, state, pos, miner);
+        return true;
     }
     
     private static boolean isAreaEnabled(ItemStack stack) {
-        if (!stack.contains(DataComponentTypes.CUSTOM_DATA)) return false;
-        
-        var nbt = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
-        return nbt.contains("area") && nbt.getBoolean("area");
+        return stack.getOrDefault(ComponentContent.IS_AOE_ACTIVE, false);
+    }
+    
+    private static void setAreaEnabled(ItemStack stack, boolean enabled) {
+        stack.set(ComponentContent.IS_AOE_ACTIVE, enabled);
     }
     
     @Override
@@ -103,17 +108,12 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
         
         if (!world.isClient && user.isSneaking()) {
             var stack = user.getStackInHand(hand);
-            var tag = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
-            var wasEnabled = false;
-            if (tag.contains("area"))
-                wasEnabled = tag.getBoolean("area");
             
-            var enabled = !wasEnabled;
-            tag.putBoolean("area", enabled);
-            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(tag));
-            MinecraftClient.getInstance().player.sendMessage(Text.literal(enabled ? "Area Effect" : "Silk Touch"), true);
-            
-            triggerAnim(user, GeoItem.getOrAssignId(stack, (ServerWorld) world), "Pickaxe", enabled ? "area" : "silk");
+            var wasArea = isAreaEnabled(stack);
+            var isArea = !wasArea;
+            setAreaEnabled(stack, isArea);
+            MinecraftClient.getInstance().player.sendMessage(Text.literal(isArea ? "Area Effect" : "Silk Touch"), true);
+            triggerAnim(user, GeoItem.getOrAssignId(stack, (ServerWorld) world), "Pickaxe", isArea ? "area" : "silk");
         }
         
         return super.use(world, user, hand);
@@ -141,6 +141,13 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
     }
     
     @Override
+    public AttributeModifiersComponent getAttributeModifiers() {
+        return super.getAttributeModifiers()
+                 .with(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, new EntityAttributeModifier(Oritech.id("pick_block_range"), 2, EntityAttributeModifier.Operation.ADD_VALUE), AttributeModifierSlot.MAINHAND)
+                 .with(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE, new EntityAttributeModifier(Oritech.id("pick_entity_range"), 2, EntityAttributeModifier.Operation.ADD_VALUE), AttributeModifierSlot.MAINHAND);
+    }
+    
+    @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         super.appendTooltip(stack, context, tooltip, type);
         
@@ -150,7 +157,6 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
         tooltip.add(Text.translatable("tooltip.oritech.promethium_pick").formatted(Formatting.DARK_GRAY));
         
     }
-    
     
     @Override
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {

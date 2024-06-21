@@ -1,23 +1,20 @@
 package rearth.oritech.item.tools;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.entity.machines.interaction.DronePortEntity;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ComponentContent;
 
 import java.util.List;
-import java.util.Objects;
 
 public class LaserTargetDesignator extends Item {
     public LaserTargetDesignator(Settings settings) {
@@ -44,8 +41,8 @@ public class LaserTargetDesignator extends Item {
         
         if (targetBlockState.getBlock().equals(BlockContent.LASER_ARM_BLOCK)
               && context.getWorld().getBlockEntity(targetPos) instanceof LaserArmBlockEntity laserEntity
-              && context.getStack().contains(DataComponentTypes.CUSTOM_DATA)) {
-            var target = BlockPos.fromLong(context.getStack().get(DataComponentTypes.CUSTOM_DATA).copyNbt().getLong("target"));
+              && context.getStack().contains(ComponentContent.TARGET_POSITION)) {
+            var target = context.getStack().get(ComponentContent.TARGET_POSITION);
             
             var success = laserEntity.setTargetFromDesignator(target);
             if (success)
@@ -55,8 +52,8 @@ public class LaserTargetDesignator extends Item {
         
         if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT_BLOCK)
               && context.getWorld().getBlockEntity(context.getBlockPos()) instanceof DronePortEntity dronePortEntity
-              && context.getStack().contains(DataComponentTypes.CUSTOM_DATA)) {
-            var target = BlockPos.fromLong(context.getStack().get(DataComponentTypes.CUSTOM_DATA).copyNbt().getLong("target"));
+              && context.getStack().contains(ComponentContent.TARGET_POSITION)) {
+            var target = context.getStack().get(ComponentContent.TARGET_POSITION);
             
             var success = dronePortEntity.setTargetFromDesignator(target);
             if (success) {
@@ -70,9 +67,7 @@ public class LaserTargetDesignator extends Item {
         if (!targetBlockState.getBlock().equals(Blocks.AIR)) {
             Oritech.LOGGER.debug(targetBlockState.toString());
             
-            var nbt = context.getStack().getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt();
-            nbt.putLong("target", context.getBlockPos().asLong());
-            context.getStack().set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+            context.getStack().set(ComponentContent.TARGET_POSITION, context.getBlockPos());
             context.getPlayer().sendMessage(Text.literal("Position stored"));
             
             return ActionResult.SUCCESS;
@@ -85,8 +80,8 @@ public class LaserTargetDesignator extends Item {
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         super.appendTooltip(stack, context, tooltip, type);
         
-        if (stack.contains(DataComponentTypes.CUSTOM_DATA)) {
-            var data = BlockPos.fromLong(Objects.requireNonNull(stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt()).getLong("target"));
+        if (stack.contains(ComponentContent.TARGET_POSITION)) {
+            var data = stack.get(ComponentContent.TARGET_POSITION);
             tooltip.add(Text.of("Set to: [" + data.toShortString() + "]"));
         } else {
             tooltip.add(Text.of("No target set"));

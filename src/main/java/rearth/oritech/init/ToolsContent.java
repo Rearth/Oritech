@@ -10,8 +10,8 @@ import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.BlockTags;
 import rearth.oritech.Oritech;
+import rearth.oritech.init.datagen.data.TagContent;
 import rearth.oritech.item.tools.armor.BackstorageExoArmorItem;
 import rearth.oritech.item.tools.armor.ExoArmorItem;
 import rearth.oritech.item.tools.harvesting.*;
@@ -21,7 +21,7 @@ import java.lang.reflect.Field;
 
 public class ToolsContent implements ItemRegistryContainer {
     
-    public static final RegistryEntry<ArmorMaterial> EXOSUIT_MATERIAL = ArmorMaterials.NETHERITE;
+    public static final RegistryEntry<ArmorMaterial> EXOSUIT_MATERIAL = ArmorMaterials.DIAMOND;
     public static final ToolMaterial ELECTRIC_MATERIAL = new ElectricToolMaterial();
     public static final ToolMaterial PROMETHIUM_MATERIAL = new PromethiumToolMaterial();
     
@@ -31,10 +31,10 @@ public class ToolsContent implements ItemRegistryContainer {
     public static final Item EXO_BOOTS = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings());
     
     public static final Item CHAINSAW = new ChainsawItem(ELECTRIC_MATERIAL, new Item.Settings());
-    public static final Item HAND_DRILL = new DrillItem(ELECTRIC_MATERIAL, BlockTags.PICKAXE_MINEABLE, new Item.Settings());
+    public static final Item HAND_DRILL = new DrillItem(ELECTRIC_MATERIAL, TagContent.DRILL_MINEABLE, new Item.Settings());
     
     public static final Item PROMETHIUM_AXE = new PromethiumAxeItem(PROMETHIUM_MATERIAL, new Item.Settings());
-    public static final Item PROMETHIUM_PICKAXE = new PromethiumPickaxeItem(PROMETHIUM_MATERIAL, BlockTags.PICKAXE_MINEABLE, new Item.Settings());
+    public static final Item PROMETHIUM_PICKAXE = new PromethiumPickaxeItem(PROMETHIUM_MATERIAL, TagContent.DRILL_MINEABLE, new Item.Settings());
     
     @IterationIgnored
     public static final Item ORITECH_GUIDE = LavenderBookItem.registerForBook(Oritech.id("oritech_guide"), new Item.Settings().maxCount(1));
