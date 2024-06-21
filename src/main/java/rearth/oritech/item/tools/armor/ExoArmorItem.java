@@ -1,6 +1,7 @@
 package rearth.oritech.item.tools.armor;
 
 import net.minecraft.client.render.entity.model.BipedEntityModel;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.EquipmentSlot;
@@ -39,7 +40,12 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
     public ExoArmorItem(RegistryEntry<ArmorMaterial> material, Type type, Settings settings) {
-        super(material, type, settings.maxDamage(-1));
+        super(material, type, settings);
+    }
+    
+    @Override
+    public ComponentMap getComponents() {
+        return super.getComponents();
     }
     
     @Override

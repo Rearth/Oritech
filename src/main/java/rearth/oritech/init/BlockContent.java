@@ -190,7 +190,6 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block RESOURCE_NODE_PLATINUM = new Block(FabricBlockSettings.copyOf(Blocks.BEDROCK));
     
     // region decorative
-    // TODO recipes
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block CEILING_LIGHT = new WallMountedLight(FabricBlockSettings.copyOf(Blocks.GLOWSTONE).nonOpaque(), 6);
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)

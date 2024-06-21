@@ -27,20 +27,4 @@ public class SmallFluidTankBlockItem extends BlockItem {
         var amountTip = amount / FluidConstants.BUCKET + " B";
         tooltip.add(Text.literal("Content: " + amountTip).formatted(Formatting.DARK_AQUA));
     }
-    
-    @Override
-    public Text getName(ItemStack stack) {
-        
-        if (!stack.contains(DataComponentTypes.CUSTOM_DATA)) return super.getName(stack);
-        
-//        var nbt = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
-//        SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
-//
-//        var variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
-//        var titleFluid = FluidVariantAttributes.getName(variant).getString();
-//
-//        return Text.of("Small " + titleFluid + " Tank");
-        // TODO fix this
-        return super.getName(stack);
-    }
 }
