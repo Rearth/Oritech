@@ -4,7 +4,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CropBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.UnbreakableComponent;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.loot.context.LootContextParameterSet;
+import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
@@ -14,6 +23,7 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockFrameInteractionEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -30,6 +40,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
     public boolean hasCropFilterAddon;
     public int range = 1;
+    public int yieldAddons = 0;
     
     // non-persistent
     public BlockPos quarryTarget = BlockPos.ORIGIN;
@@ -42,6 +53,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     public void gatherAddonStats(List<AddonBlock> addons) {
         range = 1;
+        yieldAddons = 0;
         super.gatherAddonStats(addons);
     }
     
@@ -50,9 +62,11 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON))
             hasCropFilterAddon = true;
         
-        if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON)) {
+        if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON))
             range *= 8;
-        }
+        
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON))
+            yieldAddons++;
         
         
         super.getAdditionalStatFromAddon(addonBlock);
@@ -63,6 +77,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         super.resetAddons();
         hasCropFilterAddon = false;
         range = 1;
+        yieldAddons = 0;
     }
     
     @Override
@@ -70,6 +85,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         super.writeNbt(nbt, registryLookup);
         nbt.putBoolean("cropAddon", hasCropFilterAddon);
         nbt.putInt("range", range);
+        nbt.putInt("yield", yieldAddons);
     }
     
     @Override
@@ -77,6 +93,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         super.readNbt(nbt, registryLookup);
         hasCropFilterAddon = nbt.getBoolean("cropAddon");
         range = nbt.getInt("range");
+        yieldAddons = nbt.getInt("yield");
     }
     
     @Override
@@ -146,7 +163,12 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         if (!targetState.getBlock().equals(Blocks.AIR)) {
             
             var targetEntity = world.getBlockEntity(targetPosition);
-            var dropped = Block.getDroppedStacks(targetState, (ServerWorld) world, targetPosition, targetEntity);
+            List<ItemStack> dropped;
+            if (yieldAddons > 0) {
+                dropped = getLootDrops(targetState, (ServerWorld) world, targetPosition, targetEntity, yieldAddons);
+            } else {
+                dropped = Block.getDroppedStacks(targetState, (ServerWorld) world, targetPosition, targetEntity);
+            }
             
             // only proceed if all stacks fit
             for (var stack : dropped) {
@@ -162,6 +184,17 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             world.breakBlock(targetPosition, false);
             super.finishBlockWork(processed);
         }
+    }
+    
+    public static List<ItemStack> getLootDrops(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity, int yieldAddons) {
+        
+        var sampleTool = new ItemStack(Items.NETHERITE_PICKAXE);
+        sampleTool.set(DataComponentTypes.UNBREAKABLE, new UnbreakableComponent(false));
+        var fortuneEntry = world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(Enchantments.FORTUNE).get();
+        sampleTool.addEnchantment(fortuneEntry, Math.min(yieldAddons, 3));
+        
+        var builder = new LootContextParameterSet.Builder(world).add(LootContextParameters.ORIGIN, Vec3d.ofCenter(pos)).add(LootContextParameters.TOOL, sampleTool).addOptional(LootContextParameters.BLOCK_ENTITY, blockEntity);
+        return state.getDroppedStacks(builder);
     }
     
     @Override
@@ -180,10 +213,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
     @Override
     public List<Pair<Text, Text>> getExtraExtensionLabels() {
-        
-        if (range == 1) return super.getExtraExtensionLabels();
-        
-        return List.of(new Pair<>(Text.literal(range + " Range"), Text.literal("Maximum digging depth")));
+        if (range == 1 && yieldAddons == 0) return super.getExtraExtensionLabels();
+        return List.of(new Pair<>(Text.literal(range + " Range"), Text.literal("Maximum digging depth")), new Pair<>(Text.literal(yieldAddons + " Fortune"), Text.literal("Yield addon count. 3 is the effective maximum")));
     }
     
     @Override
@@ -254,7 +285,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     }
     
     private void syncQuarryNetworkData() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.QuarryTargetPacket(pos, quarryTarget, range, getBaseAddonData().speed()));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.QuarryTargetPacket(pos, quarryTarget, range, yieldAddons, getBaseAddonData().speed()));
     }
     
     @Override

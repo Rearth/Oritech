@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.machines.interaction;
 
+import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
@@ -92,6 +93,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     private float coreQuality = 1f;
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
     public int areaSize = 1;
+    public int yieldAddons = 0;
     
     // config
     private final int range = Oritech.CONFIG.laserArmConfig.range();
@@ -108,6 +110,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     // needed only on client
     public Vec3d lastRenderPosition;
+    private PlayerEntity laserPlayerEntity = null;
     
     public LaserArmBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.LASER_ARM_ENTITY, pos, state);
@@ -184,7 +187,12 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         progress -= targetBlockEnergyNeeded;
         
         var targetEntity = world.getBlockEntity(targetPos);
-        var dropped = Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetPos, targetEntity);
+        List<ItemStack> dropped;
+        if (yieldAddons > 0) {
+            dropped = DestroyerBlockEntity.getLootDrops(targetBlockState, (ServerWorld) world, targetPos, targetEntity, yieldAddons);
+        } else {
+            dropped = Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetPos, targetEntity);
+        }
         
         if (targetBlockState.getBlock().equals(Blocks.AMETHYST_CLUSTER)) {
             dropped = List.of(new ItemStack(ItemContent.FLUXITE));
@@ -197,7 +205,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         }
         
         try {
-            targetBlockState.getBlock().onBreak(world, targetPos, targetBlockState, null);
+            targetBlockState.getBlock().onBreak(world, targetPos, targetBlockState, getLaserPlayerEntity());
         } catch (Exception exception) {
             Oritech.LOGGER.warn("Laser arm block break event failure when breaking " + targetBlockState + " at " + targetPos + ": " + exception.getLocalizedMessage());
         }
@@ -206,6 +214,24 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         world.breakBlock(targetPos, false);
         
         findNextBlockBreakTarget();
+    }
+    
+    private PlayerEntity getLaserPlayerEntity() {
+        if (laserPlayerEntity == null) {
+            laserPlayerEntity = new PlayerEntity(world, pos, 0, new GameProfile(UUID.randomUUID(), "laser")) {
+                @Override
+                public boolean isSpectator() {
+                    return false;
+                }
+                
+                @Override
+                public boolean isCreative() {
+                    return false;
+                }
+            };
+        }
+        
+        return laserPlayerEntity;
     }
     
     private void findNextBlockBreakTarget() {
@@ -299,6 +325,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     public void gatherAddonStats(List<AddonBlock> addons) {
         
         areaSize = 1;
+        yieldAddons = 0;
         
         MachineAddonController.super.gatherAddonStats(addons);
     }
@@ -307,9 +334,10 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
         MachineAddonController.super.getAdditionalStatFromAddon(addonBlock);
         
-        if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON)) {
+        if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON))
             areaSize++;
-        }
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON))
+            yieldAddons++;
         
     }
     
@@ -323,7 +351,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     private void updateNetwork() {
         var sendTarget = currentTarget != null ? currentTarget : BlockPos.ORIGIN;
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
         networkDirty = false;
     }
@@ -373,6 +401,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         nbt.putLong("energy_stored", energyStorage.amount);
         nbt.putBoolean("redstone", redstonePowered);
         nbt.putInt("areaSize", areaSize);
+        nbt.putInt("yieldAddons", yieldAddons);
         
         if (targetDirection != null && currentTarget != null) {
             nbt.putLong("target_position", currentTarget.asLong());
@@ -401,6 +430,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         targetDirection = BlockPos.fromLong(nbt.getLong("target_direction"));
         currentTarget = BlockPos.fromLong(nbt.getLong("target_position"));
         areaSize = nbt.getInt("areaSize");
+        yieldAddons = nbt.getInt("yieldAddons");
         
         if (nbt.contains("pendingPositions")) {
             pendingArea = Arrays.stream(nbt.getLongArray("pendingPositions")).mapToObj(BlockPos::fromLong).collect(Collectors.toCollection(ArrayDeque::new));
@@ -613,10 +643,8 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     @Override
     public List<Pair<Text, Text>> getExtraExtensionLabels() {
-        
-        if (areaSize == 1) return ScreenProvider.super.getExtraExtensionLabels();
-        
-        return List.of(new Pair<>(Text.literal("Beam Size: " + areaSize), Text.literal("Maximum beam width")));
+        if (areaSize == 1 && yieldAddons == 0) return ScreenProvider.super.getExtraExtensionLabels();
+        return List.of(new Pair<>(Text.literal(areaSize + " Size"), Text.literal("Effective Beam Radius")), new Pair<>(Text.literal(yieldAddons + " Fortune"), Text.literal("Yield addon count. 3 is the effective maximum")));
     }
     
     @Override

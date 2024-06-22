@@ -52,7 +52,7 @@ public class NetworkContent {
                                              BlockPos areaMin, BlockPos areaMax) {
     }   // times are in ticks
     
-    public record QuarryTargetPacket(BlockPos position, BlockPos quarryTarget, int range, float operationSpeed) {
+    public record QuarryTargetPacket(BlockPos position, BlockPos quarryTarget, int range, int yieldAddons, float operationSpeed) {
     }
     
     public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress) {
@@ -64,7 +64,7 @@ public class NetworkContent {
     public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {
     }   // this goes both ways
     
-    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize) {
+    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize, int yieldAddons) {
     }
     public record DeepDrillSyncPacket(BlockPos position, long lastWorkTime) {
     }
@@ -133,6 +133,7 @@ public class NetworkContent {
                 laserArmBlock.setCurrentTarget(message.target);
                 laserArmBlock.setLastFiredAt(message.lastFiredAt);
                 laserArmBlock.areaSize = message.areaSize;
+                laserArmBlock.yieldAddons = message.yieldAddons;
             }
             
         }));
@@ -248,6 +249,7 @@ public class NetworkContent {
             if (entity instanceof DestroyerBlockEntity machine) {
                 machine.quarryTarget = message.quarryTarget;
                 machine.range = message.range;
+                machine.yieldAddons = message.yieldAddons;
                 
                 var oldData = machine.getBaseAddonData();
                 var newData = new MachineAddonController.BaseAddonData(message.operationSpeed, oldData.efficiency(), oldData.energyBonusCapacity(), oldData.energyBonusTransfer());

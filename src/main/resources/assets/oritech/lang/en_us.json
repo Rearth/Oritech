@@ -16,7 +16,7 @@
 
   "tooltip.oritech.addon_speed_desc": "Operation Speed ",
   "tooltip.oritech.addon_efficiency_desc": "Energy Efficiency ",
-  "tooltip.oritech.addon_yield_desc": "Doubles byproduct amount. Applicable to Fragment Forge",
+  "tooltip.oritech.addon_yield_desc": "Doubles byproduct amount in Fragment Forge. Increases block breaking yield in Block Destroyer and Enderic Laser",
   "tooltip.oritech.addon_fluid_desc": "Allows fluid processing. Applicable to centrifuge",
   "tooltip.oritech.addon_acceptor_desc": "Acts as energy proxy",
   "tooltip.oritech.addon_crop_desc": "Applicable to block destroyer. Skips non-grown crops",
