@@ -1,6 +1,5 @@
 package rearth.oritech.network;
 
-import io.wispforest.endec.impl.ReflectiveEndecBuilder;
 import io.wispforest.owo.network.OwoNetChannel;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.item.ItemStack;
@@ -92,9 +91,7 @@ public class NetworkContent {
         
         Oritech.LOGGER.debug("Registering oritech channels");
         
-        // ReflectiveEndecBuilder.SHARED_INSTANCE.register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
-        ReflectiveEndecBuilder.SHARED_INSTANCE.register(ItemFilterBlockEntity.FILTER_ITEMS_ENDEC, (Class<Map<Integer, ItemStack>>) (Object) Map.class); // I don't even know what kind of abomination this cast is, but it seems to work
-        
+        MACHINE_CHANNEL.builder().register(ItemFilterBlockEntity.FILTER_ITEMS_ENDEC, (Class<Map<Integer, ItemStack>>) (Object) Map.class); // I don't even know what kind of abomination this cast is, but it seems to work
         MACHINE_CHANNEL.builder().register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
         
         MACHINE_CHANNEL.registerClientbound(MachineSyncPacket.class, ((message, access) -> {

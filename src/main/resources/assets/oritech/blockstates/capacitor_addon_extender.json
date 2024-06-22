@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "oritech:block/capacitor_ctm"
+      "model": "oritech:block/capacitor_addon_extender"
     }
   },
 
