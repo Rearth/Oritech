@@ -15,7 +15,7 @@ import team.reborn.energy.api.base.SimpleEnergyItem;
 // strongly based on reborncore
 // https://github.com/TechReborn/TechReborn/blob/1.21/RebornCore/src/main/java/reborncore/common/powerSystem/RcEnergyItem.java#L94
 public interface OritechEnergyItem extends SimpleEnergyItem, FabricItem {
-    long getEnergyCapacity(ItemStack stack);
+    default long getEnergyCapacity(ItemStack stack) {return 10_000;}
     
     default long getEnergyMaxInput(ItemStack stack) {
         return 500;

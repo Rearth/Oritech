@@ -51,21 +51,6 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
     }
     
     @Override
-    public long getEnergyCapacity(ItemStack stack) {
-        return 10000;
-    }
-    
-    @Override
-    public long getEnergyMaxInput(ItemStack stack) {
-        return 100;
-    }
-    
-    @Override
-    public long getEnergyMaxOutput(ItemStack stack) {
-        return 0;
-    }
-    
-    @Override
     public boolean canRepair(ItemStack stack, ItemStack ingredient) {
         return false;
     }

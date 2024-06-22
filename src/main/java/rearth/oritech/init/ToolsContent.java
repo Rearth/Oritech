@@ -18,6 +18,8 @@ import rearth.oritech.item.tools.armor.BackstorageExoArmorItem;
 import rearth.oritech.item.tools.armor.ExoArmorItem;
 import rearth.oritech.item.tools.harvesting.*;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
+import team.reborn.energy.api.EnergyStorage;
+import team.reborn.energy.api.base.SimpleEnergyItem;
 
 import java.lang.reflect.Field;
 
@@ -53,6 +55,13 @@ public class ToolsContent implements ItemRegistryContainer {
         }
         
         ItemGroups.add(targetGroup, value);
+        
+        if (value instanceof SimpleEnergyItem energyItem) {
+            var variantStack = new ItemStack(value);
+            variantStack.set(EnergyStorage.ENERGY_COMPONENT, energyItem.getEnergyCapacity(variantStack));
+            ItemGroups.add(targetGroup, variantStack);
+        }
+        
     }
     
     public static void registerEventHandlers() {

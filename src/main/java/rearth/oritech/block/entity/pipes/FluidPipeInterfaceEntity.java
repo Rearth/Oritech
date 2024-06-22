@@ -117,6 +117,12 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
         // insert until no more fluid to output is available
         if (fluidStorage.amount <= 0) return;
         
+        if (fluidStorage.variant == FluidVariant.blank()) {
+            System.err.println("this should never happen! Maybe it's updating old data?");
+            fluidStorage.amount = 0;
+            return;
+        }
+        
         var targets = findNetworkTargets(pos, data);
         var netHash = targets.hashCode();
         
