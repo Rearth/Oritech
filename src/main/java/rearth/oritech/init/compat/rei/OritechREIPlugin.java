@@ -6,6 +6,9 @@ import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.item.ItemConvertible;
+import rearth.oritech.block.entity.machines.generators.BioGeneratorEntity;
+import rearth.oritech.block.entity.machines.generators.FuelGeneratorEntity;
+import rearth.oritech.block.entity.machines.generators.LavaGeneratorEntity;
 import rearth.oritech.block.entity.machines.processing.*;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.compat.rei.Screens.OritechReiDisplay;
@@ -29,6 +32,11 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerOritechCategory(registry, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, CentrifugeBlockEntity.class, icon));
         registerOritechCategory(registry, RecipeContent.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, AtomicForgeBlockEntity.class, icon));
         
+        // generators
+        registerOritechCategory(registry, RecipeContent.BIO_GENERATOR, BlockContent.BIO_GENERATOR_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, BioGeneratorEntity.class, icon));
+        registerOritechCategory(registry, RecipeContent.FUEL_GENERATOR, BlockContent.FUEL_GENERATOR_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, FuelGeneratorEntity.class, icon));
+        registerOritechCategory(registry, RecipeContent.LAVA_GENERATOR, BlockContent.LAVA_GENERATOR_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, LavaGeneratorEntity.class, icon));
+        
         // workstations
         registerOriWorkstation(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK);
         registerOriWorkstation(registry, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK);
@@ -37,6 +45,9 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerOriWorkstation(registry, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK);
         registerOriWorkstation(registry, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK);
         registerOriWorkstation(registry, RecipeContent.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE_BLOCK);
+        registerOriWorkstation(registry, RecipeContent.BIO_GENERATOR, BlockContent.BIO_GENERATOR_BLOCK);
+        registerOriWorkstation(registry, RecipeContent.LAVA_GENERATOR, BlockContent.LAVA_GENERATOR_BLOCK);
+        registerOriWorkstation(registry, RecipeContent.FUEL_GENERATOR, BlockContent.FUEL_GENERATOR_BLOCK);
         
         registry.addWorkstations(CategoryIdentifier.of("minecraft", "plugins/smelting"), EntryStacks.of(BlockContent.POWERED_FURNACE_BLOCK));
     }
@@ -53,6 +64,9 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerMachineRecipeType(registry, RecipeContent.CENTRIFUGE);
         registerMachineRecipeType(registry, RecipeContent.CENTRIFUGE_FLUID);
         registerMachineRecipeType(registry, RecipeContent.ATOMIC_FORGE);
+        registerMachineRecipeType(registry, RecipeContent.BIO_GENERATOR);
+        registerMachineRecipeType(registry, RecipeContent.LAVA_GENERATOR);
+        registerMachineRecipeType(registry, RecipeContent.FUEL_GENERATOR);
     }
     
     private void registerOritechCategory(CategoryRegistry registry, OritechRecipeType recipeType, ItemConvertible machineIcon, BiFunction<OritechRecipeType, ItemConvertible, OritechReiDisplay> screenType) {

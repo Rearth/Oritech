@@ -8,6 +8,9 @@ import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.recipe.RecipeManager;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.entity.machines.generators.BioGeneratorEntity;
+import rearth.oritech.block.entity.machines.generators.FuelGeneratorEntity;
+import rearth.oritech.block.entity.machines.generators.LavaGeneratorEntity;
 import rearth.oritech.block.entity.machines.processing.*;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -26,6 +29,11 @@ public class OritechEMIPlugin implements EmiPlugin {
         registerOritechCategory(registry, manager, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK, CentrifugeBlockEntity.class);
         registerOritechCategory(registry, manager, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK, CentrifugeBlockEntity.class);
         registerOritechCategory(registry, manager, RecipeContent.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE_BLOCK, AtomicForgeBlockEntity.class);
+        
+        // generators
+        registerOritechCategory(registry, manager, RecipeContent.BIO_GENERATOR, BlockContent.BIO_GENERATOR_BLOCK, BioGeneratorEntity.class);
+        registerOritechCategory(registry, manager, RecipeContent.FUEL_GENERATOR, BlockContent.FUEL_GENERATOR_BLOCK, FuelGeneratorEntity.class);
+        registerOritechCategory(registry, manager, RecipeContent.LAVA_GENERATOR, BlockContent.LAVA_GENERATOR_BLOCK, LavaGeneratorEntity.class);
         
         registry.addWorkstation(VanillaEmiRecipeCategories.SMELTING, EmiStack.of(BlockContent.POWERED_FURNACE_BLOCK));
         

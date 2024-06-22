@@ -23,6 +23,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.init.compat.rei.OritechDisplay;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.ScreenProvider;
@@ -82,7 +83,12 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         }
         
         // arrow
-        root.child(adapter.wrap(Widgets.createArrow(new Point(0, 0))).positioning(Positioning.absolute(80 - offsetX, 35 - offsetY)));
+        var isGenerator = screenProvider instanceof UpgradableGeneratorBlockEntity;
+        if (isGenerator) {
+            root.child(adapter.wrap(Widgets.createBurningFire(new Point(0, 0))).positioning(Positioning.absolute(77 - offsetX, 42 - offsetY)));
+        } else {
+            root.child(adapter.wrap(Widgets.createArrow(new Point(0, 0))).positioning(Positioning.absolute(80 - offsetX, 39 - offsetY)));
+        }
         
         // outputs
         var outputEntries = display.getOutputEntries();
@@ -98,7 +104,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         var duration = String.format("%.0f", display.getEntry().value().getTime() / 20f);
         root.child(
           Components.label(Text.of(duration + "s")).lineHeight(7)
-            .positioning(Positioning.relative(30, 97))
+            .positioning(Positioning.relative(40, 97))
         );
         
         // fluids

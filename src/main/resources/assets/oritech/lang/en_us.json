@@ -83,6 +83,9 @@
   "rei.process.oritech:centrifuge": "Centrifuging",
   "rei.process.oritech:centrifuge_fluid": "Fluid Separation",
   "rei.process.oritech:atomic_forge": "Engraving",
+  "rei.process.oritech:lava_generator": "Lava Burning",
+  "rei.process.oritech:bio_generator": "Biomass Churning",
+  "rei.process.oritech:fuel_generator": "Fuel Burning",
 
   "emi.category.oritech.pulverizer": "Pulverizing",
   "emi.category.oritech.grinder": "Fragmenting",
@@ -91,6 +94,9 @@
   "emi.category.oritech.centrifuge": "Centrifuging",
   "emi.category.oritech.centrifuge_fluid": "Fluid Separation",
   "emi.category.oritech.atomic_forge": "Engraving",
+  "emi.category.oritech.lava_generator": "Lava Burning",
+  "emi.category.oritech.bio_generator": "Biomass Churning",
+  "emi.category.oritech.fuel_generator": "Fuel Burning",
 
   "itemgroup.oritech.machines": "Oritech Machines",
   "itemgroup.oritech.components": "Oritech Components",
