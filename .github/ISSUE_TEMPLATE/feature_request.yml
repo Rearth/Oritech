@@ -1,0 +1,21 @@
+name: Feature Request
+labels: enhancement
+description: Suggest an idea or enhancement for Mekanism
+body:
+  - type: markdown
+    attributes:
+      value: "*Please use the search functionality before requesting a feature. Also take a look at the closed issues!*"
+  - type: textarea
+    attributes:
+      label: Describe the feature you'd like
+      description: A clear and concise description of what feature you would like added.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe alternatives you've considered
+      description: A clear and concise description of any alternative solutions you have considered.
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: A place to provide any additional context to help us better understand the request.
