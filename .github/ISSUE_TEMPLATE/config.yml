@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Oritech Discord
+    url: https://discord.gg/M43kMvprgj
+    about: The best place to receive quick answers to any questions you may have
+  - name: Currently planned features & roadmap
+    url: https://github.com/Rearth/Oritech/discussions?discussions_q=is%3Aopen
+    about: Feel free to upvote ideas and comment your thoughts to them
