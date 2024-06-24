@@ -322,6 +322,8 @@
   "text.config.oritech-config.option.processingMachines.pulverizerData.energyPerTick": "Energy Per Tick",
   "text.config.oritech-config.category.generators": "Generators",
   "text.config.oritech-config.option.generators.animationSpeedMultiplier": "Animation Speed Multiplier",
+  "text.config.oritech-config.option.generators.rfToSteamRation": "RF -> Stream Ration",
+  "text.config.oritech-config.option.generators.rfToSteamRation.tooltip": "Applies to generators with the steam addon. How many mb of steam will be produced instead of the usual RF",
   "text.config.oritech-config.category.generators.basicGeneratorData": "Basic Generator Data",
   "text.config.oritech-config.option.generators.basicGeneratorData.energyCapacity": "Energy Capacity",
   "text.config.oritech-config.option.generators.basicGeneratorData.maxEnergyInsertion": "Max Energy Insertion",

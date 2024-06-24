@@ -1,6 +1,8 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.client.screens.SlotGenerator;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,6 +13,8 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.util.EnergyProvider;
 import rearth.oritech.util.FluidProvider;
@@ -31,6 +35,10 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     
     @NotNull
     protected final ScreenProvider screenData;
+    
+    @Nullable
+    protected final SingleVariantStorage<FluidVariant> steamStorage;
+    
     
     protected final FluidProvider fluidProvider;
     
@@ -71,6 +79,11 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         this.machineBlock = blockEntity.getCachedState();
         this.blockEntity = blockEntity;
         
+        if (this.blockEntity instanceof UpgradableGeneratorBlockEntity generatorEntity && generatorEntity.isProducingSteam) {
+            steamStorage = generatorEntity.getSteamStorage();
+        } else {
+            steamStorage = null;
+        }
         
         buildItemSlots();
     }

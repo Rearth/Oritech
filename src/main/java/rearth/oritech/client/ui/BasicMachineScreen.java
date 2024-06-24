@@ -37,10 +37,14 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     private TextureComponent progress_indicator;
     private TextureComponent energyIndicator;
     private ButtonComponent cycleInputButton;
-    private BoxComponent fluidFillStatusOverlay;
     
+    private BoxComponent fluidFillStatusOverlay;
     private float lastFluidFill = 1;    // to allow smooth interpolation
     private ColoredSpriteComponent fluidBackground;
+    
+    private BoxComponent steamFillStatusOverlay;
+    private float lastSteamFill = 1;    // to allow smooth interpolation
+    private ColoredSpriteComponent steamBackground;
     
     public BasicMachineScreen(S handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -83,8 +87,13 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     protected void handledScreenTick() {
         super.handledScreenTick();
         
-        if (handler.screenData.showEnergy())
-            updateEnergyBar();
+        if (handler.screenData.showEnergy()) {
+            if (handler.steamStorage != null) {
+                updateSteamBar();
+            } else {
+                updateEnergyBar();
+            }
+        }
         
         if (handler.screenData.showProgress())
             updateProgressBar();
@@ -194,8 +203,13 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         }
         
         if (handler.screenData.showEnergy()) {
-            addEnergyBar(overlay);
-            updateEnergyBar();
+            if (handler.steamStorage != null) {
+                addSteamBar(overlay);
+                updateSteamBar();
+            } else {
+                addEnergyBar(overlay);
+                updateEnergyBar();
+            }
         }
         
         if (handler.screenData.showProgress()) {
@@ -237,6 +251,31 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(container.getResource()).get(0)), Text.of((container.getAmount() * 1000 / FluidConstants.BUCKET) + " mb"));
         fluidBackground.tooltip(tooltipText);
+    }
+    
+    protected void updateSteamBar() {
+        
+        var config = handler.screenData.getEnergyConfiguration();
+        var container = handler.steamStorage;
+        
+        if (steamBackground.getSprite() == null && !container.isResourceBlank() && container.amount > 0) {
+            var parent = steamBackground.parent();
+            var targetIndex = parent.children().indexOf(steamBackground);
+            var newFluid = createFluidRenderer(container.getResource(), container.getAmount(), config);
+            parent.removeChild(steamBackground);
+            ((FlowLayout) parent).child(targetIndex, newFluid);
+            steamBackground = newFluid;
+        }
+        
+        var fill = 1 - ((float) container.getAmount() / container.getCapacity());
+        
+        var targetFill = LaserArmModel.lerp(lastSteamFill, fill, 0.15f);
+        lastSteamFill = targetFill;
+        
+        steamFillStatusOverlay.verticalSizing(Sizing.fixed((int) (config.height() * targetFill * 0.98f)));
+        
+        var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(container.getResource()).get(0)), Text.of((container.getAmount() * 1000 / FluidConstants.BUCKET) + " mb"));
+        steamBackground.tooltip(tooltipText);
     }
     
     private void addProgressArrow(FlowLayout panel) {
@@ -282,6 +321,40 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         panel.child(fluidBackground);
         panel.child(fluidFillStatusOverlay);
+        panel.child(foreGround);
+        
+    }
+    
+    protected void addSteamBar(FlowLayout panel) {
+        
+        var config = handler.screenData.getEnergyConfiguration();
+        var container = handler.steamStorage;
+        
+        steamBackground = null;
+        lastSteamFill = 1 - ((float) container.getAmount() / container.getCapacity());
+        
+        for (var it = container.nonEmptyIterator(); it.hasNext(); ) {
+            var fluid = it.next();
+            steamBackground = createFluidRenderer(fluid.getResource(), fluid.getAmount(), config);
+            break;
+        }
+        
+        if (steamBackground == null) {
+            steamBackground = createFluidRenderer(FluidVariant.of(Fluids.EMPTY), 0L, config);
+        }
+        
+        steamFillStatusOverlay = Components.box(Sizing.fixed(config.width()), Sizing.fixed((int) (config.height() * lastFluidFill)));
+        steamFillStatusOverlay.color(new Color(77.6f / 255f, 77.6f / 255f, 77.6f / 255f));
+        steamFillStatusOverlay.fill(true);
+        steamFillStatusOverlay.positioning(Positioning.absolute(config.x(), config.y()));
+        
+        
+        var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
+        foreGround.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
+        foreGround.positioning(Positioning.absolute(config.x(), config.y()));
+        
+        panel.child(steamBackground);
+        panel.child(steamFillStatusOverlay);
         panel.child(foreGround);
         
     }

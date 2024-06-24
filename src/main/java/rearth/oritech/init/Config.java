@@ -76,6 +76,7 @@ public class Config {
     public static class Generators {
         
         public float animationSpeedMultiplier = 20;
+        public float rfToSteamRation = 2;
         
         @Nest
         public BasicEnergyMachineData basicGeneratorData = new BasicEnergyMachineData(50_000, 0, 512, 32);

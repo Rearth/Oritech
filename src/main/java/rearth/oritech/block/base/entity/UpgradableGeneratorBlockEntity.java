@@ -3,6 +3,8 @@ package rearth.oritech.block.base.entity;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
@@ -11,12 +13,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
+import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
 import team.reborn.energy.api.EnergyStorage;
@@ -29,6 +34,9 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     private int currentMaxBurnTime; // needed only for progress display
     private List<ItemStack> pendingOutputs = new ArrayList<>(); // used if a recipe produces a byproduct at the end
     private Multimap<Direction, BlockApiCache<EnergyStorage, Direction>> directionCaches;
+    
+    public boolean isProducingSteam = true;
+    public final SingleVariantStorage<FluidVariant> steamStorage = createBasicTank();
     
     // speed multiplier increases output rate and reduces burn time by same percentage
     // efficiency multiplier only increases burn time
@@ -153,7 +161,16 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     // gives energy in this case
     @SuppressWarnings("lossy-conversions")
     protected void produceEnergy() {
-        energyStorage.amount += calculateEnergyUsage();
+        var produced = calculateEnergyUsage();
+        if (isProducingSteam) {
+            // yes this will void excess steam. Generators will only stop producing when the RF storage is full, not the steam storage
+            // this is by design and supposed to be one of the negatives of steam production
+            steamStorage.amount += produced * Oritech.CONFIG.generators.rfToSteamRation();
+            steamStorage.amount = Math.min(steamStorage.amount, steamStorage.getCapacity());
+            
+        } else {
+            energyStorage.amount += produced;
+        }
     }
     
     // returns energy production in this case
@@ -166,6 +183,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         nbt.putInt("storedBurn", currentMaxBurnTime);
+        SingleVariantStorage.writeNbt(steamStorage, FluidVariant.CODEC, nbt, registryLookup);
         
         var resList = new NbtList();
         for (var stack : pendingOutputs) {
@@ -179,6 +197,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         currentMaxBurnTime = nbt.getInt("currentMaxBurnTime");
+        SingleVariantStorage.readNbt(steamStorage, FluidVariant.CODEC, () -> FluidVariant.of(FluidContent.STILL_FUEL), nbt, registryLookup);
         
         var storedResults = nbt.getList("pendingResults", NbtElement.COMPOUND_TYPE);
         for (var elem : storedResults) {
@@ -192,6 +211,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     protected void sendNetworkEntry() {
         super.sendNetworkEntry();
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorUISyncPacket(getPos(), currentMaxBurnTime));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorSteamSyncPacket(pos, Registries.FLUID.getId(steamStorage.variant.getFluid()).toString(), steamStorage.amount));
     }
     
     private void outputEnergy() {
@@ -237,5 +257,29 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     @Override
     protected float getAnimationSpeed() {
         return super.getAnimationSpeed() * Oritech.CONFIG.generators.animationSpeedMultiplier();
+    }
+    
+    public SingleVariantStorage<FluidVariant> getSteamStorage() {
+        return steamStorage;
+    }
+    
+    private SingleVariantStorage<FluidVariant> createBasicTank() {
+        return new SingleVariantStorage<>() {
+            @Override
+            protected FluidVariant getBlankVariant() {
+                return FluidVariant.of(FluidContent.STILL_FUEL);
+            }
+            
+            @Override
+            protected long getCapacity(FluidVariant variant) {
+                return CentrifugeBlockEntity.CAPACITY;
+            }
+            
+            @Override
+            protected void onFinalCommit() {
+                super.onFinalCommit();
+                UpgradableGeneratorBlockEntity.this.markDirty();
+            }
+        };
     }
 }

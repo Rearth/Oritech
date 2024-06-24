@@ -72,6 +72,9 @@ public class NetworkContent {
     public record SingleVariantFluidSyncPacket(BlockPos position, String fluidType, long amount) {
     }
     
+    public record GeneratorSteamSyncPacket(BlockPos position, String fluidType, long amount) {
+    }
+    
     public record DroneSendEventPacket(BlockPos position, boolean sendEvent, boolean receiveEvent) {
     
     }
@@ -186,6 +189,18 @@ public class NetworkContent {
             
             if (entity instanceof FluidProvider fluidProvider && fluidProvider.getForDirectFluidAccess() != null) {
                 var storage = fluidProvider.getForDirectFluidAccess();
+                storage.amount = message.amount;
+                storage.variant = FluidVariant.of(Registries.FLUID.get(Identifier.of(message.fluidType)));
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(GeneratorSteamSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
+                var storage = generatorBlock.steamStorage;
                 storage.amount = message.amount;
                 storage.variant = FluidVariant.of(Registries.FLUID.get(Identifier.of(message.fluidType)));
             }

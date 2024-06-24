@@ -47,7 +47,7 @@ import java.util.List;
 
 public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidProvider {
     
-    private static final long CAPACITY = Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidConstants.BUCKET;
+    public static final long CAPACITY = Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidConstants.BUCKET;
     
     public final SingleVariantStorage<FluidVariant> inputStorage = createBasicTank();
     public final SingleVariantStorage<FluidVariant> outputStorage = createBasicTank();
