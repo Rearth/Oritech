@@ -6,7 +6,7 @@
       "item": "oritech:silicon"
     },
     "i": {
-      "tag": "c:copper_ingots"
+      "item": "minecraft:copper_ingot"
     }
   },
   "pattern": [

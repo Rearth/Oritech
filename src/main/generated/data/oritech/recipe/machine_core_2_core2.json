@@ -6,7 +6,7 @@
       "item": "minecraft:lapis_lazuli"
     },
     "s": {
-      "tag": "c:copper_ingots"
+      "item": "minecraft:copper_ingot"
     }
   },
   "pattern": [

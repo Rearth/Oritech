@@ -6,7 +6,7 @@
       "item": "oritech:fluid_pipe"
     },
     "p": {
-      "tag": "c:copper_ingots"
+      "item": "minecraft:copper_ingot"
     }
   },
   "pattern": [

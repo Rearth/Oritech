@@ -9,7 +9,7 @@
       "item": "oritech:electrum_ingot"
     },
     "f": {
-      "tag": "c:copper_ingots"
+      "item": "minecraft:copper_ingot"
     },
     "m": {
       "tag": "c:platinum_ingots"

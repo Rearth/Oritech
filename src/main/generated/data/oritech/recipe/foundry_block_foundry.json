@@ -9,7 +9,7 @@
       "item": "oritech:motor"
     },
     "f": {
-      "tag": "c:copper_ingots"
+      "item": "minecraft:copper_ingot"
     },
     "s": {
       "item": "oritech:electrum_ingot"
