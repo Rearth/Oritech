@@ -13,6 +13,7 @@
   "tooltip.oritech.machine_rate_desc": "Energy Usage: ",
   "tooltip.oritech.machine_capacity_desc": "Energy Capacity: ",
   "tooltip.oritech.solar_generation": "Generation rate depends on core quality",
+  "tooltip.oritech.needs_laser_power": "Must be powered via an enderic laser",
 
   "tooltip.oritech.addon_speed_desc": "Operation Speed ",
   "tooltip.oritech.addon_efficiency_desc": "Energy Efficiency ",
