@@ -3,6 +3,8 @@ package rearth.oritech.block.base.entity;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
@@ -17,6 +19,7 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.FluidProvider;
 
+import java.util.List;
 import java.util.Optional;
 
 public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGeneratorBlockEntity implements FluidProvider {
@@ -38,22 +41,35 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
         }
         
         @Override
+        protected boolean canInsert(FluidVariant variant) {
+            return getAllowedFuels().contains(variant);
+        }
+        
+        @Override
         protected void onFinalCommit() {
             super.onFinalCommit();
             FluidMultiblockGeneratorBlockEntity.this.markDirty();
         }
     };
     
+    private final Storage<FluidVariant> wrappedInput = FilteringStorage.insertOnlyOf(inputTank);
+    private final Storage<FluidVariant> combinedSteamGenStorage = new CombinedStorage<>(List.of(waterWrapper, steamWrapper, wrappedInput));
+    
     public FluidMultiblockGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state, energyPerTick);
     }
     
+    public abstract List<FluidVariant> getAllowedFuels();
+    
     @Override
     protected void tryConsumeInput() {
+        
+        if (isProducingSteam && (waterStorage.amount == 0 || steamStorage.amount == steamStorage.getCapacity())) return;
         
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty())
             currentRecipe = OritechRecipe.DUMMY;     // reset recipe when invalid or no input is given
+        
         
         if (recipeCandidate.isPresent()) {
             // this is separate so that progress is not reset when out of energy
@@ -111,7 +127,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     
     @Override
     public Storage<FluidVariant> getFluidStorage(Direction direction) {
-        return inputTank;
+        return isProducingSteam ? combinedSteamGenStorage : inputTank;
     }
     
     @Override

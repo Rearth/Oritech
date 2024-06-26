@@ -23,9 +23,9 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item BANANA = new Item(new Item.Settings());
     @ItemGroupTarget(Groups.equipment)
     public static final Item TARGET_DESIGNATOR = new LaserTargetDesignator(new Item.Settings().maxCount(1));
-    @ItemGroupTarget(Groups.components)
     public static final Item OIL_BUCKET = new BucketItem(FluidContent.STILL_OIL, new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1));
     public static final Item FUEL_BUCKET = new BucketItem(FluidContent.STILL_FUEL, new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1));
+    public static final Item STEAM_BUCKET = new BucketItem(FluidContent.STILL_STEAM, new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1));
     
     // region metals
     // nickel

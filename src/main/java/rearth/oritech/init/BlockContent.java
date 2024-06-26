@@ -141,6 +141,8 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block OIL_FLUID_BLOCK = new FluidBlock((FlowableFluid) FluidContent.FLOWING_OIL, FabricBlockSettings.copyOf(Blocks.WATER));
     @NoBlockItem
     public static final Block FUEL_FLUID_BLOCK = new FluidBlock((FlowableFluid) FluidContent.FLOWING_FUEL, FabricBlockSettings.copyOf(Blocks.WATER));
+    @NoBlockItem
+    public static final Block STEAM_FLUID_BLOCK = new FluidBlock((FlowableFluid) FluidContent.FLOWING_STEAM, FabricBlockSettings.copyOf(Blocks.WATER));
     
     //region metals
     @NoAutoDrop

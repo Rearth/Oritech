@@ -72,7 +72,7 @@ public class NetworkContent {
     public record SingleVariantFluidSyncPacket(BlockPos position, String fluidType, long amount) {
     }
     
-    public record GeneratorSteamSyncPacket(BlockPos position, String fluidType, long amount) {
+    public record GeneratorSteamSyncPacket(BlockPos position, long steamAmount, long waterAmount) {
     }
     
     public record DroneSendEventPacket(BlockPos position, boolean sendEvent, boolean receiveEvent) {
@@ -200,9 +200,8 @@ public class NetworkContent {
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
             if (entity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
-                var storage = generatorBlock.steamStorage;
-                storage.amount = message.amount;
-                storage.variant = FluidVariant.of(Registries.FLUID.get(Identifier.of(message.fluidType)));
+                generatorBlock.steamStorage.amount = message.steamAmount;
+                generatorBlock.waterStorage.amount = message.waterAmount;
             }
             
         }));

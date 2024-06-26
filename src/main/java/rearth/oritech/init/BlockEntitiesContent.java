@@ -61,6 +61,7 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedInventory
     @AssignSidedEnergy
+    @AssignSidedFluid
     public static final BlockEntityType<BioGeneratorEntity> BIO_GENERATOR_ENTITY = FabricBlockEntityTypeBuilder.create(BioGeneratorEntity::new, BlockContent.BIO_GENERATOR_BLOCK).build();
     
     @AssignSidedFluid

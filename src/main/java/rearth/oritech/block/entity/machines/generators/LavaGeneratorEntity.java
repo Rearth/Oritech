@@ -3,7 +3,9 @@ package rearth.oritech.block.entity.machines.generators;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.block.BlockState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -88,6 +90,11 @@ public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     @Override
     public long getDefaultCapacity() {
         return Oritech.CONFIG.generators.lavaGeneratorData.energyCapacity();
+    }
+    
+    @Override
+    public List<FluidVariant> getAllowedFuels() {
+        return List.of(FluidVariant.of(Fluids.LAVA));
     }
     
     @Override

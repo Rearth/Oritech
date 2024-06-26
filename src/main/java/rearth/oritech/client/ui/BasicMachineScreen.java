@@ -10,6 +10,7 @@ import io.wispforest.owo.ui.util.SpriteUtilInvoker;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
@@ -38,16 +39,83 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     private TextureComponent energyIndicator;
     private ButtonComponent cycleInputButton;
     
-    private BoxComponent fluidFillStatusOverlay;
-    private float lastFluidFill = 1;    // to allow smooth interpolation
-    private ColoredSpriteComponent fluidBackground;
+    private final FluidDisplay genericDisplay;
+    private final FluidDisplay steamDisplay;
+    private final FluidDisplay waterDisplay;
     
-    private BoxComponent steamFillStatusOverlay;
-    private float lastSteamFill = 1;    // to allow smooth interpolation
-    private ColoredSpriteComponent steamBackground;
+    protected static final class FluidDisplay {
+        private final BoxComponent fillOverlay;
+        private float lastFill;
+        private ColoredSpriteComponent background;
+        private final TextureComponent foreGround;
+        private final ScreenProvider.BarConfiguration config;
+        private final SingleVariantStorage<FluidVariant> storage;
+        
+        private FluidDisplay(BoxComponent fillOverlay, float lastFill, ColoredSpriteComponent background, TextureComponent foreGround, ScreenProvider.BarConfiguration config, SingleVariantStorage<FluidVariant> storage) {
+            this.fillOverlay = fillOverlay;
+            this.lastFill = lastFill;
+            this.background = background;
+            this.foreGround = foreGround;
+            this.config = config;
+            this.storage = storage;
+        }
+    }
     
     public BasicMachineScreen(S handler, PlayerInventory inventory, Text title) {
+        
         super(handler, inventory, title);
+        
+        if (handler.fluidProvider != null) {
+            var container = handler.fluidProvider.getForDirectFluidAccess();
+            var config = handler.screenData.getFluidConfiguration();
+            genericDisplay = initDisplay(container, config);
+        } else {
+            genericDisplay = null;
+        }
+        
+        if (handler.steamStorage != null) {
+            var config = handler.screenData.getEnergyConfiguration();
+            var container = handler.waterStorage;
+            waterDisplay = initDisplay(container, config);
+            
+            var offset = config.width() + 8;
+            
+            var configSteam = new ScreenProvider.BarConfiguration(config.x() + offset, config.y(), config.width(), config.height());
+            var containerSteam = handler.steamStorage;
+            steamDisplay = initDisplay(containerSteam, configSteam);
+        } else {
+            steamDisplay = null;
+            waterDisplay = null;
+        }
+        
+    }
+    
+    protected static FluidDisplay initDisplay(SingleVariantStorage<FluidVariant> container, ScreenProvider.BarConfiguration config) {
+        var lastFill = 1 - ((float) container.getAmount() / container.getCapacity());
+        ColoredSpriteComponent background = null;
+        
+        
+        for (var it = container.nonEmptyIterator(); it.hasNext(); ) {
+            var fluid = it.next();
+            background = createFluidRenderer(fluid.getResource(), fluid.getAmount(), config);
+            break;
+        }
+        
+        if (background == null) {
+            background = createFluidRenderer(FluidVariant.of(Fluids.EMPTY), 0L, config);
+        }
+        
+        var fillOverlay = Components.box(Sizing.fixed(config.width()), Sizing.fixed((int) (config.height() * lastFill)));
+        fillOverlay.color(new Color(77.6f / 255f, 77.6f / 255f, 77.6f / 255f));
+        fillOverlay.fill(true);
+        fillOverlay.positioning(Positioning.absolute(config.x(), config.y()));
+        
+        
+        var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
+        foreGround.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
+        foreGround.positioning(Positioning.absolute(config.x(), config.y()));
+        
+        return new FluidDisplay(fillOverlay, lastFill, background, foreGround, config, container);
     }
     
     public static Component getItemFrame(int x, int y) {
@@ -89,7 +157,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         if (handler.screenData.showEnergy()) {
             if (handler.steamStorage != null) {
-                updateSteamBar();
+                updateFluidDisplay(waterDisplay);
+                updateFluidDisplay(steamDisplay);
             } else {
                 updateEnergyBar();
             }
@@ -101,7 +170,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         updateSettingsButtons();
         
         if (handler.fluidProvider != null)
-            updateFluidBar();
+            updateFluidDisplay(genericDisplay);
     }
     
     private void updateProgressBar() {
@@ -193,8 +262,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         addTitle(overlay);
         
         if (handler.fluidProvider != null) {
-            addFluidBar(overlay);
-            updateFluidBar();
+            addFluidDisplay(overlay, genericDisplay);
+            updateFluidDisplay(genericDisplay);
         }
         
         for (var slot : handler.screenData.getGuiSlots()) {
@@ -204,8 +273,10 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         if (handler.screenData.showEnergy()) {
             if (handler.steamStorage != null) {
-                addSteamBar(overlay);
-                updateSteamBar();
+                addFluidDisplay(overlay, steamDisplay);
+                updateFluidDisplay(steamDisplay);
+                addFluidDisplay(overlay, waterDisplay);
+                updateFluidDisplay(waterDisplay);
             } else {
                 addEnergyBar(overlay);
                 updateEnergyBar();
@@ -228,56 +299,6 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         overlay.child(label.positioning(Positioning.relative(54, 2)));
     }
     
-    protected void updateFluidBar() {
-        
-        var container = handler.fluidProvider.getForDirectFluidAccess();
-        var data = handler.screenData.getFluidConfiguration();
-        
-        if (fluidBackground.getSprite() == null && !container.isResourceBlank() && container.amount > 0) {
-            var parent = fluidBackground.parent();
-            var targetIndex = parent.children().indexOf(fluidBackground);
-            var newFluid = createFluidRenderer(container.getResource(), container.getAmount(), data);
-            parent.removeChild(fluidBackground);
-            ((FlowLayout) parent).child(targetIndex, newFluid);
-            fluidBackground = newFluid;
-        }
-        
-        var fill = 1 - ((float) container.getAmount() / container.getCapacity());
-        
-        var targetFill = LaserArmModel.lerp(lastFluidFill, fill, 0.15f);
-        lastFluidFill = targetFill;
-        
-        fluidFillStatusOverlay.verticalSizing(Sizing.fixed((int) (data.height() * targetFill * 0.98f)));
-        
-        var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(container.getResource()).get(0)), Text.of((container.getAmount() * 1000 / FluidConstants.BUCKET) + " mb"));
-        fluidBackground.tooltip(tooltipText);
-    }
-    
-    protected void updateSteamBar() {
-        
-        var config = handler.screenData.getEnergyConfiguration();
-        var container = handler.steamStorage;
-        
-        if (steamBackground.getSprite() == null && !container.isResourceBlank() && container.amount > 0) {
-            var parent = steamBackground.parent();
-            var targetIndex = parent.children().indexOf(steamBackground);
-            var newFluid = createFluidRenderer(container.getResource(), container.getAmount(), config);
-            parent.removeChild(steamBackground);
-            ((FlowLayout) parent).child(targetIndex, newFluid);
-            steamBackground = newFluid;
-        }
-        
-        var fill = 1 - ((float) container.getAmount() / container.getCapacity());
-        
-        var targetFill = LaserArmModel.lerp(lastSteamFill, fill, 0.15f);
-        lastSteamFill = targetFill;
-        
-        steamFillStatusOverlay.verticalSizing(Sizing.fixed((int) (config.height() * targetFill * 0.98f)));
-        
-        var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(container.getResource()).get(0)), Text.of((container.getAmount() * 1000 / FluidConstants.BUCKET) + " mb"));
-        steamBackground.tooltip(tooltipText);
-    }
-    
     private void addProgressArrow(FlowLayout panel) {
         
         var config = handler.screenData.getIndicatorConfiguration();
@@ -290,73 +311,37 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
           .child(progress_indicator.positioning(Positioning.absolute(config.x(), config.y())));
     }
     
-    // only supports single variants, for more complex variants override this
-    protected void addFluidBar(FlowLayout panel) {
-        
-        var container = handler.fluidProvider.getForDirectFluidAccess();
-        fluidBackground = null;
-        var config = handler.screenData.getFluidConfiguration();
-        lastFluidFill = 1 - ((float) container.getAmount() / container.getCapacity());
-        
-        
-        for (var it = container.nonEmptyIterator(); it.hasNext(); ) {
-            var fluid = it.next();
-            fluidBackground = createFluidRenderer(fluid.getResource(), fluid.getAmount(), config);
-            break;
-        }
-        
-        if (fluidBackground == null) {
-            fluidBackground = createFluidRenderer(FluidVariant.of(Fluids.EMPTY), 0L, config);
-        }
-        
-        fluidFillStatusOverlay = Components.box(Sizing.fixed(config.width()), Sizing.fixed((int) (config.height() * lastFluidFill)));
-        fluidFillStatusOverlay.color(new Color(77.6f / 255f, 77.6f / 255f, 77.6f / 255f));
-        fluidFillStatusOverlay.fill(true);
-        fluidFillStatusOverlay.positioning(Positioning.absolute(config.x(), config.y()));
-        
-        
-        var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
-        foreGround.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
-        foreGround.positioning(Positioning.absolute(config.x(), config.y()));
-        
-        panel.child(fluidBackground);
-        panel.child(fluidFillStatusOverlay);
-        panel.child(foreGround);
-        
+    protected void addFluidDisplay(FlowLayout panel, FluidDisplay display) {
+        panel.child(display.background);
+        panel.child(display.fillOverlay);
+        panel.child(display.foreGround);
     }
     
-    protected void addSteamBar(FlowLayout panel) {
+    protected void updateFluidDisplay(FluidDisplay display) {
         
-        var config = handler.screenData.getEnergyConfiguration();
-        var container = handler.steamStorage;
+        var background = display.background;
+        var container = display.storage;
+        var config = display.config;
         
-        steamBackground = null;
-        lastSteamFill = 1 - ((float) container.getAmount() / container.getCapacity());
-        
-        for (var it = container.nonEmptyIterator(); it.hasNext(); ) {
-            var fluid = it.next();
-            steamBackground = createFluidRenderer(fluid.getResource(), fluid.getAmount(), config);
-            break;
+        if (background.getSprite() == null && !container.isResourceBlank() && container.amount > 0) {
+            var parent = background.parent();
+            var targetIndex = parent.children().indexOf(background);
+            var newFluid = createFluidRenderer(container.getResource(), container.getAmount(), config);
+            parent.removeChild(background);
+            ((FlowLayout) parent).child(targetIndex, newFluid);
+            background = newFluid;
+            display.background = background;
         }
         
-        if (steamBackground == null) {
-            steamBackground = createFluidRenderer(FluidVariant.of(Fluids.EMPTY), 0L, config);
-        }
+        var fill = 1 - ((float) container.getAmount() / container.getCapacity());
         
-        steamFillStatusOverlay = Components.box(Sizing.fixed(config.width()), Sizing.fixed((int) (config.height() * lastFluidFill)));
-        steamFillStatusOverlay.color(new Color(77.6f / 255f, 77.6f / 255f, 77.6f / 255f));
-        steamFillStatusOverlay.fill(true);
-        steamFillStatusOverlay.positioning(Positioning.absolute(config.x(), config.y()));
+        var targetFill = LaserArmModel.lerp(display.lastFill, fill, 0.15f);
+        display.lastFill = targetFill;
         
+        display.fillOverlay.verticalSizing(Sizing.fixed((int) (config.height() * targetFill * 0.98f)));
         
-        var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
-        foreGround.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
-        foreGround.positioning(Positioning.absolute(config.x(), config.y()));
-        
-        panel.child(steamBackground);
-        panel.child(steamFillStatusOverlay);
-        panel.child(foreGround);
-        
+        var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(container.getResource()).get(0)), Text.of((container.getAmount() * 1000 / FluidConstants.BUCKET) + " mb"));
+        background.tooltip(tooltipText);
     }
     
     public static ColoredSpriteComponent createFluidRenderer(FluidVariant variant, long amount, ScreenProvider.BarConfiguration config) {

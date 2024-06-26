@@ -62,14 +62,13 @@ public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     
     @Override
     public InventorySlotAssignment getSlots() {
-        return new InventorySlotAssignment(0, 1, 1, 1);
+        return new InventorySlotAssignment(0, 1, 1, 0);
     }
     
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 75, 21),
-          new GuiSlot(1, 75, 59));
+          new GuiSlot(0, 80, 21));
     }
     
     @Override

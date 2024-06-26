@@ -72,6 +72,11 @@ public class ModRenderers {
           Oritech.id("block/fluid/fluid_strange_pale_2"),
           0x2D3D48
         ));
+        FluidRenderHandlerRegistry.INSTANCE.register(FluidContent.STILL_STEAM, FluidContent.FLOWING_STEAM, new SimpleFluidRenderHandler(
+          Oritech.id("block/fluid/fluid_steam"),
+          Oritech.id("block/fluid/fluid_steam"),
+          0xFFFFFF
+        ));
         
         BlockRenderLayerMap.INSTANCE.putFluids(RenderLayer.getTranslucent(), FluidContent.STILL_OIL, FluidContent.FLOWING_OIL);
 

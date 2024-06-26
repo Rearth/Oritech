@@ -38,6 +38,8 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     
     @Nullable
     protected final SingleVariantStorage<FluidVariant> steamStorage;
+    @Nullable
+    protected final SingleVariantStorage<FluidVariant> waterStorage;
     
     
     protected final FluidProvider fluidProvider;
@@ -81,8 +83,10 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         
         if (this.blockEntity instanceof UpgradableGeneratorBlockEntity generatorEntity && generatorEntity.isProducingSteam) {
             steamStorage = generatorEntity.getSteamStorage();
+            waterStorage = generatorEntity.getWaterStorage();
         } else {
             steamStorage = null;
+            waterStorage = null;
         }
         
         buildItemSlots();
