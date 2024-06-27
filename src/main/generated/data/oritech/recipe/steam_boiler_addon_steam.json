@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:silicon"
+    },
+    "c": {
+      "item": "oritech:fluid_pipe"
+    },
+    "f": {
+      "item": "oritech:coal_dust"
+    },
+    "s": {
+      "item": "oritech:nickel_ingot"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:steam_boiler_addon"
+  }
+}

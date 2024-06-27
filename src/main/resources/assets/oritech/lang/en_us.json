@@ -26,6 +26,7 @@
   "tooltip.oritech.addon_capacity_desc": "Energy Capacity ",
   "tooltip.oritech.addon_transfer_desc": "Energy Transfer Rate ",
   "tooltip.oritech.addon_extender_desc": "Allows additional addons to be connected",
+  "tooltip.oritech.addon_boiler_desc": "Allows a generator to produce steam instead of RF. Input water at this addon, and extract steam from it",
 
   "tooltip.oritech.overchargedcrystal": "Any enchanted book will work when crafting this",
   "tooltip.oritech.fluxite": "Can also be created by harvesting grown amethyst with an enderic laser",
@@ -151,6 +152,7 @@
   "block.oritech.machine_speed_addon": "Machine Speed Addon",
   "block.oritech.machine_fluid_addon": "Machine Fluid Addon",
   "block.oritech.machine_yield_addon": "Machine Yield Addon",
+  "block.oritech.steam_boiler_addon": "Steam Boiler Addon",
   "block.oritech.crop_filter_addon": "Crop Filter Addon",
   "block.oritech.quarry_addon": "Quarry Addon",
   "block.oritech.machine_efficiency_addon": "Machine Efficiency Addon",

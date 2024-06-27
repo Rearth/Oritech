@@ -188,6 +188,8 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
                 tooltip.add(Text.translatable("tooltip.oritech.addon_fluid_desc").formatted(Formatting.DARK_GRAY));
             if (blockType == BlockContent.MACHINE_ACCEPTOR_ADDON)
                 tooltip.add(Text.translatable("tooltip.oritech.addon_acceptor_desc").formatted(Formatting.DARK_GRAY));
+            if (blockType == BlockContent.STEAM_BOILER_ADDON)
+                tooltip.add(Text.translatable("tooltip.oritech.addon_boiler_desc").formatted(Formatting.DARK_GRAY));
             if (blockType == BlockContent.CROP_FILTER_ADDON)
                 tooltip.add(Text.translatable("tooltip.oritech.addon_crop_desc").formatted(Formatting.DARK_GRAY));
             if (blockType == BlockContent.MACHINE_INVENTORY_PROXY_ADDON)

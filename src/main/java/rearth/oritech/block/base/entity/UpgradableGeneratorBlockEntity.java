@@ -24,16 +24,16 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.FluidProvider;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBlockEntity implements FluidProvider {
+public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBlockEntity {
     
     private int currentMaxBurnTime; // needed only for progress display
     private List<ItemStack> pendingOutputs = new ArrayList<>(); // used if a recipe produces a byproduct at the end
@@ -153,6 +153,21 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         pendingOutputs.clear();
     }
     
+    @Override
+    public void gatherAddonStats(List<AddonBlock> addons) {
+        isProducingSteam = false;
+        super.gatherAddonStats(addons);
+    }
+    
+    @Override
+    public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
+        super.getAdditionalStatFromAddon(addonBlock);
+        if (addonBlock.state().getBlock() == BlockContent.STEAM_BOILER_ADDON) {
+            isProducingSteam = true;
+            world.updateNeighborsAlways(addonBlock.pos(), addonBlock.state().getBlock());
+        }
+    }
+    
     // ensure that insertion is disabled, and instead upgrade extraction rates
     @Override
     public void updateEnergyContainer() {
@@ -166,6 +181,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     
     // check if the energy can fit
     protected boolean canFitEnergy() {
+        if (isProducingSteam) return true;
         var produced = calculateEnergyUsage();
         return energyStorage.capacity >= energyStorage.amount + produced;
     }
@@ -229,8 +245,10 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     @Override
     protected void sendNetworkEntry() {
         super.sendNetworkEntry();
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorUISyncPacket(getPos(), currentMaxBurnTime));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorSteamSyncPacket(pos, steamStorage.amount, waterStorage.amount));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorUISyncPacket(getPos(), currentMaxBurnTime, isProducingSteam));
+        
+        if (isProducingSteam)
+            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorSteamSyncPacket(pos, steamStorage.amount, waterStorage.amount));
     }
     
     private void outputEnergy() {
@@ -288,12 +306,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     
     public SingleVariantStorage<FluidVariant> getWaterStorage() {
         return waterStorage;
-    }
-    
-    @Override
-    public Storage<FluidVariant> getFluidStorage(Direction direction) {
-        if (!isProducingSteam) return null;
-        return exposedStorage;
     }
     
     private SingleVariantStorage<FluidVariant> createBasicTank(FluidVariant fluidType) {

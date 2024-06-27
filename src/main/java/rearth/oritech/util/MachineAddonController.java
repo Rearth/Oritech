@@ -60,6 +60,7 @@ public interface MachineAddonController {
             var state = Objects.requireNonNull(getMachineWorld()).getBlockState(addon);
             if (state.getBlock() instanceof MachineAddonBlock) {
                 getMachineWorld().setBlockState(addon, state.with(MachineAddonBlock.ADDON_USED, false));
+                getMachineWorld().updateNeighborsAlways(addon, state.getBlock());
             }
         }
         

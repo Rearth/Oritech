@@ -3,8 +3,6 @@ package rearth.oritech.block.base.entity;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
@@ -51,9 +49,6 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
             FluidMultiblockGeneratorBlockEntity.this.markDirty();
         }
     };
-    
-    private final Storage<FluidVariant> wrappedInput = FilteringStorage.insertOnlyOf(inputTank);
-    private final Storage<FluidVariant> combinedSteamGenStorage = new CombinedStorage<>(List.of(waterWrapper, steamWrapper, wrappedInput));
     
     public FluidMultiblockGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state, energyPerTick);
@@ -127,7 +122,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     
     @Override
     public Storage<FluidVariant> getFluidStorage(Direction direction) {
-        return isProducingSteam ? combinedSteamGenStorage : inputTank;
+        return inputTank;
     }
     
     @Override

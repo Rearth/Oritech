@@ -12,6 +12,7 @@ import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.EnergyAcceptorAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
+import rearth.oritech.block.entity.machines.addons.SteamBoilerAddonBlockEntity;
 import rearth.oritech.block.entity.machines.generators.*;
 import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.*;
@@ -61,7 +62,6 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedInventory
     @AssignSidedEnergy
-    @AssignSidedFluid
     public static final BlockEntityType<BioGeneratorEntity> BIO_GENERATOR_ENTITY = FabricBlockEntityTypeBuilder.create(BioGeneratorEntity::new, BlockContent.BIO_GENERATOR_BLOCK).build();
     
     @AssignSidedFluid
@@ -100,6 +100,9 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedEnergy
     public static final BlockEntityType<EnergyAcceptorAddonBlockEntity> ENERGY_ACCEPTOR_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(EnergyAcceptorAddonBlockEntity::new, BlockContent.MACHINE_ACCEPTOR_ADDON).build();
+    
+    @AssignSidedFluid
+    public static final BlockEntityType<SteamBoilerAddonBlockEntity> STEAM_BOILER_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(SteamBoilerAddonBlockEntity::new, BlockContent.STEAM_BOILER_ADDON).build();
     
     @AssignSidedInventory
     @AssignSidedEnergy

@@ -39,7 +39,7 @@ public class NetworkContent {
     public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {
     }
     
-    public record GeneratorUISyncPacket(BlockPos position, int burnTime) {
+    public record GeneratorUISyncPacket(BlockPos position, int burnTime, boolean steamAddon) {
     }
     
     public record MachineSetupEventPacket(BlockPos position) {
@@ -240,6 +240,7 @@ public class NetworkContent {
             
             if (entity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
                 generatorBlock.setCurrentMaxBurnTime(message.burnTime);
+                generatorBlock.isProducingSteam = message.steamAddon;
             }
             
         }));
