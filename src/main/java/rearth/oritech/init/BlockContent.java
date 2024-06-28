@@ -23,6 +23,7 @@ import rearth.oritech.block.blocks.machines.storage.LargeStorageBlock;
 import rearth.oritech.block.blocks.machines.storage.SmallFluidTank;
 import rearth.oritech.block.blocks.machines.storage.SmallStorageBlock;
 import rearth.oritech.block.blocks.pipes.*;
+import rearth.oritech.block.fluid.MineralFluidBlock;
 import rearth.oritech.init.datagen.BlockLootGenerator;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.util.item.OritechGeoItem;
@@ -140,9 +141,9 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block STEAM_BOILER_ADDON = new SteamBoilerAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1);
     
     @NoBlockItem
-    public static final Block OIL_FLUID_BLOCK = new FluidBlock((FlowableFluid) FluidContent.FLOWING_OIL, FabricBlockSettings.copyOf(Blocks.WATER));
+    public static final Block OIL_FLUID_BLOCK = new MineralFluidBlock((FlowableFluid) FluidContent.FLOWING_OIL, FabricBlockSettings.copyOf(Blocks.WATER));
     @NoBlockItem
-    public static final Block FUEL_FLUID_BLOCK = new FluidBlock((FlowableFluid) FluidContent.FLOWING_FUEL, FabricBlockSettings.copyOf(Blocks.WATER));
+    public static final Block FUEL_FLUID_BLOCK = new MineralFluidBlock((FlowableFluid) FluidContent.FLOWING_FUEL, FabricBlockSettings.copyOf(Blocks.WATER));
     @NoBlockItem
     public static final Block STEAM_FLUID_BLOCK = new FluidBlock((FlowableFluid) FluidContent.FLOWING_STEAM, FabricBlockSettings.copyOf(Blocks.WATER));
     
