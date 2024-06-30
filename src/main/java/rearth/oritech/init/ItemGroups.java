@@ -17,8 +17,11 @@ import java.util.Map;
 
 public class ItemGroups {
     
-    private static final Map<ItemContent.Groups, List<ItemConvertible>> registered = new HashMap<>();
+    private static final Map<ItemContent.Groups, List<ItemStack>> registered = new HashMap<>();
     public static void add(ItemContent.Groups group, ItemConvertible item) {
+        registered.computeIfAbsent(group, k -> new ArrayList<>()).add(new ItemStack(item));
+    }
+    public static void add(ItemContent.Groups group, ItemStack item) {
         registered.computeIfAbsent(group, k -> new ArrayList<>()).add(item);
     }
 
