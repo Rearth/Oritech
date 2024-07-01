@@ -41,7 +41,8 @@
 		"team_reborn_energy": ">=4.0.0",
 		"owo": "*",
 		"geckolib": "*",
-		"lavender": "*"
+		"lavender": "*",
+		"athena": "*"
 	},
 	"suggests": {
 		"another-mod": "*"
