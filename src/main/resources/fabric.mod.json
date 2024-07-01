@@ -40,7 +40,8 @@
 		"fabric-api": "*",
 		"team_reborn_energy": ">=4.0.0",
 		"owo": "*",
-		"geckolib": "*"
+		"geckolib": "*",
+		"lavender": "*"
 	},
 	"suggests": {
 		"another-mod": "*"
