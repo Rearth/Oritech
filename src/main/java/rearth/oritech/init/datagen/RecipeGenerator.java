@@ -309,7 +309,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addCentrifugeFluidRecipe(exporter, Ingredient.fromTag(TagContent.COAL_DUSTS), null, FluidContent.STILL_OIL, 1f, FluidContent.STILL_FUEL, 1f, 1f, "_fuel");
         
         // biosteel
-        offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.BIOSTEEL_INGOT, 3), Ingredient.ofItems(Items.IRON_INGOT), Ingredient.ofItems(ItemContent.BIOMASS), "biosteel");
+        offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.BIOSTEEL_INGOT, 2), Ingredient.ofItems(Items.IRON_INGOT), Ingredient.ofItems(ItemContent.BIOMASS), "biosteel");
         
         // endgame components
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.SUPER_AI_CHIP), ItemContent.HEISENBERG_COMPENSATOR, 100, "_compensator");
@@ -433,7 +433,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addAlloyRecipe(exporter, Items.GOLD_INGOT, Items.REDSTONE, ItemContent.ELECTRUM_INGOT, "_electrum");
         addAlloyRecipe(exporter, Ingredient.ofItems(Items.DIAMOND), Ingredient.fromTag(TagContent.NICKEL_INGOTS), ItemContent.ADAMANT_INGOT, "_adamant");
         addAlloyRecipe(exporter, Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.ofItems(ItemContent.FLUXITE), ItemContent.ENERGITE_INGOT, "_energite");
-        addAlloyRecipe(exporter, Ingredient.ofItems(Items.IRON_INGOT), Ingredient.fromTag(TagContent.COAL_DUSTS), ItemContent.STEEL_INGOT, "_steel");
+        addAlloyRecipe(exporter, Ingredient.ofItems(Items.IRON_INGOT), Ingredient.fromTag(TagContent.COAL_DUSTS), ItemContent.STEEL_INGOT, 0.3333f, "_steel");
     }
     
     private void addDusts(RecipeExporter exporter) {
@@ -555,7 +555,12 @@ public class RecipeGenerator extends FabricRecipeProvider {
     }
     
     private void addAlloyRecipe(RecipeExporter exporter, Ingredient A, Ingredient B, Item result, String suffix) {
-        var foundryDefaultSpeed = 300;
+        addAlloyRecipe(exporter, A, B, result, 1f, suffix);
+    }
+    
+    
+    private void addAlloyRecipe(RecipeExporter exporter, Ingredient A, Ingredient B, Item result, float speedMultiplier, String suffix) {
+        var foundryDefaultSpeed = (int) (300 * speedMultiplier);
         
         var entry = new OritechRecipe(foundryDefaultSpeed, List.of(A, B), List.of(new ItemStack(result)), RecipeContent.FOUNDRY, null, null);
         exporter.accept(Oritech.id("foundryalloy" + suffix), entry, null);
