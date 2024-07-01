@@ -17,7 +17,6 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.FluidProvider;
 
-import java.util.List;
 import java.util.Optional;
 
 public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGeneratorBlockEntity implements FluidProvider {
@@ -39,11 +38,6 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
         }
         
         @Override
-        protected boolean canInsert(FluidVariant variant) {
-            return getAllowedFuels().contains(variant);
-        }
-        
-        @Override
         protected void onFinalCommit() {
             super.onFinalCommit();
             FluidMultiblockGeneratorBlockEntity.this.markDirty();
@@ -53,8 +47,6 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     public FluidMultiblockGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state, energyPerTick);
     }
-    
-    public abstract List<FluidVariant> getAllowedFuels();
     
     @Override
     protected void tryConsumeInput() {

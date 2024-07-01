@@ -89,11 +89,6 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    public List<FluidVariant> getAllowedFuels() {
-        return List.of(FluidVariant.of(FluidContent.STILL_FUEL), FluidVariant.of(FluidContent.STILL_OIL));
-    }
-    
-    @Override
     public List<Vec3i> getAddonSlots() {
         
         return List.of(
