@@ -7,7 +7,6 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
@@ -34,6 +33,7 @@ import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.DroneScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
@@ -149,8 +149,8 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     private void checkPositionCard() {
         
         var source = cardInventory.heldStacks.get(0);
-        if (source.getItem().equals(ItemContent.TARGET_DESIGNATOR) && source.contains(DataComponentTypes.CUSTOM_DATA)) {
-            var target = BlockPos.fromLong(source.get(DataComponentTypes.CUSTOM_DATA).copyNbt().getLong("target"));
+        if (source.getItem().equals(ItemContent.TARGET_DESIGNATOR) && source.contains(ComponentContent.TARGET_POSITION)) {
+            var target = source.get(ComponentContent.TARGET_POSITION);
             setTargetFromDesignator(target);
         } else {
             return;
