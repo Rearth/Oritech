@@ -48,6 +48,7 @@ import java.util.List;
 public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<SmallFluidTankEntity> {
     
     private boolean netDirty = false;
+    private int lastComparatorOutput = 0;
     
     public final SimpleInventory inventory = new SimpleInventory(2) {
         @Override
@@ -109,7 +110,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         
         if (world.isClient) return;
         
-        if (world.getTime() % 100 == 0) netDirty = true;    // to ensure this syncs when no charged are triggered, and inventory isn't opened
+        if (world.getTime() % 100 == 0) netDirty = true;    // to ensure this syncs when no charges are triggered, and inventory isn't opened
         
         var inStack = inventory.getStack(0);
         var outStack = inventory.getStack(1);
@@ -117,9 +118,19 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         processBuckets(inStack, outStack);
         
         if (netDirty) {
+            updateComparators(world, pos, state);
             updateNetwork();
         }
         
+    }
+    
+    private void updateComparators(World world, BlockPos pos, BlockState state) {
+        var previous = lastComparatorOutput;
+        lastComparatorOutput = getComparatorOutput();
+        
+        if (previous != lastComparatorOutput) {
+            world.updateComparators(pos, state.getBlock());
+        }
     }
     
     private void processBuckets(ItemStack inStack, ItemStack outStack) {
@@ -173,6 +184,11 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         if (slot == null) return true;
         if (slot.isEmpty()) return true;
         return slot.getItem().equals(Items.BUCKET) && slot.getCount() < slot.getMaxCount();
+    }
+    
+    public int getComparatorOutput() {
+        var fillPercentage = fluidStorage.amount / (float) fluidStorage.getCapacity();
+        return (int) (fillPercentage * 16);
     }
     
     @Override

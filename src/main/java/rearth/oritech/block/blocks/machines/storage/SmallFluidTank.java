@@ -45,6 +45,16 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     }
     
     @Override
+    protected boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+    
+    @Override
+    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return ((SmallFluidTankEntity) world.getBlockEntity(pos)).getComparatorOutput();
+    }
+    
+    @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
         if (!world.isClient) {
