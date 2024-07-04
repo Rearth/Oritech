@@ -251,7 +251,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorSteamSyncPacket(pos, steamStorage.amount, waterStorage.amount));
     }
     
-    private void outputEnergy() {
+    protected void outputEnergy() {
         if (energyStorage.amount <= 0) return;
         var availableOutput = Math.min(energyStorage.amount, energyStorage.maxExtract);
         var totalInserted = 0L;

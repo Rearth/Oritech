@@ -40,6 +40,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> BIO_GENERATOR_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> BASIC_GENERATOR_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> LAVA_GENERATOR_SCREEN = upgradeHandler();
+    public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> STEAM_ENGINE_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> FUEL_GENERATOR_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> DESTROYER_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> PLACER_SCREEN = upgradeHandler();
@@ -63,6 +64,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
         HandledScreens.register(POWERED_FURNACE_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(BIO_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(LAVA_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
+        HandledScreens.register(STEAM_ENGINE_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(FUEL_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(BASIC_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(STORAGE_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);

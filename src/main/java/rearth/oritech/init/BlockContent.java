@@ -94,6 +94,8 @@ public class BlockContent implements BlockRegistryContainer {
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block BASIC_GENERATOR_BLOCK = new BasicGeneratorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
+    public static final Block STEAM_ENGINE_BLOCK = new SteamEngineBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @UseGeoBlockItem(scale = 0.7f)
     public static final Block BIG_SOLAR_PANEL_BLOCK = new BigSolarPanelBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), Oritech.CONFIG.generators.solarGeneratorData.energyPerTick());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block POWERED_FURNACE_BLOCK = new PoweredFurnaceBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());

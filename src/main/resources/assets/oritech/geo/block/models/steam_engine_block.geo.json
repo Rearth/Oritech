@@ -1,0 +1,88 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "base",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-7, 0, -8], "size": [30, 2, 16], "uv": [0, 18]},
+						{"origin": [-7, 5, -8], "size": [30, 2, 16], "uv": [0, 0]},
+						{"origin": [-6, 2, -8], "size": [28, 3, 16], "uv": [0, 36]},
+						{"origin": [21, 0, -1], "size": [3, 8, 2], "uv": [32, 55]},
+						{"origin": [-8, 0, -1], "size": [3, 8, 2], "uv": [32, 55]}
+					]
+				},
+				{
+					"name": "tilted2",
+					"parent": "base",
+					"pivot": [-2.5, 10.25, 0]
+				},
+				{
+					"name": "tilted",
+					"parent": "base",
+					"pivot": [18.5, 10.25, 0],
+					"cubes": [
+						{"origin": [17, 6.25, -7.99], "size": [3, 8, 15.9], "pivot": [18.5, 10.25, 0], "rotation": [0, 0, -20], "uv": [48, 55]},
+						{"origin": [-4, 6.25, -7.99], "size": [3, 8, 15.9], "pivot": [-2.5, 10.25, 0], "rotation": [180, 0, -160], "uv": [48, 55]}
+					]
+				},
+				{
+					"name": "shaft",
+					"pivot": [8, 23, 0],
+					"cubes": [
+						{"origin": [7, 22, 3], "size": [2, 2, 5], "uv": [0, 43]},
+						{"origin": [7, 22, -8], "size": [2, 2, 5], "uv": [0, 36]},
+						{"origin": [3, 22, 1], "size": [6, 2, 2], "uv": [0, 55]},
+						{"origin": [3, 22, -3], "size": [6, 2, 2], "uv": [0, 30]},
+						{"origin": [3, 22, -1], "size": [2, 2, 2], "uv": [8, 0]}
+					]
+				},
+				{
+					"name": "connectorA",
+					"pivot": [8, 16.5, 0],
+					"rotation": [0, 0, -32.5],
+					"cubes": [
+						{"origin": [6, 15, -0.5], "size": [4, 11, 1], "uv": [0, 18]}
+					]
+				},
+				{
+					"name": "connectorb",
+					"pivot": [8, 16.5, 0],
+					"cubes": [
+						{"origin": [7, 3, -1], "size": [2, 14, 2], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "inner",
+					"pivot": [16, 7, 0],
+					"cubes": [
+						{"origin": [-3, 7, -8], "size": [3, 4, 16], "uv": [72, 39]},
+						{"origin": [16, 7, -8], "size": [3, 4, 16], "pivot": [17.5, 9, 0], "rotation": [0, 180, 0], "uv": [72, 39]},
+						{"origin": [4, 7, -8], "size": [8, 2, 16], "uv": [0, 55]},
+						{"origin": [0, 7, 5], "size": [2, 2, 3], "uv": [52, 55]},
+						{"origin": [0, 7, -8], "size": [2, 2, 3], "pivot": [1, 8, -6.5], "rotation": [180, 0, -90], "uv": [52, 55]},
+						{"origin": [14, 7, -8], "size": [2, 2, 3], "pivot": [15, 8, -6.5], "rotation": [0, 180, 0], "uv": [52, 55]},
+						{"origin": [14, 7, 5], "size": [2, 2, 3], "pivot": [15, 8, 6.5], "rotation": [0, 0, -90], "uv": [52, 55]}
+					]
+				},
+				{
+					"name": "shaftHolder",
+					"pivot": [8, 9.5, -6.5],
+					"cubes": [
+						{"origin": [6, 9, -7.5], "size": [4, 17, 2], "uv": [0, 73]}
+					]
+				}
+			]
+		}
+	]
+}

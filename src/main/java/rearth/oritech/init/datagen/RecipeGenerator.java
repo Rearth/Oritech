@@ -93,11 +93,13 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.SOLID_BIOFUEL), 160, "_solidbiomass");
         addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.RAW_BIOPOLYMER), 300, "_polymer");
         addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), 3000, "_vex");
-        // fuel
-        addLavaGen(exporter, new FluidStack(Fluids.LAVA, 81000), 120, "_lava");
         // lava
+        addLavaGen(exporter, new FluidStack(Fluids.LAVA, 81000), 120, "_lava");
+        // fuel
         addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_OIL, 81000), 120, "_crude");
         addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_FUEL, 81000), 200, "_fuel");
+        //steam
+        addSteamEngineGen(exporter, new FluidStack(FluidContent.STILL_STEAM, 32), 1, "_steameng");
     }
     
     private void addBiomass(RecipeExporter exporter) {
@@ -593,6 +595,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
     private void addLavaGen(RecipeExporter exporter, FluidStack input, int timeInSeconds, String suffix) {
         var entry = new OritechRecipe(timeInSeconds * 20, List.of(), List.of(), RecipeContent.LAVA_GENERATOR, input, null);
         exporter.accept(Oritech.id("lavagen" + suffix), entry, null);
+    }
+    
+    private void addSteamEngineGen(RecipeExporter exporter, FluidStack input, int timeInTicks, String suffix) {
+        var entry = new OritechRecipe(timeInTicks, List.of(), List.of(), RecipeContent.STEAM_ENGINE, input, null);
+        exporter.accept(Oritech.id("steamgen" + suffix), entry, null);
     }
     
     private void addMetalProcessingChain(RecipeExporter exporter, Ingredient oreInput, Ingredient rawOre, Item rawMain, Item rawSecondary, Item clump, Item smallClump,

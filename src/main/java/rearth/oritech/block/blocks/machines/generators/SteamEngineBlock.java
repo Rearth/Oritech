@@ -7,24 +7,23 @@ import net.minecraft.state.property.Properties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.block.MultiblockMachine;
-import rearth.oritech.block.entity.machines.generators.FuelGeneratorEntity;
+import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
 
 import java.util.Objects;
 
-public class FuelGeneratorBlock extends MultiblockMachine {
-    public FuelGeneratorBlock(Settings settings) {
+public class SteamEngineBlock extends MultiblockMachine {
+    public SteamEngineBlock(Settings settings) {
         super(settings);
     }
     
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        // because the model is inverted, we dont do the opposite here
-        return Objects.requireNonNull(super.getPlacementState(ctx)).with(Properties.HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing());
+        return Objects.requireNonNull(super.getPlacementState(ctx)).with(Properties.HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing().getOpposite());
     }
     
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
-        return FuelGeneratorEntity.class;
+        return SteamEngineEntity.class;
     }
 }

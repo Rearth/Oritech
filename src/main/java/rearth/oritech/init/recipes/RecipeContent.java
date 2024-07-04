@@ -17,6 +17,7 @@ public class RecipeContent {
     public static final OritechRecipeType BIO_GENERATOR = register(Oritech.id("bio_generator"));
     public static final OritechRecipeType FUEL_GENERATOR = register(Oritech.id("fuel_generator"));
     public static final OritechRecipeType LAVA_GENERATOR = register(Oritech.id("lava_generator"));
+    public static final OritechRecipeType STEAM_ENGINE = register(Oritech.id("steam_engine"));
     public static final OritechRecipeType DEEP_DRILL = register(Oritech.id("deep_drill"));
 
     private static OritechRecipeType register(Identifier name) {
