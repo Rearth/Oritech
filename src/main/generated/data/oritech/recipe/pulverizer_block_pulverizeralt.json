@@ -9,7 +9,7 @@
       "tag": "c:nickel_ingots"
     },
     "f": {
-      "tag": "c:steel_ingots"
+      "item": "minecraft:iron_ingot"
     },
     "s": {
       "item": "oritech:motor"
