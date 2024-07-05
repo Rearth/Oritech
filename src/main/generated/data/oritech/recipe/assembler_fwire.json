@@ -2,13 +2,13 @@
   "type": "oritech:assembler",
   "ingredients": [
     {
-      "tag": "c:nickel_ingots"
+      "tag": "c:ingots/nickel"
     },
     {
-      "tag": "c:nickel_ingots"
+      "tag": "c:ingots/nickel"
     },
     {
-      "tag": "c:nickel_ingots"
+      "tag": "c:ingots/nickel"
     },
     {
       "item": "minecraft:copper_ingot"

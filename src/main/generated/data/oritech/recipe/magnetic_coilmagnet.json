@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "c": {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     },
     "i": {
       "item": "oritech:insulated_wire"

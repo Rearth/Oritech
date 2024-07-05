@@ -3,10 +3,10 @@
   "category": "redstone",
   "key": {
     "a": {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     },
     "c": {
-      "tag": "c:nickel_ingots"
+      "tag": "c:ingots/nickel"
     },
     "e": {
       "item": "minecraft:stone"

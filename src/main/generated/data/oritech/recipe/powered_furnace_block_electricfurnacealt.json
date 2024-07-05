@@ -12,7 +12,7 @@
       "item": "minecraft:copper_ingot"
     },
     "m": {
-      "tag": "c:platinum_ingots"
+      "tag": "c:ingots/platinum"
     },
     "s": {
       "item": "oritech:magnetic_coil"

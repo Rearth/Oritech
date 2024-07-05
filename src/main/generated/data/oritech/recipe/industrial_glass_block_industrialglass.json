@@ -3,7 +3,7 @@
   "category": "redstone",
   "key": {
     "a": {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     },
     "c": {
       "item": "oritech:machine_plating_block"

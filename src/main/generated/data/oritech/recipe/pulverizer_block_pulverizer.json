@@ -6,10 +6,10 @@
       "item": "minecraft:iron_block"
     },
     "c": {
-      "tag": "c:nickel_ingots"
+      "tag": "c:ingots/nickel"
     },
     "f": {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     },
     "s": {
       "item": "oritech:motor"

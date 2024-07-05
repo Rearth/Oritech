@@ -2,10 +2,10 @@
   "type": "oritech:assembler",
   "ingredients": [
     {
-      "tag": "c:nickel_ingots"
+      "tag": "c:ingots/nickel"
     },
     {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     },
     {
       "item": "oritech:magnetic_coil"

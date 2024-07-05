@@ -6,7 +6,7 @@
       "item": "minecraft:copper_ingot"
     },
     "b": {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     }
   },
   "pattern": [

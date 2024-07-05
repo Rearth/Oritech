@@ -2,13 +2,13 @@
   "type": "oritech:assembler",
   "ingredients": [
     {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     },
     {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     },
     {
-      "tag": "c:nickel_ingots"
+      "tag": "c:ingots/nickel"
     },
     {
       "item": "oritech:plastic_sheet"

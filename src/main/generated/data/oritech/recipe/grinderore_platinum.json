@@ -2,7 +2,7 @@
   "type": "oritech:grinder",
   "ingredients": [
     {
-      "tag": "c:platinum_ores"
+      "tag": "c:ores/platinum"
     }
   ],
   "results": [

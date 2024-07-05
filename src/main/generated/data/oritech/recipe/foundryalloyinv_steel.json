@@ -2,7 +2,7 @@
   "type": "oritech:foundry",
   "ingredients": [
     {
-      "tag": "c:coal_dusts"
+      "tag": "c:dusts/coal"
     },
     {
       "item": "minecraft:iron_ingot"

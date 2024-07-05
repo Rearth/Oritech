@@ -12,7 +12,7 @@
       "item": "oritech:insulated_wire"
     },
     "m": {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     },
     "s": {
       "item": "oritech:flux_gate"

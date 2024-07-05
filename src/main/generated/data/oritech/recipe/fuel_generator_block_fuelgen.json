@@ -9,7 +9,7 @@
       "item": "oritech:enderic_lens"
     },
     "f": {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     },
     "s": {
       "item": "oritech:basic_generator_block"

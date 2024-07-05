@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "c": {
-      "tag": "c:nickel_ingots"
+      "tag": "c:ingots/nickel"
     },
     "s": {
       "item": "minecraft:iron_bars"

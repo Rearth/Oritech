@@ -6,10 +6,10 @@
       "item": "oritech:magnetic_coil"
     },
     "s": {
-      "tag": "c:nickel_ingots"
+      "tag": "c:ingots/nickel"
     },
     "w": {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     }
   },
   "pattern": [

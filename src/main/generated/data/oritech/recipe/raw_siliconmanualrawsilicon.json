@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "a": {
-      "tag": "c:quartz_dusts"
+      "tag": "c:dusts/quartz"
     },
     "b": {
       "tag": "minecraft:sand"

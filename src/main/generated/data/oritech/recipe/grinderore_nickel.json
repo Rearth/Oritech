@@ -2,7 +2,7 @@
   "type": "oritech:grinder",
   "ingredients": [
     {
-      "tag": "c:nickel_ores"
+      "tag": "c:ores/nickel"
     }
   ],
   "results": [

@@ -2,7 +2,7 @@
   "type": "oritech:assembler",
   "ingredients": [
     {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     },
     {
       "item": "oritech:insulated_wire"

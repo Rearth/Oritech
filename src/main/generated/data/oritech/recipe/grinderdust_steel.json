@@ -2,7 +2,7 @@
   "type": "oritech:grinder",
   "ingredients": [
     {
-      "tag": "c:steel_ingots"
+      "tag": "c:ingots/steel"
     }
   ],
   "results": [

@@ -2,7 +2,7 @@
   "type": "oritech:foundry",
   "ingredients": [
     {
-      "tag": "c:nickel_ingots"
+      "tag": "c:ingots/nickel"
     },
     {
       "item": "oritech:fluxite"

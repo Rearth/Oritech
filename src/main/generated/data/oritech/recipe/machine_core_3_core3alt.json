@@ -6,7 +6,7 @@
       "item": "minecraft:redstone"
     },
     "s": {
-      "tag": "c:nickel_ingots"
+      "tag": "c:ingots/nickel"
     }
   },
   "pattern": [

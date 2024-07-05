@@ -2,7 +2,7 @@
   "type": "oritech:pulverizer",
   "ingredients": [
     {
-      "tag": "c:nickel_ingots"
+      "tag": "c:ingots/nickel"
     }
   ],
   "results": [
