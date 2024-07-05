@@ -3,7 +3,6 @@ package rearth.oritech.item.tools.harvesting;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.DataComponentTypes;
@@ -22,7 +21,6 @@ import net.minecraft.item.ToolMaterial;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -112,8 +110,8 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
             var wasArea = isAreaEnabled(stack);
             var isArea = !wasArea;
             setAreaEnabled(stack, isArea);
-            MinecraftClient.getInstance().player.sendMessage(Text.literal(isArea ? "Area Effect" : "Silk Touch"), true);
-            triggerAnim(user, GeoItem.getOrAssignId(stack, (ServerWorld) world), "Pickaxe", isArea ? "area" : "silk");
+            
+            user.sendMessage(Text.literal(isArea ? "Area Effect" : "Silk Touch"));
         }
         
         return super.use(world, user, hand);
