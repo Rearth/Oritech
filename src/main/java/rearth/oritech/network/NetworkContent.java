@@ -12,6 +12,7 @@ import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
+import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -53,6 +54,9 @@ public class NetworkContent {
     }   // times are in ticks
     
     public record QuarryTargetPacket(BlockPos position, BlockPos quarryTarget, int range, int yieldAddons, float operationSpeed) {
+    }
+    
+    public record SteamEnginePacket(BlockPos position, float speed, float efficiency, long waterStored, int energyProducedTick) {
     }
     
     public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress) {
@@ -269,6 +273,20 @@ public class NetworkContent {
                 var oldData = machine.getBaseAddonData();
                 var newData = new MachineAddonController.BaseAddonData(message.operationSpeed, oldData.efficiency(), oldData.energyBonusCapacity(), oldData.energyBonusTransfer());
                 machine.setBaseAddonData(newData);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(SteamEnginePacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            if (entity instanceof SteamEngineEntity machine) {
+                
+                var oldData = machine.getBaseAddonData();
+                var newData = new MachineAddonController.BaseAddonData(message.speed, message.efficiency, oldData.energyBonusCapacity(), oldData.energyBonusTransfer());
+                machine.setBaseAddonData(newData);
+                machine.waterStorage.amount = message.waterStored;
+                machine.energyProducedTick = message.energyProducedTick;
             }
             
         }));

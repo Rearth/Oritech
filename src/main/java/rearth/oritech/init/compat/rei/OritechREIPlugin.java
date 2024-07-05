@@ -9,6 +9,7 @@ import net.minecraft.item.ItemConvertible;
 import rearth.oritech.block.entity.machines.generators.BioGeneratorEntity;
 import rearth.oritech.block.entity.machines.generators.FuelGeneratorEntity;
 import rearth.oritech.block.entity.machines.generators.LavaGeneratorEntity;
+import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.machines.processing.*;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.compat.rei.Screens.OritechReiDisplay;
@@ -36,6 +37,7 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerOritechCategory(registry, RecipeContent.BIO_GENERATOR, BlockContent.BIO_GENERATOR_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, BioGeneratorEntity.class, icon));
         registerOritechCategory(registry, RecipeContent.FUEL_GENERATOR, BlockContent.FUEL_GENERATOR_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, FuelGeneratorEntity.class, icon));
         registerOritechCategory(registry, RecipeContent.LAVA_GENERATOR, BlockContent.LAVA_GENERATOR_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, LavaGeneratorEntity.class, icon));
+        registerOritechCategory(registry, RecipeContent.STEAM_ENGINE, BlockContent.STEAM_ENGINE_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, SteamEngineEntity.class, icon));
         
         // workstations
         registerOriWorkstation(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK);
@@ -66,6 +68,7 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerMachineRecipeType(registry, RecipeContent.ATOMIC_FORGE);
         registerMachineRecipeType(registry, RecipeContent.BIO_GENERATOR);
         registerMachineRecipeType(registry, RecipeContent.LAVA_GENERATOR);
+        registerMachineRecipeType(registry, RecipeContent.STEAM_ENGINE);
         registerMachineRecipeType(registry, RecipeContent.FUEL_GENERATOR);
     }
     

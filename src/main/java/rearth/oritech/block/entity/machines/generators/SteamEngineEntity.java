@@ -12,8 +12,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
@@ -22,11 +24,13 @@ import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
 import team.reborn.energy.api.EnergyStorage;
@@ -42,8 +46,11 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     private final Storage<FluidVariant> waterOutputWrapper = FilteringStorage.extractOnlyOf(waterStorage);
     private final Storage<FluidVariant> steamWrapperInput = FilteringStorage.insertOnlyOf(inputTank);
     private final Storage<FluidVariant> exposedSteamEngineStorage = new CombinedStorage<>(List.of(steamWrapperInput, waterOutputWrapper));
+    
     private final ArrayList<SteamEngineEntity> connectedTanks = new ArrayList<>();
     private SteamEngineEntity cachedTargetTank = null;
+    
+    public int energyProducedTick = 0;
     
     public SteamEngineEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.STEAM_ENGINE_ENTITY, pos, state, Oritech.CONFIG.generators.steamEngineData.energyPerTick());
@@ -53,7 +60,6 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     public void initAddons() {
         setupTankCache();
         cachedTargetTank = reloadTargetTankFromCache();
-        return;
     }
     
     @Override
@@ -80,6 +86,7 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
         
         var usedSteamTank = usedTankEntity.inputTank;
         var usedWaterTank = usedTankEntity.waterStorage;
+        var usedEnergyStorage = usedTankEntity.energyStorage;
         
         if (usedSteamTank.amount == 0 || usedWaterTank.amount == usedWaterTank.getCapacity()) return;
         
@@ -100,19 +107,31 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
         progress = (int) (speed * 100);
         
         var energyEfficiency = getSteamEnergyEfficiency(speed);
-        var energyProduced = consumed * energyEfficiency;
-        
-        System.out.println(speed + " yields " + energyEfficiency);
-        energyStorage.amount = (long) Math.min(energyStorage.amount + energyProduced, energyStorage.capacity);
+        var energyProduced = consumed * energyEfficiency * energyPerTick;
+        usedEnergyStorage.amount = (long) Math.min(usedEnergyStorage.amount + energyProduced, usedEnergyStorage.capacity);
+        usedTankEntity.energyProducedTick += (int) energyProduced;
         
         setBaseAddonData(new BaseAddonData(1 / (speed), 1/ energyEfficiency, 0, 0));
         
+        spawnParticles();
+        
         markDirty();
         markNetDirty();
+        outputEnergy();
         
         if (networkDirty) {
             updateNetwork();
         }
+    }
+    
+    private void spawnParticles() {
+        if (world.random.nextFloat() > 0.4) return;
+        // emit particles
+        var facing = getFacing();
+        var offsetLocal = Geometry.rotatePosition(new Vec3d(0, 0, -0.5), facing);
+        var emitPosition = Vec3d.ofCenter(pos).add(offsetLocal);
+        
+        ParticleContent.STEAM_ENGINE_WORKING.spawn(world, emitPosition, 1);
     }
     
     private float getSteamEnergyEfficiency(float x) {
@@ -198,9 +217,16 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    protected Multimap<Direction, BlockApiCache<EnergyStorage, Direction>> getNeighborCaches(BlockPos pos, World world) {
-        
-        return ArrayListMultimap.<Direction, BlockApiCache<EnergyStorage, Direction>>create();
+    public BarConfiguration getFluidConfiguration() {
+        return new BarConfiguration(149, 24, 15, 54);
+    }
+    
+    @Override
+    protected void sendNetworkEntry() {
+        super.sendNetworkEntry();
+        var data = getBaseAddonData();
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SteamEnginePacket(pos, data.speed(), data.efficiency(), waterStorage.amount, energyProducedTick));
+        energyProducedTick = 0;
     }
     
     @Override
@@ -229,13 +255,33 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    public EnergyStorage getEnergyStorageForLink() {
-        return null;
+    public long getDefaultCapacity() {
+        return Oritech.CONFIG.generators.steamEngineData.energyCapacity();
     }
     
     @Override
-    public long getDefaultCapacity() {
-        return Oritech.CONFIG.generators.steamEngineData.energyCapacity();
+    public long getDefaultExtractionRate() {
+        return Oritech.CONFIG.generators.steamEngineData.maxEnergyExtraction();
+    }
+    
+    @Override
+    protected Multimap<Direction, BlockApiCache<EnergyStorage, Direction>> getNeighborCaches(BlockPos pos, World world) {
+        
+        var facing = getFacing();
+        
+        var res = ArrayListMultimap.<Direction, BlockApiCache<EnergyStorage, Direction>>create();
+        var northCache = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, pos.north());
+        res.put(Direction.NORTH, northCache);
+        var eastCache = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, pos.east());
+        res.put(Direction.EAST, eastCache);
+        var southCache = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, pos.south());
+        res.put(Direction.SOUTH, southCache);
+        var westCache = BlockApiCache.create(EnergyStorage.SIDED, (ServerWorld) world, pos.west());
+        res.put(Direction.WEST, westCache);
+        
+        res.removeAll(facing.rotateYCounterclockwise());
+        
+        return res;
     }
     
     @Override
@@ -255,11 +301,6 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     @Override
     public Storage<FluidVariant> getFluidStorage(Direction direction) {
         return exposedSteamEngineStorage;
-    }
-    
-    @Override
-    public boolean showEnergy() {
-        return super.showEnergy();
     }
     
     @Override

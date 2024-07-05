@@ -5,7 +5,6 @@ import io.wispforest.owo.particles.systems.ParticleSystem;
 import io.wispforest.owo.particles.systems.ParticleSystemController;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import rearth.oritech.Oritech;
@@ -61,6 +60,11 @@ public class ParticleContent {
     public static final ParticleSystem<Integer> ASSEMBLER_WORKING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(data);
         ClientParticles.spawn(ParticleTypes.ENCHANTED_HIT, world, pos, 0.6);
+    }));
+    
+    public static final ParticleSystem<Integer> STEAM_ENGINE_WORKING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawn(ParticleTypes.CLOUD, world, pos, 0.6);
     }));
     
     public static final ParticleSystem<Integer> CHARGING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {

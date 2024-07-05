@@ -40,7 +40,6 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> BIO_GENERATOR_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> BASIC_GENERATOR_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> LAVA_GENERATOR_SCREEN = upgradeHandler();
-    public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> STEAM_ENGINE_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> FUEL_GENERATOR_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> DESTROYER_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> PLACER_SCREEN = upgradeHandler();
@@ -49,6 +48,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
     
     public static final ExtendedScreenHandlerType<DroneScreenHandler, BasicData> DRONE_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(DroneScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<CentrifugeScreenHandler, UpgradableData> CENTRIFUGE_SCREEN = new ExtendedScreenHandlerType<>(new UpgradeFactory<>(CentrifugeScreenHandler.class), UpgradableData.PACKET_CODEC);
+    public static final ExtendedScreenHandlerType<SteamEngineScreenHandler, UpgradableData> STEAM_ENGINE_SCREEN = new ExtendedScreenHandlerType<>(new UpgradeFactory<>(SteamEngineScreenHandler.class), UpgradableData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<ItemFilterScreenHandler, BasicData> ITEM_FILTER_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(ItemFilterScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<InventoryProxyScreenHandler, InventoryProxyScreenHandler.InvProxyData> INVENTORY_PROXY_SCREEN = new ExtendedScreenHandlerType<>(new InventoryProxyScreenHandler.HandlerFactory(), InventoryProxyScreenHandler.InvProxyData.PACKET_CODEC);
     
@@ -64,7 +64,6 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
         HandledScreens.register(POWERED_FURNACE_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(BIO_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(LAVA_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
-        HandledScreens.register(STEAM_ENGINE_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(FUEL_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(BASIC_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(STORAGE_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
@@ -77,6 +76,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
         HandledScreens.register(ITEM_FILTER_SCREEN, ItemFilterScreen::new);
         HandledScreens.register(DRONE_SCREEN, DroneScreen::new);
         HandledScreens.register(CENTRIFUGE_SCREEN, CentrifugeScreen::new);
+        HandledScreens.register(STEAM_ENGINE_SCREEN, SteamEngineScreen::new);
     }
     
     @Override

@@ -87,7 +87,7 @@ public class Config {
         @Nest
         public BasicEnergyMachineData fuelGeneratorData = new BasicEnergyMachineData(250_000, 0, 2048, 256);
         @Nest
-        public BasicEnergyMachineData steamEngineData = new BasicEnergyMachineData(100_000, 0, 0, 1);
+        public BasicEnergyMachineData steamEngineData = new BasicEnergyMachineData(100_000, 0, 10_000, 1);
         @Nest
         public BasicEnergyMachineData solarGeneratorData = new BasicEnergyMachineData(100_000, 0, 1024, 32);
     }

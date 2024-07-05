@@ -1,6 +1,7 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.OverlayContainer;
@@ -31,6 +32,9 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
     
     private static final Identifier MACHINE_CORE_CENTER = Oritech.id("textures/gui/modular/machine_core/center.png");
     
+    protected LabelComponent speedLabel;
+    protected LabelComponent efficiencyLabel;
+    
     public UpgradableMachineScreen(S handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
     }
@@ -42,9 +46,12 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         var speed = String.format("%.0f", 1 / handler.addonUiData.speed() * 100);
         var efficiency = String.format("%.0f", 1 / handler.addonUiData.efficiency() * 100);
         
+        speedLabel = Components.label(Text.literal("⌛ " + speed + "%"));
+        efficiencyLabel = Components.label(Text.literal("⚡ " + efficiency + "%"));
+        
         container.child(Components.box(Sizing.fixed(73), Sizing.fixed(1)).color(new Color(0.8f, 0.8f, 0.8f)));
-        container.child(Components.label(Text.literal("⌛ " + speed + "%")).tooltip(Text.literal("Processing Speed")).margins(Insets.of(3)));
-        container.child(Components.label(Text.literal("⚡ " + efficiency + "%")).tooltip(Text.literal("Energy Efficiency")).margins(Insets.of(3)));
+        container.child(speedLabel.tooltip(Text.literal("Processing Speed")).margins(Insets.of(3)));
+        container.child(efficiencyLabel.tooltip(Text.literal("Energy Efficiency")).margins(Insets.of(3)));
         
         if (handler.blockEntity instanceof PulverizerBlockEntity || handler.blockEntity instanceof FragmentForgeBlockEntity) {
             container.child(Components.label(Text.literal("\uD83D\uDD28 Enabled")).tooltip(Text.literal("Auto-combines small dusts to ingots")).margins(Insets.of(3)));

@@ -77,6 +77,7 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     public static final BlockEntityType<BasicGeneratorEntity> BASIC_GENERATOR_ENTITY = FabricBlockEntityTypeBuilder.create(BasicGeneratorEntity::new, BlockContent.BASIC_GENERATOR_BLOCK).build();
     
     @AssignSidedFluid
+    @AssignSidedEnergy
     public static final BlockEntityType<SteamEngineEntity> STEAM_ENGINE_ENTITY = FabricBlockEntityTypeBuilder.create(SteamEngineEntity::new, BlockContent.STEAM_ENGINE_BLOCK).build();
     
     @AssignSidedEnergy

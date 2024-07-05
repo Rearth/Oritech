@@ -176,6 +176,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerGeneratorRecipe(exporter, BlockContent.BIO_GENERATOR_BLOCK.asItem(), Ingredient.ofItems(BlockContent.BASIC_GENERATOR_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.ofItems(ItemContent.BIOSTEEL_INGOT), "_biogen");
         // lava generator
         offerGeneratorRecipe(exporter, BlockContent.LAVA_GENERATOR_BLOCK.asItem(), Ingredient.ofItems(BlockContent.BASIC_GENERATOR_BLOCK.asItem()), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), "_lavagen");
+         // steam engine
+        offerGeneratorRecipe(exporter, BlockContent.STEAM_ENGINE_BLOCK.asItem(), Ingredient.ofItems(BlockContent.BASIC_GENERATOR_BLOCK.asItem()), Ingredient.ofItems(Items.COPPER_INGOT), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), "_steamgen");
         // diesel generator
         offerGeneratorRecipe(exporter, BlockContent.FUEL_GENERATOR_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(BlockContent.BASIC_GENERATOR_BLOCK), Ingredient.ofItems(ItemContent.ENDERIC_LENS), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_fuelgen");
         // large solar
@@ -223,10 +225,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_ACCEPTOR_ADDON.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_acceptor");
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_YIELD_ADDON.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ENDERIC_LENS), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_yield");
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_FLUID_ADDON.asItem(), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(BlockContent.FLUID_PIPE), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), "_fluid");
-        offerGeneratorRecipe(exporter, BlockContent.STEAM_BOILER_ADDON.asItem(), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.NICKEL_INGOT), Ingredient.ofItems(BlockContent.FLUID_PIPE), Ingredient.ofItems(ItemContent.COAL_DUST), "_steam");
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_INVENTORY_PROXY_ADDON.asItem(), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.fromTag(ConventionalItemTags.CHESTS), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), "_invproxy");
         offerGeneratorRecipe(exporter, BlockContent.CROP_FILTER_ADDON.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), "_cropfilter");
         offerGeneratorRecipe(exporter, BlockContent.QUARRY_ADDON.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(Items.DIAMOND_PICKAXE), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_quarryaddon");
+        offerGeneratorRecipe(exporter, BlockContent.STEAM_BOILER_ADDON.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(Items.COPPER_INGOT), Ingredient.ofItems(BlockContent.FLUID_PIPE), "_steamboiler");
+        offerGeneratorRecipe(exporter, BlockContent.STEAM_BOILER_ADDON.asItem(), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(BlockContent.FLUID_PIPE), Ingredient.ofItems(ItemContent.COAL_DUST), "_steamboileralt");
         offerTwoComponentRecipe(exporter, BlockContent.CAPACITOR_ADDON_EXTENDER.asItem(), Ingredient.ofItems(BlockContent.MACHINE_EXTENDER.asItem()), Ingredient.ofItems(BlockContent.MACHINE_CAPACITOR_ADDON), "_capextender");
         
         // cores

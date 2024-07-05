@@ -256,7 +256,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         var availableOutput = Math.min(energyStorage.amount, energyStorage.maxExtract);
         var totalInserted = 0L;
         
-        if (directionCaches == null) directionCaches = getNeighborCaches(pos, world);
+        if (directionCaches == null || availableOutput == 0) directionCaches = getNeighborCaches(pos, world);
         
         try (var tx = Transaction.openOuter()) {
             for (var entry : directionCaches.entries()) {
