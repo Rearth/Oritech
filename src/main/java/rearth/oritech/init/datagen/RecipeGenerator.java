@@ -158,8 +158,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE_BLOCK.asItem(), Ingredient.ofItems(Blocks.FURNACE.asItem()), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(Items.COPPER_INGOT), "_electricfurnace");
         offerFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE_BLOCK.asItem(), Ingredient.ofItems(Blocks.FURNACE.asItem()), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.fromTag(TagContent.PLATINUM_INGOTS), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(Items.COPPER_INGOT), "_electricfurnacealt");
         // assembler
-        offerFurnaceRecipe(exporter, BlockContent.ASSEMBLER_BLOCK.asItem(), Ingredient.ofItems(Blocks.BLAST_FURNACE.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(Items.COPPER_INGOT), "_assembler");
-        offerFurnaceRecipe(exporter, BlockContent.ASSEMBLER_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SILICON), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(Items.COPPER_INGOT), "_assembleralt");
+        offerFurnaceRecipe(exporter, BlockContent.ASSEMBLER_BLOCK.asItem(), Ingredient.ofItems(Blocks.BLAST_FURNACE.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(Items.CRAFTER), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(Items.COPPER_INGOT), "_assembler");
+        offerFurnaceRecipe(exporter, BlockContent.ASSEMBLER_BLOCK.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(Items.CRAFTER), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(Items.COPPER_INGOT), "_assembleralt");
         // foundry
         offerGeneratorRecipe(exporter, BlockContent.FOUNDRY_BLOCK.asItem(), Ingredient.ofItems(Blocks.CAULDRON.asItem()), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(Items.COPPER_INGOT), "_foundry");
         // centrifuge
@@ -314,7 +314,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addCentrifugeFluidRecipe(exporter, Ingredient.fromTag(TagContent.COAL_DUSTS), null, FluidContent.STILL_OIL, 1f, FluidContent.STILL_FUEL, 1f, 1f, "_fuel");
         
         // biosteel
-        offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.BIOSTEEL_INGOT, 2), Ingredient.ofItems(Items.IRON_INGOT), Ingredient.ofItems(ItemContent.BIOMASS), "biosteel");
+        addAlloyRecipe(exporter, ItemContent.RAW_BIOPOLYMER, Items.IRON_INGOT, ItemContent.BIOSTEEL_INGOT, "_biosteel");
         
         // endgame components
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.SUPER_AI_CHIP), ItemContent.HEISENBERG_COMPENSATOR, 100, "_compensator");
