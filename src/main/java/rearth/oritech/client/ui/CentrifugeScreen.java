@@ -34,6 +34,7 @@ public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHa
     public void fillOverlay(FlowLayout overlay) {
         super.fillOverlay(overlay);
         
+        System.out.println(inFluidDisplay);
         if (inFluidDisplay != null) {
             addFluidDisplay(overlay, inFluidDisplay);
             updateFluidDisplay(inFluidDisplay);
@@ -46,6 +47,8 @@ public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHa
         
         if (inFluidDisplay != null)
             updateFluidDisplay(inFluidDisplay);
+        
+        super.handledScreenTick();
     }
     
     @Override

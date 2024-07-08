@@ -55,7 +55,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     private final Storage<FluidVariant> exposedOutput = FilteringStorage.extractOnlyOf(outputStorage);
     private final Storage<FluidVariant> combinedTanks = new CombinedStorage<>(List.of(exposedInput, exposedOutput));
     
-    public boolean hasFluidAddon;
+    public boolean hasFluidAddon = false;
     
     public final SimpleInventory bucketInventory = new SimpleInventory(2) {
         @Override
@@ -314,12 +314,16 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     @Override
     public @Nullable SingleVariantStorage<FluidVariant> getForDirectFluidAccess() {
+        
+        if (!hasFluidAddon) return null;
+        
         return outputStorage;
     }
     
     @Override
     protected void sendNetworkEntry() {
         super.sendNetworkEntry();
+        
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(
           new NetworkContent.CentrifugeFluidSyncPacket(
             pos,
