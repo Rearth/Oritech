@@ -25,7 +25,10 @@ import java.lang.reflect.Field;
 
 public class ToolsContent implements ItemRegistryContainer {
     
-    private static final Item.Settings UNBREAKING_SETTINGS = new Item.Settings().maxCount(1).maxDamage(0).component(DataComponentTypes.UNBREAKABLE, new UnbreakableComponent(true));
+    private static final Item.Settings UNBREAKING_SETTINGS = new Item.Settings()
+                                                               .maxCount(1)
+                                                               .maxDamage(0)
+                                                               .component(DataComponentTypes.UNBREAKABLE, new UnbreakableComponent(true));
     
     public static final RegistryEntry<ArmorMaterial> EXOSUIT_MATERIAL = ArmorMaterials.DIAMOND;
     public static final ToolMaterial ELECTRIC_MATERIAL = new ElectricToolMaterial();

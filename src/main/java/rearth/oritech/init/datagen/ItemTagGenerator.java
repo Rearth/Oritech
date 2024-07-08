@@ -8,6 +8,7 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.ToolsContent;
 import rearth.oritech.init.datagen.data.TagContent;
 
 import java.util.concurrent.CompletableFuture;
@@ -79,5 +80,31 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .addOptionalTag(ItemTags.SAPLINGS)
           .addOptionalTag(ConventionalItemTags.FOODS)
           .add(Items.WHEAT);
+        
+        // equipment enchanting
+        getOrCreateTagBuilder(ItemTags.MINING_ENCHANTABLE)
+          .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);
+        
+        getOrCreateTagBuilder(ItemTags.CLUSTER_MAX_HARVESTABLES)
+          .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);
+        
+        getOrCreateTagBuilder(ItemTags.MINING_LOOT_ENCHANTABLE)
+          .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);
+        
+        getOrCreateTagBuilder(ItemTags.SWORD_ENCHANTABLE)
+          .add(ToolsContent.PROMETHIUM_AXE, ToolsContent.CHAINSAW);
+        
+        getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
+          .add(ToolsContent.CHAINSAW, ToolsContent.HAND_DRILL);
+        
+        getOrCreateTagBuilder(ItemTags.HEAD_ARMOR_ENCHANTABLE)
+          .add(ToolsContent.EXO_HELMET);
+        getOrCreateTagBuilder(ItemTags.CHEST_ARMOR_ENCHANTABLE)
+          .add(ToolsContent.EXO_CHESTPLATE);
+        getOrCreateTagBuilder(ItemTags.LEG_ARMOR_ENCHANTABLE)
+          .add(ToolsContent.EXO_LEGGINGS);
+        getOrCreateTagBuilder(ItemTags.FOOT_ARMOR_ENCHANTABLE)
+          .add(ToolsContent.EXO_BOOTS);
+        
     }
 }
