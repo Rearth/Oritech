@@ -108,27 +108,46 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     
     @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
-        ItemStack newStack = ItemStack.EMPTY;
-        Slot slot = this.slots.get(invSlot);
+        
+        var newStack = ItemStack.EMPTY;
+        
+        var slot = this.slots.get(invSlot);
+
         if (slot.hasStack()) {
-            ItemStack originalStack = slot.getStack();
+            var originalStack = slot.getStack();
             newStack = originalStack.copy();
-            if (invSlot < this.inventory.size()) {
-                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+            if (invSlot < this.inventory.size() || invSlot > this.inventory.size() + 36) {  // second condition is for machines adding extra slots afterwards, which are treated as part of the machine
+                if (!this.insertItem(originalStack, getPlayerInvStartSlot(newStack), getPlayerInvEndSlot(newStack), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
+            } else if (!this.insertItem(originalStack, getMachineInvStartSlot(newStack), getMachineInvEndSlot(newStack), false)) {
                 return ItemStack.EMPTY;
             }
-            
+
             if (originalStack.isEmpty()) {
                 slot.setStack(ItemStack.EMPTY);
             } else {
                 slot.markDirty();
             }
         }
-        
+
         return newStack;
+    }
+    
+    public int getPlayerInvStartSlot(ItemStack stack) {
+        return this.inventory.size();
+    }
+    
+    public int getPlayerInvEndSlot(ItemStack stack) {
+        return this.slots.size();
+    }
+    
+    public int getMachineInvStartSlot(ItemStack stack) {
+        return 0;
+    }
+    
+    public int getMachineInvEndSlot(ItemStack stack) {
+        return this.inventory.size();
     }
     
     @Override
