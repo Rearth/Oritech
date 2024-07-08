@@ -463,6 +463,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // redstone
         addGrinderRecipe(exporter, Ingredient.fromTag(ItemTags.REDSTONE_ORES), Items.REDSTONE, 12, "_redstoneoregrinder");
         addPulverizerRecipe(exporter, Ingredient.fromTag(ItemTags.REDSTONE_ORES), Items.REDSTONE, 8, "_redstoneorepulverizer");
+        // diamond
+        addGrinderRecipe(exporter, Ingredient.fromTag(ItemTags.DIAMOND_ORES), Items.DIAMOND, 2, "_diamondoregrinder");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(ItemTags.DIAMOND_ORES), Items.DIAMOND, 1, "_diamondorepulverizer");
         // quartz
         addGrinderRecipe(exporter, Ingredient.ofItems(Blocks.NETHER_QUARTZ_ORE), Items.QUARTZ, 3, "_quartzoregrinder");
         addPulverizerRecipe(exporter, Ingredient.ofItems(Blocks.NETHER_QUARTZ_ORE), Items.QUARTZ, 2, "_quartzorepulverizer");
@@ -481,6 +484,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // wool
         addGrinderRecipe(exporter, Ingredient.fromTag(ItemTags.WOOL), Items.STRING, 4, "_stringgrinder");
         addPulverizerRecipe(exporter, Ingredient.fromTag(ItemTags.WOOL), Items.STRING, 3, "_stringpulverizer");
+        // ancient debris
+        addGrinderRecipe(exporter, Ingredient.ofItems(Items.ANCIENT_DEBRIS), Items.NETHERITE_SCRAP, 2, "_netheritescrapgrinder");
     }
     
     private void addDustRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, String suffix) {
