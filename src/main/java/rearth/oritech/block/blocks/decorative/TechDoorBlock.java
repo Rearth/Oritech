@@ -71,7 +71,10 @@ public class TechDoorBlock extends HorizontalFacingBlock implements BlockEntityP
         
         if (!aboveState.getBlock().equals(BlockContent.TECH_DOOR_HINGE)) return;
         
-        world.playSound(null, pos, SoundContent.PRESS, SoundCategory.BLOCKS, Oritech.CONFIG.machineVolumeMultiplier() * 0.18f, 1.3f);
+        var entity = (TechDoorBlockEntity) world.getBlockEntity(pos);
+        
+        if (entity.shouldPlaySoundAgain())
+            world.playSound(null, pos, SoundContent.PRESS, SoundCategory.BLOCKS, Oritech.CONFIG.machineVolumeMultiplier() * 0.18f, 1.3f);
         
         world.setBlockState(pos, state.with(OPENED, isPowered));
         world.setBlockState(pos.up(), aboveState.with(OPENED, isPowered));

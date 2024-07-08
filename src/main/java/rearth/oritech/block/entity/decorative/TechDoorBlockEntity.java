@@ -24,8 +24,17 @@ public class TechDoorBlockEntity extends BlockEntity implements GeoBlockEntity {
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     private final AnimationController<TechDoorBlockEntity> animationController = getAnimationController();
     
+    private long lastSoundEventAt = 0;
+    
     public TechDoorBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.TECH_DOOR_ENTITY, pos, state);
+    }
+    
+    public boolean shouldPlaySoundAgain() {
+        var age = world.getTime() - lastSoundEventAt;
+        lastSoundEventAt = world.getTime();
+        
+        return age > 40;
     }
     
     private AnimationController<TechDoorBlockEntity> getAnimationController() {
