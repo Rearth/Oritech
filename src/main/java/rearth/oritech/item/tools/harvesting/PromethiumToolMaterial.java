@@ -15,7 +15,7 @@ public class PromethiumToolMaterial implements ToolMaterial {
     
     @Override
     public float getMiningSpeedMultiplier() {
-        return 18f;
+        return 24f;
     }
     
     @Override
