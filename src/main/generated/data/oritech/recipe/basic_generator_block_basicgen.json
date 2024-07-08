@@ -6,10 +6,10 @@
       "item": "minecraft:furnace"
     },
     "c": {
-      "tag": "c:ingots/nickel"
+      "item": "minecraft:copper_ingot"
     },
     "f": {
-      "item": "minecraft:iron_ingot"
+      "tag": "c:ingots/nickel"
     },
     "s": {
       "item": "oritech:magnetic_coil"
