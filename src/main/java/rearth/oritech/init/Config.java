@@ -75,7 +75,7 @@ public class Config {
     
     public static class Generators {
         
-        public float animationSpeedMultiplier = 20;
+        public float animationSpeedMultiplier = 10;
         public float rfToSteamRation = 2;
         
         @Nest

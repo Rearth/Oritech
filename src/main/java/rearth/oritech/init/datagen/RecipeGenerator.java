@@ -94,10 +94,10 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.RAW_BIOPOLYMER), 300, "_polymer");
         addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), 3000, "_vex");
         // lava
-        addLavaGen(exporter, new FluidStack(Fluids.LAVA, 81000), 120, "_lava");
+        addLavaGen(exporter, new FluidStack(Fluids.LAVA, 8100), 12, "_lava");
         // fuel
-        addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_OIL, 81000), 120, "_crude");
-        addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_FUEL, 81000), 200, "_fuel");
+        addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_OIL, 8100), 12, "_crude");
+        addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_FUEL, 8100), 20, "_fuel");
         //steam
         addSteamEngineGen(exporter, new FluidStack(FluidContent.STILL_STEAM, 32), 1, "_steameng");
     }
