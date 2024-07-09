@@ -111,7 +111,7 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
         usedEnergyStorage.amount = (long) Math.min(usedEnergyStorage.amount + energyProduced, usedEnergyStorage.capacity);
         usedTankEntity.energyProducedTick += (int) energyProduced;
         
-        setBaseAddonData(new BaseAddonData(1 / (speed), 1/ energyEfficiency, 0, 0));
+        setBaseAddonData(new BaseAddonData(1 / (speed), 1 / energyEfficiency, 0, 0));
         
         spawnParticles();
         

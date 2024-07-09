@@ -53,6 +53,9 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         container.child(speedLabel.tooltip(Text.literal("Processing Speed")).margins(Insets.of(3)));
         container.child(efficiencyLabel.tooltip(Text.literal("Energy Efficiency")).margins(Insets.of(3)));
         
+        if (steamProductionLabel != null)
+            container.child(steamProductionLabel.margins(Insets.of(3)));
+        
         if (handler.blockEntity instanceof PulverizerBlockEntity || handler.blockEntity instanceof FragmentForgeBlockEntity) {
             container.child(Components.label(Text.literal("\uD83D\uDD28 Enabled")).tooltip(Text.literal("Auto-combines small dusts to ingots")).margins(Insets.of(3)));
         }

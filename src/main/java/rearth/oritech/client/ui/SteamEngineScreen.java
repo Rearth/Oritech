@@ -13,6 +13,7 @@ public class SteamEngineScreen extends UpgradableMachineScreen<SteamEngineScreen
     
     private final FluidDisplay waterDisplay;
     protected LabelComponent productionLabel;
+    protected LabelComponent steamUsageLabel;
     
     public SteamEngineScreen(SteamEngineScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -37,6 +38,9 @@ public class SteamEngineScreen extends UpgradableMachineScreen<SteamEngineScreen
         
         productionLabel = Components.label(Text.literal("0 RF/t"));
         container.child(productionLabel.tooltip(Text.literal("Total production (includes chained generators")).margins(Insets.of(3)));
+        
+        steamUsageLabel = Components.label(Text.literal("0 su/t"));
+        container.child(steamUsageLabel.tooltip(Text.literal("Total steam consumption in storage units (droplets) per tick (includes chained generators")).margins(Insets.of(3)));
     }
     
     @Override
@@ -50,10 +54,12 @@ public class SteamEngineScreen extends UpgradableMachineScreen<SteamEngineScreen
         var speed = String.format("%.0f", 1 / data.speed() * 100);
         var efficiency = String.format("%.0f", 1 / data.efficiency() * 100);
         var totalProduction = steamEntity.energyProducedTick + " RF/t";
+        var totalSteamUsage = String.format("%.0f", steamEntity.energyProducedTick * data.efficiency() / steamEntity.getEnergyPerTick());
         
         speedLabel.text(Text.literal("⌛ " + speed + "%"));
         efficiencyLabel.text(Text.literal("⚡ " + efficiency + "%"));
         productionLabel.text(Text.literal("↗ " + totalProduction));
+        steamUsageLabel.text(Text.literal("\uD83D\uDEDE " + totalSteamUsage + " su/t"));
         
     }
 }

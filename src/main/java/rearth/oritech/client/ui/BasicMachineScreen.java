@@ -45,6 +45,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     private final FluidDisplay genericDisplay;
     private final FluidDisplay steamDisplay;
     private final FluidDisplay waterDisplay;
+    protected final LabelComponent steamProductionLabel;
     
     protected static final class FluidDisplay {
         private final BoxComponent fillOverlay;
@@ -86,9 +87,13 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             var configSteam = new ScreenProvider.BarConfiguration(config.x() + offset, config.y(), config.width(), config.height());
             var containerSteam = handler.steamStorage;
             steamDisplay = initDisplay(containerSteam, configSteam);
+            // the label is then actually added to the screen in the upgradable screen extension
+            steamProductionLabel = Components.label(Text.literal("0 su/t"));
+            steamProductionLabel.tooltip(Text.of("Amount of steam droplets produced per tick. Any excess will be lost when the storage is full."));
         } else {
             steamDisplay = null;
             waterDisplay = null;
+            steamProductionLabel = null;
         }
         
     }
@@ -174,6 +179,12 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         if (handler.fluidProvider != null)
             updateFluidDisplay(genericDisplay);
+        
+        if (steamProductionLabel != null) {
+            var productionRate = handler.screenData.getDisplayedEnergyUsage() * Oritech.CONFIG.generators.rfToSteamRation();
+            productionRate = Math.min(this.waterDisplay.storage.amount, productionRate);
+            steamProductionLabel.text(Text.of("\uD83D\uDEDE " + String.format("%.0f", productionRate) + " su/t"));
+        }
     }
     
     private void updateProgressBar() {
@@ -271,6 +282,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         for (var label : handler.screenData.getExtraExtensionLabels()) {
             container.child(Components.label(label.getLeft()).tooltip(label.getRight()).margins(Insets.of(3)));
         }
+        
     }
     
     private FlowLayout buildOverlay() {
