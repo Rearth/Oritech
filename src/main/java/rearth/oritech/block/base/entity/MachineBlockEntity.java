@@ -52,7 +52,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     public final SimpleInventory inventory = new SimpleMachineInventory(getInventorySize());
     // crafting / processing
-    protected int progress;
+    public int progress;
     protected int energyPerTick;
     protected OritechRecipe currentRecipe = OritechRecipe.DUMMY;
     protected InventoryInputMode inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;

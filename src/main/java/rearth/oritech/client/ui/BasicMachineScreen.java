@@ -21,6 +21,9 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
+import rearth.oritech.block.entity.machines.generators.BasicGeneratorEntity;
 import rearth.oritech.client.renderers.LaserArmModel;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.ScreenProvider;
@@ -176,6 +179,27 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     private void updateProgressBar() {
         var config = handler.screenData.getIndicatorConfiguration();
         var progress = handler.screenData.getProgress();
+        
+        
+        if (handler.blockEntity instanceof MachineBlockEntity machineEntity && (machineEntity.getCurrentRecipe().getTime() > 0 || machineEntity.progress > 0)) {
+            
+            var progressTicks = machineEntity.progress;
+            var recipeDurationTicks = machineEntity.getCurrentRecipe().getTime();
+            var effectiveDurationTicks = (int) (recipeDurationTicks * machineEntity.getSpeedMultiplier());
+            
+            if (machineEntity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
+                if (recipeDurationTicks <= 0)
+                    recipeDurationTicks = (int) (generatorBlock.currentMaxBurnTime / generatorBlock.getSpeedMultiplier() * generatorBlock.getEfficiencyMultiplier());
+                effectiveDurationTicks = generatorBlock.currentMaxBurnTime;
+            }
+            
+            if (machineEntity instanceof BasicGeneratorEntity generatorEntity)
+                recipeDurationTicks = generatorEntity.currentMaxBurnTime;
+            
+            
+            progress_indicator.tooltip(Text.of(progressTicks + "/" + effectiveDurationTicks + " ticks\n(base " + recipeDurationTicks + " ticks)"));
+        }
+        
         
         if (config.horizontal()) {
             progress_indicator.visibleArea(PositionedRectangle.of(0, 0, (int) (config.width() * progress), config.height()));

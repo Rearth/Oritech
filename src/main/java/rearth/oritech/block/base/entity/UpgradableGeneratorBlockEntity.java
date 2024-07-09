@@ -35,7 +35,7 @@ import java.util.List;
 
 public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBlockEntity {
     
-    private int currentMaxBurnTime; // needed only for progress display
+    public int currentMaxBurnTime; // needed only for progress display
     private List<ItemStack> pendingOutputs = new ArrayList<>(); // used if a recipe produces a byproduct at the end
     private Multimap<Direction, BlockApiCache<EnergyStorage, Direction>> directionCaches;
     
@@ -229,7 +229,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        currentMaxBurnTime = nbt.getInt("currentMaxBurnTime");
+        currentMaxBurnTime = nbt.getInt("storedBurn");
         steamStorage.amount = nbt.getLong("steamStored");
         waterStorage.amount = nbt.getLong("waterStored");
         isProducingSteam = nbt.getBoolean("steamAddon");
