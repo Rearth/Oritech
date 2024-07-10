@@ -128,3 +128,4 @@ In detail, these are the following items that are from the above-mentioned sourc
 * The creators and maintainers of Geckolib for creating the great animation engine, and helping out in their discord
 * [LyFl0w's texture maker](https://github.com/LyFl0w/TextureMaker), which has been used for a lot of the other mod textures
 * Ycar, for creating all tiers of the machine core textures
+* BBoldt and BLOKBUSTR, for fixing a series of issues with the textures, and generally improving and redesigning almost all the metal component textures
