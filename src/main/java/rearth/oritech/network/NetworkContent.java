@@ -46,6 +46,9 @@ public class NetworkContent {
     public record MachineSetupEventPacket(BlockPos position) {
     }
     
+    public record TreeFellerBlockAnimation(BlockPos position, String animation) {
+    }
+    
     public record DroneCardEventPacket(BlockPos position, String message) {
     }
     
@@ -118,6 +121,16 @@ public class NetworkContent {
             if (entity instanceof MultiblockMachineController machine) {
                 System.out.println("playing setup on client!");
                 machine.playSetupAnimation();
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(TreeFellerBlockAnimation.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof TreefellerBlockEntity machine) {
+                machine.playWorkAnimation(message.animation);
             }
             
         }));

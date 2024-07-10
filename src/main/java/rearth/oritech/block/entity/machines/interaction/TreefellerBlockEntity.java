@@ -111,7 +111,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
             var idleTicks = world.getTime() - lastWorkedAt;
             var isWorking = idleTicks < 20;
             var animName = isWorking ? "work" : "idle";
-            triggerAnim("machine", animName);
+            triggerWorkAnimation(animName);
         }
         
         if (networkDirty && world.getTime() % 4 == 0) {
@@ -312,6 +312,14 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         sendNetworkEntry();
         return new BasicMachineScreenHandler(syncId, playerInventory, this);
+    }
+    
+    private void triggerWorkAnimation(String animName) {
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.TreeFellerBlockAnimation(pos, animName));
+    }
+    
+    public void playWorkAnimation(String animName) {
+        triggerAnim("machine", animName);
     }
     
     private void sendNetworkEntry() {
