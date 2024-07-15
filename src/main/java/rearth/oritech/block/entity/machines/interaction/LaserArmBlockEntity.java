@@ -155,7 +155,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             fired = true;
             amethystBlock.randomTick(targetBlockState, (ServerWorld) world, targetBlock, world.random);
             ParticleContent.ACCELERATING.spawn(world, Vec3d.of(targetBlock));
-        } else if (!canPassThrough(targetBlockState)) {
+        } else if (!canPassThrough(targetBlockState) && !isSearchTerminatorBlock(targetBlockState)) {
             fired = true;
             progress += energyRequiredToFire();
             
@@ -286,35 +286,45 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             var to = from.add(direction.multiply(i));
             var targetBlockPos = BlockPos.ofFloored(to.add(0, 0.3f, 0));
             var targetState = world.getBlockState(targetBlockPos);
+            if (isSearchTerminatorBlock(targetState)) return null;
             if (!canPassThrough(targetState)) return targetBlockPos;
             
             var offsetTop = to.add(0, -searchOffset, 0);
             targetBlockPos = BlockPos.ofFloored(offsetTop);
             targetState = world.getBlockState(targetBlockPos);
+            if (isSearchTerminatorBlock(targetState)) return null;
             if (!canPassThrough(targetState)) return targetBlockPos;
             
             var offsetLeft = to.add(-searchOffset, 0, 0);
             targetBlockPos = BlockPos.ofFloored(offsetLeft);
             targetState = world.getBlockState(targetBlockPos);
+            if (isSearchTerminatorBlock(targetState)) return null;
             if (!canPassThrough(targetState)) return targetBlockPos;
             
             var offsetRight = to.add(searchOffset, 0, 0);
             targetBlockPos = BlockPos.ofFloored(offsetRight);
             targetState = world.getBlockState(targetBlockPos);
+            if (isSearchTerminatorBlock(targetState)) return null;
             if (!canPassThrough(targetState)) return targetBlockPos;
             
             var offsetFront = to.add(0, 0, searchOffset);
             targetBlockPos = BlockPos.ofFloored(offsetFront);
             targetState = world.getBlockState(targetBlockPos);
+            if (isSearchTerminatorBlock(targetState)) return null;
             if (!canPassThrough(targetState)) return targetBlockPos;
             
             var offsetBack = to.add(0, 0, -searchOffset);
             targetBlockPos = BlockPos.ofFloored(offsetBack);
             targetState = world.getBlockState(targetBlockPos);
+            if (isSearchTerminatorBlock(targetState)) return null;
             if (!canPassThrough(targetState)) return targetBlockPos;
         }
         
         return null;
+    }
+    
+    private boolean isSearchTerminatorBlock(BlockState state) {
+        return state.getBlock().equals(Blocks.TARGET);
     }
     
     private boolean canPassThrough(BlockState state) {
