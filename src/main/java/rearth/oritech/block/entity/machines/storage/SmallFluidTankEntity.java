@@ -117,12 +117,33 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         
         processBuckets(inStack, outStack);
         
+        if ((world.getTime() + this.pos.getY()) % 20 == 0 && fluidStorage.amount > 0)
+            outputToBelow();
+        
         if (netDirty) {
             updateComparators(world, pos, state);
             updateNetwork();
         }
         
     }
+    
+    private void outputToBelow() {
+        var tankCandidate = world.getBlockEntity(pos.down(), BlockEntitiesContent.SMALL_TANK_ENTITY);
+        
+        if (tankCandidate.isEmpty()) return;
+        var belowTank = tankCandidate.get();
+        var ownTank = this.fluidStorage;
+        var targetTank = belowTank.fluidStorage;
+        
+        try (var tx = Transaction.openOuter()) {
+            var transferAmount = targetTank.insert(ownTank.variant, ownTank.amount, tx);
+            var extracted = ownTank.extract(ownTank.variant, transferAmount, tx);
+            if (transferAmount > 0 && transferAmount == extracted)
+                tx.commit();
+        }
+        
+    }
+    
     
     private void updateComparators(World world, BlockPos pos, BlockState state) {
         var previous = lastComparatorOutput;

@@ -17,6 +17,6 @@ into a pipe, which the pipe then moves to the next available fluid storage.
 ;;;;;
 
 To store fluids, you can use a fluid tank. The small fluid tanks stores up to *256* buckets of liquid. When broken, the small tank keep's
-all of it's content in the item nbt. A comparator output will reflect the tanks fill status.
+all of it's content in the item nbt. A comparator output will reflect the tanks fill status. Stacked tanks will automatically let the fluid flow down inside.
 
 <block;oritech:small_tank_block>
