@@ -263,7 +263,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     @Override
     public Text getDisplayName() {
-        return Text.literal("invalid");
+        return Text.literal("");
     }
     
     @Nullable

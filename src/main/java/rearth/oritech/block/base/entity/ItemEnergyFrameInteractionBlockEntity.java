@@ -129,7 +129,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public Text getDisplayName() {
-        return Text.of("Invalid");
+        return Text.of("");
     }
     
     @Override

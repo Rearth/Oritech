@@ -436,7 +436,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     @Override
     public Text getDisplayName() {
-        return Text.literal("Ignored");
+        return Text.literal("");
     }
     
     @Nullable

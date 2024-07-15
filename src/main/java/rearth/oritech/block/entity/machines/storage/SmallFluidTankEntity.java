@@ -204,7 +204,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     
     @Override
     public Text getDisplayName() {
-        return Text.of("invalid");
+        return Text.of("");
     }
     
     @Nullable

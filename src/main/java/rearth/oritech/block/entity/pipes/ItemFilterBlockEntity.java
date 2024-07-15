@@ -104,7 +104,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
     
     @Override
     public Text getDisplayName() {
-        return Text.of("invalid");
+        return Text.of("");
     }
     
     @Nullable

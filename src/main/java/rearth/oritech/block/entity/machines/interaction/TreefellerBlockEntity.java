@@ -304,7 +304,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     
     @Override
     public Text getDisplayName() {
-        return Text.of("invalid");
+        return Text.of("");
     }
     
     @Nullable
