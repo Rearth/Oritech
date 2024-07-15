@@ -103,8 +103,8 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         // data
         var duration = String.format("%.0f", display.getEntry().value().getTime() / 20f);
         root.child(
-          Components.label(Text.of(duration + "s")).lineHeight(7)
-            .positioning(Positioning.relative(40, 97))
+          Components.label(Text.of(duration + "s (" + display.getEntry().value().getTime() + " ticks)")).lineHeight(7)
+            .positioning(Positioning.relative(35, 97))
         );
         
         // fluids

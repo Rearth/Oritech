@@ -94,7 +94,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         
         // data
         var duration = String.format("%.0f", recipe.getTime() / 20f);
-        widgets.addText(Text.of(duration + "s"), (int) (getDisplayWidth() * 0.4), (int) (getDisplayHeight() * 0.88), 0xFFFFFF, true);
+        widgets.addText(Text.of(duration + "s (" + recipe.getTime() + " ticks)"), (int) (getDisplayWidth() * 0.35), (int) (getDisplayHeight() * 0.88), 0xFFFFFF, true);
         
     }
 }
