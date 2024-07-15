@@ -37,6 +37,10 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .add(BlockContent.DEEPSLATE_PLATINUM_ORE)
           .add(BlockContent.ENDSTONE_PLATINUM_ORE);
         
+        getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
+          .add(BlockContent.ITEM_PIPE)
+          .add(BlockContent.ITEM_PIPE_CONNECTION);
+        
         getOrCreateTagBuilder(ConventionalBlockTags.ORES)
           .add(BlockContent.NICKEL_ORE)
           .add(BlockContent.DEEPSLATE_NICKEL_ORE)
