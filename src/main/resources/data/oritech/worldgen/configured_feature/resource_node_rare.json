@@ -12,8 +12,6 @@
       "minecraft:bedrock",
       "minecraft:bedrock",
       "minecraft:bedrock",
-      "minecraft:bedrock",
-      "minecraft:bedrock",
       "minecraft:bedrock"
     ],
     "boulderOres": [
@@ -21,6 +19,10 @@
       "minecraft:deepslate_gold_ore",
       "minecraft:deepslate_emerald_ore",
       "oritech:deepslate_platinum_ore",
+      "minecraft:deepslate",
+      "minecraft:deepslate",
+      "minecraft:deepslate",
+      "minecraft:deepslate",
       "minecraft:deepslate",
       "minecraft:deepslate",
       "minecraft:deepslate",
