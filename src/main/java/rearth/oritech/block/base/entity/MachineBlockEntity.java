@@ -549,6 +549,12 @@ public abstract class MachineBlockEntity extends BlockEntity
         return inventory;
     }
     
+    @Override
+    public void markDirty() {
+        if (this.world != null)
+            world.markDirty(pos);
+    }
+    
     private class SimpleMachineInventory extends SimpleInventory implements SidedInventory {
         
         public SimpleMachineInventory(int size) {

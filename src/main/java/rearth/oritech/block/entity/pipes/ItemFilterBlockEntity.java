@@ -150,6 +150,12 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
         this.markDirty();
     }
     
+    @Override
+    public void markDirty() {
+        if (this.world != null)
+            world.markDirty(pos);
+    }
+    
     // items is a map of position index (in the filter GUI) to filtered item stack
     public record FilterData(boolean useNbt, boolean useWhitelist, Map<Integer, ItemStack> items) {
     }

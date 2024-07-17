@@ -116,6 +116,12 @@ public class ItemPipeInterfaceEntity extends GenericPipeInterfaceEntity {
         
     }
     
+    @Override
+    public void markDirty() {
+        if (this.world != null)
+            world.markDirty(pos);
+    }
+    
     private Storage<ItemVariant> findFromCache(World world, BlockPos pos, Direction direction) {
         var cacheRes = lookupCache.computeIfAbsent(pos, elem -> BlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world, pos));
         return cacheRes.find(direction);

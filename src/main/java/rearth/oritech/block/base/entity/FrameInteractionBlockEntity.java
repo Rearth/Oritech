@@ -328,6 +328,12 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineFrameMovementPacket(pos, currentTarget, lastTarget, areaMin, areaMax));
     }
     
+    @Override
+    public void markDirty() {
+        if (this.world != null)
+            world.markDirty(pos);
+    }
+    
     public abstract BlockState getMachineHead();
     
     public int getFrameOffset() {

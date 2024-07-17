@@ -161,8 +161,12 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
             tx.commit();
         }
         
-        markDirty();
-        
+    }
+    
+    @Override
+    public void markDirty() {
+        if (this.world != null)
+            world.markDirty(pos);
     }
     
     private Storage<FluidVariant> findFromCache(World world, BlockPos pos, Direction direction) {

@@ -79,8 +79,12 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
             tx.commit();
         }
         
-        markDirty();
-        
+    }
+    
+    @Override
+    public void markDirty() {
+        if (this.world != null)
+            world.markDirty(pos);
     }
     
     private EnergyStorage findFromCache(World world, BlockPos pos, Direction direction) {
