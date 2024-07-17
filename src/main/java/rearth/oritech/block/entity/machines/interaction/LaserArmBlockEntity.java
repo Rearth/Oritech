@@ -195,7 +195,8 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         }
         
         if (targetBlockState.getBlock().equals(Blocks.AMETHYST_CLUSTER)) {
-            dropped = List.of(new ItemStack(ItemContent.FLUXITE));
+            var farmedCount = 1 + yieldAddons;
+            dropped = List.of(new ItemStack(ItemContent.FLUXITE, farmedCount));
             ParticleContent.CHARGING.spawn(world, Vec3d.of(targetPos), 1);
         }
         
