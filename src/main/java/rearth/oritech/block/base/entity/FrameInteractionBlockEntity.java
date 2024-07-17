@@ -205,11 +205,16 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         
         if (!canProgress()) return;
         
+        // yes this is inaccurate, but when the machine is this fast the move duration can just be skipped
+        var skipMoveTime = getMoveTime() <= 1;
+        if (skipMoveTime && moving && hasWorkAvailable(currentTarget))
+            moving = false;
+        
         if (!moving && currentProgress >= getWorkTime() && moveBlock()) {
             // if another machine occupies this position in the frame, we wait for it to move (with a timeout to avoid fully blocking everything)
             currentProgress = 0;
             finishBlockWork(lastTarget);
-            updateBlockPosition();
+            updateToolPosInFrame();
             moving = true;
             updateNetwork();
             this.markDirty();
@@ -235,7 +240,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         return !frameEntries.containsValue(target);
     }
     
-    private void updateBlockPosition() {
+    private void updateToolPosInFrame() {
         var frameEntries = occupiedAreas.get(areaMin);
         frameEntries.put(pos, currentTarget);
     }
