@@ -48,6 +48,8 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
             var offsetY = renderRandom.nextFloat() * 0.009 - 0.004;
             movingOffset = new Vec3d(0, offsetY, 0);
         }
+        renderedPosition = LaserArmRenderer.lerp(entity.lastRenderedPosition, renderedPosition, 0.1f);
+        entity.lastRenderedPosition = renderedPosition;
         var targetOffset = renderedPosition.subtract(Vec3d.of(entity.getPos())).add(movingOffset);
         
         matrices.push();

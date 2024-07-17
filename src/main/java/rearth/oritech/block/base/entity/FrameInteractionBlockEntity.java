@@ -41,6 +41,8 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     
     // client only
     private long moveStartedAt;
+    // for smooth client rendering only
+    public Vec3d lastRenderedPosition = new Vec3d(0, 0, 0);
     
     public FrameInteractionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);

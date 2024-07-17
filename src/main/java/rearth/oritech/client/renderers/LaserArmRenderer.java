@@ -99,12 +99,12 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         matrices.pop();
     }
     
-    private static Vec3d idToOffset(BlockPos source, float range) {
+    public static Vec3d idToOffset(BlockPos source, float range) {
         var random = Random.create(source.asLong());
         return new Vec3d((random.nextFloat() * 2 - 1) * range, (random.nextFloat() * 2 - 1) * range, (random.nextFloat() * 2 - 1) * range);
     }
     
-    private static Vec3d lerp(Vec3d a, Vec3d b, float f) {
+    public static Vec3d lerp(Vec3d a, Vec3d b, float f) {
         return new Vec3d(lerp(a.x, b.x, f), lerp(a.y, b.y, f), lerp(a.z, b.z, f));
     }
     
