@@ -93,6 +93,8 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         
         getOrCreateTagBuilder(ItemTags.SWORD_ENCHANTABLE)
           .add(ToolsContent.PROMETHIUM_AXE, ToolsContent.CHAINSAW);
+        getOrCreateTagBuilder(ItemTags.WEAPON_ENCHANTABLE)
+          .add(ToolsContent.PROMETHIUM_AXE, ToolsContent.CHAINSAW);
         
         getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
           .add(ToolsContent.CHAINSAW, ToolsContent.HAND_DRILL);
