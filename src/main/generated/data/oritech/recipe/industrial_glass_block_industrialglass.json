@@ -6,7 +6,7 @@
       "tag": "c:ingots/steel"
     },
     "c": {
-      "item": "oritech:machine_plating_block"
+      "tag": "oritech:plating"
     },
     "e": {
       "tag": "c:glass_blocks"

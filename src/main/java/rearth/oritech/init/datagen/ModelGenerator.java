@@ -117,6 +117,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.NICKEL_PLATING_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.INDUSTRIAL_GLASS_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.CAPACITOR_ADDON_EXTENDER);
+        blockStateModelGenerator.registerSimpleState(BlockContent.METAL_BEAM_BLOCK);
         
     }
     

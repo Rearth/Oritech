@@ -210,7 +210,9 @@ public class BlockContent implements BlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block IRON_PLATING_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block NICKEL_PLATING_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).notSolid());
+    public static final Block NICKEL_PLATING_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block METAL_BEAM_BLOCK = new MetalBeamBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block INDUSTRIAL_GLASS_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS).requiresTool().strength(7.0F, 8.0F).nonOpaque());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
