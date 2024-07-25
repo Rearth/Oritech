@@ -8,7 +8,7 @@
       "tag": "c:ingots/steel"
     },
     {
-      "tag": "c:ingots/nickel"
+      "item": "minecraft:copper_ingot"
     },
     {
       "item": "oritech:plastic_sheet"

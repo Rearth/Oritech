@@ -113,6 +113,8 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.blockStateCollector.accept(createButtonBlockState(BlockContent.TECH_BUTTON, Identifier.of(Oritech.MOD_ID, "block/tech_button"), Identifier.of(Oritech.MOD_ID, "block/tech_button_on")));
         registerLever(BlockContent.TECH_LEVER, blockStateModelGenerator);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_PLATING_BLOCK);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.IRON_PLATING_BLOCK);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.NICKEL_PLATING_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.INDUSTRIAL_GLASS_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.CAPACITOR_ADDON_EXTENDER);
         

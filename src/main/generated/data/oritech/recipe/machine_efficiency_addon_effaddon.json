@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "b": {
-      "item": "oritech:machine_plating_block"
+      "tag": "oritech:plating"
     },
     "c": {
       "item": "oritech:electrum_ingot"

@@ -6,7 +6,7 @@
       "item": "oritech:machine_core_2"
     },
     "s": {
-      "item": "oritech:machine_plating_block"
+      "tag": "oritech:plating"
     }
   },
   "pattern": [

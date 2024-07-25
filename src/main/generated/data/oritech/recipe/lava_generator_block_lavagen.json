@@ -12,7 +12,7 @@
       "item": "oritech:electrum_ingot"
     },
     "s": {
-      "item": "oritech:machine_plating_block"
+      "tag": "oritech:plating"
     }
   },
   "pattern": [

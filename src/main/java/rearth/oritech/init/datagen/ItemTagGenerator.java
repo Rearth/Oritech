@@ -81,6 +81,12 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .addOptionalTag(ConventionalItemTags.FOODS)
           .add(Items.WHEAT);
         
+        // plating variants
+        getOrCreateTagBuilder(TagContent.MACHINE_PLATING)
+          .add(BlockContent.MACHINE_PLATING_BLOCK.asItem())
+          .add(BlockContent.IRON_PLATING_BLOCK.asItem())
+          .add(BlockContent.NICKEL_PLATING_BLOCK.asItem());
+        
         // equipment enchanting
         getOrCreateTagBuilder(ItemTags.MINING_ENCHANTABLE)
           .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);

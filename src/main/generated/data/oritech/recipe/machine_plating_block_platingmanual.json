@@ -6,7 +6,7 @@
       "tag": "c:ingots/steel"
     },
     "c": {
-      "tag": "c:ingots/nickel"
+      "item": "minecraft:copper_ingot"
     },
     "e": {
       "item": "minecraft:stone"

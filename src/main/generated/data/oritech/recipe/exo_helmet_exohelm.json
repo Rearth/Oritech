@@ -6,7 +6,7 @@
       "item": "oritech:enderic_lens"
     },
     "p": {
-      "item": "oritech:machine_plating_block"
+      "tag": "oritech:plating"
     }
   },
   "pattern": [

@@ -6,7 +6,7 @@
       "item": "oritech:advanced_battery"
     },
     "p": {
-      "item": "oritech:machine_plating_block"
+      "tag": "oritech:plating"
     }
   },
   "pattern": [
