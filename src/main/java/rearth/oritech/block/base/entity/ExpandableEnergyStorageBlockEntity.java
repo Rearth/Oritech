@@ -27,10 +27,12 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.machines.storage.SmallStorageBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import team.reborn.energy.api.EnergyStorage;
@@ -95,7 +97,19 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         if (!redstonePowered)
             outputEnergy();
         
+        inputFromCrystal();
+        
         if (networkDirty) sendNetworkEntry();
+    }
+    
+    private void inputFromCrystal() {
+        if (energyStorage.amount >= energyStorage.capacity || inventory.isEmpty()) return;
+        
+        if (!inventory.getStack(0).getItem().equals(ItemContent.OVERCHARGED_CRYSTAL)) return;
+        
+        energyStorage.amount = Math.min(energyStorage.capacity, energyStorage.amount + Oritech.CONFIG.overchargedCrystalChargeRate());
+        energyStorage.onFinalCommit();
+        
     }
     
     private void outputEnergy() {
@@ -244,7 +258,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     @Override
     public void markDirty() {
-        super.markDirty();
+        if (world != null)
+            world.markDirty(pos);
         networkDirty = true;
     }
     

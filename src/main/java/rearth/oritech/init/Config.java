@@ -30,6 +30,7 @@ public class Config {
     @Nest
     public BasicEnergyMachineData largeEnergyStorage = new BasicEnergyMachineData(20_000_000, 5000, 5000, 0);
     public int portableTankCapacityBuckets = 256;
+    public int overchargedCrystalChargeRate = 10;
     
     @SectionHeader("logistics")
     public int itemPipeTransferAmount = 8;
