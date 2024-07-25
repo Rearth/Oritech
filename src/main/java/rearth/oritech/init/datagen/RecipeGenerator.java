@@ -98,8 +98,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // lava
         addLavaGen(exporter, new FluidStack(Fluids.LAVA, 8100), 12, "_lava");
         // fuel
-        addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_OIL, 8100), 12, "_crude");
-        addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_FUEL, 8100), 20, "_fuel");
+        addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_OIL, 8100), 8, "_crude");
+        addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_FUEL, 8100), 16, "_fuel");
         //steam
         addSteamEngineGen(exporter, new FluidStack(FluidContent.STILL_STEAM, 32), 1, "_steameng");
     }
