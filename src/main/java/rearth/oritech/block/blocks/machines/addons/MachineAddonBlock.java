@@ -196,6 +196,8 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
                 tooltip.add(Text.translatable("tooltip.oritech.addon_proxy_desc").formatted(Formatting.DARK_GRAY));
             if (blockType == BlockContent.QUARRY_ADDON)
                 tooltip.add(Text.translatable("tooltip.oritech.addon_quarry_desc").formatted(Formatting.DARK_GRAY));
+            if (blockType == BlockContent.MACHINE_REDSTONE_ADDON)
+                tooltip.add(Text.translatable("tooltip.oritech.addon_redstone_desc").formatted(Formatting.DARK_GRAY));
             
             if (extender) {
                 tooltip.add(Text.translatable("tooltip.oritech.addon_extender_desc").formatted(Formatting.DARK_GRAY));

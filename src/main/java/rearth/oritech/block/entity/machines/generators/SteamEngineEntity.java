@@ -114,6 +114,7 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
         setBaseAddonData(new BaseAddonData(1 / (speed), 1 / energyEfficiency, 0, 0));
         
         spawnParticles();
+        lastWorkedAt = world.getTime();
         
         markDirty();
         markNetDirty();

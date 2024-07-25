@@ -47,6 +47,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> LASER_SCREEN = upgradeHandler();
     
     public static final ExtendedScreenHandlerType<DroneScreenHandler, BasicData> DRONE_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(DroneScreenHandler.class), BasicData.PACKET_CODEC);
+    public static final ExtendedScreenHandlerType<RedstoneAddonScreenHandler, BasicData> REDSTONE_ADDON_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(RedstoneAddonScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<CentrifugeScreenHandler, UpgradableData> CENTRIFUGE_SCREEN = new ExtendedScreenHandlerType<>(new UpgradeFactory<>(CentrifugeScreenHandler.class), UpgradableData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<SteamEngineScreenHandler, UpgradableData> STEAM_ENGINE_SCREEN = new ExtendedScreenHandlerType<>(new UpgradeFactory<>(SteamEngineScreenHandler.class), UpgradableData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<ItemFilterScreenHandler, BasicData> ITEM_FILTER_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(ItemFilterScreenHandler.class), BasicData.PACKET_CODEC);
@@ -75,6 +76,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
         HandledScreens.register(INVENTORY_PROXY_SCREEN, InventoryProxyScreen::new);
         HandledScreens.register(ITEM_FILTER_SCREEN, ItemFilterScreen::new);
         HandledScreens.register(DRONE_SCREEN, DroneScreen::new);
+        HandledScreens.register(REDSTONE_ADDON_SCREEN, RedstoneAddonScreen::new);
         HandledScreens.register(CENTRIFUGE_SCREEN, CentrifugeScreen::new);
         HandledScreens.register(STEAM_ENGINE_SCREEN, SteamEngineScreen::new);
     }

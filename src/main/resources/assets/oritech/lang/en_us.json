@@ -24,6 +24,7 @@
   "tooltip.oritech.addon_crop_desc": "Applicable to block destroyer. Skips non-grown crops",
   "tooltip.oritech.addon_proxy_desc": "Allows access to specific inventory slots",
   "tooltip.oritech.addon_quarry_desc": "Applicable to block destroyer and Enderic Laser. Increases working area size",
+  "tooltip.oritech.addon_redstone_desc": "Allows further redstone and comparator configuration",
   "tooltip.oritech.addon_capacity_desc": "Energy Capacity ",
   "tooltip.oritech.addon_transfer_desc": "Energy Transfer Rate ",
   "tooltip.oritech.addon_extender_desc": "Allows additional addons to be connected",
@@ -78,6 +79,17 @@
       "color": "gray"
     }
   ],
+
+  "tooltip.oritech.redstone_output_power": "Comparators will measure the energy storage",
+  "title.oritech.redstone_output_power": "Power Measure",
+  "tooltip.oritech.redstone_output_slot": "Comparators will measure selected inventory slot",
+  "title.oritech.redstone_output_slot": "Inventory Slot Measure",
+  "tooltip.oritech.redstone_output_progress": "Comparators will measure the current recipe progress",
+  "title.oritech.redstone_output_progress": "Progress Measure",
+  "tooltip.oritech.redstone_output_active": "Comparators will measure whether the machine is currently working",
+  "title.oritech.redstone_output_active": "Activity Measure",
+  "tooltip.oritech.redstone_input_control": "Enables the machine to be disabled via a redstone signal to this addon",
+  "title.oritech.redstone_input_control": "Control Input",
 
   "rei.process.oritech:pulverizer": "Pulverizing",
   "rei.process.oritech:grinder": "Fragmenting",
@@ -163,6 +175,7 @@
   "block.oritech.machine_capacitor_addon": "Machine Capacitor Addon",
   "block.oritech.machine_acceptor_addon": "Machine Acceptor Addon",
   "block.oritech.machine_inventory_proxy_addon": "Machine Inventory Proxy Addon",
+  "block.oritech.machine_redstone_addon": "Redstone Control Unit Addon",
   "block.oritech.machine_extender": "Machine Extender",
   "block.oritech.oil_fluid_block": "Oil",
   "block.oritech.fuel_fluid_block": "Refined Fuel",

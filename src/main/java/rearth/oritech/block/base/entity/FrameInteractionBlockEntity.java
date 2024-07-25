@@ -38,6 +38,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     private int currentProgress;    // not synced
     private boolean moving;    // not synced
     private Vec3i currentDirection = new Vec3i(1, 0, 0);    // not synced
+    public long lastWorkedAt;   // not synced
     
     // client only
     private long moveStartedAt;
@@ -228,6 +229,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         
         doProgress(moving);
         currentProgress++;
+        lastWorkedAt = world.getTime();
     }
     
     private boolean isBlockAvailable(BlockPos target) {

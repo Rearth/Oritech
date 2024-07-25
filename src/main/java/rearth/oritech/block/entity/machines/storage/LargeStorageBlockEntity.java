@@ -5,11 +5,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.ExpandableMultiblockEnergyStorageBlockEntity;
+import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.List;
 
-public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBlockEntity {
+public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBlockEntity implements RedstoneAddonBlockEntity.RedstoneControllable {
     
     public LargeStorageBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.LARGE_STORAGE_ENTITY, pos, state);
@@ -51,6 +52,36 @@ public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBl
           new Vec3i(1, 0,0),
           new Vec3i(1, 1,0)
         );
+    }
+    
+    @Override
+    public int getComparatorEnergyAmount() {
+        return (int) ((energyStorage.amount / (float) energyStorage.capacity) * 15);
+    }
+    
+    @Override
+    public int getComparatorSlotAmount(int slot) {
+        if (inventory.heldStacks.size() <= slot) return 0;
+        
+        var stack = inventory.getStack(slot);
+        if (stack.isEmpty()) return 0;
+        
+        return (int) ((stack.getCount() / (float) stack.getMaxCount()) * 15);
+    }
+    
+    @Override
+    public int getComparatorProgress() {
+        return 0;
+    }
+    
+    @Override
+    public int getComparatorActiveState() {
+        return 15;
+    }
+    
+    @Override
+    public void onRedstoneEvent(boolean isPowered) {
+        this.setRedstonePowered(isPowered);
     }
     
 }

@@ -12,6 +12,7 @@ import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
+import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
@@ -30,7 +31,7 @@ public class NetworkContent {
     
     // Server -> Client
     public record MachineSyncPacket(BlockPos position, long energy, long maxEnergy, long maxInsert, int progress,
-                                    OritechRecipe activeRecipe, InventoryInputMode inputMode) {
+                                    OritechRecipe activeRecipe, InventoryInputMode inputMode, long lastWorkedAt) {
     }
     
     // Client -> Server (e.g. from UI interactions
@@ -38,6 +39,9 @@ public class NetworkContent {
     }
     
     public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {
+    }
+    
+    public record RedstoneAddonSyncPacket(BlockPos position, BlockPos controllerPos, int targetSlot, int targetMode, int currentOutput) {
     }
     
     public record GeneratorUISyncPacket(BlockPos position, int burnTime, boolean steamAddon) {
@@ -328,6 +332,24 @@ public class NetworkContent {
             }
             
         }));
+        
+        MACHINE_CHANNEL.registerClientbound(RedstoneAddonSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            if (entity instanceof RedstoneAddonBlockEntity machine) {
+                machine.handleClientBound(message);
+            }
+            
+        }));
+        
+        UI_CHANNEL.registerServerbound(RedstoneAddonSyncPacket.class, (message, access) -> {
+            
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            if (entity instanceof RedstoneAddonBlockEntity machine) {
+                machine.handleServerBound(message);
+            }
+            
+        });
         
         UI_CHANNEL.registerServerbound(InventoryInputModeSelectorPacket.class, (message, access) -> {
             

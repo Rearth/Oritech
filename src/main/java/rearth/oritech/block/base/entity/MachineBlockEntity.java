@@ -26,6 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -42,13 +43,14 @@ import team.reborn.energy.api.EnergyStorage;
 import java.util.*;
 
 public abstract class MachineBlockEntity extends BlockEntity
-  implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyProvider, ScreenProvider, InventoryProvider, BlockEntityTicker<MachineBlockEntity> {
+  implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyProvider, ScreenProvider, InventoryProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
     
     // animations
     public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("deploy");
     public static final RawAnimation IDLE = RawAnimation.begin().thenPlayAndHold("idle");
     public static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
+    
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     public final SimpleInventory inventory = new SimpleMachineInventory(getInventorySize());
     // crafting / processing
@@ -56,6 +58,8 @@ public abstract class MachineBlockEntity extends BlockEntity
     protected int energyPerTick;
     protected OritechRecipe currentRecipe = OritechRecipe.DUMMY;
     protected InventoryInputMode inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
+    protected boolean disabledViaRedstone = false;
+    public long lastWorkedAt;
     // network state
     protected boolean networkDirty = true;
     //own storage
@@ -71,12 +75,15 @@ public abstract class MachineBlockEntity extends BlockEntity
         super(type, pos, state);
         this.energyPerTick = energyPerTick;
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
+        
+        if (world != null)
+            lastWorkedAt = world.getTime();
     }
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
         
-        if (world.isClient || !isActive(state)) return;
+        if (world.isClient || !isActive(state) || disabledViaRedstone) return;
         
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty())
@@ -87,6 +94,7 @@ public abstract class MachineBlockEntity extends BlockEntity
             if (hasEnoughEnergy()) {
                 var activeRecipe = recipeCandidate.get().value();
                 currentRecipe = activeRecipe;
+                lastWorkedAt = world.getTime();
                 
                 // check energy
                 useEnergy();
@@ -153,7 +161,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     protected void sendNetworkEntry() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineSyncPacket(getPos(), energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, progress, currentRecipe, inventoryInputMode));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineSyncPacket(getPos(), energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, progress, currentRecipe, inventoryInputMode, lastWorkedAt));
         networkDirty = false;
     }
     
@@ -166,6 +174,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         this.energyStorage.capacity = message.maxEnergy();
         this.setCurrentRecipe(message.activeRecipe());
         this.setInventoryInputMode(message.inputMode());
+        this.lastWorkedAt = message.lastWorkedAt();
     }
     
     public List<ItemStack> getCraftingResults(OritechRecipe activeRecipe) {
@@ -270,6 +279,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         nbt.putInt("oritech.machine_progress", progress);
         nbt.putLong("oritech.machine_energy", energyStorage.amount);
         nbt.putShort("oritech.machine_input_mode", (short) inventoryInputMode.ordinal());
+        nbt.putBoolean("oritech.redstone", disabledViaRedstone);
     }
     
     @Override
@@ -278,6 +288,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         progress = nbt.getInt("oritech.machine_progress");
         energyStorage.amount = nbt.getLong("oritech.machine_energy");
         inventoryInputMode = InventoryInputMode.values()[nbt.getShort("oritech.machine_input_mode")];
+        disabledViaRedstone = nbt.getBoolean("oritech.redstone");
     }
     
     private int slotRecipeSearch(ItemStack stack, List<ItemStack> inv) {
@@ -394,7 +405,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         if (state.getController().isPlayingTriggeredAnimation()) return PlayState.CONTINUE;
         
         if (isActive(getCachedState())) {
-            if (progress > 0) {
+            if (isActivelyWorking()) {
                 return state.setAndContinue(WORKING);
             } else {
                 return state.setAndContinue(IDLE);
@@ -402,6 +413,10 @@ public abstract class MachineBlockEntity extends BlockEntity
         }
         
         return state.setAndContinue(PACKAGED);
+    }
+    
+    public boolean isActivelyWorking() {
+        return world.getTime() - lastWorkedAt < 5;
     }
     
     public void playSetupAnimation() {
@@ -551,8 +566,40 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     @Override
     public void markDirty() {
+        // basically the same as the parent method, but without the comparator update for a slight speed increase
         if (this.world != null)
             world.markDirty(pos);
+    }
+    
+    @Override
+    public int getComparatorEnergyAmount() {
+        return (int) ((energyStorage.amount / (float) energyStorage.capacity) * 15);
+    }
+    
+    @Override
+    public int getComparatorSlotAmount(int slot) {
+        if (inventory.heldStacks.size() <= slot) return 0;
+        
+        var stack = inventory.getStack(slot);
+        if (stack.isEmpty()) return 0;
+        
+        return (int) ((stack.getCount() / (float) stack.getMaxCount()) * 15);
+    }
+    
+    @Override
+    public int getComparatorProgress() {
+        if (currentRecipe.getTime() <= 0) return 0;
+        return (int) ((progress / (float) currentRecipe.getTime() * getSpeedMultiplier()) * 15);
+    }
+    
+    @Override
+    public int getComparatorActiveState() {
+        return isActivelyWorking() ? 15 : 0;
+    }
+    
+    @Override
+    public void onRedstoneEvent(boolean isPowered) {
+        this.disabledViaRedstone = isPowered;
     }
     
     private class SimpleMachineInventory extends SimpleInventory implements SidedInventory {

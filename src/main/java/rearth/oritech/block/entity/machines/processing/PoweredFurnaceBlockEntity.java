@@ -58,6 +58,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
                 var activeRecipe = recipeCandidate.get().value();
                 useEnergy();
                 progress++;
+                lastWorkedAt = world.getTime();
                 
                 if (world.random.nextFloat() > 0.8)
                     ParticleContent.FURNACE_BURNING.spawn(world, Vec3d.of(pos), 1);

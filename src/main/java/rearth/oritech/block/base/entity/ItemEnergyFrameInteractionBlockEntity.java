@@ -18,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity implements InventoryProvider, EnergyProvider, ExtendedScreenHandlerFactory, ScreenProvider, MachineAddonController {
+public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity implements InventoryProvider, EnergyProvider, ExtendedScreenHandlerFactory, ScreenProvider, MachineAddonController, RedstoneAddonBlockEntity.RedstoneControllable {
     
     public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0) {
         @Override
@@ -49,6 +50,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     private final List<BlockPos> connectedAddons = new ArrayList<>();
     private final List<BlockPos> openSlots = new ArrayList<>();
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
+    private boolean disabledViaRedstone;
     
     public ItemEnergyFrameInteractionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -60,7 +62,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     protected boolean canProgress() {
-        return
+        return !disabledViaRedstone &&
           energyStorage.amount >= getMoveEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()) &&
             energyStorage.amount >= getOperationEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed());
     }
@@ -81,6 +83,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
         super.readNbt(nbt, registryLookup);
         Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
         energyStorage.amount = nbt.getLong("energy_stored");
+        disabledViaRedstone = nbt.getBoolean("oritech.redstone");
         
         loadAddonNbtData(nbt);
         updateEnergyContainer();
@@ -91,6 +94,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
         super.writeNbt(nbt, registryLookup);
         Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putLong("energy_stored", energyStorage.amount);
+        nbt.putBoolean("oritech.redstone", disabledViaRedstone);
         writeAddonToNbt(nbt);
     }
     
@@ -246,5 +250,39 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     public void setBaseAddonData(BaseAddonData data) {
         this.addonData = data;
         this.markDirty();
+    }
+    
+    public boolean isActivelyWorking() {
+        return world.getTime() - lastWorkedAt < 5;
+    }
+    
+    @Override
+    public int getComparatorEnergyAmount() {
+        return (int) ((energyStorage.amount / (float) energyStorage.capacity) * 15);
+    }
+    
+    @Override
+    public int getComparatorSlotAmount(int slot) {
+        if (inventory.heldStacks.size() <= slot) return 0;
+        
+        var stack = inventory.getStack(slot);
+        if (stack.isEmpty()) return 0;
+        
+        return (int) ((stack.getCount() / (float) stack.getMaxCount()) * 15);
+    }
+    
+    @Override
+    public int getComparatorProgress() {
+        return 0;
+    }
+    
+    @Override
+    public int getComparatorActiveState() {
+        return isActivelyWorking() ? 15 : 0;
+    }
+    
+    @Override
+    public void onRedstoneEvent(boolean isPowered) {
+        this.disabledViaRedstone = isPowered;
     }
 }

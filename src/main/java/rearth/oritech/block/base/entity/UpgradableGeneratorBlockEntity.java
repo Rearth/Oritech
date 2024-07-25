@@ -87,6 +87,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
                 
                 progress--;
                 produceEnergy();
+                lastWorkedAt = world.getTime();
                 
                 if (progress == 0) {
                     burningFinished();
