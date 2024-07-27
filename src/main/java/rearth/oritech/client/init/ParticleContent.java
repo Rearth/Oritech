@@ -17,6 +17,11 @@ public class ParticleContent {
         ClientParticles.reset();
     });
     
+    public static final ParticleSystem<LineData> WEED_KILLER = PARTICLE_CONTROLLER.register(LineData.class, (world, pos, data) -> {
+        ClientParticles.setParticleCount(4 + world.random.nextInt(3));
+        ClientParticles.spawnLine(ParticleTypes.DRAGON_BREATH, world, data.start, data.end, 0.2f);
+    });
+    
     public static final ParticleSystem<Void> DEBUG_BLOCK = PARTICLE_CONTROLLER.register(Void.class, (world, pos, data) -> {
         spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, pos, 1, 120, 2);
         ClientParticles.reset();
