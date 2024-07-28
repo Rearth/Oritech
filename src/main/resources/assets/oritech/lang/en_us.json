@@ -1,4 +1,61 @@
 {
+  "advancements.oritech.begin": "Oritech",
+  "advancements.oritech.begin.description": "Nickel & Dime - Start your technological adventure by acquiring some raw nickel. Shine on, you crazy miner!",
+
+  "advancements.oritech.generator": "Power Up!",
+  "advancements.oritech.generator.description": "Generate some serious power with a basic generator. Electrifying, isn't it?",
+
+  "advancements.oritech.furnace": "Furnace of the future",
+  "advancements.oritech.furnace.description": "Get your hands on a powered furnace. Things are heating up now!",
+
+  "advancements.oritech.pulverizer": "Crushing It",
+  "advancements.oritech.pulverizer.description": "Obtain a pulverizer and turn your ores into dust. Rock 'n' roll!",
+
+  "advancements.oritech.foundry": "Melt Down",
+  "advancements.oritech.foundry.description": "Acquire a foundry and start forging powerful alloys. Alchemy at its finest!",
+
+  "advancements.oritech.assembler": "Assembly Line",
+  "advancements.oritech.assembler.description": "Get an assembler and start putting things together. It's all coming together now!",
+
+  "advancements.oritech.exo_boots": "Boots like Feathers",
+  "advancements.oritech.exo_boots.description": "Craft Exo Boots and say goodbye to fall damage. Gravity? Never heard of it!",
+
+  "advancements.oritech.exo_legs": "Leg Day",
+  "advancements.oritech.exo_legs.description": "Craft Exo Leggings and get a leg up on the competition. Stronger, faster, better!",
+
+  "advancements.oritech.exo_chest": "Heart of Steel",
+  "advancements.oritech.exo_chest.description": "Craft an Exo Chestplate and protect your core. Iron Man, who?",
+
+  "advancements.oritech.exo_helmet": "Head Start",
+  "advancements.oritech.exo_helmet.description": "Craft an Exo Helmet and get ahead in the game. Mind over matter!",
+
+  "advancements.oritech.drill": "Drill Sergeant",
+  "advancements.oritech.drill.description": "Obtain a hand drill and start boring through the earth. Dig deep, soldier!",
+
+  "advancements.oritech.centrifuge": "Spin Doctor",
+  "advancements.oritech.centrifuge.description": "Acquire a centrifuge and separate the good from the bad. Spin to win!",
+
+  "advancements.oritech.plastic": "Fantastic Plastic",
+  "advancements.oritech.plastic.description": "Get your hands on a plastic sheet. It's not just fantastic, it's plastic!",
+
+  "advancements.oritech.laser": "Laser Focus",
+  "advancements.oritech.laser.description": "Obtain a laser arm block. Power up, mine fluxite, and dig through the earth. Pew pew, you're unstoppable",
+
+  "advancements.oritech.fluxite": "Fluxite",
+  "advancements.oritech.fluxite.description": "Acquire some fluxite. Great Scott, we're going back to the future!",
+
+  "advancements.oritech.atomicforge": "Atomic Smith",
+  "advancements.oritech.atomicforge.description": "Get an atomic forge and start crafting like a pro. It's atomic!",
+
+  "advancements.oritech.promethium": "Promethean Fire",
+  "advancements.oritech.promethium.description": "Obtain a promethium ingot. You've stolen fire from the gods!",
+
+  "advancements.oritech.ai": "Artificial Brilliance",
+  "advancements.oritech.ai.description": "Get a Super AI Chip. Skynet who? It's not just smart, it's super smart!",
+
+  "advancements.oritech.unholy": "Unholy Knowledge",
+  "advancements.oritech.unholy.description": "Acquire an unholy intelligence. Knowledge is power, but this is something else!",
+
   "button.oritech.input_mode_fill_left_to_right": "Default",
   "button.oritech.input_mode_fill_evenly": "Fill Evenly",
   "button.oritech.input_mode_fill_matching_recipe": "Match Recipe",

@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:oritech/generator",
+  "criteria": {
+    "got_furnace": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:powered_furnace_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": {
+      "translate": "advancements.oritech.furnace.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "oritech:powered_furnace_block"
+    },
+    "title": {
+      "translate": "advancements.oritech.furnace"
+    }
+  },
+  "requirements": [
+    [
+      "got_furnace"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

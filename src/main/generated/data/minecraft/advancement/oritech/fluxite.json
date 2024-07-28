@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:oritech/laser",
+  "criteria": {
+    "got_fluxite": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:fluxite"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": {
+      "translate": "advancements.oritech.fluxite.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "oritech:fluxite"
+    },
+    "title": {
+      "translate": "advancements.oritech.fluxite"
+    }
+  },
+  "requirements": [
+    [
+      "got_fluxite"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

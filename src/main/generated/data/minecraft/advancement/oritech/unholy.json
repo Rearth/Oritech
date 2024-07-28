@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:oritech/assembler",
+  "criteria": {
+    "got_unholy": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:unholy_intelligence"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": {
+      "translate": "advancements.oritech.unholy.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "oritech:unholy_intelligence"
+    },
+    "title": {
+      "translate": "advancements.oritech.unholy"
+    }
+  },
+  "requirements": [
+    [
+      "got_unholy"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
