@@ -1,4 +1,4 @@
-package rearth.oritech.init;
+package rearth.oritech.init.datagen;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
@@ -10,6 +10,9 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.ToolsContent;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;

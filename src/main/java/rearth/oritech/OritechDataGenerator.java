@@ -2,7 +2,7 @@ package rearth.oritech;
 
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import rearth.oritech.init.AdvancementGenerator;
+import rearth.oritech.init.datagen.AdvancementGenerator;
 import rearth.oritech.init.datagen.*;
 
 public class OritechDataGenerator implements DataGeneratorEntrypoint {
