@@ -360,7 +360,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
           Items.IRON_NUGGET,
           Items.IRON_INGOT,
           1f,
-          "_iron"
+          "_iron",
+          3
         );
         
         // copper chain
@@ -380,7 +381,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
           ItemContent.COPPER_NUGGET,
           Items.COPPER_INGOT,
           1f,
-          "_copper"
+          "_copper",
+          3
         );
         
         // gold chain
@@ -400,7 +402,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
           Items.GOLD_NUGGET,
           Items.GOLD_INGOT,
           1f,
-          "_gold"
+          "_gold",
+          3
         );
         
         // nickel chain
@@ -420,7 +423,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
           ItemContent.NICKEL_NUGGET,
           ItemContent.NICKEL_INGOT,
           1f,
-          "_nickel"
+          "_nickel",
+          2
         );
         
         // platinum chain
@@ -431,16 +435,17 @@ public class RecipeGenerator extends FabricRecipeProvider {
           ItemContent.FLUXITE,
           ItemContent.PLATINUM_CLUMP,
           ItemContent.SMALL_PLATINUM_CLUMP,
-          Items.AMETHYST_SHARD,
+          ItemContent.FLUXITE,
           ItemContent.PLATINUM_DUST,
           ItemContent.SMALL_PLATINUM_DUST,
-          Items.AMETHYST_SHARD,
+          ItemContent.FLUXITE,
           ItemContent.PLATINUM_GEM,
           Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND),
           ItemContent.PLATINUM_NUGGET,
           ItemContent.PLATINUM_INGOT,
           1.5f,
-          "_platinum"
+          "_platinum",
+          1
         );
     }
     
@@ -623,7 +628,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
     
     private void addMetalProcessingChain(RecipeExporter exporter, Ingredient oreInput, Ingredient rawOre, Item rawMain, Item rawSecondary, Item clump, Item smallClump,
                                          Item smallSecondaryClump, Item dust, Item smallDust, Item smallSecondaryDust, Item gem, Ingredient gemCatalyst, Item nugget,
-                                         Item ingot, float timeMultiplier, String suffix) {
+                                         Item ingot, float timeMultiplier, String suffix, int byproductAmount) {
                 
         // ore block -> raw ores
         var pulverizerOre = new OritechRecipe((int) (400 * timeMultiplier), List.of(oreInput), List.of(new ItemStack(rawMain, 2)), RecipeContent.PULVERIZER, null, null);
@@ -631,10 +636,10 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         // raw ores -> dusts / clumps
         var pulverizerRaw = new OritechRecipe((int) (500 * timeMultiplier), List.of(rawOre), List.of(new ItemStack(dust, 1), new ItemStack(smallDust, 3)), RecipeContent.PULVERIZER, null, null);
-        var grinderRaw = new OritechRecipe((int) (800 * timeMultiplier), List.of(rawOre), List.of(new ItemStack(clump, 1), new ItemStack(smallClump, 3), new ItemStack(smallSecondaryClump, 3)), RecipeContent.GRINDER, null, null);
+        var grinderRaw = new OritechRecipe((int) (800 * timeMultiplier), List.of(rawOre), List.of(new ItemStack(clump, 1), new ItemStack(smallClump, 3), new ItemStack(smallSecondaryClump, byproductAmount)), RecipeContent.GRINDER, null, null);
         
         // clump processing
-        var centrifugeClumpDry = new OritechRecipe((int) (400 * timeMultiplier), List.of(Ingredient.ofItems(clump)), List.of(new ItemStack(dust, 1), new ItemStack(smallSecondaryDust, 3)), RecipeContent.CENTRIFUGE, null, null);
+        var centrifugeClumpDry = new OritechRecipe((int) (400 * timeMultiplier), List.of(Ingredient.ofItems(clump)), List.of(new ItemStack(dust, 1), new ItemStack(smallSecondaryDust, byproductAmount)), RecipeContent.CENTRIFUGE, null, null);
         var centrifugeClumpWet = new OritechRecipe((int) (600 * timeMultiplier), List.of(Ingredient.ofItems(clump)), List.of(new ItemStack(dust, 2)), RecipeContent.CENTRIFUGE_FLUID, new FluidStack(Fluids.WATER, 81000), null);
         
         // gems

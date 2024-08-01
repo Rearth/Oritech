@@ -1,4 +1,4 @@
-// 1.21	2024-07-28T10:54:44.1458249	Oritech/Model Definitions
+// 1.21	2024-08-01T17:38:38.8973529	Oritech/Model Definitions
 2e964d91a46577bf6a179afb1ded52a0d5deaaaa assets\oritech\models\item\copper_gem.json
 ef6a1aaf0e99d850fc2908f444af16d0ddf99274 assets\oritech\models\item\metal_beam_block.json
 d83f00d15d54fb178e4a4f9ba12506b9c9ff12ed assets\oritech\models\item\hand_drill.json
@@ -118,8 +118,8 @@ eafe84c787830ab2a866e0878e9ed718d58659f5 assets\oritech\blockstates\banana_block
 e8ea32d466df5531df3b6678639b3ffae59d9989 assets\oritech\models\item\overcharged_crystal.json
 84bc2922b2e7b64a95ec3160df10688923726be8 assets\oritech\models\item\copper_nugget.json
 45fbece69084d6df6eaa4ba344d25eef914c63c3 assets\oritech\models\item\small_storage_block.json
-0fd9239827741bd5fa2b8123c7a50fd138dfb548 assets\oritech\blockstates\resource_node_lapis.json
 c0a08ce14172e22abd9f55d82686f7e96e74834a assets\oritech\blockstates\large_storage_block.json
+0fd9239827741bd5fa2b8123c7a50fd138dfb548 assets\oritech\blockstates\resource_node_lapis.json
 4af7874799cc7544ddf9f32365204ce6f7e123df assets\oritech\models\item\gold_clump.json
 8bf485ac83476add1c6d660f3dc7ca314dbfaf1e assets\oritech\models\item\platinum_dust.json
 e3b4d6b1ebd2b4d5aa6ba4f86b40d42d6d74499f assets\oritech\models\block\resource_node_lapis.json
