@@ -62,14 +62,14 @@ Include REI and EMI compatibility.
 
 Install it just like any mod by dragging it into the mods folder. Make sure you have the following dependencies installed (newer version might work too):
 
-- Minecraft Version: fabric-1.20.4
+- Minecraft Version: fabric-1.21
 - Fabric loader 0.15.9
 - Fabric api 0.97.0+1.20.4
 - Owo lib 0.12.6+1.20.3
 - Lavender 0.1.7+1.20.3
 - Geckolib 1.20.4:4.4.4
 - Reborn Energy API 3.0.0
-- Athena 3.3.2
+- Athena 4.0.0 (important: If you have sodium installed, Athena, and in turn Oritech, will break without indium)
 
 ## Roadmap
 
