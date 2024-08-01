@@ -225,9 +225,9 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     public List<ScreenProvider.GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 117, 20),
-          new GuiSlot(1, 117, 38),
-          new GuiSlot(2, 117, 56));
+          new GuiSlot(0, 117, 20, true),
+          new GuiSlot(1, 117, 38, true),
+          new GuiSlot(2, 117, 56, true));
     }
     
     @Override

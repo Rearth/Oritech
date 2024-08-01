@@ -146,7 +146,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     public List<GuiSlot> getGuiSlots() {
         return List.of(
           new GuiSlot(0, 56, 38),
-          new GuiSlot(1, 117, 38));
+          new GuiSlot(1, 117, 38, true));
     }
     
     @Override

@@ -45,7 +45,7 @@ public class FoundryBlockEntity extends MultiblockMachineEntity {
         return List.of(
           new GuiSlot(0, 56, 26),
           new GuiSlot(1, 56, 44),
-          new GuiSlot(2, 117, 36));
+          new GuiSlot(2, 117, 36, true));
     }
     
     @Override

@@ -242,7 +242,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     
     @Override
     public List<GuiSlot> getGuiSlots() {
-        return List.of(new GuiSlot(0, 50, 40), new GuiSlot(1, 100, 40));
+        return List.of(new GuiSlot(0, 50, 40), new GuiSlot(1, 100, 40, true));
     }
     
     @Override

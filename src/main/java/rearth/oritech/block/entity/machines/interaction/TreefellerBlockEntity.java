@@ -257,7 +257,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     public List<GuiSlot> getGuiSlots() {
         var list = new ArrayList<GuiSlot>();
         for (int i = 0; i < inventory.size(); i++) {
-            list.add(new GuiSlot(i, 40 + i * 19, 25));
+            list.add(new GuiSlot(i, 40 + i * 19, 25, true));
         }
         return list;
     }

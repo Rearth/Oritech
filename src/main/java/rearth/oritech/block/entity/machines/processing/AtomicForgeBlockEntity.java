@@ -49,7 +49,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
           new GuiSlot(0, 83, 21),
           new GuiSlot(1, 56, 38),
           new GuiSlot(2, 83, 54),
-          new GuiSlot(3, 117, 36));
+          new GuiSlot(3, 117, 36, true));
     }
     
     @Override
