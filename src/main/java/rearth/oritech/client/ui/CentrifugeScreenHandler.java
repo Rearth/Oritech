@@ -3,7 +3,6 @@ package rearth.oritech.client.ui;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.BucketItem;
@@ -66,10 +65,5 @@ public class CentrifugeScreenHandler extends UpgradableMachineScreenHandler {
             return this.slots.size();
         
         return super.getMachineInvEndSlot(stack);
-    }
-    
-    @Override
-    public ItemStack quickMove(PlayerEntity player, int invSlot) {
-        return super.quickMove(player, invSlot);
     }
 }

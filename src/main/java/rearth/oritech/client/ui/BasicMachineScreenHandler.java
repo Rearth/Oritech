@@ -116,7 +116,7 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         if (slot.hasStack()) {
             var originalStack = slot.getStack();
             newStack = originalStack.copy();
-            if (invSlot < this.inventory.size() || invSlot > this.inventory.size() + 36) {  // second condition is for machines adding extra slots afterwards, which are treated as part of the machine
+            if (invSlot < this.inventory.size() || invSlot >= this.inventory.size() + 36) {  // second condition is for machines adding extra slots afterwards, which are treated as part of the machine
                 if (!this.insertItem(originalStack, getPlayerInvStartSlot(newStack), getPlayerInvEndSlot(newStack), true)) {
                     return ItemStack.EMPTY;
                 }
