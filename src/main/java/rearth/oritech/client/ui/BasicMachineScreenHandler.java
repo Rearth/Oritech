@@ -95,15 +95,19 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     private void buildItemSlots() {
         
         for (var slot : screenData.getGuiSlots()) {
-            addMachineSlot(slot.index(), slot.x(), slot.y());
+            addMachineSlot(slot.index(), slot.x(), slot.y(), slot.output());
         }
         
         SlotGenerator.begin(this::addSlot, 8, 84)
           .playerInventory(playerInventory);
     }
     
-    public void addMachineSlot(int inventorySlot, int x, int y) {
-        this.addSlot(new Slot(inventory, inventorySlot, x, y));
+    public void addMachineSlot(int inventorySlot, int x, int y, boolean output) {
+        if (output) {
+            this.addSlot(new BasicMachineOutputSlot(inventory, inventorySlot, x, y));
+        } else {
+            this.addSlot(new Slot(inventory, inventorySlot, x, y));
+        }
     }
     
     @Override

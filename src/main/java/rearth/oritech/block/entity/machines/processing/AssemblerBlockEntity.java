@@ -50,7 +50,7 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
           new GuiSlot(1, 56, 26),
           new GuiSlot(2, 38, 44),
           new GuiSlot(3, 56, 44),
-          new GuiSlot(4, 117, 36));
+          new GuiSlot(4, 117, 36, true));
     }
     
     @Override

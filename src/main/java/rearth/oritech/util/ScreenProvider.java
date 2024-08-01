@@ -16,7 +16,11 @@ public interface ScreenProvider {
     
     default List<Pair<Text, Text>> getExtraExtensionLabels() {return List.of();}
     
-    record GuiSlot (int index, int x, int y) {}
+    record GuiSlot (int index, int x, int y, boolean output) {
+        public GuiSlot (int index, int x, int y) {
+            this(index, x, y, false);
+        }
+    }
 
     record BarConfiguration(int x, int y, int width, int height) {}
 
