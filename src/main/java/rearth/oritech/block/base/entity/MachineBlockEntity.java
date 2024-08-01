@@ -90,6 +90,9 @@ public abstract class MachineBlockEntity extends BlockEntity
             currentRecipe = OritechRecipe.DUMMY;     // reset recipe when invalid or no input is given
         
         if (recipeCandidate.isPresent() && canOutputRecipe(recipeCandidate.get().value()) && canProceed(recipeCandidate.get().value())) {
+
+            if (currentRecipe != recipeCandidate.get().value()) resetProgress();
+
             // this is separate so that progress is not reset when out of energy
             if (hasEnoughEnergy()) {
                 var activeRecipe = recipeCandidate.get().value();
