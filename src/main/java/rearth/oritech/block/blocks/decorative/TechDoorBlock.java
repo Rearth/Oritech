@@ -66,7 +66,10 @@ public class TechDoorBlock extends HorizontalFacingBlock implements BlockEntityP
         
         if (world.isClient) return;
         
+        var isOpen = state.get(OPENED);
         var isPowered = world.isReceivingRedstonePower(pos) || world.isReceivingRedstonePower(pos.up());
+        if (isOpen == isPowered) return;
+
         var aboveState = world.getBlockState(pos.up());
         
         if (!aboveState.getBlock().equals(BlockContent.TECH_DOOR_HINGE)) return;

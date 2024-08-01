@@ -200,7 +200,7 @@ public class BlockContent implements BlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block CEILING_LIGHT_HANGING = new WallMountedLight(FabricBlockSettings.copyOf(Blocks.GLOWSTONE).nonOpaque(), 12);
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block TECH_BUTTON = new TechRedstoneButton(BlockSetType.IRON, 50, FabricBlockSettings.copyOf(Blocks.STONE_BUTTON));
+    public static final Block TECH_BUTTON = new TechRedstoneButton(BlockSetType.IRON, 80, FabricBlockSettings.copyOf(Blocks.STONE_BUTTON));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block TECH_LEVER = new TechLever(FabricBlockSettings.copyOf(Blocks.STONE_BUTTON));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
