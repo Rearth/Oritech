@@ -6,11 +6,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
@@ -94,5 +96,10 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
         };
+    }
+    
+    @Override
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
+        return new ItemStack(getNormalBlock().getBlock());
     }
 }
