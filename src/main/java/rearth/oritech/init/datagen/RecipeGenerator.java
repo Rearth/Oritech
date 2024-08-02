@@ -99,7 +99,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addLavaGen(exporter, new FluidStack(Fluids.LAVA, 8100), 12, "_lava");
         // fuel
         addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_OIL, 8100), 8, "_crude");
-        addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_FUEL, 8100), 16, "_fuel");
+        addFuelGenRecipe(exporter, new FluidStack(FluidContent.STILL_FUEL, 8100), 24, "_fuel");
         //steam
         addSteamEngineGen(exporter, new FluidStack(FluidContent.STILL_STEAM, 32), 1, "_steameng");
     }
@@ -322,7 +322,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerMotorRecipe(exporter, ItemContent.ADVANCED_BATTERY, Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), Ingredient.fromTag(TagContent.STEEL_INGOTS), "_advbattery");
         
         // fuel
-        addCentrifugeFluidRecipe(exporter, Ingredient.fromTag(TagContent.COAL_DUSTS), null, FluidContent.STILL_OIL, 1f, FluidContent.STILL_FUEL, 1f, 1f, "_fuel");
+        addCentrifugeFluidRecipe(exporter, Ingredient.ofItems(ItemContent.FLUXITE), null, FluidContent.STILL_OIL, 1f, FluidContent.STILL_FUEL, 1f, 1f, "_fuel");
         
         // biosteel
         addAlloyRecipe(exporter, ItemContent.RAW_BIOPOLYMER, Items.IRON_INGOT, ItemContent.BIOSTEEL_INGOT, "_biosteel");

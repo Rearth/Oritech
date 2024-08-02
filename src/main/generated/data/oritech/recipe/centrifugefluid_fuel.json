@@ -10,7 +10,7 @@
   },
   "ingredients": [
     {
-      "tag": "c:dusts/coal"
+      "item": "oritech:fluxite"
     }
   ],
   "results": [],
