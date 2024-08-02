@@ -9,12 +9,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -134,9 +136,34 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             addLiquidToTank(targetState);
             useEnergy();
             this.markDirty();
+            setLastPumpTime(world.getTime());
             updateNetwork(fluidStorage.variant);
         }
         
+    }
+    
+    public void onUsed(PlayerEntity player) {
+        
+        var message = Text.literal("Starting");
+        if (!initialized) {
+            if (!toolheadLowered) {
+                message = Text.literal("Trunk is extending....");
+            } else if (searchActive) {
+                message= Text.literal("Pump is initializing... (This might take a moment for large bodies of water)");
+            } else {
+                message = Text.literal("No liquids available");
+            }
+        } else if (isBusy()) {
+            message = Text.literal("Pump is working...");
+        } else if (!hasEnoughEnergy()) {
+            message = Text.literal("Not enough energy!");
+        } else if (pendingLiquidPositions.isEmpty()) {
+            message = Text.literal("All liquids have been pumped");
+        } else if (tankIsFull()) {
+            message = Text.literal("Tank is full");
+        }
+        
+        player.sendMessage(message, true);
     }
     
     private void spawnWorkingParticles() {

@@ -7,16 +7,26 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.interaction.PumpBlockEntity;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.List;
+import java.util.Objects;
 
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
@@ -24,8 +34,19 @@ public class PumpBlock extends Block implements BlockEntityProvider {
     
     public PumpBlock(Settings settings) {
         super(settings);
+        setDefaultState(getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH));
     }
     
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(Properties.HORIZONTAL_FACING);
+    }
+    
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return Objects.requireNonNull(super.getPlacementState(ctx)).with(Properties.HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    }
     
     @Override
     public BlockRenderType getRenderType(BlockState state) {
@@ -36,6 +57,31 @@ public class PumpBlock extends Block implements BlockEntityProvider {
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new PumpBlockEntity(pos, state);
+    }
+    
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        
+        if (!world.isClient) {
+            var pumpEntity = world.getBlockEntity(pos, BlockEntitiesContent.PUMP_BLOCK);
+            pumpEntity.ifPresent(pumpBlockEntity -> pumpBlockEntity.onUsed(player));
+        }
+        return ActionResult.SUCCESS;
+    }
+    
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        
+        if (!world.isClient) {
+            // break all trunk blocks below
+            var checkPos = pos.down();
+            while (world.getBlockState(checkPos).getBlock().equals(BlockContent.PUMP_TRUNK_BLOCK)) {
+                world.breakBlock(checkPos, false);
+                checkPos = checkPos.down();
+            }
+        }
+        
+        return super.onBreak(world, pos, state, player);
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
