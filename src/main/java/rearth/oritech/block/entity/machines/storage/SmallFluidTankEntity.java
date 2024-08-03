@@ -85,7 +85,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
-        Inventories.writeNbt(nbt, DefaultedList.of(), false, registryLookup);
+        Inventories.writeNbt(nbt, this.inventory.heldStacks, false, registryLookup);
     }
     
     @Override
@@ -93,6 +93,10 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         super.readNbt(nbt, registryLookup);
         SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
         Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+    }
+    
+    public void writeFluidToNbt(NbtCompound nbt) {
+        SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, world.getRegistryManager());
     }
     
     @Override

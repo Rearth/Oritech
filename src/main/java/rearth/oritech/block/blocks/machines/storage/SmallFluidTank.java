@@ -70,18 +70,29 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         
         if (!world.isClient) {
-            var stack = getStackWithData(world, pos);
             var tankEntity = (SmallFluidTankEntity) world.getBlockEntity(pos);
-            
-            if (!player.isCreative())
-                Block.dropStack(world, pos, stack);
-            
+
             var stacks = tankEntity.inventory.heldStacks;
             for (var heldStack : stacks) {
                 if (!heldStack.isEmpty()) {
                     var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
                     world.spawnEntity(itemEntity);
                 }
+            } 
+
+            if (!player.isCreative()) {
+                ItemStack emptyTankStack = new ItemStack(this);
+                
+                // Copy only the fluid data, not the inventory
+                if (tankEntity != null) {
+                    NbtCompound nbt = new NbtCompound();
+                    tankEntity.writeFluidToNbt(nbt);
+                    if (!nbt.isEmpty()) {
+                        emptyTankStack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+                    }
+                }
+                
+                Block.dropStack(world, pos, emptyTankStack);
             }
             
         }
