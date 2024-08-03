@@ -29,6 +29,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -84,7 +85,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+        Inventories.writeNbt(nbt, DefaultedList.of(), false, registryLookup);
     }
     
     @Override
