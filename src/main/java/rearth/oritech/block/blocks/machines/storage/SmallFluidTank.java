@@ -102,6 +102,7 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
         if (tankEntity.getForDirectFluidAccess().amount > 0) {
             var nbt = new NbtCompound();
             tankEntity.writeNbt(nbt, world.getRegistryManager());
+            nbt.remove("Items");
             stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
             var fluidName = FluidVariantAttributes.getName(tankEntity.getForDirectFluidAccess().variant);
             stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable("block.oritech.small_tank_block")));
