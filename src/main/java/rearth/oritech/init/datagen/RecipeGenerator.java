@@ -71,6 +71,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addAlloyRecipe(exporter, Items.GOLD_INGOT, Items.NETHERITE_SCRAP, Items.NETHERITE_INGOT, "_netheritealloying");
         // books
         addAssemblerRecipe(exporter, Ingredient.ofItems(Items.PAPER), Ingredient.ofItems(Items.PAPER), Ingredient.ofItems(Items.PAPER), Ingredient.ofItems(Items.LEATHER), Items.BOOK, 2, 1f, "_assemblerbook");
+        // reinforced deepslate
+        addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.DURATIUM_INGOT), Ingredient.ofItems(Items.DEEPSLATE), Items.REINFORCED_DEEPSLATE, 100, "_reinfdeepslate");
     }
     
     private void addDeepDrillOres(RecipeExporter exporter) {
