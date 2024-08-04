@@ -31,6 +31,5 @@ On the surface, the location of a resource node cluster can be identified by the
 
 ;;;;;
 
-When in operation, the extracted ore will be of the type that the resource node below the middle of the machine is. This is important to keep in mind when placing the machine.
-
-As the bedrock extractor is 3x3x3 in size, you'll have to place it one block in front of the target resource node.
+When in operation, the bedrock extractor will mine the ores directly below it (the whole 3x3 area). Each operation will randomly select one of the blocks below. Not all blocks have to be
+ore nodes.

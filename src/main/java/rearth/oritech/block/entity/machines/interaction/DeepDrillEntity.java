@@ -13,9 +13,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
@@ -42,7 +44,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     
     // work data
     private boolean initialized;
-    private Block targetedOre;
+    private List<Block> targetedOre = new ArrayList<>();
     private int progress;
     private long lastWorkTime;
     private boolean networkDirty;
@@ -88,7 +90,8 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
         if (!checkState.isIn(TagContent.RESOURCE_NODES)) return false;
         
         initialized = true;
-        targetedOre = checkState.getBlock();
+        targetedOre.clear();
+        loadOreBlocks();
         
         return true;
     }
@@ -105,8 +108,8 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
             lastWorkTime = world.getTime();
             networkDirty = true;
             
-            var particlePos = pos.toCenterPos().subtract(0, 0.4f, 0);
-            ParticleContent.FURNACE_BURNING.spawn(world, particlePos, 1);
+            var particlePos = getCenter(0);
+            ParticleContent.FURNACE_BURNING.spawn(world, Vec3d.of(particlePos), 1);
         }
         
         // try increasing faster if too much energy is provided
@@ -127,6 +130,25 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
         
     }
     
+    private BlockPos getCenter(int y) {
+        var state = getCachedState();
+        var facing = state.get(Properties.HORIZONTAL_FACING);
+        return pos.add(Geometry.rotatePosition(new Vec3i(1, y, 0), facing));
+    }
+    
+    private void loadOreBlocks() {
+        var center = getCenter(-1);
+        
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                var target = center.add(x, 0, z);
+                ParticleContent.DEBUG_BLOCK.spawn(world, Vec3d.of(target));
+                targetedOre.add(world.getBlockState(target).getBlock());
+            }
+        }
+        
+    }
+    
     private void updateNetwork() {
         if (networkDirty && world.getTime() % 5 == 0) {
             NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.DeepDrillSyncPacket(pos, lastWorkTime));
@@ -135,14 +157,13 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     }
     
     private void craftResult(World world, BlockPos pos) {
-        var nodeOreBlockItem = targetedOre.asItem();
+        var usedOre = targetedOre.get(world.random.nextBetweenExclusive(0, 9));
+        var nodeOreBlockItem = usedOre.asItem();
         var sampleInv = new SimpleCraftingInventory(new ItemStack(nodeOreBlockItem, 1));
         
         var recipeCandidate = world.getRecipeManager().getFirstMatch(RecipeContent.DEEP_DRILL, sampleInv, world);
-        if (recipeCandidate.isEmpty()) {
-            Oritech.LOGGER.warn("Deep drill works on ore node without a matching recipe! At " + pos + " for ore " + nodeOreBlockItem);
+        if (recipeCandidate.isEmpty())
             return;
-        }
         
         var output = recipeCandidate.get().value().getResults().get(0);
         if (!inventory.canInsert(output)) return;
@@ -159,8 +180,11 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
         addMultiblockToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
         nbt.putBoolean("initialized", initialized);
-        if (initialized)
-            nbt.putString("nodeType", Registries.BLOCK.getId(targetedOre).toString());
+        if (initialized) {
+            for (int i = 0; i < 9; i++) {
+                nbt.putString("nodeType" + i, Registries.BLOCK.getId(targetedOre.get(i)).toString());
+            }
+        }
     }
     
     @Override
@@ -170,8 +194,11 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
         loadMultiblockNbtData(nbt);
         energyStorage.amount = nbt.getLong("energy_stored");
         initialized = nbt.getBoolean("initialized");
-        if (initialized)
-            targetedOre = Registries.BLOCK.get(Identifier.of(nbt.getString("nodeType")));
+        if (initialized) {
+            for (int i = 0; i < 9; i++) {
+                targetedOre.add(Registries.BLOCK.get(Identifier.of(nbt.getString("nodeType" + i))));
+            }
+        }
     }
     
     @Override
@@ -218,7 +245,8 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     
     @Override
     public Direction getFacingForMultiblock() {
-        return Direction.SOUTH;
+        var state = getCachedState();
+        return state.get(Properties.HORIZONTAL_FACING).getOpposite();
     }
     
     @Override

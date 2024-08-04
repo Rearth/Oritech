@@ -4,15 +4,18 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
-import software.bernie.geckolib.cache.object.BakedGeoModel;
+import rearth.oritech.util.Geometry;
 import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
 
 import java.util.HashMap;
@@ -46,8 +49,8 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
             if (startPos.z < targetPos.z) moveZ = -0.5;
             targetPos = targetPos.add(moveX, 0.5, moveZ);
         } else if (laserEntity.isTargetingDeepdrill()) {
-            var offset = cachedOffsets.computeIfAbsent(laserEntity, id -> idToOffset(id.getPos(), 0.7f));
-            targetPos = targetPos.add(0, 1, 1).add(offset);
+            var offset = cachedOffsets.computeIfAbsent(laserEntity, id -> idToOffset(id.getPos(), 0.5f, laserEntity.getWorld(), laserEntity.getCurrentTarget()));
+            targetPos = targetPos.add(offset);
         }
         
         if (laserEntity.lastRenderPosition == null) laserEntity.lastRenderPosition = targetPos;
@@ -99,9 +102,13 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         matrices.pop();
     }
     
-    public static Vec3d idToOffset(BlockPos source, float range) {
+    public static Vec3d idToOffset(BlockPos source, float range, World world, BlockPos targetPos) {
+        
+        var drillFacing = world.getBlockState(targetPos).get(Properties.HORIZONTAL_FACING);
+        var drillCenter = Geometry.rotatePosition(new Vec3d(1, 1.4, 0), drillFacing);
+        
         var random = Random.create(source.asLong());
-        return new Vec3d((random.nextFloat() * 2 - 1) * range, (random.nextFloat() * 2 - 1) * range, (random.nextFloat() * 2 - 1) * range);
+        return new Vec3d((random.nextFloat() * 2 - 1) * range, (random.nextFloat() * 2 - 1) * range, (random.nextFloat() * 2 - 1) * range).add(drillCenter);
     }
     
     public static Vec3d lerp(Vec3d a, Vec3d b, float f) {

@@ -1,5 +1,6 @@
 package rearth.oritech.client.renderers;
 
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2f;
 import rearth.oritech.Oritech;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extends DefaultedBlockGeoModel<T> {
     
     private static final HashMap<Long, ModelRenderData> additionalData = new HashMap<>();
+    private static final HashMap<Long, Vec3d> drillOffsets = new HashMap<>();
     
     public LaserArmModel(String subpath) {
         super(Oritech.id(subpath));
@@ -24,12 +26,25 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
         return additionalData.computeIfAbsent(id, s -> new ModelRenderData(0, 0, getAnimationProcessor().getBone("pivotX"), getAnimationProcessor().getBone("pivotY")));
     }
     
+    private Vec3d getOffsetByDrillId(long id, T laserEntity) {
+        return drillOffsets.computeIfAbsent(id, s -> {
+            var drillFacing = laserEntity.getWorld().getBlockState(laserEntity.getCurrentTarget()).get(Properties.HORIZONTAL_FACING);
+            return Geometry.rotatePosition(new Vec3d(1, 1.4, 0), drillFacing);
+        });
+    }
+    
     @Override
     public void setCustomAnimations(T laserEntity, long instanceId, AnimationState<T> animationState) {
         
         if (laserEntity.getCurrentTarget() == null) return;
         var target = Vec3d.of(laserEntity.getCurrentTarget());
-        if (laserEntity.isTargetingDeepdrill()) target = target.add(0, 1, 1);
+        
+        if (laserEntity.isTargetingDeepdrill()) {
+            var drillId = laserEntity.getCurrentTarget().asLong();
+            var offset = getOffsetByDrillId(drillId, laserEntity);
+            target = target.add(offset);
+        }
+        
         var ownPos = Vec3d.of(laserEntity.getPos());
         var offset = target.subtract(ownPos.add(0, 1.55 - 0.5, 0)); // add 1.55 to get to height of pivotX, minus block center offset
         
