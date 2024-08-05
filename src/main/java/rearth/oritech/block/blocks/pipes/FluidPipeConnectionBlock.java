@@ -9,11 +9,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
+
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity;
@@ -58,6 +59,13 @@ public class FluidPipeConnectionBlock extends GenericPipeConnectionBlock {
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new FluidPipeInterfaceEntity(pos, state);
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        var baseState = super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+
+        return baseState.with(EXTRACT, state.get(EXTRACT));
     }
     
     @Override
