@@ -72,6 +72,7 @@
   "tooltip.oritech.solar_generation": "Generation rate depends on core quality",
   "tooltip.oritech.needs_laser_power": "Must be powered via an enderic laser",
   "tooltip.oritech.steam_engine": "Processes steam into RF and water. Can be chained together",
+  "tooltip.oritech.item_filter": "Used to filter which items can be inserted into an inventory.",
 
   "tooltip.oritech.addon_speed_desc": "Operation Speed ",
   "tooltip.oritech.addon_efficiency_desc": "Energy Efficiency ",
