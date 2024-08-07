@@ -3,6 +3,8 @@ package rearth.oritech.init;
 import io.wispforest.owo.registration.reflect.BlockRegistryContainer;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
+import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -104,10 +106,12 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block DRONE_PORT_BLOCK = new DronePortBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     @NoAutoDrop
-    public static final Block SMALL_STORAGE_BLOCK = new SmallStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @DispenserPlace
+    public static final Block SMALL_STORAGE_BLOCK = new SmallStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY));
     public static final Block LARGE_STORAGE_BLOCK = new LargeStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @NoAutoDrop
-    public static final Block SMALL_TANK_BLOCK = new SmallFluidTank(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @DispenserPlace
+    public static final Block SMALL_TANK_BLOCK = new SmallFluidTank(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY));
     
     public static final Block PLACER_BLOCK = new PlacerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block DESTROYER_BLOCK = new DestroyerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
@@ -241,6 +245,10 @@ public class BlockContent implements BlockRegistryContainer {
         if (!field.isAnnotationPresent(NoAutoDrop.class)) {
             BlockLootGenerator.autoRegisteredDrops.add(value);
         }
+
+        if (field.isAnnotationPresent(DispenserPlace.class)) {
+            DispenserBlock.registerBehavior(value, new BlockPlacementDispenserBehavior());
+        }
         
         ItemGroups.add(targetGroup, value);
     }
@@ -259,6 +267,11 @@ public class BlockContent implements BlockRegistryContainer {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface NoAutoDrop {
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    public @interface DispenserPlace {
     }
     
 }

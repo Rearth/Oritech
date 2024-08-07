@@ -9,15 +9,14 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.loot.context.LootContextParameterSet;
+import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.text.Text;
@@ -29,8 +28,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
+import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
 import rearth.oritech.block.entity.machines.storage.SmallStorageBlockEntity;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.List;
@@ -106,43 +105,15 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
         
         return ActionResult.SUCCESS;
     }
-    
-    @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        
-        if (!world.isClient()) {
-            
-            var entity = world.getBlockEntity(pos);
-            if (entity instanceof MachineAddonController machineEntity) {
-                machineEntity.resetAddons();
-            }
-            
-            if (entity instanceof ExpandableEnergyStorageBlockEntity storageBlock) {
-                var stacks = storageBlock.inventory.heldStacks;
-                for (var heldStack : stacks) {
-                    if (!heldStack.isEmpty()) {
-                        var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
-                        world.spawnEntity(itemEntity);
-                    }
-                }
-                
-                // drop block with nbt
-                if (state.getBlock().equals(BlockContent.SMALL_STORAGE_BLOCK)) {
-                    var stack = new ItemStack(BlockContent.SMALL_STORAGE_BLOCK.asItem());
-                    var storedAmount = storageBlock.getStorageForAddon().amount;
-                    if (storedAmount > 0) {
-                        var nbt = new NbtCompound();
-                        storageBlock.writeNbt(nbt, world.getRegistryManager());
-                        stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
-                    }
-                    
-                    if (!player.isCreative())
-                        Block.dropStack(world, pos, stack);
-                }
-            }
-        }
-        
-        return super.onBreak(world, pos, state, player);
+
+    protected List<ItemStack> getDroppedStacks(BlockState state, LootContextParameterSet.Builder builder) {
+        var droppedStacks = super.getDroppedStacks(state, builder);
+
+        var blockEntity = (BlockEntity)builder.getOptional(LootContextParameters.BLOCK_ENTITY);
+        if (blockEntity instanceof SmallStorageBlockEntity storageEntity)
+            droppedStacks.addAll(storageEntity.inventory.getHeldStacks());
+
+        return droppedStacks;
     }
     
     @Override

@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:copy_components",
+              "include": [
+                "minecraft:custom_name"
+              ],
+              "source": "block_entity"
+            },
+            {
+              "function": "oritech:nbt_block_loot_function"
+            }
+          ],
+          "name": "oritech:small_tank_block"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

@@ -58,6 +58,7 @@ public class Oritech implements ModInitializer {
         NetworkContent.registerChannels();
         ParticleContent.registerParticles();
         FeatureContent.initialize();
+        LootContent.init();
         
         ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
         PlayerBlockBreakEvents.BEFORE.register(PromethiumPickaxeItem::preMine);
