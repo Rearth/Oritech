@@ -1,8 +1,8 @@
 {
   "type": "minecraft:smelting",
   "category": "misc",
-  "cookingtime": 300,
-  "experience": 0.5,
+  "cookingtime": 200,
+  "experience": 1.0,
   "group": "oritech",
   "ingredient": {
     "item": "oritech:nickel_dust"

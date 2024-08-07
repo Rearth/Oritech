@@ -1,8 +1,8 @@
 {
   "type": "minecraft:blasting",
   "category": "misc",
-  "cookingtime": 150,
-  "experience": 0.5,
+  "cookingtime": 100,
+  "experience": 1.0,
   "group": "oritech",
   "ingredient": {
     "item": "oritech:adamant_dust"
