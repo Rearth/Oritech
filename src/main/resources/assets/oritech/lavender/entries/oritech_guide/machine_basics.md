@@ -6,7 +6,9 @@
 }
 ```
 
-All oritech machines require energy to operate. The top side is item-input only, while the sides can be used to insert and extract. The bottom only allows item extraction.
+All oritech machines require energy to operate.
+
+The top side is item-input only, while the sides can be used to insert and extract. The bottom only allows item extraction.
 
 ;;;;;
 

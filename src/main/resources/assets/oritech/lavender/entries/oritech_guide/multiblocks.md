@@ -16,7 +16,9 @@
 ```
 
 Some machines need additional machine cores to function. These must be placed at specific positions relative to the machine itself. The amount of 
-cores needed for a machine is listed in the machines' tooltip. Cores cannot be shared between machines. To begin the multiblock construction, first place down the machine itself.
+cores needed for a machine is listed in the machines' tooltip. Cores cannot be shared between machines.
+
+To begin the multiblock construction, first place down the machine itself.
 
 ;;;;;
 
@@ -26,6 +28,8 @@ If there is an obstacle, the block will be highlighted instead.
 
 ;;;;;
 
-Each machine core has a quality associated with it. Using better machine cores results increases the total quality of the machine. To view the resulting quality of a machine,
+Each machine core has a quality associated with it. Using better machine cores results increases the total quality of the machine.
+
+To view the resulting quality of a machine,
 hover over the machine icon in the top left of the UI. The machine quality itself does not directly affect the machine operation. Instead, it is used to determine
 how many addons can be added to a machine. If you don't plan on adding addons to the machine, you can use the cheapest cores.

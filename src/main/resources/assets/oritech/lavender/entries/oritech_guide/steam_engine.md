@@ -13,7 +13,7 @@
 <block;oritech:steam_boiler_addon>
 
 
-All generators (except the basic generator) can be upgrades to produce steam. To do so, add a steam boiler addon. When added, the machine will no longer directly produce RF.
+All generators (except the basic generator) can be upgraded to produce steam. To do so, add a steam boiler addon. When added, the machine will no longer directly produce RF.
 
 ;;;;;
 
