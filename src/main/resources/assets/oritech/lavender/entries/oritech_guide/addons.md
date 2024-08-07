@@ -31,7 +31,9 @@ The maximum layers of machine extenders you can
 ;;;;;
 
 use depends on the machine quality. If you have a machine with a core quality of 1, you can't use any extender. Each additional extender that 
-goes **through** another extender requires an increase in core quality of 1. The core quality never directly counts the amount of machine extends you have active. Instead, it counts through how many
+goes **through** another extender requires an increase in core quality of 1.
+
+The core quality never directly counts the amount of machine extenders you have active. Instead, it counts through how many
 extenders an addon has to go to be connected to the machine. If this number is greater than the core quality, the addon 
 
 ;;;;;

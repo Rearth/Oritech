@@ -22,7 +22,7 @@ must be powered using enderic lasers.
 
 <block;oritech:resource_node_nickel>
 
-Resource nodes are spawned naturally throughout the world. The appear in clusters just on top of the bedrock layer. There's resource nodes for all ore types 
+Resource nodes are spawned naturally throughout the world. They appear in clusters just on top of the bedrock layer. There are resource nodes for all ore types 
 in the overworld. They are usually covered by a small pocket of water or oil on top.
 
 ;;;;;

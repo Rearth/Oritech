@@ -11,15 +11,15 @@
 }
 ```
 
-Oritech uses **RF** to power all of its machines. It uses the Reborn Energy API to do so. This means Oritech is compatible with
+Oritech uses {gold}**RF**{} to power all of its machines. It uses the Reborn Energy API to do so. This means Oritech is compatible with
 all mods using the Tech Reborn energy system, which currently includes basically all fabric energy using mods.
 
-There is only 1 cable tier available, capable of transferring up to 10k RF/t.
+There is only 1 cable tier available, capable of transferring up to {gold}10k RF/t{}.
 
 ;;;;;
 
 Generators will always output energy, and all other machines accept
-energy from all sides (and won't output it again). The cables themselves store up to 10k RF in each machine connection, if it can't output the energy.
+energy from all sides (and won't output it again). The cables themselves store up to {gold}10k RF{} in each machine connection, if it can't output the energy.
 
 ;;;;;
 
@@ -30,6 +30,6 @@ Energy storage blocks accept energy from all sides with a {green}green port{}, a
 
 ;;;;;
 
-Energy can also be transferred wireless using an enderic laser. For more information, see page [enderic laser](^oritech:enderic_laser)
+Energy can also be transferred wirelessly using an enderic laser. For more information, see page [enderic laser](^oritech:enderic_laser)
 
 <block;oritech:laser_arm_block>

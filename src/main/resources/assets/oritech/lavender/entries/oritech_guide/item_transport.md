@@ -10,12 +10,12 @@
 }
 ```
 
-Oritech includes item transport pipes and item filter blocks to fulfill your item logistic needs. Item pipes connect to each other all
+Oritech includes item transport pipes and item filter blocks to fulfill your item logistic needs. Item pipes connect to each other and all
 neighboring inventories.
 
 ;;;;;
 
-Unlike other pipes, the item pipes themselves do not have an inventory. This means that other blocks (such as a hopper)
+Unlike other pipes, the item pipes do not have an inventory. This means that other blocks (such as a hopper)
 cannot insert items into the pipe network on their own. 
 Instead, an item pipe can be set to extract from a nearby inventory. To do so,
 just right click a pipe block (that's connected to something).
@@ -27,8 +27,7 @@ you'll notice that all connection turn to extraction mode. This is a
 current limitation of oritech pipes. If you set a pipe block to extract, it will try to extract
 from all blocks that are connected to this pipe block. So to actually transport anything, you'll need the pipe network to consist of at least 2 blocks.
 
-The extracting pipe will then always extract the first item in the connected inventory. Extracted items will be put into the **closest**
-available inventory further down the network.
+Extracted items will be put into the **closest** available inventory further down the network.
 
 ;;;;;
 

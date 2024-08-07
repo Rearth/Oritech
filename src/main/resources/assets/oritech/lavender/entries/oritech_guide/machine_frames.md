@@ -12,7 +12,7 @@
 }
 ```
 
-The *[block placer](^oritech:block_placer),[block destroyer](^oritech:block_destroyer) and [fertlizer](^oritech:fertilizer)* all operate on a gantry that is build on machine frames. The machine frame designates
+The *[block placer](^oritech:block_placer), [block destroyer](^oritech:block_destroyer) and [fertilizer](^oritech:fertilizer)* all operate on a gantry that is built with machine frames. The machine frame designates
 the area the machines operate in. The machines always target the blocks **below** the frame. The frame itself needs to be rectangular and empty inside.
 
 Any number of machines can operate on the same machine frame. To do so, simple place
