@@ -56,8 +56,6 @@ public class BlockLootGenerator extends FabricBlockLootTableProvider {
         addDrop(block, LootTable.builder().pool(
             (LootPool.Builder)this.addSurvivesExplosionCondition(block, LootPool.builder()
                                   .rolls(ConstantLootNumberProvider.create(1.0F))
-                                  .with(ItemEntry.builder(block).apply(CopyComponentsLootFunction.builder(Source.BLOCK_ENTITY)
-                                                                                                 .include(DataComponentTypes.CUSTOM_NAME))
-                                                                .apply(NbtBlockLootFunction.builder())))));
+                                  .with(ItemEntry.builder(block).apply(NbtBlockLootFunction.builder())))));
     }
 }

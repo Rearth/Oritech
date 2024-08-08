@@ -13,13 +13,6 @@
           "type": "minecraft:item",
           "functions": [
             {
-              "function": "minecraft:copy_components",
-              "include": [
-                "minecraft:custom_name"
-              ],
-              "source": "block_entity"
-            },
-            {
               "function": "oritech:nbt_block_loot_function"
             }
           ],

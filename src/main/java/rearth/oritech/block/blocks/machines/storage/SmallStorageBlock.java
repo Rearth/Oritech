@@ -1,6 +1,7 @@
 package rearth.oritech.block.blocks.machines.storage;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -9,6 +10,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -17,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.text.Text;
@@ -26,13 +29,19 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
+
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
+import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
 import rearth.oritech.block.entity.machines.storage.SmallStorageBlockEntity;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
@@ -113,6 +122,25 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
             droppedStacks.addAll(storageEntity.inventory.getHeldStacks());
 
         return droppedStacks;
+    }
+
+    @Override
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
+        return getStackWithData(world, pos);
+    }
+    
+    @NotNull
+    private static ItemStack getStackWithData(WorldView world, BlockPos pos) {
+        var stack = new ItemStack(BlockContent.SMALL_STORAGE_BLOCK.asItem());
+        var storageEntity = (SmallStorageBlockEntity) world.getBlockEntity(pos);
+        
+        if (storageEntity.getStorage(null).getAmount() > 0) {
+            var nbt = new NbtCompound();
+            storageEntity.writeNbt(nbt, world.getRegistryManager());
+            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+        }
+        
+        return stack;
     }
     
     @Override

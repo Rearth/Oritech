@@ -3,6 +3,7 @@ package rearth.oritech.init.datagen.loot;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
@@ -12,11 +13,13 @@ import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunctionType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
 import rearth.oritech.block.entity.machines.storage.SmallStorageBlockEntity;
 import rearth.oritech.init.LootContent;
 
 import java.util.List;
+import java.util.UUID;
 
 public class NbtBlockLootFunction extends ConditionalLootFunction {
     public static final String NAME = "nbt_block_loot";
@@ -31,9 +34,19 @@ public class NbtBlockLootFunction extends ConditionalLootFunction {
 
         var nbt = new NbtCompound();
         if (blockEntity instanceof SmallFluidTankEntity tankEntity) {
-            tankEntity.writeNbt(nbt, context.getWorld().getRegistryManager());
+            if (tankEntity.getForDirectFluidAccess().amount > 0) {
+                tankEntity.writeNbt(nbt, context.getWorld().getRegistryManager());
+                var fluidName = FluidVariantAttributes.getName(tankEntity.getForDirectFluidAccess().variant);
+                stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable("block.oritech.small_tank_block")));
+                // make all non-empty tanks unstackable
+                nbt.putUuid("unstackable", UUID.randomUUID());
+            }
         } else if (blockEntity instanceof SmallStorageBlockEntity storageEntity) {
-            storageEntity.writeNbt(nbt, context.getWorld().getRegistryManager());
+            if (storageEntity.getStorage(null).getAmount() > 0) {
+                storageEntity.writeNbt(nbt, context.getWorld().getRegistryManager());
+                // make all non-empty storage blocks unstackable
+                nbt.putUuid("unstackable", UUID.randomUUID());
+            }
         }
 
         // Any items contained in the block should be added to the drops in the Block's getDroppedStacks() method
