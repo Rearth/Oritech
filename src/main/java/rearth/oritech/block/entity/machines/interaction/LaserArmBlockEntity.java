@@ -151,10 +151,12 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
                     tx.commit();
                 }
             }
-        } else if (targetBlockState.getBlock() instanceof BuddingAmethystBlock amethystBlock && !canPassThrough(targetBlockState)) {
-            fired = true;
-            amethystBlock.randomTick(targetBlockState, (ServerWorld) world, targetBlock, world.random);
-            ParticleContent.ACCELERATING.spawn(world, Vec3d.of(targetBlock));
+        } else if (targetBlockState.getBlock() instanceof BuddingAmethystBlock amethystBlock &&!canPassThrough(targetBlockState)) {
+            if (buddingAmethystCanGrow(world, targetBlockState, targetBlock)) {
+                fired = true;
+                amethystBlock.randomTick(targetBlockState, (ServerWorld) world, targetBlock, world.random);
+                ParticleContent.ACCELERATING.spawn(world, Vec3d.of(targetBlock));
+            }
         } else if (!canPassThrough(targetBlockState) && !isSearchTerminatorBlock(targetBlockState)) {
             fired = true;
             progress += energyRequiredToFire();
@@ -162,21 +164,36 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             if (progress >= targetBlockEnergyNeeded) {
                 finishBlockBreaking(targetBlock, targetBlockState);
             }
-        } else {
-            // when targeting air
-            if (world.getTime() % 40 == 0)
-                findNextBlockBreakTarget();
         }
         
         if (fired) {
             energyStorage.amount -= energyRequiredToFire();
             networkDirty = true;
             lastFiredAt = world.getTime();
+        } else if (world.getTime() % 40 == 0) {
+            findNextBlockBreakTarget();
         }
         
         if (networkDirty)
             updateNetwork();
         
+    }
+
+    private boolean buddingAmethystCanGrow(World world, BlockState blockState, BlockPos pos) {
+        if (!blockState.isOf(Blocks.BUDDING_AMETHYST))
+            return false;
+
+        for (Direction direction : Direction.values()) {
+            BlockPos growingPos = pos.offset(direction);
+            BlockState growingState = world.getBlockState(growingPos);
+            if (BuddingAmethystBlock.canGrowIn(growingState)
+                    || growingState.isOf(Blocks.SMALL_AMETHYST_BUD)
+                    || growingState.isOf(Blocks.MEDIUM_AMETHYST_BUD)
+                    || growingState.isOf(Blocks.LARGE_AMETHYST_BUD))
+                return true;
+        }
+
+        return false;
     }
     
     public void setRedstonePowered(boolean redstonePowered) {
