@@ -11,6 +11,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
 
 public abstract class MultiblockMachine extends UpgradableMachineBlock {
@@ -50,6 +51,8 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
             // first time created
             if (isAssembled && !wasAssembled) {
                 NetworkContent.MACHINE_CHANNEL.serverHandle(entity).send(new NetworkContent.MachineSetupEventPacket(pos));
+                if (entity instanceof MachineAddonController controllerEntity)
+                    controllerEntity.initAddons();
                 return ActionResult.SUCCESS;
             }
             

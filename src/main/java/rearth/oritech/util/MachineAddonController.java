@@ -186,8 +186,10 @@ public interface MachineAddonController {
         for (var addon : addons) {
             var newState = addon.state()
                              .with(MachineAddonBlock.ADDON_USED, true);
-            world.setBlockState(addon.pos(), newState);
+            // Set controller before setting block state, otherwise the addon will think
+            // it's not connected to a machine the first time neighbor blocks are being updated.
             addon.addonEntity().setControllerPos(pos);
+            world.setBlockState(addon.pos(), newState);
         }
     }
     
