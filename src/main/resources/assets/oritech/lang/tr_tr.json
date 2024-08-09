@@ -114,7 +114,7 @@
 
   "tooltip.oritech.capture_item_desc_1": [
     {
-      "text": "Küçük, büyülü, zeki bir uçan yaratığın beynini\nele geçirebilir.",
+      "text": "Küçük, büyülü, zeki, uçan bir yaratığın beynini ele geçirebilir.",
       "italic": true,
       "color": "gray"
     }
@@ -126,14 +126,14 @@
       "italic": true
     },
     {
-      "text": " bu tanıma uyabilir. Her zaman\neşyalarını almaya çalışsalar da",
+      "text": " bu tanıma uyabilir. Her ne kadar eşyayı sizden almaya çalışsalar da.",
       "italic": true,
       "color": "gray"
     }
   ],
   "tooltip.oritech.capture_item_desc_3": [
     {
-      "text": "bunlar senden. Belki yakalamak için benzer başka bir\nvarlık da bulabilirsiniz.",
+      "text": "Belki yakalayacak benzer başka bir varlık da bulabilirsin.",
       "italic": true,
       "color": "gray"
     }
