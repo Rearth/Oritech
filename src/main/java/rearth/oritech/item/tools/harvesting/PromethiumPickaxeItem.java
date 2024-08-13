@@ -119,7 +119,7 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
             var isArea = !wasArea;
             setAreaEnabled(stack, isArea);
             
-            user.sendMessage(Text.literal(isArea ? "Area Effect" : "Silk Touch"));
+            user.sendMessage(isArea ? Text.translatable("message.oritech.tool_mode.area_effect") : Text.translatable("message.oritech.tool_mode.silk_touch"));
         }
         
         return super.use(world, user, hand);
@@ -159,7 +159,7 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
         
         var area = isAreaEnabled(stack);
         
-        tooltip.add(Text.literal("Mode: " + (area ? "Area" : "Single")).formatted(Formatting.GOLD));
+        tooltip.add(area ? Text.translatable("tooltip.oritech.tool_mode.area_range.area") :  Text.translatable("tooltip.oritech.tool_mode.area_range.single"));
         tooltip.add(Text.translatable("tooltip.oritech.promethium_pick").formatted(Formatting.DARK_GRAY));
         
     }

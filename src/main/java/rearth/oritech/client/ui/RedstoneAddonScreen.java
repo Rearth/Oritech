@@ -109,7 +109,7 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
         // small separator line
         buttonContainer.child(Components.box(Sizing.fixed(160), Sizing.fixed(1)).color(new Color(0.1f, 0.1f, 0.1f)).positioning(Positioning.absolute(8, 0)));
         
-        var title = Components.label(Text.literal("Please select a target slot").formatted(Formatting.DARK_GRAY));
+        var title = Components.label(Text.translatable("title.oritech.redstone_addon"));
         title.horizontalTextAlignment(HorizontalAlignment.CENTER);
         buttonContainer.child(title.positioning(Positioning.relative(50, 5)));
         

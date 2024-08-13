@@ -57,14 +57,14 @@ public class TooltipHelper {
             if (entity instanceof MachineBlockEntity machineEntity) {
                 var energyRate = machineEntity.getEnergyPerTick();
                 if (entity instanceof UpgradableGeneratorBlockEntity) {
-                    tooltip.add(Text.translatable("tooltip.oritech.generator_rate_desc").formatted(Formatting.GRAY).append(Text.literal(energyRate + " RF/t").formatted(Formatting.GOLD)));
+                    tooltip.add(Text.translatable("tooltip.oritech.generator_rate_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", energyRate)));
                 } else if (entity instanceof MachineBlockEntity) {
-                    tooltip.add(Text.translatable("tooltip.oritech.machine_rate_desc").formatted(Formatting.GRAY).append(Text.literal(energyRate + " RF/t").formatted(Formatting.GOLD)));
+                    tooltip.add(Text.translatable("tooltip.oritech.machine_rate_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", energyRate)));
                 }
             }
             if (entity instanceof EnergyProvider energyProvider) {
                 var maxStorage = getEnergyText(energyProvider.getStorage(null).getCapacity());
-                tooltip.add(Text.translatable("tooltip.oritech.machine_capacity_desc").formatted(Formatting.GRAY).append(Text.literal(maxStorage + " RF").formatted(Formatting.GOLD)));
+                tooltip.add(Text.translatable("tooltip.oritech.machine_capacity_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", maxStorage)));
                 
                 if (energyProvider instanceof AtomicForgeBlockEntity || energyProvider instanceof DeepDrillEntity)
                     tooltip.add(Text.translatable("tooltip.oritech.needs_laser_power").formatted(Formatting.BOLD));

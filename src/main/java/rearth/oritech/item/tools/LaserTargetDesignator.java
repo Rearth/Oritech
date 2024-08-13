@@ -46,7 +46,7 @@ public class LaserTargetDesignator extends Item {
             
             var success = laserEntity.setTargetFromDesignator(target);
             if (success)
-                context.getPlayer().sendMessage(Text.literal("Position saved to machine"));
+                context.getPlayer().sendMessage(Text.translatable("message.oritech.target_designator.position_saved"));
             return success ? ActionResult.SUCCESS : ActionResult.FAIL;
         }
         
@@ -57,9 +57,9 @@ public class LaserTargetDesignator extends Item {
             
             var success = dronePortEntity.setTargetFromDesignator(target);
             if (success) {
-                context.getPlayer().sendMessage(Text.literal("Position saved to machine"));
+                context.getPlayer().sendMessage(Text.translatable("message.oritech.target_designator.position_saved"));
             } else {
-                context.getPlayer().sendMessage(Text.literal("Invalid position for drone port, target port must be at least 50 blocks away"));
+                context.getPlayer().sendMessage(Text.translatable("message.oritech.target_designator.position_invalid"));
             }
             return success ? ActionResult.SUCCESS : ActionResult.FAIL;
         }
@@ -68,7 +68,7 @@ public class LaserTargetDesignator extends Item {
             Oritech.LOGGER.debug(targetBlockState.toString());
             
             context.getStack().set(ComponentContent.TARGET_POSITION, context.getBlockPos());
-            context.getPlayer().sendMessage(Text.literal("Position stored"));
+            context.getPlayer().sendMessage(Text.translatable("message.oritech.target_designator.position_stored"));
             
             return ActionResult.SUCCESS;
         }
@@ -82,9 +82,9 @@ public class LaserTargetDesignator extends Item {
         
         if (stack.contains(ComponentContent.TARGET_POSITION)) {
             var data = stack.get(ComponentContent.TARGET_POSITION);
-            tooltip.add(Text.of("Set to: [" + data.toShortString() + "]"));
+            tooltip.add(Text.translatable("tooltip.oritech.target_designator.no_target", data.toShortString()));
         } else {
-            tooltip.add(Text.of("No target set"));
+            tooltip.add(Text.translatable("tooltip.oritech.target_designator.no_target"));
         }
     }
 }

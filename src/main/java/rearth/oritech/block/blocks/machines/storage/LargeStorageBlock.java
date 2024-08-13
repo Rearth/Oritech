@@ -71,7 +71,7 @@ public class LargeStorageBlock extends SmallStorageBlock {
             }
             
             if (!isAssembled) {
-                player.sendMessage(Text.literal("Machine is not assembled. Please add missing core blocks"));
+                player.sendMessage(Text.translatable("message.oritech.machine.missing_core"));
                 return ActionResult.SUCCESS;
             }
             

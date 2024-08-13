@@ -26,7 +26,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
     private static final Color SPEED_COLOR = Color.ofRgb(0x219ebc);
     private static final Color EFFICIENCY_COLOR = Color.ofRgb(0x8ecae6);
     private static final Color CAPACITY_COLOR = Color.ofRgb(0x023047);
-    private static final Color THROUGPUT_COLOR = Color.ofRgb(0xffb703);
+    private static final Color THROUGHPUT_COLOR = Color.ofRgb(0xffb703);
     
     private static final float rotationSpeed = 0.2f;
     
@@ -43,21 +43,21 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
     public void addExtensionComponents(FlowLayout container) {
         super.addExtensionComponents(container);
         
-        var speed = String.format("%.0f", 1 / handler.addonUiData.speed() * 100);
-        var efficiency = String.format("%.0f", 1 / handler.addonUiData.efficiency() * 100);
+        var speed = 1 / handler.addonUiData.speed() * 100;
+        var efficiency = 1 / handler.addonUiData.efficiency() * 100;
         
-        speedLabel = Components.label(Text.literal("⌛ " + speed + "%"));
-        efficiencyLabel = Components.label(Text.literal("⚡ " + efficiency + "%"));
+        speedLabel = Components.label(Text.translatable("title.oritech.machine_speed", speed));
+        efficiencyLabel = Components.label(Text.translatable("title.oritech.machine_efficiency", efficiency));
         
         container.child(Components.box(Sizing.fixed(73), Sizing.fixed(1)).color(new Color(0.8f, 0.8f, 0.8f)));
-        container.child(speedLabel.tooltip(Text.literal("Processing Speed")).margins(Insets.of(3)));
-        container.child(efficiencyLabel.tooltip(Text.literal("Energy Efficiency")).margins(Insets.of(3)));
+        container.child(speedLabel.tooltip(Text.translatable("tooltip.oritech.machine_speed")).margins(Insets.of(3)));
+        container.child(efficiencyLabel.tooltip(Text.translatable("tooltip.oritech.machine_efficiency")).margins(Insets.of(3)));
         
         if (steamProductionLabel != null)
             container.child(steamProductionLabel.margins(Insets.of(3)));
         
         if (handler.blockEntity instanceof PulverizerBlockEntity || handler.blockEntity instanceof FragmentForgeBlockEntity) {
-            container.child(Components.label(Text.literal("\uD83D\uDD28 Enabled")).tooltip(Text.literal("Auto-combines small dusts to ingots")).margins(Insets.of(3)));
+            container.child(Components.label(Text.translatable("title.oritech.machine_option_enabled")).tooltip(Text.translatable("tooltip.oritech.pulverizer_dust_combine")).margins(Insets.of(3)));
         }
         
         if (!((MachineAddonController) handler.blockEntity).getAddonSlots().isEmpty())
@@ -109,7 +109,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
     private Text getQualityTooltip() {
         var quality = handler.quality;
         var effectiveQuality = (int) handler.quality;
-        return Text.of(String.format("Machine Quality: %d\n\nControls how many layers of machine\naddons can be added to this block.\n\nUse better cores to increase this\n\nCurrent quality progress: %.2f", effectiveQuality, quality));
+        return Text.translatable("tooltip.oritech.machine.quality", effectiveQuality, quality);
     }
     
     private Identifier getRingIdentifier(int level) {
@@ -169,7 +169,6 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             
             // detailed list element
             var addonBlockType = (MachineAddonBlock) addonBlock.getBlock();
-            var pattern = "%+.0f";
             var speed = (1 - addonBlockType.getSpeedMultiplier()) * 100;
             var efficiency = (1 - addonBlockType.getEfficiencyMultiplier()) * 100;
             
@@ -184,15 +183,15 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             var bottomPanel = Containers.horizontalFlow(Sizing.content(2), Sizing.content(2));
             
             if (speed != 0) {
-                bottomPanel.child(Components.label(Text.of("⌛ " + String.format(pattern, speed) + "%  ")).color(SPEED_COLOR).tooltip(Text.of("Processing Speed")));
+                bottomPanel.child(Components.label(Text.translatable("title.oritech.machine_speed", speed)).color(SPEED_COLOR).tooltip(Text.translatable("tooltip.oritech.machine_speed")));
             }
             if (efficiency != 0) {
-                bottomPanel.child(Components.label(Text.of("⚡ " + String.format(pattern, efficiency) + "%  ")).color(EFFICIENCY_COLOR).tooltip(Text.of("Energy Efficiency")));
+                bottomPanel.child(Components.label(Text.translatable("title.oritech.machine_efficiency", efficiency)).color(EFFICIENCY_COLOR).tooltip(Text.translatable("tooltip.oritech.machine_efficiency")));
             }
             
             if (addonBlockType instanceof EnergyAddonBlock capacitorAddonBlock) {
-                bottomPanel.child(Components.label(Text.of("\uD83D\uDD0B " + capacitorAddonBlock.getAddedCapacity() + "RF  ")).color(CAPACITY_COLOR).tooltip(Text.of("Added Capacity")));
-                bottomPanel.child(Components.label(Text.of("\uD83D\uDCC8 " + capacitorAddonBlock.getAddedInsert() + "RF/t  ")).color(THROUGPUT_COLOR).tooltip(Text.of("Added Throughput")));
+                bottomPanel.child(Components.label(Text.translatable("title.oritech.machine.capacitor_added_capacity", capacitorAddonBlock.getAddedCapacity())));
+                bottomPanel.child(Components.label(Text.translatable("title.oritech.machine.capacitor_added_throughput", capacitorAddonBlock.getAddedInsert())));
             }
             
             detailPane.child(bottomPanel.positioning(Positioning.absolute(34, 18)));
@@ -214,7 +213,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         }
         
         if (handler.addonUiData.positions().isEmpty()) {
-            detailsScrollPane.child(Components.label(Text.of("No addons connected")));
+            detailsScrollPane.child(Components.label(Text.translatable("title.oritech.machine.no_addons")));
         }
         
         // machine itself
@@ -224,7 +223,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             .positioning(Positioning.absolute(previewX, previewY))
         );
         
-        var openAddonsButton = Components.button(Text.of("Addons"), button -> {
+        var openAddonsButton = Components.button(Text.translatable("button.oritech.machine.addons"), button -> {
             root.child(floatingPanel);
             // handler.hideSlots();
         });

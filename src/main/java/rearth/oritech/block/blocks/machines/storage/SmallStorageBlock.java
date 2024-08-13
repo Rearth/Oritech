@@ -173,8 +173,8 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
         if (stack.contains(DataComponentTypes.CUSTOM_DATA)) {
             var storedEnergy = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt().getLong("energy_stored");
             if (storedEnergy != 0) {
-                var text = Text.literal(String.format("Stored: %d RF", storedEnergy));
-                tooltip.add(text.formatted(Formatting.GOLD));
+                var text = Text.translatable("tooltip.oritech.energy_stored", storedEnergy);
+                tooltip.add(text);
             }
         }
         

@@ -23,8 +23,7 @@ public class SmallFluidTankBlockItem extends BlockItem {
         if (!stack.contains(DataComponentTypes.CUSTOM_DATA)) return;
         var nbt = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
         
-        var amount = nbt.getLong("amount");
-        var amountTip = amount / FluidConstants.BUCKET + " B";
-        tooltip.add(Text.literal("Content: " + amountTip).formatted(Formatting.DARK_AQUA));
+        var amount = nbt.getLong("amount") * 1000 / FluidConstants.BUCKET;
+        tooltip.add(Text.translatable("tooltip.oritech.fluid_content", amount));
     }
 }

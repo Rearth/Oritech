@@ -110,7 +110,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         // data
         var duration = String.format("%.0f", display.getEntry().value().getTime() / 20f);
         root.child(
-          Components.label(Text.of(duration + "s (" + display.getEntry().value().getTime() + " ticks)")).lineHeight(7)
+          Components.label(Text.translatable("rei.title.oritech.cookingtime", duration, display.getEntry().value().getTime())).lineHeight(7)
             .positioning(Positioning.relative(35, 97))
         );
         
@@ -122,7 +122,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, 81000, new ScreenProvider.BarConfiguration(4, 5, 16, 50)));
             
             
-            var text = Text.literal(amount * 1000 / FluidConstants.BUCKET + " mB " + FluidVariantAttributes.getName(fluid).getString()).formatted(Formatting.DARK_AQUA);
+            var text = Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(fluid).getString());
             var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
             foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));
             foreGround.positioning(Positioning.absolute(3, 4));
@@ -136,7 +136,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             
             root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, 81000, new ScreenProvider.BarConfiguration(123, 5, 16, 50)));
             
-            var text = Text.literal(amount * 1000 / FluidConstants.BUCKET + " mB " + FluidVariantAttributes.getName(fluid).getString()).formatted(Formatting.DARK_AQUA);
+            var text = Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(fluid).getString());
             var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
             foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));
             foreGround.positioning(Positioning.absolute(122, 4));

@@ -62,6 +62,7 @@
   "tooltip.oritech.input_mode_fill_left_to_right": "Fills the slots from left to right. Moves to the\nnext slot when the first has been filled.",
   "tooltip.oritech.input_mode_fill_evenly": "Fills items evenly. New items are always\nput into the lowest matching slot.",
   "tooltip.oritech.input_mode_fill_matching_recipe": "Inserts items balanced according to matching recipes.\nIf there is no recipe that uses an item, it will not be\ninserted.",
+  "title.oritech.details": "Details",
 
   "tooltip.oritech.item_extra_info": "Hold ctrl for more info",
   "tooltip.oritech.addon_desc": "Addon slots: ",
@@ -73,6 +74,18 @@
   "tooltip.oritech.needs_laser_power": "Must be powered via an enderic laser",
   "tooltip.oritech.steam_engine": "Processes steam into RF and water. Can be chained together",
   "tooltip.oritech.item_filter": "Used to filter which items can be inserted into an inventory.",
+  "button.oritech.item_filter.whitelist": "Whitelist",
+  "title.oritech.item_filter.whitelist": "Whitelist",
+  "tooltip.oritech.item_filter.whitelist": "Currently only allows items through which \nmatch the listed items",
+  "button.oritech.item_filter.blacklist": "Blacklist",
+  "title.oritech.item_filter.blacklist": "Blacklist",
+  "tooltip.oritech.item_filter.blacklist": "Currently only allows items through which \ndo NOT match the listed items",
+  "title.oritech.item_filter.nbt": "Use NBT",
+  "button.oritech.item_filter.nbt_on": "NBT On",
+  "tooltip.oritech.item_filter.nbt": "Currently checks the listed items for NBT \nvalues, such as damage, enchantments, etc.",
+  "title.oritech.item_filter.no_nbt": "NBT Off",
+  "button.oritech.item_filter.no_nbt": "No NBT",
+  "tooltip.oritech.item_filter.no_nbt": "Currently only checks the item type/id",
 
   "tooltip.oritech.addon_speed_desc": "Operation Speed ",
   "tooltip.oritech.addon_efficiency_desc": "Energy Efficiency ",
@@ -81,6 +94,7 @@
   "tooltip.oritech.addon_acceptor_desc": "Acts as energy proxy",
   "tooltip.oritech.addon_crop_desc": "Applicable to block destroyer. Skips non-grown crops",
   "tooltip.oritech.addon_proxy_desc": "Allows access to specific inventory slots",
+  "tooltip.oritech.addon_proxy_select": "Select proxy target slot",
   "tooltip.oritech.addon_quarry_desc": "Applicable to block destroyer and Enderic Laser. Increases working area size",
   "tooltip.oritech.addon_redstone_desc": "Allows further redstone and comparator configuration",
   "tooltip.oritech.addon_capacity_desc": "Energy Capacity ",
@@ -139,6 +153,12 @@
     }
   ],
 
+  "title.oritech.redstone_addon": [
+    {
+      "text": "Please select a target slot",
+      "color": "dark_gray"
+    }
+  ],
   "tooltip.oritech.redstone_output_power": "Comparators will measure the energy storage",
   "title.oritech.redstone_output_power": "Power Measure",
   "tooltip.oritech.redstone_output_slot": "Comparators will measure selected inventory slot",
@@ -149,6 +169,59 @@
   "title.oritech.redstone_output_active": "Activity Measure",
   "tooltip.oritech.redstone_input_control": "Enables the machine to be disabled via a redstone signal to this addon",
   "title.oritech.redstone_input_control": "Control Input",
+  
+  "title.oritech.inventory_proxy": "Machine Inventory Access",
+
+  "tooltip.oritech.energy_stored": "Stored: %d RF",
+  "tooltip.oritech.energy_indicator": [
+    { "text": "%d/%d RF", "color": "gold" }
+  ],
+  "tooltip.oritech.energy_max_transfer": [
+    { "text": "Max Transfer Rate: ", "color": "gray" },
+    { "translate": "tooltip.oritech.energy_transfer_rate" }
+  ],
+  "tooltip.oritech.energy_transfer_rate": [
+    { "text": "%d RF/t", "color": "gold" }
+  ],
+  "title.oritech.machine.addon_range": "%d Range",
+  "tooltip.oritech.block_destroyer.addon_range": "Maximum digging depth",
+  "tooltip.oritech.laser_arm.addon_range": "Effective beam radius",
+  "title.oritech.machine.addon_fortune": "%d Fortune",
+  "tooltip.oritech.machine.addon_fortune": "Yield addon count. 3 is the effective maximum",
+  "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many layers of machine\naddons can be added to this block.\n\nUse better cores to increase this\n\nCurrent quality progress: %.2f",
+
+  "title.oritech.machine_speed": "⌛ %.0f%%",
+  "tooltip.oritech.machine_speed": "Processing Speed",
+  "title.oritech.machine_efficiency": "⚡ %.0f%%",
+  "tooltip.oritech.machine_efficiency": "Energy Efficiency",
+  "title.oritech.machine_energy_production": "↗ %d RF/t",
+
+  "tooltip.oritech.steam_energy_production": "Total production (includes chained generators)",
+  "title.oritech.steam_production": "\uD83D\uDEDE %.0f su/t",
+  "tooltip.oritech.steam_production": "Amount of steam droplets produced per tick. Any excess will be lost when the storage is full.",
+  "title.oritech.steam_consumption": "\uD83D\uDEDE %.0f su/t",
+  "tooltip.oritech.steam_consumption": "Total steam consumption in storage units (droplets) per tick (includes chained generators)",
+  "tooltip.oritech.energy_usage": "%s / %s RF\n%.1f%% Charged\n\nMaximum Usage: %.1f RF/t",
+  "title.oritech.machine.no_addons": "No addons connected",
+  "button.oritech.machine.addons": "Addons",
+
+  "title.oritech.machine.capacitor_added_capacity": [
+    { "text": "\uD83D\uDD0B %d RF ", "color": "gold" },
+    { "text": "Added Capacity", "color": "dark_gray" }
+  ],
+  "title.oritech.machine.capacitor_added_throughput": [
+    { "text": "\uD83D\uDD0B %d RF/t", "color": "gold" },
+    { "text": "Added Throughput", "color": "dark_gray" }
+  ],
+
+  "title.oritech.machine_option_enabled": "\uD83D\uDD28 Enabled",
+  "tooltip.oritech.pulverizer_dust_combine": "Auto-combines small dusts to ingots",
+
+  "tooltip.oritech.fluid_content": [
+    { "text": "%f mB %s", "color": "dark_aqua" }
+  ],
+
+  "tooltip.oritech.progress_indicator": "%d / %d ticks\n(base %d ticks)",
 
   "rei.process.oritech:pulverizer": "Pulverizing",
   "rei.process.oritech:grinder": "Fragmenting",
@@ -161,6 +234,7 @@
   "rei.process.oritech:steam_engine": "Steam Usage",
   "rei.process.oritech:bio_generator": "Biomass Churning",
   "rei.process.oritech:fuel_generator": "Fuel Burning",
+  "rei.title.oritech.cookingtime": "%ds (%d ticks)",
 
   "emi.category.oritech.pulverizer": "Pulverizing",
   "emi.category.oritech.grinder": "Fragmenting",
@@ -173,6 +247,7 @@
   "emi.category.oritech.steam_engine": "Steam Usage",
   "emi.category.oritech.bio_generator": "Biomass Churning",
   "emi.category.oritech.fuel_generator": "Fuel Burning",
+  "emi.title.oritech.cookingtime": "%ds (%d ticks)",
 
   "itemgroup.oritech.machines": "Oritech Machines",
   "itemgroup.oritech.components": "Oritech Components",
@@ -364,6 +439,35 @@
   ],
   "item.oritech.promethium_pickaxe": [
     { "text": "Prometheum Pickaxe", "color": "#ffd505" }
+  ],
+
+  "message.oritech.deep_drill.ore_placement": "Machine must be placed on ore nodes",
+  "message.oritech.generator.production_rate": "Production rate: %d with core multiplier: %d",
+  "message.oritech.machine.missing_core": "Machine is not assembled. Please add missing core blocks",
+  "message.oritech.machine_frame.missing_frame": "Missing frame. Add an empty rectangular frame behind the machine using machine frame blocks",
+
+  "message.oritech.pump.starting": "Starting",
+  "message.oritech.pump.extending": "Trunk is extending...",
+  "message.oritech.pump.initializing": "Pump is initializing... (This might take a moment for large bodies of liquid)",
+  "message.oritech.pump.no_fluids": "No liquids available",
+  "message.oritech.pump.busy": "Pump is working...",
+  "message.oritech.pump.low_energy": "Not enough energy!",
+  "message.oritech.pump.pump_finished": "All liquids have been pumped",
+  "message.oritech.pump.full": "Tank is full",
+
+  "message.oritech.target_designator.position_invalid": "Invalid position for drone port, target port must be at least 50 blocks away",
+  "message.oritech.target_designator.position_saved": "Position saved to machine",
+  "message.oritech.target_designator.position_stored": "Position stored",
+  "tooltip.oritech.target_designator.set_to": "Set to: [%s]",
+  "tooltip.oritech.target_designator.no_target": "No target set",
+
+  "message.oritech.tool_mode.area_effect": "Area Effect",
+  "message.oritech.tool_mode.silk_touch": "Silk Touch",
+  "tooltip.oritech.tool_mode.area_range.area": [
+    { "text": "Mode: Area", "color": "gold" }
+  ],
+  "tooltip.oritech.tool_mode.area_range.single": [
+    { "text": "Mode: Single", "color": "gold" }
   ],
 
   "text.config.oritech-config.title": "Oritech Settings",
