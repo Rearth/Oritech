@@ -340,10 +340,10 @@ public class RecipeGenerator extends FabricRecipeProvider {
     private void addOreChains(RecipeExporter exporter) {
         
         // basic smelting for nickel + platinum
-        offerSmelting(exporter, List.of(ItemContent.RAW_NICKEL), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 0.5f, 300, "nickelsmelting");
-        offerSmelting(exporter, List.of(ItemContent.RAW_PLATINUM), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 0.5f, 300, "platinumsmelting");
-        offerBlasting(exporter, List.of(ItemContent.RAW_NICKEL), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 0.5f, 150, "nickelblasting");
-        offerBlasting(exporter, List.of(ItemContent.RAW_PLATINUM), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 0.5f, 150, "platinumblasting");
+        offerSmelting(exporter, List.of(ItemContent.RAW_NICKEL), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 1f, 200, "nickelsmelting");
+        offerSmelting(exporter, List.of(ItemContent.RAW_PLATINUM), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 1f, 200, "platinumsmelting");
+        offerBlasting(exporter, List.of(ItemContent.RAW_NICKEL), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 1f, 100, "nickelblasting");
+        offerBlasting(exporter, List.of(ItemContent.RAW_PLATINUM), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 1f, 100, "platinumblasting");
         
         // iron chain
         addMetalProcessingChain(exporter,
@@ -513,8 +513,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addPulverizerRecipe(exporter, ingot, dust, suffix);
         addGrinderRecipe(exporter, ingot, dust, suffix);
         if (ingotSmelted != null) {
-            RecipeProvider.offerSmelting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 0.5f, 300, Oritech.MOD_ID);
-            RecipeProvider.offerBlasting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 0.5f, 150, Oritech.MOD_ID);
+            RecipeProvider.offerSmelting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 200, Oritech.MOD_ID);
+            RecipeProvider.offerBlasting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 100, Oritech.MOD_ID);
         }
     }
     
@@ -649,10 +649,10 @@ public class RecipeGenerator extends FabricRecipeProvider {
         var foundryGem = new OritechRecipe(800, List.of(Ingredient.ofItems(gem), Ingredient.ofItems(gem)), List.of(new ItemStack(ingot, 4)), RecipeContent.FOUNDRY, null, null);
         
         // smelting/compacting
-        RecipeProvider.offerSmelting(exporter, List.of(dust), RecipeCategory.MISC, ingot, 0.5f, 300, Oritech.MOD_ID);
-        RecipeProvider.offerSmelting(exporter, List.of(smallDust), RecipeCategory.MISC, nugget, 0.5f, 300, Oritech.MOD_ID);
-        RecipeProvider.offerBlasting(exporter, List.of(dust), RecipeCategory.MISC, ingot, 0.5f, 150, Oritech.MOD_ID);
-        RecipeProvider.offerBlasting(exporter, List.of(smallDust), RecipeCategory.MISC, nugget, 0.5f, 150, Oritech.MOD_ID);
+        RecipeProvider.offerSmelting(exporter, List.of(dust), RecipeCategory.MISC, ingot, 1f, 200, Oritech.MOD_ID);
+        RecipeProvider.offerSmelting(exporter, List.of(smallDust), RecipeCategory.MISC, nugget, 0.5f, 50, Oritech.MOD_ID);
+        RecipeProvider.offerBlasting(exporter, List.of(dust), RecipeCategory.MISC, ingot, 1, 100, Oritech.MOD_ID);
+        RecipeProvider.offerBlasting(exporter, List.of(smallDust), RecipeCategory.MISC, nugget, 0.5f, 50, Oritech.MOD_ID);
         RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, clump, smallClump);
         RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, dust, smallDust);
         RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, ingot, nugget);
