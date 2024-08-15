@@ -5,9 +5,16 @@
   "category": "oritech:processing",
   "associated_items": [
     "oritech:machine_extender",
+    "oritech:power_bank_addon",
     "oritech:machine_speed_addon",
     "oritech:machine_efficiency_addon",
-    "oritech:machine_capacitor_addon"
+    "oritech:machine_capacitor_addon",
+    "oritech:machine_fluid_addon",
+    "oritech:machine_yield_addon",
+    "oritech:crop_filter_addon",
+    "oritech:quarry_addon",
+    "oritech:machine_acceptor_addon",
+    "oritech:machine_inventory_proxy_addon"
   ]
 }
 ```
