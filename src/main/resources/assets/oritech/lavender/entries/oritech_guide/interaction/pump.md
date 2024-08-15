@@ -12,7 +12,7 @@
 <block;oritech:pump_block>
 
 The pump is used to pump liquids from below. When placed, it will extend a trunk down until a liquid or obstruction is found. Once a liquid has been found, it will
-scan the liquid body and stores which positions to
+scan the liquid body and store all positions to
 
 ;;;;;
 
