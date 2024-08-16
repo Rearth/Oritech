@@ -167,7 +167,6 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
-        Inventories.writeNbt(nbt, cardInventory.heldStacks, false, registryLookup);
         addMultiblockToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
         
@@ -191,7 +190,6 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
-        Inventories.readNbt(nbt, cardInventory.heldStacks, registryLookup);
         loadMultiblockNbtData(nbt);
         
         energyStorage.amount = nbt.getLong("energy_stored");
