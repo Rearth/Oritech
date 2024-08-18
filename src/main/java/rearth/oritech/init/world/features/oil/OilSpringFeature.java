@@ -5,6 +5,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.noise.PerlinNoiseSampler;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.util.FeatureContext;
 import rearth.oritech.Oritech;
@@ -52,6 +53,8 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
         
         var bottomEnd = surfacePos.down(depth);
         var center = bottomEnd.add(random.nextBetween(-2, 2), random.nextBetween(-3, 3), random.nextBetween(0, height / 2));
+
+        var perlinSampler = new PerlinNoiseSampler(random);
         
         // iterate through a cube, calculate distance from center to get a good circle
         for (int x = 0; x < depth + 2; x++) {
@@ -59,12 +62,12 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
                 for (int z = 0; z < depth + 2; z++) {
                     var point = new BlockPos(x - height, y - height, z - height).add(bottomEnd);
                     var distance = Math.sqrt(point.getSquaredDistance(center));
-                    if (distance > height - 2) {
-                        if (distance > height) continue;
+                    var noiseOffset = perlinSampler.sample(x, y, z);
+                    if (distance <= height + noiseOffset - 2) {
+                        world.setBlockState(point, state, 0x10);
+                    } else if (distance <= height + noiseOffset) {
                         world.setBlockState(point, Blocks.STONE.getDefaultState(), 0x10);
-                        continue;
                     }
-                    world.setBlockState(point, state, 0x10);
                 }
             }
         }
