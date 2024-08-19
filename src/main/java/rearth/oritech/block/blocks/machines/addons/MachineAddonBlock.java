@@ -17,6 +17,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
@@ -26,6 +29,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.TooltipHelper;
 
@@ -35,6 +39,8 @@ import java.util.Objects;
 
 public class MachineAddonBlock extends WallMountedBlock implements BlockEntityProvider {
     
+    public static final Boolean USE_ACCURATE_OUTLINES = Oritech.CONFIG.tightMachineAddonHitboxes();
+
     public static final BooleanProperty ADDON_USED = BooleanProperty.of("addon_used");
     
     private final boolean extender;
@@ -111,6 +117,55 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
     @Override
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
+    }
+
+    @Override
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        if (!USE_ACCURATE_OUTLINES)
+            return super.getOutlineShape(state, world, pos, context);
+        
+        var block = state.getBlock();
+        if (block == BlockContent.QUARRY_ADDON) {
+            return VoxelShapes.union(
+                // base
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), state.get(FACING), state.get(FACE)),
+                // status bar
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.375, 0.25, 0.875), state.get(FACING), state.get(FACE)),
+                // pickaxe handle
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.625, 0.125, 0.3125, 0.6875, 0.1875, 0.8125), state.get(FACING), state.get(FACE)),
+                // pickaxe head
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.25, 0.875, 0.1875, 0.4375), state.get(FACING), state.get(FACE))
+            );
+        }
+        else if (block == BlockContent.MACHINE_EFFICIENCY_ADDON) {
+            return VoxelShapes.union(
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.25, 0.125, 0.1875, 0.75, 0.4375, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.75, 0.125, 0.125, 0.875, 0.5, 0.875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.25, 0.5, 0.875), state.get(FACING), state.get(FACE))
+            );
+        }
+        else if (block == BlockContent.MACHINE_SPEED_ADDON) {
+            return VoxelShapes.union(
+                // base
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.6875, 0.125, 0.3125, 0.8125, 0.25, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.1875, 0.125, 0.1875, 0.8125, 0.25, 0.3125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.3125, 0.125, 0.125, 0.4375, 0.25, 0.1875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5625, 0.125, 0.125, 0.6875, 0.25, 0.1875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.8125, 0.125, 0.5625, 0.875, 0.25, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.8125, 0.125, 0.3125, 0.875, 0.25, 0.4375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.25, 0.125, 0.3125, 0.6875, 0.1875, 0.75), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0.1875, 0.4375, 0.5625, 0.625, 0.625), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.3125, 0.1875, 0.5, 0.625, 0.5625, 0.5625), state.get(FACING), state.get(FACE))
+            );
+        }
+        return VoxelShapes.fullCube();
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return getOutlineShape(state, world, pos, context);
     }
     
     public boolean isExtender() {

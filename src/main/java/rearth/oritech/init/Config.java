@@ -47,7 +47,10 @@ public class Config {
     @SectionHeader("clientSettings")
     @Sync(Option.SyncMode.NONE)
     @RestartRequired
-    public boolean tightMachineFrameHitboxes = false;
+    public boolean tightMachineAddonHitboxes = true;
+    @Sync(Option.SyncMode.NONE)
+    @RestartRequired
+    public boolean tightMachineFrameHitboxes = true;
     @Sync(Option.SyncMode.NONE)
     @RestartRequired
     public boolean tightCableHitboxes = true;
