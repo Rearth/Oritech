@@ -11,6 +11,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ToolsContent;
 
 import java.util.HashSet;
@@ -131,8 +132,7 @@ public class ModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(ToolsContent.CHAINSAW, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.HAND_DRILL, Models.GENERATED);
         
-        itemModelGenerator.register(ToolsContent.ORITECH_GUIDE, Models.GENERATED);
-        // itemModelGenerator.registerArmor((ArmorItem) ToolsContent.EXO_HELMET);   // this seems to generate it compatible with armor trims
+        itemModelGenerator.register(ItemContent.ORITECH_GUIDE, Models.GENERATED);
         
         for (var item : autoRegisteredModels) {
             itemModelGenerator.register(item, Models.GENERATED);

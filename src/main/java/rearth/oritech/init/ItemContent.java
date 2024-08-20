@@ -1,10 +1,13 @@
 package rearth.oritech.init;
 
+import io.wispforest.lavender.book.LavenderBookItem;
+import io.wispforest.owo.registration.annotations.IterationIgnored;
 import io.wispforest.owo.registration.reflect.ItemRegistryContainer;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import rearth.oritech.Oritech;
 import rearth.oritech.init.datagen.ModelGenerator;
 import rearth.oritech.item.other.CustomTooltipItem;
 import rearth.oritech.item.other.MobCaptureItem;
@@ -24,6 +27,8 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item BANANA = new Item(new Item.Settings());
     @ItemGroupTarget(Groups.equipment)
     public static final Item TARGET_DESIGNATOR = new LaserTargetDesignator(new Item.Settings().maxCount(1));
+    @IterationIgnored
+    public static final Item ORITECH_GUIDE = LavenderBookItem.registerForBook(Oritech.id("oritech_guide"), new Item.Settings().maxCount(1));
     @ItemGroupTarget(Groups.equipment)
     public static final Item WEED_KILLER = new WeedKiller(new Item.Settings().maxCount(1));
     public static final Item OIL_BUCKET = new BucketItem(FluidContent.STILL_OIL, new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1));
