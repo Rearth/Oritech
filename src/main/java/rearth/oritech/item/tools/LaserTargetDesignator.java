@@ -24,7 +24,7 @@ public class LaserTargetDesignator extends Item {
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         if (context.getWorld().isClient()) {
-            return super.useOnBlock(context);
+            return ActionResult.SUCCESS;
         }
         
         var targetPos = context.getBlockPos();
