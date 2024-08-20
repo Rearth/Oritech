@@ -8,14 +8,20 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.InsertionOnlyStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.impl.transfer.context.SingleSlotContainerItemContext;
+import net.fabricmc.fabric.mixin.transfer.BucketItemAccessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -41,23 +47,25 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventoryProvider;
+import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.util.SimpleSidedInventory;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<SmallFluidTankEntity> {
     
     private boolean netDirty = false;
     private int lastComparatorOutput = 0;
-    
-    public final SimpleInventory inventory = new SimpleInventory(2) {
+
+    public final SimpleSidedInventory inventory = new SimpleSidedInventory(2, new InventorySlotAssignment(0, 1, 1, 1)) {
         @Override
         public void markDirty() {
             SmallFluidTankEntity.this.markDirty();
         }
     };
     
-    private final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
         @Override
         protected FluidVariant getBlankVariant() {
@@ -112,10 +120,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         
         if (world.getTime() % 100 == 0) netDirty = true;    // to ensure this syncs when no charges are triggered, and inventory isn't opened
         
-        var inStack = inventory.getStack(0);
-        var outStack = inventory.getStack(1);
-        
-        processBuckets(inStack, outStack);
+        processBuckets();
         
         if ((world.getTime() + this.pos.getY()) % 20 == 0 && fluidStorage.amount > 0)
             outputToBelow();
@@ -154,44 +159,52 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         }
     }
     
-    private void processBuckets(ItemStack inStack, ItemStack outStack) {
-        if (inStack != ItemStack.EMPTY && inStack.getItem().equals(Items.BUCKET) && fluidStorage.amount >= FluidConstants.BUCKET && outStack == ItemStack.EMPTY) {
+    private void processBuckets() {
+        var inStack = inventory.getStack(0);
+
+        if (!inStack.isEmpty() && inStack.isOf(Items.BUCKET) && fluidStorage.amount >= FluidConstants.BUCKET) {
             // try fill bucket
-            var filledBucketType = fluidStorage.variant.getFluid().getBucketItem();
-            if (filledBucketType == null) return;
-            inStack.decrement(1);
-            inventory.heldStacks.set(1, new ItemStack(filledBucketType));
-            inventory.heldStacks.set(0, inStack);
-            fluidStorage.amount -= FluidConstants.BUCKET;
-            this.markDirty();
-        } else if (inStack != ItemStack.EMPTY && inStack.getItem() instanceof BucketItem && !inStack.getItem().equals(Items.BUCKET) && outputCanAcceptBucket(outStack)) {
-            // empty input bucket
-            
-            // weird voodoo because the transaction APIs are weird and I have NO idea what this all is
-            var context = ContainerItemContext.ofSingleSlot(inventoryStorage.getSlot(0)).find(FluidStorage.ITEM);
-            if (context == null) return;
-            var variant = context.iterator().next().getResource();  // non empty iterator doesnt seem to do what it implies, so whatever
-            if (variant == null) return;
-            
-            var bucketUsed = false;
-            if ((fluidStorage.variant.isOf(variant.getFluid()) && fluidStorage.amount + FluidConstants.BUCKET <= fluidStorage.getCapacity())) {
-                bucketUsed = true;
-                fluidStorage.amount += FluidConstants.BUCKET;
-            } else if (fluidStorage.amount == 0) {
-                fluidStorage.variant = variant;
-                fluidStorage.amount = FluidConstants.BUCKET;
-                bucketUsed = true;
-            }
-            
-            if (bucketUsed) {
-                inventory.setStack(0, ItemStack.EMPTY);
-                try (var tx = Transaction.openOuter()) {
-                    var slot = inventoryStorage.getSlot(1);
-                    slot.insert(ItemVariant.of(Items.BUCKET), 1, tx);
-                    tx.commit();
+            var filledBucket = ItemVariant.of(fluidStorage.variant.getFluid().getBucketItem(), inStack.getComponentChanges()).toStack();
+            if (!outputCanAcceptBucket(filledBucket)) return;
+            if (filledBucket == null) return;
+
+            try (var tx = Transaction.openOuter()) {
+                long extracted = fluidStorage.extract(fluidStorage.getResource(), FluidConstants.BUCKET, tx);
+                if (extracted != FluidConstants.BUCKET) return;
+
+                inStack.decrement(1);
+                // In theory, the slot should be empty at this point, but this should still work
+                // if some mod has done something weird like making lava buckets stackable.
+                if (inventory.getStack(1).isEmpty()) {
+                    inventory.heldStacks.set(1, filledBucket);
+                } else {
+                    inventory.getStack(1).increment(1);
                 }
+                inventory.heldStacks.set(0, inStack);
+                tx.commit();
+            }
+        } else if (inStack != ItemStack.EMPTY && inStack.getItem() instanceof BucketItem) {
+            // empty input bucket
+            var emptyBucket = ItemVariant.of(Items.BUCKET, inStack.getComponentChanges()).toStack();
+            if (!outputCanAcceptBucket(emptyBucket)) return;
+            Fluid bucketFluid = ((BucketItemAccessor) inStack.getItem()).fabric_getFluid();
+            if (bucketFluid == Fluids.EMPTY) return;
+
+            try (var tx = Transaction.openOuter()) {
+                long inserted = fluidStorage.insert(FluidVariant.of(bucketFluid), FluidConstants.BUCKET, tx);
+                if (inserted != FluidConstants.BUCKET) return;
+
+                inStack.decrement(1);
+                if (inventory.getStack(1).isEmpty()) {
+                    inventory.heldStacks.set(1, emptyBucket);
+                } else {
+                    inventory.getStack(1).increment(1);
+                }
+                inventory.heldStacks.set(0, inStack);
+                tx.commit();
             }
             
+            // shouldn't be necessary, since tx.commit should already be marking this dirty
             this.markDirty();
         }
     }
@@ -201,10 +214,9 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SingleVariantFluidSyncPacket(pos, Registries.FLUID.getId(fluidStorage.variant.getFluid()).toString(), fluidStorage.amount));
     }
     
-    private boolean outputCanAcceptBucket(ItemStack slot) {
-        if (slot == null) return true;
-        if (slot.isEmpty()) return true;
-        return slot.getItem().equals(Items.BUCKET) && slot.getCount() < slot.getMaxCount();
+    private boolean outputCanAcceptBucket(ItemStack bucket) {
+        var slot = inventory.getStack(1);
+        return (slot.isEmpty() || (slot.isStackable() && ItemStack.areItemsAndComponentsEqual(slot, bucket) && slot.getCount() < slot.getMaxCount()));
     }
     
     public int getComparatorOutput() {
@@ -237,7 +249,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     
     @Override
     public InventoryStorage getInventory(Direction direction) {
-        return inventoryStorage;
+        return InventoryStorage.of(inventory, direction);
     }
     
     @Override
