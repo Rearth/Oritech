@@ -11,6 +11,7 @@ import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
+import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
@@ -82,6 +83,8 @@ public class NetworkContent {
     
     public record SingleVariantFluidSyncPacket(BlockPos position, String fluidType, long amount) {
     }
+    
+    public record CatalystSyncPacket(BlockPos position, int storedSouls, int progress, boolean isHyperEnchanting, int maxSouls) {}
     
     public record GeneratorSteamSyncPacket(BlockPos position, long steamAmount, long waterAmount) {
     }
@@ -168,6 +171,16 @@ public class NetworkContent {
             
             if (entity instanceof DeepDrillEntity drillBlock) {
                 drillBlock.setLastWorkTime(message.lastWorkTime);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(CatalystSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof EnchantmentCatalystBlockEntity catalystBlock) {
+                catalystBlock.handleNetworkPacket(message);
             }
             
         }));

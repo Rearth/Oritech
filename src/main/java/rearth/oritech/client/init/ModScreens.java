@@ -31,6 +31,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
     public static final ExtendedScreenHandlerType<BasicMachineScreenHandler, BasicData> TANK_SCREEN = basicHandler();
     public static final ExtendedScreenHandlerType<BasicMachineScreenHandler, BasicData> TREEFELLER_SCREEN = basicHandler();
     
+    
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> PULVERIZER_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> GRINDER_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> ASSEMBLER_SCREEN = upgradeHandler();
@@ -46,6 +47,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> FERTILIZER_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> LASER_SCREEN = upgradeHandler();
     
+    public static final ExtendedScreenHandlerType<CatalystScreenHandler, BasicData> CATALYST_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(CatalystScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<DroneScreenHandler, BasicData> DRONE_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(DroneScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<RedstoneAddonScreenHandler, BasicData> REDSTONE_ADDON_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(RedstoneAddonScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<CentrifugeScreenHandler, UpgradableData> CENTRIFUGE_SCREEN = new ExtendedScreenHandlerType<>(new UpgradeFactory<>(CentrifugeScreenHandler.class), UpgradableData.PACKET_CODEC);
@@ -57,6 +59,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
         HandledScreens.register(TANK_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         HandledScreens.register(TREEFELLER_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         HandledScreens.register(ATOMIC_FORGE_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
+        HandledScreens.register(CATALYST_SCREEN, CatalystScreen::new);
         
         HandledScreens.register(PULVERIZER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(GRINDER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);

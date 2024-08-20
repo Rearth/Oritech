@@ -39,7 +39,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     public static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
     public FlowLayout root;
     private TextureComponent progress_indicator;
-    private TextureComponent energyIndicator;
+    protected TextureComponent energyIndicator;
     private ButtonComponent cycleInputButton;
     
     private final FluidDisplay genericDisplay;
@@ -72,7 +72,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         if (handler.fluidProvider != null) {
             var container = handler.fluidProvider.getForDirectFluidAccess();
             var config = handler.screenData.getFluidConfiguration();
-            genericDisplay = initDisplay(container, config);
+            genericDisplay = initFluidDisplay(container, config);
         } else {
             genericDisplay = null;
         }
@@ -80,13 +80,13 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         if (handler.steamStorage != null) {
             var config = handler.screenData.getEnergyConfiguration();
             var container = handler.waterStorage;
-            waterDisplay = initDisplay(container, config);
+            waterDisplay = initFluidDisplay(container, config);
             
             var offset = config.width() + 8;
             
             var configSteam = new ScreenProvider.BarConfiguration(config.x() + offset, config.y(), config.width(), config.height());
             var containerSteam = handler.steamStorage;
-            steamDisplay = initDisplay(containerSteam, configSteam);
+            steamDisplay = initFluidDisplay(containerSteam, configSteam);
             // the label is then actually added to the screen in the upgradable screen extension
             steamProductionLabel = Components.label(Text.literal("0 su/t"));
             steamProductionLabel.tooltip(Text.of("Amount of steam droplets produced per tick. Any excess will be lost when the storage is full."));
@@ -98,7 +98,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
     }
     
-    protected static FluidDisplay initDisplay(SingleVariantStorage<FluidVariant> container, ScreenProvider.BarConfiguration config) {
+    protected static FluidDisplay initFluidDisplay(SingleVariantStorage<FluidVariant> container, ScreenProvider.BarConfiguration config) {
         var lastFill = 1 - ((float) container.getAmount() / container.getCapacity());
         ColoredSpriteComponent background = null;
         
@@ -144,19 +144,27 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
           .horizontalAlignment(HorizontalAlignment.CENTER)
           .verticalAlignment(VerticalAlignment.CENTER);
         
+        if (showExtensionPanel()) {
+            rootComponent.child(
+              Containers.horizontalFlow(Sizing.fixed(176 + 250), Sizing.fixed(166 + 40))        // span entire inner area
+                .child(Containers.horizontalFlow(Sizing.content(), Sizing.content())
+                         .child(buildExtensionPanel())
+                         .surface(Surface.PANEL)
+                         .positioning(Positioning.absolute(176 + 117, 30)))
+                .positioning(Positioning.relative(50, 50))
+                .zIndex(-1)
+            );
+        }
+        
         rootComponent.child(
-          Containers.horizontalFlow(Sizing.fixed(176 + 250), Sizing.fixed(166 + 40))        // span entire inner area
-            .child(Containers.horizontalFlow(Sizing.content(), Sizing.content())
-                     .child(buildExtensionPanel())
-                     .surface(Surface.PANEL)
-                     .positioning(Positioning.absolute(176 + 117, 30)))
-            .positioning(Positioning.relative(50, 50))
-            .zIndex(-1)
-        ).child(
           Components.texture(BACKGROUND, 0, 0, 176, 166, 176, 166)
         ).child(
           buildOverlay().positioning(Positioning.relative(50, 50))
         );
+    }
+    
+    public boolean showExtensionPanel() {
+        return true;
     }
     
     @Override
@@ -175,7 +183,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         if (handler.screenData.showProgress())
             updateProgressBar();
         
-        updateSettingsButtons();
+        if (showExtensionPanel())
+            updateSettingsButtons();
         
         if (handler.fluidProvider != null)
             updateFluidDisplay(genericDisplay);
@@ -219,7 +228,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         }
     }
     
-    private void updateEnergyBar() {
+    protected void updateEnergyBar() {
         
         var capacity = handler.energyStorage.getCapacity();
         var amount = handler.energyStorage.getAmount();

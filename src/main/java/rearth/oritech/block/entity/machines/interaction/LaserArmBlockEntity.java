@@ -36,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.MachineCoreBlock;
+import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.processing.AtomicForgeBlockEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -131,6 +132,8 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             storageCandidate = atomicForgeEntity.getEnergyStorage();
         } else if (targetBlockEntity instanceof DeepDrillEntity deepDrillEntity) {
             storageCandidate = deepDrillEntity.getStorage(null);
+        } else if (targetBlockEntity instanceof EnchantmentCatalystBlockEntity catalyst) {
+            storageCandidate = catalyst.energyStorage;
         }
         
         var fired = false;
@@ -138,16 +141,16 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         if (storageCandidate != null) {
             var insertAmount = storageCandidate.getCapacity() - storageCandidate.getAmount();
             if (insertAmount < 10) return;
+            var transferCapacity = Math.min(insertAmount, energyRequiredToFire());
             fired = true;
             
             if (storageCandidate instanceof DynamicEnergyStorage dynamicStorage) {
-                var transferCapacity = Math.min(insertAmount, energyRequiredToFire());
                 dynamicStorage.amount += transferCapacity;  // direct transfer, allowing to insert into any container, even when inserting isnt allowed (e.g. atomic forge)
                 dynamicStorage.onFinalCommit(); // gross abuse of transaction system to force it to sync
             } else {
                 // probably not how this should be used, but whatever
                 try (var tx = Transaction.openOuter()) {
-                    storageCandidate.insert(insertAmount, tx);
+                    storageCandidate.insert(transferCapacity, tx);
                     tx.commit();
                 }
             }
@@ -643,9 +646,13 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         return world.getBlockState(currentTarget).getBlock().equals(BlockContent.DEEP_DRILL_BLOCK);
     }
     
+    public boolean isTargetingCatalyst() {
+        return world.getBlockState(currentTarget).getBlock().equals(BlockContent.ENCHANTMENT_CATALYST_BLOCK);
+    }
+    
     public boolean isTargetingEnergyContainer() {
         var storageCandidate = EnergyStorage.SIDED.find(world, currentTarget, null);
-        return storageCandidate != null || isTargetingAtomicForge() || isTargetingDeepdrill();
+        return storageCandidate != null || isTargetingAtomicForge() || isTargetingDeepdrill() || isTargetingCatalyst();
     }
     
     public boolean isTargetingBuddingAmethyst() {

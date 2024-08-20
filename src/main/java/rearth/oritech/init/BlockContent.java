@@ -11,6 +11,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.MachineCoreBlock;
+import rearth.oritech.block.blocks.arcane.EnchantmentCatalystBlock;
 import rearth.oritech.block.blocks.decorative.*;
 import rearth.oritech.block.blocks.machines.addons.*;
 import rearth.oritech.block.blocks.machines.generators.*;
@@ -114,6 +115,8 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block FERTILIZER_BLOCK = new FertilizerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block TREEFELLER_BLOCK = new TreefellerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    
+    public static final Block ENCHANTMENT_CATALYST_BLOCK = new EnchantmentCatalystBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block PUMP_BLOCK = new PumpBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
