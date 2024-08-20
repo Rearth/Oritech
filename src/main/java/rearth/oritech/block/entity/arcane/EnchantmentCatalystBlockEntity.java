@@ -81,7 +81,7 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
         
         if (world.isClient) return;
         
-        // check if powered
+        // check if powered, and adjust soul capacity
         if (energyStorage.amount > 0) {
             var gainedSoulCapacity = energyStorage.amount / 20;
             energyStorage.amount = 0;
@@ -89,6 +89,12 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
             adjustMaxSouls(newMax);
         } else if (maxSouls > baseSoulCapacity) {
             adjustMaxSouls(baseSoulCapacity);
+        }
+        
+        // explode if unstable
+        if (collectedSouls > maxSouls) {
+            doExplosion();
+            return;
         }
         
         // check if output is empty
@@ -114,6 +120,15 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
             DeathListener.resetEvents();
         }
         
+    }
+    
+    private void doExplosion() {
+        
+        var center = pos.toCenterPos();
+        var strength = Math.sqrt(collectedSouls - baseSoulCapacity);
+        
+        world.createExplosion(null, center.x, center.y, center.z, (int) strength, true, World.ExplosionSourceType.BLOCK);
+        world.removeBlock(pos, false);
     }
     
     private void adjustMaxSouls(long target) {

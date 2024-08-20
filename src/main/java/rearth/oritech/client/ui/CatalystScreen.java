@@ -64,7 +64,7 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
         
         var result = "Stable";
         
-        if (soulBonus > 0) {
+        if (soulBonus > 0 && currentSouls >= baseSouls) {
             if (free > 5) {
                 result = "Stabilized";
             } else if (free > 0) {
