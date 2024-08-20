@@ -186,9 +186,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         if (!blockState.isOf(Blocks.BUDDING_AMETHYST))
             return false;
 
-        for (Direction direction : Direction.values()) {
-            BlockPos growingPos = pos.offset(direction);
-            BlockState growingState = world.getBlockState(growingPos);
+        for (var direction : Direction.values()) {
+            var growingPos = pos.offset(direction);
+            var growingState = world.getBlockState(growingPos);
             if (BuddingAmethystBlock.canGrowIn(growingState) || isUnfinishedAmethyst(growingState))
                 return true;
         }
