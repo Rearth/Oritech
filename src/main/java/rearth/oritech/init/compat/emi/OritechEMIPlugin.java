@@ -5,6 +5,8 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiStack;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.recipe.RecipeManager;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
@@ -48,9 +50,14 @@ public class OritechEMIPlugin implements EmiPlugin {
         registry.addCategory(category);
         registry.addWorkstation(category, icon);
         
+        var blockState = Blocks.STONE.getDefaultState();
+        if (machine instanceof Block blockItem)
+            blockState = blockItem.getDefaultState();
+        var finalBlockState = blockState;
+        
         manager.listAllOfType(recipeType)
           .stream()
-          .map(entry -> new OritechEMIRecipe(entry, category, screenProviderSource))
+          .map(entry -> new OritechEMIRecipe(entry, category, screenProviderSource, finalBlockState))
           .forEach(registry::addRecipe);
         
     }
