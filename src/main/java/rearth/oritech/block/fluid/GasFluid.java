@@ -17,7 +17,7 @@ import net.minecraft.world.WorldView;
 public abstract class GasFluid extends FlowableFluid {
     
     @Override
-    protected boolean isInfinite(World world) {
+    public boolean isInfinite(World world) {
         return false;
     }
     
