@@ -50,7 +50,7 @@ public class Config {
     public boolean tightMachineAddonHitboxes = true;
     @Sync(Option.SyncMode.NONE)
     @RestartRequired
-    public boolean tightMachineFrameHitboxes = true;
+    public boolean tightMachineFrameHitboxes = false;
     @Sync(Option.SyncMode.NONE)
     @RestartRequired
     public boolean tightCableHitboxes = true;
