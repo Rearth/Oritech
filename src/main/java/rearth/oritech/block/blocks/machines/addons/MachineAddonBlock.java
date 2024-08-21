@@ -125,39 +125,130 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
             return super.getOutlineShape(state, world, pos, context);
         
         var block = state.getBlock();
-        if (block == BlockContent.QUARRY_ADDON) {
+        if (block == BlockContent.MACHINE_ACCEPTOR_ADDON) {
             return VoxelShapes.union(
-                // base
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), state.get(FACING), state.get(FACE)),
-                // status bar
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.375, 0.25, 0.875), state.get(FACING), state.get(FACE)),
-                // pickaxe handle
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.625, 0.125, 0.3125, 0.6875, 0.1875, 0.8125), state.get(FACING), state.get(FACE)),
-                // pickaxe head
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.25, 0.875, 0.1875, 0.4375), state.get(FACING), state.get(FACE))
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.25, 0.625, 0.25, 0.75, 0.75, 0.75), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.25, 0.125, 0.875, 0.375, 0.875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.375, 0.125, 0.875, 0.5, 0.875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.5, 0.125, 0.875, 0.625, 0.875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0.75, 0, 1, 0.875, 1), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0, 0, 1, 0.125, 1), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.875, 0.125, 0.875, 1, 0.875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.1875, 0.625, 0.1875, 0.8125, 0.75, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.1875, 0.125, 0.1875, 0.8125, 0.25, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.3125, 0.0625, 0.0625, 0.6875, 0.8125, 0.1875), state.get(FACING), state.get(FACE))
             );
-        }
-        else if (block == BlockContent.MACHINE_EFFICIENCY_ADDON) {
+        } else if (block == BlockContent.MACHINE_CAPACITOR_ADDON) {
+            return VoxelShapes.union(
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.1875, 0.1875, 0.3125, 0.25, 0.375, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.25, 0.125, 0.25, 0.75, 0.4375, 0.75), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.75, 0.125, 0.1875, 0.8125, 0.5, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5625, 0.4375, 0.25, 0.625, 0.5, 0.75), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.6875, 0.4375, 0.25, 0.75, 0.5, 0.75), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.3125, 0.4375, 0.25, 0.375, 0.5, 0.75), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.4375, 0.25, 0.5, 0.5, 0.75), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5625, 0.125, 0.1875, 0.625, 0.5, 0.25), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.6875, 0.125, 0.1875, 0.75, 0.5, 0.25), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.3125, 0.125, 0.1875, 0.375, 0.5, 0.25), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.1875, 0.5, 0.5, 0.25), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.25, 0.125, 0.75, 0.75, 0.5, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.8125, 0.25, 0.5625, 0.875, 0.4375, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.8125, 0.25, 0.3125, 0.875, 0.4375, 0.4375), state.get(FACING), state.get(FACE))
+            );
+        } else if (block == BlockContent.CROP_FILTER_ADDON) {
+            return VoxelShapes.union(
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.1875, 0.875, 0.25, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.25, 0.1875, 0.875, 0.5625, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5625, 0.3125, 0.1875, 0.75, 0.4375, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5625, 0.125, 0.8125, 0.75, 0.4375, 0.9375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.375, 0.25, 0.875), state.get(FACING), state.get(FACE))
+            );
+        } else if (block == BlockContent.MACHINE_EFFICIENCY_ADDON) {
             return VoxelShapes.union(
                 Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), state.get(FACING), state.get(FACE)),
                 Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.25, 0.125, 0.1875, 0.75, 0.4375, 0.8125), state.get(FACING), state.get(FACE)),
                 Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.75, 0.125, 0.125, 0.875, 0.5, 0.875), state.get(FACING), state.get(FACE)),
                 Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.25, 0.5, 0.875), state.get(FACING), state.get(FACE))
             );
-        }
-        else if (block == BlockContent.MACHINE_SPEED_ADDON) {
+        } else if (block == BlockContent.MACHINE_FLUID_ADDON) {
             return VoxelShapes.union(
-                // base
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0, 0.125, 0.875, 0.125, 0.875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0.3125, 0.1875, 0.375, 0.625, 0.5625), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.625, 0.3125, 0.1875, 1, 0.625, 0.5625), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.5, 0.6875, 0.5625, 1, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.375, 0.6875, 0.875, 0.5, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.75, 0.375, 0.5625, 0.875, 0.5, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.46875, 0.125, 0.71875, 0.59375, 0.375, 0.78125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.734375, 0.125, 0.625, 0.859375, 0.375, 0.8125), state.get(FACING), state.get(FACE)), // angled post
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.25, 0.3125, 0.3125, 0.5), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0.375, 0.25, 0.625, 0.5625, 0.5), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.6875, 0.125, 0.25, 0.875, 0.3125, 0.5), state.get(FACING), state.get(FACE))
+            );
+        } else if (block == BlockContent.MACHINE_INVENTORY_PROXY_ADDON) {
+            return VoxelShapes.union(
                 Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), state.get(FACING), state.get(FACE)),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.6875, 0.125, 0.3125, 0.8125, 0.25, 0.8125), state.get(FACING), state.get(FACE)),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.1875, 0.125, 0.1875, 0.8125, 0.25, 0.3125), state.get(FACING), state.get(FACE)),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.3125, 0.125, 0.125, 0.4375, 0.25, 0.1875), state.get(FACING), state.get(FACE)),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5625, 0.125, 0.125, 0.6875, 0.25, 0.1875), state.get(FACING), state.get(FACE)),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.8125, 0.125, 0.5625, 0.875, 0.25, 0.6875), state.get(FACING), state.get(FACE)),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.8125, 0.125, 0.3125, 0.875, 0.25, 0.4375), state.get(FACING), state.get(FACE)),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.25, 0.125, 0.3125, 0.6875, 0.1875, 0.75), state.get(FACING), state.get(FACE)),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0.1875, 0.4375, 0.5625, 0.625, 0.625), state.get(FACING), state.get(FACE)),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.3125, 0.1875, 0.5, 0.625, 0.5625, 0.5625), state.get(FACING), state.get(FACE))
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.875, 0.875, 0.875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.875, 0.375, 0.375, 1, 0.625, 0.625), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0.375, 0.375, 0.125, 0.625, 0.625), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0.375, 0, 0.625, 0.625, 0.125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0.375, 0.875, 0.625, 0.625, 1), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0.8125, 0.375, 0.625, 1, 0.625), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0.00125, 0.3125, 1, 0.93875, 0.375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0.00125, 0.625, 1, 0.93875, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.3125, 0.000625, 0, 0.375, 0.938125, 1), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.625, 0.000625, 0, 0.6875, 0.938125, 1), state.get(FACING), state.get(FACE))
+            );
+        } else if (block == BlockContent.QUARRY_ADDON) {
+            return VoxelShapes.union(
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), state.get(FACING), state.get(FACE)), // base
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.375, 0.25, 0.875), state.get(FACING), state.get(FACE)), // status bar
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.625, 0.125, 0.3125, 0.6875, 0.1875, 0.8125), state.get(FACING), state.get(FACE)), // pickaxe handle
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.25, 0.875, 0.1875, 0.4375), state.get(FACING), state.get(FACE)) // pickaxe head
+            );
+        } else if (block == BlockContent.MACHINE_REDSTONE_ADDON) {
+            return VoxelShapes.union(
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.1875, 0.125, 0, 0.4375, 0.25, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.1875, 0, 0.0015625, 0.6875, 0.1875, 0.0640625), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.625, 0.125, 0.1875, 0.75, 0.25, 0.3125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.625, 0.125, 0.5, 0.75, 0.25, 0.625), state.get(FACING), state.get(FACE))
+            );
+        } else if (block == BlockContent.MACHINE_SPEED_ADDON) {
+            return VoxelShapes.union(
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.3125, 0.125, 0.6875, 0.8125, 0.25, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.1875, 0.125, 0.1875, 0.3125, 0.25, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.3125, 0.1875, 0.25, 0.4375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.5625, 0.1875, 0.25, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5625, 0.125, 0.8125, 0.6875, 0.25, 0.875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.3125, 0.125, 0.8125, 0.4375, 0.25, 0.875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.3125, 0.125, 0.25, 0.75, 0.1875, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.1875, 0.375, 0.625, 0.625, 0.5625), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0.1875, 0.4375, 0.6875, 0.5625, 0.5), state.get(FACING), state.get(FACE))
+            );
+        } else if (block == BlockContent.STEAM_BOILER_ADDON) {
+            return VoxelShapes.union(
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0, 0.125, 0.875, 0.125, 0.875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.3125, 0.25, 0.25, 0.4375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.75, 0.125, 0.3125, 0.875, 0.25, 0.4375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.5625, 0.5625, 0.25, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0000625, 0.25, 0.3125, 1.000125, 0.625, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0.1875, 0.375, 1, 0.6875, 0.625), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.000125, 0.3125, 0.25, 1.00025, 0.5625, 0.75), state.get(FACING), state.get(FACE))
+            );
+        } else if (block == BlockContent.MACHINE_YIELD_ADDON) {
+            return VoxelShapes.union(
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), state.get(FACING), state.get(FACE)), // base
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.25, 0.375, 0.875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.75, 0.125, 0.125, 0.875, 0.375, 0.875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.25, 0.125, 0.125, 0.75, 0.375, 0.25), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.3125, 0.125, 0.3125, 0.6875, 0.25, 0.8125), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0.125, 0.5625, 0.3125, 0.4375, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.6875, 0.125, 0.5625, 0.9375, 0.4375, 0.6875), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0.125, 0.3125, 0.3125, 0.4375, 0.4375), state.get(FACING), state.get(FACE)),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.6875, 0.125, 0.3125, 0.9375, 0.4375, 0.4375), state.get(FACING), state.get(FACE))
             );
         }
         return VoxelShapes.fullCube();
