@@ -5,10 +5,12 @@ import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -43,6 +45,7 @@ public class EnchanterBlockEntity extends BlockEntity
         }
     };
     protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
+    public RegistryEntry<Enchantment> selectedEnchantment;
     
     public EnchanterBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ENCHANTER_BLOCK_ENTITY, pos, state);
@@ -51,6 +54,11 @@ public class EnchanterBlockEntity extends BlockEntity
     @Override
     public void tick(World world, BlockPos pos, BlockState state, EnchanterBlockEntity blockEntity) {
     
+        if (world.isClient) return;
+        
+        var content = inventory.heldStacks.get(0);
+        if (content.isEmpty() || !content.getItem().isEnchantable(content)) return;
+        
     }
     
     @Override
@@ -77,7 +85,7 @@ public class EnchanterBlockEntity extends BlockEntity
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 56, 26));
+          new GuiSlot(0, 86, 56));
     }
     
     @Override

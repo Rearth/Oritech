@@ -203,6 +203,7 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
             var maxLevel = enchantment.value().getMaxLevel();
             var level = bookCandidate.get(DataComponentTypes.STORED_ENCHANTMENTS).getLevel(enchantment);
             
+            // yes this does not check if the item can be enchanted with this enchantment. This is intentional, allowing you to skip the normal limitations
             var inputStack = inventory.getStack(1);
             var toolLevel = inputStack.getEnchantments().getLevel(enchantment);
             this.isHyperEnchanting = toolLevel >= maxLevel;

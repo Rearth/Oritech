@@ -296,7 +296,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     private FlowLayout buildOverlay() {
         
-        var overlay = Containers.horizontalFlow(Sizing.fixed(176), Sizing.fixed(166));
+        var overlay = Containers.verticalFlow(Sizing.fixed(176), Sizing.fixed(166));
         fillOverlay(overlay);
         
         return overlay;
