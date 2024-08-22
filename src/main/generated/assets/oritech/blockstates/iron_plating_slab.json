@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "oritech:block/iron_plating_slab"
+    },
+    "type=double": {
+      "model": "oritech:block/iron_plating_block"
+    },
+    "type=top": {
+      "model": "oritech:block/iron_plating_slab_top"
+    }
+  }
+}

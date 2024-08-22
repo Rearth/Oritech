@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_bottom_left_open",
+  "textures": {
+    "bottom": "oritech:block/machine_plating_door_bottom",
+    "top": "oritech:block/machine_plating_door_top"
+  }
+}
