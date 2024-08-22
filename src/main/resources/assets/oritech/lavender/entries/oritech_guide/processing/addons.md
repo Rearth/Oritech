@@ -5,7 +5,7 @@
   "category": "oritech:processing",
   "associated_items": [
     "oritech:machine_extender",
-    "oritech:power_bank_addon",
+    "oritech:capacitor_addon_extender",
     "oritech:machine_speed_addon",
     "oritech:machine_efficiency_addon",
     "oritech:machine_capacitor_addon",
