@@ -5,7 +5,8 @@
   "category": "oritech:interaction",
   "associated_items": [
     "oritech:pump_block"
-  ]
+  ],
+  "ordinal": 4
 }
 ```
 

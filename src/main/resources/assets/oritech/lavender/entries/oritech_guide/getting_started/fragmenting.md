@@ -13,6 +13,6 @@ A [fragment forge](^oritech:processing/fragment_forge) can improve the yield of 
 
 ;;;;;
 
-You can put raw ores into a Fragment Forge, but for some ores you will get better results if you mine them with a silk touch pickaxe and put the ore blocks into the forge.
+You can put raw ores into a fragment forge, but for some ores you will get better results if you mine them with a silk touch pickaxe and put the ore blocks into the forge.
 
-Both the Fragment Forge and the Centrifuge can also produce secondary ores. For example, processing [nickel](^oritech:resources/nickel) will give you nickel and can also give you some [platinum](^oritech:resources/platinum).
+Both the fragment forge and the centrifuge can also produce secondary ores. For example, processing [nickel](^oritech:resources/nickel) will give you nickel and can also give you some [platinum](^oritech:resources/platinum).

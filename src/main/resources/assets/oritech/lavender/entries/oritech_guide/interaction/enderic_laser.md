@@ -8,14 +8,21 @@
     "oritech:fluxite",
     "minecraft:amethyst_cluster",
     "minecraft:amethyst_shard"
-  ]
+  ],
+  "ordinal": 6
 }
 ```
 
-<block;oritech:laser_arm_block[machine_assembled=true]>
+![enderic laser](oritech:textures/book/enderic_laser.png,fit)
 
-The enderic laser utilizes huge amounts of energy to fire a laser beam in a specific direction. In most cases, this results in the block being destroyed. 
-The dropped blocks are then placed in the inventory.
+The enderic laser utilizes
+
+;;;;;
+
+huge amounts of energy to fire a laser beam in a specific direction.
+
+ In most cases, this results in the block being destroyed. 
+The dropped blocks are then placed in the inventory. Any blocks that don't fit into the inventory will be lost, so you may want to use an [item pipe](^oritech:logistics/item_transport) to keep getting items.
 
 ;;;;;
 

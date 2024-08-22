@@ -15,7 +15,8 @@
     "oritech:quarry_addon",
     "oritech:machine_acceptor_addon",
     "oritech:machine_inventory_proxy_addon"
-  ]
+  ],
+  "ordinal": 2
 }
 ```
 

@@ -9,7 +9,8 @@
     "oritech:lava_generator_block",
     "oritech:fuel_generator_block",
     "oritech:big_solar_panel_block"
-  ]
+  ],
+  "ordinal": 3
 }
 ```
 

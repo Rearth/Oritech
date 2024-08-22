@@ -47,4 +47,4 @@ It only accepts items which match the filter set via the UI, and automatically o
 
 ;;;;;
 
-However, it'll not automatically extract items from neighboring inventories.
+However, it will not automatically extract items from neighboring inventories.

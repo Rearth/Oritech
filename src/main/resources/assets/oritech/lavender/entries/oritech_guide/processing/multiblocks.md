@@ -11,7 +11,8 @@
     "oritech:machine_core_5",
     "oritech:machine_core_6",
     "oritech:machine_core_7"
-  ]
+  ],
+  "ordinal": 1
 }
 ```
 

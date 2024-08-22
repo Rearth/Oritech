@@ -2,7 +2,8 @@
 {
   "title": "Machine Basics",
   "icon": "oritech:assembler_block",
-  "category": "oritech:processing"
+  "category": "oritech:processing",
+  "ordinal": 0
 }
 ```
 

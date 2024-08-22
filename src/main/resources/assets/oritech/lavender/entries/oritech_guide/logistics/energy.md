@@ -30,6 +30,6 @@ Energy storage blocks accept energy from all sides with a {green}green port{}, a
 
 ;;;;;
 
-Energy can also be transferred wirelessly using an enderic laser. For more information, see page [enderic laser](^oritech:interaction/enderic_laser)
+Energy can also be transferred wirelessly using an enderic laser. See [enderic laser](^oritech:interaction/enderic_laser)
 
-<block;oritech:laser_arm_block>
+![enderic laser](oritech:textures/book/enderic_laser.png,fit)

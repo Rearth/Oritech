@@ -5,7 +5,8 @@
   "category": "oritech:interaction",
   "associated_items": [
     "oritech:deep_drill_block"
-  ]
+  ],
+  "ordinal": 7
 }
 ```
 
