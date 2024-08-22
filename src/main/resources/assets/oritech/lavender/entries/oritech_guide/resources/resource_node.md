@@ -18,13 +18,14 @@
 }
 ```
 
-![resource_node](oritech:textures/book/resource_node.png,fit)
+Resource nodes are found throughout the world, appearing in clusters just on top of the bedrock layer. There are resource nodes for all overworld ore types. They are usually covered by a small pocket of [crude oil](^oritech:resources/crude_oil).
+
+Resource nodes can only be mined with a [bedrock extractor](^oritech:interaction/deepdrill).
+
+On the surface, the location of a resource node cluster can be identified by the
 
 ;;;;;
 
-Resource nodes are spawned naturally throughout the world. They appear in clusters just on top of the bedrock layer. There are resource nodes for all ore types 
-in the overworld. They are usually covered by a small pocket of water or [crude oil](^oritech:resources/crude_oil) on top.
+![resource_node](oritech:textures/book/resource_node.png,fit)
 
-Resource nodes can only be mined with a [Bedrock Extractor](^oritech:interaction/deepdrill).
-
-On the surface, the location of a resource node cluster can be identified by the occurrence of an [ore boulder](^oritech:resources/ore_boulder). The ore boulder also identifies the type of ores found in the cluster.
+occurrence of an [ore boulder](^oritech:resources/ore_boulder). The ore boulder also identifies the type of ores found in the cluster.

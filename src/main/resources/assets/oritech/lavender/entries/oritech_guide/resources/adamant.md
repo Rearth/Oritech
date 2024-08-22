@@ -11,7 +11,7 @@
 }
 ```
 
-Adamant is a basic alloy that is used to create the [Assembler](^oritech:processing/assembler), [Steam Boiler Addon](^oritech:logistics/steam), machines, and other components and tools.
+Adamant is a basic alloy that is used to create the [assembler](^oritech:processing/assembler), [steam boiler addon](^oritech:logistics/steam), machine cores, and other components and tools.
 
 Adamant can be created in a crafting grid:
 
@@ -19,4 +19,4 @@ Adamant can be created in a crafting grid:
 
 ;;;;;
 
-The [Foundry](^oritech:processing/foundry) can produce more adamant with less diamond and nickel.
+The [foundry](^oritech:processing/foundry) can produce more adamant with less diamond and nickel.

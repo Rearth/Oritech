@@ -11,6 +11,6 @@
 }
 ```
 
-Biosteel is an alloy of [steel](^oritech:resources/steel) and raw biopolymer that can only be made in a [Foundry](^oritech:processing/foundry).
+Biosteel is an alloy of [steel](^oritech:resources/steel) and raw biopolymer that can only be made in a [foundry](^oritech:processing/foundry).
 
-It can be used in many places that steel is accepted, and is also needed to make [Bio Generators](^oritech:logistics/generators) and [Machine Speed Addons](^oritech:processing/speed_addon).
+It can be used in many places that steel is accepted, and is also needed to make [bio generators](^oritech:logistics/generators) and [machine speed addons](^oritech:processing/speed_addon).

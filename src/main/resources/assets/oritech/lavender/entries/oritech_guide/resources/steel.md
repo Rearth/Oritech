@@ -19,4 +19,4 @@ Steel can be created in a crafting grid:
 
 ;;;;;
 
-The [Foundry](^oritech:processing/foundry) can produce more steel with less iron and coal.
+The [foundry](^oritech:processing/foundry) can produce more steel with less iron and coal.

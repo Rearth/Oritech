@@ -19,4 +19,4 @@ Electrum can be created in a crafting grid:
 
 ;;;;;
 
-The [Foundry](^oritech:processing/foundry) can produce more electrum with less gold and redstone.
+The [foundry](^oritech:processing/foundry) can produce more electrum with less gold and redstone.

@@ -18,6 +18,6 @@
 }
 ```
 
-Platinum is an important resource, and like diamond can be difficult to find. Platinum ores can be found most easily while mining near bedrock, or in the End.
+Platinum is an important resource. Like diamond, it can be difficult to find. Platinum ores can be found most frequently while mining near bedrock. It can also be found easily in the End.
 
-Platinum can also be found while processing [nickel](^oritech:resources/nickel) in a [Fragment Forge](^oritech:processing/fragment_forge).
+Platinum can also be found while processing [nickel](^oritech:resources/nickel) in a [fragment forge](^oritech:processing/fragment_forge).

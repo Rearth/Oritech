@@ -11,7 +11,7 @@
 }
 ```
 
-Raw silicon can be created by grinding nether quartz in a [Pulverizer](^oritech:processing/pulverizer) or a [Fragment Forge](^oritech:processing/fragment_forge) and mixing the quartz dust with sand.
+Raw silicon can be created by grinding nether quartz in a [pulverizer](^oritech:processing/pulverizer) or a [fragment forge](^oritech:processing/fragment_forge) and mixing the quartz dust with sand.
 
 <recipe;oritech:raw_siliconmanualrawsilicon>
 
