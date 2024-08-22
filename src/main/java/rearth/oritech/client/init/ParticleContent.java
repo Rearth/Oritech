@@ -33,6 +33,10 @@ public class ParticleContent {
         ClientParticles.spawnWithMaxAge(ParticleTypes.SCULK_SOUL, pos, data.duration);
     });
     
+    public static final ParticleSystem<LineData> CATALYST_CONNECTION = PARTICLE_CONTROLLER.register(LineData.class, (world, pos, data) -> {
+        ClientParticles.spawnEnchantParticles(world, data.start, data.end, 0.7f);
+    });
+    
     public static final ParticleSystem<Integer> FERTILIZER_EFFECT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(data);
         ClientParticles.spawnWithinBlock(ParticleTypes.HAPPY_VILLAGER, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z));

@@ -9,10 +9,13 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -51,6 +54,7 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
     // working data
     public int collectedSouls;
     public int maxSouls = 50;
+    private int unstableTicks;
     private int progress;
     private boolean isHyperEnchanting;
     private boolean dirty;
@@ -93,9 +97,14 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
         
         // explode if unstable
         if (collectedSouls > maxSouls) {
-            doExplosion();
+            unstableTicks++;
+            
+            if (unstableTicks > 20)
+                doExplosion();
             return;
         }
+        
+        unstableTicks = 0;
         
         // check if output is empty
         // check if a book is in slot 0
@@ -120,6 +129,22 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
             DeathListener.resetEvents();
         }
         
+    }
+    
+    @Override
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
+        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+        nbt.putInt("souls", collectedSouls);
+        nbt.putInt("maxSouls", maxSouls);
+    }
+    
+    @Override
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+        collectedSouls = nbt.getInt("souls");
+        maxSouls = nbt.getInt("maxSouls");
     }
     
     private void doExplosion() {
@@ -167,7 +192,7 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
     
     private int getEnchantmentCost(Enchantment enchantment, int targetLevel, boolean hyper) {
         var baseCost = enchantment.getAnvilCost();
-        var resultingCost = baseCost * targetLevel;
+        var resultingCost = baseCost * targetLevel;    // todo config parameter multiplicator
         if (hyper) resultingCost = resultingCost * 2 + 50;
         return resultingCost;
     }
