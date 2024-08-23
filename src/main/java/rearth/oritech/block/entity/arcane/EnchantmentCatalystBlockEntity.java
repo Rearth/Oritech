@@ -99,7 +99,9 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
         if (collectedSouls > maxSouls) {
             unstableTicks++;
             
-            if (unstableTicks > 20)
+            ParticleContent.MELTDOWN_IMMINENT.spawn(world, pos.toCenterPos(), unstableTicks / 4);
+            
+            if (unstableTicks > 60)
                 doExplosion();
             return;
         }
@@ -112,6 +114,8 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
         if (canProceed()) {
             dirty = true;
             progress++;
+            
+            ParticleContent.SOUL_USED.spawn(world, pos.toCenterPos().add(0, 0.3, 0), isHyperEnchanting ? 15 : 3);
             
             if (progress >= maxProgress) {
                 enchantInput();

@@ -38,7 +38,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     public static final Identifier ITEM_SLOT = Oritech.id("textures/gui/modular/itemslot.png");
     public static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
     public FlowLayout root;
-    private TextureComponent progress_indicator;
+    protected TextureComponent progress_indicator;
     protected TextureComponent energyIndicator;
     private ButtonComponent cycleInputButton;
     

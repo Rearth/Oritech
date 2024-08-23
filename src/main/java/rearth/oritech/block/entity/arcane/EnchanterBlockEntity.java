@@ -63,11 +63,12 @@ public class EnchanterBlockEntity extends BlockEntity
     
     protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     public RegistryEntry<Enchantment> selectedEnchantment;
-    private int progress;
-    private int maxProgress = 10;
+    public int progress;
+    public int maxProgress = 10;
     private final List<EnchantmentCatalystBlockEntity> cachedCatalysts = new ArrayList<>();
     public EnchanterStatistics statistics = EnchanterStatistics.EMPTY; // used for client display
     private boolean networkDirty = false;
+    private Identifier nbtLoadedSelection;
     
     public EnchanterBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ENCHANTER_BLOCK_ENTITY, pos, state);
@@ -81,6 +82,16 @@ public class EnchanterBlockEntity extends BlockEntity
         if (networkDirty)
             updateNetwork();
         
+        // load data from nbt, as the registry entry is not available during the readNbt method
+        if (nbtLoadedSelection != null && selectedEnchantment == null) {
+            var registry = world.getRegistryManager().get(RegistryKeys.ENCHANTMENT);
+            var selected = registry.getEntry(registry.get(nbtLoadedSelection));
+            if (selected != null)
+                selectedEnchantment = selected;
+            nbtLoadedSelection = null;
+        }
+        
+        // return early if there is no work to do
         statistics = EnchanterStatistics.EMPTY;
         var content = inventory.heldStacks.get(0);
         if (content.isEmpty()
@@ -136,10 +147,7 @@ public class EnchanterBlockEntity extends BlockEntity
         energyStorage.amount = nbt.getLong("energy");
         
         if (nbt.contains("selected")) {
-            var candidate = nbt.getString("selected");
-            // TODO refactor this to use the registry lookup
-            var registry = world.getRegistryManager().get(RegistryKeys.ENCHANTMENT);
-            selectedEnchantment = registry.getEntry(registry.get(Identifier.of(candidate)));
+            nbtLoadedSelection = Identifier.of(nbt.getString("selected"));
         }
     }
     
@@ -166,6 +174,10 @@ public class EnchanterBlockEntity extends BlockEntity
         
         statistics = new EnchanterStatistics(requiredCatalysts, cachedCatalysts.size());
         
+        for (var catalyst : cachedCatalysts) {
+            ParticleContent.CATALYST_CONNECTION.spawn(world, pos.toCenterPos(), new ParticleContent.LineData(catalyst.getPos().toCenterPos(), pos.up().toCenterPos()));
+        }
+        
         if (cachedCatalysts.size() < requiredCatalysts) return false;
         
         // get a random entry where souls > 0
@@ -174,10 +186,6 @@ public class EnchanterBlockEntity extends BlockEntity
         if (usedOne.isEmpty()) return false;
         
         usedOne.get().collectedSouls--;
-        
-        for (var catalyst : cachedCatalysts) {
-            ParticleContent.CATALYST_CONNECTION.spawn(world, pos.toCenterPos(), new ParticleContent.LineData(catalyst.getPos().toCenterPos(), pos.toCenterPos()));
-        }
         
         return true;
     }
@@ -249,6 +257,7 @@ public class EnchanterBlockEntity extends BlockEntity
     
     @Override
     public ModScreens.BasicData getScreenOpeningData(ServerPlayerEntity player) {
+        networkDirty = true;
         return new ModScreens.BasicData(pos);
     }
     
@@ -261,6 +270,7 @@ public class EnchanterBlockEntity extends BlockEntity
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         sendSelectionToClient();
+        networkDirty = true;
         return new EnchanterScreenHandler(syncId, playerInventory, this);
     }
     

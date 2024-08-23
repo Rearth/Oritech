@@ -15,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.network.NetworkContent;
 
@@ -54,6 +55,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     
     private void onOpenClicked(ButtonComponent event) {
         NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.EnchanterSelectionPacket(this.handler.blockPos, ""));
+        this.handler.enchanter.selectedEnchantment = null;
         openSelectionPanel();
     }
     
@@ -87,8 +89,10 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         if (statistics.equals(EnchanterBlockEntity.EnchanterStatistics.EMPTY)) {
             statisticsLabel.text(Text.literal(""));
         } else {
-            statisticsLabel.text(Text.literal(statistics.availableCatalysts() + "/" + statistics.requiredCatalysts() + " Catalysts"));
+            statisticsLabel.text(Text.literal(statistics.availableCatalysts() + "/" + statistics.requiredCatalysts() + " Catalysts").formatted(Formatting.DARK_GRAY));
         }
+        
+        this.progress_indicator.tooltip(Text.literal(handler.enchanter.progress + "/" + handler.enchanter.maxProgress + " Souls used"));
         
     }
     

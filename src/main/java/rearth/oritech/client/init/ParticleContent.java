@@ -67,6 +67,16 @@ public class ParticleContent {
         ClientParticles.spawnCenteredOnBlock(ParticleTypes.DUST_PLUME, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
     }));
     
+    public static final ParticleSystem<Integer> SOUL_USED = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawn(ParticleTypes.HAPPY_VILLAGER, world, pos, 1.2);
+    }));
+    
+    public static final ParticleSystem<Integer> MELTDOWN_IMMINENT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawn(ParticleTypes.LAVA, world, pos, 1);
+    }));
+    
     public static final ParticleSystem<Integer> GRINDER_WORKING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(data);
         ClientParticles.spawn(ParticleTypes.DUST_PLUME, world, pos, 0.8);
