@@ -13,6 +13,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
+import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
@@ -66,6 +67,10 @@ public class NetworkContent {
     }
     
     public record SteamEnginePacket(BlockPos position, float speed, float efficiency, long waterStored, int energyProducedTick) {
+    }
+    
+    public record SpawnerSyncPacket(BlockPos position, Identifier spawnedMob, boolean hasCage, int collectedSouls,
+                                    int maxSouls) {
     }
     
     public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress) {
@@ -242,6 +247,19 @@ public class NetworkContent {
                 var storage = fluidProvider.getForDirectFluidAccess();
                 storage.amount = message.amount;
                 storage.variant = FluidVariant.of(Registries.FLUID.get(Identifier.of(message.fluidType)));
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(SpawnerSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof SpawnerControllerBlockEntity spawnerEntity) {
+                spawnerEntity.loadEntityFromIdentifier(message.spawnedMob);
+                spawnerEntity.hasCage = message.hasCage;
+                spawnerEntity.collectedSouls = message.collectedSouls;
+                spawnerEntity.maxSouls = message.maxSouls;
             }
             
         }));

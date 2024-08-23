@@ -3,7 +3,6 @@ package rearth.oritech.block.entity.arcane;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
@@ -16,20 +15,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.event.BlockPositionSource;
-import net.minecraft.world.event.GameEvent;
-import net.minecraft.world.event.PositionSource;
-import net.minecraft.world.event.listener.GameEventListener;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -41,13 +34,11 @@ import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.ScreenProvider;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
-import java.util.HashSet;
 import java.util.List;
 
-public class EnchantmentCatalystBlockEntity extends BlockEntity
-  implements InventoryProvider, ScreenProvider, BlockEntityTicker<EnchantmentCatalystBlockEntity>, GameEventListener.Holder<EnchantmentCatalystBlockEntity.DeathListener>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
+  implements InventoryProvider, ScreenProvider, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
     
-    private final DeathListener listener;
     public final int baseSoulCapacity = 50;
     public final int maxProgress = 20;
     
@@ -77,7 +68,6 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
     
     public EnchantmentCatalystBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY, pos, state);
-        listener = new DeathListener(pos);
     }
     
     @Override
@@ -244,11 +234,7 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
     }
     
     @Override
-    public DeathListener getEventListener() {
-        return listener;
-    }
-    
-    private void onSoulIncoming(Vec3d source) {
+    public void onSoulIncoming(Vec3d source) {
         var distance = (float) source.distanceTo(pos.toCenterPos());
         collectedSouls++;
         dirty = true;
@@ -259,12 +245,9 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
         ParticleContent.WANDERING_SOUL.spawn(world, source.add(0, 0.7f, 0), animData);
     }
     
-    private boolean canAcceptSoul() {
+    @Override
+    public boolean canAcceptSoul() {
         return collectedSouls < maxSouls;
-    }
-    
-    private static float getSoulTravelDuration(float distance) {
-        return (float) (Math.sqrt(distance * 20) * 3);
     }
     
     private void updateNetwork() {
@@ -347,47 +330,4 @@ public class EnchantmentCatalystBlockEntity extends BlockEntity
     public boolean showEnergy() {
         return true;
     }
-    
-    public class DeathListener implements GameEventListener {
-        
-        private final PositionSource position;
-        
-        private static final HashSet<Vec3d> consumedEvents = new HashSet<>();
-        
-        public static void resetEvents() {
-            consumedEvents.clear();
-        }
-        
-        public DeathListener(BlockPos pos) {
-            this.position = new BlockPositionSource(pos);
-        }
-        
-        @Override
-        public PositionSource getPositionSource() {
-            return position;
-        }
-        
-        @Override
-        public int getRange() {
-            return 23;
-        }
-        
-        @Override
-        public TriggerOrder getTriggerOrder() {
-            return TriggerOrder.BY_DISTANCE;
-        }
-        
-        @Override
-        public boolean listen(ServerWorld world, RegistryEntry<GameEvent> event, GameEvent.Emitter emitter, Vec3d emitterPos) {
-            if (event.matchesKey(GameEvent.ENTITY_DIE.registryKey()) && canAcceptSoul() && !consumedEvents.contains(emitterPos)) {
-                System.out.println("Death event! " + emitterPos + " " + emitter.sourceEntity().getName());
-                EnchantmentCatalystBlockEntity.this.onSoulIncoming(emitterPos);
-                consumedEvents.add(emitterPos);
-                return true;
-            }
-            
-            return false;
-        }
-    }
-    
 }
