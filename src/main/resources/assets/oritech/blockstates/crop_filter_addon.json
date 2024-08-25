@@ -41,34 +41,34 @@
       "y": 90
     },
     "face=floor,facing=north,addon_used=true": {
-      "model": "oritech:block/crop_filter_addon_on"
-    },
-    "face=floor,facing=north,addon_used=false": {
-      "model": "oritech:block/crop_filter_addon"
-    },
-    "face=floor,facing=south,addon_used=true": {
       "model": "oritech:block/crop_filter_addon_on",
       "y": 180
     },
-    "face=floor,facing=south,addon_used=false": {
+    "face=floor,facing=north,addon_used=false": {
       "model": "oritech:block/crop_filter_addon",
       "y": 180
+    },
+    "face=floor,facing=south,addon_used=true": {
+      "model": "oritech:block/crop_filter_addon_on"
+    },
+    "face=floor,facing=south,addon_used=false": {
+      "model": "oritech:block/crop_filter_addon"
     },
     "face=floor,facing=west,addon_used=true": {
       "model": "oritech:block/crop_filter_addon_on",
-      "y": 270
+      "y": 90
     },
     "face=floor,facing=west,addon_used=false": {
       "model": "oritech:block/crop_filter_addon",
-      "y": 270
+      "y": 90
     },
     "face=floor,facing=east,addon_used=true": {
       "model": "oritech:block/crop_filter_addon_on",
-      "y": 90
+      "y": 270
     },
     "face=floor,facing=east,addon_used=false": {
       "model": "oritech:block/crop_filter_addon",
-      "y": 90
+      "y": 270
     },
     "face=ceiling,facing=north,addon_used=true": {
       "model": "oritech:block/crop_filter_addon_on",

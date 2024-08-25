@@ -13,12 +13,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 
 public class RedstoneAddonBlock extends MachineAddonBlock {
     
-    public RedstoneAddonBlock(Settings settings, boolean extender, float speedMultiplier, float efficiencyMultiplier) {
-        super(settings, extender, speedMultiplier, efficiencyMultiplier, true);
+    public RedstoneAddonBlock(Settings settings, AddonSettings addonSettings) {
+        super(settings, addonSettings);
     }
     
     @Override

@@ -2,49 +2,51 @@
   "variants": {
     "face=wall,facing=north,addon_used=true": {
       "model": "oritech:block/machine_speed_addon_on",
-      "x": 90,
-      "y": 0
+      "x": 270,
+      "y": 180
     },
     "face=wall,facing=north,addon_used=false": {
       "model": "oritech:block/machine_speed_addon",
-      "x": 90,
-      "y": 0
+      "x": 270,
+      "y": 180
     },
     "face=wall,facing=south,addon_used=true": {
       "model": "oritech:block/machine_speed_addon_on",
-      "x": 90,
-      "y": 180
+      "x": 270,
+      "y": 0
     },
     "face=wall,facing=south,addon_used=false": {
       "model": "oritech:block/machine_speed_addon",
-      "x": 90,
-      "y": 180
+      "x": 270,
+      "y": 0
     },
     "face=wall,facing=west,addon_used=true": {
       "model": "oritech:block/machine_speed_addon_on",
-      "x": 90,
-      "y": 270
+      "x": 270,
+      "y": 90
     },
     "face=wall,facing=west,addon_used=false": {
       "model": "oritech:block/machine_speed_addon",
-      "x": 90,
-      "y": 270
+      "x": 270,
+      "y": 90
     },
     "face=wall,facing=east,addon_used=true": {
       "model": "oritech:block/machine_speed_addon_on",
-      "x": 90,
-      "y": 90
+      "x": 270,
+      "y": 270
     },
     "face=wall,facing=east,addon_used=false": {
       "model": "oritech:block/machine_speed_addon",
-      "x": 90,
-      "y": 90
+      "x": 270,
+      "y": 270
     },
     "face=floor,facing=north,addon_used=true": {
-      "model": "oritech:block/machine_speed_addon_on"
+      "model": "oritech:block/machine_speed_addon_on",
+      "y": 0
     },
     "face=floor,facing=north,addon_used=false": {
-      "model": "oritech:block/machine_speed_addon"
+      "model": "oritech:block/machine_speed_addon",
+      "y": 0
     },
     "face=floor,facing=south,addon_used=true": {
       "model": "oritech:block/machine_speed_addon_on",
@@ -72,41 +74,41 @@
     },
     "face=ceiling,facing=north,addon_used=true": {
       "model": "oritech:block/machine_speed_addon_on",
-      "x": 180,
-      "y": 180
+      "x": 180
     },
     "face=ceiling,facing=north,addon_used=false": {
       "model": "oritech:block/machine_speed_addon",
-      "x": 180,
-      "y": 180
+      "x": 180
     },
     "face=ceiling,facing=south,addon_used=true": {
       "model": "oritech:block/machine_speed_addon_on",
-      "x": 180
+      "x": 180,
+      "y": 180
     },
     "face=ceiling,facing=south,addon_used=false": {
       "model": "oritech:block/machine_speed_addon",
-      "x": 180
+      "x": 180,
+      "y": 180
     },
     "face=ceiling,facing=west,addon_used=true": {
       "model": "oritech:block/machine_speed_addon_on",
       "x": 180,
-      "y": 90
+      "y": 270
     },
     "face=ceiling,facing=west,addon_used=false": {
       "model": "oritech:block/machine_speed_addon",
       "x": 180,
-      "y": 90
+      "y": 270
     },
     "face=ceiling,facing=east,addon_used=true": {
       "model": "oritech:block/machine_speed_addon_on",
       "x": 180,
-      "y": 270
+      "y": 90
     },
     "face=ceiling,facing=east,addon_used=false": {
       "model": "oritech:block/machine_speed_addon",
       "x": 180,
-      "y": 270
+      "y": 90
     }
   }
 }
