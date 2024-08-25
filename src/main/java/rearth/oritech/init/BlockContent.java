@@ -16,6 +16,7 @@ import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.blocks.arcane.EnchanterBlock;
 import rearth.oritech.block.blocks.arcane.EnchantmentCatalystBlock;
 import rearth.oritech.block.blocks.arcane.SpawnerControllerBlock;
+import rearth.oritech.block.blocks.arcane.WitheredCropBlock;
 import rearth.oritech.block.blocks.decorative.*;
 import rearth.oritech.block.blocks.machines.addons.*;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock.AddonSettings;
@@ -126,6 +127,8 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block ENCHANTMENT_CATALYST_BLOCK = new EnchantmentCatalystBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block ENCHANTER_BLOCK = new EnchanterBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block SPAWNER_CONTROLLER_BLOCK = new SpawnerControllerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @NoAutoDrop
+    public static final Block WITHER_CROP_BLOCK = new WitheredCropBlock(FabricBlockSettings.copyOf(Blocks.WHEAT));
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block PUMP_BLOCK = new PumpBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
