@@ -12,7 +12,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.machines.processing.FragmentForgeBlockEntity;
 import rearth.oritech.block.entity.machines.processing.PulverizerBlockEntity;
@@ -169,11 +168,12 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             
             // detailed list element
             var addonBlockType = (MachineAddonBlock) addonBlock.getBlock();
+            var addonSettings = addonBlockType.getAddonSettings();
             var pattern = "%+.0f";
-            var speed = (1 - addonBlockType.getSpeedMultiplier()) * 100;
-            var efficiency = (1 - addonBlockType.getEfficiencyMultiplier()) * 100;
+            var speed = (1 - addonSettings.speedMultiplier()) * 100;
+            var efficiency = (1 - addonSettings.efficiencyMultiplier()) * 100;
             
-            var blockSize = addonBlockType.isExtender() ? 15 : 23;
+            var blockSize = addonSettings.extender() ? 15 : 23;
             
             var detailPane = Containers.horizontalFlow(Sizing.fill(100), Sizing.content(2))
                                .child(Components.block(addonBlock).sizing(Sizing.fixed(blockSize)).margins(Insets.of(4)))
@@ -190,10 +190,10 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
                 bottomPanel.child(Components.label(Text.of("⚡ " + String.format(pattern, efficiency) + "%  ")).color(EFFICIENCY_COLOR).tooltip(Text.of("Energy Efficiency")));
             }
             
-            if (addonBlockType instanceof EnergyAddonBlock capacitorAddonBlock) {
-                bottomPanel.child(Components.label(Text.of("\uD83D\uDD0B " + capacitorAddonBlock.getAddedCapacity() + "RF  ")).color(CAPACITY_COLOR).tooltip(Text.of("Added Capacity")));
-                bottomPanel.child(Components.label(Text.of("\uD83D\uDCC8 " + capacitorAddonBlock.getAddedInsert() + "RF/t  ")).color(THROUGPUT_COLOR).tooltip(Text.of("Added Throughput")));
-            }
+            if (addonBlockType.getAddonSettings().addedCapacity() > 0)
+                bottomPanel.child(Components.label(Text.of("\uD83D\uDD0B " + addonSettings.addedCapacity() + "RF  ")).color(CAPACITY_COLOR).tooltip(Text.of("Added Capacity")));
+            if (addonBlockType.getAddonSettings().addedInsert() > 0)
+                bottomPanel.child(Components.label(Text.of("\uD83D\uDCC8 " + addonSettings.addedInsert() + "RF/t  ")).color(THROUGPUT_COLOR).tooltip(Text.of("Added Throughput")));
             
             detailPane.child(bottomPanel.positioning(Positioning.absolute(34, 18)));
             

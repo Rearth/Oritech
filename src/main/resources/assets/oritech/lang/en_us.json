@@ -501,6 +501,7 @@
   "text.config.oritech-config.option.fluidPipeInternalStorageBuckets": "Fluid Pipe Internal Storage Buckets",
   "text.config.oritech-config.option.energyPipeTransferRate": "Energy Pipe Transfer Rate",
   "text.config.oritech-config.section.clientSettings": "Client only",
+  "text.config.oritech-config.option.tightMachineAddonHitboxes": "Tight Machine Addon Hitboxes",
   "text.config.oritech-config.option.tightMachineFrameHitboxes": "Tight Machine Frame Hitboxes",
   "text.config.oritech-config.option.tightCableHitboxes": "Tight Cable Hitboxes",
   "text.config.oritech-config.option.machineVolumeMultiplier": "Machine Sound Volume"
