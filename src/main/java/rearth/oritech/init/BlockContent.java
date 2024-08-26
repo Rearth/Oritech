@@ -13,10 +13,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.MachineCoreBlock;
-import rearth.oritech.block.blocks.arcane.EnchanterBlock;
-import rearth.oritech.block.blocks.arcane.EnchantmentCatalystBlock;
-import rearth.oritech.block.blocks.arcane.SpawnerControllerBlock;
-import rearth.oritech.block.blocks.arcane.WitheredCropBlock;
+import rearth.oritech.block.blocks.arcane.*;
 import rearth.oritech.block.blocks.decorative.*;
 import rearth.oritech.block.blocks.machines.addons.*;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock.AddonSettings;
@@ -42,6 +39,7 @@ public class BlockContent implements BlockRegistryContainer {
     
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block BANANA_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
+    public static final Block SPAWNER_CAGE_BLOCK = new SpawnerCageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block MACHINE_FRAME_BLOCK = new MachineFrameBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
     

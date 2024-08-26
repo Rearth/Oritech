@@ -158,7 +158,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     }
     
     private void reloadCage() {
-        var cageSize = new Vec3i(Math.round(spawnedMob.getWidth() * 2), Math.round(spawnedMob.getHeight() + 0.5f), Math.round(spawnedMob.getWidth() * 2));
+        var cageSize = new Vec3i(Math.round(spawnedMob.getWidth() * 2 + 0.5f), Math.round(spawnedMob.getHeight() + 0.5f), Math.round(spawnedMob.getWidth() * 2 + 0.5f));
         var offset = cageSize.getX() / 2;
         
         hasCage = true;
@@ -169,7 +169,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
                     var candidate = pos.add(-offset + x, -y - 1, -offset + z);
                     
                     // block type is a placeholder
-                    if (!world.getBlockState(candidate).getBlock().equals(BlockContent.INDUSTRIAL_GLASS_BLOCK)) {
+                    if (!world.getBlockState(candidate).getBlock().equals(BlockContent.SPAWNER_CAGE_BLOCK)) {
                         hasCage = false;
                         ParticleContent.DEBUG_BLOCK.spawn(world, Vec3d.of(candidate));
                     }

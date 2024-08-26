@@ -21,7 +21,7 @@ public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerCon
         if (entity.renderedEntity != null && entity.hasCage) {
             
             matrices.push();
-            matrices.translate(0, -Math.round(entity.spawnedMob.getHeight() + 0.5f), 0);
+            matrices.translate(0, -Math.round(entity.spawnedMob.getHeight() + 0.4f), 0);
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(45));
             
             var dispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
@@ -39,6 +39,7 @@ public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerCon
                 
                 matrices.scale(-1.0F, -1.0F, 1.0F);
                 matrices.translate(0.0F, -1.501F, 0.0F);
+                matrices.scale(0.9f, 0.9f, 0.9f);
                 var model = livingEntityRenderer.getModel();
                 var renderLayer = RenderLayer.getBeaconBeam(Identifier.ofVanilla("textures/entity/beacon_beam.png"), true);
                 // var renderLayer = RenderLayer.getEndGateway();   // yeah this is fun
