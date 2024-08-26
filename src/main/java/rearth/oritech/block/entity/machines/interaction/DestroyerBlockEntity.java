@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.machines.interaction;
 
+import com.mojang.authlib.GameProfile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -8,6 +9,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.UnbreakableComponent;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.loot.context.LootContextParameterSet;
@@ -35,6 +37,7 @@ import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
@@ -45,6 +48,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     // non-persistent
     public BlockPos quarryTarget = BlockPos.ORIGIN;
     public float targetHardness = 1f;
+    private PlayerEntity destroyerPlayerEntity = null;
     
     public DestroyerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.DESTROYER_BLOCK_ENTITY, pos, state);
@@ -114,6 +118,24 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         return !targetState.getBlock().equals(Blocks.AIR);
     }
     
+    private PlayerEntity getDestroyerPlayerEntity() {
+        if (destroyerPlayerEntity == null) {
+            destroyerPlayerEntity = new PlayerEntity(world, pos, 0, new GameProfile(UUID.randomUUID(), "laser")) {
+                @Override
+                public boolean isSpectator() {
+                    return false;
+                }
+                
+                @Override
+                public boolean isCreative() {
+                    return false;
+                }
+            };
+        }
+        
+        return destroyerPlayerEntity;
+    }
+    
     private boolean hasQuarryTarget(BlockPos toolPosition) {
         return getQuarryDownwardState(toolPosition) != null;
     }
@@ -179,7 +201,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
                 this.inventory.addStack(stack);
             }
             
-            world.addBlockBreakParticles(targetPosition, world.getBlockState(targetPosition));
+            // world.addBlockBreakParticles(targetPosition, world.getBlockState(targetPosition));
+            targetState.getBlock().onBreak(world, targetPosition, targetState, getDestroyerPlayerEntity());
             world.playSound(null, targetPosition, targetState.getSoundGroup().getBreakSound(), SoundCategory.BLOCKS, 1f, 1f);
             world.breakBlock(targetPosition, false);
             super.finishBlockWork(processed);
