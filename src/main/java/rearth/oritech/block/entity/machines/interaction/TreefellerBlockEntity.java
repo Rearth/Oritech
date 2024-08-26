@@ -35,6 +35,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.datagen.data.TagContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -97,7 +98,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
         for (int i = 0; i < 6 && !pendingBlocks.isEmpty(); i++) {
             var candidate = pendingBlocks.peekLast();
             var candidateState = world.getBlockState(candidate);
-            var isLog = isLogBlock(candidateState);
+            var isLog = candidateState.isIn(TagContent.CUTTER_LOGS_MINEABLE);
 
             var energyCost = isLog ? LOG_COST : LEAF_COST;
             if (energyCost > energyStorage.amount) break;
@@ -132,19 +133,9 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
         super.markDirty();
         networkDirty = true;
     }
-
-    private static boolean isLogBlock(BlockState state) {
-        var block = state.getBlock();
-        return state.isIn(BlockTags.LOGS) || block instanceof MangroveRootsBlock || block instanceof MushroomBlock;
-    }
-
-    private static boolean isLeafBlock(BlockState state) {
-        var block = state.getBlock();
-        return state.isIn(BlockTags.LEAVES) || state.isIn(BlockTags.WART_BLOCKS) || block == Blocks.SHROOMLIGHT;
-    }
     
     private ActionResult breakTreeBlock(BlockState candidateState, BlockPos candidate) {
-        if (!isLogBlock(candidateState) && !isLeafBlock(candidateState)) return ActionResult.PASS;
+        if (!candidateState.isIn(TagContent.CUTTER_LOGS_MINEABLE) && !candidateState.isIn(TagContent.CUTTER_LEAVES_MINEABLE)) return ActionResult.PASS;
         
         var dropped = Block.getDroppedStacks(candidateState, (ServerWorld) world, candidate, null);
         if (dropped.stream().anyMatch((itemStack) -> !(itemStack.isEmpty() || canInsert(itemStack)))) return ActionResult.FAIL;
@@ -179,7 +170,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     public static Deque<BlockPos> getTreeBlocks(BlockPos startPos, World world) {
         
         var startState = world.getBlockState(startPos);
-        if (!isLogBlock(startState)) return new ArrayDeque<>();
+        if (!startState.isIn(TagContent.CUTTER_LOGS_MINEABLE)) return new ArrayDeque<>();
         
         var checkedPositions = new HashSet<BlockPos>();
         var foundPositions = new ArrayDeque<BlockPos>();
@@ -201,8 +192,8 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
             var candidateState = world.getBlockState(candidate);
             checkedPositions.add(candidate);
             
-            var isLog = isLogBlock(candidateState);
-            var isValidLeaf = isLeafBlock(candidateState) && !candidateState.getOrEmpty(Properties.PERSISTENT).orElse(false);
+            var isLog = candidateState.isIn(TagContent.CUTTER_LOGS_MINEABLE);
+            var isValidLeaf = candidateState.isIn(TagContent.CUTTER_LEAVES_MINEABLE) && !candidateState.getOrEmpty(Properties.PERSISTENT).orElse(false);
             
             if (!isLog && !isValidLeaf) continue;
             
@@ -227,7 +218,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
         }
         
         // when no leaves are found, return nothing to prevent accidentally destroying buildings
-        if (foundLogs.size() == foundPositions.size() && !(startState.getBlock() instanceof MushroomBlock)) return new ArrayDeque<>();
+        if (foundLogs.size() == foundPositions.size()) return new ArrayDeque<>();
         
         return foundPositions;
     }

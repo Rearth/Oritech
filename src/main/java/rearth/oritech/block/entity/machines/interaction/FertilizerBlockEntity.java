@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.machines.interaction;
 
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -109,8 +110,6 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
         
         // skip not grown crops
         if (canFertilizeFarmland(toolPosition)) return true;
-        if (canFertilizeGrass(toolPosition)) return true;
-        if (canFertilizeUnderwater(toolPosition)) return true;
         return targetState.getBlock() instanceof Fertilizable fertilizable && fertilizable.isFertilizable(world, targetPosition, targetState);
     }
     
@@ -125,70 +124,45 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
         
         return false;
     }
-
-    private boolean canFertilizeGrass(BlockPos toolPosition) {
-        var targetPosition = toolPosition.down(2);
-        var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
-
-        return targetState.getBlock() instanceof GrassBlock grassBlock && grassBlock.isFertilizable(world, targetPosition, targetState);
-    }
-
-    // A simpler version of the check in BoneMealItem::useOnGround
-    private boolean canFertilizeUnderwater(BlockPos toolPosition) {
-        var waterPosition = toolPosition.down(1);
-        var targetPosition = toolPosition.down(2);
-
-        if (!(world.getBlockState(waterPosition).isOf(Blocks.WATER) && world.getFluidState(waterPosition).getLevel() == 8)) return false;
-        BlockState seagrassState = Blocks.SEAGRASS.getDefaultState();
-        //world.getBlockState(waterPosition).isIn(BlockTags.CORALS)
-        return world.getBlockState(targetPosition).isFullCube(world, targetPosition) && seagrassState.canPlaceAt(world, targetPosition);
-    }
-
-    private static boolean isBonemeal(ItemStack itemStack) {
-        return (itemStack.getItem() instanceof BoneMealItem && itemStack.getCount() > 0);
-    }
     
     @Override
     public void finishBlockWork(BlockPos processed) {
         
-        var fertilizerStrength = 1;
-        var itemStack = inventory.getStack(0);
-        // simulate bonemeal with the fertilizer machine
-        var fakeBonemeal = new ItemStack(Items.BONE_MEAL, 128);
+        var inventoryStack = inventory.getStack(0);
+        var fertilizerInInventory = !inventoryStack.isEmpty() && inventoryStack.isIn(ConventionalItemTags.FERTILIZERS);
+        var fertilizerStrength = fertilizerInInventory ? 2 : 1;
         var fertilized = false;
         
         var targetPosition = processed.down();
         var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
-        var belowPosition = processed.down(2);
         
         if (!hasWorkAvailable(processed)) return;
 
-        if (BoneMealItem.useOnFertilizable(fakeBonemeal, world, targetPosition)) {
+        if (targetState.getBlock() instanceof CropBlock cropBlock) {
+            var newAge = cropBlock.getAge(targetState) + fertilizerStrength;
+            newAge = Math.min(newAge, cropBlock.getMaxAge());
+            world.setBlockState(targetPosition, cropBlock.withAge(newAge), Block.NOTIFY_LISTENERS);
             fertilized = true;
-            if (isBonemeal(itemStack)) {
-                BoneMealItem.useOnFertilizable(itemStack, world, targetPosition);
-                inventory.setStack(0, itemStack);
-            }
-        } else if (BoneMealItem.useOnFertilizable(fakeBonemeal, world, belowPosition)) {
-            fertilized = true;
-            if (isBonemeal(itemStack)) {
-                BoneMealItem.useOnFertilizable(itemStack, world, belowPosition);
-                inventory.setStack(0, itemStack);
-            }
-        } else if (BoneMealItem.useOnGround(fakeBonemeal, world, targetPosition, null)) {
-            fertilized = true;
-            if (isBonemeal(itemStack)) {
-                BoneMealItem.useOnGround(fakeBonemeal, world, targetPosition, null);
-                inventory.setStack(0, itemStack);
+        } else if (targetState.getBlock() instanceof Fertilizable fertilizable) {
+            fertilizable.grow((ServerWorld) world, world.random, targetPosition, targetState);
+            if (fertilizerInInventory) {
+                fertilizable.grow((ServerWorld) world, world.random, targetPosition, targetState);
+                fertilized = true;
             }
         }
 
-        var farmlandState = world.getBlockState(belowPosition);
-        if (farmlandState.getBlock() instanceof FarmlandBlock && farmlandState.get(Properties.MOISTURE) < 7) {
-            world.setBlockState(belowPosition, farmlandState.with(Properties.MOISTURE, 7));
+        var farmlandPosition = processed.down(2);
+        var farmlandState = world.getBlockState(farmlandPosition);
+
+        if (farmlandState.getBlock() instanceof FarmlandBlock && farmlandState.get(Properties.MOISTURE) != 7) {
+            world.setBlockState(farmlandPosition, farmlandState.with(Properties.MOISTURE, 7));
         }
         
-        if (fertilized = true) {
+        if (fertilized == true) {
+            if (fertilizerInInventory) {
+                inventoryStack.decrement(1);
+                inventory.setStack(0, inventoryStack);
+            }
             super.finishBlockWork(processed);
             ParticleContent.FERTILIZER_EFFECT.spawn(world, Vec3d.of(targetPosition), fertilizerStrength * 3 + 2);
             world.playSound(null, targetPosition, SoundEvents.ITEM_BONE_MEAL_USE, SoundCategory.BLOCKS, 1f, 1f);

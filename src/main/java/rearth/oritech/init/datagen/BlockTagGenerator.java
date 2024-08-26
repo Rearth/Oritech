@@ -3,6 +3,7 @@ package rearth.oritech.init.datagen;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
+import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 import rearth.oritech.init.BlockContent;
@@ -70,5 +71,19 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .add(BlockContent.RESOURCE_NODE_DIAMOND)
           .add(BlockContent.RESOURCE_NODE_COAL)
           .add(BlockContent.RESOURCE_NODE_PLATINUM);
+
+        getOrCreateTagBuilder(TagContent.CUTTER_LOGS_MINEABLE)
+        // using forceAddTag because the datagen wasn't recognizing the vanilla LOGS, LEAVES, and WART_BLOCKS tags
+        // even though they should absolutely be there
+          .forceAddTag(BlockTags.LOGS)
+          .add(Blocks.MANGROVE_ROOTS)
+          .add(Blocks.MUSHROOM_STEM);
+        
+        getOrCreateTagBuilder(TagContent.CUTTER_LEAVES_MINEABLE)
+          .forceAddTag(BlockTags.LEAVES)
+          .forceAddTag(BlockTags.WART_BLOCKS)
+          .add(Blocks.SHROOMLIGHT)
+          .add(Blocks.RED_MUSHROOM_BLOCK)
+          .add(Blocks.BROWN_MUSHROOM_BLOCK);
     }
 }

@@ -10,7 +10,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
@@ -129,7 +128,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             }
             
             var targetState = world.getFluidState(targetBlock);
-            if (!isInfinite(world, targetBlock)) {
+            if (!targetState.getFluid().matchesType(Fluids.WATER)) {
                 drainSourceBlock(targetBlock);
                 pendingLiquidPositions.pollLast();
             }
@@ -150,7 +149,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             if (!toolheadLowered) {
                 message = Text.literal("Trunk is extending....");
             } else if (searchActive) {
-                message= Text.literal("Pump is initializing... (This might take a moment for large bodies of liquid)");
+                message= Text.literal("Pump is initializing... (This might take a moment for large bodies of water)");
             } else {
                 message = Text.literal("No liquids available");
             }
@@ -313,26 +312,6 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     public void setLastPumpTime(long lastPumpTime) {
         this.lastPumpTime = lastPumpTime;
     }
-
-    private static boolean isInfinite(World world, BlockPos target) {
-        var blockState = world.getBlockState(target);
-        if (world.getFluidState(target).getFluid() instanceof FlowableFluid fluid) {
-            if (!fluid.isInfinite(world)) return false;
-
-            int matchingNeighbors = 0;
-            for (var direction : Direction.values()) {
-                if (!direction.getAxis().isHorizontal()) continue;
-                var neighborPos = target.offset(direction);
-                var neighborBlockState = world.getBlockState(neighborPos);
-                if (neighborBlockState.getFluidState().getFluid().matchesType(fluid)
-                    && fluid.receivesFlow(direction, world, target, blockState, neighborPos, neighborBlockState))
-                    matchingNeighbors++;
-            }
-
-            return matchingNeighbors >= 2;
-        }
-        return false;
-    }
     
     private static class FloodFillSearch {
         
@@ -358,7 +337,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
                 if (isValidTarget(target)) {
                     foundTargets.addLast(target);
                     addNeighborsToQueue(target);
-                    if (isInfinite(world, target)) earlyStop = true;
+                    if (checkForEarlyStop(target)) earlyStop = true;
                 }
                 
                 checkedPositions.add(target);
@@ -368,6 +347,10 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             if (cutoffSearch() || earlyStop) nextTargets.clear();
             
             return nextTargets.isEmpty();
+        }
+        
+        private boolean checkForEarlyStop(BlockPos target) {
+            return world.getFluidState(target).getFluid().matchesType(Fluids.WATER);
         }
         
         private boolean cutoffSearch() {
