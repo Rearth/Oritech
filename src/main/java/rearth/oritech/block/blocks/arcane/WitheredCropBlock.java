@@ -64,7 +64,8 @@ public class WitheredCropBlock extends CropBlock {
     
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        world.emitGameEvent(GameEvent.ENTITY_DIE.registryKey(), pos, GameEvent.Emitter.of(state));
+        if (this.getAge(state) == this.getMaxAge())
+            world.emitGameEvent(GameEvent.ENTITY_DIE.registryKey(), pos, GameEvent.Emitter.of(state));
         return super.onBreak(world, pos, state, player);
     }
 }

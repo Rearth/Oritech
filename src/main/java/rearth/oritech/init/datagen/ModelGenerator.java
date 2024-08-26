@@ -93,6 +93,7 @@ public class ModelGenerator extends FabricModelProvider {
         
         //arcane
         blockStateModelGenerator.registerSimpleState(BlockContent.SPAWNER_CAGE_BLOCK);
+        blockStateModelGenerator.registerSimpleState(BlockContent.SPAWNER_CONTROLLER_BLOCK);
         blockStateModelGenerator.registerCrop(BlockContent.WITHER_CROP_BLOCK, CropBlock.AGE, 0, 0, 1, 2, 3, 3, 4, 5);
         
         // metals
