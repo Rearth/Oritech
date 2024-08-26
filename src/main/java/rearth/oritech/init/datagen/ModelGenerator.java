@@ -3,6 +3,7 @@ package rearth.oritech.init.datagen;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.block.Block;
+import net.minecraft.block.CropBlock;
 import net.minecraft.block.enums.BlockFace;
 import net.minecraft.data.client.*;
 import net.minecraft.item.Item;
@@ -11,6 +12,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ToolsContent;
 
 import java.util.HashSet;
@@ -119,6 +121,8 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.CAPACITOR_ADDON_EXTENDER);
         blockStateModelGenerator.registerSimpleState(BlockContent.METAL_BEAM_BLOCK);
         
+        blockStateModelGenerator.registerCrop(BlockContent.WITHER_CROP_BLOCK, CropBlock.AGE, 0, 0, 1, 2, 3, 3, 4, 5);
+        
     }
     
     @Override
@@ -131,8 +135,7 @@ public class ModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(ToolsContent.CHAINSAW, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.HAND_DRILL, Models.GENERATED);
         
-        itemModelGenerator.register(ToolsContent.ORITECH_GUIDE, Models.GENERATED);
-        // itemModelGenerator.registerArmor((ArmorItem) ToolsContent.EXO_HELMET);   // this seems to generate it compatible with armor trims
+        itemModelGenerator.register(ItemContent.ORITECH_GUIDE, Models.GENERATED);
         
         for (var item : autoRegisteredModels) {
             itemModelGenerator.register(item, Models.GENERATED);

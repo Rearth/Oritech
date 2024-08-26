@@ -1,7 +1,8 @@
 ```json
 {
   "title": "World interaction machines",
-  "icon": "oritech:fertilizer_block"
+  "icon": "oritech:fertilizer_block",
+  "ordinal": 3
 }
 ```
 

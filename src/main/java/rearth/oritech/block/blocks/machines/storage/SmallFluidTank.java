@@ -11,10 +11,11 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.context.LootContextParameterSet;
+import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -22,8 +23,12 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
+
+import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
 import rearth.oritech.init.BlockContent;
 
@@ -65,30 +70,17 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
         
         return ActionResult.SUCCESS;
     }
-    
-    @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        
-        if (!world.isClient) {
-            var stack = getStackWithData(world, pos);
-            var tankEntity = (SmallFluidTankEntity) world.getBlockEntity(pos);
-            
-            if (!player.isCreative())
-                Block.dropStack(world, pos, stack);
-            
-            var stacks = tankEntity.inventory.heldStacks;
-            for (var heldStack : stacks) {
-                if (!heldStack.isEmpty()) {
-                    var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
-                    world.spawnEntity(itemEntity);
-                }
-            }
-            
-        }
-        
-        return super.onBreak(world, pos, state, player);
+
+    protected List<ItemStack> getDroppedStacks(BlockState state, LootContextParameterSet.Builder builder) {
+        var droppedStacks = super.getDroppedStacks(state, builder);
+
+        var blockEntity = (BlockEntity)builder.getOptional(LootContextParameters.BLOCK_ENTITY);
+        if (blockEntity instanceof SmallFluidTankEntity tankEntity)
+            droppedStacks.addAll(tankEntity.inventory.getHeldStacks());
+
+        return droppedStacks;
     }
-    
+
     @Override
     public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         return getStackWithData(world, pos);
@@ -102,7 +94,6 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
         if (tankEntity.getForDirectFluidAccess().amount > 0) {
             var nbt = new NbtCompound();
             tankEntity.writeNbt(nbt, world.getRegistryManager());
-            nbt.remove("Items");
             stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
             var fluidName = FluidVariantAttributes.getName(tankEntity.getForDirectFluidAccess().variant);
             stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable("block.oritech.small_tank_block")));

@@ -10,7 +10,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -605,10 +604,10 @@ public abstract class MachineBlockEntity extends BlockEntity
         this.disabledViaRedstone = isPowered;
     }
     
-    private class SimpleMachineInventory extends SimpleInventory implements SidedInventory {
+    private class SimpleMachineInventory extends SimpleSidedInventory {
         
         public SimpleMachineInventory(int size) {
-            super(size);
+            super(size, getSlots());
         }
         
         @Override
@@ -617,44 +616,15 @@ public abstract class MachineBlockEntity extends BlockEntity
         }
         
         @Override
-        public int[] getAvailableSlots(Direction side) {
-            
-            // return a list of slot indices
-            // top is input, sides are both, bottom is output
-            if (side == Direction.DOWN) {
-                var res = new int[getSlots().outputCount()];
-                for (int i = 0; i < getSlots().outputCount(); i++) {
-                    res[i] = getSlots().outputStart() + i;
-                }
-                return res;
-            } if (side == Direction.UP) {
-                var res = new int[getSlots().inputCount()];
-                for (int i = 0; i < getSlots().inputCount(); i++) {
-                    res[i] = getSlots().inputStart() + i;
-                }
-                return res;
-            } else {
-                var res = new ArrayList<Integer>();
-                for (int i = 0; i < getSlots().inputCount(); i++) {
-                    res.add(getSlots().inputStart() + i);
-                }
-                for (int i = 0; i < getSlots().outputCount(); i++) {
-                    res.add(getSlots().outputStart() + i);
-                }
-                return res.stream().mapToInt(Integer::intValue).toArray();
-            }
-        }
-        
-        @Override
         public boolean canInsert(int slot, ItemStack stack, @Nullable Direction side) {
+            // Check that this is an insert slot, and is being inserted on an accepted side.
+            if (!super.canInsert(slot, stack, side))
+                return false;
             
             var mode = inventoryInputMode;
             var config = getSlots();
             
             var inv = getInputView();
-            
-            // allow insert only to input slots
-            if (slot < config.inputStart() || slot >= config.inputStart() + config.inputCount()) return false;
             
             // fill equally
             // check all slots, find the one with the lowest (or empty) type
@@ -670,13 +640,6 @@ public abstract class MachineBlockEntity extends BlockEntity
                     yield recipeTargetSlot >= 0 && config.inputToRealSlot(recipeTargetSlot) == slot;
                 }
             };
-        }
-        
-        @Override
-        public boolean canExtract(int slot, ItemStack stack, Direction side) {
-            
-            var config = getSlots();
-            return slot >= config.outputStart() && slot < config.outputStart() + config.outputCount();
         }
     }
 }

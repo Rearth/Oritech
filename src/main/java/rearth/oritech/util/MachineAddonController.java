@@ -12,7 +12,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import rearth.oritech.block.blocks.machines.addons.EnergyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 
@@ -129,7 +128,7 @@ public interface MachineAddonController {
                 var entry = new AddonBlock(addonBlock, candidate, candidatePos, candidateAddonEntity);
                 result.add(entry);
                 
-                if (addonBlock.isExtender()) {
+                if (addonBlock.getAddonSettings().extender()) {
                     var neighbors = getNeighbors(candidatePos);
                     for (var neighbor : neighbors) {
                         if (!searchedPositions.contains(neighbor)) toAdd.add(neighbor);
@@ -156,12 +155,13 @@ public interface MachineAddonController {
         var energyInsert = 0L;
         
         for (var addon : addons) {
-            speed *= addon.addonBlock().getSpeedMultiplier();
-            efficiency *= addon.addonBlock().getEfficiencyMultiplier();
+            var addonSettings = addon.addonBlock().getAddonSettings();
+            speed *= addonSettings.speedMultiplier();
+            efficiency *= addonSettings.efficiencyMultiplier();
             
-            if (addon.addonBlock() instanceof EnergyAddonBlock capacitorBlock) {
-                energyAmount += capacitorBlock.getAddedCapacity();
-                energyInsert += capacitorBlock.getAddedInsert();
+            if (addonSettings.acceptEnergy()) {
+                energyAmount += addonSettings.addedCapacity();
+                energyInsert += addonSettings.addedInsert();
             }
             
             getAdditionalStatFromAddon(addon);
@@ -186,8 +186,10 @@ public interface MachineAddonController {
         for (var addon : addons) {
             var newState = addon.state()
                              .with(MachineAddonBlock.ADDON_USED, true);
-            world.setBlockState(addon.pos(), newState);
+            // Set controller before setting block state, otherwise the addon will think
+            // it's not connected to a machine the first time neighbor blocks are being updated.
             addon.addonEntity().setControllerPos(pos);
+            world.setBlockState(addon.pos(), newState);
         }
     }
     

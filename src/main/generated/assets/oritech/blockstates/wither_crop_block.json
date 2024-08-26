@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "oritech:block/wither_crop_block_stage0"
+    },
+    "age=1": {
+      "model": "oritech:block/wither_crop_block_stage0"
+    },
+    "age=2": {
+      "model": "oritech:block/wither_crop_block_stage1"
+    },
+    "age=3": {
+      "model": "oritech:block/wither_crop_block_stage2"
+    },
+    "age=4": {
+      "model": "oritech:block/wither_crop_block_stage3"
+    },
+    "age=5": {
+      "model": "oritech:block/wither_crop_block_stage3"
+    },
+    "age=6": {
+      "model": "oritech:block/wither_crop_block_stage4"
+    },
+    "age=7": {
+      "model": "oritech:block/wither_crop_block_stage5"
+    }
+  }
+}

@@ -135,8 +135,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // feet (silicon + plating)
         offerFeetRecipe(exporter, ToolsContent.EXO_BOOTS, Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.SILICON), "_exoboots");
         
-        // guidebook (any ingot + cactus)
-        offerHelmetRecipe(exporter, ToolsContent.ORITECH_GUIDE, Ingredient.fromTag(ConventionalItemTags.INGOTS), Ingredient.ofItems(Items.LAPIS_LAZULI), "_guidebook");
+        // guidebook (any ingot + lapis)
+        offerHelmetRecipe(exporter, ItemContent.ORITECH_GUIDE, Ingredient.fromTag(ConventionalItemTags.INGOTS), Ingredient.ofItems(Items.LAPIS_LAZULI), "_guidebook");
     }
     
     private void addDecorative(RecipeExporter exporter) {

@@ -3,6 +3,8 @@ package rearth.oritech.init;
 import io.wispforest.owo.registration.reflect.BlockRegistryContainer;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
+import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -11,8 +13,13 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.MachineCoreBlock;
+import rearth.oritech.block.blocks.arcane.EnchanterBlock;
+import rearth.oritech.block.blocks.arcane.EnchantmentCatalystBlock;
+import rearth.oritech.block.blocks.arcane.SpawnerControllerBlock;
+import rearth.oritech.block.blocks.arcane.WitheredCropBlock;
 import rearth.oritech.block.blocks.decorative.*;
 import rearth.oritech.block.blocks.machines.addons.*;
+import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock.AddonSettings;
 import rearth.oritech.block.blocks.machines.generators.*;
 import rearth.oritech.block.blocks.machines.interaction.*;
 import rearth.oritech.block.blocks.machines.processing.*;
@@ -104,16 +111,24 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block DRONE_PORT_BLOCK = new DronePortBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     @NoAutoDrop
-    public static final Block SMALL_STORAGE_BLOCK = new SmallStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @DispenserPlace
+    public static final Block SMALL_STORAGE_BLOCK = new SmallStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY));
     public static final Block LARGE_STORAGE_BLOCK = new LargeStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @NoAutoDrop
-    public static final Block SMALL_TANK_BLOCK = new SmallFluidTank(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @DispenserPlace
+    public static final Block SMALL_TANK_BLOCK = new SmallFluidTank(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY));
     
     public static final Block PLACER_BLOCK = new PlacerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block DESTROYER_BLOCK = new DestroyerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block FERTILIZER_BLOCK = new FertilizerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block TREEFELLER_BLOCK = new TreefellerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    
+    public static final Block ENCHANTMENT_CATALYST_BLOCK = new EnchantmentCatalystBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block ENCHANTER_BLOCK = new EnchanterBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block SPAWNER_CONTROLLER_BLOCK = new SpawnerControllerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @NoAutoDrop
+    public static final Block WITHER_CROP_BLOCK = new WitheredCropBlock(FabricBlockSettings.copyOf(Blocks.WHEAT));
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block PUMP_BLOCK = new PumpBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
@@ -126,19 +141,19 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block MACHINE_CORE_6 = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 6);
     public static final Block MACHINE_CORE_7 = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 7);
     
-    public static final Block MACHINE_SPEED_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 0.9f, 1.05f, true);
-    public static final Block MACHINE_FLUID_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
-    public static final Block MACHINE_YIELD_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
-    public static final Block CROP_FILTER_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
-    public static final Block QUARRY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1f, 1f, true);
-    public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 0.9f, true);
-    public static final Block MACHINE_CAPACITOR_ADDON = new EnergyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 2_000_000, 1000, false, true);
-    public static final Block MACHINE_ACCEPTOR_ADDON = new EnergyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f, 500_000, 2000, true, true);
-    public static final Block MACHINE_INVENTORY_PROXY_ADDON = new InventoryProxyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1f);
-    public static final Block MACHINE_EXTENDER = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), true, 1, 1, false);
-    public static final Block CAPACITOR_ADDON_EXTENDER = new EnergyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), true, 1, 1, 2_500_000, 500, false, false);
-    public static final Block STEAM_BOILER_ADDON = new SteamBoilerAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1);
-    public static final Block MACHINE_REDSTONE_ADDON = new RedstoneAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), false, 1, 1);
+    public static final Block MACHINE_SPEED_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withSpeedMultiplier(0.9f).withEfficiencyMultiplier(1.05f).withBoundingShape(MachineAddonBlock.MACHINE_SPEED_ADDON_SHAPE));
+    public static final Block MACHINE_FLUID_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_FLUID_ADDON_SHAPE));
+    public static final Block MACHINE_YIELD_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_YIELD_ADDON_SHAPE));
+    public static final Block CROP_FILTER_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.CROP_FILTER_ADDON_SHAPE));
+    public static final Block QUARRY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.QUARRY_ADDON_SHAPE));
+    public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withEfficiencyMultiplier(0.9f).withBoundingShape(MachineAddonBlock.MACHINE_EFFICIENCY_ADDON_SHAPE));
+    public static final Block MACHINE_CAPACITOR_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withAddedCapacity(2_000_000).withAddedInsert(1_000).withBoundingShape(MachineAddonBlock.MACHINE_CAPACITOR_ADDON_SHAPE));
+    public static final Block MACHINE_ACCEPTOR_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withAddedCapacity(500_000).withAddedInsert(2000).withAcceptEnergy(true).withBoundingShape(MachineAddonBlock.MACHINE_ACCEPTOR_ADDON_SHAPE));
+    public static final Block MACHINE_INVENTORY_PROXY_ADDON = new InventoryProxyAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_INVENTORY_PROXY_ADDON_SHAPE));
+    public static final Block MACHINE_EXTENDER = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withExtender(true).withNeedsSupport(false));
+    public static final Block CAPACITOR_ADDON_EXTENDER = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withExtender(true).withNeedsSupport(false).withAddedCapacity(2_500_000).withAddedInsert(500));
+    public static final Block STEAM_BOILER_ADDON = new SteamBoilerAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.STEAM_BOILER_ADDON_SHAPE));
+    public static final Block MACHINE_REDSTONE_ADDON = new RedstoneAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_REDSTONE_ADDON_SHAPE));
     
     @NoBlockItem
     public static final Block OIL_FLUID_BLOCK = new MineralFluidBlock((FlowableFluid) FluidContent.FLOWING_OIL, FabricBlockSettings.copyOf(Blocks.WATER));
@@ -241,6 +256,10 @@ public class BlockContent implements BlockRegistryContainer {
         if (!field.isAnnotationPresent(NoAutoDrop.class)) {
             BlockLootGenerator.autoRegisteredDrops.add(value);
         }
+
+        if (field.isAnnotationPresent(DispenserPlace.class)) {
+            DispenserBlock.registerBehavior(value, new BlockPlacementDispenserBehavior());
+        }
         
         ItemGroups.add(targetGroup, value);
     }
@@ -259,6 +278,11 @@ public class BlockContent implements BlockRegistryContainer {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface NoAutoDrop {
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    public @interface DispenserPlace {
     }
     
 }

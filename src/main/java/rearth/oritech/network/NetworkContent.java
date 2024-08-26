@@ -11,6 +11,9 @@ import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
+import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
+import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
+import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
@@ -66,6 +69,10 @@ public class NetworkContent {
     public record SteamEnginePacket(BlockPos position, float speed, float efficiency, long waterStored, int energyProducedTick) {
     }
     
+    public record SpawnerSyncPacket(BlockPos position, Identifier spawnedMob, boolean hasCage, int collectedSouls,
+                                    int maxSouls) {
+    }
+    
     public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress) {
     }
     
@@ -82,6 +89,14 @@ public class NetworkContent {
     
     public record SingleVariantFluidSyncPacket(BlockPos position, String fluidType, long amount) {
     }
+    
+    public record EnchanterSelectionPacket(BlockPos position, String enchantment) {
+    }
+    
+    public record EnchanterSyncPacket(BlockPos position, long energy, int progress, int maxProgress, int requiredCatalysts, int availableCatalysts) {
+    }
+    
+    public record CatalystSyncPacket(BlockPos position, int storedSouls, int progress, boolean isHyperEnchanting, int maxSouls) {}
     
     public record GeneratorSteamSyncPacket(BlockPos position, long steamAmount, long waterAmount) {
     }
@@ -129,6 +144,16 @@ public class NetworkContent {
             
         }));
         
+        MACHINE_CHANNEL.registerClientbound(EnchanterSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof EnchanterBlockEntity machine) {
+                machine.handleSyncPacket(message);
+            }
+            
+        }));
+        
         MACHINE_CHANNEL.registerClientbound(TreeFellerBlockAnimation.class, ((message, access) -> {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
@@ -168,6 +193,16 @@ public class NetworkContent {
             
             if (entity instanceof DeepDrillEntity drillBlock) {
                 drillBlock.setLastWorkTime(message.lastWorkTime);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(CatalystSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof EnchantmentCatalystBlockEntity catalystBlock) {
+                catalystBlock.handleNetworkPacket(message);
             }
             
         }));
@@ -212,6 +247,19 @@ public class NetworkContent {
                 var storage = fluidProvider.getForDirectFluidAccess();
                 storage.amount = message.amount;
                 storage.variant = FluidVariant.of(Registries.FLUID.get(Identifier.of(message.fluidType)));
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(SpawnerSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof SpawnerControllerBlockEntity spawnerEntity) {
+                spawnerEntity.loadEntityFromIdentifier(message.spawnedMob);
+                spawnerEntity.hasCage = message.hasCage;
+                spawnerEntity.collectedSouls = message.collectedSouls;
+                spawnerEntity.maxSouls = message.maxSouls;
             }
             
         }));
@@ -342,6 +390,16 @@ public class NetworkContent {
             
         }));
         
+        MACHINE_CHANNEL.registerClientbound(EnchanterSelectionPacket.class, ((message, access) -> {
+            
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            
+            if (entity instanceof EnchanterBlockEntity enchanter) {
+                enchanter.handleEnchantmentSelection(message);
+            }
+            
+        }));
+        
         UI_CHANNEL.registerServerbound(RedstoneAddonSyncPacket.class, (message, access) -> {
             
             var entity = access.player().getWorld().getBlockEntity(message.position);
@@ -377,6 +435,16 @@ public class NetworkContent {
             
             if (entity instanceof ItemFilterBlockEntity filter) {
                 filter.setFilterSettings(message.data);
+            }
+            
+        }));
+        
+        UI_CHANNEL.registerServerbound(EnchanterSelectionPacket.class, ((message, access) -> {
+            
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            
+            if (entity instanceof EnchanterBlockEntity enchanter) {
+                enchanter.handleEnchantmentSelection(message);
             }
             
         }));

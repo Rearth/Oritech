@@ -1,8 +1,11 @@
 package rearth.oritech.block.entity.machines.generators;
 
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -42,7 +45,11 @@ public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
         
         var fuelTime = FUEL_MAP.getOrDefault(firstItem.getItem(), 0);
         if (fuelTime > 0) {
-            firstItem.decrement(1);
+            if (firstItem.getItem() instanceof BucketItem) {
+                this.getInputView().set(0, ItemVariant.of(Items.BUCKET, firstItem.getComponentChanges()).toStack());
+            } else {
+                firstItem.decrement(1);
+            }
             progress = fuelTime;
             setCurrentMaxBurnTime(fuelTime);
             markNetDirty();

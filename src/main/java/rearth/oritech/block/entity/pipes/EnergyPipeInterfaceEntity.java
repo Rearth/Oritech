@@ -59,6 +59,8 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
         var data = EnergyPipeBlock.ENERGY_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
         var targets = findNetworkTargets(pos, data);
         
+        if (targets == null) return;    // this should never happen
+        
         var energyStorages = targets.stream()
                                .map(target -> findFromCache(world, target.getLeft(), target.getRight()))
                                .filter(obj -> Objects.nonNull(obj) && obj.supportsInsertion())

@@ -22,7 +22,7 @@ public class SteamEngineScreen extends UpgradableMachineScreen<SteamEngineScreen
         var offset = -config.width() - 8;
         var configWater = new ScreenProvider.BarConfiguration(config.x() + offset, config.y(), config.width(), config.height());
         var container = handler.engineWaterStorage;
-        waterDisplay = initDisplay(container, configWater);
+        waterDisplay = initFluidDisplay(container, configWater);
     }
     
     @Override

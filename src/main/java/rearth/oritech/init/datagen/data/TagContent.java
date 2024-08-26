@@ -39,6 +39,9 @@ public class TagContent {
     
     // plating
     public static final TagKey<Item> MACHINE_PLATING = TagKey.of(RegistryKeys.ITEM, Oritech.id("plating"));
+
+    // silicon
+    public static final TagKey<Item> SILICON = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "silicon"));
     
     // blocks
     public static final TagKey<Block> DRILL_MINEABLE = TagKey.of(RegistryKeys.BLOCK, Oritech.id("mineable/drill"));

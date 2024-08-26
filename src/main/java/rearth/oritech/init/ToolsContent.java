@@ -1,7 +1,5 @@
 package rearth.oritech.init;
 
-import io.wispforest.lavender.book.LavenderBookItem;
-import io.wispforest.owo.registration.annotations.IterationIgnored;
 import io.wispforest.owo.registration.reflect.ItemRegistryContainer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -12,7 +10,6 @@ import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.registry.entry.RegistryEntry;
-import rearth.oritech.Oritech;
 import rearth.oritech.init.datagen.data.TagContent;
 import rearth.oritech.item.tools.armor.BackstorageExoArmorItem;
 import rearth.oritech.item.tools.armor.ExoArmorItem;
@@ -25,7 +22,7 @@ import java.lang.reflect.Field;
 
 public class ToolsContent implements ItemRegistryContainer {
     
-    private static final Item.Settings UNBREAKING_SETTINGS = new Item.Settings()
+    protected static final Item.Settings UNBREAKING_SETTINGS = new Item.Settings()
                                                                .maxCount(1)
                                                                .maxDamage(0)
                                                                .component(DataComponentTypes.UNBREAKABLE, new UnbreakableComponent(true));
@@ -44,9 +41,6 @@ public class ToolsContent implements ItemRegistryContainer {
     
     public static final Item PROMETHIUM_AXE = new PromethiumAxeItem(PROMETHIUM_MATERIAL, UNBREAKING_SETTINGS.attributeModifiers(AxeItem.createAttributeModifiers(PROMETHIUM_MATERIAL, 8f, -2.1f)));
     public static final Item PROMETHIUM_PICKAXE = new PromethiumPickaxeItem(PROMETHIUM_MATERIAL, TagContent.DRILL_MINEABLE, UNBREAKING_SETTINGS.attributeModifiers(AxeItem.createAttributeModifiers(PROMETHIUM_MATERIAL, 3f, -2.4f)));
-    
-    @IterationIgnored
-    public static final Item ORITECH_GUIDE = LavenderBookItem.registerForBook(Oritech.id("oritech_guide"), UNBREAKING_SETTINGS.maxCount(1));
     
     @Override
     public void postProcessField(String namespace, Item value, String identifier, Field field) {

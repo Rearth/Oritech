@@ -1,7 +1,8 @@
 ```json
 {
   "title": "Processing",
-  "icon": "oritech:assembler_block"
+  "icon": "oritech:assembler_block",
+  "ordinal": 2
 }
 ```
 

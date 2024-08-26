@@ -7,7 +7,6 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.text.Text;
@@ -25,7 +24,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
     private final MachineBlockEntity screenProvider;
     private final OritechRecipe recipe;
     
-    public OritechEMIRecipe(RecipeEntry<OritechRecipe> entry, EmiRecipeCategory category, Class<? extends MachineBlockEntity> screenProviderSource) {
+    public OritechEMIRecipe(RecipeEntry<OritechRecipe> entry, EmiRecipeCategory category, Class<? extends MachineBlockEntity> screenProviderSource, BlockState machineState) {
         super(category, entry.id(), 150, 66);
         
         recipe = entry.value();
@@ -38,7 +37,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
             this.outputs.add(EmiStack.of(recipe.getFluidOutput().variant().getFluid(), recipe.getFluidInput().amount()));
         
         try {
-            this.screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(new BlockPos(0, 0, 0), Blocks.AIR.getDefaultState());
+            this.screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(new BlockPos(0, 0, 0), machineState);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             throw new RuntimeException(e);

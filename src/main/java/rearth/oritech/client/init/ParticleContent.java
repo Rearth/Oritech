@@ -12,6 +12,7 @@ import rearth.oritech.Oritech;
 public class ParticleContent {
     
     public static final ParticleSystemController PARTICLE_CONTROLLER = new ParticleSystemController(Oritech.id("particles"));
+    
     public static final ParticleSystem<Void> HIGHLIGHT_BLOCK = PARTICLE_CONTROLLER.register(Void.class, (world, pos, data) -> {
         spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, pos, 1, 120, 6);
         ClientParticles.reset();
@@ -25,6 +26,15 @@ public class ParticleContent {
     public static final ParticleSystem<Void> DEBUG_BLOCK = PARTICLE_CONTROLLER.register(Void.class, (world, pos, data) -> {
         spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, pos, 1, 120, 2);
         ClientParticles.reset();
+    });
+    
+    public static final ParticleSystem<SoulParticleData> WANDERING_SOUL = PARTICLE_CONTROLLER.register(SoulParticleData.class, (world, pos, data) -> {
+        ClientParticles.setVelocity(data.offset.multiply((1f / data.duration) * 1.5f));
+        ClientParticles.spawnWithMaxAge(ParticleTypes.SCULK_SOUL, pos, data.duration);
+    });
+    
+    public static final ParticleSystem<LineData> CATALYST_CONNECTION = PARTICLE_CONTROLLER.register(LineData.class, (world, pos, data) -> {
+        ClientParticles.spawnEnchantParticles(world, data.start, data.end, 0.7f);
     });
     
     public static final ParticleSystem<Integer> FERTILIZER_EFFECT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
@@ -55,6 +65,16 @@ public class ParticleContent {
     public static final ParticleSystem<Integer> PULVERIZER_WORKING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(data);
         ClientParticles.spawnCenteredOnBlock(ParticleTypes.DUST_PLUME, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
+    }));
+    
+    public static final ParticleSystem<Integer> SOUL_USED = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawn(ParticleTypes.HAPPY_VILLAGER, world, pos, 1.2);
+    }));
+    
+    public static final ParticleSystem<Integer> MELTDOWN_IMMINENT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawn(ParticleTypes.LAVA, world, pos, 1);
     }));
     
     public static final ParticleSystem<Integer> GRINDER_WORKING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
@@ -122,5 +142,7 @@ public class ParticleContent {
     }
     
     public record LineData(Vec3d start, Vec3d end) {}
+    
+    public record SoulParticleData(Vec3d offset, int duration) {}
     
 }

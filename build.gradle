@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.7-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -90,7 +90,7 @@ dependencies {
     modCompileOnly "dev.emi:emi-fabric:${project.emi_version}:api"
 
     // athena (CTM)
-    modRuntimeOnly "earth.terrarium.athena:athena-fabric-${minecraft_version}:${athena_version}"
+    modRuntimeOnly "earth.terrarium.athena:athena-fabric-${athena_version}"
 
     // recipe viewer runtime
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
