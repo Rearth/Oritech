@@ -244,10 +244,10 @@ public class EnchanterBlockEntity extends BlockEntity
                 if (chunk == null) continue;
                 
                 var entities = chunk.blockEntities;
-                // select all non-empty catalysts within range (12)
+                // select all non-empty catalysts within range (16)
                 var catalysts = entities.values()
                                   .stream()
-                                  .filter(elem -> elem instanceof EnchantmentCatalystBlockEntity catalyst && catalyst.collectedSouls > 0 && elem.getPos().getManhattanDistance(pos) < 12)
+                                  .filter(elem -> elem instanceof EnchantmentCatalystBlockEntity catalyst && catalyst.collectedSouls > 0 && elem.getPos().getManhattanDistance(pos) < 16)
                                   .map(elem -> (EnchantmentCatalystBlockEntity) elem)
                                   .toList();
                 cachedCatalysts.addAll(catalysts);

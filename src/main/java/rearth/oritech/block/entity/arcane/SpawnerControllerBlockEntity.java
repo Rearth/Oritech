@@ -51,7 +51,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         if (loadedMob != null && spawnedMob == null) {
             loadEntityFromIdentifier(loadedMob);
             loadedMob = null;
-            networkDirty = true;
+            this.markDirty();
         }
         
         if (spawnedMob == null) return;
