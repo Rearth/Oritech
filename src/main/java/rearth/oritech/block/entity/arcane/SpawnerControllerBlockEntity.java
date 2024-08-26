@@ -54,7 +54,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
             this.markDirty();
         }
         
-        if (spawnedMob == null) return;
+        if (spawnedMob == null || !hasCage) return;
         
         if (collectedSouls >= maxSouls && world.getTime() % 4 == 0) {
             spawnMob();
