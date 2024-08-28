@@ -29,18 +29,31 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.CatalystScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.ScreenProvider;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import java.util.List;
 
 public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
-  implements InventoryProvider, ScreenProvider, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+  implements InventoryProvider, ScreenProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+    
+    public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    public static final RawAnimation STABILIZED = RawAnimation.begin().thenLoop("stabilized");
+    public static final RawAnimation UNSTABLE = RawAnimation.begin().thenLoop("unstable");
     
     public final int baseSoulCapacity = 50;
     public final int maxProgress = 20;
+    protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     // working data
     public int collectedSouls;
@@ -48,7 +61,8 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     private int unstableTicks;
     private int progress;
     private boolean isHyperEnchanting;
-    private boolean dirty;
+    private boolean networkDirty;
+    private String lastAnimation = "idle";
     
     public final SimpleInventory inventory = new SimpleInventory(2) {
         @Override
@@ -102,13 +116,14 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         // check if a book is in slot 0
         // check if an item is in slot 1
         if (canProceed()) {
-            dirty = true;
+            networkDirty = true;
             progress++;
             
             ParticleContent.SOUL_USED.spawn(world, pos.toCenterPos().add(0, 0.3, 0), isHyperEnchanting ? 15 : 3);
             
             if (progress >= maxProgress) {
                 enchantInput();
+                ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.toCenterPos(), maxProgress + 10);
                 
                 progress = 0;
                 isHyperEnchanting = false;
@@ -117,11 +132,16 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             progress = 0;
         }
         
-        if (dirty) {
-            dirty = false;
+        if (networkDirty) {
+            networkDirty = false;
             updateNetwork();
             DeathListener.resetEvents();
+            updateAnimation();
         }
+        
+        // periodically re-trigger animation updates
+        if (world.getTime() % 60 == 0)
+            lastAnimation = "idle";
         
     }
     
@@ -157,7 +177,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             maxSouls++;
         }
         
-        this.dirty = true;
+        this.networkDirty = true;
     }
     
     private void enchantInput() {
@@ -237,7 +257,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     public void onSoulIncoming(Vec3d source) {
         var distance = (float) source.distanceTo(pos.toCenterPos());
         collectedSouls++;
-        dirty = true;
+        networkDirty = true;
         
         var soulPath = pos.toCenterPos().subtract(source);
         var animData = new ParticleContent.SoulParticleData(soulPath, (int) getSoulTravelDuration(distance));
@@ -293,6 +313,40 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         return List.of(
           new GuiSlot(0, 56, 26),
           new GuiSlot(1, 56, 44));
+    }
+    
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "machine", 4, state -> {
+            if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED))
+                return state.setAndContinue(IDLE);
+            return PlayState.CONTINUE;
+        })
+                          .triggerableAnim("stabilized", STABILIZED)
+                          .triggerableAnim("idle", IDLE)
+                          .triggerableAnim("unstable", UNSTABLE)
+                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+    }
+    
+    private void updateAnimation() {
+        
+        var targetAnim = "idle";
+        if (maxSouls > baseSoulCapacity)
+            targetAnim = "stabilized";
+        
+        if (unstableTicks > 0)
+            targetAnim = "unstable";
+        
+        if (!targetAnim.equals(lastAnimation)) {
+            triggerAnim("machine", targetAnim);
+            lastAnimation = targetAnim;
+        }
+        
+    }
+    
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animatableInstanceCache;
     }
     
     @Override

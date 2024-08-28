@@ -2,10 +2,7 @@ package rearth.oritech.block.blocks.arcane;
 
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -47,10 +44,10 @@ public class EnchantmentCatalystBlock extends HorizontalFacingBlock implements B
         return null;
     }
     
-//    @Override
-//    public BlockRenderType getRenderType(BlockState state) {
-//        return BlockRenderType.ENTITYBLOCK_ANIMATED;
-//    }
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.ENTITYBLOCK_ANIMATED;
+    }
     
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
