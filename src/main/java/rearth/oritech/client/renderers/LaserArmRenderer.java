@@ -115,7 +115,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         return new Vec3d(lerp(a.x, b.x, f), lerp(a.y, b.y, f), lerp(a.z, b.z, f));
     }
     
-    private static double lerp(double a, double b, double f) {
+    public static double lerp(double a, double b, double f) {
         return a + f * (b - a);
     }
 }

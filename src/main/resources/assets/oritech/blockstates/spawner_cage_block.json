@@ -1,0 +1,58 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "up": "false"
+      },
+      "apply": {
+        "model": "oritech:block/spawner_cage_block",
+        "x": -90
+      }
+    },
+    {
+      "when": {
+        "down": "false"
+      },
+      "apply": {
+        "model": "oritech:block/spawner_cage_block",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "north": "false"
+      },
+      "apply": {
+        "model": "oritech:block/spawner_cage_block",
+        "x": 0
+      }
+    },
+    {
+      "when": {
+        "east": "false"
+      },
+      "apply": {
+        "model": "oritech:block/spawner_cage_block",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "false"
+      },
+      "apply": {
+        "model": "oritech:block/spawner_cage_block",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "false"
+      },
+      "apply": {
+        "model": "oritech:block/spawner_cage_block",
+        "y": 270
+      }
+    }
+  ]
+}

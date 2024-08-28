@@ -33,6 +33,10 @@ public class ParticleContent {
         ClientParticles.spawnWithMaxAge(ParticleTypes.SCULK_SOUL, pos, data.duration);
     });
     
+    public static final ParticleSystem<LineData> CATALYST_CONNECTION = PARTICLE_CONTROLLER.register(LineData.class, (world, pos, data) -> {
+        ClientParticles.spawnEnchantParticles(world, data.start, data.end, 0.7f);
+    });
+    
     public static final ParticleSystem<Integer> FERTILIZER_EFFECT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(data);
         ClientParticles.spawnWithinBlock(ParticleTypes.HAPPY_VILLAGER, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z));
@@ -61,6 +65,16 @@ public class ParticleContent {
     public static final ParticleSystem<Integer> PULVERIZER_WORKING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(data);
         ClientParticles.spawnCenteredOnBlock(ParticleTypes.DUST_PLUME, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
+    }));
+    
+    public static final ParticleSystem<Integer> SOUL_USED = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawn(ParticleTypes.HAPPY_VILLAGER, world, pos, 1.2);
+    }));
+    
+    public static final ParticleSystem<Integer> MELTDOWN_IMMINENT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawn(ParticleTypes.LAVA, world, pos, 1);
     }));
     
     public static final ParticleSystem<Integer> GRINDER_WORKING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {

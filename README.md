@@ -120,6 +120,7 @@ In detail, these are the following items that are from the above-mentioned sourc
   * Metal Beam
 * From [malcolmriley's unused-textures repo](https://github.com/malcolmriley/unused-textures)
   * Oil fluid textures (the dark gas texture)
+  * The withered crop textures
   * Most of the crafting component textures
 
 ## Acknowledgements

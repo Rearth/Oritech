@@ -1,7 +1,8 @@
 ```json
 {
   "title": "Logistics",
-  "icon": "oritech:fluid_pipe"
+  "icon": "oritech:fluid_pipe",
+  "ordinal": 4
 }
 ```
 

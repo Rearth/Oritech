@@ -43,6 +43,8 @@ public class ModRenderers {
         BlockEntityRendererFactories.register(BlockEntitiesContent.FERTILIZER_BLOCK_ENTITY, ctx -> new MachineGantryRenderer());
         BlockEntityRendererFactories.register(BlockEntitiesContent.SMALL_TANK_ENTITY, ctx -> new SmallTankRenderer());
         
+        BlockEntityRendererFactories.register(BlockEntitiesContent.SPAWNER_CONTROLLER_BLOCK_ENTITY, ctx -> new SpawnerControllerRenderer());
+        
         BlockEntityRendererFactories.register(BlockEntitiesContent.TECH_DOOR_ENTITY, ctx -> new MachineRenderer<>("models/tech_door"));
         
         // cutout renders
@@ -61,6 +63,8 @@ public class ModRenderers {
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.INDUSTRIAL_GLASS_BLOCK, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.QUARRY_BEAM_TARGET, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.QUARRY_BEAM_RING, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.WITHER_CROP_BLOCK, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.SPAWNER_CONTROLLER_BLOCK, RenderLayer.getCutout());
         
         // fluids
         FluidRenderHandlerRegistry.INSTANCE.register(FluidContent.STILL_OIL, FluidContent.FLOWING_OIL, new SimpleFluidRenderHandler(

@@ -129,13 +129,6 @@
 			}
 		}
 	],
-	"display": {
-		"gui": {
-			"rotation": [40, -45, 0],
-			"translation": [0, 2.75, 0],
-			"scale": [0.8, 0.8, 0.8]
-		}
-	},
 	"groups": [
 		0,
 		{

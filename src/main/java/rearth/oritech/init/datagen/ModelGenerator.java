@@ -3,6 +3,7 @@ package rearth.oritech.init.datagen;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.block.Block;
+import net.minecraft.block.CropBlock;
 import net.minecraft.block.enums.BlockFace;
 import net.minecraft.data.client.*;
 import net.minecraft.item.Item;
@@ -90,6 +91,11 @@ public class ModelGenerator extends FabricModelProvider {
         
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_EXTENDER);
         
+        //arcane
+        blockStateModelGenerator.registerSimpleState(BlockContent.SPAWNER_CAGE_BLOCK);
+        blockStateModelGenerator.registerSimpleState(BlockContent.SPAWNER_CONTROLLER_BLOCK);
+        blockStateModelGenerator.registerCrop(BlockContent.WITHER_CROP_BLOCK, CropBlock.AGE, 0, 0, 1, 2, 3, 3, 4, 5);
+        
         // metals
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.NICKEL_ORE);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.DEEPSLATE_NICKEL_ORE);
@@ -119,6 +125,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.INDUSTRIAL_GLASS_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.CAPACITOR_ADDON_EXTENDER);
         blockStateModelGenerator.registerSimpleState(BlockContent.METAL_BEAM_BLOCK);
+        
         
     }
     
