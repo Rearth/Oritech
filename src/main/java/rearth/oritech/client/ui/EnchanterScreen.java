@@ -39,7 +39,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     public void fillOverlay(FlowLayout overlay) {
         super.fillOverlay(overlay);
         
-        openEnchantmentSelection = Components.button(Text.literal("Bane of long names"), this::onOpenClicked);
+        openEnchantmentSelection = Components.button(Text.translatable("button.oritech.enchanter.bane_of_long_names"), this::onOpenClicked);
         openEnchantmentSelection.positioning(Positioning.relative(70, 14));
         openEnchantmentSelection.active(false);
         overlay.child(openEnchantmentSelection);
@@ -48,7 +48,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         detailsScrollPane.padding(Insets.of(2));
         detailsScrollPane.margins(Insets.of(3));
         
-        statisticsLabel = Components.label(Text.literal("1 / 4 catalysts available"));
+        statisticsLabel = Components.label(Text.translatable("title.oritech.enchanter.catalysts_available", 1, 4));
         statisticsLabel.positioning(Positioning.relative(70, 40));
         overlay.child(statisticsLabel);
     }
@@ -72,7 +72,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
             onStackChanged();
         }
         
-        Text description = Text.literal("Insert Item");
+        Text description = Text.translatable("message.oritech.enchanter.insert_item");
         var hasSelection = this.handler.enchanter.selectedEnchantment != null;
         if (hasSelection) {
             description = this.handler.enchanter.selectedEnchantment.value().description();
@@ -89,10 +89,10 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         if (statistics.equals(EnchanterBlockEntity.EnchanterStatistics.EMPTY)) {
             statisticsLabel.text(Text.literal(""));
         } else {
-            statisticsLabel.text(Text.literal(statistics.availableCatalysts() + "/" + statistics.requiredCatalysts() + " Catalysts").formatted(Formatting.DARK_GRAY));
+            statisticsLabel.text(Text.translatable("title.oritech.enchanter.catalysts", statistics.availableCatalysts(), statistics.requiredCatalysts()).formatted(Formatting.DARK_GRAY));
         }
         
-        this.progress_indicator.tooltip(Text.literal(handler.enchanter.progress + "/" + handler.enchanter.maxProgress + " Souls used"));
+        this.progress_indicator.tooltip(Text.translatable("title.oritech.enchanter.souls_used", handler.enchanter.progress, handler.enchanter.maxProgress));
         
     }
     

@@ -7,7 +7,6 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 import java.util.List;
 
@@ -24,6 +23,6 @@ public class SmallFluidTankBlockItem extends BlockItem {
         var nbt = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
         
         var amount = nbt.getLong("amount") * 1000 / FluidConstants.BUCKET;
-        tooltip.add(Text.translatable("tooltip.oritech.fluid_content", amount));
+        tooltip.add(Text.translatable("tooltip.oritech.fluid_amount", amount));
     }
 }

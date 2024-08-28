@@ -10,6 +10,7 @@ import io.wispforest.owo.ui.util.SpriteUtilInvoker;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.Sprite;
@@ -88,7 +89,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             var containerSteam = handler.steamStorage;
             steamDisplay = initFluidDisplay(containerSteam, configSteam);
             // the label is then actually added to the screen in the upgradable screen extension
-            steamProductionLabel = Components.label(Text.translatable("title.oritech.steam_production", 0.0F));
+            steamProductionLabel = Components.label(Text.translatable("title.oritech.steam_production", "0"));
             steamProductionLabel.tooltip(Text.translatable("tooltip.oritech.steam_production"));
         } else {
             steamDisplay = null;
@@ -192,7 +193,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         if (steamProductionLabel != null) {
             var productionRate = handler.screenData.getDisplayedEnergyUsage() * Oritech.CONFIG.generators.rfToSteamRation();
             productionRate = Math.min(this.waterDisplay.storage.amount, productionRate);
-            steamProductionLabel.text(Text.translatable("title.oritech.steam_production", productionRate));
+            steamProductionLabel.text(Text.translatable("title.oritech.steam_production", String.format("%.0f", productionRate)));
         }
     }
     
@@ -242,10 +243,11 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     public Text getEnergyTooltip(long amount, long max) {
         var percentage = (float) amount / max;
+        var energyFill = String.format("%.1f", percentage * 100);
         var energyUsage = handler.screenData.getDisplayedEnergyUsage();
         var storedAmount = TooltipHelper.getEnergyText(amount);
         var maxAmount = TooltipHelper.getEnergyText(max);
-        return Text.translatable("tooltip.oritech.energy_usage", storedAmount, maxAmount, percentage, energyUsage);
+        return Text.translatable("tooltip.oritech.energy_usage", storedAmount, maxAmount, energyFill, energyUsage);
     }
     
     public void updateSettingsButtons() {
@@ -383,7 +385,9 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         display.fillOverlay.verticalSizing(Sizing.fixed((int) (config.height() * targetFill * 0.98f)));
         
-        var tooltipText = Text.translatable("tooltip.oritech.fluid_content", container.getAmount() * 1000 / FluidConstants.BUCKET, container.getResource().toString());
+        var tooltipText = container.getAmount() > 0
+            ? Text.translatable("tooltip.oritech.fluid_content", container.getAmount() * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(container.getResource()).getString())
+            : Text.translatable("tooltip.oritech.fluid_empty");
         background.tooltip(tooltipText);
     }
     
@@ -396,7 +400,9 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     @NotNull
     private static ColoredSpriteComponent getColoredSpriteComponent(FluidVariant variant, long amount, ScreenProvider.BarConfiguration config, Sprite sprite, int spriteColor) {
-        var tooltipText = Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidConstants.BUCKET, variant.toString());
+        var tooltipText = amount > 0
+            ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(variant).getString())
+            : Text.translatable("tooltip.oritech.fluid_empty");
         
         var result = new ColoredSpriteComponent(sprite);
         result.widthMultiplier = config.width() / 60f;

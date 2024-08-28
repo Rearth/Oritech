@@ -108,6 +108,6 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements SimpleEnerg
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         super.appendTooltip(stack, context, tooltip, type);
         var text = Text.translatable("tooltip.oritech.energy_indicator", this.getStoredEnergy(stack), this.getEnergyCapacity(stack));
-        tooltip.add(text);
+        tooltip.add(text.formatted(Formatting.GOLD));
     }
 }

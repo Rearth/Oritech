@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
@@ -303,18 +304,18 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
         
         var distance = targetPos.getManhattanDistance(pos);
         if (distance < 50) {
-            sendNetworkStatusMessage("Target must be at least 50 blocks away.\n(current distance: " + distance + ")");
+            sendNetworkStatusMessage(I18n.translate("message.oritech.drone.invalid_distance", distance));
             return false;
         }
         
         if (world.getBlockState(targetPos).getBlock() instanceof DronePortBlock) {
             // store position
             this.targetPosition = targetPos;
-            sendNetworkStatusMessage("Target port set.\nDrone will deliver whenever the inventory is not empty.");
+            sendNetworkStatusMessage(I18n.translate("message.oritech.drone.target_set"));
             return true;
         }
         
-        sendNetworkStatusMessage("Target is not a valid drone port.\nEnsure that the target port is loaded and active.");
+        sendNetworkStatusMessage(I18n.translate("message.oritech.drone.target_invalid"));
         return false;
         
     }

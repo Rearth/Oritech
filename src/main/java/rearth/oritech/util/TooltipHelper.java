@@ -3,6 +3,7 @@ package rearth.oritech.util;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -22,11 +23,11 @@ public class TooltipHelper {
         if (amount < 1000) {
             return String.valueOf(amount);
         } else if (amount < 1_000_000) {
-            return getFormatted(amount / 1000.0) + "K";
+            return getFormatted(amount / 1000.0) + I18n.translate("tooltip.oritech.thousand_abbrev");
         } else if (amount < 1_000_000_000) {
-            return getFormatted(amount / 1000000.0) + "M";
+            return getFormatted(amount / 1000000.0) + I18n.translate("tooltip.oritech.million_abbrev");
         } else {
-            return getFormatted(amount / 1000000000.0) + "B";
+            return getFormatted(amount / 1000000000.0) + I18n.translate("tooltip.oritech.billion_abbrev");
         }
     }
     

@@ -159,7 +159,7 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
         
         var area = isAreaEnabled(stack);
         
-        tooltip.add(area ? Text.translatable("tooltip.oritech.tool_mode.area_range.area") :  Text.translatable("tooltip.oritech.tool_mode.area_range.single"));
+        tooltip.add((area ? Text.translatable("tooltip.oritech.tool_mode.area_range.area") :  Text.translatable("tooltip.oritech.tool_mode.area_range.single")).formatted(Formatting.GOLD));
         tooltip.add(Text.translatable("tooltip.oritech.promethium_pick").formatted(Formatting.DARK_GRAY));
         
     }

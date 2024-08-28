@@ -122,7 +122,10 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, 81000, new ScreenProvider.BarConfiguration(4, 5, 16, 50)));
             
             
-            var text = Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(fluid).getString());
+            var text = amount > 0
+                ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(fluid).getString())
+                : Text.translatable("tooltip.oritech.fluid_empty");
+
             var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
             foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));
             foreGround.positioning(Positioning.absolute(3, 4));
@@ -136,7 +139,9 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             
             root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, 81000, new ScreenProvider.BarConfiguration(123, 5, 16, 50)));
             
-            var text = Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(fluid).getString());
+            var text = amount > 0
+                ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(fluid).getString())
+                : Text.translatable("tooltip.oritech.fluid_empty");
             var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
             foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));
             foreGround.positioning(Positioning.absolute(122, 4));

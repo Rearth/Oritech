@@ -173,55 +173,58 @@
   "title.oritech.inventory_proxy": "Machine Inventory Access",
 
   "tooltip.oritech.energy_stored": "Stored: %d RF",
-  "tooltip.oritech.energy_indicator": [
-    { "text": "%d/%d RF", "color": "gold" }
-  ],
-  "tooltip.oritech.energy_max_transfer": [
-    { "text": "Max Transfer Rate: ", "color": "gray" },
-    { "translate": "tooltip.oritech.energy_transfer_rate" }
-  ],
-  "tooltip.oritech.energy_transfer_rate": [
-    { "text": "%d RF/t", "color": "gold" }
-  ],
+  "tooltip.oritech.energy_indicator": "%d/%d RF",
+  "tooltip.oritech.energy_max_transfer": "Max Transfer Rate: ",
+  "tooltip.oritech.energy_transfer_rate": "%d RF/t",
   "title.oritech.machine.addon_range": "%d Range",
   "tooltip.oritech.block_destroyer.addon_range": "Maximum digging depth",
   "tooltip.oritech.laser_arm.addon_range": "Effective beam radius",
   "title.oritech.machine.addon_fortune": "%d Fortune",
   "tooltip.oritech.machine.addon_fortune": "Yield addon count. 3 is the effective maximum",
-  "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many layers of machine\naddons can be added to this block.\n\nUse better cores to increase this\n\nCurrent quality progress: %.2f",
+  "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many layers of machine\naddons can be added to this block.\n\nUse better cores to increase this\n\nCurrent quality progress: %s",
 
-  "title.oritech.machine_speed": "⌛ %.0f%%",
+  "tooltip.oritech.thousand_abbrev": "K",
+  "tooltip.oritech.million_abbrev": "M",
+  "tooltip.oritech.billion_abbrev": "B",
+
+  "title.oritech.machine_speed": "⌛ %s%%",
   "tooltip.oritech.machine_speed": "Processing Speed",
-  "title.oritech.machine_efficiency": "⚡ %.0f%%",
+  "title.oritech.machine_efficiency": "⚡ %s%%",
   "tooltip.oritech.machine_efficiency": "Energy Efficiency",
   "title.oritech.machine_energy_production": "↗ %d RF/t",
 
   "tooltip.oritech.steam_energy_production": "Total production (includes chained generators)",
-  "title.oritech.steam_production": "\uD83D\uDEDE %.0f su/t",
+  "title.oritech.steam_production": "\uD83D\uDEDE %s su/t",
   "tooltip.oritech.steam_production": "Amount of steam droplets produced per tick. Any excess will be lost when the storage is full.",
-  "title.oritech.steam_consumption": "\uD83D\uDEDE %.0f su/t",
+  "title.oritech.steam_consumption": "\uD83D\uDEDE %s su/t",
   "tooltip.oritech.steam_consumption": "Total steam consumption in storage units (droplets) per tick (includes chained generators)",
-  "tooltip.oritech.energy_usage": "%s / %s RF\n%.1f%% Charged\n\nMaximum Usage: %.1f RF/t",
+  "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Charged\n\nMaximum Usage: %s RF/t",
   "title.oritech.machine.no_addons": "No addons connected",
   "button.oritech.machine.addons": "Addons",
 
-  "title.oritech.machine.capacitor_added_capacity": [
-    { "text": "\uD83D\uDD0B %d RF ", "color": "gold" },
-    { "text": "Added Capacity", "color": "dark_gray" }
-  ],
-  "title.oritech.machine.capacitor_added_throughput": [
-    { "text": "\uD83D\uDD0B %d RF/t", "color": "gold" },
-    { "text": "Added Throughput", "color": "dark_gray" }
-  ],
+  "title.oritech.machine.capacitor_added_capacity": "\uD83D\uDD0B %d RF ",
+  "tooltip.oritech.machine.capacitor_added_capacity": "Added Capacity",
+  "title.oritech.machine.capacitor_added_throughput": "\uD83D\uDD0B %d RF/t",
+  "tooltip.oritech.machine.capacitor_added_throughput": "Added Throughput",
 
   "title.oritech.machine_option_enabled": "\uD83D\uDD28 Enabled",
   "tooltip.oritech.pulverizer_dust_combine": "Auto-combines small dusts to ingots",
-
-  "tooltip.oritech.fluid_content": [
-    { "text": "%f mB %s", "color": "dark_aqua" }
-  ],
-
+  "tooltip.oritech.fluid_content": "%f mB %s",
+  "tooltip.oritech.fluid_amount": "%f mB",
+  "tooltip.oritech.fluid_empty": "Empty",
   "tooltip.oritech.progress_indicator": "%d / %d ticks\n(base %d ticks)",
+
+  "title.oritech.catalyst.stable": "Stable",
+  "title.oritech.catalyst.stabilized": "Stabilized",
+  "title.oritech.catalyst.semi_stable": "Semi-Stable",
+  "title.oritech.catalyst.unstable": "Unstable",
+
+  "tooltip.oritech.spawner.collected_souls": "%d / %d Souls",
+
+  "button.oritech.enchanter.bane_of_long_names": "Bane of long names",
+  "title.oritech.enchanter.catalysts_available": "%d / %d catalysts available",
+  "title.oritech.enchanter.catalysts": "%d / %d Catalysts",
+  "title.oritech.enchanter.souls_used": "%d / %d Souls used",
 
   "rei.process.oritech:pulverizer": "Pulverizing",
   "rei.process.oritech:grinder": "Fragmenting",
@@ -441,10 +444,18 @@
     { "text": "Prometheum Pickaxe", "color": "#ffd505" }
   ],
 
+  "message.oritech.catalyst.cost": "Cost: %d",
+
   "message.oritech.deep_drill.ore_placement": "Machine must be placed on ore nodes",
   "message.oritech.generator.production_rate": "Production rate: %d with core multiplier: %d",
   "message.oritech.machine.missing_core": "Machine is not assembled. Please add missing core blocks",
   "message.oritech.machine_frame.missing_frame": "Missing frame. Add an empty rectangular frame behind the machine using machine frame blocks",
+
+  "message.oritech.enchanter.insert_item": "Insert Item",
+
+  "message.oritech.drone.invalid_distance": "Target must be at least 50 blocks away.\n(current distance: %d)",
+  "message.oritech.drone.target_set": "Target port set.\nDrone will deliver whenever the inventory is not empty.",
+  "message.oritech.drone.target_invalid": "Target is not a valid drone port.\nEnsure that the target port is loaded and active.",
 
   "message.oritech.pump.starting": "Starting",
   "message.oritech.pump.extending": "Trunk is extending...",
@@ -455,6 +466,9 @@
   "message.oritech.pump.pump_finished": "All liquids have been pumped",
   "message.oritech.pump.full": "Tank is full",
 
+  "message.oritech.spawner.no_cage": "Missing mob cage!",
+  "message.oritech.spawner.no_mob": "No mob caught. Move a mob on top to load it into the spawner",
+
   "message.oritech.target_designator.position_invalid": "Invalid position for drone port, target port must be at least 50 blocks away",
   "message.oritech.target_designator.position_saved": "Position saved to machine",
   "message.oritech.target_designator.position_stored": "Position stored",
@@ -463,12 +477,8 @@
 
   "message.oritech.tool_mode.area_effect": "Area Effect",
   "message.oritech.tool_mode.silk_touch": "Silk Touch",
-  "tooltip.oritech.tool_mode.area_range.area": [
-    { "text": "Mode: Area", "color": "gold" }
-  ],
-  "tooltip.oritech.tool_mode.area_range.single": [
-    { "text": "Mode: Single", "color": "gold" }
-  ],
+  "tooltip.oritech.tool_mode.area_range.area": "Mode: Area",
+  "tooltip.oritech.tool_mode.area_range.single": "Mode: Single",
 
   "text.config.oritech-config.title": "Oritech Settings",
   "text.config.oritech-config.section.machineSettings": "Machines",

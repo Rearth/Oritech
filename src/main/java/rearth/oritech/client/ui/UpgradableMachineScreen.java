@@ -106,7 +106,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
     }
     
     private Text getQualityTooltip() {
-        var quality = handler.quality;
+        var quality = String.format("%.2f", handler.quality);
         var effectiveQuality = (int) handler.quality;
         return Text.translatable("tooltip.oritech.machine.quality", effectiveQuality, quality);
     }
@@ -191,9 +191,9 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             }
             
             if (addonBlockType.getAddonSettings().addedCapacity() > 0)
-                bottomPanel.child(Components.label(Text.of("\uD83D\uDD0B " + addonSettings.addedCapacity() + "RF  ")).color(CAPACITY_COLOR).tooltip(Text.of("Added Capacity")));
+                bottomPanel.child(Components.label(Text.translatable("title.oritech.machine.capacitor_added_capacity", addonSettings.addedCapacity())).color(CAPACITY_COLOR).tooltip(Text.translatable("tooltip.oritech.machine.capacitor_added_capacity")));
             if (addonBlockType.getAddonSettings().addedInsert() > 0)
-                bottomPanel.child(Components.label(Text.of("\uD83D\uDCC8 " + addonSettings.addedInsert() + "RF/t  ")).color(THROUGPUT_COLOR).tooltip(Text.of("Added Throughput")));
+                bottomPanel.child(Components.label(Text.translatable("title.oritech.machine.capacitor_added_throughput", addonSettings.addedInsert())).color(THROUGHPUT_COLOR).tooltip(Text.translatable("tooltip.oritech.machine.capacitor_added_throughput")));
             
             detailPane.child(bottomPanel.positioning(Positioning.absolute(34, 18)));
             

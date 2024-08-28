@@ -51,10 +51,10 @@ public class SteamEngineScreen extends UpgradableMachineScreen<SteamEngineScreen
         var steamEntity = ((SteamEngineEntity) handler.blockEntity);
         var data = steamEntity.getBaseAddonData();
         
-        var speed = 1 / data.speed() * 100;
-        var efficiency = 1 / data.efficiency() * 100;
+        var speed = String.format("%.0f", 1 / data.speed() * 100);
+        var efficiency = String.format("%.0f", 1 / data.efficiency() * 100);
         var totalProduction = steamEntity.energyProducedTick;
-        var totalSteamUsage = steamEntity.energyProducedTick * data.efficiency() / steamEntity.getEnergyPerTick();
+        var totalSteamUsage = String.format("%.0f", steamEntity.energyProducedTick * data.efficiency() / steamEntity.getEnergyPerTick());
         
         speedLabel.text(Text.translatable("title.oritech.machine_speed", speed));
         efficiencyLabel.text(Text.translatable("title.oritech.machine_efficiency", efficiency));
