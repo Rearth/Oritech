@@ -25,6 +25,10 @@ public class ModelGenerator extends FabricModelProvider {
     public ModelGenerator(FabricDataOutput output) {
         super(output);
     }
+
+    public static TextureMap stairsOrientable(Block block, Block baseBlock) {
+        return new TextureMap().put(TextureKey.FRONT, TextureMap.getSubId(block, "_front")).put(TextureKey.SIDE, TextureMap.getSubId(block, "_side")).put(TextureKey.TOP, TextureMap.getSubId(block, "_top")).put(TextureKey.BACK, TextureMap.getId(baseBlock)).put(TextureKey.BOTTOM, TextureMap.getId(baseBlock));
+    }
     
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
@@ -115,13 +119,13 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.blockStateCollector.accept(createButtonBlockState(BlockContent.TECH_BUTTON, Identifier.of(Oritech.MOD_ID, "block/tech_button"), Identifier.of(Oritech.MOD_ID, "block/tech_button_on")));
         registerLever(BlockContent.TECH_LEVER, blockStateModelGenerator);
         BlockStateModelGenerator.BlockTexturePool machinePlatingPool = blockStateModelGenerator.registerCubeAllModelTexturePool(BlockContent.MACHINE_PLATING_BLOCK);
-        machinePlatingPool.stairs(BlockContent.MACHINE_PLATING_STAIRS);
+        blockStateModelGenerator.accept(BlockStateSupplier.create(BlockContent.MACHINE_PLATING_STAIRS).//registerSingleton(BlockContent.MACHINE_PLATING_STAIRS, TexturedModel.makeFactory((block) -> stairsOrientable(block, BlockContent.MACHINE_PLATING_BLOCK), Models.STAIRS));
+        // blockStateModelGenerator.blockStateCollector.accept(createStairsBlockState(BlockContent.MACHINE_PLATING_STAIRS, BlockContent.MACHINE_PLATING_BLOCK, Oritech.id("textures/block/machine_plating_cut_side"), Oritech.id("textures/block/machine_plating_cut_front")));
+        // machinePlatingPool.stairs(BlockContent.MACHINE_PLATING_STAIRS);
+        // blockStateModelGenerator.registerSingleton(BlockContent.MACHINE_PLATING_STAIRS, TexturedModel.ORIENTABLE)
         machinePlatingPool.slab(BlockContent.MACHINE_PLATING_SLAB);
         machinePlatingPool.wall(BlockContent.MACHINE_PLATING_WALL);
-        machinePlatingPool.button(BlockContent.MACHINE_PLATING_BUTTON);
         machinePlatingPool.pressurePlate(BlockContent.MACHINE_PLATING_PRESSURE_PLATE);
-        blockStateModelGenerator.registerDoor(BlockContent.MACHINE_PLATING_DOOR);
-        blockStateModelGenerator.registerTrapdoor(BlockContent.MACHINE_PLATING_TRAPDOOR);
         BlockStateModelGenerator.BlockTexturePool ironPlatingPool = blockStateModelGenerator.registerCubeAllModelTexturePool(BlockContent.IRON_PLATING_BLOCK);
         ironPlatingPool.stairs(BlockContent.IRON_PLATING_STAIRS);
         ironPlatingPool.slab(BlockContent.IRON_PLATING_SLAB);
@@ -135,6 +139,21 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerCrop(BlockContent.WITHER_CROP_BLOCK, CropBlock.AGE, 0, 0, 1, 2, 3, 3, 4, 5);
         
     }
+
+    // public BlockStateModelGenerator$BlockTexturePool stairs(Block block) {
+    //     Identifier identifier = this.ensureModel(Models.INNER_STAIRS, block);
+    //     Identifier identifier2 = this.ensureModel(Models.STAIRS, block);
+    //     Identifier identifier3 = this.ensureModel(Models.OUTER_STAIRS, block);
+    //     this.field_22836.blockStateCollector.accept(BlockStateModelGenerator.createStairsBlockState(block, identifier, identifier2, identifier3));
+    //     this.field_22836.registerParentedItemModel(block, identifier2);
+    //     return this;
+    //  }
+
+    //  private Identifier ensureModel(Model model, Block block) {
+    //     return (Identifier)this.knownModels.computeIfAbsent(model, (newModel) -> {
+    //        return newModel.upload(block, this.textures, this.field_22836.modelCollector);
+    //     });
+    //  }
     
     @Override
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
@@ -216,5 +235,4 @@ public class ModelGenerator extends FabricModelProvider {
                           .register(BlockFace.WALL, Direction.SOUTH, BlockStateVariant.create().put(VariantSettings.X, VariantSettings.Rotation.R90).put(VariantSettings.Y, VariantSettings.Rotation.R180))
                           .register(BlockFace.WALL, Direction.WEST, BlockStateVariant.create().put(VariantSettings.X, VariantSettings.Rotation.R90).put(VariantSettings.Y, VariantSettings.Rotation.R270))));
     }
-    
 }

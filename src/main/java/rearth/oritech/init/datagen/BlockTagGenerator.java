@@ -72,12 +72,8 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .add(BlockContent.RESOURCE_NODE_PLATINUM);
         
         getOrCreateTagBuilder(BlockTags.WALLS)
-          .add(BlockContent.MACHINE_PLATING_WALL);
-        
-        getOrCreateTagBuilder(BlockTags.DOORS)
-          .add(BlockContent.MACHINE_PLATING_DOOR);
-        
-        getOrCreateTagBuilder(BlockTags.TRAPDOORS)
-          .add(BlockContent.MACHINE_PLATING_TRAPDOOR);
+          .add(BlockContent.MACHINE_PLATING_WALL)
+          .add(BlockContent.IRON_PLATING_WALL)
+          .add(BlockContent.NICKEL_PLATING_WALL);
     }
 }

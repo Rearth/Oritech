@@ -221,17 +221,11 @@ public class BlockContent implements BlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block MACHINE_PLATING_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block MACHINE_PLATING_WALL = new WallBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
-    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block MACHINE_PLATING_DOOR = new DoorBlock(BlockSetType.COPPER, FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
-    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block MACHINE_PLATING_TRAPDOOR = new TrapdoorBlock(BlockSetType.COPPER, FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
-    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block MACHINE_PLATING_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block MACHINE_PLATING_STAIRS = new StairsBlock(MACHINE_PLATING_BLOCK.getDefaultState(), FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block MACHINE_PLATING_BUTTON = new ButtonBlock(BlockSetType.IRON, 10, FabricBlockSettings.copyOf(Blocks.STONE_BUTTON));
+    public static final Block MACHINE_PLATING_WALL = new WallBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block MACHINE_PLATING_PRESSURE_PLATE = new PressurePlateBlock(BlockSetType.IRON, FabricBlockSettings.copyOf(Blocks.STONE_BUTTON));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
@@ -241,15 +235,21 @@ public class BlockContent implements BlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block IRON_PLATING_STAIRS = new StairsBlock(IRON_PLATING_BLOCK.getDefaultState(), FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block IRON_PLATING_WALL = new WallBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block IRON_PLATING_PRESSURE_PLATE = new PressurePlateBlock(BlockSetType.IRON, FabricBlockSettings.copyOf(Blocks.STONE_BUTTON));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block NICKEL_PLATING_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block NICKEL_PLATING_SLAB = new SlabBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block NICKEL_PLATING_WALL = new WallBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block NICKEL_PLATING_PRESSURE_PLATE = new PressurePlateBlock(BlockSetType.IRON, FabricBlockSettings.copyOf(Blocks.STONE_BUTTON));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block NICKEL_PLATING_STAIRS = new StairsBlock(NICKEL_PLATING_BLOCK.getDefaultState(), FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block METAL_BEAM_BLOCK = new MetalBeamBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
-    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block CAUTION_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block INDUSTRIAL_GLASS_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS).requiresTool().strength(7.0F, 8.0F).nonOpaque());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)

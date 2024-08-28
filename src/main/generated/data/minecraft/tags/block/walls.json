@@ -1,5 +1,7 @@
 {
   "values": [
-    "oritech:machine_plating_wall"
+    "oritech:machine_plating_wall",
+    "oritech:iron_plating_wall",
+    "oritech:nickel_plating_wall"
   ]
 }

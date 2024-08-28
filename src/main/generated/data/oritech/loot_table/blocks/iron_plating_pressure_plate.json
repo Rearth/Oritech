@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "oritech:machine_plating_trapdoor"
+          "name": "oritech:iron_plating_pressure_plate"
         }
       ],
       "rolls": 1.0

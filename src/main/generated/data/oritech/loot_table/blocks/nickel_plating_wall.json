@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "oritech:caution_block"
+          "name": "oritech:nickel_plating_wall"
         }
       ],
       "rolls": 1.0

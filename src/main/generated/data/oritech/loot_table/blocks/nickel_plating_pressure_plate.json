@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "oritech:machine_plating_button"
+          "name": "oritech:nickel_plating_pressure_plate"
         }
       ],
       "rolls": 1.0
