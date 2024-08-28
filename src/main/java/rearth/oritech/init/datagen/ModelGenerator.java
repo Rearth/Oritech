@@ -95,6 +95,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleState(BlockContent.SPAWNER_CAGE_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.SPAWNER_CONTROLLER_BLOCK);
         blockStateModelGenerator.registerCrop(BlockContent.WITHER_CROP_BLOCK, CropBlock.AGE, 0, 0, 1, 2, 3, 3, 4, 5);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.ENCHANTER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);   // uses geckolib
         
         // metals
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.NICKEL_ORE);

@@ -9,6 +9,7 @@ import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
@@ -76,5 +77,23 @@ public class EnchantmentCatalystBlock extends HorizontalFacingBlock implements B
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
         };
+    }
+    
+    // drop inv
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        
+        if (!world.isClient) {
+            var entity = (EnchantmentCatalystBlockEntity) world.getBlockEntity(pos);
+            var stacks = entity.inventory.heldStacks;
+            for (var stack : stacks) {
+                if (!stack.isEmpty()) {
+                    var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+                    world.spawnEntity(itemEntity);
+                }
+            }
+        }
+        
+        return super.onBreak(world, pos, state, player);
     }
 }
