@@ -6,9 +6,9 @@
 				"identifier": "geometry.unknown",
 				"texture_width": 128,
 				"texture_height": 128,
-				"visible_bounds_width": 4,
-				"visible_bounds_height": 3.5,
-				"visible_bounds_offset": [0, 1.25, 0]
+				"visible_bounds_width": 5,
+				"visible_bounds_height": 4,
+				"visible_bounds_offset": [0, 1, 0]
 			},
 			"bones": [
 				{
@@ -168,12 +168,12 @@
 							"pivot": [-0.175, 12.15, 0],
 							"rotation": [-23.47603, 16.1299, -6.88003],
 							"uv": {
-								"north": {"uv": [18, 18], "uv_size": [18, 18]},
-								"east": {"uv": [0, 18], "uv_size": [18, 18]},
-								"south": {"uv": [54, 18], "uv_size": [18, 18]},
-								"west": {"uv": [36, 18], "uv_size": [18, 18]},
+								"north": {"uv": [18, 0], "uv_size": [18, 18]},
+								"east": {"uv": [18, 0], "uv_size": [18, 18]},
+								"south": {"uv": [18, 0], "uv_size": [18, 18]},
+								"west": {"uv": [18, 0], "uv_size": [18, 18]},
 								"up": {"uv": [18, 0], "uv_size": [18, 18]},
-								"down": {"uv": [36, 18], "uv_size": [18, -18]}
+								"down": {"uv": [18, 18], "uv_size": [18, -18]}
 							}
 						}
 					]
