@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_machine_plating_slab": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:machine_plating_slab"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:machine_plating_slab_machineslab"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_machine_plating_slab"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:machine_plating_slab_machineslab"
+    ]
+  }
+}

@@ -126,19 +126,17 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.blockStateCollector.accept(createButtonBlockState(BlockContent.TECH_BUTTON, Identifier.of(Oritech.MOD_ID, "block/tech_button"), Identifier.of(Oritech.MOD_ID, "block/tech_button_on")));
         registerLever(BlockContent.TECH_LEVER, blockStateModelGenerator);
         BlockStateModelGenerator.BlockTexturePool machinePlatingPool = blockStateModelGenerator.registerCubeAllModelTexturePool(BlockContent.MACHINE_PLATING_BLOCK);
-        blockStateModelGenerator.accept(BlockStateSupplier.create(BlockContent.MACHINE_PLATING_STAIRS).//registerSingleton(BlockContent.MACHINE_PLATING_STAIRS, TexturedModel.makeFactory((block) -> stairsOrientable(block, BlockContent.MACHINE_PLATING_BLOCK), Models.STAIRS));
-        // blockStateModelGenerator.blockStateCollector.accept(createStairsBlockState(BlockContent.MACHINE_PLATING_STAIRS, BlockContent.MACHINE_PLATING_BLOCK, Oritech.id("textures/block/machine_plating_cut_side"), Oritech.id("textures/block/machine_plating_cut_front")));
-        // machinePlatingPool.stairs(BlockContent.MACHINE_PLATING_STAIRS);
-        // blockStateModelGenerator.registerSingleton(BlockContent.MACHINE_PLATING_STAIRS, TexturedModel.ORIENTABLE)
+        machinePlatingPool.stairs(BlockContent.MACHINE_PLATING_STAIRS);
         machinePlatingPool.slab(BlockContent.MACHINE_PLATING_SLAB);
-        machinePlatingPool.wall(BlockContent.MACHINE_PLATING_WALL);
         machinePlatingPool.pressurePlate(BlockContent.MACHINE_PLATING_PRESSURE_PLATE);
         BlockStateModelGenerator.BlockTexturePool ironPlatingPool = blockStateModelGenerator.registerCubeAllModelTexturePool(BlockContent.IRON_PLATING_BLOCK);
         ironPlatingPool.stairs(BlockContent.IRON_PLATING_STAIRS);
         ironPlatingPool.slab(BlockContent.IRON_PLATING_SLAB);
+        ironPlatingPool.pressurePlate(BlockContent.IRON_PLATING_PRESSURE_PLATE);
         BlockStateModelGenerator.BlockTexturePool nickelPlatingPool = blockStateModelGenerator.registerCubeAllModelTexturePool(BlockContent.NICKEL_PLATING_BLOCK);
         nickelPlatingPool.stairs(BlockContent.NICKEL_PLATING_STAIRS);
         nickelPlatingPool.slab(BlockContent.NICKEL_PLATING_SLAB);
+        nickelPlatingPool.pressurePlate(BlockContent.NICKEL_PLATING_PRESSURE_PLATE);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.INDUSTRIAL_GLASS_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.CAPACITOR_ADDON_EXTENDER);
         blockStateModelGenerator.registerSimpleState(BlockContent.METAL_BEAM_BLOCK);

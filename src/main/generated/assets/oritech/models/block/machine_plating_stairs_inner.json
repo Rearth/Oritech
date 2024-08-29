@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/stairs",
+  "parent": "minecraft:block/inner_stairs",
   "textures": {
     "bottom": "oritech:block/machine_plating_block",
     "side": "oritech:block/machine_plating_block",
