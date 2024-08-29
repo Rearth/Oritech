@@ -46,6 +46,14 @@ repositories {
         url "https://modmaven.dev"
     }
 
+    maven { // for Jade
+        name = 'Curse'
+        url = 'https://www.cursemaven.com'
+        content {
+            includeGroup 'curse.maven'
+        }
+    }
+
     maven { // for EMI
         name = 'TerraformersMC'
         url 'https://maven.terraformersmc.com/'
@@ -91,6 +99,8 @@ dependencies {
 
     // athena (CTM)
     modRuntimeOnly "earth.terrarium.athena:athena-fabric-${athena_version}"
+
+    modImplementation "curse.maven:jade-324717:${jade_id}"
 
     // recipe viewer runtime
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
