@@ -6,6 +6,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.enums.BlockFace;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -19,9 +20,13 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.interaction.TreefellerBlockEntity;
+import rearth.oritech.util.Geometry;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +34,8 @@ import java.util.Objects;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 public class TreefellerBlock extends HorizontalFacingBlock implements BlockEntityProvider {
+
+    private static final VoxelShape[] BOUNDING_SHAPES;
     
     public TreefellerBlock(Settings settings) {
         super(settings);
@@ -104,5 +111,33 @@ public class TreefellerBlock extends HorizontalFacingBlock implements BlockEntit
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         super.appendTooltip(stack, context, tooltip, options);
         addMachineTooltip(tooltip, this, this);
+    }
+
+    @Override
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return BOUNDING_SHAPES[state.get(FACING).ordinal()];
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return getOutlineShape(state, world, pos, context);
+    }
+
+    static {
+        BOUNDING_SHAPES = new VoxelShape[Direction.values().length];
+        for (var facing : Direction.values()) {
+            if (!facing.getAxis().isHorizontal()) continue;
+            BOUNDING_SHAPES[facing.ordinal()] = VoxelShapes.union(
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, BlockFace.FLOOR),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.875, 0.3125, 0.875), facing, BlockFace.FLOOR),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0.3125, 0.0625, 0.9375, 0.4375, 0.9375), facing, BlockFace.FLOOR),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.4375, 0.125, 0.875, 0.5625, 0.875), facing, BlockFace.FLOOR),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0.625, 0.0625, 0.9375, 0.75, 0.875), facing, BlockFace.FLOOR),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.5625, 0.125, 0.875, 0.625, 0.6875), facing, BlockFace.FLOOR),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0, 0.375, 0.1875, 0.8125, 0.625), facing, BlockFace.FLOOR),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.8125, 0, 0.375, 1, 0.8125, 0.625), facing, BlockFace.FLOOR),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0, 0.875, 0.625, 0.5, 1), facing, BlockFace.FLOOR),
+                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0, 0, 0.625, 0.8125, 0.1875), facing, BlockFace.FLOOR));
+        }
     }
 }
