@@ -4,6 +4,7 @@ package rearth.oritech.util;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
@@ -20,7 +21,14 @@ public record FluidStack(FluidVariant variant, long amount) {
     
     public static FluidStack fromNbt(NbtCompound nbt) {
         var amount = nbt.getLong("amount");
-        var variant = FluidVariant.of(Registries.FLUID.get(Identifier.of(nbt.getString("variant"))));
+        var nbtVariant = nbt.get("variant");
+        // FluidVariant writes to nbt as variant:{fluid:"fluid_id"}
+        // but but this reads/writes as variant:"fluid_id"
+        // Support either format while reading here
+        var variantID = (nbtVariant.getType() == NbtElement.STRING_TYPE)
+            ? Identifier.of(nbtVariant.asString())
+            : Identifier.of(((NbtCompound)nbtVariant).getString("fluid"));
+        var variant = FluidVariant.of(Registries.FLUID.get(variantID));
         return new FluidStack(variant, amount);
     }
     

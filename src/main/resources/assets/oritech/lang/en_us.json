@@ -210,7 +210,6 @@
   "title.oritech.machine_option_enabled": "\uD83D\uDD28 Enabled",
   "tooltip.oritech.pulverizer_dust_combine": "Auto-combines small dusts to ingots",
   "tooltip.oritech.fluid_content": "%f mB %s",
-  "tooltip.oritech.fluid_amount": "%f mB",
   "tooltip.oritech.fluid_empty": "Empty",
   "tooltip.oritech.progress_indicator": "%d / %d ticks\n(base %d ticks)",
 
