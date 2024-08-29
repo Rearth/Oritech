@@ -41,20 +41,23 @@ public class BasicGeneratorBlock extends UpgradableMachineBlock {
     static {
         BOUNDING_SHAPES = new VoxelShape[Direction.values().length];
         for (var facing : Direction.values()) {
-            if (!facing.getAxis().isHorizontal()) continue;
-            BOUNDING_SHAPES[facing.ordinal()] = VoxelShapes.union(
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.25, 0.375, 0.25, 0.75, 0.6875, 0.75), facing, BlockFace.FLOOR),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0, 0, 1, 0.125, 1), facing, BlockFace.FLOOR),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0006249999999999867, 0.3125, 0.0006249999999999867, 0.999375, 0.375, 0.999375), facing, BlockFace.FLOOR),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0.125, 0.0625, 0.9375, 0.3125, 0.9375), facing, BlockFace.FLOOR),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0.375, 0.8734375, 0.625, 0.625, 1.0000624999999999), facing, BlockFace.FLOOR),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(-0.00006249999999996536, 0.375, 0.375, 0.12656250000000002, 0.625, 0.625), facing, BlockFace.FLOOR),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.8734375, 0.375, 0.375, 1.0000624999999999, 0.625, 0.625), facing, BlockFace.FLOOR),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0.375, 0.875, 1, 0.5, 0.99875), facing, BlockFace.FLOOR),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0006249999999999867, 0.375, 0.125, 0.125, 0.5, 0.875), facing, BlockFace.FLOOR),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.875, 0.375, 0.125, 0.999375, 0.5, 0.875), facing, BlockFace.FLOOR),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0.375, 0.0006249999999999867, 1, 0.5, 0.125), facing, BlockFace.FLOOR),
-                Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0.375, -0.00006249999999996536, 0.625, 0.625, 0.12656250000000002), facing, BlockFace.FLOOR));
+            if (!facing.getAxis().isHorizontal()) {
+                BOUNDING_SHAPES[facing.ordinal()] = VoxelShapes.fullCube();
+            } else {
+                BOUNDING_SHAPES[facing.ordinal()] = VoxelShapes.union(
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.25, 0.375, 0.25, 0.75, 0.6875, 0.75), facing, BlockFace.FLOOR),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0, 0, 1, 0.125, 1), facing, BlockFace.FLOOR),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.000625, 0.3125, 0.000625, 0.999375, 0.375, 0.999375), facing, BlockFace.FLOOR),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0.125, 0.0625, 0.9375, 0.3125, 0.9375), facing, BlockFace.FLOOR),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0.375, 0.8734375, 0.625, 0.625, 1.0000625), facing, BlockFace.FLOOR),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(-0.0000625, 0.375, 0.375, 0.1265625, 0.625, 0.625), facing, BlockFace.FLOOR),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.8734375, 0.375, 0.375, 1.00006245, 0.625, 0.625), facing, BlockFace.FLOOR),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0.375, 0.875, 1, 0.5, 0.99875), facing, BlockFace.FLOOR),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.000625, 0.375, 0.125, 0.125, 0.5, 0.875), facing, BlockFace.FLOOR),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.875, 0.375, 0.125, 0.999375, 0.5, 0.875), facing, BlockFace.FLOOR),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0.375, 0.000625, 1, 0.5, 0.125), facing, BlockFace.FLOOR),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.375, 0.375, -0.0000625, 0.625, 0.625, 0.1265625), facing, BlockFace.FLOOR));
+            }
         }
     }
 }
