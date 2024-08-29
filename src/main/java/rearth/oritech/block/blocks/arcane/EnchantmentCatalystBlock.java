@@ -2,13 +2,11 @@ package rearth.oritech.block.blocks.arcane;
 
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
@@ -46,10 +44,10 @@ public class EnchantmentCatalystBlock extends HorizontalFacingBlock implements B
         return null;
     }
     
-//    @Override
-//    public BlockRenderType getRenderType(BlockState state) {
-//        return BlockRenderType.ENTITYBLOCK_ANIMATED;
-//    }
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.ENTITYBLOCK_ANIMATED;
+    }
     
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
@@ -76,5 +74,23 @@ public class EnchantmentCatalystBlock extends HorizontalFacingBlock implements B
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
         };
+    }
+    
+    // drop inv
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        
+        if (!world.isClient) {
+            var entity = (EnchantmentCatalystBlockEntity) world.getBlockEntity(pos);
+            var stacks = entity.inventory.heldStacks;
+            for (var stack : stacks) {
+                if (!stack.isEmpty()) {
+                    var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+                    world.spawnEntity(itemEntity);
+                }
+            }
+        }
+        
+        return super.onBreak(world, pos, state, player);
     }
 }

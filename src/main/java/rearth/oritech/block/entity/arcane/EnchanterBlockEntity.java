@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.arcane;
 
+import io.wispforest.owo.util.VectorRandomUtils;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
@@ -33,6 +34,13 @@ import rearth.oritech.client.ui.EnchanterScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.ArrayList;
@@ -40,7 +48,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class EnchanterBlockEntity extends BlockEntity
-  implements InventoryProvider, EnergyProvider, ScreenProvider, BlockEntityTicker<EnchanterBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+  implements InventoryProvider, EnergyProvider, GeoBlockEntity, ScreenProvider, BlockEntityTicker<EnchanterBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+    
+    public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    public static final RawAnimation UNPOWERED = RawAnimation.begin().thenPlayAndHold("unpowered");
+    public static final RawAnimation WORKING = RawAnimation.begin().thenPlay("working");
     
     public record EnchanterStatistics(int requiredCatalysts, int availableCatalysts){
         public static EnchanterStatistics EMPTY = new EnchanterStatistics(-1, -1);
@@ -54,7 +66,7 @@ public class EnchanterBlockEntity extends BlockEntity
         }
     };
     
-    public final SimpleInventory inventory = new SimpleInventory(2) {
+    public final SimpleInventory inventory = new SimpleSidedInventory(2, new InventorySlotAssignment(0, 1, 1, 1)) {
         @Override
         public void markDirty() {
             EnchanterBlockEntity.this.markDirty();
@@ -62,6 +74,7 @@ public class EnchanterBlockEntity extends BlockEntity
     };
     
     protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
+    protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     public RegistryEntry<Enchantment> selectedEnchantment;
     public int progress;
     public int maxProgress = 10;
@@ -69,6 +82,7 @@ public class EnchanterBlockEntity extends BlockEntity
     public EnchanterStatistics statistics = EnchanterStatistics.EMPTY; // used for client display
     private boolean networkDirty = false;
     private Identifier nbtLoadedSelection;
+    private String activeAnimation = "idle";
     
     public EnchanterBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ENCHANTER_BLOCK_ENTITY, pos, state);
@@ -82,6 +96,7 @@ public class EnchanterBlockEntity extends BlockEntity
         if (networkDirty)
             updateNetwork();
         
+        activeAnimation = "idle";
         // load data from nbt, as the registry entry is not available during the readNbt method
         if (nbtLoadedSelection != null && selectedEnchantment == null) {
             var registry = world.getRegistryManager().get(RegistryKeys.ENCHANTMENT);
@@ -114,17 +129,24 @@ public class EnchanterBlockEntity extends BlockEntity
             this.markDirty();
             energyStorage.amount -= (long) getDisplayedEnergyUsage();
             progress++;
+            activeAnimation = "working";
             
-            System.out.println(progress + "/" + maxProgress);
+            var center = pos.toCenterPos();
+            var offset = VectorRandomUtils.getRandomOffset(world, center, 4f);
+            ParticleContent.WEED_KILLER.spawn(world, center, new ParticleContent.LineData(center, offset));
             
             if (progress >= maxProgress) {
                 progress = 0;
                 finishEnchanting();
+                ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.toCenterPos(), maxProgress + 10);
+                activeAnimation = "idle";
             }
         }
         
-        if (networkDirty)
+        if (networkDirty) {
             updateNetwork();
+            updateAnimation();
+        }
         
     }
     
@@ -166,11 +188,14 @@ public class EnchanterBlockEntity extends BlockEntity
     }
     
     private boolean canProgress(int targetLevel) {
-        if (energyStorage.amount <= getDisplayedEnergyUsage()) return false;
+        networkDirty = true;
+        if (energyStorage.amount <= getDisplayedEnergyUsage()) {
+            activeAnimation = "unpowered";
+            return false;
+        }
         
         if (world.getTime() % 15 == 0) updateNearbyCatalysts();
         var requiredCatalysts = getRequiredCatalystCount(targetLevel);
-        networkDirty = true;
         
         statistics = new EnchanterStatistics(requiredCatalysts, cachedCatalysts.size());
         
@@ -217,6 +242,24 @@ public class EnchanterBlockEntity extends BlockEntity
         
     }
     
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "machine", 4, state -> PlayState.CONTINUE)
+                          .triggerableAnim("working", WORKING)
+                          .triggerableAnim("idle", IDLE)
+                          .triggerableAnim("unpowered", UNPOWERED)
+                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+    }
+    
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animatableInstanceCache;
+    }
+    
+    private void updateAnimation() {
+        triggerAnim("machine", activeAnimation);
+    }
+    
     private void updateNetwork() {
         networkDirty = false;
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.EnchanterSyncPacket(pos, energyStorage.amount, progress, maxProgress, statistics.requiredCatalysts, statistics.availableCatalysts));
@@ -244,10 +287,10 @@ public class EnchanterBlockEntity extends BlockEntity
                 if (chunk == null) continue;
                 
                 var entities = chunk.blockEntities;
-                // select all non-empty catalysts within range (12)
+                // select all non-empty catalysts within range (16)
                 var catalysts = entities.values()
                                   .stream()
-                                  .filter(elem -> elem instanceof EnchantmentCatalystBlockEntity catalyst && catalyst.collectedSouls > 0 && elem.getPos().getManhattanDistance(pos) < 12)
+                                  .filter(elem -> elem instanceof EnchantmentCatalystBlockEntity catalyst && catalyst.collectedSouls > 0 && elem.getPos().getManhattanDistance(pos) < 16)
                                   .map(elem -> (EnchantmentCatalystBlockEntity) elem)
                                   .toList();
                 cachedCatalysts.addAll(catalysts);

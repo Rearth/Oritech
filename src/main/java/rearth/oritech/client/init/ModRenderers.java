@@ -37,6 +37,8 @@ public class ModRenderers {
         BlockEntityRendererFactories.register(BlockEntitiesContent.DEEP_DRILL_ENTITY, ctx -> new MachineRenderer<>("models/deep_drill_block"));
         BlockEntityRendererFactories.register(BlockEntitiesContent.DRONE_PORT_ENTITY, ctx -> new MachineRenderer<>("models/drone_port_block"));
         BlockEntityRendererFactories.register(BlockEntitiesContent.TREEFELLER_BLOCK_ENTITY, ctx -> new MachineRenderer<>("models/treefeller_block"));
+        BlockEntityRendererFactories.register(BlockEntitiesContent.ENCHANTER_BLOCK_ENTITY, ctx -> new MachineRenderer<>("models/enchanter_block"));
+        BlockEntityRendererFactories.register(BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY, ctx -> new MachineRenderer<>("models/enchantment_catalyst_block"));
         BlockEntityRendererFactories.register(BlockEntitiesContent.PUMP_BLOCK, ctx -> new MachineRenderer<>("models/pump_block"));
         BlockEntityRendererFactories.register(BlockEntitiesContent.PLACER_BLOCK_ENTITY, ctx -> new MachineGantryRenderer());
         BlockEntityRendererFactories.register(BlockEntitiesContent.DESTROYER_BLOCK_ENTITY, ctx -> new MachineGantryRenderer());
@@ -64,6 +66,7 @@ public class ModRenderers {
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.QUARRY_BEAM_TARGET, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.QUARRY_BEAM_RING, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.WITHER_CROP_BLOCK, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.SPAWNER_CONTROLLER_BLOCK, RenderLayer.getCutout());
         
         // fluids
         FluidRenderHandlerRegistry.INSTANCE.register(FluidContent.STILL_OIL, FluidContent.FLOWING_OIL, new SimpleFluidRenderHandler(

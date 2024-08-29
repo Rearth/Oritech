@@ -249,7 +249,8 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     
     public void cleanup() {
         var frameEntries = occupiedAreas.get(areaMin);
-        frameEntries.remove(pos);
+        if (frameEntries != null)
+            frameEntries.remove(pos);
     }
     
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

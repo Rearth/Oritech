@@ -6,13 +6,18 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -20,13 +25,16 @@ import rearth.oritech.network.NetworkContent;
 
 public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity implements BlockEntityTicker<SpawnerControllerBlockEntity> {
     
-    public int maxSouls = 10;
+    public int maxSouls = 100_000;
     public int collectedSouls = 0;
     
     public EntityType<?> spawnedMob;
     public Entity renderedEntity;
     private boolean networkDirty;
     public boolean hasCage;
+    
+    // loading cache only
+    private Identifier loadedMob;
     
     // client only
     public float lastProgress = 0f;
@@ -40,13 +48,45 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         
         if (world.isClient) return;
         
+        if (loadedMob != null && spawnedMob == null) {
+            loadEntityFromIdentifier(loadedMob);
+            loadedMob = null;
+            this.markDirty();
+        }
+        
+        if (spawnedMob == null || !hasCage) return;
+        
         if (collectedSouls >= maxSouls && world.getTime() % 4 == 0) {
             spawnMob();
         }
         
-        if (networkDirty)
+        if (networkDirty) {
             updateNetwork();
+            DeathListener.resetEvents();
+        }
         
+    }
+    
+    @Override
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
+        nbt.putInt("souls", collectedSouls);
+        nbt.putInt("maxSouls", maxSouls);
+        nbt.putBoolean("cage", hasCage);
+        if (spawnedMob != null) {
+            nbt.putString("spawnedMob", Registries.ENTITY_TYPE.getId(spawnedMob).toString());
+        }
+    }
+    
+    @Override
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+        hasCage = nbt.getBoolean("cage");
+        maxSouls = nbt.getInt("maxSouls");
+        collectedSouls = nbt.getInt("souls");
+        
+        if (nbt.contains("spawnedMob"))
+            loadedMob = Identifier.of(nbt.getString("spawnedMob"));
     }
     
     private void spawnMob() {
@@ -55,8 +95,6 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         var requiredHeight = Math.round(spawnedMob.getHeight() + 0.5f);
         
         var targetPosition = findSpawnPosition(spawnRange, requiredHeight);
-        
-        System.out.println("spawning at " + targetPosition);
         
         if (targetPosition == null) return;
         networkDirty = true;
@@ -108,10 +146,8 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         
         if (newMob != spawnedMob) {
             spawnedMob = newMob;
-            System.out.println("got new mob on client: " + spawnedMob);
             renderedEntity = spawnedMob.create(world);
         }
-        
     }
     
     @Override
@@ -136,7 +172,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     }
     
     public void onEntitySteppedOn(Entity entity) {
-        // if (spawnedMob != null) return;
+        if (spawnedMob != null) return;
         
         if (entity instanceof MobEntity mobEntity) {
             spawnedMob = mobEntity.getType();
@@ -144,21 +180,29 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
             maxSouls = getSoulCost((int) mobEntity.getMaxHealth());
             
             mobEntity.remove(Entity.RemovalReason.DISCARDED);
-            reloadCage();
+            reloadCage(null);
+            
+            this.markDirty();
         }
     }
     
-    public void onBlockInteracted() {
-        if (spawnedMob == null) return;
+    public void onBlockInteracted(PlayerEntity player) {
+        
+        if (spawnedMob == null) {
+            player.sendMessage(Text.literal("No mob caught. Move a mob on top to load it into the spawner"));
+            return;
+        }
         
         networkDirty = true;
         
-        reloadCage();
+        reloadCage(player);
         
+        if (hasCage)
+            player.sendMessage(Text.of(collectedSouls + "/" + maxSouls + " Souls"));
     }
     
-    private void reloadCage() {
-        var cageSize = new Vec3i(Math.round(spawnedMob.getWidth() * 2), Math.round(spawnedMob.getHeight() + 0.5f), Math.round(spawnedMob.getWidth() * 2));
+    private void reloadCage(@Nullable PlayerEntity player) {
+        var cageSize = new Vec3i(Math.round(spawnedMob.getWidth() * 2 + 0.5f), Math.round(spawnedMob.getHeight() + 0.5f), Math.round(spawnedMob.getWidth() * 2 + 0.5f));
         var offset = cageSize.getX() / 2;
         
         hasCage = true;
@@ -169,7 +213,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
                     var candidate = pos.add(-offset + x, -y - 1, -offset + z);
                     
                     // block type is a placeholder
-                    if (!world.getBlockState(candidate).getBlock().equals(BlockContent.INDUSTRIAL_GLASS_BLOCK)) {
+                    if (!world.getBlockState(candidate).getBlock().equals(BlockContent.SPAWNER_CAGE_BLOCK)) {
                         hasCage = false;
                         ParticleContent.DEBUG_BLOCK.spawn(world, Vec3d.of(candidate));
                     }
@@ -177,5 +221,11 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
                 }
             }
         }
+        
+        if (!hasCage && player != null) {
+            player.sendMessage(Text.literal("Missing mob cage!"));
+        }
+        
+        this.markDirty();
     }
 }
