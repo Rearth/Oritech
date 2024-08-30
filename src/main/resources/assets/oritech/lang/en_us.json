@@ -80,7 +80,8 @@
   "tooltip.oritech.catalyst": "Stores souls from entities parting nearby. Can apply enchantments from books.",
   "tooltip.oritech.catalyst_warning": "Warning: Tinkering with the arcane can have dangerous consequences.",
   "tooltip.oritech.spawner_cage": "Used to build a cage of the required size under the spawner controller.",
-  "tooltip.oritech.spawner": "Traps the first mob that walks on it in a cage underneath. Collects and uses souls from entities parting nearby.",
+  "tooltip.oritech.spawner": "Traps the first mob that walks on it in a cage underneath.",
+  "tooltip.oritech.spawner2": "Collects and uses souls from entities parting nearby.",
   "tooltip.oritech.soul_crop": "Grown on soul soil. Contains a soul.",
 
   "tooltip.oritech.addon_speed_desc": "Operation Speed ",
@@ -294,7 +295,7 @@
   ],
   "block.oritech.spawner_controller_block": "Spawner Controller",
   "block.oritech.spawner_cage_block": "Spawner Cage",
-  "block.oritech.withered_crop_block": "Soul Flowers",
+  "block.oritech.wither_crop_block": "Soul Flowers",
 
   "item.oritech.banana": "Banana",
   "item.oritech.weed_killer": "Weed Killer",
