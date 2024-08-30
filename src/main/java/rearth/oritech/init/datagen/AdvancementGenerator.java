@@ -229,6 +229,22 @@ public class AdvancementGenerator extends FabricAdvancementProvider {
                                 .build(consumer, Oritech.MOD_ID + "/plastic");
         
         
+        var arcaneAdvancement = Advancement.Builder.create().parent(plasticAdvancement)
+                                .display(
+                                  BlockContent.ENCHANTMENT_CATALYST_BLOCK, // The display icon
+                                  Text.translatable("advancements.oritech.catalyst"), // The title
+                                  Text.translatable("advancements.oritech.catalyst.description"), // The description
+                                  Identifier.of("textures/gui/advancements/backgrounds/adventure.png"), // Background image used
+                                  AdvancementFrame.TASK, // Options: TASK, CHALLENGE, GOAL
+                                  true, // Show toast top right
+                                  true, // Announce to chat
+                                  false // Hidden in the advancement tab
+                                )
+                                // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
+                                .criterion("got_catalyst", InventoryChangedCriterion.Conditions.items(BlockContent.ENCHANTMENT_CATALYST_BLOCK))
+                                .build(consumer, Oritech.MOD_ID + "/catalyst");
+        
+        
         var laserAdvancement = Advancement.Builder.create().parent(centrifugeAdvancement)
                                 .display(
                                   BlockContent.LASER_ARM_BLOCK, // The display icon

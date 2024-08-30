@@ -8,15 +8,25 @@ import io.wispforest.owo.ui.core.Positioning;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
+import rearth.oritech.Oritech;
 
 public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
+    
+    public static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components_souls.png");
+    public static final Identifier BOOK_SLOT = Oritech.id("textures/gui/modular/book_slot_background.png");
     
     private LabelComponent costLabel;
     private LabelComponent stabilizationLabel;
     
     public CatalystScreen(CatalystScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
+    }
+    
+    @Override
+    public Identifier getGuiComponents() {
+        return GUI_COMPONENTS;
     }
     
     @Override
@@ -28,11 +38,14 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
     public void fillOverlay(FlowLayout overlay) {
         super.fillOverlay(overlay);
         
-        costLabel = Components.label(Text.literal("Cost: " + 0));
-        stabilizationLabel = Components.label(Text.literal("Stable"));
+        costLabel = Components.label(Text.translatable("tooltip.oritech.soul_count_tooltip"));
+        stabilizationLabel = Components.label(Text.translatable("tooltip.oritech.catalyst_stable"));
         
-        overlay.child(costLabel.positioning(Positioning.absolute(90, 35)));
-        overlay.child(stabilizationLabel.positioning(Positioning.absolute(90, 50)));
+        overlay.child(costLabel.positioning(Positioning.absolute(58, 58)));
+        overlay.child(stabilizationLabel.positioning(Positioning.absolute(108, 39)));
+        
+        var slotConfig = handler.screenData.getGuiSlots().getFirst();
+        overlay.child(Components.texture(BOOK_SLOT, 0, 0, 16, 16, 16, 16).positioning(Positioning.absolute(slotConfig.x(), slotConfig.y())));
         
     }
     
@@ -41,7 +54,7 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
         super.handledScreenTick();
         
         var cost = handler.catalyst.getDisplayedCost();
-        costLabel.text(Text.literal("Cost: " + cost).formatted(Formatting.BLACK));
+        costLabel.text(Text.translatable("tooltip.oritech.cost_tooltip").append(Text.literal(String.valueOf(cost))).formatted(Formatting.BLACK));
         
         if (cost == 0) {
             costLabel.zIndex(-5);
@@ -50,7 +63,7 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
         }
         
         var result = getStablizationTitle();
-        stabilizationLabel.text(Text.literal(result).formatted(Formatting.BLACK));
+        stabilizationLabel.text(Text.translatable("tooltip.oritech.catalyst_" + result).formatted(Formatting.BLACK));
         
     }
     
@@ -66,19 +79,19 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
         
         if (soulBonus > 0 && currentSouls >= baseSouls) {
             if (free > 5) {
-                result = "Stabilized";
+                result = "stabilized";
             } else if (free > 0) {
-                result = "Semi-Stable";
+                result = "semi_stable";
             } else {
-                result = "Unstable";
+                result = "unstable";
             }
         } else {
             if (free > 5) {
-                result = "Stable";
+                result = "stable";
             } else if (free > 0) {
-                result = "Semi-Stable";
+                result = "semi_stable";
             } else {
-                result = "Unstable";
+                result = "unstable";
             }
         }
         return result;
@@ -98,6 +111,6 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
     }
     
     public Text getSoulTooltip(long amount, long max) {
-        return Text.literal(amount + " / " + max + " Souls");
+        return Text.literal(amount + " / " + max + " ").append(Text.translatable("tooltip.oritech.soul_count_tooltip"));
     }
 }

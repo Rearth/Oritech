@@ -9,7 +9,7 @@ import net.minecraft.util.math.Direction;
 
 public class SimpleSidedInventory extends SimpleInventory implements SidedInventory {
 
-    private InventorySlotAssignment slotAssignment;
+    private final InventorySlotAssignment slotAssignment;
 
     public SimpleSidedInventory(int size, InventorySlotAssignment slotAssignment) {
         super(size);

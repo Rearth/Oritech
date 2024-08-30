@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:oritech/plastic",
+  "criteria": {
+    "got_catalyst": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:enchantment_catalyst_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": {
+      "translate": "advancements.oritech.catalyst.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "oritech:enchantment_catalyst_block"
+    },
+    "title": {
+      "translate": "advancements.oritech.catalyst"
+    }
+  },
+  "requirements": [
+    [
+      "got_catalyst"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

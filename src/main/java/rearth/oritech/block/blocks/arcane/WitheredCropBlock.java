@@ -2,8 +2,13 @@ package rearth.oritech.block.blocks.arcane;
 
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
@@ -12,6 +17,8 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import rearth.oritech.init.BlockContent;
+
+import java.util.List;
 
 public class WitheredCropBlock extends CropBlock {
     
@@ -67,5 +74,11 @@ public class WitheredCropBlock extends CropBlock {
         if (this.getAge(state) == this.getMaxAge())
             world.emitGameEvent(GameEvent.ENTITY_DIE.registryKey(), pos, GameEvent.Emitter.of(state));
         return super.onBreak(world, pos, state, player);
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        super.appendTooltip(stack, context, tooltip, options);
+        tooltip.add(Text.translatable("tooltip.oritech.soul_crop").formatted(Formatting.GRAY));
     }
 }

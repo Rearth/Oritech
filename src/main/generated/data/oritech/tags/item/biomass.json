@@ -12,6 +12,7 @@
       "id": "#c:foods",
       "required": false
     },
+    "oritech:wither_crop_block",
     "minecraft:wheat"
   ]
 }

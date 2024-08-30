@@ -220,6 +220,9 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             
             var enchantment = bookCandidate.get(DataComponentTypes.STORED_ENCHANTMENTS).getEnchantments().stream().findFirst().get();
             var maxLevel = enchantment.value().getMaxLevel();
+            var bookLevel = bookCandidate.get(DataComponentTypes.STORED_ENCHANTMENTS).getLevel(enchantment);
+            
+            if (bookLevel != maxLevel) return 0;
             
             var inputStack = inventory.getStack(1);
             var toolLevel = inputStack.getEnchantments().getLevel(enchantment);
@@ -311,8 +314,13 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 56, 26),
-          new GuiSlot(1, 56, 44));
+          new GuiSlot(0, 56, 35),
+          new GuiSlot(1, 75, 35));
+    }
+    
+    @Override
+    public BarConfiguration getEnergyConfiguration() {
+        return new BarConfiguration(7, 7, 18, 71);
     }
     
     @Override

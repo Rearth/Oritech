@@ -38,6 +38,9 @@
   "advancements.oritech.plastic": "Fantastic Plastic",
   "advancements.oritech.plastic.description": "Get your hands on a plastic sheet. It's not just fantastic, it's plastic!",
 
+  "advancements.oritech.catalyst": "Arcane Tinkerer",
+  "advancements.oritech.catalyst.description": "Acquire an Arcane Stabilizer (Warning: May contain souls!)",
+
   "advancements.oritech.laser": "Laser Focus",
   "advancements.oritech.laser.description": "Obtain a laser arm block. Power up, mine fluxite, and dig through the earth. Pew pew, you're unstoppable",
 
@@ -73,6 +76,12 @@
   "tooltip.oritech.needs_laser_power": "Must be powered via an enderic laser",
   "tooltip.oritech.steam_engine": "Processes steam into RF and water. Can be chained together",
   "tooltip.oritech.item_filter": "Used to filter which items can be inserted into an inventory.",
+  "tooltip.oritech.enchanter": "Applies enchantments using energy and souls from nearby catalysts.",
+  "tooltip.oritech.catalyst": "Stores souls from entities parting nearby. Can apply enchantments from books.",
+  "tooltip.oritech.catalyst_warning": "Warning: Tinkering with the arcane can have dangerous consequences.",
+  "tooltip.oritech.spawner_cage": "Used to build a cage of the required size under the spawner controller.",
+  "tooltip.oritech.spawner": "Traps the first mob that walks on it in a cage underneath. Collects and uses souls from entities parting nearby.",
+  "tooltip.oritech.soul_crop": "Grown on soul soil. Contains a soul.",
 
   "tooltip.oritech.addon_speed_desc": "Operation Speed ",
   "tooltip.oritech.addon_efficiency_desc": "Energy Efficiency ",
@@ -179,6 +188,17 @@
   "itemgroup.oritech.decorative": "Oritech Blocks",
   "itemgroup.oritech.equipment": "Oritech Equipment",
 
+  "tooltip.oritech.soul_count_tooltip": "Souls",
+  "tooltip.oritech.cost_tooltip": "Cost: ",
+  "tooltip.oritech.catalyst_stable": "Stable",
+  "tooltip.oritech.catalyst_semi_stable": "Semi-Stable",
+  "tooltip.oritech.catalyst_unstable": "Unstable",
+  "tooltip.oritech.catalyst_stabilized": "Stabilized",
+  "tooltip.oritech.enchanter_catalysts_ready": " Catalysts",
+  "tooltip.oritech.enchanter_item_needed": "Insert Item",
+  "tooltip.oritech.enchanter_souls_used": " Souls Used",
+  "tooltip.oritech.enchanter_selection": "Select Enchantment",
+
   "block.oritech.banana_block": "Banana Block",
   "block.oritech.machine_frame_block": "Machine Frame",
   "block.oritech.fluid_pipe": "Fluid Pipe",
@@ -266,6 +286,15 @@
   "block.oritech.industrial_glass_block": "Industrial Glass",
   "block.oritech.capacitor_addon_extender": "Power Bank Addon",
   "block.oritech.treefeller_block": "Tree Cutter",
+  "block.oritech.enchantment_catalyst_block": [
+    { "text": "Arcane Catalyst", "color": "#cc66ff" }
+  ],
+  "block.oritech.enchanter_block": [
+    { "text": "Stabilized Enchanter", "color": "#cc66ff" }
+  ],
+  "block.oritech.spawner_controller_block": "Spawner Controller",
+  "block.oritech.spawner_cage_block": "Spawner Cage",
+  "block.oritech.withered_crop_block": "Soul Flowers",
 
   "item.oritech.banana": "Banana",
   "item.oritech.weed_killer": "Weed Killer",
