@@ -24,6 +24,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.CatalystScreenHandler;
@@ -51,13 +52,13 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     public static final RawAnimation STABILIZED = RawAnimation.begin().thenLoop("stabilized");
     public static final RawAnimation UNSTABLE = RawAnimation.begin().thenLoop("unstable");
     
-    public final int baseSoulCapacity = 50;
+    public final int baseSoulCapacity = Oritech.CONFIG.catalystBaseSouls();
     public final int maxProgress = 20;
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     // working data
     public int collectedSouls;
-    public int maxSouls = 50;
+    public int maxSouls = Oritech.CONFIG.catalystBaseSouls();
     private int unstableTicks;
     private int progress;
     private boolean isHyperEnchanting;
@@ -71,7 +72,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         }
     };
     
-    public final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(50000, 50000, 0) {
+    public final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(50000, 10000, 0) {
         @Override
         protected void onFinalCommit() {
             EnchantmentCatalystBlockEntity.this.markDirty();
@@ -91,7 +92,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         
         // check if powered, and adjust soul capacity
         if (energyStorage.amount > 0) {
-            var gainedSoulCapacity = energyStorage.amount / 20;
+            var gainedSoulCapacity = energyStorage.amount / Oritech.CONFIG.catalystRFPerSoul();
             energyStorage.amount = 0;
             var newMax = baseSoulCapacity + gainedSoulCapacity;
             adjustMaxSouls(newMax);
@@ -206,8 +207,8 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     
     private int getEnchantmentCost(Enchantment enchantment, int targetLevel, boolean hyper) {
         var baseCost = enchantment.getAnvilCost();
-        var resultingCost = baseCost * targetLevel;    // todo config parameter multiplicator
-        if (hyper) resultingCost = resultingCost * 2 + 50;
+        var resultingCost = baseCost * targetLevel * Oritech.CONFIG.catalystCostMultiplier();
+        if (hyper) resultingCost = resultingCost * Oritech.CONFIG.catalystHyperMultiplier() + Oritech.CONFIG.catalystBaseSouls();
         return resultingCost;
     }
     

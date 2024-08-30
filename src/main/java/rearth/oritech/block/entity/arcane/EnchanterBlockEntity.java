@@ -217,11 +217,10 @@ public class EnchanterBlockEntity extends BlockEntity
     }
     
     private int getEnchantmentCost(Enchantment enchantment, int targetLevel) {
-        return enchantment.getAnvilCost() * targetLevel * 5 + 1;    // todo config parameter multiplicator
+        return enchantment.getAnvilCost() * targetLevel * Oritech.CONFIG.enchanterCostMultiplier() + 1;
     }
     
     public void handleEnchantmentSelection(NetworkContent.EnchanterSelectionPacket packet) {
-        System.out.println("got: " + packet.enchantment());
         
         if (packet.enchantment().isEmpty()) {
             selectedEnchantment = null;
