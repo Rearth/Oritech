@@ -36,16 +36,6 @@ public class SpawnerCageBlock extends Block {
         builder.add(UP, DOWN, NORTH, EAST, SOUTH, WEST);
     }
     
-//    @Override
-//    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-//        return BEAM_SHAPE;
-//    }
-//
-//    @Override
-//    protected VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-//        return BEAM_SHAPE;
-//    }
-    
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {

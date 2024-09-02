@@ -337,7 +337,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
                 return false;
             } else {
                 // can see if basicRaycast() doesn't find anything it can't pass through between laser and target
-                return basicRaycast(laserHead.add(direction.multiply(1.5)), direction, (int)(laserHead.distanceTo(target) - 0.5)) == null;
+                return basicRaycast(laserHead.add(direction.multiply(1.5)), direction, (int)(laserHead.distanceTo(target) - 0.5), 0.0F) == null;
             }
         }
     }

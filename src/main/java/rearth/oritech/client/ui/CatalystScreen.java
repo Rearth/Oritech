@@ -41,7 +41,7 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
         costLabel = Components.label(Text.translatable("tooltip.oritech.soul_count_tooltip"));
         stabilizationLabel = Components.label(Text.translatable("tooltip.oritech.catalyst_stable"));
         
-        overlay.child(costLabel.positioning(Positioning.absolute(58, 58)));
+        overlay.child(costLabel.positioning(Positioning.absolute(56, 58)));
         overlay.child(stabilizationLabel.positioning(Positioning.absolute(108, 39)));
         
         var slotConfig = handler.screenData.getGuiSlots().getFirst();

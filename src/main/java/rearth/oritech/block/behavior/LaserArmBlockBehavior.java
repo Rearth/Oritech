@@ -46,13 +46,16 @@ public class LaserArmBlockBehavior {
             return transferPowerBehavior.fireAtBlock(world, laserEntity, block, blockPos, blockState, blockEntity);
         
         // an unregistered budding block, attempt to energize it
-        if (!blockState.isIn(ConventionalBlockTags.BUDDING_BLOCKS))
+        if (blockState.isIn(ConventionalBlockTags.BUDDING_BLOCKS))
             return energizeBuddingBehavior.fireAtBlock(world, laserEntity, block, blockPos, blockState, blockEntity);
         
         // passes through, stop targetting this block
-        if (blockState.isIn(TagContent.LASER_PASSTHROUGH))
+        if (blockState.isIn(TagContent.LASER_PASSTHROUGH)) {
+            Oritech.LOGGER.info("default fireAtBlock: passthrough. skipping");
             return false;
+        }
 
+        Oritech.LOGGER.info("default fireAtBlock: continuing to break block");
         laserEntity.addBlockBreakProgress(laserEntity.energyRequiredToFire());
         if (laserEntity.getBlockBreakProgress() >= laserEntity.getTargetBlockEnergyNeeded())
             laserEntity.finishBlockBreaking(blockPos, blockState);
@@ -64,6 +67,7 @@ public class LaserArmBlockBehavior {
             @Override
             public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
                 // don't do anything, and don't keep targetting this block
+                Oritech.LOGGER.info("noop fireAtBlock");
                 return false;
             }
         };
@@ -73,6 +77,7 @@ public class LaserArmBlockBehavior {
         transferPowerBehavior = new LaserArmBlockBehavior() {
             @Override
             public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
+                Oritech.LOGGER.info("transfer power fireAtBlock begin");
                 var storageCandidate = EnergyStorage.SIDED.find(world, blockPos, blockState, blockEntity, null);
                 if (storageCandidate == null && blockEntity instanceof EnergyProvider energyProvider)
                     storageCandidate = energyProvider.getStorage(null);
@@ -105,16 +110,9 @@ public class LaserArmBlockBehavior {
         energizeBuddingBehavior = new LaserArmBlockBehavior() {
             @Override
             public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
+                Oritech.LOGGER.info("energize budding fireAtBlock begin");
                 if (buddingAmethystCanGrow(world, blockState, blockPos)) {
-                    try {
-                        // Using reflection instead of typecasting so that other "budding" geodes will work with the laser as long as they're tagged with c:budding_blocks
-                        Method randomTick = block.getClass().getMethod("randomTick", BlockState.class, ServerWorld.class, BlockPos.class, Random.class);
-                        randomTick.invoke(blockState, (ServerWorld)world, blockPos, world.random);
-                    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException e) {
-                        // weird state, probably a modded "budding" block that doesn't subclass BuddingAmethystBlock or have a similar randomTick method
-                        Oritech.LOGGER.error("laser attempting to overload budding block {} at {}, but does not recognize block", block, blockPos);
-                        return false;
-                    }
+                    blockState.randomTick((ServerWorld)world, blockPos, world.random);
                     ParticleContent.ACCELERATING.spawn(world, Vec3d.of(blockPos));
                     return true;
                 }
