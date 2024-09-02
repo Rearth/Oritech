@@ -373,8 +373,8 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
 
         var entityRange = hunterRange();
         // Only sort the list when getting a new list of entities in range.
-        // The entities can move around so the sort order isn't guaranteed to be correct because entities can move around, but it should be good enough.
-        // There's no need to spend the time
+        // The entities can move around so the sort order isn't guaranteed to be correct, but it should be good enough.
+        // There's no need to spend the time re-sorting the list every time the laser needs to pick a new target from the cached list.
         List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, new Box(laserHead.x - entityRange, laserHead.y - entityRange, laserHead.z - entityRange, laserHead.x + entityRange, laserHead.y + entityRange, laserHead.z + entityRange), EntityPredicates.VALID_LIVING_ENTITY.and(EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR));
         Collections.sort(targets, Comparator.comparingDouble((entity) -> entity.squaredDistanceTo(laserHead)));
         pendingLivingTargets = new ArrayDeque<>(targets);
@@ -450,6 +450,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     public boolean canPassThrough(BlockState state, BlockPos blockPos) {
+        // When targetting entities, don't let grass, vines, small mushrooms, pressure plates, etc. get in the way of the laser
         return state.isAir() || state.isLiquid() || state.isIn(TagContent.LASER_PASSTHROUGH) || (hunterAddons > 0 && !state.isSolidBlock(world, blockPos));
     }
     

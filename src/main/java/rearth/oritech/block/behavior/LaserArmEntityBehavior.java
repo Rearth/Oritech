@@ -29,9 +29,6 @@ public class LaserArmEntityBehavior {
     // and the laser could respect the attackable TargetPredicate to avoid attacking "friendly" mobs or to attack players
     // instead of trying to charge their energy storage chestplates
 
-    // TODO: use "crop filter" addon to avoid attacking baby animals
-    // TODO: add fire type to damage to "cook" dropped loot?
-
     public boolean fireAtEntity(World world, LaserArmBlockEntity laserEntity, LivingEntity entity) {
         // Don't kill baby animals if the crop filter addon is applied
         if (laserEntity.hasCropFilterAddon && entity instanceof AnimalEntity && entity.isBaby()) {

@@ -50,12 +50,9 @@ public class LaserArmBlockBehavior {
             return energizeBuddingBehavior.fireAtBlock(world, laserEntity, block, blockPos, blockState, blockEntity);
         
         // passes through, stop targetting this block
-        if (blockState.isIn(TagContent.LASER_PASSTHROUGH)) {
-            Oritech.LOGGER.info("default fireAtBlock: passthrough. skipping");
+        if (blockState.isIn(TagContent.LASER_PASSTHROUGH))
             return false;
-        }
 
-        Oritech.LOGGER.info("default fireAtBlock: continuing to break block");
         laserEntity.addBlockBreakProgress(laserEntity.energyRequiredToFire());
         if (laserEntity.getBlockBreakProgress() >= laserEntity.getTargetBlockEnergyNeeded())
             laserEntity.finishBlockBreaking(blockPos, blockState);
@@ -67,7 +64,6 @@ public class LaserArmBlockBehavior {
             @Override
             public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
                 // don't do anything, and don't keep targetting this block
-                Oritech.LOGGER.info("noop fireAtBlock");
                 return false;
             }
         };
@@ -77,7 +73,6 @@ public class LaserArmBlockBehavior {
         transferPowerBehavior = new LaserArmBlockBehavior() {
             @Override
             public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
-                Oritech.LOGGER.info("transfer power fireAtBlock begin");
                 var storageCandidate = EnergyStorage.SIDED.find(world, blockPos, blockState, blockEntity, null);
                 if (storageCandidate == null && blockEntity instanceof EnergyProvider energyProvider)
                     storageCandidate = energyProvider.getStorage(null);
@@ -110,7 +105,6 @@ public class LaserArmBlockBehavior {
         energizeBuddingBehavior = new LaserArmBlockBehavior() {
             @Override
             public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
-                Oritech.LOGGER.info("energize budding fireAtBlock begin");
                 if (buddingAmethystCanGrow(world, blockState, blockPos)) {
                     blockState.randomTick((ServerWorld)world, blockPos, world.random);
                     ParticleContent.ACCELERATING.spawn(world, Vec3d.of(blockPos));
