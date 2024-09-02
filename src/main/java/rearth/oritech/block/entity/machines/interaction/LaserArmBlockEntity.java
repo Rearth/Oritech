@@ -308,7 +308,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         var direction = Vec3d.of(targetDirection.subtract(pos.up())).normalize();
         var from = laserHead.add(direction.multiply(1.5));
         
-        var nextBlock = basicRaycast(from, direction, range);
+        var nextBlock = basicRaycast(from, direction, range, 0.45F);
         if (nextBlock == null) return;
         
         var maxSize = (int) from.distanceTo(nextBlock.toCenterPos()) - 1;
@@ -399,9 +399,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         return new ArrayDeque<>(targets);
     }
     
-    private BlockPos basicRaycast(Vec3d from, Vec3d direction, int range) {
-        
-        var searchOffset = 0.45;
+    private BlockPos basicRaycast(Vec3d from, Vec3d direction, int range, float searchOffset) {
         
         for (float i = 0; i < range; i += 0.3f) {
             var to = from.add(direction.multiply(i));
@@ -409,6 +407,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             var targetState = world.getBlockState(targetBlockPos);
             if (isSearchTerminatorBlock(targetState)) return null;
             if (!canPassThrough(targetState, targetBlockPos)) return targetBlockPos;
+
+            if (searchOffset == 0.0F)
+                return null;
             
             var offsetTop = to.add(0, -searchOffset, 0);
             targetBlockPos = BlockPos.ofFloored(offsetTop);
