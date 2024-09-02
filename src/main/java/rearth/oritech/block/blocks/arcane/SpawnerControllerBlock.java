@@ -1,10 +1,7 @@
 package rearth.oritech.block.blocks.arcane;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -38,6 +35,34 @@ public class SpawnerControllerBlock extends HorizontalFacingBlock implements Blo
             spawnerEntity.onEntitySteppedOn(entity);
         }
         
+    }
+    
+    @Override
+    public boolean emitsRedstonePower(BlockState state) {
+        return true;
+    }
+    
+    @Override
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        
+        if (world.isClient) return;
+        
+        var isPowered = world.isReceivingRedstonePower(pos);
+        
+        var entity = (SpawnerControllerBlockEntity) world.getBlockEntity(pos);
+        entity.setRedstonePowered(isPowered);
+        
+    }
+    
+    @Override
+    protected boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+    
+    @Override
+    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return ((SpawnerControllerBlockEntity) world.getBlockEntity(pos)).getComparatorOutput();
     }
     
     @Override

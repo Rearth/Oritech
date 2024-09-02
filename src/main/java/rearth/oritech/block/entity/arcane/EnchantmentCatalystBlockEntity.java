@@ -66,6 +66,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     private boolean isHyperEnchanting;
     private boolean networkDirty;
     private String lastAnimation = "idle";
+    private int lastComparatorOutput;
     
     public final SimpleInventory inventory = new SimpleInventory(2) {
         @Override
@@ -140,6 +141,13 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             updateNetwork();
             DeathListener.resetEvents();
             updateAnimation();
+            
+            var level = calculateComparatorLevel();
+            if (level != lastComparatorOutput) {
+                lastComparatorOutput = level;
+                world.updateComparators(pos, state.getBlock());
+            }
+            
         }
         
         // periodically re-trigger animation updates
@@ -274,6 +282,14 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     @Override
     public boolean canAcceptSoul() {
         return collectedSouls < maxSouls;
+    }
+    
+    public int getComparatorOutput() {
+        return calculateComparatorLevel();
+    }
+    
+    private int calculateComparatorLevel() {
+        return (int) ((float) collectedSouls / maxSouls * 16);
     }
     
     private void updateNetwork() {

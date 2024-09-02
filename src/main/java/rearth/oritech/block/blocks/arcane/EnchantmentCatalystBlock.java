@@ -35,6 +35,16 @@ public class EnchantmentCatalystBlock extends HorizontalFacingBlock implements B
     }
     
     @Override
+    protected boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+    
+    @Override
+    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return ((EnchantmentCatalystBlockEntity) world.getBlockEntity(pos)).getComparatorOutput();
+    }
+    
+    @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(Properties.HORIZONTAL_FACING);
     }
