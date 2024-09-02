@@ -56,6 +56,7 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
     public static VoxelShape[][] MACHINE_FLUID_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_INVENTORY_PROXY_ADDON_SHAPE;
     public static VoxelShape[][] QUARRY_ADDON_SHAPE;
+    public static VoxelShape[][] MACHINE_HUNTER_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_REDSTONE_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_SPEED_ADDON_SHAPE;
     public static VoxelShape[][] STEAM_BOILER_ADDON_SHAPE;
@@ -228,6 +229,8 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
                 tooltip.add(Text.translatable("tooltip.oritech.addon_proxy_desc").formatted(Formatting.DARK_GRAY));
             if (blockType == BlockContent.QUARRY_ADDON)
                 tooltip.add(Text.translatable("tooltip.oritech.addon_quarry_desc").formatted(Formatting.DARK_GRAY));
+            if (blockType == BlockContent.MACHINE_HUNTER_ADDON)
+                tooltip.add(Text.translatable("tooltip.oritech.addon_hunter_desc").formatted(Formatting.DARK_GRAY));
             if (blockType == BlockContent.MACHINE_REDSTONE_ADDON)
                 tooltip.add(Text.translatable("tooltip.oritech.addon_redstone_desc").formatted(Formatting.DARK_GRAY));
             
@@ -249,6 +252,7 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
         MACHINE_FLUID_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
         MACHINE_INVENTORY_PROXY_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
         QUARRY_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
+        MACHINE_HUNTER_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
         MACHINE_REDSTONE_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
         MACHINE_SPEED_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
         STEAM_BOILER_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
@@ -324,6 +328,12 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
                     Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.375, 0.25, 0.875), facing, face), // status bar
                     Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.625, 0.125, 0.3125, 0.6875, 0.1875, 0.8125), facing, face), // pickaxe handle
                     Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.25, 0.875, 0.1875, 0.4375), facing, face)); // pickaxe head
+                MACHINE_HUNTER_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = VoxelShapes.union(
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
+		            Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.375, 0.25, 0.875), facing, face),
+		            Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5, 0.125, 0.375, 0.75, 0.25, 0.625), facing, face),
+		            Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.3125, 0.5, 0.3125, 0.6875), facing, face),
+		            Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.75, 0.125, 0.3125, 0.8125, 0.3125, 0.6875), facing, face));
                 MACHINE_REDSTONE_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = VoxelShapes.union(
                     Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
                     Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.1875, 0.125, 0, 0.4375, 0.25, 0.8125), facing, face),

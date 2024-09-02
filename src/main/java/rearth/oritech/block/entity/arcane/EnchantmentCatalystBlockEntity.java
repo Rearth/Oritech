@@ -31,6 +31,7 @@ import rearth.oritech.client.ui.CatalystScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
+import rearth.oritech.util.EnergyProvider;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.ScreenProvider;
@@ -41,12 +42,13 @@ import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import java.util.List;
 
 public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
-  implements InventoryProvider, ScreenProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+  implements InventoryProvider, EnergyProvider, ScreenProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
     
     public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     public static final RawAnimation STABILIZED = RawAnimation.begin().thenLoop("stabilized");
@@ -310,6 +312,11 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     @Override
     public InventoryStorage getInventory(Direction direction) {
         return inventoryStorage;
+    }
+
+    @Override
+    public EnergyStorage getStorage(Direction direction) {
+        return energyStorage;
     }
     
     @Override

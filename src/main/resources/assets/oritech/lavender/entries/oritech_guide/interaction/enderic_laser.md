@@ -54,6 +54,15 @@ The laser ignores all input and output limits, and can fill the energy storage o
 
 ;;;;;
 
+**Machine Hunter Addon**
+
+When the enderic laser has a machine hunter addon, it will target mobs instead of blocks. Addon upgrades still work when hunting mobs: the yield addon will make the
+mobs drop more loot, the quarry addon will extend the target range, the crop filter will avoid killing baby animals.
+
+If you are wearing an [exo chestplate](^oritech:tools/exo_armor) then the enderic laser will charge it for you.
+
+;;;;;
+
 **More details**
 
 The laser beam will target any block, but it passes through glass (and not-grown amethysts). Quarry addons will increase the width of the excavated area.
