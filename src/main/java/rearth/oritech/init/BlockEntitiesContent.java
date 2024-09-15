@@ -165,7 +165,8 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
       BlockContent.MACHINE_YIELD_ADDON,
       BlockContent.CROP_FILTER_ADDON,
       BlockContent.MACHINE_EXTENDER,
-      BlockContent.MACHINE_CAPACITOR_ADDON
+      BlockContent.MACHINE_CAPACITOR_ADDON,
+      BlockContent.QUARRY_ADDON
     ).build();
     
     @AssignSidedInventory
