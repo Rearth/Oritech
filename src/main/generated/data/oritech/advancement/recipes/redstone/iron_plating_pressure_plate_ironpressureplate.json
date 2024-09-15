@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_iron_plating_pressure_plate": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:iron_plating_pressure_plate"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:iron_plating_pressure_plate_ironpressureplate"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_iron_plating_pressure_plate"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:iron_plating_pressure_plate_ironpressureplate"
+    ]
+  }
+}
