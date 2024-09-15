@@ -517,6 +517,7 @@
   "message.oritech.tool_mode.silk_touch": "Silk Touch",
   "tooltip.oritech.tool_mode.area_range.area": "Mode: Area",
   "tooltip.oritech.tool_mode.area_range.single": "Mode: Single",
+  "config.jade.plugin_oritech.machine_core_controller": "Oritech Controller Link View",
 
   "text.config.oritech-config.title": "Oritech Settings",
   "text.config.oritech-config.section.machineSettings": "Machines",
