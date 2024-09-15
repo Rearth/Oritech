@@ -40,7 +40,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         super.fillOverlay(overlay);
         
         openEnchantmentSelection = Components.button(Text.translatable("button.oritech.enchanter.bane_of_long_names"), this::onOpenClicked);
-        openEnchantmentSelection.positioning(Positioning.relative(70, 14));
+        openEnchantmentSelection.positioning(Positioning.relative(54, 13));
         openEnchantmentSelection.active(false);
         overlay.child(openEnchantmentSelection);
         
@@ -49,7 +49,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         detailsScrollPane.margins(Insets.of(3));
         
         statisticsLabel = Components.label(Text.translatable("title.oritech.enchanter.catalysts_available", 1, 4));
-        statisticsLabel.positioning(Positioning.relative(70, 40));
+        statisticsLabel.positioning(Positioning.relative(54, 29));
         overlay.child(statisticsLabel);
     }
     

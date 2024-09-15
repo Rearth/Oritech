@@ -197,11 +197,11 @@
   "tooltip.oritech.million_abbrev": "M",
   "tooltip.oritech.billion_abbrev": "B",
 
-  "title.oritech.machine_speed": "⌛ %s%%",
+  "title.oritech.machine_speed": "⌛ %s%% ",
   "tooltip.oritech.machine_speed": "Processing Speed",
-  "title.oritech.machine_efficiency": "⚡ %s%%",
+  "title.oritech.machine_efficiency": "⚡ %s%% ",
   "tooltip.oritech.machine_efficiency": "Energy Efficiency",
-  "title.oritech.machine_energy_production": "↗ %d RF/t",
+  "title.oritech.machine_energy_production": "↗ %d RF/t ",
 
   "tooltip.oritech.steam_energy_production": "Total production (includes chained generators)",
   "title.oritech.steam_production": "\uD83D\uDEDE %s su/t",

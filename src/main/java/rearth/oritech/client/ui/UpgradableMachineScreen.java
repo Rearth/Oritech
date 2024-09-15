@@ -45,8 +45,8 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         var speed = 1 / handler.addonUiData.speed() * 100;
         var efficiency = 1 / handler.addonUiData.efficiency() * 100;
         
-        speedLabel = Components.label(Text.translatable("title.oritech.machine_speed", speed));
-        efficiencyLabel = Components.label(Text.translatable("title.oritech.machine_efficiency", efficiency));
+        speedLabel = Components.label(Text.translatable("title.oritech.machine_speed", (int) speed));
+        efficiencyLabel = Components.label(Text.translatable("title.oritech.machine_efficiency", (int) efficiency));
         
         container.child(Components.box(Sizing.fixed(73), Sizing.fixed(1)).color(new Color(0.8f, 0.8f, 0.8f)));
         container.child(speedLabel.tooltip(Text.translatable("tooltip.oritech.machine_speed")).margins(Insets.of(3)));
@@ -169,7 +169,6 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             // detailed list element
             var addonBlockType = (MachineAddonBlock) addonBlock.getBlock();
             var addonSettings = addonBlockType.getAddonSettings();
-            var pattern = "%+.0f";
             var speed = (1 - addonSettings.speedMultiplier()) * 100;
             var efficiency = (1 - addonSettings.efficiencyMultiplier()) * 100;
             
@@ -184,10 +183,10 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             var bottomPanel = Containers.horizontalFlow(Sizing.content(2), Sizing.content(2));
             
             if (speed != 0) {
-                bottomPanel.child(Components.label(Text.translatable("title.oritech.machine_speed", speed)).color(SPEED_COLOR).tooltip(Text.translatable("tooltip.oritech.machine_speed")));
+                bottomPanel.child(Components.label(Text.translatable("title.oritech.machine_speed", (int) speed)).color(SPEED_COLOR).tooltip(Text.translatable("tooltip.oritech.machine_speed")));
             }
             if (efficiency != 0) {
-                bottomPanel.child(Components.label(Text.translatable("title.oritech.machine_efficiency", efficiency)).color(EFFICIENCY_COLOR).tooltip(Text.translatable("tooltip.oritech.machine_efficiency")));
+                bottomPanel.child(Components.label(Text.translatable("title.oritech.machine_efficiency", (int) efficiency)).color(EFFICIENCY_COLOR).tooltip(Text.translatable("tooltip.oritech.machine_efficiency")));
             }
             
             if (addonBlockType.getAddonSettings().addedCapacity() > 0)

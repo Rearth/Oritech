@@ -30,8 +30,6 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
 
-import java.util.List;
-
 public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends BaseOwoHandledScreen<FlowLayout, S> {
     
     
@@ -256,7 +254,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     public Text getEnergyTooltip(long amount, long max) {
         var percentage = (float) amount / max;
         var energyFill = String.format("%.1f", percentage * 100);
-        var energyUsage = handler.screenData.getDisplayedEnergyUsage();
+        var energyUsage = (int) handler.screenData.getDisplayedEnergyUsage();
         var storedAmount = TooltipHelper.getEnergyText(amount);
         var maxAmount = TooltipHelper.getEnergyText(max);
         return Text.translatable("tooltip.oritech.energy_usage", storedAmount, maxAmount, energyFill, energyUsage);
