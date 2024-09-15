@@ -24,6 +24,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.CatalystScreenHandler;
@@ -51,18 +52,19 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     public static final RawAnimation STABILIZED = RawAnimation.begin().thenLoop("stabilized");
     public static final RawAnimation UNSTABLE = RawAnimation.begin().thenLoop("unstable");
     
-    public final int baseSoulCapacity = 50;
+    public final int baseSoulCapacity = Oritech.CONFIG.catalystBaseSouls();
     public final int maxProgress = 20;
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     // working data
     public int collectedSouls;
-    public int maxSouls = 50;
+    public int maxSouls = Oritech.CONFIG.catalystBaseSouls();
     private int unstableTicks;
     private int progress;
     private boolean isHyperEnchanting;
     private boolean networkDirty;
     private String lastAnimation = "idle";
+    private int lastComparatorOutput;
     
     public final SimpleInventory inventory = new SimpleInventory(2) {
         @Override
@@ -71,7 +73,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         }
     };
     
-    public final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(50000, 50000, 0) {
+    public final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(50000, 10000, 0) {
         @Override
         protected void onFinalCommit() {
             EnchantmentCatalystBlockEntity.this.markDirty();
@@ -91,7 +93,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         
         // check if powered, and adjust soul capacity
         if (energyStorage.amount > 0) {
-            var gainedSoulCapacity = energyStorage.amount / 20;
+            var gainedSoulCapacity = energyStorage.amount / Oritech.CONFIG.catalystRFPerSoul();
             energyStorage.amount = 0;
             var newMax = baseSoulCapacity + gainedSoulCapacity;
             adjustMaxSouls(newMax);
@@ -137,6 +139,13 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             updateNetwork();
             DeathListener.resetEvents();
             updateAnimation();
+            
+            var level = calculateComparatorLevel();
+            if (level != lastComparatorOutput) {
+                lastComparatorOutput = level;
+                world.updateComparators(pos, state.getBlock());
+            }
+            
         }
         
         // periodically re-trigger animation updates
@@ -206,8 +215,8 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     
     private int getEnchantmentCost(Enchantment enchantment, int targetLevel, boolean hyper) {
         var baseCost = enchantment.getAnvilCost();
-        var resultingCost = baseCost * targetLevel;    // todo config parameter multiplicator
-        if (hyper) resultingCost = resultingCost * 2 + 50;
+        var resultingCost = baseCost * targetLevel * Oritech.CONFIG.catalystCostMultiplier();
+        if (hyper) resultingCost = resultingCost * Oritech.CONFIG.catalystHyperMultiplier() + Oritech.CONFIG.catalystBaseSouls();
         return resultingCost;
     }
     
@@ -220,6 +229,9 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             
             var enchantment = bookCandidate.get(DataComponentTypes.STORED_ENCHANTMENTS).getEnchantments().stream().findFirst().get();
             var maxLevel = enchantment.value().getMaxLevel();
+            var bookLevel = bookCandidate.get(DataComponentTypes.STORED_ENCHANTMENTS).getLevel(enchantment);
+            
+            if (bookLevel != maxLevel) return 0;
             
             var inputStack = inventory.getStack(1);
             var toolLevel = inputStack.getEnchantments().getLevel(enchantment);
@@ -270,6 +282,14 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         return collectedSouls < maxSouls;
     }
     
+    public int getComparatorOutput() {
+        return calculateComparatorLevel();
+    }
+    
+    private int calculateComparatorLevel() {
+        return (int) ((float) collectedSouls / maxSouls * 16);
+    }
+    
     private void updateNetwork() {
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.CatalystSyncPacket(pos, collectedSouls, progress, isHyperEnchanting, maxSouls));
     }
@@ -311,8 +331,13 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 56, 26),
-          new GuiSlot(1, 56, 44));
+          new GuiSlot(0, 56, 35),
+          new GuiSlot(1, 75, 35));
+    }
+    
+    @Override
+    public BarConfiguration getEnergyConfiguration() {
+        return new BarConfiguration(7, 7, 18, 71);
     }
     
     @Override

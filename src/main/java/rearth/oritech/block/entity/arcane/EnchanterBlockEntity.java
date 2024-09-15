@@ -28,6 +28,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkStatus;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.EnchanterScreenHandler;
@@ -216,11 +217,10 @@ public class EnchanterBlockEntity extends BlockEntity
     }
     
     private int getEnchantmentCost(Enchantment enchantment, int targetLevel) {
-        return enchantment.getAnvilCost() * targetLevel * 5 + 1;    // todo config parameter multiplicator
+        return enchantment.getAnvilCost() * targetLevel * Oritech.CONFIG.enchanterCostMultiplier() + 1;
     }
     
     public void handleEnchantmentSelection(NetworkContent.EnchanterSelectionPacket packet) {
-        System.out.println("got: " + packet.enchantment());
         
         if (packet.enchantment().isEmpty()) {
             selectedEnchantment = null;
@@ -330,8 +330,21 @@ public class EnchanterBlockEntity extends BlockEntity
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 33, 23),
-          new GuiSlot(1, 33, 53, true));
+          new GuiSlot(0, 52, 58),
+          new GuiSlot(1, 108, 58, true));
+    }
+    
+    @Override
+    public ArrowConfiguration getIndicatorConfiguration() {
+        return new ArrowConfiguration(
+          Oritech.id("textures/gui/modular/arrow_empty.png"),
+          Oritech.id("textures/gui/modular/arrow_full.png"),
+          73, 58, 29, 16, true);
+    }
+    
+    @Override
+    public BarConfiguration getEnergyConfiguration() {
+        return new BarConfiguration(7, 7, 18, 71);
     }
     
     @Override

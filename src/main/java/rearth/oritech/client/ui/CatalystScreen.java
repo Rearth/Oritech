@@ -6,17 +6,28 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.PositionedRectangle;
 import io.wispforest.owo.ui.core.Positioning;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
+import rearth.oritech.Oritech;
 
 public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
+    
+    public static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components_souls.png");
+    public static final Identifier BOOK_SLOT = Oritech.id("textures/gui/modular/book_slot_background.png");
     
     private LabelComponent costLabel;
     private LabelComponent stabilizationLabel;
     
     public CatalystScreen(CatalystScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
+    }
+    
+    @Override
+    public Identifier getGuiComponents() {
+        return GUI_COMPONENTS;
     }
     
     @Override
@@ -28,11 +39,13 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
     public void fillOverlay(FlowLayout overlay) {
         super.fillOverlay(overlay);
         
-        costLabel = Components.label(Text.literal("Cost: " + 0));
-        stabilizationLabel = Components.label(Text.literal("Stable"));
+        costLabel = Components.label(Text.translatable("message.oritech.catalyst.cost", 0));
+        stabilizationLabel = Components.label(Text.translatable("title.oritech.catalyst.stable"));
+        overlay.child(costLabel.positioning(Positioning.absolute(56, 58)));
+        overlay.child(stabilizationLabel.positioning(Positioning.absolute(108, 39)));
         
-        overlay.child(costLabel.positioning(Positioning.absolute(90, 35)));
-        overlay.child(stabilizationLabel.positioning(Positioning.absolute(90, 50)));
+        var slotConfig = handler.screenData.getGuiSlots().getFirst();
+        overlay.child(Components.texture(BOOK_SLOT, 0, 0, 16, 16, 16, 16).positioning(Positioning.absolute(slotConfig.x(), slotConfig.y())));
         
     }
     
@@ -41,7 +54,7 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
         super.handledScreenTick();
         
         var cost = handler.catalyst.getDisplayedCost();
-        costLabel.text(Text.literal("Cost: " + cost).formatted(Formatting.BLACK));
+        costLabel.text(Text.translatable("message.oritech.catalyst.cost", cost).formatted(Formatting.BLACK));
         
         if (cost == 0) {
             costLabel.zIndex(-5);
@@ -50,35 +63,35 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
         }
         
         var result = getStablizationTitle();
-        stabilizationLabel.text(Text.literal(result).formatted(Formatting.BLACK));
+        stabilizationLabel.text(result.formatted(Formatting.BLACK));
         
     }
     
     @NotNull
-    private String getStablizationTitle() {
+    private MutableText getStablizationTitle() {
         var currentSouls = handler.catalyst.collectedSouls;
         var baseSouls = handler.catalyst.baseSoulCapacity;
         var maxSouls = handler.catalyst.maxSouls;
         var soulBonus = maxSouls - baseSouls;
         var free = maxSouls - currentSouls;
         
-        var result = "Stable";
+        var result = Text.translatable("title.oritech.catalyst.stable");
         
         if (soulBonus > 0 && currentSouls >= baseSouls) {
             if (free > 5) {
-                result = "Stabilized";
+                result = Text.translatable("title.oritech.catalyst.stabilized");;
             } else if (free > 0) {
-                result = "Semi-Stable";
+                result = Text.translatable("title.oritech.catalyst.semi_stable");;
             } else {
-                result = "Unstable";
+                result = Text.translatable("title.oritech.catalyst.unstable");;
             }
         } else {
             if (free > 5) {
-                result = "Stable";
+                result = Text.translatable("title.oritech.catalyst.stable");;
             } else if (free > 0) {
-                result = "Semi-Stable";
+                result = Text.translatable("title.oritech.catalyst.semi_stable");;
             } else {
-                result = "Unstable";
+                result = Text.translatable("title.oritech.catalyst.stable");;
             }
         }
         return result;
@@ -98,6 +111,6 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
     }
     
     public Text getSoulTooltip(long amount, long max) {
-        return Text.literal(amount + " / " + max + " Souls");
+        return Text.translatable("tooltip.oritech.spawner.collected_souls", amount, max);
     }
 }

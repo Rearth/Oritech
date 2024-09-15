@@ -45,7 +45,7 @@ public abstract class MultiblockFrameInteractionBlock extends FrameInteractionBl
             
             var isAssembled = machineEntity.initMultiblock(state);
             if (!isAssembled) {
-                player.sendMessage(Text.literal("Machine is not assembled. Please add missing core blocks"));
+                player.sendMessage(Text.translatable("message.oritech.machine.missing_core"));
                 return ActionResult.SUCCESS;
             }
             

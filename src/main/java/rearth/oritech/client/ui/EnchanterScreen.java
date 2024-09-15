@@ -39,8 +39,8 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     public void fillOverlay(FlowLayout overlay) {
         super.fillOverlay(overlay);
         
-        openEnchantmentSelection = Components.button(Text.literal("Bane of long names"), this::onOpenClicked);
-        openEnchantmentSelection.positioning(Positioning.relative(70, 14));
+        openEnchantmentSelection = Components.button(Text.translatable("button.oritech.enchanter.bane_of_long_names"), this::onOpenClicked);
+        openEnchantmentSelection.positioning(Positioning.relative(54, 13));
         openEnchantmentSelection.active(false);
         overlay.child(openEnchantmentSelection);
         
@@ -48,8 +48,8 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         detailsScrollPane.padding(Insets.of(2));
         detailsScrollPane.margins(Insets.of(3));
         
-        statisticsLabel = Components.label(Text.literal("1 / 4 catalysts available"));
-        statisticsLabel.positioning(Positioning.relative(70, 40));
+        statisticsLabel = Components.label(Text.translatable("title.oritech.enchanter.catalysts_available", 1, 4));
+        statisticsLabel.positioning(Positioning.relative(54, 29));
         overlay.child(statisticsLabel);
     }
     
@@ -72,7 +72,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
             onStackChanged();
         }
         
-        Text description = Text.literal("Insert Item");
+        Text description = Text.translatable("message.oritech.enchanter.insert_item");
         var hasSelection = this.handler.enchanter.selectedEnchantment != null;
         if (hasSelection) {
             description = this.handler.enchanter.selectedEnchantment.value().description();
@@ -89,15 +89,14 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         if (statistics.equals(EnchanterBlockEntity.EnchanterStatistics.EMPTY)) {
             statisticsLabel.text(Text.literal(""));
         } else {
-            statisticsLabel.text(Text.literal(statistics.availableCatalysts() + "/" + statistics.requiredCatalysts() + " Catalysts").formatted(Formatting.DARK_GRAY));
+            statisticsLabel.text(Text.translatable("title.oritech.enchanter.catalysts", statistics.availableCatalysts(), statistics.requiredCatalysts()).formatted(Formatting.DARK_GRAY));
         }
         
-        this.progress_indicator.tooltip(Text.literal(handler.enchanter.progress + "/" + handler.enchanter.maxProgress + " Souls used"));
+        this.progress_indicator.tooltip(Text.translatable("title.oritech.enchanter.souls_used", handler.enchanter.progress, handler.enchanter.maxProgress));
         
     }
     
     private void onStackChanged() {
-        System.out.println("got new stack: " + currentItem);
         if (handler.enchanter.selectedEnchantment != null) return;
         openSelectionPanel();
         
@@ -112,7 +111,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         
         detailsScrollPane.clearChildren();
         
-        var title = Components.label(Text.literal("Select Enchantment"));
+        var title = Components.label(Text.translatable("tooltip.oritech.enchanter_selection"));
         detailsScrollPane.child(title);
         
         var scrollPane = Containers.verticalScroll(Sizing.fixed(184), Sizing.fixed(200), detailsScrollPane);
@@ -140,7 +139,6 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     }
     
     private void onEnchantmentSelected(RegistryEntry<Enchantment> entry, OverlayContainer<ScrollContainer<FlowLayout>> floatingPanel) {
-        System.out.println(entry);
         this.handler.enchanter.selectedEnchantment = entry;
         floatingPanel.remove();
         NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.EnchanterSelectionPacket(this.handler.blockPos, entry.getIdAsString()));

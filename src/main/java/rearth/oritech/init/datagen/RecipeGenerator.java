@@ -238,6 +238,18 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerAtomicForgeRecipe(exporter, BlockContent.DRONE_PORT_BLOCK.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), "_droneport");
         offerAtomicForgeRecipe(exporter, BlockContent.DRONE_PORT_BLOCK.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), Ingredient.ofItems(ItemContent.SUPER_AI_CHIP), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), "_droneportalt");
         
+        // arcane catalyst
+        offerFurnaceRecipe(exporter, BlockContent.ENCHANTMENT_CATALYST_BLOCK.asItem(), Ingredient.ofItems(Items.ENCHANTING_TABLE), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(Items.OBSIDIAN), Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), Ingredient.ofItems(ItemContent.FLUXITE), "catalyst");
+        offerFurnaceRecipe(exporter, BlockContent.ENCHANTMENT_CATALYST_BLOCK.asItem(), Ingredient.ofItems(Items.ENCHANTING_TABLE), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(Items.OBSIDIAN), Ingredient.ofItems(ItemContent.SUPER_AI_CHIP), Ingredient.ofItems(ItemContent.FLUXITE), "catalyst_alt");
+        // enchanter
+        offerGeneratorRecipe(exporter, BlockContent.ENCHANTER_BLOCK.asItem(), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), Ingredient.ofItems(BlockContent.ENCHANTMENT_CATALYST_BLOCK.asItem()), Ingredient.ofItems(Items.BOOK), "_enchanter");
+        // spawner
+        offerTankRecipe(exporter, BlockContent.SPAWNER_CONTROLLER_BLOCK.asItem(), Ingredient.ofItems(BlockContent.SPAWNER_CAGE_BLOCK), Ingredient.ofItems(BlockContent.ENCHANTMENT_CATALYST_BLOCK), "_spawner");
+        // spawner cage
+        offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.SPAWNER_CAGE_BLOCK, 2), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), Ingredient.ofItems(Items.IRON_BARS), "_cage");
+        // withered rose
+        offerMachineFrameRecipe(exporter, BlockContent.WITHER_CROP_BLOCK.asItem(), Ingredient.ofItems(Items.WITHER_ROSE), Ingredient.fromTag(ItemTags.FLOWERS), 1, "_witherrose");
+        
         // addons
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_SPEED_ADDON.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.BIOSTEEL_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_speedaddon");
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_EFFICIENCY_ADDON.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "_effaddon");
@@ -721,8 +733,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, getItemPath(output) + suffix);
     }
     
-    public void offerFurnaceRecipe(RecipeExporter exporter, Item output, Ingredient base, Ingredient sides, Ingredient middleSides, Ingredient core, Ingredient frame, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', sides).input('c', core).input('f', frame).input('b', base).input('m', middleSides)
+    public void offerFurnaceRecipe(RecipeExporter exporter, Item output, Ingredient bottom, Ingredient botSides, Ingredient middleSides, Ingredient core, Ingredient top, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', botSides).input('c', core).input('f', top).input('b', bottom).input('m', middleSides)
                         .pattern("fff")
                         .pattern("mcm")
                         .pattern("sbs");

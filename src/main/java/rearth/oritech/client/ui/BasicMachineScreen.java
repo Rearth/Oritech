@@ -10,6 +10,7 @@ import io.wispforest.owo.ui.util.SpriteUtilInvoker;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.Sprite;
@@ -28,8 +29,6 @@ import rearth.oritech.client.renderers.LaserArmModel;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
-
-import java.util.List;
 
 public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends BaseOwoHandledScreen<FlowLayout, S> {
     
@@ -88,8 +87,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             var containerSteam = handler.steamStorage;
             steamDisplay = initFluidDisplay(containerSteam, configSteam);
             // the label is then actually added to the screen in the upgradable screen extension
-            steamProductionLabel = Components.label(Text.literal("0 su/t"));
-            steamProductionLabel.tooltip(Text.of("Amount of steam droplets produced per tick. Any excess will be lost when the storage is full."));
+            steamProductionLabel = Components.label(Text.translatable("title.oritech.steam_production", "0"));
+            steamProductionLabel.tooltip(Text.translatable("tooltip.oritech.steam_production"));
         } else {
             steamDisplay = null;
             waterDisplay = null;
@@ -98,7 +97,19 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
     }
     
-    protected static FluidDisplay initFluidDisplay(SingleVariantStorage<FluidVariant> container, ScreenProvider.BarConfiguration config) {
+    public Identifier getGuiComponents() {
+        return GUI_COMPONENTS;
+    }
+    
+    public Identifier getItemSlot() {
+        return ITEM_SLOT;
+    }
+    
+    public Identifier getBackground() {
+        return BACKGROUND;
+    }
+    
+    protected FluidDisplay initFluidDisplay(SingleVariantStorage<FluidVariant> container, ScreenProvider.BarConfiguration config) {
         var lastFill = 1 - ((float) container.getAmount() / container.getCapacity());
         ColoredSpriteComponent background = null;
         
@@ -119,7 +130,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         fillOverlay.positioning(Positioning.absolute(config.x(), config.y()));
         
         
-        var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
+        var foreGround = Components.texture(getGuiComponents(), 48, 0, 14, 50, 98, 96);
         foreGround.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
         foreGround.positioning(Positioning.absolute(config.x(), config.y()));
         
@@ -192,7 +203,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         if (steamProductionLabel != null) {
             var productionRate = handler.screenData.getDisplayedEnergyUsage() * Oritech.CONFIG.generators.rfToSteamRation();
             productionRate = Math.min(this.waterDisplay.storage.amount, productionRate);
-            steamProductionLabel.text(Text.of("\uD83D\uDEDE " + String.format("%.0f", productionRate) + " su/t"));
+            steamProductionLabel.text(Text.translatable("title.oritech.steam_production", String.format("%.0f", productionRate)));
         }
     }
     
@@ -217,7 +228,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
                 recipeDurationTicks = generatorEntity.currentMaxBurnTime;
             
             
-            progress_indicator.tooltip(Text.of(progressTicks + "/" + effectiveDurationTicks + " ticks\n(base " + recipeDurationTicks + " ticks)"));
+            progress_indicator.tooltip(Text.translatable("tooltip.oritech.progress_indicator", progressTicks, effectiveDurationTicks, recipeDurationTicks));
         }
         
         
@@ -243,11 +254,10 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     public Text getEnergyTooltip(long amount, long max) {
         var percentage = (float) amount / max;
         var energyFill = String.format("%.1f", percentage * 100);
-        var energyUsage = handler.screenData.getDisplayedEnergyUsage();
-        var energyUsageText = String.format("%.1f", energyUsage);
+        var energyUsage = (int) handler.screenData.getDisplayedEnergyUsage();
         var storedAmount = TooltipHelper.getEnergyText(amount);
         var maxAmount = TooltipHelper.getEnergyText(max);
-        return Text.literal(storedAmount + " / " + maxAmount + " RF\n" + energyFill + "% Charged\n\nMaximum Usage: " + energyUsageText + " RF/t");
+        return Text.translatable("tooltip.oritech.energy_usage", storedAmount, maxAmount, energyFill, energyUsage);
     }
     
     public void updateSettingsButtons() {
@@ -276,14 +286,14 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     public void addExtensionComponents(FlowLayout container) {
         
-        cycleInputButton = Components.button(Text.literal("Match Recipe"),
+        cycleInputButton = Components.button(Text.translatable("button.oritech.input_mode_fill_matching_recipe"),
           button -> {
               NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.InventoryInputModeSelectorPacket(handler.blockPos));
           });
         cycleInputButton.horizontalSizing(Sizing.fixed(73));
         cycleInputButton.margins(Insets.of(3));
         
-        container.child(Components.label(Text.literal("Details")).margins(Insets.of(3, 1, 1, 1)));
+        container.child(Components.label(Text.translatable("title.oritech.details")).margins(Insets.of(3, 1, 1, 1)));
         
         if (handler.screenData.inputOptionsEnabled())
             container.child(cycleInputButton);
@@ -385,7 +395,9 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         display.fillOverlay.verticalSizing(Sizing.fixed((int) (config.height() * targetFill * 0.98f)));
         
-        var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(container.getResource()).get(0)), Text.of((container.getAmount() * 1000 / FluidConstants.BUCKET) + " mb"));
+        var tooltipText = container.getAmount() > 0
+            ? Text.translatable("tooltip.oritech.fluid_content", container.getAmount() * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(container.getResource()).getString())
+            : Text.translatable("tooltip.oritech.fluid_empty");
         background.tooltip(tooltipText);
     }
     
@@ -398,7 +410,9 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     @NotNull
     private static ColoredSpriteComponent getColoredSpriteComponent(FluidVariant variant, long amount, ScreenProvider.BarConfiguration config, Sprite sprite, int spriteColor) {
-        var tooltipText = List.of(Text.of(FluidVariantRendering.getTooltip(variant).get(0)), Text.of((amount * 1000 / FluidConstants.BUCKET) + " mb"));
+        var tooltipText = amount > 0
+            ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(variant).getString())
+            : Text.translatable("tooltip.oritech.fluid_empty");
         
         var result = new ColoredSpriteComponent(sprite);
         result.widthMultiplier = config.width() / 60f;
@@ -413,7 +427,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         var config = handler.screenData.getEnergyConfiguration();
         var insetSize = 1;
-        var tooltipText = Text.literal("10/50 RF");
+        var tooltipText = Text.translatable("tooltip.oritech.energy_indicator", 10, 50);
         
         var frame = Containers.horizontalFlow(Sizing.fixed(config.width() + insetSize * 2), Sizing.fixed(config.height() + insetSize * 2));
         frame.surface(Surface.PANEL_INSET);
@@ -421,10 +435,10 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         frame.positioning(Positioning.absolute(config.x() - insetSize, config.y() - insetSize));
         panel.child(frame);
         
-        var indicator_background = Components.texture(GUI_COMPONENTS, 24, 0, 24, 96, 98, 96);
+        var indicator_background = Components.texture(getGuiComponents(), 24, 0, 24, 96, 98, 96);
         indicator_background.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
         
-        energyIndicator = Components.texture(GUI_COMPONENTS, 0, 0, 24, (96), 98, 96);
+        energyIndicator = Components.texture(getGuiComponents(), 0, 0, 24, (96), 98, 96);
         energyIndicator.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
         energyIndicator.positioning(Positioning.absolute(0, 0));
         energyIndicator.tooltip(tooltipText);

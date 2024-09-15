@@ -62,15 +62,15 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     private void updateButtons() {
         var data = handler.blockEntity.getFilterSettings();
         
-        var textWhitelist = data.useWhitelist() ? Text.of("Whitelist") : Text.of("Blacklist");
+        var textWhitelist = data.useWhitelist() ? Text.translatable("title.oritech.item_filter.whitelist") : Text.translatable("title.oritech.item_filter.blacklist");
         var textWhitelistTooltip = data.useWhitelist() ?
-                                     Text.of("Currently only allows items through which \nmatch the listed items")
-                                     : Text.of("Currently only allows items through which \ndo NOT match the listed items");
+                                     Text.translatable("tooltip.oritech.item_filter.whitelist")
+                                     : Text.translatable("tooltip.oritech.item_filter.blacklist");
         
-        var textNbt = data.useNbt() ? Text.of("Use NBT") : Text.of("No NBT");
+        var textNbt = data.useNbt() ? Text.translatable("title.oritech.item_filter.nbt") : Text.translatable("title.oritech.item_filter.no_nbt");
         var textNbtTooltip = data.useNbt() ?
-                                     Text.of("Currently checks the listed items for NBT \nvalues, such as damage, enchantments, etc.")
-                                     : Text.of("Currently only checks the item type/id");
+                                     Text.translatable("tooltip.oritech.item_filter.nbt")
+                                     : Text.translatable("tooltip.oritech.item_filter.no_nbt");
         
         whiteListButton.setMessage(textWhitelist);
         whiteListButton.tooltip(textWhitelistTooltip);
@@ -113,11 +113,11 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         overlay.child(gridContainer.positioning(Positioning.absolute(25, 20)));
         
         var buttonWidth = 50;
-        whiteListButton = Components.button(Text.of("Whitelist"), buttonComponent -> toggleWhitelist());
+        whiteListButton = Components.button(Text.translatable("button.oritech.item_filter.whitelist"), buttonComponent -> toggleWhitelist());
         whiteListButton.horizontalSizing(Sizing.fixed(buttonWidth));
         overlay.child(whiteListButton.positioning(Positioning.absolute(110, 20)));
         
-        nbtButton = Components.button(Text.of("Nbt On"), buttonComponent -> toggleNbt());
+        nbtButton = Components.button(Text.translatable("button.oritech.item_filter.nbt_on"), buttonComponent -> toggleNbt());
         nbtButton.horizontalSizing(Sizing.fixed(buttonWidth));
         overlay.child(nbtButton.positioning(Positioning.absolute(110, 46)));
         

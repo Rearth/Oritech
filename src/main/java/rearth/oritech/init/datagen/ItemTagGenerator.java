@@ -79,6 +79,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .addOptionalTag(ItemTags.VILLAGER_PLANTABLE_SEEDS)
           .addOptionalTag(ItemTags.SAPLINGS)
           .addOptionalTag(ConventionalItemTags.FOODS)
+          .add(BlockContent.WITHER_CROP_BLOCK.asItem())
           .add(Items.WHEAT);
         
         // plating variants

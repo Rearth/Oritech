@@ -2,13 +2,20 @@ package rearth.oritech.block.blocks.arcane;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class SpawnerCageBlock extends Block {
     
@@ -28,16 +35,6 @@ public class SpawnerCageBlock extends Block {
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(UP, DOWN, NORTH, EAST, SOUTH, WEST);
     }
-    
-//    @Override
-//    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-//        return BEAM_SHAPE;
-//    }
-//
-//    @Override
-//    protected VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-//        return BEAM_SHAPE;
-//    }
     
     @Nullable
     @Override
@@ -70,5 +67,11 @@ public class SpawnerCageBlock extends Block {
     @Override
     protected BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         return getTargetState(world, pos);
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        super.appendTooltip(stack, context, tooltip, options);
+        tooltip.add(Text.translatable("tooltip.oritech.spawner_cage").formatted(Formatting.GRAY));
     }
 }

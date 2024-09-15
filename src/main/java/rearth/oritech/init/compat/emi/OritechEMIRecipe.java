@@ -93,7 +93,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         
         // data
         var duration = String.format("%.0f", recipe.getTime() / 20f);
-        widgets.addText(Text.of(duration + "s (" + recipe.getTime() + " ticks)"), (int) (getDisplayWidth() * 0.35), (int) (getDisplayHeight() * 0.88), 0xFFFFFF, true);
+        widgets.addText(Text.translatable("emi.title.oritech.cookingtime", duration, recipe.getTime()), (int) (getDisplayWidth() * 0.35), (int) (getDisplayHeight() * 0.88), 0xFFFFFF, true);
         
     }
 }

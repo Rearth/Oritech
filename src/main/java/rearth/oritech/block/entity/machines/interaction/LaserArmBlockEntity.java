@@ -676,7 +676,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     @Override
     public List<Pair<Text, Text>> getExtraExtensionLabels() {
         if (areaSize == 1 && yieldAddons == 0) return ScreenProvider.super.getExtraExtensionLabels();
-        return List.of(new Pair<>(Text.literal(areaSize + " Size"), Text.literal("Effective Beam Radius")), new Pair<>(Text.literal(yieldAddons + " Fortune"), Text.literal("Yield addon count. 3 is the effective maximum")));
+        return List.of(new Pair<>(Text.translatable("title.oritech.machine.addon_range", areaSize), Text.translatable("tooltip.oritech.laser_arm.addon_range")), new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")));
     }
     
     @Override

@@ -15,7 +15,6 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -23,6 +22,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
@@ -32,6 +32,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.datagen.data.TagContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -92,16 +93,20 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
         }
         
         for (int i = 0; i < 6 && !pendingBlocks.isEmpty(); i++) {
-            var candidate = pendingBlocks.pollLast();
+            var candidate = pendingBlocks.peekLast();
             var candidateState = world.getBlockState(candidate);
-            var isLog = candidateState.isIn(BlockTags.LOGS);
-            
-            breakTreeBlock(candidateState, candidate);
-            lastWorkedAt = world.getTime();
-            
+            var isLog = candidateState.isIn(TagContent.CUTTER_LOGS_MINEABLE);
+
             var energyCost = isLog ? LOG_COST : LEAF_COST;
-            energyStorage.amount -= energyCost;
             if (energyCost > energyStorage.amount) break;
+            
+            var actionResult = breakTreeBlock(candidateState, candidate);
+            if (actionResult == ActionResult.FAIL) break;
+            pendingBlocks.pollLast();
+            if (actionResult == ActionResult.PASS) continue;
+            lastWorkedAt = world.getTime();
+
+            energyStorage.amount -= energyCost;
             this.markDirty();
             
             if (isLog) break; // only harvest 1 log, but multiple leaves
@@ -126,17 +131,26 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
         networkDirty = true;
     }
     
-    private void breakTreeBlock(BlockState candidateState, BlockPos candidate) {
-        if (!candidateState.isIn(BlockTags.LOGS) && !candidateState.isIn(BlockTags.LEAVES)) return;
+    private ActionResult breakTreeBlock(BlockState candidateState, BlockPos candidate) {
+        if (!candidateState.isIn(TagContent.CUTTER_LOGS_MINEABLE) && !candidateState.isIn(TagContent.CUTTER_LEAVES_MINEABLE)) return ActionResult.PASS;
         
         var dropped = Block.getDroppedStacks(candidateState, (ServerWorld) world, candidate, null);
+        if (dropped.stream().anyMatch((itemStack) -> !(itemStack.isEmpty() || canInsert(itemStack)))) return ActionResult.FAIL;
+
         world.addBlockBreakParticles(candidate, candidateState);
         if (world.getTime() % 2 == 0)
             world.playSound(null, candidate, candidateState.getSoundGroup().getBreakSound(), SoundCategory.BLOCKS, 0.5f, 1f);
         world.setBlockState(candidate, Blocks.AIR.getDefaultState());
         
         dropped.forEach(inventory::addStack);
+        return ActionResult.SUCCESS;
     }
+
+    private boolean canInsert(ItemStack stack) {
+        return inventory.heldStacks.stream().anyMatch((itemStack) -> 
+            itemStack.isEmpty() || (ItemStack.areItemsAndComponentsEqual(itemStack, stack) && itemStack.getCount() + stack.getCount() <= itemStack.getMaxCount())
+        );
+     }
     
     public void findTarget() {
         
@@ -153,7 +167,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     public static Deque<BlockPos> getTreeBlocks(BlockPos startPos, World world) {
         
         var startState = world.getBlockState(startPos);
-        if (!startState.isIn(BlockTags.LOGS)) return new ArrayDeque<>();
+        if (!startState.isIn(TagContent.CUTTER_LOGS_MINEABLE)) return new ArrayDeque<>();
         
         var checkedPositions = new HashSet<BlockPos>();
         var foundPositions = new ArrayDeque<BlockPos>();
@@ -175,8 +189,8 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
             var candidateState = world.getBlockState(candidate);
             checkedPositions.add(candidate);
             
-            var isLog = candidateState.isIn(BlockTags.LOGS);
-            var isValidLeaf = candidateState.isIn(BlockTags.LEAVES) && !candidateState.get(Properties.PERSISTENT);
+            var isLog = candidateState.isIn(TagContent.CUTTER_LOGS_MINEABLE);
+            var isValidLeaf = candidateState.isIn(TagContent.CUTTER_LEAVES_MINEABLE) && !candidateState.getOrEmpty(Properties.PERSISTENT).orElse(false);
             
             if (!isLog && !isValidLeaf) continue;
             
@@ -184,7 +198,8 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
             if (isLog) {
                 isValid = isInLogRange(candidate, foundLogs, 3);
             } else {
-                var range = candidateState.get(Properties.DISTANCE_1_7);
+                // Give a default of 1 for "leaf" blocks without a DISTANCE_1_7 property (like shroomlights)
+                var range = candidateState.getOrEmpty(Properties.DISTANCE_1_7).orElse(1);
                 isValid = isInLogRange(candidate, foundLogs, range + 2);
             }
             
@@ -199,7 +214,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
             
         }
         
-        // when no leaves are found, return nothing to prevent accidentally destorying buildings
+        // when no leaves are found, return nothing to prevent accidentally destroying buildings
         if (foundLogs.size() == foundPositions.size()) return new ArrayDeque<>();
         
         return foundPositions;
@@ -210,10 +225,12 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     }
     
     private static List<BlockPos> getNeighbors(BlockPos input) {
-        return List.of(input.up(), input.north(), input.east(), input.south(), input.west(), input.down(),
-          input.up().east(), input.up().west(), input.up().north(), input.up().south(),
-          input.up().east().north(), input.up().west().north(), input.up().east().south(), input.up().west().south(),
-          input.north().east(), input.north().west(), input.south().east(), input.south().west());
+        List<BlockPos> neighbors = new ArrayList<>();
+        for (BlockPos pos : BlockPos.iterateOutwards(input, 1, 1, 1)) {
+            // Without toImmutable, all of the elements in the collected list end up being the same BlockPos
+            neighbors.add(pos.toImmutable());
+        }
+        return neighbors;
     }
     
     @Override
