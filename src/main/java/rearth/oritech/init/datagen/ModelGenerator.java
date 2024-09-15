@@ -33,8 +33,6 @@ public class ModelGenerator extends FabricModelProvider {
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
         
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.BANANA_BLOCK);
-        
         blockStateModelGenerator.registerSimpleState(BlockContent.MACHINE_FRAME_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.FLUID_PIPE);
         blockStateModelGenerator.registerSimpleState(BlockContent.ENERGY_PIPE);

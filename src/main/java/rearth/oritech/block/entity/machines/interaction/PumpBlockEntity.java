@@ -248,7 +248,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         var stateBelow = world.getBlockState(posBelow);
         var blockBelow = stateBelow.getBlock();
         
-        return !(blockBelow.equals(Blocks.AIR) || blockBelow.equals(BlockContent.BANANA_BLOCK));
+        return !(blockBelow.equals(Blocks.AIR) || blockBelow.equals(BlockContent.PUMP_TRUNK_BLOCK));
     }
     
     private void startLiquidSearch(BlockPos start) {

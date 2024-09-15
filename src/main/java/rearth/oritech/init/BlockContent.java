@@ -37,8 +37,6 @@ import java.lang.reflect.Field;
 
 public class BlockContent implements BlockRegistryContainer {
     
-    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block BANANA_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK));
     public static final Block SPAWNER_CAGE_BLOCK = new SpawnerCageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block MACHINE_FRAME_BLOCK = new MachineFrameBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS));
