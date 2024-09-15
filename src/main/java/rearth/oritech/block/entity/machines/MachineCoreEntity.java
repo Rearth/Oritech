@@ -55,7 +55,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         this.markDirty();
     }
     
-    private MultiblockMachineController getCachedController() {
+    public MultiblockMachineController getCachedController() {
         if (!this.getCachedState().get(MachineCoreBlock.USED)) return null;
         
         if (controllerEntity == null)
