@@ -36,11 +36,11 @@ public class SteamEngineScreen extends UpgradableMachineScreen<SteamEngineScreen
     public void addExtensionComponents(FlowLayout container) {
         super.addExtensionComponents(container);
         
-        productionLabel = Components.label(Text.literal("0 RF/t"));
-        container.child(productionLabel.tooltip(Text.literal("Total production (includes chained generators")).margins(Insets.of(3)));
+        productionLabel = Components.label(Text.translatable("title.oritech.steam_energy_production", 0));
+        container.child(productionLabel.tooltip(Text.translatable("tooltip.oritech.steam_energy_production")).margins(Insets.of(3)));
         
-        steamUsageLabel = Components.label(Text.literal("0 su/t"));
-        container.child(steamUsageLabel.tooltip(Text.literal("Total steam consumption in storage units (droplets) per tick (includes chained generators")).margins(Insets.of(3)));
+        steamUsageLabel = Components.label(Text.translatable("title.oritech.steam_consumption", 0));
+        container.child(steamUsageLabel.tooltip(Text.translatable("tooltip.oritech.steam_consumption")).margins(Insets.of(3)));
     }
     
     @Override
@@ -53,13 +53,12 @@ public class SteamEngineScreen extends UpgradableMachineScreen<SteamEngineScreen
         
         var speed = String.format("%.0f", 1 / data.speed() * 100);
         var efficiency = String.format("%.0f", 1 / data.efficiency() * 100);
-        var totalProduction = steamEntity.energyProducedTick + " RF/t";
+        var totalProduction = steamEntity.energyProducedTick;
         var totalSteamUsage = String.format("%.0f", steamEntity.energyProducedTick * data.efficiency() / steamEntity.getEnergyPerTick());
         
-        speedLabel.text(Text.literal("⌛ " + speed + "%"));
-        efficiencyLabel.text(Text.literal("⚡ " + efficiency + "%"));
-        productionLabel.text(Text.literal("↗ " + totalProduction));
-        steamUsageLabel.text(Text.literal("\uD83D\uDEDE " + totalSteamUsage + " su/t"));
-        
+        speedLabel.text(Text.translatable("title.oritech.machine_speed", speed));
+        efficiencyLabel.text(Text.translatable("title.oritech.machine_efficiency", efficiency));
+        productionLabel.text(Text.translatable("title.oritech.steam_production", totalProduction));
+        steamUsageLabel.text(Text.translatable("title.oritech.steam_consumption", totalSteamUsage));
     }
 }

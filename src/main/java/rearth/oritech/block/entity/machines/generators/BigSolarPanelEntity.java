@@ -81,7 +81,7 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     }
     
     public void sendInfoMessageToPlayer(PlayerEntity player) {
-        player.sendMessage(Text.literal("Production rate: " + getProductionRate() + " with core multiplier: " + getCoreQuality()));
+        player.sendMessage(Text.translatable("message.oritech.generator.production_rate", getProductionRate(), getCoreQuality()));
     }
     
     // output only to north and south

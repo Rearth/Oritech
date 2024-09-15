@@ -70,7 +70,7 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     
     @Override
     public Text getDisplayName() {
-        return Text.literal("Machine Inventory Access");
+        return Text.translatable("title.oritech.inventory_proxy");
     }
     
     @Nullable
