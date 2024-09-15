@@ -1,13 +1,8 @@
 package rearth.oritech.block.entity.machines.interaction;
 
 import com.mojang.authlib.GameProfile;
-
-import dev.emi.emi.api.widget.Bounds;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -17,15 +12,9 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.UnbreakableComponent;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.TargetPredicate;
-import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -33,7 +22,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
@@ -43,30 +31,16 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Pair;
-import net.minecraft.util.Util;
-import net.minecraft.util.hit.HitResult.Type;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.RaycastContext.FluidHandling;
-import net.minecraft.world.RaycastContext.ShapeType;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
-
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.blocks.machines.interaction.LaserArmBlock;
-import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
-import rearth.oritech.block.entity.machines.processing.AtomicForgeBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
@@ -84,7 +58,6 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
@@ -144,7 +117,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     private boolean networkDirty;
     private boolean redstonePowered;
     private ArrayDeque<BlockPos> pendingArea;
-    private ArrayDeque<LivingEntity> pendingLivingTargets;
+    private final ArrayDeque<LivingEntity> pendingLivingTargets = new ArrayDeque<>();
     
     // needed only on client
     public Vec3d lastRenderPosition;
@@ -204,9 +177,10 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
                 currentTarget = null;
                 networkDirty = true;
             };
+        } else {
+            loadNextLivingTarget();
         }
 
-        findNextLivingTarget();
     }
     
     public void setRedstonePowered(boolean redstonePowered) {
@@ -331,13 +305,13 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         if (entity.getWorld() != this.getWorld() || entity.isInvisible()) {
             return false;
         } else {
-            var target = new Vec3d(entity.getX(), entity.getEyeY(), entity.getZ());
+            var target = entity.getEyePos();
             var direction = target.subtract(laserHead).normalize();
             if (laserHead.distanceTo(target) > 128.0) {
                 return false;
             } else {
                 // can see if basicRaycast() doesn't find anything it can't pass through between laser and target
-                return basicRaycast(laserHead.add(direction.multiply(1.5)), direction, (int)(laserHead.distanceTo(target) - 0.5), 0.0F) == null;
+                return basicRaycast(laserHead.add(direction.multiply(1.5)), direction, (int)(laserHead.distanceTo(target) - 1), 0.2f) == null;
             }
         }
     }
@@ -346,38 +320,36 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         return entity.isAlive() && canSee(entity) && entity.getPos().isInRange(pos.up().toCenterPos(), hunterRange());
     }
 
-    private void findNextLivingTarget() {
+    // this only gets called if we don't have a target (e.g. null or not valid)
+    private void loadNextLivingTarget() {
         // delay between searches
-        if (world.getTime() % 40 != 0)
+        if ((world.getTime() + pos.asLong()) % 20 != 0)
             return;
-
-        while (pendingLivingTargets != null && !pendingLivingTargets.isEmpty()) {
-            // to target the closest entity, the list of nearby entities would need to searched/sorted every time a new target is picked
-            // not a big deal when there are only a couple of entities, but could really bog down if entities are crammed
-            // for now, just let the laser target the first in the deque regardless of distance
-            var nextEntity = pendingLivingTargets.peek();
-            // if there is no closest, or the closest is out of range, then the cached list of nearby entities can be discarded
-            // checking canSee() for the targetted entity every time is probably the slowest part of this, but the laser *really* shouldn't be targetting
-            // entities that have gone around a corner or turned invisible
-            if (nextEntity == null || !validTarget(nextEntity)) {
-                currentLivingTarget = null;
-                currentTarget = null;
-                pendingLivingTargets.pop();
-            } else {
-                // keep targetting the same entity until it's out of sight, out of range, or no longer exists
-                currentLivingTarget = nextEntity;
-                currentTarget = currentLivingTarget.getBlockPos();
-                break;
+        
+        // load targets if we don't have any
+        if (pendingLivingTargets.isEmpty()) {
+            updateEntityTargets();
+        }
+        
+        // assign first target from cached, distance sorted target list
+        while (!pendingLivingTargets.isEmpty()) {
+            var candidate = pendingLivingTargets.pop();
+            if (validTarget(candidate)) {
+                currentLivingTarget = candidate;
+                currentTarget = candidate.getBlockPos();
+                return;
             }
         }
-
+    }
+    
+    private void updateEntityTargets() {
         var entityRange = hunterRange();
         // Only sort the list when getting a new list of entities in range.
         // The entities can move around so the sort order isn't guaranteed to be correct, but it should be good enough.
         // There's no need to spend the time re-sorting the list every time the laser needs to pick a new target from the cached list.
-        List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, new Box(laserHead.x - entityRange, laserHead.y - entityRange, laserHead.z - entityRange, laserHead.x + entityRange, laserHead.y + entityRange, laserHead.z + entityRange), EntityPredicates.VALID_LIVING_ENTITY.and(EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR));
-        Collections.sort(targets, Comparator.comparingDouble((entity) -> entity.squaredDistanceTo(laserHead)));
-        pendingLivingTargets = new ArrayDeque<>(targets);
+        var targets = world.getEntitiesByClass(LivingEntity.class, new Box(laserHead.x - entityRange, laserHead.y - entityRange, laserHead.z - entityRange, laserHead.x + entityRange, laserHead.y + entityRange, laserHead.z + entityRange), EntityPredicates.VALID_LIVING_ENTITY.and(EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR));
+        targets.sort(Comparator.comparingDouble((entity) -> entity.squaredDistanceTo(laserHead)));
+        pendingLivingTargets.addAll(targets);
     }
     
     // returns the first block in an X*X*X cube, from the outside in
@@ -403,7 +375,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         
         for (float i = 0; i < range; i += 0.3f) {
             var to = from.add(direction.multiply(i));
-            var targetBlockPos = BlockPos.ofFloored(to.add(0, 0.3f, 0));
+            var targetBlockPos = BlockPos.ofFloored(to.add(0, searchOffset, 0));
             var targetState = world.getBlockState(targetBlockPos);
             if (isSearchTerminatorBlock(targetState)) return null;
             if (!canPassThrough(targetState, targetBlockPos)) return targetBlockPos;
@@ -489,8 +461,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     private void updateNetwork() {
+        var entityId = currentLivingTarget != null ? currentLivingTarget.getId() : -1;
         var sendTarget = currentTarget != null ? currentTarget : BlockPos.ORIGIN;
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons, hunterAddons, hasCropFilterAddon));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons, hunterAddons, hasCropFilterAddon, entityId));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
         networkDirty = false;
     }
@@ -739,8 +712,29 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         return currentTarget;
     }
     
+    public Vec3d getVisualTarget() {
+        if (hunterAddons > 0 && currentLivingTarget != null) {
+            return currentLivingTarget.getEyePos().subtract(0.5f, 0, 0.5f);
+        } else {
+            return Vec3d.of(getCurrentTarget()).add(0, 0.5, 0);
+        }
+    }
+    
     public void setCurrentTarget(BlockPos currentTarget) {
         this.currentTarget = currentTarget;
+    }
+    
+    public void setLivingTargetFromNetwork(int id) {
+        if (id == -1) {
+            currentLivingTarget = null;
+        } else {
+            var candidate = world.getEntityById(id);
+            if (candidate instanceof LivingEntity livingEntity) {
+                currentLivingTarget = livingEntity;
+            } else {
+                currentLivingTarget = null;
+            }
+        }
     }
     
     public long getLastFiredAt() {
