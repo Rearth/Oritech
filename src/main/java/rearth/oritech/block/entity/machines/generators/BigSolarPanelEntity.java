@@ -10,6 +10,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.PassiveGeneratorBlockEntity;
@@ -68,13 +69,15 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     @Override
     public int getProductionRate() {
         var baseRate = ((BigSolarPanelBlock) this.getCachedState().getBlock()).productionRate;
-        isFolded = world.isNight();
+        var skyLightLevel = world.getLightLevel(LightType.SKY, this.getPos());
+        isFolded = world.isNight() && skyLightLevel < 12;
         return (int) (coreQuality * baseRate);
     }
     
     @Override
     public boolean isProducing() {
-        return !world.isNight() && isActive(getCachedState());
+        var skyLightLevel = world.getLightLevel(LightType.SKY, this.getPos());
+        return !world.isNight() && skyLightLevel >= 12 && isActive(getCachedState());
     }
     
     public void sendInfoMessageToPlayer(PlayerEntity player) {
@@ -177,8 +180,9 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
             
             // update correct state on client
             var timeOfDay = getAdjustedTimeOfDay();
+            var skyLightLevel = world.getLightLevel(LightType.SKY, this.getPos());
             var isDay = timeOfDay > 0 && timeOfDay < 12500;
-            isFolded = !isDay;
+            isFolded = !isDay || skyLightLevel < 12;
             
             if (isFolded) {
                 return state.setAndContinue(FOLD);

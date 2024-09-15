@@ -191,6 +191,11 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             } else {
                 dropped = Block.getDroppedStacks(targetState, (ServerWorld) world, targetPosition, targetEntity);
             }
+            if (dropped.isEmpty()) {
+                // If the block doesn't drop any loot, try to break it again with shears
+                // Good for seagrass, cobwebs, vines, etc.
+                dropped = Block.getDroppedStacks(targetState, (ServerWorld) world, targetPosition, targetEntity, null, new ItemStack(Items.SHEARS));
+            }
             
             // only proceed if all stacks fit
             for (var stack : dropped) {
