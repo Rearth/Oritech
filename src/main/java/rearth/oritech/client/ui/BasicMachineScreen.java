@@ -99,7 +99,19 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
     }
     
-    protected static FluidDisplay initFluidDisplay(SingleVariantStorage<FluidVariant> container, ScreenProvider.BarConfiguration config) {
+    public Identifier getGuiComponents() {
+        return GUI_COMPONENTS;
+    }
+    
+    public Identifier getItemSlot() {
+        return ITEM_SLOT;
+    }
+    
+    public Identifier getBackground() {
+        return BACKGROUND;
+    }
+    
+    protected FluidDisplay initFluidDisplay(SingleVariantStorage<FluidVariant> container, ScreenProvider.BarConfiguration config) {
         var lastFill = 1 - ((float) container.getAmount() / container.getCapacity());
         ColoredSpriteComponent background = null;
         
@@ -120,7 +132,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         fillOverlay.positioning(Positioning.absolute(config.x(), config.y()));
         
         
-        var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
+        var foreGround = Components.texture(getGuiComponents(), 48, 0, 14, 50, 98, 96);
         foreGround.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
         foreGround.positioning(Positioning.absolute(config.x(), config.y()));
         
@@ -425,10 +437,10 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         frame.positioning(Positioning.absolute(config.x() - insetSize, config.y() - insetSize));
         panel.child(frame);
         
-        var indicator_background = Components.texture(GUI_COMPONENTS, 24, 0, 24, 96, 98, 96);
+        var indicator_background = Components.texture(getGuiComponents(), 24, 0, 24, 96, 98, 96);
         indicator_background.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
         
-        energyIndicator = Components.texture(GUI_COMPONENTS, 0, 0, 24, (96), 98, 96);
+        energyIndicator = Components.texture(getGuiComponents(), 0, 0, 24, (96), 98, 96);
         energyIndicator.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
         energyIndicator.positioning(Positioning.absolute(0, 0));
         energyIndicator.tooltip(tooltipText);

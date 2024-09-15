@@ -97,7 +97,6 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     }
     
     private void onStackChanged() {
-        System.out.println("got new stack: " + currentItem);
         if (handler.enchanter.selectedEnchantment != null) return;
         openSelectionPanel();
         
@@ -112,7 +111,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         
         detailsScrollPane.clearChildren();
         
-        var title = Components.label(Text.literal("Select Enchantment"));
+        var title = Components.label(Text.translatable("tooltip.oritech.enchanter_selection"));
         detailsScrollPane.child(title);
         
         var scrollPane = Containers.verticalScroll(Sizing.fixed(184), Sizing.fixed(200), detailsScrollPane);
@@ -140,7 +139,6 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     }
     
     private void onEnchantmentSelected(RegistryEntry<Enchantment> entry, OverlayContainer<ScrollContainer<FlowLayout>> floatingPanel) {
-        System.out.println(entry);
         this.handler.enchanter.selectedEnchantment = entry;
         floatingPanel.remove();
         NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.EnchanterSelectionPacket(this.handler.blockPos, entry.getIdAsString()));

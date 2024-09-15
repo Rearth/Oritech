@@ -9,15 +9,25 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
+import rearth.oritech.Oritech;
 
 public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
+    
+    public static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components_souls.png");
+    public static final Identifier BOOK_SLOT = Oritech.id("textures/gui/modular/book_slot_background.png");
     
     private LabelComponent costLabel;
     private LabelComponent stabilizationLabel;
     
     public CatalystScreen(CatalystScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
+    }
+    
+    @Override
+    public Identifier getGuiComponents() {
+        return GUI_COMPONENTS;
     }
     
     @Override
@@ -31,9 +41,11 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
         
         costLabel = Components.label(Text.translatable("message.oritech.catalyst.cost", 0));
         stabilizationLabel = Components.label(Text.translatable("title.oritech.catalyst.stable"));
+        overlay.child(costLabel.positioning(Positioning.absolute(56, 58)));
+        overlay.child(stabilizationLabel.positioning(Positioning.absolute(108, 39)));
         
-        overlay.child(costLabel.positioning(Positioning.absolute(90, 35)));
-        overlay.child(stabilizationLabel.positioning(Positioning.absolute(90, 50)));
+        var slotConfig = handler.screenData.getGuiSlots().getFirst();
+        overlay.child(Components.texture(BOOK_SLOT, 0, 0, 16, 16, 16, 16).positioning(Positioning.absolute(slotConfig.x(), slotConfig.y())));
         
     }
     

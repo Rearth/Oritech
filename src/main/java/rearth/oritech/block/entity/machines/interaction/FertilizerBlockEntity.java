@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.machines.interaction;
 
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -119,36 +120,50 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
         }
         
         return false;
-        
     }
     
     @Override
     public void finishBlockWork(BlockPos processed) {
         
-        var fertilizerStrength = 1;
+        var inventoryStack = inventory.getStack(0);
+        var fertilizerInInventory = !inventoryStack.isEmpty() && inventoryStack.isIn(ConventionalItemTags.FERTILIZERS);
+        var fertilizerStrength = fertilizerInInventory ? 2 : 1;
+        var fertilized = false;
         
         var targetPosition = processed.down();
         var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
         
         if (!hasWorkAvailable(processed)) return;
-        
+
         if (targetState.getBlock() instanceof CropBlock cropBlock) {
             var newAge = cropBlock.getAge(targetState) + fertilizerStrength;
             newAge = Math.min(newAge, cropBlock.getMaxAge());
             world.setBlockState(targetPosition, cropBlock.withAge(newAge), Block.NOTIFY_LISTENERS);
+            fertilized = true;
         } else if (targetState.getBlock() instanceof Fertilizable fertilizable) {
             fertilizable.grow((ServerWorld) world, world.random, targetPosition, targetState);
+            if (fertilizerInInventory) {
+                fertilizable.grow((ServerWorld) world, world.random, targetPosition, targetState);
+                fertilized = true;
+            }
         }
-        
+
         var farmlandPosition = processed.down(2);
         var farmlandState = world.getBlockState(farmlandPosition);
-        
+
         if (farmlandState.getBlock() instanceof FarmlandBlock && farmlandState.get(Properties.MOISTURE) != 7) {
             world.setBlockState(farmlandPosition, farmlandState.with(Properties.MOISTURE, 7));
         }
         
-        ParticleContent.FERTILIZER_EFFECT.spawn(world, Vec3d.of(targetPosition), fertilizerStrength * 3 + 2);
-        world.playSound(null, targetPosition, SoundEvents.ITEM_BONE_MEAL_USE, SoundCategory.BLOCKS, 1f, 1f);
+        if (fertilized == true) {
+            if (fertilizerInInventory) {
+                inventoryStack.decrement(1);
+                inventory.setStack(0, inventoryStack);
+            }
+            super.finishBlockWork(processed);
+            ParticleContent.FERTILIZER_EFFECT.spawn(world, Vec3d.of(targetPosition), fertilizerStrength * 3 + 2);
+            world.playSound(null, targetPosition, SoundEvents.ITEM_BONE_MEAL_USE, SoundCategory.BLOCKS, 1f, 1f);
+        }
     }
     
     @Override

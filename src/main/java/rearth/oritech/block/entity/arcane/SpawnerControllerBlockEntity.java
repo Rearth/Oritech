@@ -18,6 +18,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -32,6 +33,8 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     public Entity renderedEntity;
     private boolean networkDirty;
     public boolean hasCage;
+    private int lastComparatorOutput;
+    private boolean redstonePowered;
     
     // loading cache only
     private Identifier loadedMob;
@@ -54,10 +57,11 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
             this.markDirty();
         }
         
-        if (spawnedMob == null || !hasCage) return;
+        if (spawnedMob == null || !hasCage || redstonePowered) return;
         
         if (collectedSouls >= maxSouls && world.getTime() % 4 == 0) {
             spawnMob();
+            updateComparator();
         }
         
         if (networkDirty) {
@@ -73,6 +77,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         nbt.putInt("souls", collectedSouls);
         nbt.putInt("maxSouls", maxSouls);
         nbt.putBoolean("cage", hasCage);
+        nbt.putBoolean("redstone", redstonePowered);
         if (spawnedMob != null) {
             nbt.putString("spawnedMob", Registries.ENTITY_TYPE.getId(spawnedMob).toString());
         }
@@ -84,6 +89,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         hasCage = nbt.getBoolean("cage");
         maxSouls = nbt.getInt("maxSouls");
         collectedSouls = nbt.getInt("souls");
+        redstonePowered = nbt.getBoolean("redstone");
         
         if (nbt.contains("spawnedMob"))
             loadedMob = Identifier.of(nbt.getString("spawnedMob"));
@@ -155,6 +161,25 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         return collectedSouls < maxSouls;
     }
     
+    private void updateComparator() {
+        var progress = getComparatorOutput();
+        if (lastComparatorOutput != progress) {
+            lastComparatorOutput = progress;
+            world.updateComparators(pos, getCachedState().getBlock());
+        }
+        
+    }
+    
+    public int getComparatorOutput() {
+        if (spawnedMob == null || maxSouls == 0) return 0;
+        
+        return  (int) (collectedSouls / (float) maxSouls * 15);
+    }
+    
+    public void setRedstonePowered(boolean active) {
+        this.redstonePowered = active;
+    }
+    
     @Override
     public void onSoulIncoming(Vec3d source) {
         var distance = (float) source.distanceTo(pos.toCenterPos());
@@ -165,10 +190,11 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         
         ParticleContent.WANDERING_SOUL.spawn(world, source.add(0, 0.7f, 0), animData);
         networkDirty = true;
+        updateComparator();
     }
     
     private int getSoulCost(int maxHp) {
-        return (int) (Math.sqrt(maxHp) + 0.5f);
+        return (int) (Math.sqrt(maxHp) + 0.5f) * Oritech.CONFIG.spawnerCostMultiplier();
     }
     
     public void onEntitySteppedOn(Entity entity) {

@@ -44,6 +44,14 @@ public class Config {
     public boolean generateOres = true;
     public boolean easyFindFeatures = true;
     
+    @SectionHeader("arcane")
+    public int enchanterCostMultiplier = 5;
+    public int catalystBaseSouls = 50;
+    public int catalystRFPerSoul = 20;
+    public int catalystCostMultiplier = 2;
+    public int catalystHyperMultiplier = 2;
+    public int spawnerCostMultiplier = 1;
+    
     @SectionHeader("clientSettings")
     @Sync(Option.SyncMode.NONE)
     @RestartRequired

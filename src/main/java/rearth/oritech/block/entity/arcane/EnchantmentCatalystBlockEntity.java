@@ -24,31 +24,47 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.CatalystScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.ScreenProvider;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import java.util.List;
 
 public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
-  implements InventoryProvider, ScreenProvider, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+  implements InventoryProvider, ScreenProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
     
-    public final int baseSoulCapacity = 50;
+    public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    public static final RawAnimation STABILIZED = RawAnimation.begin().thenLoop("stabilized");
+    public static final RawAnimation UNSTABLE = RawAnimation.begin().thenLoop("unstable");
+    
+    public final int baseSoulCapacity = Oritech.CONFIG.catalystBaseSouls();
     public final int maxProgress = 20;
+    protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     // working data
     public int collectedSouls;
-    public int maxSouls = 50;
+    public int maxSouls = Oritech.CONFIG.catalystBaseSouls();
     private int unstableTicks;
     private int progress;
     private boolean isHyperEnchanting;
-    private boolean dirty;
+    private boolean networkDirty;
+    private String lastAnimation = "idle";
+    private int lastComparatorOutput;
     
     public final SimpleInventory inventory = new SimpleInventory(2) {
         @Override
@@ -57,7 +73,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         }
     };
     
-    public final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(50000, 50000, 0) {
+    public final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(50000, 10000, 0) {
         @Override
         protected void onFinalCommit() {
             EnchantmentCatalystBlockEntity.this.markDirty();
@@ -77,7 +93,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         
         // check if powered, and adjust soul capacity
         if (energyStorage.amount > 0) {
-            var gainedSoulCapacity = energyStorage.amount / 20;
+            var gainedSoulCapacity = energyStorage.amount / Oritech.CONFIG.catalystRFPerSoul();
             energyStorage.amount = 0;
             var newMax = baseSoulCapacity + gainedSoulCapacity;
             adjustMaxSouls(newMax);
@@ -102,13 +118,14 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         // check if a book is in slot 0
         // check if an item is in slot 1
         if (canProceed()) {
-            dirty = true;
+            networkDirty = true;
             progress++;
             
             ParticleContent.SOUL_USED.spawn(world, pos.toCenterPos().add(0, 0.3, 0), isHyperEnchanting ? 15 : 3);
             
             if (progress >= maxProgress) {
                 enchantInput();
+                ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.toCenterPos(), maxProgress + 10);
                 
                 progress = 0;
                 isHyperEnchanting = false;
@@ -117,11 +134,23 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             progress = 0;
         }
         
-        if (dirty) {
-            dirty = false;
+        if (networkDirty) {
+            networkDirty = false;
             updateNetwork();
             DeathListener.resetEvents();
+            updateAnimation();
+            
+            var level = calculateComparatorLevel();
+            if (level != lastComparatorOutput) {
+                lastComparatorOutput = level;
+                world.updateComparators(pos, state.getBlock());
+            }
+            
         }
+        
+        // periodically re-trigger animation updates
+        if (world.getTime() % 60 == 0)
+            lastAnimation = "idle";
         
     }
     
@@ -157,7 +186,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             maxSouls++;
         }
         
-        this.dirty = true;
+        this.networkDirty = true;
     }
     
     private void enchantInput() {
@@ -186,8 +215,8 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     
     private int getEnchantmentCost(Enchantment enchantment, int targetLevel, boolean hyper) {
         var baseCost = enchantment.getAnvilCost();
-        var resultingCost = baseCost * targetLevel;    // todo config parameter multiplicator
-        if (hyper) resultingCost = resultingCost * 2 + 50;
+        var resultingCost = baseCost * targetLevel * Oritech.CONFIG.catalystCostMultiplier();
+        if (hyper) resultingCost = resultingCost * Oritech.CONFIG.catalystHyperMultiplier() + Oritech.CONFIG.catalystBaseSouls();
         return resultingCost;
     }
     
@@ -200,6 +229,9 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             
             var enchantment = bookCandidate.get(DataComponentTypes.STORED_ENCHANTMENTS).getEnchantments().stream().findFirst().get();
             var maxLevel = enchantment.value().getMaxLevel();
+            var bookLevel = bookCandidate.get(DataComponentTypes.STORED_ENCHANTMENTS).getLevel(enchantment);
+            
+            if (bookLevel != maxLevel) return 0;
             
             var inputStack = inventory.getStack(1);
             var toolLevel = inputStack.getEnchantments().getLevel(enchantment);
@@ -237,7 +269,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     public void onSoulIncoming(Vec3d source) {
         var distance = (float) source.distanceTo(pos.toCenterPos());
         collectedSouls++;
-        dirty = true;
+        networkDirty = true;
         
         var soulPath = pos.toCenterPos().subtract(source);
         var animData = new ParticleContent.SoulParticleData(soulPath, (int) getSoulTravelDuration(distance));
@@ -248,6 +280,14 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     @Override
     public boolean canAcceptSoul() {
         return collectedSouls < maxSouls;
+    }
+    
+    public int getComparatorOutput() {
+        return calculateComparatorLevel();
+    }
+    
+    private int calculateComparatorLevel() {
+        return (int) ((float) collectedSouls / maxSouls * 16);
     }
     
     private void updateNetwork() {
@@ -291,8 +331,47 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 56, 26),
-          new GuiSlot(1, 56, 44));
+          new GuiSlot(0, 56, 35),
+          new GuiSlot(1, 75, 35));
+    }
+    
+    @Override
+    public BarConfiguration getEnergyConfiguration() {
+        return new BarConfiguration(7, 7, 18, 71);
+    }
+    
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "machine", 4, state -> {
+            if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED))
+                return state.setAndContinue(IDLE);
+            return PlayState.CONTINUE;
+        })
+                          .triggerableAnim("stabilized", STABILIZED)
+                          .triggerableAnim("idle", IDLE)
+                          .triggerableAnim("unstable", UNSTABLE)
+                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+    }
+    
+    private void updateAnimation() {
+        
+        var targetAnim = "idle";
+        if (maxSouls > baseSoulCapacity)
+            targetAnim = "stabilized";
+        
+        if (unstableTicks > 0)
+            targetAnim = "unstable";
+        
+        if (!targetAnim.equals(lastAnimation)) {
+            triggerAnim("machine", targetAnim);
+            lastAnimation = targetAnim;
+        }
+        
+    }
+    
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animatableInstanceCache;
     }
     
     @Override

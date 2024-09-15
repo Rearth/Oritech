@@ -1,21 +1,25 @@
 package rearth.oritech.block.blocks.arcane;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
+
+import java.util.List;
 
 public class SpawnerControllerBlock extends HorizontalFacingBlock implements BlockEntityProvider {
     
@@ -31,6 +35,34 @@ public class SpawnerControllerBlock extends HorizontalFacingBlock implements Blo
             spawnerEntity.onEntitySteppedOn(entity);
         }
         
+    }
+    
+    @Override
+    public boolean emitsRedstonePower(BlockState state) {
+        return true;
+    }
+    
+    @Override
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        
+        if (world.isClient) return;
+        
+        var isPowered = world.isReceivingRedstonePower(pos);
+        
+        var entity = (SpawnerControllerBlockEntity) world.getBlockEntity(pos);
+        entity.setRedstonePowered(isPowered);
+        
+    }
+    
+    @Override
+    protected boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+    
+    @Override
+    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return ((SpawnerControllerBlockEntity) world.getBlockEntity(pos)).getComparatorOutput();
     }
     
     @Override
@@ -67,5 +99,12 @@ public class SpawnerControllerBlock extends HorizontalFacingBlock implements Blo
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
         };
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        super.appendTooltip(stack, context, tooltip, options);
+        tooltip.add(Text.translatable("tooltip.oritech.spawner").formatted(Formatting.GRAY));
+        tooltip.add(Text.translatable("tooltip.oritech.spawner2").formatted(Formatting.GRAY));
     }
 }
