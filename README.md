@@ -132,4 +132,4 @@ In detail, these are the following items that are from the above-mentioned sourc
 * [LyFl0w's texture maker](https://github.com/LyFl0w/TextureMaker), which has been used for a lot of the other mod textures
 * Ycar, for creating all tiers of the machine core textures
 * BBoldt and BLOKBUSTR, for fixing a series of issues with the textures, and generally improving and redesigning almost all the metal component textures
-* jshipley, for fixing issues around the industrial door, machine output slots, and machine progress bugs
+* jshipley, for a lot of contributions with new features, block, mechanics and bugfixes
