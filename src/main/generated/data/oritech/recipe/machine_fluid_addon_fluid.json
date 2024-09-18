@@ -3,13 +3,13 @@
   "category": "misc",
   "key": {
     "b": {
-      "item": "oritech:silicon"
+      "tag": "c:silicon"
     },
     "c": {
       "item": "oritech:fluid_pipe"
     },
     "f": {
-      "item": "oritech:carbon_fibre_strands"
+      "tag": "c:carbon_fibre"
     },
     "s": {
       "item": "oritech:electrum_ingot"

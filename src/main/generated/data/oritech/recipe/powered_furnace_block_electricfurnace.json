@@ -12,7 +12,7 @@
       "item": "minecraft:copper_ingot"
     },
     "m": {
-      "item": "oritech:silicon"
+      "tag": "c:silicon"
     },
     "s": {
       "item": "oritech:magnetic_coil"

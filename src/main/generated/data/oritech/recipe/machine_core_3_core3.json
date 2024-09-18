@@ -6,7 +6,7 @@
       "item": "minecraft:redstone"
     },
     "s": {
-      "item": "oritech:carbon_fibre_strands"
+      "tag": "c:carbon_fibre"
     }
   },
   "pattern": [

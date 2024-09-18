@@ -9,7 +9,7 @@
       "item": "oritech:processing_unit"
     },
     "f": {
-      "item": "oritech:carbon_fibre_strands"
+      "tag": "c:carbon_fibre"
     },
     "s": {
       "item": "oritech:motor"

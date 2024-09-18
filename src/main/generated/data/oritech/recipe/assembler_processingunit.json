@@ -5,7 +5,7 @@
       "item": "oritech:plastic_sheet"
     },
     {
-      "item": "oritech:carbon_fibre_strands"
+      "tag": "c:carbon_fibre"
     },
     {
       "item": "oritech:electrum_ingot"

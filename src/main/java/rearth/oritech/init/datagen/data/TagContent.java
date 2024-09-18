@@ -42,6 +42,9 @@ public class TagContent {
 
     // silicon
     public static final TagKey<Item> SILICON = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "silicon"));
+
+    // carbon fibre
+    public static final TagKey<Item> CARBON_FIBRE = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "carbon_fibre"));
     
     // blocks
     public static final TagKey<Block> DRILL_MINEABLE = TagKey.of(RegistryKeys.BLOCK, Oritech.id("mineable/drill"));

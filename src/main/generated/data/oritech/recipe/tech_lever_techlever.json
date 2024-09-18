@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "a": {
-      "item": "oritech:carbon_fibre_strands"
+      "tag": "c:carbon_fibre"
     },
     "b": {
       "tag": "c:ingots/steel"

@@ -12,7 +12,7 @@
       "item": "oritech:insulated_wire"
     },
     "m": {
-      "item": "oritech:silicon"
+      "tag": "c:silicon"
     },
     "s": {
       "tag": "c:ingots/nickel"

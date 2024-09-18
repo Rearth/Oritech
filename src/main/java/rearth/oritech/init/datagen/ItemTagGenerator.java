@@ -6,10 +6,13 @@ import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.util.Identifier;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.init.datagen.data.TagContent;
+import techreborn.TechReborn;
+import techreborn.init.TRContent;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -79,6 +82,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .addOptionalTag(ItemTags.VILLAGER_PLANTABLE_SEEDS)
           .addOptionalTag(ItemTags.SAPLINGS)
           .addOptionalTag(ConventionalItemTags.FOODS)
+          .addOptional(Identifier.of(TechReborn.MOD_ID, TRContent.Parts.PLANTBALL.name))
           .add(BlockContent.WITHER_CROP_BLOCK.asItem())
           .add(Items.WHEAT);
         
@@ -91,6 +95,11 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         // silicon
         getOrCreateTagBuilder(TagContent.SILICON)
           .add(ItemContent.SILICON);
+        
+        // carbon fibre
+        getOrCreateTagBuilder(TagContent.CARBON_FIBRE)
+          .add(ItemContent.CARBON_FIBRE_STRANDS)
+          .addOptional(Identifier.of(TechReborn.MOD_ID, TRContent.Parts.CARBON_FIBER.name));
         
         // equipment enchanting
         getOrCreateTagBuilder(ItemTags.MINING_ENCHANTABLE)

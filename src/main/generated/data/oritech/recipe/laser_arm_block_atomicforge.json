@@ -9,7 +9,7 @@
       "item": "oritech:electrum_ingot"
     },
     "f": {
-      "item": "oritech:carbon_fibre_strands"
+      "tag": "c:carbon_fibre"
     },
     "m": {
       "item": "oritech:motor"

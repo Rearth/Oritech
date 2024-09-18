@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "c": {
-      "item": "oritech:silicon"
+      "tag": "c:silicon"
     },
     "i": {
       "item": "minecraft:copper_ingot"

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "tag": "oritech:plating"
+    },
+    "c": {
+      "item": "oritech:motor"
+    },
+    "f": {
+      "item": "oritech:electrum_ingot"
+    },
+    "s": {
+      "item": "oritech:machine_frame_block"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:frame_constructor_block"
+  }
+}

@@ -46,6 +46,11 @@ repositories {
         url "https://modmaven.dev"
     }
 
+    maven {
+        name = 'Curseforge'
+        url 'https://cursemaven.com'
+    }
+
     maven { // for EMI
         name = 'TerraformersMC'
         url 'https://maven.terraformersmc.com/'
@@ -99,6 +104,10 @@ dependencies {
         case "disabled": break
         default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, or disabled.")
     }
+
+    // Tech Reborn - for compatibility datagen
+    modImplementation "curse.maven:techreborn-233564:5608205"
+    modImplementation "curse.maven:reborncore-237903:5608204"
 }
 
 processResources {
