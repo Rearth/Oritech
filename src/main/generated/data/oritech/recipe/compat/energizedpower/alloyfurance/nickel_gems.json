@@ -11,23 +11,24 @@
   "inputs": [
     {
       "input": {
-        "item": "minecraft:iron_ingot"
+        "item": "oritech:nickel_gem"
       }
     },
     {
       "input": {
-        "item": "oritech:raw_biopolymer"
+        "item": "oritech:nickel_gem"
       }
     }
   ],
   "output": {
-    "item": "oritech:biosteel_ingot"
+    "count": 4,
+    "item": "oritech:nickel_ingot"
   },
   "secondaryOutput": {
     "output": {
-      "item": "minecraft:diamond_block"
+      "item": "minecraft:iron_ingot"
     },
     "percentages": []
   },
-  "ticks": 500
+  "ticks": 800
 }

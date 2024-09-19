@@ -7,27 +7,31 @@
       ]
     }
   ],
-  "type": "energizedpower:alloy_furnace",
+  "type": "energizedpower:assembling_machine",
   "inputs": [
     {
       "input": {
-        "tag": "c:ingots/nickel"
+        "item": "oritech:plastic_sheet"
       }
     },
     {
       "input": {
         "item": "oritech:fluxite"
       }
+    },
+    {
+      "input": {
+        "item": "oritech:fluxite"
+      }
+    },
+    {
+      "input": {
+        "tag": "c:ingots/steel"
+      }
     }
   ],
   "output": {
-    "item": "oritech:energite_ingot"
-  },
-  "secondaryOutput": {
-    "output": {
-      "item": "minecraft:diamond_block"
-    },
-    "percentages": []
-  },
-  "ticks": 500
+    "count": 2,
+    "item": "oritech:basic_battery"
+  }
 }

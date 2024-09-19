@@ -7,7 +7,7 @@
       ]
     }
   ],
-  "type": "energizedpower:alloy_furnace",
+  "type": "energizedpower:assembling_machine",
   "inputs": [
     {
       "input": {
@@ -16,18 +16,22 @@
     },
     {
       "input": {
-        "item": "minecraft:diamond"
+        "tag": "c:ingots/steel"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:magnetic_coil"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:magnetic_coil"
       }
     }
   ],
   "output": {
-    "item": "oritech:adamant_ingot"
-  },
-  "secondaryOutput": {
-    "output": {
-      "item": "minecraft:diamond_block"
-    },
-    "percentages": []
-  },
-  "ticks": 800
+    "count": 2,
+    "item": "oritech:motor"
+  }
 }

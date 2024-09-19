@@ -11,23 +11,23 @@
   "inputs": [
     {
       "input": {
-        "tag": "c:ingots/platinum"
+        "item": "minecraft:iron_ingot"
       }
     },
     {
       "input": {
-        "item": "minecraft:netherite_ingot"
+        "tag": "c:dusts/coal"
       }
     }
   ],
   "output": {
-    "item": "oritech:duratium_ingot"
+    "item": "oritech:steel_ingot"
   },
   "secondaryOutput": {
     "output": {
-      "item": "minecraft:diamond_block"
+      "item": "minecraft:iron_ingot"
     },
     "percentages": []
   },
-  "ticks": 1000
+  "ticks": 500
 }

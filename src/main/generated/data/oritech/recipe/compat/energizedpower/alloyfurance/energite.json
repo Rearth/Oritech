@@ -11,24 +11,23 @@
   "inputs": [
     {
       "input": {
-        "item": "oritech:copper_gem"
+        "tag": "c:ingots/nickel"
       }
     },
     {
       "input": {
-        "item": "oritech:copper_gem"
+        "item": "oritech:fluxite"
       }
     }
   ],
   "output": {
-    "count": 4,
-    "item": "minecraft:copper_ingot"
+    "item": "oritech:energite_ingot"
   },
   "secondaryOutput": {
     "output": {
-      "item": "minecraft:diamond_block"
+      "item": "minecraft:iron_ingot"
     },
     "percentages": []
   },
-  "ticks": 800
+  "ticks": 500
 }

@@ -60,9 +60,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addDecorative(exporter);
         addVanillaAdditions(exporter);
         
-        TechRebornRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(Arrays.asList(TechReborn.MOD_ID))));
-        EnergizedPowerRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(Arrays.asList(EnergizedPowerMod.MODID))));
-        
+        TechRebornRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(TechReborn.MOD_ID))));
+        EnergizedPowerRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(EnergizedPowerMod.MODID))));        
     }
     
     private void addVanillaAdditions(RecipeExporter exporter) {

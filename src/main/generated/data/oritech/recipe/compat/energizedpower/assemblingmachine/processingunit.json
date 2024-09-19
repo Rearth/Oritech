@@ -7,11 +7,21 @@
       ]
     }
   ],
-  "type": "energizedpower:alloy_furnace",
+  "type": "energizedpower:assembling_machine",
   "inputs": [
     {
       "input": {
-        "item": "minecraft:gold_ingot"
+        "item": "oritech:plastic_sheet"
+      }
+    },
+    {
+      "input": {
+        "tag": "c:carbon_fibre"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:electrum_ingot"
       }
     },
     {
@@ -21,13 +31,6 @@
     }
   ],
   "output": {
-    "item": "oritech:electrum_ingot"
-  },
-  "secondaryOutput": {
-    "output": {
-      "item": "minecraft:diamond_block"
-    },
-    "percentages": []
-  },
-  "ticks": 500
+    "item": "oritech:processing_unit"
+  }
 }

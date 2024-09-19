@@ -11,22 +11,22 @@
   "inputs": [
     {
       "input": {
-        "item": "oritech:platinum_gem"
+        "item": "oritech:copper_gem"
       }
     },
     {
       "input": {
-        "item": "oritech:platinum_gem"
+        "item": "oritech:copper_gem"
       }
     }
   ],
   "output": {
     "count": 4,
-    "item": "oritech:platinum_ingot"
+    "item": "minecraft:copper_ingot"
   },
   "secondaryOutput": {
     "output": {
-      "item": "minecraft:diamond_block"
+      "item": "minecraft:iron_ingot"
     },
     "percentages": []
   },
