@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_iron_plating_block": {
+    "has_nickel_plating_pressure_plate": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:iron_plating_block"
+            "items": "oritech:nickel_plating_pressure_plate"
           }
         ]
       },
@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:crafting/plating/iron"
+        "recipe": "minecraft:crafting/pressureplate/nickel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -21,12 +21,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_iron_plating_block"
+      "has_nickel_plating_pressure_plate"
     ]
   ],
   "rewards": {
     "recipes": [
-      "minecraft:crafting/plating/iron"
+      "minecraft:crafting/pressureplate/nickel"
     ]
   }
 }

@@ -41,7 +41,7 @@ public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
     @Override
     protected void tryConsumeInput() {
         var firstItem = this.getInputView().get(0);
-        if (firstItem.isEmpty()) return;
+        if (firstItem.isEmpty() || firstItem.getItem() instanceof BucketItem) return;
         
         var fuelTime = FUEL_MAP.getOrDefault(firstItem.getItem(), 0);
         if (fuelTime > 0) {

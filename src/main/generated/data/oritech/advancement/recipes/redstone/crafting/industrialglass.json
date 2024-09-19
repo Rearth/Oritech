@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_machine_plating_block": {
+    "has_industrial_glass_block": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:machine_plating_block"
+            "items": "oritech:industrial_glass_block"
           }
         ]
       },
@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:crafting/plating/plating"
+        "recipe": "minecraft:crafting/industrialglass"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -21,12 +21,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_machine_plating_block"
+      "has_industrial_glass_block"
     ]
   ],
   "rewards": {
     "recipes": [
-      "minecraft:crafting/plating/plating"
+      "minecraft:crafting/industrialglass"
     ]
   }
 }

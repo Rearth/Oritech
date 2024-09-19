@@ -79,7 +79,7 @@ public abstract class FrameInteractionBlock extends HorizontalFacingBlock implem
                 var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
                 player.openHandledScreen(handler);
             } else {
-                player.sendMessage(Text.literal("Missing frame. Add an empty rectangular frame behind the machine using machine frame blocks"));
+                player.sendMessage(Text.translatable("message.oritech.machine_frame.missing_frame"));
             }
             
         }

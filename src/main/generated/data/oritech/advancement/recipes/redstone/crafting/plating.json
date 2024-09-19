@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_nickel_plating_block": {
+    "has_machine_plating_block": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:nickel_plating_block"
+            "items": "oritech:machine_plating_block"
           }
         ]
       },
@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:crafting/plating/nickel"
+        "recipe": "minecraft:crafting/plating"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -21,12 +21,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_nickel_plating_block"
+      "has_machine_plating_block"
     ]
   ],
   "rewards": {
     "recipes": [
-      "minecraft:crafting/plating/nickel"
+      "minecraft:crafting/plating"
     ]
   }
 }

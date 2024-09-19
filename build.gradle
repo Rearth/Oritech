@@ -46,9 +46,12 @@ repositories {
         url "https://modmaven.dev"
     }
 
-    maven {
-        name = 'Curseforge'
-        url 'https://cursemaven.com'
+    maven { // for Jade, Tech Reborn, Energized Power
+        name = 'Curse'
+        url = 'https://www.cursemaven.com'
+        content {
+            includeGroup 'curse.maven'
+        }
     }
 
     maven { // for EMI
@@ -97,6 +100,8 @@ dependencies {
     // athena (CTM)
     modRuntimeOnly "earth.terrarium.athena:athena-fabric-${athena_version}"
 
+    modImplementation "curse.maven:jade-324717:${jade_id}"
+
     // recipe viewer runtime
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
         case "emi": modRuntimeOnly "dev.emi:emi-fabric:${emi_version}"; break
@@ -106,11 +111,11 @@ dependencies {
     }
 
     // Tech Reborn - for compatibility datagen
-    modImplementation "curse.maven:techreborn-233564:5608205"
-    modImplementation "curse.maven:reborncore-237903:5608204"
+    modImplementation "curse.maven:techreborn-233564:${tech_reborn_version_id}"
+    modImplementation "curse.maven:reborncore-237903:${reborn_core_version_id}"
 
     // Energized Power - for compatibility datagen
-    modImplementation "curse.maven:energized-power-782147:5650292"
+    modImplementation "curse.maven:energized-power-782147:${energized_power_version_id}"
 }
 
 processResources {

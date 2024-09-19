@@ -25,11 +25,13 @@ public class ModelGenerator extends FabricModelProvider {
     public ModelGenerator(FabricDataOutput output) {
         super(output);
     }
+
+    public static TextureMap stairsOrientable(Block block, Block baseBlock) {
+        return new TextureMap().put(TextureKey.FRONT, TextureMap.getSubId(block, "_front")).put(TextureKey.SIDE, TextureMap.getSubId(block, "_side")).put(TextureKey.TOP, TextureMap.getSubId(block, "_top")).put(TextureKey.BACK, TextureMap.getId(baseBlock)).put(TextureKey.BOTTOM, TextureMap.getId(baseBlock));
+    }
     
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
-        
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.BANANA_BLOCK);
         
         blockStateModelGenerator.registerSimpleState(BlockContent.MACHINE_FRAME_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.FLUID_PIPE);
@@ -117,16 +119,28 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.RESOURCE_NODE_PLATINUM);
         
         //decorative
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.INDUSTRIAL_GLASS_BLOCK);
+        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.CAPACITOR_ADDON_EXTENDER);
+        blockStateModelGenerator.registerSimpleState(BlockContent.METAL_BEAM_BLOCK);
         blockStateModelGenerator.blockStateCollector.accept(createWallMountedState(BlockContent.CEILING_LIGHT));
         blockStateModelGenerator.blockStateCollector.accept(createWallMountedState(BlockContent.CEILING_LIGHT_HANGING));
         blockStateModelGenerator.blockStateCollector.accept(createButtonBlockState(BlockContent.TECH_BUTTON, Identifier.of(Oritech.MOD_ID, "block/tech_button"), Identifier.of(Oritech.MOD_ID, "block/tech_button_on")));
         registerLever(BlockContent.TECH_LEVER, blockStateModelGenerator);
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_PLATING_BLOCK);
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.IRON_PLATING_BLOCK);
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.NICKEL_PLATING_BLOCK);
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.INDUSTRIAL_GLASS_BLOCK);
-        blockStateModelGenerator.registerSimpleCubeAll(BlockContent.CAPACITOR_ADDON_EXTENDER);
-        blockStateModelGenerator.registerSimpleState(BlockContent.METAL_BEAM_BLOCK);
+        
+        var machinePlatingPool = blockStateModelGenerator.registerCubeAllModelTexturePool(BlockContent.MACHINE_PLATING_BLOCK);
+        machinePlatingPool.stairs(BlockContent.MACHINE_PLATING_STAIRS);
+        machinePlatingPool.slab(BlockContent.MACHINE_PLATING_SLAB);
+        machinePlatingPool.pressurePlate(BlockContent.MACHINE_PLATING_PRESSURE_PLATE);
+        
+        var ironPlatingPool = blockStateModelGenerator.registerCubeAllModelTexturePool(BlockContent.IRON_PLATING_BLOCK);
+        ironPlatingPool.stairs(BlockContent.IRON_PLATING_STAIRS);
+        ironPlatingPool.slab(BlockContent.IRON_PLATING_SLAB);
+        ironPlatingPool.pressurePlate(BlockContent.IRON_PLATING_PRESSURE_PLATE);
+        
+        var nickelPlatingPool = blockStateModelGenerator.registerCubeAllModelTexturePool(BlockContent.NICKEL_PLATING_BLOCK);
+        nickelPlatingPool.stairs(BlockContent.NICKEL_PLATING_STAIRS);
+        nickelPlatingPool.slab(BlockContent.NICKEL_PLATING_SLAB);
+        nickelPlatingPool.pressurePlate(BlockContent.NICKEL_PLATING_PRESSURE_PLATE);
         
         
     }
@@ -211,5 +225,4 @@ public class ModelGenerator extends FabricModelProvider {
                           .register(BlockFace.WALL, Direction.SOUTH, BlockStateVariant.create().put(VariantSettings.X, VariantSettings.Rotation.R90).put(VariantSettings.Y, VariantSettings.Rotation.R180))
                           .register(BlockFace.WALL, Direction.WEST, BlockStateVariant.create().put(VariantSettings.X, VariantSettings.Rotation.R90).put(VariantSettings.Y, VariantSettings.Rotation.R270))));
     }
-    
 }

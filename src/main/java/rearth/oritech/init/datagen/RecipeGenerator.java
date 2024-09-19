@@ -163,6 +163,18 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.METAL_BEAM_BLOCK.asItem(), 6), Ingredient.fromTag(TagContent.CARBON_FIBRE), Ingredient.fromTag(TagContent.STEEL_INGOTS), "metalbeams");
         // tech glass
         offerMachinePlatingRecipe(exporter, BlockContent.INDUSTRIAL_GLASS_BLOCK.asItem(), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.fromTag(ConventionalItemTags.GLASS_BLOCKS), Ingredient.fromTag(TagContent.MACHINE_PLATING), 4, "industrialglass");
+        // machine plated stairs, slabs, pressure plates
+        offerSlabRecipe(exporter, BlockContent.MACHINE_PLATING_SLAB.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), "machine");
+        offerStairsRecipe(exporter, BlockContent.MACHINE_PLATING_STAIRS.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), "machine");
+        offerPressurePlateRecipe(exporter, BlockContent.MACHINE_PLATING_PRESSURE_PLATE.asItem(), Ingredient.ofItems(BlockContent.MACHINE_PLATING_BLOCK.asItem()), "machine");
+        // iron plated stairs, slabs, pressure plates
+        offerSlabRecipe(exporter, BlockContent.IRON_PLATING_SLAB.asItem(), Ingredient.ofItems(BlockContent.IRON_PLATING_BLOCK.asItem()), "iron");
+        offerStairsRecipe(exporter, BlockContent.IRON_PLATING_STAIRS.asItem(), Ingredient.ofItems(BlockContent.IRON_PLATING_BLOCK.asItem()), "iron");
+        offerPressurePlateRecipe(exporter, BlockContent.IRON_PLATING_PRESSURE_PLATE.asItem(), Ingredient.ofItems(BlockContent.IRON_PLATING_BLOCK.asItem()), "iron");
+        // nickel plated stairs, slabs, pressure plates
+        offerSlabRecipe(exporter, BlockContent.NICKEL_PLATING_SLAB.asItem(), Ingredient.ofItems(BlockContent.NICKEL_PLATING_BLOCK.asItem()), "nickel");
+        offerStairsRecipe(exporter, BlockContent.NICKEL_PLATING_STAIRS.asItem(), Ingredient.ofItems(BlockContent.NICKEL_PLATING_BLOCK.asItem()), "nickel");
+        offerPressurePlateRecipe(exporter, BlockContent.NICKEL_PLATING_PRESSURE_PLATE.asItem(), Ingredient.ofItems(BlockContent.NICKEL_PLATING_BLOCK.asItem()), "nickel");
     }
     
     private void addMachines(RecipeExporter exporter) {
@@ -853,6 +865,14 @@ public class RecipeGenerator extends FabricRecipeProvider {
                         .pattern("b  ");
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
     }
+
+    public void offerMachinePlatingRecipe(RecipeExporter exporter, Item output, Ingredient side, Ingredient edge, Ingredient core, int count, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, count).input('a', side).input('e', edge).input('c', core)
+                        .pattern("eae")
+                        .pattern("aca")
+                        .pattern("eae");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+    }
     
     public void offerDoorRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
         var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, 1).input('a', A)
@@ -861,12 +881,24 @@ public class RecipeGenerator extends FabricRecipeProvider {
                         .pattern("aa ");
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
     }
-    
-    public void offerMachinePlatingRecipe(RecipeExporter exporter, Item output, Ingredient side, Ingredient edge, Ingredient core, int count, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, count).input('a', side).input('e', edge).input('c', core)
-                        .pattern("eae")
-                        .pattern("aca")
-                        .pattern("eae");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/plating/" + suffix);
+
+    public void offerSlabRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.BUILDING_BLOCKS, output, 6).input('a', A)
+                        .pattern("aaa");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/slab/" + suffix);
+    }
+
+    public void offerStairsRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.BUILDING_BLOCKS, output, 4).input('a', A)
+                        .pattern("a  ")
+                        .pattern("aa ")
+                        .pattern("aaa");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/stairs/" + suffix);
+    }
+
+    public void offerPressurePlateRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, 1).input('a', A)
+                        .pattern("aa");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/pressureplate/" + suffix);
     }
 }

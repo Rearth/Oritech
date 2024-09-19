@@ -65,6 +65,7 @@
   "tooltip.oritech.input_mode_fill_left_to_right": "Fills the slots from left to right. Moves to the\nnext slot when the first has been filled.",
   "tooltip.oritech.input_mode_fill_evenly": "Fills items evenly. New items are always\nput into the lowest matching slot.",
   "tooltip.oritech.input_mode_fill_matching_recipe": "Inserts items balanced according to matching recipes.\nIf there is no recipe that uses an item, it will not be\ninserted.",
+  "title.oritech.details": "Details",
 
   "tooltip.oritech.item_extra_info": "Hold ctrl for more info",
   "tooltip.oritech.addon_desc": "Addon slots: ",
@@ -76,6 +77,18 @@
   "tooltip.oritech.needs_laser_power": "Must be powered via an enderic laser",
   "tooltip.oritech.steam_engine": "Processes steam into RF and water. Can be chained together",
   "tooltip.oritech.item_filter": "Used to filter which items can be inserted into an inventory.",
+  "button.oritech.item_filter.whitelist": "Whitelist",
+  "title.oritech.item_filter.whitelist": "Whitelist",
+  "tooltip.oritech.item_filter.whitelist": "Currently only allows items through which \nmatch the listed items",
+  "button.oritech.item_filter.blacklist": "Blacklist",
+  "title.oritech.item_filter.blacklist": "Blacklist",
+  "tooltip.oritech.item_filter.blacklist": "Currently only allows items through which \ndo NOT match the listed items",
+  "title.oritech.item_filter.nbt": "Use NBT",
+  "button.oritech.item_filter.nbt_on": "NBT On",
+  "tooltip.oritech.item_filter.nbt": "Currently checks the listed items for NBT \nvalues, such as damage, enchantments, etc.",
+  "title.oritech.item_filter.no_nbt": "NBT Off",
+  "button.oritech.item_filter.no_nbt": "No NBT",
+  "tooltip.oritech.item_filter.no_nbt": "Currently only checks the item type/id",
   "tooltip.oritech.enchanter": "Applies enchantments using energy and souls from nearby catalysts.",
   "tooltip.oritech.catalyst": "Stores souls from entities parting nearby. Can apply enchantments from books.",
   "tooltip.oritech.catalyst_warning": "Warning: Tinkering with the arcane can have dangerous consequences.",
@@ -91,6 +104,7 @@
   "tooltip.oritech.addon_acceptor_desc": "Acts as energy proxy",
   "tooltip.oritech.addon_crop_desc": "Applicable to block destroyer. Skips non-grown crops",
   "tooltip.oritech.addon_proxy_desc": "Allows access to specific inventory slots",
+  "tooltip.oritech.addon_proxy_select": "Select proxy target slot",
   "tooltip.oritech.addon_quarry_desc": "Applicable to block destroyer and Enderic Laser. Increases working area size",
   "tooltip.oritech.addon_redstone_desc": "Allows further redstone and comparator configuration",
   "tooltip.oritech.addon_capacity_desc": "Energy Capacity ",
@@ -149,6 +163,12 @@
     }
   ],
 
+  "title.oritech.redstone_addon": [
+    {
+      "text": "Please select a target slot",
+      "color": "dark_gray"
+    }
+  ],
   "tooltip.oritech.redstone_output_power": "Comparators will measure the energy storage",
   "title.oritech.redstone_output_power": "Power Measure",
   "tooltip.oritech.redstone_output_slot": "Comparators will measure selected inventory slot",
@@ -159,6 +179,61 @@
   "title.oritech.redstone_output_active": "Activity Measure",
   "tooltip.oritech.redstone_input_control": "Enables the machine to be disabled via a redstone signal to this addon",
   "title.oritech.redstone_input_control": "Control Input",
+  
+  "title.oritech.inventory_proxy": "Machine Inventory Access",
+
+  "tooltip.oritech.energy_stored": "Stored: %d RF",
+  "tooltip.oritech.energy_indicator": "%d/%d RF",
+  "tooltip.oritech.energy_max_transfer": "Max Transfer Rate: ",
+  "tooltip.oritech.energy_transfer_rate": "%d RF/t",
+  "title.oritech.machine.addon_range": "%d Range",
+  "tooltip.oritech.block_destroyer.addon_range": "Maximum digging depth",
+  "tooltip.oritech.laser_arm.addon_range": "Effective beam radius",
+  "title.oritech.machine.addon_fortune": "%d Fortune",
+  "tooltip.oritech.machine.addon_fortune": "Yield addon count. 3 is the effective maximum",
+  "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many layers of machine\naddons can be added to this block.\n\nUse better cores to increase this\n\nCurrent quality progress: %s",
+
+  "tooltip.oritech.thousand_abbrev": "K",
+  "tooltip.oritech.million_abbrev": "M",
+  "tooltip.oritech.billion_abbrev": "B",
+
+  "title.oritech.machine_speed": "⌛ %s%% ",
+  "tooltip.oritech.machine_speed": "Processing Speed",
+  "title.oritech.machine_efficiency": "⚡ %s%% ",
+  "tooltip.oritech.machine_efficiency": "Energy Efficiency",
+  "title.oritech.machine_energy_production": "↗ %d RF/t ",
+
+  "tooltip.oritech.steam_energy_production": "Total production (includes chained generators)",
+  "title.oritech.steam_production": "\uD83D\uDEDE %s su/t",
+  "tooltip.oritech.steam_production": "Amount of steam droplets produced per tick. Any excess will be lost when the storage is full.",
+  "title.oritech.steam_consumption": "\uD83D\uDEDE %s su/t",
+  "tooltip.oritech.steam_consumption": "Total steam consumption in storage units (droplets) per tick (includes chained generators)",
+  "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Charged\n\nMaximum Usage: %s RF/t",
+  "title.oritech.machine.no_addons": "No addons connected",
+  "button.oritech.machine.addons": "Addons",
+
+  "title.oritech.machine.capacitor_added_capacity": "\uD83D\uDD0B %d RF ",
+  "tooltip.oritech.machine.capacitor_added_capacity": "Added Capacity",
+  "title.oritech.machine.capacitor_added_throughput": "\uD83D\uDD0B %d RF/t",
+  "tooltip.oritech.machine.capacitor_added_throughput": "Added Throughput",
+
+  "title.oritech.machine_option_enabled": "\uD83D\uDD28 Enabled",
+  "tooltip.oritech.pulverizer_dust_combine": "Auto-combines small dusts to ingots",
+  "tooltip.oritech.fluid_content": "%f mB %s",
+  "tooltip.oritech.fluid_empty": "Empty",
+  "tooltip.oritech.progress_indicator": "%d / %d ticks\n(base %d ticks)",
+
+  "title.oritech.catalyst.stable": "Stable",
+  "title.oritech.catalyst.stabilized": "Stabilized",
+  "title.oritech.catalyst.semi_stable": "Semi-Stable",
+  "title.oritech.catalyst.unstable": "Unstable",
+
+  "tooltip.oritech.spawner.collected_souls": "%d / %d Souls",
+
+  "button.oritech.enchanter.bane_of_long_names": "Bane of long names",
+  "title.oritech.enchanter.catalysts_available": "%d / %d catalysts available",
+  "title.oritech.enchanter.catalysts": "%d / %d Catalysts",
+  "title.oritech.enchanter.souls_used": "%d / %d Souls used",
 
   "rei.process.oritech:pulverizer": "Pulverizing",
   "rei.process.oritech:grinder": "Fragmenting",
@@ -171,6 +246,7 @@
   "rei.process.oritech:steam_engine": "Steam Usage",
   "rei.process.oritech:bio_generator": "Biomass Churning",
   "rei.process.oritech:fuel_generator": "Fuel Burning",
+  "rei.title.oritech.cookingtime": "%ds (%d ticks)",
 
   "emi.category.oritech.pulverizer": "Pulverizing",
   "emi.category.oritech.grinder": "Fragmenting",
@@ -183,6 +259,7 @@
   "emi.category.oritech.steam_engine": "Steam Usage",
   "emi.category.oritech.bio_generator": "Biomass Churning",
   "emi.category.oritech.fuel_generator": "Fuel Burning",
+  "emi.title.oritech.cookingtime": "%ds (%d ticks)",
 
   "itemgroup.oritech.machines": "Oritech Machines",
   "itemgroup.oritech.components": "Oritech Components",
@@ -282,8 +359,17 @@
   "block.oritech.tech_door_hinge": "Industrial Door",
   "block.oritech.metal_beam_block": "Industrial Support Beam",
   "block.oritech.machine_plating_block": "Copper Reinforced Plating",
+  "block.oritech.machine_plating_slab": "Copper Reinforced Plating Slab",
+  "block.oritech.machine_plating_stairs": "Copper Reinforced Plating Stairs",
+  "block.oritech.machine_plating_pressure_plate": "Copper Reinforced Plating Pressure Plate",
   "block.oritech.iron_plating_block": "Iron Reinforced Plating",
+  "block.oritech.iron_plating_slab": "Iron Reinforced Plating Slab",
+  "block.oritech.iron_plating_stairs": "Iron Reinforced Plating Stairs",
+  "block.oritech.iron_plating_pressure_plate": "Copper Reinforced Plating Pressure Plate",
   "block.oritech.nickel_plating_block": "Nickel Reinforced Plating",
+  "block.oritech.nickel_plating_slab": "Nickel Reinforced Plating Slab",
+  "block.oritech.nickel_plating_stairs": "Nickel Reinforced Plating Stairs",
+  "block.oritech.nickel_plating_pressure_plate": "Copper Reinforced Plating Pressure Plate",
   "block.oritech.industrial_glass_block": "Industrial Glass",
   "block.oritech.capacitor_addon_extender": "Power Bank Addon",
   "block.oritech.treefeller_block": "Tree Cutter",
@@ -395,6 +481,43 @@
   "item.oritech.promethium_pickaxe": [
     { "text": "Prometheum Pickaxe", "color": "#ffd505" }
   ],
+
+  "message.oritech.catalyst.cost": "Cost: %d",
+
+  "message.oritech.deep_drill.ore_placement": "Machine must be placed on ore nodes",
+  "message.oritech.generator.production_rate": "Production rate: %d with core multiplier: %d",
+  "message.oritech.machine.missing_core": "Machine is not assembled. Please add missing core blocks",
+  "message.oritech.machine_frame.missing_frame": "Missing frame. Add an empty rectangular frame behind the machine using machine frame blocks",
+
+  "message.oritech.enchanter.insert_item": "Insert Item",
+
+  "message.oritech.drone.invalid_distance": "Target must be at least 50 blocks away.\n(current distance: %d)",
+  "message.oritech.drone.target_set": "Target port set.\nDrone will deliver whenever the inventory is not empty.",
+  "message.oritech.drone.target_invalid": "Target is not a valid drone port.\nEnsure that the target port is loaded and active.",
+
+  "message.oritech.pump.starting": "Starting",
+  "message.oritech.pump.extending": "Trunk is extending...",
+  "message.oritech.pump.initializing": "Pump is initializing... (This might take a moment for large bodies of liquid)",
+  "message.oritech.pump.no_fluids": "No liquids available",
+  "message.oritech.pump.busy": "Pump is working...",
+  "message.oritech.pump.low_energy": "Not enough energy!",
+  "message.oritech.pump.pump_finished": "All liquids have been pumped",
+  "message.oritech.pump.full": "Tank is full",
+
+  "message.oritech.spawner.no_cage": "Missing mob cage!",
+  "message.oritech.spawner.no_mob": "No mob caught. Move a mob on top to load it into the spawner",
+
+  "message.oritech.target_designator.position_invalid": "Invalid position for drone port, target port must be at least 50 blocks away",
+  "message.oritech.target_designator.position_saved": "Position saved to machine",
+  "message.oritech.target_designator.position_stored": "Position stored",
+  "tooltip.oritech.target_designator.set_to": "Set to: [%s]",
+  "tooltip.oritech.target_designator.no_target": "No target set",
+
+  "message.oritech.tool_mode.area_effect": "Area Effect",
+  "message.oritech.tool_mode.silk_touch": "Silk Touch",
+  "tooltip.oritech.tool_mode.area_range.area": "Mode: Area",
+  "tooltip.oritech.tool_mode.area_range.single": "Mode: Single",
+  "config.jade.plugin_oritech.machine_core_controller": "Oritech Controller Link View",
 
   "text.config.oritech-config.title": "Oritech Settings",
   "text.config.oritech-config.section.machineSettings": "Machines",

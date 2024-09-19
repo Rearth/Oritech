@@ -191,6 +191,11 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             } else {
                 dropped = Block.getDroppedStacks(targetState, (ServerWorld) world, targetPosition, targetEntity);
             }
+            if (dropped.isEmpty()) {
+                // If the block doesn't drop any loot, try to break it again with shears
+                // Good for seagrass, cobwebs, vines, etc.
+                dropped = Block.getDroppedStacks(targetState, (ServerWorld) world, targetPosition, targetEntity, null, new ItemStack(Items.SHEARS));
+            }
             
             // only proceed if all stacks fit
             for (var stack : dropped) {
@@ -237,7 +242,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     public List<Pair<Text, Text>> getExtraExtensionLabels() {
         if (range == 1 && yieldAddons == 0) return super.getExtraExtensionLabels();
-        return List.of(new Pair<>(Text.literal(range + " Range"), Text.literal("Maximum digging depth")), new Pair<>(Text.literal(yieldAddons + " Fortune"), Text.literal("Yield addon count. 3 is the effective maximum")));
+        return List.of(new Pair<>(Text.translatable("title.oritech.machine.addon_range", range), Text.translatable("tooltip.oritech.block_destroyer.addon_range")), new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")));
     }
     
     @Override

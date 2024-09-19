@@ -144,23 +144,23 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     
     public void onUsed(PlayerEntity player) {
         
-        var message = Text.literal("Starting");
+        var message = Text.translatable("message.oritech.pump.starting");
         if (!initialized) {
             if (!toolheadLowered) {
-                message = Text.literal("Trunk is extending....");
+                message = Text.translatable("message.oritech.pump.extending");
             } else if (searchActive) {
-                message= Text.literal("Pump is initializing... (This might take a moment for large bodies of water)");
+                message= Text.translatable("message.oritech.pump.initializing");
             } else {
-                message = Text.literal("No liquids available");
+                message = Text.translatable("message.oritech.pump.no_fluids");
             }
         } else if (isBusy()) {
-            message = Text.literal("Pump is working...");
+            message = Text.translatable("message.oritech.pump.busy");
         } else if (!hasEnoughEnergy()) {
-            message = Text.literal("Not enough energy!");
+            message = Text.translatable("message.oritech.pump.low_energy");
         } else if (pendingLiquidPositions.isEmpty()) {
-            message = Text.literal("All liquids have been pumped");
+            message = Text.translatable("message.oritech.pump.pump_finished");
         } else if (tankIsFull()) {
-            message = Text.literal("Tank is full");
+            message = Text.translatable("message.oritech.pump.full");
         }
         
         player.sendMessage(message, true);
@@ -248,7 +248,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         var stateBelow = world.getBlockState(posBelow);
         var blockBelow = stateBelow.getBlock();
         
-        return !(blockBelow.equals(Blocks.AIR) || blockBelow.equals(BlockContent.BANANA_BLOCK));
+        return !(blockBelow.equals(Blocks.AIR) || blockBelow.equals(BlockContent.PUMP_TRUNK_BLOCK));
     }
     
     private void startLiquidSearch(BlockPos start) {
