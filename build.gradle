@@ -108,6 +108,9 @@ dependencies {
     // Tech Reborn - for compatibility datagen
     modImplementation "curse.maven:techreborn-233564:5608205"
     modImplementation "curse.maven:reborncore-237903:5608204"
+
+    // Energized Power - for compatibility datagen
+    modImplementation "curse.maven:energized-power-782147:5650292"
 }
 
 processResources {

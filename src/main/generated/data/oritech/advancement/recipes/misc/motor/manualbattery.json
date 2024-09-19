@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_basic_battery": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:basic_battery"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:motor/manualbattery"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_basic_battery"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:motor/manualbattery"
+    ]
+  }
+}

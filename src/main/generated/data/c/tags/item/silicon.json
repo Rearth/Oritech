@@ -1,9 +1,5 @@
 {
   "values": [
-    "oritech:silicon",
-    {
-      "id": "techreborn:carbon_fiber",
-      "required": false
-    }
+    "oritech:silicon"
   ]
 }

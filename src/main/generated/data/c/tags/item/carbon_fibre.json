@@ -1,5 +1,9 @@
 {
   "values": [
-    "oritech:carbon_fibre_strands"
+    "oritech:carbon_fibre_strands",
+    {
+      "id": "techreborn:carbon_fiber",
+      "required": false
+    }
   ]
 }

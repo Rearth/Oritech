@@ -101,6 +101,10 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.CARBON_FIBRE_STRANDS)
           .addOptional(Identifier.of(TechReborn.MOD_ID, TRContent.Parts.CARBON_FIBER.name));
         
+        // wires
+        getOrCreateTagBuilder(TagContent.WIRES)
+          .add(ItemContent.INSULATED_WIRE);
+        
         // equipment enchanting
         getOrCreateTagBuilder(ItemTags.MINING_ENCHANTABLE)
           .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);
