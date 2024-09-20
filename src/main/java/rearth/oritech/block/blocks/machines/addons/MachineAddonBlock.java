@@ -26,7 +26,6 @@ import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.EnergyAcceptorAddonBlockEntity;
 import rearth.oritech.init.BlockContent;
@@ -151,7 +150,7 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
         } catch (InstantiationException | InvocationTargetException | NoSuchMethodException |
                  IllegalAccessException e) {
             Oritech.LOGGER.error("Unable to create blockEntity for " + getBlockEntityType().getSimpleName() + " at " + this);
-            return new MachineCoreEntity(pos, state);
+            return new AddonBlockEntity(pos, state);
         }
     }
     

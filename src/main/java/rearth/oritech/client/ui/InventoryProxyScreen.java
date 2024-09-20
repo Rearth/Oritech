@@ -59,7 +59,7 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
         
         addTitle(overlay);
         
-        var hint = Components.label(Text.of("Select proxy target slot"));
+        var hint = Components.label(Text.translatable("tooltip.oritech.addon_proxy_select"));
         hint.horizontalTextAlignment(HorizontalAlignment.CENTER);
         hint.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
         hint.sizing(Sizing.fixed(176), Sizing.content(2));

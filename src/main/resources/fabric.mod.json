@@ -28,6 +28,9 @@
 		],
 		"emi": [
 			"rearth.oritech.init.compat.emi.OritechEMIPlugin"
+		],
+		"jade": [
+			"rearth.oritech.init.compat.jade.OritechJadePlugin"
 		]
 	},
 	"mixins": [

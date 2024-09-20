@@ -24,7 +24,8 @@ body:
       label: Minecraft version
       description: What version of Minecraft are you using?
       options:
-        - 1.21 (Latest)
+        - 1.21.1 (Latest)
+        - 1.21
         - 1.20.4 (No longer being developed)
     validations:
       required: true
@@ -46,7 +47,7 @@ body:
     id: oritech-version
     attributes:
       label: Oritech version
-      description: What version of Mekanism are you using?
+      description: What version of Oritech are you using?
       placeholder: e.g. 0.6.0
     validations:
       required: true

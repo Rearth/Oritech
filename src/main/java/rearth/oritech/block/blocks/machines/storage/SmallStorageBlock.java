@@ -1,7 +1,6 @@
 package rearth.oritech.block.blocks.machines.storage;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -30,18 +29,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
-import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
 import rearth.oritech.block.entity.machines.storage.SmallStorageBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
@@ -173,7 +169,7 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
         if (stack.contains(DataComponentTypes.CUSTOM_DATA)) {
             var storedEnergy = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt().getLong("energy_stored");
             if (storedEnergy != 0) {
-                var text = Text.literal(String.format("Stored: %d RF", storedEnergy));
+                var text = Text.translatable("tooltip.oritech.energy_stored", storedEnergy);
                 tooltip.add(text.formatted(Formatting.GOLD));
             }
         }

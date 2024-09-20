@@ -72,9 +72,23 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .add(BlockContent.RESOURCE_NODE_COAL)
           .add(BlockContent.RESOURCE_NODE_PLATINUM);
         
-          getOrCreateTagBuilder(TagContent.LASER_PASSTHROUGH)
-            .forceAddTag(ConventionalBlockTags.GLASS_BLOCKS)
-            .forceAddTag(ConventionalBlockTags.GLASS_PANES)
-            .forceAddTag(ConventionalBlockTags.BUDS);
+        getOrCreateTagBuilder(TagContent.LASER_PASSTHROUGH)
+          .forceAddTag(ConventionalBlockTags.GLASS_BLOCKS)
+          .forceAddTag(ConventionalBlockTags.GLASS_PANES)
+          .forceAddTag(ConventionalBlockTags.BUDS);
+
+        getOrCreateTagBuilder(TagContent.CUTTER_LOGS_MINEABLE)
+        // using forceAddTag because the datagen wasn't recognizing the vanilla LOGS, LEAVES, and WART_BLOCKS tags
+        // even though they should absolutely be there
+          .forceAddTag(BlockTags.LOGS)
+          .add(Blocks.MANGROVE_ROOTS)
+          .add(Blocks.MUSHROOM_STEM);
+        
+        getOrCreateTagBuilder(TagContent.CUTTER_LEAVES_MINEABLE)
+          .forceAddTag(BlockTags.LEAVES)
+          .forceAddTag(BlockTags.WART_BLOCKS)
+          .add(Blocks.SHROOMLIGHT)
+          .add(Blocks.RED_MUSHROOM_BLOCK)
+          .add(Blocks.BROWN_MUSHROOM_BLOCK);
     }
 }

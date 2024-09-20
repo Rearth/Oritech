@@ -75,7 +75,7 @@ public class BigSolarPanelBlock extends PassiveGeneratorBlock {
             }
             
             if (!isAssembled) {
-                player.sendMessage(Text.literal("Machine is not assembled. Please add missing core blocks"));
+                player.sendMessage(Text.translatable("message.oritech.machine.missing_core"));
             } else {
                 solarPanel.sendInfoMessageToPlayer(player);
             }
