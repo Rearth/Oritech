@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Enchanting",
+  "title": "附魔",
   "icon": "oritech:enchanter_block",
   "category": "oritech:arcane",
   "associated_items": [

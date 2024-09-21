@@ -1,12 +1,12 @@
 ```json
 {
-  "title": "Have Fun",
+  "title": "玩的开心",
   "icon": "minecraft:firework_rocket",
   "category": "oritech:getting_started",
   "ordinal": 7
 }
 ```
 
-There are many more things to try, and [logistics pipelines](^oritech:logistics) to build.
+还有更多等待发现，更复杂的[物流管道](^oritech:logistics)等待建设。
 
-Go explore the rest of the manual, and then start experimenting and building.
+探索手册的剩余部分，开始你的实验性建造！

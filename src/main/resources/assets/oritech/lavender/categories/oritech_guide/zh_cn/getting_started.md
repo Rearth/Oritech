@@ -1,15 +1,15 @@
 ```json
 {
-  "title": "Getting Started",
+  "title": "起步",
   "icon": "oritech:basic_generator_block",
   "ordinal": 0
 }
 ```
 
-Welcome to Oritech!
+欢迎来到Oritech！
 
-It is **strongly** recommended that you use either REI or EMI to view and discover recipes.
+**强烈**建议安装REI或EMI来浏览和发现配方。
 
-Ready to dive in? Here are some suggestions for getting started with Oritech.
+准备好了吗？这里有一些给Oritech新手的建议：
 
-At any point, explore the rest of the tools and machines that Oritech has to offer. You might find a better way to do things.
+在任何时候，你都可以探索Oritech提供的其他工具和机器。您可能会找到更好的方法进行游玩。

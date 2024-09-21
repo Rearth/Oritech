@@ -1,18 +1,18 @@
 ```json
 {
-  "title": "Your First Generator",
+  "title": "你的第一个发电机",
   "icon": "oritech:basic_generator_block",
   "category": "oritech:getting_started",
   "ordinal": 1
 }
 ```
 
-Build a [basic generator](^oritech:processing/generators).
+建造一个[基础发电机](^oritech:processing/generators).
 
 <recipe;oritech:basic_generator_block_basicgen>
 
-This won't generate nearly enough power, but it's enough to get you started.
+它能提供的能量远远不够，但已经足够让你起步了。
 
 ;;;;;
 
-When you need more power, build more generators or start looking at the other [generators](^oritech:processing/generators) that Oritech provides.
+当你需要更多的能量时，建造更多的发电机或者开始着手制造Oritech提供的其它[发电机](^oritech:processing/generators)。

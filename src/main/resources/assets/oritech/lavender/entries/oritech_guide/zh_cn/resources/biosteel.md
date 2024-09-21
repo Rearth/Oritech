@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Biosteel",
+  "title": "生物质钢",
   "icon": "oritech:biosteel_ingot",
   "category": "oritech:resources",
   "associated_items": [

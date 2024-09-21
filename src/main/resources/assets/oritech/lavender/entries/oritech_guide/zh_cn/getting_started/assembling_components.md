@@ -1,25 +1,25 @@
 ```json
 {
-  "title": "Assembling Components",
+  "title": "装配组件",
   "icon": "oritech:assembler_block",
   "category": "oritech:getting_started",
   "ordinal": 3
 }
 ```
 
-Build an [assembler](^oritech:processing/assembler).
+建造一个[装配器](^oritech:processing/assembler)。
 
-An assembler can craft some things (like wires, coils, and motors) more efficiently than you can, and it can craft some things that you are not able to craft.
+装配器可以用来更高效地合成一些物品（例如导线，线圈，马达等），它也可以用来制造你不能够制造的东西。
 
 ---
 
-Build a [centrifuge](^oritech:processing/centrifuge).
+建造一个[离心机](^oritech:processing/centrifuge)。
 
-A centrifuge will be needed to make process some resources and create
+离心机可以用来处理一些资源以及制造
 
 ;;;;;
 
-components that will be needed for further progress.
+进阶组件。
 
 <recipe;oritech:assembler_block_assembler>
 

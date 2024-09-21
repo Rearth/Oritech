@@ -1,18 +1,18 @@
 ```json
 {
-  "title": "Fragmenting Ores",
+  "title": "粉碎矿石",
   "icon": "oritech:platinum_clump",
   "category": "oritech:getting_started",
   "ordinal": 5
 }
 ```
 
-A [fragment forge](^oritech:processing/fragment_forge) can improve the yield of ores. When you process ores in a fragment forge, they get broken up into clumps and small clumps.
+[粉碎工厂](^oritech:processing/fragment_forge)可提高矿石的产率。当你使用粉碎工厂处理矿石时，矿石将会破碎成碎块和碎末。
 
-9 small clumps can be crafted into a clump, and clumps can be processed in a [centrifuge](^oritech:processing/centrifuge) to turn them into dusts and small dusts which can be smelted in a furnace.
+9个碎末可以合成一个碎块，碎块可以在[离心机](^oritech:processing/centrifuge) 处理为粉和细粉，并在熔炉中熔炼为锭。
 
 ;;;;;
 
-You can put raw ores into a fragment forge, but for some ores you will get better results if you mine them with a silk touch pickaxe and put the ore blocks into the forge.
+你可以将粗矿放入粉碎工厂，但对于某些矿物，放入使用精准采集得到的矿石效果更佳。
 
-Both the fragment forge and the centrifuge can also produce secondary ores. For example, processing [nickel](^oritech:resources/nickel) will give you nickel and can also give you some [platinum](^oritech:resources/platinum).
+粉碎工厂和离心机也都可以处理二级矿石。处理[镍](^oritech:resources/nickel)将会得到镍和少量的[铂](^oritech:resources/platinum)。
