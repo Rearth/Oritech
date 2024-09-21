@@ -1,15 +1,15 @@
 ```json
 {
-  "title": "Making Steel (and Other Alloys)",
+  "title": "制作钢（以及其它合金）",
   "icon": "oritech:steel_ingot",
   "category": "oritech:getting_started",
   "ordinal": 2
 }
 ```
 
-You can make [steel](^oritech:resources/steel), [electrum](^oritech:resources/electrum), and [adamant](^oritech:resources/adamant) in a crafting table, but it wastes resources to do it that way.
+你可以在工作台中制作[钢](^oritech:resources/steel)，[琥珀金](^oritech:resources/electrum)以及[金刚镍](^oritech:resources/adamant)，但这样比较浪费资源。
 
-As soon as you can, you will want to build a [pulverizer](^oritech:processing/pulverizer) and [foundry](^oritech:processing/foundry) so that you can make alloys more efficiently.
+一旦可以，你会想制作一个[磨粉机](^oritech:processing/pulverizer)和 [铸造器](^oritech:processing/foundry)，这样你就可以更高效地制作合金了。
 
 ;;;;;
 
