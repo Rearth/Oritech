@@ -23,6 +23,7 @@ public class SmallFluidTankBlockItem extends BlockItem {
         
         if (!stack.contains(DataComponentTypes.CUSTOM_DATA)) return;
         var nbt = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
+        if (nbt.isEmpty()) return;
         var fluidStack = FluidStack.fromNbt(nbt);
         var variant = fluidStack.variant();
         var amount = fluidStack.amount() * 1000 / FluidConstants.BUCKET;
