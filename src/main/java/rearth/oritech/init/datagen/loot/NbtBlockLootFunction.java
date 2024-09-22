@@ -53,7 +53,8 @@ public class NbtBlockLootFunction extends ConditionalLootFunction {
         // Removing it here so that the inventory items are not still stored in the dropped item's data
         if (nbt.contains("Items"))
             nbt.remove("Items");
-        stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+        if (!nbt.isEmpty())
+            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
         return stack;
     }
 
