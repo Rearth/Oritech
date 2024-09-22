@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "玩的开心",
+  "title": "玩得开心",
   "icon": "minecraft:firework_rocket",
   "category": "oritech:getting_started",
   "ordinal": 7
