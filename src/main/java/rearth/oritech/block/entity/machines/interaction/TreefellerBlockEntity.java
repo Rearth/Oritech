@@ -179,7 +179,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
         pendingPositions.addAll(getNeighbors(startPos));
         foundLogs.add(startPos);
         
-        while (!pendingPositions.isEmpty() && checkedPositions.size() < 1500) {
+        while (!pendingPositions.isEmpty() && checkedPositions.size() < 3000) {
             // do logs first, if none available then leaves
             var candidate = pendingPositions.pollFirst();
             if (candidate.getY() < startPos.getY()) continue;
