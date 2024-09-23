@@ -3,15 +3,18 @@
   "category": "misc",
   "key": {
     "c": {
-      "item": "oritech:fluid_pipe"
+      "tag": "c:glass_blocks"
     },
     "p": {
       "item": "minecraft:copper_ingot"
+    },
+    "s": {
+      "item": "oritech:fluid_pipe"
     }
   },
   "pattern": [
     "ppp",
-    "pcp",
+    "scs",
     "ppp"
   ],
   "result": {

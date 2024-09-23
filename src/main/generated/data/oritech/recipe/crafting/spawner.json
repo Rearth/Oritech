@@ -3,15 +3,18 @@
   "category": "misc",
   "key": {
     "c": {
-      "item": "oritech:enchantment_catalyst_block"
+      "item": "oritech:spawner_cage_block"
     },
     "p": {
       "item": "oritech:spawner_cage_block"
+    },
+    "s": {
+      "item": "oritech:enchantment_catalyst_block"
     }
   },
   "pattern": [
     "ppp",
-    "pcp",
+    "scs",
     "ppp"
   ],
   "result": {
