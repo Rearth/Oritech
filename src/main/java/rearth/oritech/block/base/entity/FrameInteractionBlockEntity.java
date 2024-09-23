@@ -265,7 +265,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        if (getCachedState().get(FrameInteractionBlock.HAS_FRAME)) {
+        if (getCachedState().get(FrameInteractionBlock.HAS_FRAME) && areaMin != null) {
             nbt.putLong("areaMin", areaMin.asLong());
             nbt.putLong("areaMax", areaMax.asLong());
             nbt.putLong("currentTarget", currentTarget.asLong());
