@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_raw_silicon": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:raw_silicon"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/alloy/rawsilicon"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_raw_silicon"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/alloy/rawsilicon"
+    ]
+  }
+}
