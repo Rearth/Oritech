@@ -28,7 +28,6 @@ public class WeedKiller extends Item {
             return super.useOnBlock(context);
         
         var startPos = context.getBlockPos();
-        System.out.println(startPos);
         
         new Thread(() -> doWeedKilling(context.getWorld(), startPos)).start();
         
