@@ -68,8 +68,8 @@
   "title.oritech.details": "Detalhes",
 
   "tooltip.oritech.item_extra_info": "Segure Ctrl para mais informações",
-  "tooltip.oritech.addon_desc": "Slots de Adicionais: ",
-  "tooltip.oritech.core_desc": "Multiblock. Máquinas Núcleos Necessários: ",
+  "tooltip.oritech.addon_desc": "Slots Adicionais: ",
+  "tooltip.oritech.core_desc": "Multiblock. Núcleos de Máquina Necessários: ",
   "tooltip.oritech.generator_rate_desc": "Produção: ",
   "tooltip.oritech.machine_rate_desc": "Consumo de Energia: ",
   "tooltip.oritech.machine_capacity_desc": "Capacidade de Energia: ",
