@@ -334,7 +334,7 @@
   "block.oritech.treefeller_block": "砍树器",
   "block.oritech.enchantment_catalyst_block": [
     {
-      "text": "Arcane Catalyst",
+      "text": "奥术触媒",
       "color": "#cc66ff"
     }
   ],
@@ -599,7 +599,7 @@
   "text.config.oritech-config.option.itemPipeTransferAmount": "物品管道传输速率",
   "text.config.oritech-config.section.worldGeneration": "世界生成",
   "text.config.oritech-config.option.generateOres": "生成矿石",
-  "text.config.oritech-config.section.arcane": "Arcane",
+  "text.config.oritech-config.section.arcane": "奥术",
   "text.config.oritech-config.option.enchanterCostMultiplier": "Enchanter Soul Cost Multiplier",
   "text.config.oritech-config.option.catalystBaseSouls": "Catalyst Base Soul Capacity",
   "text.config.oritech-config.option.catalystRFPerSoul": "RF/t per catalyst soul capacity level increase",
