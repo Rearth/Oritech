@@ -46,7 +46,7 @@ repositories {
         url "https://modmaven.dev"
     }
 
-    maven { // for Jade
+    maven { // for Jade, Tech Reborn, Energized Power
         name = 'Curse'
         url = 'https://www.cursemaven.com'
         content {
@@ -109,6 +109,13 @@ dependencies {
         case "disabled": break
         default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, or disabled.")
     }
+
+    // Tech Reborn - for compatibility datagen
+    modImplementation "curse.maven:techreborn-233564:${tech_reborn_version_id}"
+    modImplementation "curse.maven:reborncore-237903:${reborn_core_version_id}"
+
+    // Energized Power - for compatibility datagen
+    modImplementation "curse.maven:energized-power-782147:${energized_power_version_id}"
 }
 
 processResources {

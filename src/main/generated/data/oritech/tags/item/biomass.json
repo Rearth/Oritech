@@ -12,6 +12,10 @@
       "id": "#c:foods",
       "required": false
     },
+    {
+      "id": "techreborn:plantball",
+      "required": false
+    },
     "oritech:wither_crop_block",
     "minecraft:wheat"
   ]

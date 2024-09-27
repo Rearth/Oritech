@@ -48,7 +48,18 @@ Currently in very early access, numerous bugs and issues are to be expected.
 
 If you want to contribute, suggest ideas or just see what's planned, make sure to check out the GitHub discussions for this project (https://github.com/Rearth/Oritech/discussions).
 
-Include REI and EMI compatibility.
+Includes REI and EMI compatibility.
+
+Forge-compatible with sinytra connector on 1.21.
+
+Extra mod compatibilities (allowing metals and other components to be processed in Oritech machines, and vice-versa) for the following mode are included:
+- Alloy Forgery
+- Tech Reborn
+- Energized Power
+
+The following translations are available:
+- English
+- Chinese
 
 ## Built With
 
