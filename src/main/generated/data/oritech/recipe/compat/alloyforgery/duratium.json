@@ -8,18 +8,21 @@
     }
   ],
   "type": "alloy_forgery:forging",
+  "fuel_per_tick": 20,
   "inputs": [
     {
-      "tag": "c:ingots/gold"
+      "count": 1,
+      "tag": "c:ingots/platinum"
     },
     {
-      "item": "minecraft:redstone"
+      "count": 1,
+      "item": "minecraft:netherite_ingot"
     }
   ],
-  "output": {
-    "item": "oritech:electrum_ingot",
-    "count": 1
-  },
   "min_forge_tier": 1,
-  "fuel_per_tick": 10
+  "output": {
+    "count": 1,
+    "item": "oritech:duratium_ingot"
+  },
+  "overrides": {}
 }

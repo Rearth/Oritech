@@ -8,18 +8,21 @@
     }
   ],
   "type": "alloy_forgery:forging",
+  "fuel_per_tick": 20,
   "inputs": [
     {
-      "tag": "c:ingots/nickel"
+      "count": 1,
+      "item": "oritech:platinum_gem"
     },
     {
-      "item": "oritech:fluxite"
+      "count": 1,
+      "item": "oritech:platinum_gem"
     }
   ],
-  "output": {
-    "item": "oritech:energite_ingot",
-    "count": 1
-  },
   "min_forge_tier": 1,
-  "fuel_per_tick": 10
+  "output": {
+    "count": 1,
+    "item": "oritech:platinum_ingot"
+  },
+  "overrides": {}
 }

@@ -1,0 +1,28 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "alloy_forgery"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 5,
+  "inputs": [
+    {
+      "count": 1,
+      "item": "oritech:copper_gem"
+    },
+    {
+      "count": 1,
+      "item": "oritech:copper_gem"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 1,
+    "item": "minecraft:copper_ingot"
+  },
+  "overrides": {}
+}

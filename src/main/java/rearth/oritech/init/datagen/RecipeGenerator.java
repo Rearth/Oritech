@@ -20,18 +20,22 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
+import nourl.mythicmetals.MythicMetals;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ToolsContent;
+import rearth.oritech.init.datagen.compat.AlloyForgeryRecipeGenerator;
 import rearth.oritech.init.datagen.compat.EnergizedPowerRecipeGenerator;
+import rearth.oritech.init.datagen.compat.MythicMetalsRecipeGenerator;
 import rearth.oritech.init.datagen.compat.TechRebornRecipeGenerator;
 import rearth.oritech.init.datagen.data.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.FluidStack;
 import techreborn.TechReborn;
+import wraith.alloyforgery.AlloyForgery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +63,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addVanillaAdditions(exporter);
         
         TechRebornRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(TechReborn.MOD_ID))));
-        EnergizedPowerRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(EnergizedPowerMod.MODID))));        
+        EnergizedPowerRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(EnergizedPowerMod.MODID))));    
+        AlloyForgeryRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(AlloyForgery.MOD_ID))));
+        MythicMetalsRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(MythicMetals.MOD_ID))));
     }
     
     private void addVanillaAdditions(RecipeExporter exporter) {
