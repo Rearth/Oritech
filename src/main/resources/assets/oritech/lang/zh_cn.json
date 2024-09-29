@@ -340,7 +340,7 @@
   ],
   "block.oritech.enchanter_block": [
     {
-      "text": "Stabilized Enchanter",
+      "text": "稳定附魔器",
       "color": "#cc66ff"
     }
   ],
@@ -600,12 +600,12 @@
   "text.config.oritech-config.section.worldGeneration": "世界生成",
   "text.config.oritech-config.option.generateOres": "生成矿石",
   "text.config.oritech-config.section.arcane": "奥术",
-  "text.config.oritech-config.option.enchanterCostMultiplier": "Enchanter Soul Cost Multiplier",
-  "text.config.oritech-config.option.catalystBaseSouls": "Catalyst Base Soul Capacity",
-  "text.config.oritech-config.option.catalystRFPerSoul": "RF/t per catalyst soul capacity level increase",
-  "text.config.oritech-config.option.catalystCostMultiplier": "Catalyst Soul Cost Multiplier",
-  "text.config.oritech-config.option.catalystHyperMultiplier": "Additional Catalyst Hyper Enchanting Cost Multiplier",
-  "text.config.oritech-config.option.spawnerCostMultiplier": "Spawner Soul Cost Multiplier",
+  "text.config.oritech-config.option.enchanterCostMultiplier": "附魔器灵魂消耗倍率",
+  "text.config.oritech-config.option.catalystBaseSouls": "触媒基础灵魂容量",
+  "text.config.oritech-config.option.catalystRFPerSoul": "每触媒灵魂容量等级增加的RF/刻",
+  "text.config.oritech-config.option.catalystCostMultiplier": "触媒灵魂消耗倍率",
+  "text.config.oritech-config.option.catalystHyperMultiplier": "触媒超载附魔消耗额外倍率",
+  "text.config.oritech-config.option.spawnerCostMultiplier": "刷怪器灵魂消耗倍率",
   "text.config.oritech-config.option.easyFindFeatures": "“便于发现”配置",
   "text.config.oritech-config.option.easyFindFeatures.tooltip": "让油井和基岩矿石资源节点更容易找到。油井将会包含一个小井喷，资源节点将会在表面有一小片沙砾",
   "text.config.oritech-config.option.itemPipeIntervalDuration": "物品管道间隔时间",
