@@ -1,8 +1,5 @@
 package rearth.oritech.block.behavior;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
@@ -12,13 +9,10 @@ import net.minecraft.block.BuddingAmethystBlock;
 import net.minecraft.block.CropBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.machines.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;

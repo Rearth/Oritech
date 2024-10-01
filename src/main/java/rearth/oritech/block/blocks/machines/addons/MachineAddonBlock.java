@@ -328,11 +328,14 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
                     Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.625, 0.125, 0.3125, 0.6875, 0.1875, 0.8125), facing, face), // pickaxe handle
                     Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.25, 0.875, 0.1875, 0.4375), facing, face)); // pickaxe head
                 MACHINE_HUNTER_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = VoxelShapes.union(
-                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
-		            Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.375, 0.25, 0.875), facing, face),
-		            Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5, 0.125, 0.375, 0.75, 0.25, 0.625), facing, face),
-		            Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.3125, 0.5, 0.3125, 0.6875), facing, face),
-		            Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.75, 0.125, 0.3125, 0.8125, 0.3125, 0.6875), facing, face));
+		            Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.375, 0.25, 0.875), facing, face),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5, 0.1875, 0.4375, 0.75, 0.25, 0.5625), facing, face),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.375, 0.8125, 0.1875, 0.625), facing, face),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5625, 0.1875, 0.375, 0.6875, 0.25, 0.4375), facing, face),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5, 0.125, 0.3125, 0.75, 0.1875, 0.375), facing, face),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5, 0.125, 0.625, 0.75, 0.1875, 0.6875), facing, face),
+                    Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.5625, 0.1875, 0.5625, 0.6875, 0.25, 0.625), facing, face));
                 MACHINE_REDSTONE_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = VoxelShapes.union(
                     Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
                     Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.1875, 0.125, 0, 0.4375, 0.25, 0.8125), facing, face),

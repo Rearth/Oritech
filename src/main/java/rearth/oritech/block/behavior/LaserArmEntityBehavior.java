@@ -16,7 +16,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.World;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.machines.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import team.reborn.energy.api.EnergyStorage;

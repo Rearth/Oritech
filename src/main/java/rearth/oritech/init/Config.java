@@ -109,6 +109,7 @@ public class Config {
         public long maxEnergyInsertion = 512;
         public long energyPerTick = 128;
         public int blockBreakEnergyBase = 1024; // multiplied by block hardness
+        public float damageTickBase = 2;
         public int range = 128;
     }
     

@@ -162,6 +162,7 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
       BlockContent.MACHINE_SPEED_ADDON,
       BlockContent.MACHINE_EFFICIENCY_ADDON,
       BlockContent.MACHINE_FLUID_ADDON,
+      BlockContent.MACHINE_HUNTER_ADDON,
       BlockContent.MACHINE_YIELD_ADDON,
       BlockContent.CROP_FILTER_ADDON,
       BlockContent.MACHINE_EXTENDER,

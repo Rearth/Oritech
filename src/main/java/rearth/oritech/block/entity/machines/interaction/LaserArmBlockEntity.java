@@ -23,6 +23,9 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.damage.DamageSources;
+import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.mob.WaterCreatureEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.FluidState;
@@ -137,6 +140,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     // working data
     private BlockPos targetDirection;
     private BlockPos currentTarget;
+    public HunterTargetMode hunterTargetMode = HunterTargetMode.HOSTILE_ONLY;
     private LivingEntity currentLivingTarget;
     private long lastFiredAt;
     private int progress;
@@ -322,9 +326,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
 
     private double hunterRange() {
-        // hunter range is 2^areaSize, with max areaSize of 3
+        // hunter range is 2^hunterAddons, with max 3 hunterAddons
         // range should be calculated near the center of the laser head's cube, so add 0.5 to start counting range from side of cube
-        return Math.pow(4, Math.min(areaSize, 3)) + 0.5;
+        return Math.pow(4, Math.min(hunterAddons, 3)) + 0.5;
     }
 
     private boolean canSee(LivingEntity entity) {
@@ -343,7 +347,24 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
 
     private boolean validTarget(LivingEntity entity) {
-        return entity.isAlive() && canSee(entity) && entity.getPos().isInRange(pos.up().toCenterPos(), hunterRange());
+        return entity.isAlive() && canSee(entity) && huntedTarget(entity) && entity.getPos().isInRange(pos.up().toCenterPos(), hunterRange());
+    }
+
+    private boolean huntedTarget(LivingEntity entity) {
+        switch (hunterTargetMode) {
+            // Regardless of mode, laser will always target player to charge energy storing chestplate
+            case HunterTargetMode.HOSTILE_ONLY:
+                return entity instanceof Monster; 
+            case HunterTargetMode.HOSTILE_NEUTRAL:
+                // Not including Allay, Villagers, Trader, Iron Golem, Snow Golem
+                // Also not including pets
+                if ((entity instanceof AnimalEntity animal && animal.getLovingPlayer() == null) || entity instanceof WaterCreatureEntity)
+                    return true;
+                return entity instanceof Monster;
+            case HunterTargetMode.NONPLAYER:
+                return !(entity instanceof PlayerEntity);
+        }
+        return false;
     }
 
     private void findNextLivingTarget() {
@@ -485,12 +506,12 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
 
     public float getDamageTick() {
-        return (float)Math.pow(2, Math.min(3, hunterAddons));
+        return (Oritech.CONFIG.laserArmConfig.damageTickBase() * (1 / addonData.speed()));
     }
     
     private void updateNetwork() {
         var sendTarget = currentTarget != null ? currentTarget : BlockPos.ORIGIN;
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons, hunterAddons, hasCropFilterAddon));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons, hunterAddons, hunterTargetMode.value, hasCropFilterAddon));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
         networkDirty = false;
     }
@@ -500,6 +521,10 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         findNextBlockBreakTarget();
         
         return success;
+    }
+
+    public void cycleHunterTargetMode() {
+        hunterTargetMode = hunterTargetMode.next();
     }
     
     private boolean trySetNewTarget(BlockPos targetPos, boolean alsoSetDirection) {
@@ -543,6 +568,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         nbt.putInt("yieldAddons", yieldAddons);
         nbt.putInt("hunterAddons", hunterAddons);
         nbt.putBoolean("cropAddon", hasCropFilterAddon);
+        nbt.putInt("hunterTargetMode", hunterTargetMode.value);
         
         if (targetDirection != null && currentTarget != null) {
             nbt.putLong("target_position", currentTarget.asLong());
@@ -573,6 +599,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         areaSize = nbt.getInt("areaSize");
         yieldAddons = nbt.getInt("yieldAddons");
         hunterAddons = nbt.getInt("hunterAddons");
+        hunterTargetMode = HunterTargetMode.fromValue(nbt.getInt("hunterTargetMode"));
         hasCropFilterAddon = nbt.getBoolean("cropAddon");
         
         if (nbt.contains("pendingPositions")) {
@@ -792,8 +819,13 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     public List<Pair<Text, Text>> getExtraExtensionLabels() {
         if (areaSize == 1 && yieldAddons == 0 && hunterAddons == 0) return ScreenProvider.super.getExtraExtensionLabels();
         if (hunterAddons > 0)
-            return List.of(new Pair<>(Text.translatable("title.oritech.machine.addon_range", (int)hunterRange()), Text.translatable("tooltip.oritech.laser_arm.addon_hunter_range")), new Pair<>(Text.translatable("title.oritech.laser_arm.addon_hunter_damage", (int)getDamageTick()), Text.translatable("Effective Beam Damage")), new Pair<>(Text.translatable("title.oritech.machine.addon_looting", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_looting")));
-        return List.of(new Pair<>(Text.literal(areaSize + " Size"), Text.literal("Effective Beam Radius")), new Pair<>(Text.literal(yieldAddons + " Fortune"), Text.literal("Yield addon count. 3 is the effective maximum")));
+            return List.of(
+                new Pair<>(Text.translatable("title.oritech.machine.addon_range", (int)hunterRange()), Text.translatable("tooltip.oritech.laser_arm.addon_hunter_range")),
+                new Pair<>(Text.translatable("title.oritech.laser_arm.addon_hunter_damage", String.format("%.2f", getDamageTick())), Text.translatable("tooltip.oritech.laser_arm.addon_hunter_damage")),
+                new Pair<>(Text.translatable("title.oritech.machine.addon_looting", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_looting")));
+        return List.of(
+            new Pair<>(Text.translatable("title.oritech.machine.addon_range", areaSize), Text.translatable("tooltip.oritech.laser_arm.addon_range")),
+            new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")));
     }
     
     @Override
@@ -859,5 +891,32 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     @Override
     public Text getDisplayName() {
         return Text.literal("");
+    }
+
+    public enum HunterTargetMode {
+        HOSTILE_ONLY(1, "message.oritech.target_designator.hunter_hostile"),
+        HOSTILE_NEUTRAL(2, "message.oritech.target_designator.hunter_neutral"),
+        NONPLAYER(3, "message.oritech.target_designator.hunter_all");
+
+        public final int value;
+        public final String message;
+        HunterTargetMode(int value, String message) {
+            this.value = value;
+            this.message = message;
+        }
+
+        private static final Map<Integer, HunterTargetMode> map = new HashMap<Integer, HunterTargetMode>();
+        static {
+            for (HunterTargetMode targetMode: HunterTargetMode.values())
+                map.put(targetMode.value, targetMode);
+        }
+
+        public static HunterTargetMode fromValue(int i) {
+            return map.getOrDefault(i, HOSTILE_ONLY);
+        }
+
+        public HunterTargetMode next() {
+            return values()[(ordinal() + 1) % values().length];
+        }
     }
 }
