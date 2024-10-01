@@ -14,10 +14,7 @@ import rearth.oritech.block.blocks.machines.accelerator.AcceleratorRingBlock;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.Geometry;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 // move this into a second class to keep the entity class smaller and focus on recipe handling, work interaction, etc.
 public class AcceleratorParticleLogic {
@@ -44,6 +41,9 @@ public class AcceleratorParticleLogic {
         
         var renderedTrail = new ArrayList<Vec3d>();
         renderedTrail.add(particle.position);
+        
+        // list of positions this frame checked for entities
+        var checkedPositions = new HashSet<BlockPos>();
         
         var availableDistance = particle.velocity * timePassed;
         while (availableDistance > 0.001) {
@@ -74,6 +74,8 @@ public class AcceleratorParticleLogic {
             if (updateParticleCollision(particle.position, particle)) {
                 return;
             }
+            
+            checkParticleEntityCollision(particle.position, particle, checkedPositions);
             
             if (moveDist >= pathLength - 0.1f) {
                 // gate reached
@@ -124,6 +126,24 @@ public class AcceleratorParticleLogic {
         entity.onParticleMoved(renderedTrail);
     }
     
+    private void checkParticleEntityCollision(Vec3d position, ActiveParticle particle, Set<BlockPos> alreadyChecked) {
+        
+        var blockPos = BlockPos.ofFloored(position);
+        if (alreadyChecked.contains(blockPos)) return;
+        alreadyChecked.add(blockPos);
+        
+        var targets = world.getEntitiesByClass(LivingEntity.class, new Box(blockPos), elem -> elem.isAlive() && elem.isAttackable() && !elem.isSpectator());
+        var remainingMomentum = particle.velocity;
+        for (var mob : targets) {
+            var usedMomentum = entity.handleParticleEntityCollision(blockPos, particle, remainingMomentum, mob);
+            remainingMomentum -= usedMomentum;
+            
+            if (remainingMomentum <= 0.1f) return;
+        }
+        
+        particle.velocity = remainingMomentum;
+    }
+    
     private void exitParticle(ActiveParticle particle, Vec3d direction) {
         
         var exitFrom = particle.position;
@@ -145,13 +165,11 @@ public class AcceleratorParticleLogic {
             
             var targets = world.getEntitiesByClass(LivingEntity.class, new Box(checkPos), elem -> elem.isAlive() && elem.isAttackable() && !elem.isSpectator());
             
-            if (!targets.isEmpty()) {
-                for (var mob : targets) {
-                    var usedMomentum = entity.handleParticleEntityCollision(checkPos, particle, remainingMomentum, mob);
-                    remainingMomentum -= usedMomentum;
-                    
-                    if (remainingMomentum <= 0.1f) return;
-                }
+            for (var mob : targets) {
+                var usedMomentum = entity.handleParticleEntityCollision(checkPos, particle, remainingMomentum, mob);
+                remainingMomentum -= usedMomentum;
+                
+                if (remainingMomentum <= 0.1f) return;
             }
             
             var block = world.getBlockState(checkPos);
@@ -205,7 +223,8 @@ public class AcceleratorParticleLogic {
         var targetBlock = targetState.getBlock();
         
         // go straight through motors and sensors
-        if (targetBlock.equals(BlockContent.ACCELERATOR_MOTOR) || targetBlock.equals(BlockContent.ACCELERATOR_SENSOR)) return incomingDir;
+        if (targetBlock.equals(BlockContent.ACCELERATOR_MOTOR) || targetBlock.equals(BlockContent.ACCELERATOR_SENSOR))
+            return incomingDir;
         
         // if the target gate has just been destroyed
         if (!targetBlock.equals(BlockContent.ACCELERATOR_RING)) return incomingDir;
@@ -272,7 +291,8 @@ public class AcceleratorParticleLogic {
             var candidateState = world.getBlockState(candidatePos);
             if (candidateState.isAir()) continue;
             
-            if (candidateState.getBlock().equals(BlockContent.ACCELERATOR_MOTOR) || candidateState.getBlock().equals(BlockContent.ACCELERATOR_SENSOR)) return candidatePos;
+            if (candidateState.getBlock().equals(BlockContent.ACCELERATOR_MOTOR) || candidateState.getBlock().equals(BlockContent.ACCELERATOR_SENSOR))
+                return candidatePos;
             
             if (!candidateState.getBlock().equals(BlockContent.ACCELERATOR_RING)) return null;
             
