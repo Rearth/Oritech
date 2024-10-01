@@ -11,7 +11,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.entity.machines.accelerator.AcceleratorControllerBlockEntity;
+import rearth.oritech.block.entity.machines.accelerator.AcceleratorParticleLogic;
 
 import java.util.Objects;
 
@@ -60,11 +60,11 @@ public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
         if (isPowered && (lastRedstone == 0 || lastRedstone == 3)) {
             // store bent state and set straight
             world.setBlockState(pos, state.with(REDSTONE_STATE, lastBent).with(BENT, 0), Block.NOTIFY_LISTENERS, 1);
-            AcceleratorControllerBlockEntity.resetCachedGate(pos);
+            AcceleratorParticleLogic.resetCachedGate(pos);
         } else if (!isPowered && lastRedstone != 3 && lastRedstone != 0) {   // on redstone disabled
             // set bent to lastbent, set redstone to straight
             world.setBlockState(pos, state.with(REDSTONE_STATE, 0).with(BENT, lastRedstone), Block.NOTIFY_LISTENERS, 1);
-            AcceleratorControllerBlockEntity.resetCachedGate(pos);
+            AcceleratorParticleLogic.resetCachedGate(pos);
         }
         
     }
@@ -74,7 +74,7 @@ public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
         
         var newBent = (state.get(BENT) + 1) % 3;
         world.setBlockState(pos, state.with(BENT, newBent).with(REDSTONE_STATE, 3));
-        AcceleratorControllerBlockEntity.resetCachedGate(pos);
+        AcceleratorParticleLogic.resetCachedGate(pos);
         
         return ActionResult.SUCCESS;
     }

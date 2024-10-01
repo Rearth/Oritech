@@ -54,7 +54,7 @@ public class AcceleratorControllerBlock extends HorizontalFacingBlock implements
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
         if (!world.isClient && world.getBlockEntity(pos) instanceof AcceleratorControllerBlockEntity accelerator) {
-            accelerator.test();
+            accelerator.injectParticle();
         }
         
         return ActionResult.SUCCESS;

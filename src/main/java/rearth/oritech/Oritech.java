@@ -13,6 +13,7 @@ import rearth.oritech.block.blocks.pipes.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.ItemPipeBlock;
 import rearth.oritech.block.entity.machines.accelerator.AcceleratorControllerBlockEntity;
+import rearth.oritech.block.entity.machines.accelerator.AcceleratorParticleLogic;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -64,7 +65,7 @@ public class Oritech implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
         PlayerBlockBreakEvents.BEFORE.register(PromethiumPickaxeItem::preMine);
         ServerTickEvents.START_WORLD_TICK.register(PromethiumAxeItem::onTick);
-        ServerTickEvents.END_SERVER_TICK.register(elem -> AcceleratorControllerBlockEntity.onTickEnd());
+        ServerTickEvents.END_SERVER_TICK.register(elem -> AcceleratorParticleLogic.onTickEnd());
     }
     
     private void onServerStarted(MinecraftServer minecraftServer) {

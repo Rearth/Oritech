@@ -55,7 +55,7 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
         var activeLine = activeLines.get(entity);
         var line = activeLine.positions;
         var age = time - activeLine.startedAt;
-        if (age >= 100) {   // render for up to 5 seconds
+        if (age >= 60) {
             if (entity.displayTrail.equals(activeLine.positions)) entity.displayTrail = null;
         }
         

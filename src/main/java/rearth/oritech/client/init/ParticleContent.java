@@ -98,6 +98,14 @@ public class ParticleContent {
         ClientParticles.spawnCenteredOnBlock(ParticleTypes.SONIC_BOOM, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
     }));
     
+    public static final ParticleSystem<Void> BIG_HIT = PARTICLE_CONTROLLER.register(Void.class, ((world, pos, data) -> {
+        ClientParticles.spawn(ParticleTypes.SONIC_BOOM, world, pos, 0.3);
+    }));
+    
+    public static final ParticleSystem<Void> PARTICLE_COLLIDE = PARTICLE_CONTROLLER.register(Void.class, ((world, pos, data) -> {
+        ClientParticles.spawn(ParticleTypes.GUST, world, pos, 0);
+    }));
+    
     public static final ParticleSystem<Void> ACCELERATING = PARTICLE_CONTROLLER.register(Void.class, (world, pos, data) -> {
         spawnCubeOutline(ParticleTypes.SCULK_CHARGE_POP, pos, 1, 5, 3);
         ClientParticles.reset();

@@ -37,7 +37,7 @@ public class AcceleratorSensorBlockEntity extends BlockEntity implements BlockEn
         }
     }
     
-    public void measureParticle(AcceleratorControllerBlockEntity.ActiveParticle particle) {
+    public void measureParticle(AcceleratorParticleLogic.ActiveParticle particle) {
         this.measuredSpeed = particle.velocity;
         this.measuredTime = world.getTime();
         dirty = true;

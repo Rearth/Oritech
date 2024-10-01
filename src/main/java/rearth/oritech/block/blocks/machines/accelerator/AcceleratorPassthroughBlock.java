@@ -13,7 +13,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.entity.machines.accelerator.AcceleratorControllerBlockEntity;
+import rearth.oritech.block.entity.machines.accelerator.AcceleratorParticleLogic;
 
 import java.util.Objects;
 
@@ -37,19 +37,19 @@ public class AcceleratorPassthroughBlock extends HorizontalFacingBlock {
     @Override
     protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         super.onStateReplaced(state, world, pos, newState, moved);
-        AcceleratorControllerBlockEntity.resetCachedGate(pos);
+        AcceleratorParticleLogic.resetCachedGate(pos);
     }
     
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        AcceleratorControllerBlockEntity.resetCachedGate(pos);
+        AcceleratorParticleLogic.resetCachedGate(pos);
         return super.onBreak(world, pos, state, player);
     }
     
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         super.onDestroyedByExplosion(world, pos, explosion);
-        AcceleratorControllerBlockEntity.resetCachedGate(pos);
+        AcceleratorParticleLogic.resetCachedGate(pos);
     }
     
     @Override
