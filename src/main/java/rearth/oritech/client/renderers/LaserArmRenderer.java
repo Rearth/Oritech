@@ -32,6 +32,17 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
     public static final RenderLayer.MultiPhase CUSTOM_LINES = RenderLayer.of("lines", VertexFormats.LINES, VertexFormat.DrawMode.LINES, 1536, RenderLayer.MultiPhaseParameters.builder().program(RenderPhase.LINES_PROGRAM).layering(VIEW_OFFSET_Z_LAYERING).transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY).target(RenderPhase.ITEM_ENTITY_TARGET).writeMaskState(RenderPhase.ALL_MASK).cull(RenderPhase.DISABLE_CULLING).build(false));
     private static final HashMap<LaserArmBlockEntity, Vec3d> cachedOffsets = new HashMap<>();
     
+    
+    @Override
+    public int getRenderDistance() {
+        return 128;
+    }
+    
+    @Override
+    public boolean rendersOutsideBoundingBox(T blockEntity) {
+        return true;
+    }
+    
     @Override
     public void postRender(MatrixStack matrices, T laserEntity, BakedGeoModel model, VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int colour) {
         super.postRender(matrices, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, colour);
