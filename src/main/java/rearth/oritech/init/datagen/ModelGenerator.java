@@ -104,6 +104,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleState(BlockContent.ACCELERATOR_RING);
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.ACCELERATOR_MOTOR);
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.ACCELERATOR_CONTROLLER);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.ACCELERATOR_SENSOR);
         
         // metals
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.NICKEL_ORE);

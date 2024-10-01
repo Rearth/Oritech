@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.machines.accelerator;
 
+import io.wispforest.owo.util.VectorRandomUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -11,6 +12,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.machines.accelerator.AcceleratorRingBlock;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
@@ -20,8 +22,9 @@ import java.util.*;
 
 public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity> {
     
-    private static final int MAX_VELOCITY = 5000;
+    private static final int MAX_VELOCITY = 15000;
     private static final Map<CompPair<BlockPos, Vec3i>, BlockPos> cachedGates = new HashMap<>();    // stores the next gate for a combo of source gate and direction
+    private static final Map<BlockPos, BlockPos> activeParticles = new HashMap<>(); // stores relations between position of particle -> position of controller
     
     private ActiveParticle particle;
     
@@ -48,6 +51,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         while (availableDistance > 0.001) {
             
             if (particle.nextGate == null) {
+                exitParticle(particle, new Vec3d(0, 0, 0));
                 particle = null;
                 return;
             }
@@ -61,6 +65,11 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             renderedTrail.add(particle.position);
             particle.lastBendDistance += moveDist;
             
+            if (updateParticleCollision(particle.position)) {
+                particle = null;
+                return;
+            }
+            
             if (moveDist >= pathLength - 0.1f) {
                 // gate reached
                 // calculate next gate direction
@@ -68,6 +77,14 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
                 var nextDirection = getGateExitDirection(particle.lastGate, particle.nextGate);
                 // try find next valid gate
                 var nextGate = findNextGateCached(reachedGate, nextDirection, particle.velocity);
+                
+                // no gate built / too slow
+                if (nextGate == null) {
+                    exitParticle(particle, Vec3d.of(nextDirection));
+                    particle = null;
+                    return;
+                }
+                
                 
                 // check if curve is too strong (based on reached gate)
                 var gateOffset = particle.nextGate.subtract(particle.lastGate);
@@ -77,9 +94,10 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
                     
                     var combinedDist = particle.lastBendDistance + particle.lastBendDistance2;
                     
-                    var requiredDist = Math.sqrt(particle.velocity) / 5;
+                    var requiredDist = Math.sqrt(particle.velocity) / 3;
                     if (combinedDist <= requiredDist) {
                         System.out.println("too fast! speed: " + particle.velocity + " at bend dist " + combinedDist);
+                        exitParticle(particle, Vec3d.of(particle.nextGate.subtract(particle.lastGate)));
                         particle = null;
                         return;
                     }
@@ -88,9 +106,12 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
                     particle.lastBendDistance = 0;
                 }
                 
-                var reachedMotor = world.getBlockState(reachedGate).getBlock().equals(BlockContent.ACCELERATOR_MOTOR);
-                if (reachedMotor) {
+                // handle gate interaction (e.g. motor or sensor)
+                var gateBlock = world.getBlockState(reachedGate).getBlock();
+                if (gateBlock.equals(BlockContent.ACCELERATOR_MOTOR)) {
                     particle.velocity += 1;
+                } else if (gateBlock.equals(BlockContent.ACCELERATOR_SENSOR) && world.getBlockEntity(reachedGate) instanceof AcceleratorSensorBlockEntity sensorEntity) {
+                    sensorEntity.measureParticle(particle);
                 }
                 
                 particle.nextGate = nextGate;
@@ -101,6 +122,59 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         if (renderedTrail.size() > 1) {
             NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AcceleratorParticleRenderPacket(pos, renderedTrail));
         }
+    }
+    
+    private void exitParticle(ActiveParticle particle, Vec3d direction) {
+        
+        var exitFrom = particle.position;
+        
+        var distance = Math.max(Math.sqrt(particle.velocity), 0.9) * 0.9;
+        var exitTo = exitFrom.add(direction.multiply(distance));
+        
+        var renderedTrail = List.of(exitFrom, exitTo);
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AcceleratorParticleRenderPacket(pos, renderedTrail));
+        
+    }
+    
+    // this is called when a particle collision is being handled by another controller
+    public void removeParticleDueToCollision() {
+        particle = null;
+    }
+    
+    private boolean updateParticleCollision(Vec3d position) {
+        
+        var blockPos = new BlockPos((int) position.x, (int) position.y, (int) position.z);
+        if (activeParticles.containsKey(blockPos) && !activeParticles.get(blockPos).equals(this.pos)) {
+            // found collision
+            var secondControllerPos = activeParticles.get(blockPos);
+            
+            if (!(world.getBlockEntity(secondControllerPos) instanceof AcceleratorControllerBlockEntity secondAccelerator) || secondAccelerator.getParticle() == null)
+                return false;
+                
+            var secondParticle = secondAccelerator.particle;
+            secondAccelerator.removeParticleDueToCollision();
+            
+            var ownVelocity = particle.nextGate.toCenterPos().subtract(particle.lastGate.toCenterPos()).multiply(particle.velocity);
+            var secondVelocity = secondParticle.nextGate.toCenterPos().subtract(secondParticle.lastGate.toCenterPos()).multiply(secondParticle.velocity);
+            var impactSpeed = ownVelocity.distanceTo(secondVelocity);
+            
+            System.out.println("speeds: " + ownVelocity + " | " + secondVelocity + " | " + impactSpeed);
+            
+            var center = particle.position;
+            
+            var particleCount = Math.max(Math.sqrt(Math.sqrt(impactSpeed)), 5);
+            
+            for (int i = 0; i < particleCount; i++) {
+                var offset = VectorRandomUtils.getRandomOffset(world, center, particleCount * 1.5);
+                ParticleContent.WEED_KILLER.spawn(world, center, new ParticleContent.LineData(center, offset));
+            }
+            
+            return true;
+        }
+        
+        activeParticles.put(blockPos, this.pos);
+        return false;
+        
     }
     
     public void test() {
@@ -114,7 +188,6 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             
             var startPosition = (BlockPos) posBehind;
             var nextGate = findNextGate(startPosition, directionRight, 1);
-            System.out.println("gate: " + nextGate);
             particle = new ActiveParticle(startPosition.toCenterPos(), 1, nextGate, startPosition);
         }
     }
@@ -128,12 +201,13 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var incomingDir = new Vec3i(Math.clamp(incomingPath.getX(), -1, 1), 0, Math.clamp(incomingPath.getZ(), -1, 1));
         
         var targetState = world.getBlockState(nextGate);
+        var targetBlock = targetState.getBlock();
         
-        // go straight through motors
-        if (targetState.getBlock().equals(BlockContent.ACCELERATOR_MOTOR)) return incomingDir;
+        // go straight through motors and sensors
+        if (targetBlock.equals(BlockContent.ACCELERATOR_MOTOR) || targetBlock.equals(BlockContent.ACCELERATOR_SENSOR)) return incomingDir;
         
         // if the target gate has just been destroyed
-        if (!targetState.getBlock().equals(BlockContent.ACCELERATOR_RING)) return incomingDir;
+        if (!targetBlock.equals(BlockContent.ACCELERATOR_RING)) return incomingDir;
         
         var targetFacing = targetState.get(Properties.HORIZONTAL_FACING);
         var targetBent = targetState.get(AcceleratorRingBlock.BENT);
@@ -173,10 +247,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             var result = cachedGates.get(key);
             var dist = (int) result.toCenterPos().distanceTo(from.toCenterPos());
             if (dist <= maxDist) return result;
-            return null;
         }
         
-        System.out.println("cache miss");
         var candidate = findNextGate(from, direction, speed);
         if (candidate != null) {
             cachedGates.put(key, candidate);
@@ -199,7 +271,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             var candidateState = world.getBlockState(candidatePos);
             if (candidateState.isAir()) continue;
             
-            if (candidateState.getBlock().equals(BlockContent.ACCELERATOR_MOTOR)) return candidatePos;
+            if (candidateState.getBlock().equals(BlockContent.ACCELERATOR_MOTOR) || candidateState.getBlock().equals(BlockContent.ACCELERATOR_SENSOR)) return candidatePos;
             
             if (!candidateState.getBlock().equals(BlockContent.ACCELERATOR_RING)) return null;
             
@@ -236,6 +308,14 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         
         return null;
         
+    }
+    
+    public static void onTickEnd() {
+        activeParticles.clear();
+    }
+    
+    public ActiveParticle getParticle() {
+        return particle;
     }
     
     // remove caches that have either source or target as pos

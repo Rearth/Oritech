@@ -25,6 +25,16 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
     private final Map<AcceleratorControllerBlockEntity, RenderedLine> activeLines = new HashMap<>();
     
     @Override
+    public int getRenderDistance() {
+        return 128;
+    }
+    
+    @Override
+    public boolean rendersOutsideBoundingBox(AcceleratorControllerBlockEntity blockEntity) {
+        return true;
+    }
+    
+    @Override
     public void render(AcceleratorControllerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         
         if (entity.displayTrail == null) {
@@ -39,16 +49,16 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
         var displayTrail = entity.displayTrail;
         if (!activeLines.containsKey(entity) || !activeLines.get(entity).positions.equals(displayTrail)) {
             activeLines.put(entity, new RenderedLine(time, displayTrail));
+            ParticleContent.PARTICLE_MOVING.spawn(entity.getWorld(), displayTrail.getLast());
         }
         
         var activeLine = activeLines.get(entity);
         var line = activeLine.positions;
         var age = time - activeLine.startedAt;
-        if (age >= 2) {
+        if (age >= 100) {   // render for up to 5 seconds
             if (entity.displayTrail.equals(activeLine.positions)) entity.displayTrail = null;
         }
         
-        ParticleContent.PARTICLE_MOVING.spawn(entity.getWorld(), line.getLast());
         
         for (int i = 0; i < line.size() - 1; i++) {
             var start = line.get(i).subtract(Vec3d.of(entity.getPos()));

@@ -19,7 +19,8 @@ public class ParticleContent {
     });
     
     public static final ParticleSystem<LineData> WEED_KILLER = PARTICLE_CONTROLLER.register(LineData.class, (world, pos, data) -> {
-        ClientParticles.setParticleCount(4 + world.random.nextInt(3));
+        var dist = (int) data.end.distanceTo(data.start);
+        ClientParticles.setParticleCount(dist * 4 + world.random.nextInt(3));
         ClientParticles.spawnLine(ParticleTypes.DRAGON_BREATH, world, data.start, data.end, 0.2f);
     });
     

@@ -18,6 +18,7 @@ import rearth.oritech.block.blocks.decorative.*;
 import rearth.oritech.block.blocks.machines.accelerator.AcceleratorControllerBlock;
 import rearth.oritech.block.blocks.machines.accelerator.AcceleratorPassthroughBlock;
 import rearth.oritech.block.blocks.machines.accelerator.AcceleratorRingBlock;
+import rearth.oritech.block.blocks.machines.accelerator.AcceleratorSensorBlock;
 import rearth.oritech.block.blocks.machines.addons.InventoryProxyAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock.AddonSettings;
@@ -137,6 +138,7 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block ACCELERATOR_RING = new AcceleratorRingBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block ACCELERATOR_MOTOR = new AcceleratorPassthroughBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block ACCELERATOR_CONTROLLER = new AcceleratorControllerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block ACCELERATOR_SENSOR = new AcceleratorSensorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block PUMP_BLOCK = new PumpBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
