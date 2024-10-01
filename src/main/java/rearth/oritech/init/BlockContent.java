@@ -15,8 +15,14 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.blocks.arcane.*;
 import rearth.oritech.block.blocks.decorative.*;
-import rearth.oritech.block.blocks.machines.addons.*;
+import rearth.oritech.block.blocks.machines.accelerator.AcceleratorControllerBlock;
+import rearth.oritech.block.blocks.machines.accelerator.AcceleratorPassthroughBlock;
+import rearth.oritech.block.blocks.machines.accelerator.AcceleratorRingBlock;
+import rearth.oritech.block.blocks.machines.addons.InventoryProxyAddonBlock;
+import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock.AddonSettings;
+import rearth.oritech.block.blocks.machines.addons.RedstoneAddonBlock;
+import rearth.oritech.block.blocks.machines.addons.SteamBoilerAddonBlock;
 import rearth.oritech.block.blocks.machines.generators.*;
 import rearth.oritech.block.blocks.machines.interaction.*;
 import rearth.oritech.block.blocks.machines.processing.*;
@@ -127,6 +133,10 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block SPAWNER_CONTROLLER_BLOCK = new SpawnerControllerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     @NoAutoDrop
     public static final Block WITHER_CROP_BLOCK = new WitheredCropBlock(FabricBlockSettings.copyOf(Blocks.WHEAT));
+    
+    public static final Block ACCELERATOR_RING = new AcceleratorRingBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block ACCELERATOR_MOTOR = new AcceleratorPassthroughBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block ACCELERATOR_CONTROLLER = new AcceleratorControllerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block PUMP_BLOCK = new PumpBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());

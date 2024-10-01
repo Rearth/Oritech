@@ -100,6 +100,11 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.ENCHANTER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);   // uses geckolib
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.ENCHANTMENT_CATALYST_BLOCK, BlockContent.MACHINE_SPEED_ADDON);   // uses geckolib
         
+        // particle accelerator
+        blockStateModelGenerator.registerSimpleState(BlockContent.ACCELERATOR_RING);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.ACCELERATOR_MOTOR);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.ACCELERATOR_CONTROLLER);
+        
         // metals
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.NICKEL_ORE);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.DEEPSLATE_NICKEL_ORE);
