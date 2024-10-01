@@ -361,8 +361,8 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
                 if ((entity instanceof AnimalEntity animal && animal.getLovingPlayer() == null) || entity instanceof WaterCreatureEntity)
                     return true;
                 return entity instanceof Monster;
-            case HunterTargetMode.NONPLAYER:
-                return !(entity instanceof PlayerEntity);
+            case HunterTargetMode.ALL:
+                return true;
         }
         return false;
     }
@@ -896,7 +896,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     public enum HunterTargetMode {
         HOSTILE_ONLY(1, "message.oritech.target_designator.hunter_hostile"),
         HOSTILE_NEUTRAL(2, "message.oritech.target_designator.hunter_neutral"),
-        NONPLAYER(3, "message.oritech.target_designator.hunter_all");
+        ALL(3, "message.oritech.target_designator.hunter_all");
 
         public final int value;
         public final String message;
