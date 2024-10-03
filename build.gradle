@@ -71,26 +71,7 @@ repositories {
 }
 
 fabricApi {
-    configureDataGeneration {
-        modId = "oritech"
-        dependencies {
-            // Tech Reborn
-            modImplementation "curse.maven:techreborn-233564:${tech_reborn_version_id}"
-            modImplementation "curse.maven:reborncore-237903:${reborn_core_version_id}"
-
-            // Energized Power
-            modImplementation "curse.maven:energized-power-782147:${energized_power_version_id}"
-
-            // Alloy Forgery
-            modImplementation "curse.maven:alloy-forgery-438718:${alloy_forgery_version_id}"
-
-            // Mythic Metals
-            modImplementation "curse.maven:mythicmetals-410127:${mythic_metals_version_id}"
-            modRuntimeOnly "org.ladysnake.cardinal-components-api:cardinal-components-base:${cardinal_components_version}"
-            modRuntimeOnly "org.ladysnake.cardinal-components-api:cardinal-components-entity:${cardinal_components_version}"
-            modRuntimeOnly "maven.modrinth:additionalentityattributes:${additional_entity_attributes_version}"
-        }
-    }
+    configureDataGeneration()
 }
 
 dependencies {
@@ -129,6 +110,7 @@ dependencies {
     // athena (CTM)
     modRuntimeOnly "earth.terrarium.athena:athena-fabric-${athena_version}"
 
+    // jade
     modImplementation "curse.maven:jade-324717:${jade_id}"
 
     // recipe viewer runtime
@@ -138,6 +120,20 @@ dependencies {
         case "disabled": break
         default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, or disabled.")
     }
+
+    // dependencies for datagen
+    // Tech Reborn
+    modImplementation "curse.maven:techreborn-233564:${tech_reborn_version_id}"
+    modImplementation "curse.maven:reborncore-237903:${reborn_core_version_id}"
+    // Energized Power
+    modImplementation "curse.maven:energized-power-782147:${energized_power_version_id}"
+    // Alloy Forgery
+    modImplementation "curse.maven:alloy-forgery-438718:${alloy_forgery_version_id}"
+    // Mythic Metals
+    modImplementation "curse.maven:mythicmetals-410127:${mythic_metals_version_id}"
+    modRuntimeOnly "org.ladysnake.cardinal-components-api:cardinal-components-base:${cardinal_components_version}"
+    modRuntimeOnly "org.ladysnake.cardinal-components-api:cardinal-components-entity:${cardinal_components_version}"
+    modRuntimeOnly "maven.modrinth:additionalentityattributes:${additional_entity_attributes_version}"
 }
 
 processResources {
@@ -147,6 +143,22 @@ processResources {
         expand "version": project.version
     }
 }
+
+// doesnt seem to work
+//tasks.withType(JavaExec).configureEach {
+//    print(name)
+//    if (name.contains("runClient")) {
+//        classpath = classpath.filter { file ->
+//            !file.name.contains("energized-power") &&
+//            !file.name.contains("alloy-forgery") &&
+//            !file.name.contains("mythicmetals") &&
+//            !file.name.contains("cardinal-components") &&
+//            !file.name.contains("additionalentityattributes")
+//            // && !file.name.contains("techreborn")
+//            // && !file.name.contains("reborncore")
+//        }
+//    }
+//}
 
 tasks.withType(JavaCompile).configureEach {
     it.options.release = 21
