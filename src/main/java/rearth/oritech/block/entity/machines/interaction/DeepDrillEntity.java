@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.inventory.Inventories;
@@ -21,6 +22,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.datagen.data.TagContent;
@@ -87,13 +89,12 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
         
         var startAt = pos.south().down();
         var checkState = world.getBlockState(startAt);
-        if (!checkState.isIn(TagContent.RESOURCE_NODES)) return false;
         
         initialized = true;
         targetedOre.clear();
         loadOreBlocks();
-        
-        return true;
+
+        return !targetedOre.isEmpty();
     }
     
     @Override
@@ -141,12 +142,18 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
         
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
-                var target = center.add(x, 0, z);
-                ParticleContent.DEBUG_BLOCK.spawn(world, Vec3d.of(target));
-                targetedOre.add(world.getBlockState(target).getBlock());
+                // Only target the top-most uncovered resource node
+                for (int y = 0; y >= -2; y--) {
+                    var target = center.add(x, y, z);
+                    var targetState = world.getBlockState(target);
+                    if (targetState.isIn(TagContent.RESOURCE_NODES)) {
+                        ParticleContent.DEBUG_BLOCK.spawn(world, Vec3d.of(target));
+                        targetedOre.add(targetState.getBlock());
+                        break;
+                    } else if (!targetState.isAir()) break;
+                }
             }
-        }
-        
+        }  
     }
     
     private void updateNetwork() {
@@ -157,7 +164,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     }
     
     private void craftResult(World world, BlockPos pos) {
-        var usedOre = targetedOre.get(world.random.nextBetweenExclusive(0, 9));
+        var usedOre = targetedOre.get(world.random.nextBetweenExclusive(0, targetedOre.size()));
         var nodeOreBlockItem = usedOre.asItem();
         var sampleInv = new SimpleCraftingInventory(new ItemStack(nodeOreBlockItem, 1));
         
@@ -181,7 +188,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
         nbt.putLong("energy_stored", energyStorage.amount);
         nbt.putBoolean("initialized", initialized);
         if (initialized) {
-            for (int i = 0; i < 9; i++) {
+            for (int i = 0; i < targetedOre.size(); i++) {
                 nbt.putString("nodeType" + i, Registries.BLOCK.getId(targetedOre.get(i)).toString());
             }
         }
@@ -195,7 +202,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
         energyStorage.amount = nbt.getLong("energy_stored");
         initialized = nbt.getBoolean("initialized");
         if (initialized) {
-            for (int i = 0; i < 9; i++) {
+            for (int i = 0; i < targetedOre.size(); i++) {
                 targetedOre.add(Registries.BLOCK.get(Identifier.of(nbt.getString("nodeType" + i))));
             }
         }
