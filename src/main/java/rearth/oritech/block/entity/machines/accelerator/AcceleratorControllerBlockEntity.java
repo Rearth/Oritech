@@ -1,6 +1,7 @@
 package rearth.oritech.block.entity.machines.accelerator;
 
 import io.wispforest.owo.util.VectorRandomUtils;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -21,6 +22,8 @@ import rearth.oritech.util.Geometry;
 import java.util.List;
 
 public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity> {
+    
+    private static final int RF_ACCELERATE_COST = 10;
     
     private AcceleratorParticleLogic.ActiveParticle particle;
     private AcceleratorParticleLogic particleLogic;
@@ -124,5 +127,26 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         }
         
         return blockHardness;
+    }
+    
+    public void handleParticleMotorInteraction(BlockPos motorBlock) {
+        
+        var entity = world.getBlockEntity(motorBlock);
+        if (!(entity instanceof AcceleratorMotorBlockEntity motorEntity)) return;
+        
+        var storage = motorEntity.getStorage(null);
+        var availableEnergy = storage.getAmount();
+        
+        var speed = particle.velocity;
+        var cost = speed * RF_ACCELERATE_COST;
+        if (availableEnergy < cost) return;
+        
+        try (var tx = Transaction.openOuter()) {
+            storage.extract((long) cost, tx);
+            tx.commit();
+        }
+        
+        particle.velocity += 1;
+        
     }
 }

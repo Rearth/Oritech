@@ -113,7 +113,7 @@ public class AcceleratorParticleLogic {
                 // handle gate interaction (e.g. motor or sensor)
                 var gateBlock = world.getBlockState(reachedGate).getBlock();
                 if (gateBlock.equals(BlockContent.ACCELERATOR_MOTOR)) {
-                    particle.velocity += 1;
+                    entity.handleParticleMotorInteraction(reachedGate);
                 } else if (gateBlock.equals(BlockContent.ACCELERATOR_SENSOR) && world.getBlockEntity(reachedGate) instanceof AcceleratorSensorBlockEntity sensorEntity) {
                     sensorEntity.measureParticle(particle);
                 }
