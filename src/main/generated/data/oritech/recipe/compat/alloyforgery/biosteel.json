@@ -8,18 +8,21 @@
     }
   ],
   "type": "alloy_forgery:forging",
+  "fuel_per_tick": 10,
   "inputs": [
     {
+      "count": 1,
       "tag": "c:ingots/iron"
     },
     {
+      "count": 1,
       "item": "oritech:raw_biopolymer"
     }
   ],
-  "output": {
-    "item": "oritech:biosteel_ingot",
-    "count": 1
-  },
   "min_forge_tier": 1,
-  "fuel_per_tick": 10
+  "output": {
+    "count": 1,
+    "item": "oritech:biosteel_ingot"
+  },
+  "overrides": {}
 }

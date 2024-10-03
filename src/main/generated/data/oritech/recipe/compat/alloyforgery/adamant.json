@@ -8,18 +8,21 @@
     }
   ],
   "type": "alloy_forgery:forging",
+  "fuel_per_tick": 10,
   "inputs": [
     {
-      "tag": "c:ingots/iron"
+      "count": 1,
+      "tag": "c:ingots/nickel"
     },
     {
-      "item": "oritech:coal_dust"
+      "count": 1,
+      "item": "minecraft:diamond"
     }
   ],
-  "output": {
-    "item": "oritech:steel_ingot",
-    "count": 1
-  },
   "min_forge_tier": 1,
-  "fuel_per_tick": 5
+  "output": {
+    "count": 1,
+    "item": "oritech:adamant_ingot"
+  },
+  "overrides": {}
 }
