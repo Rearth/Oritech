@@ -106,22 +106,18 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.INSULATED_WIRE);
         
         // equipment enchanting
-        getOrCreateTagBuilder(ItemTags.MINING_ENCHANTABLE)
+        getOrCreateTagBuilder(ItemTags.SWORDS)
+          .add(ToolsContent.CHAINSAW, ToolsContent.PROMETHIUM_AXE);
+        getOrCreateTagBuilder(ItemTags.AXES)
+          .add(ToolsContent.CHAINSAW, ToolsContent.PROMETHIUM_AXE);
+        
+        getOrCreateTagBuilder(ItemTags.PICKAXES)
+          .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);
+        getOrCreateTagBuilder(ItemTags.SHOVELS)
           .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);
         
         getOrCreateTagBuilder(ItemTags.CLUSTER_MAX_HARVESTABLES)
           .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);
-        
-        getOrCreateTagBuilder(ItemTags.MINING_LOOT_ENCHANTABLE)
-          .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);
-        
-        getOrCreateTagBuilder(ItemTags.SWORD_ENCHANTABLE)
-          .add(ToolsContent.PROMETHIUM_AXE, ToolsContent.CHAINSAW);
-        getOrCreateTagBuilder(ItemTags.WEAPON_ENCHANTABLE)
-          .add(ToolsContent.PROMETHIUM_AXE, ToolsContent.CHAINSAW);
-        
-        getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
-          .add(ToolsContent.CHAINSAW, ToolsContent.HAND_DRILL);
         
         getOrCreateTagBuilder(ItemTags.HEAD_ARMOR_ENCHANTABLE)
           .add(ToolsContent.EXO_HELMET);
