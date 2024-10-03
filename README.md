@@ -59,7 +59,8 @@ Extra mod compatibilities (allowing metals and other components to be processed 
 
 The following translations are available:
 - English
-- Chinese
+- Chinese (by PlatinumOak)
+- Brazilian Portuguese (by RenanEuzebio)
 
 ## Built With
 

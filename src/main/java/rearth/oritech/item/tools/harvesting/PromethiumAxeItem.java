@@ -4,15 +4,17 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.component.type.ToolComponent;
+import net.minecraft.component.type.ToolComponent.Rule;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.tag.BlockTags;
@@ -48,13 +50,16 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
     
     public PromethiumAxeItem(ToolMaterial toolMaterial, Settings settings) {
         super(toolMaterial, settings);
-    }
-    
-    @Override
-    public boolean isCorrectForDrops(ItemStack stack, BlockState state) {
-        return Items.DIAMOND_AXE.isCorrectForDrops(stack, state)
-                 || Items.DIAMOND_SWORD.isCorrectForDrops(stack, state)
-                 || Items.SHEARS.isCorrectForDrops(stack, state);
+        // a bit of a hack, but set tool components again after super()
+        // this lets PromethiumAxeItem extend AxeItem (for the right-click actions) and still ignore
+        // the default tool components set up by AxeItem
+        var toolComponent = new ToolComponent(List.of(
+            Rule.ofNeverDropping(toolMaterial.getInverseTag()),
+            Rule.ofAlwaysDropping(BlockTags.AXE_MINEABLE, toolMaterial.getMiningSpeedMultiplier()),
+            Rule.of(BlockTags.SWORD_EFFICIENT, 1.5F),
+            Rule.ofAlwaysDropping(List.of(Blocks.COBWEB), 15.0F)),
+            1.0F, 1);
+        this.components = settings.component(DataComponentTypes.TOOL, toolComponent).getValidatedComponents();
     }
     
     @Override

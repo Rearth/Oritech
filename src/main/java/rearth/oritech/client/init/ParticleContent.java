@@ -19,7 +19,8 @@ public class ParticleContent {
     });
     
     public static final ParticleSystem<LineData> WEED_KILLER = PARTICLE_CONTROLLER.register(LineData.class, (world, pos, data) -> {
-        ClientParticles.setParticleCount(4 + world.random.nextInt(3));
+        var dist = (int) data.end.distanceTo(data.start);
+        ClientParticles.setParticleCount(dist * 4 + world.random.nextInt(3));
         ClientParticles.spawnLine(ParticleTypes.DRAGON_BREATH, world, data.start, data.end, 0.2f);
     });
     
@@ -97,14 +98,26 @@ public class ParticleContent {
         ClientParticles.spawnCenteredOnBlock(ParticleTypes.SONIC_BOOM, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);
     }));
     
+    public static final ParticleSystem<Void> BIG_HIT = PARTICLE_CONTROLLER.register(Void.class, ((world, pos, data) -> {
+        ClientParticles.spawn(ParticleTypes.SONIC_BOOM, world, pos, 0.3);
+    }));
+    
+    public static final ParticleSystem<Void> PARTICLE_COLLIDE = PARTICLE_CONTROLLER.register(Void.class, ((world, pos, data) -> {
+        ClientParticles.spawn(ParticleTypes.GUST, world, pos, 0);
+    }));
+    
     public static final ParticleSystem<Void> ACCELERATING = PARTICLE_CONTROLLER.register(Void.class, (world, pos, data) -> {
         spawnCubeOutline(ParticleTypes.SCULK_CHARGE_POP, pos, 1, 5, 3);
         ClientParticles.reset();
     });
     
-    public static final ParticleSystem<LineData> LASER_BEAM_EFFECT = PARTICLE_CONTROLLER.register(LineData.class, ((world, pos, data) -> {
+    public static final ParticleSystem<Void> LASER_BEAM_EFFECT = PARTICLE_CONTROLLER.register(Void.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(1);
-        ClientParticles.spawnPrecise(ParticleTypes.SMALL_FLAME, world, data.end, 0.4, 0.3, 0.4);
+        ClientParticles.spawnPrecise(ParticleTypes.SMALL_FLAME, world, pos, 0.4, 0.3, 0.4);
+    }));
+    
+    public static final ParticleSystem<Void> PARTICLE_MOVING = PARTICLE_CONTROLLER.register(Void.class, ((world, pos, data) -> {
+        ClientParticles.spawnPrecise(ParticleTypes.REVERSE_PORTAL, world, pos, 0.2, 0.3, 0.2);
     }));
     
     private static void spawnCubeOutline(ParticleEffect particle, Vec3d origin, float size, int duration, int segments) {
