@@ -37,6 +37,11 @@ public class SmallStorageBlockEntity extends ExpandableEnergyStorageBlockEntity 
     public long getDefaultExtractionRate() {
         return Oritech.CONFIG.smallEnergyStorage.maxEnergyExtraction();
     }
+
+    public int getComparatorOutput() {
+        if (energyStorage.amount == 0) return 0;
+        return (int) (1 + ((energyStorage.amount / (float) energyStorage.capacity) * 14));
+    }
     
     @Override
     public float getCoreQuality() {

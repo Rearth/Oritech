@@ -2,10 +2,13 @@ package rearth.oritech.init.datagen;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
@@ -26,7 +29,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
     protected void configure(RegistryWrapper.WrapperLookup lookup) {
     
         // raw ores
-        getOrCreateTagBuilder(ConventionalItemTags.RAW_ORES)
+        getOrCreateTagBuilder(ConventionalItemTags.RAW_MATERIALS)
           .add(ItemContent.RAW_NICKEL)
           .add(ItemContent.RAW_PLATINUM);
         
@@ -82,9 +85,78 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .addOptionalTag(ItemTags.VILLAGER_PLANTABLE_SEEDS)
           .addOptionalTag(ItemTags.SAPLINGS)
           .addOptionalTag(ConventionalItemTags.FOODS)
+          .addOptionalTag(ConventionalItemTags.CROPS)
           .addOptional(Identifier.of(TechReborn.MOD_ID, TRContent.Parts.PLANTBALL.name))
           .add(BlockContent.WITHER_CROP_BLOCK.asItem())
-          .add(Items.WHEAT);
+          .add(ItemContent.BANANA.asItem())
+          .add(Items.WHEAT)
+          .add(Items.DRIED_KELP)
+          .add(Items.SHORT_GRASS)
+          .add(Items.KELP)
+          .add(Items.SEAGRASS)
+          .add(Items.MOSS_CARPET)
+          .add(Items.SMALL_DRIPLEAF)
+          .add(Items.HANGING_ROOTS)
+          .add(Items.MANGROVE_ROOTS)
+          .add(Items.PITCHER_POD)
+          .add(Items.TALL_GRASS)
+          .add(Items.VINE)
+          .add(Items.NETHER_SPROUTS)
+          .add(Items.WEEPING_VINES)
+          .add(Items.TWISTING_VINES)
+          .add(Items.GLOW_LICHEN)
+          .add(Items.SEA_PICKLE)
+          .add(Items.LILY_PAD)
+          .add(Items.BROWN_MUSHROOM)
+          .add(Items.RED_MUSHROOM)
+          .add(Items.MUSHROOM_STEM)
+          .add(Items.CRIMSON_FUNGUS)
+          .add(Items.WARPED_FUNGUS)
+          .add(Items.NETHER_WART)
+          .add(Items.CRIMSON_ROOTS)
+          .add(Items.WARPED_ROOTS)
+          .add(Items.SHROOMLIGHT)
+          .add(Items.FERN)
+          .add(Items.LARGE_FERN)
+          .add(Items.MOSS_BLOCK)
+          .add(Items.BIG_DRIPLEAF)
+          .add(Items.BROWN_MUSHROOM_BLOCK)
+          .add(Items.RED_MUSHROOM_BLOCK)
+          .add(Items.NETHER_WART_BLOCK)
+          .add(Items.WARPED_WART_BLOCK);
+        
+        // dyes
+        getOrCreateTagBuilder(TagContent.RAW_WHITE_DYE)
+          .add(Items.BONE_MEAL);
+        getOrCreateTagBuilder(TagContent.RAW_LIGHT_GRAY_DYE)
+          .add(Items.AZURE_BLUET)
+          .add(Items.OXEYE_DAISY)
+          .add(Items.WHITE_TULIP);
+        getOrCreateTagBuilder(TagContent.RAW_BLACK_DYE)
+          .add(Items.INK_SAC)
+          .add(Items.WITHER_ROSE);
+        getOrCreateTagBuilder(TagContent.RAW_RED_DYE)
+          .add(Items.POPPY)
+          .add(Items.RED_TULIP)
+          .add(Items.ROSE_BUSH);
+        getOrCreateTagBuilder(TagContent.RAW_ORANGE_DYE)
+          .add(Items.ORANGE_TULIP)
+          .add(Items.TORCHFLOWER);
+        getOrCreateTagBuilder(TagContent.RAW_YELLOW_DYE)
+          .add(Items.DANDELION)
+          .add(Items.SUNFLOWER);
+        getOrCreateTagBuilder(TagContent.RAW_CYAN_DYE)
+          .add(Items.PITCHER_PLANT);
+        getOrCreateTagBuilder(TagContent.RAW_BLUE_DYE)
+          .add(Items.LAPIS_LAZULI)
+          .add(Items.CORNFLOWER);
+        getOrCreateTagBuilder(TagContent.RAW_MAGENTA_DYE)
+          .add(Items.ALLIUM)
+          .add(Items.LILAC);
+        getOrCreateTagBuilder(TagContent.RAW_PINK_DYE)
+          .add(Items.PINK_TULIP)
+          .add(Items.PEONY)
+          .add(Items.PINK_PETALS);
         
         // plating variants
         getOrCreateTagBuilder(TagContent.MACHINE_PLATING)
@@ -106,22 +178,18 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.INSULATED_WIRE);
         
         // equipment enchanting
-        getOrCreateTagBuilder(ItemTags.MINING_ENCHANTABLE)
+        getOrCreateTagBuilder(ItemTags.SWORDS)
+          .add(ToolsContent.CHAINSAW, ToolsContent.PROMETHIUM_AXE);
+        getOrCreateTagBuilder(ItemTags.AXES)
+          .add(ToolsContent.CHAINSAW, ToolsContent.PROMETHIUM_AXE);
+        
+        getOrCreateTagBuilder(ItemTags.PICKAXES)
+          .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);
+        getOrCreateTagBuilder(ItemTags.SHOVELS)
           .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);
         
         getOrCreateTagBuilder(ItemTags.CLUSTER_MAX_HARVESTABLES)
           .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);
-        
-        getOrCreateTagBuilder(ItemTags.MINING_LOOT_ENCHANTABLE)
-          .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE);
-        
-        getOrCreateTagBuilder(ItemTags.SWORD_ENCHANTABLE)
-          .add(ToolsContent.PROMETHIUM_AXE, ToolsContent.CHAINSAW);
-        getOrCreateTagBuilder(ItemTags.WEAPON_ENCHANTABLE)
-          .add(ToolsContent.PROMETHIUM_AXE, ToolsContent.CHAINSAW);
-        
-        getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
-          .add(ToolsContent.CHAINSAW, ToolsContent.HAND_DRILL);
         
         getOrCreateTagBuilder(ItemTags.HEAD_ARMOR_ENCHANTABLE)
           .add(ToolsContent.EXO_HELMET);

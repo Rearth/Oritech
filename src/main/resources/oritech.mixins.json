@@ -3,6 +3,8 @@
 	"package": "rearth.oritech.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"ShulkerEntityMixin",
+		"PlayerEntityMixin"
 		"LivingEntityMixin"
 	],
 	"injectors": {

@@ -1,0 +1,183 @@
+{
+  "variants": {
+    "facing=east,bent=0,redstone_state=3": {
+      "model": "oritech:block/accelerator_ring_straight",
+      "y": 180
+    },
+    "facing=north,bent=0,redstone_state=3": {
+      "model": "oritech:block/accelerator_ring_straight",
+      "y": 90
+    },
+    "facing=south,bent=0,redstone_state=3": {
+      "model": "oritech:block/accelerator_ring_straight",
+      "y": 270
+    },
+    "facing=west,bent=0,redstone_state=3": {
+      "model": "oritech:block/accelerator_ring_straight",
+      "y": 0
+    },
+
+    "facing=east,bent=0,redstone_state=1": {
+      "model": "oritech:block/accelerator_ring_straight_redstone_1",
+      "y": 180
+    },
+    "facing=north,bent=0,redstone_state=1": {
+      "model": "oritech:block/accelerator_ring_straight_redstone_1",
+      "y": 90
+    },
+    "facing=south,bent=0,redstone_state=1": {
+      "model": "oritech:block/accelerator_ring_straight_redstone_1",
+      "y": 270
+    },
+    "facing=west,bent=0,redstone_state=1": {
+      "model": "oritech:block/accelerator_ring_straight_redstone_1",
+      "y": 0
+    },
+
+    "facing=east,bent=0,redstone_state=2": {
+      "model": "oritech:block/accelerator_ring_straight_redstone_2",
+      "y": 180
+    },
+    "facing=north,bent=0,redstone_state=2": {
+      "model": "oritech:block/accelerator_ring_straight_redstone_2",
+      "y": 90
+    },
+    "facing=south,bent=0,redstone_state=2": {
+      "model": "oritech:block/accelerator_ring_straight_redstone_2",
+      "y": 270
+    },
+    "facing=west,bent=0,redstone_state=2": {
+      "model": "oritech:block/accelerator_ring_straight_redstone_2",
+      "y": 0
+    },
+
+    "facing=east,bent=1,redstone_state=3": {
+      "model": "oritech:block/accelerator_ring_bent",
+      "y": 180
+    },
+    "facing=north,bent=1,redstone_state=3": {
+      "model": "oritech:block/accelerator_ring_bent",
+      "y": 90
+    },
+    "facing=south,bent=1,redstone_state=3": {
+      "model": "oritech:block/accelerator_ring_bent",
+      "y": 270
+    },
+    "facing=west,bent=1,redstone_state=3": {
+      "model": "oritech:block/accelerator_ring_bent",
+      "y": 0
+    },
+
+    "facing=east,bent=1,redstone_state=0": {
+      "model": "oritech:block/accelerator_ring_bent_redstone",
+      "y": 180
+    },
+    "facing=north,bent=1,redstone_state=0": {
+      "model": "oritech:block/accelerator_ring_bent_redstone",
+      "y": 90
+    },
+    "facing=south,bent=1,redstone_state=0": {
+      "model": "oritech:block/accelerator_ring_bent_redstone",
+      "y": 270
+    },
+    "facing=west,bent=1,redstone_state=0": {
+      "model": "oritech:block/accelerator_ring_bent_redstone",
+      "y": 0
+    },
+
+    "facing=east,bent=2,redstone_state=3": {
+      "model": "oritech:block/accelerator_ring_bent_inverse",
+      "y": 180
+    },
+    "facing=north,bent=2,redstone_state=3": {
+      "model": "oritech:block/accelerator_ring_bent_inverse",
+      "y": 90
+    },
+    "facing=south,bent=2,redstone_state=3": {
+      "model": "oritech:block/accelerator_ring_bent_inverse",
+      "y": 270
+    },
+    "facing=west,bent=2,redstone_state=3": {
+      "model": "oritech:block/accelerator_ring_bent_inverse",
+      "y": 0
+    },
+
+    "facing=east,bent=2,redstone_state=0": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone",
+      "y": 180
+    },
+    "facing=north,bent=2,redstone_state=0": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone",
+      "y": 90
+    },
+    "facing=south,bent=2,redstone_state=0": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone",
+      "y": 270
+    },
+    "facing=west,bent=2,redstone_state=0": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone",
+      "y": 0
+    },
+
+    "facing=west,bent=1,redstone_state=1": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=west,bent=1,redstone_state=2": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=west,bent=2,redstone_state=1": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=west,bent=2,redstone_state=2": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=south,bent=1,redstone_state=1": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=south,bent=1,redstone_state=2": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=south,bent=2,redstone_state=1": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=south,bent=2,redstone_state=2": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=north,bent=1,redstone_state=1": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=north,bent=1,redstone_state=2": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=north,bent=2,redstone_state=1": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=north,bent=2,redstone_state=2": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=east,bent=1,redstone_state=1": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=east,bent=1,redstone_state=2": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=east,bent=2,redstone_state=1": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=east,bent=2,redstone_state=2": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=west,bent=0,redstone_state=0": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=south,bent=0,redstone_state=0": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=north,bent=0,redstone_state=0": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    },
+    "facing=east,bent=0,redstone_state=0": {
+      "model": "oritech:block/accelerator_ring_bent_inverse_redstone"
+    }
+  }
+}

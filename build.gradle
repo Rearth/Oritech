@@ -42,16 +42,26 @@ repositories {
     }
 
     maven { // for JEI
-        name = 'modrinth'
+        name = 'modmaven'
         url "https://modmaven.dev"
     }
 
-    maven { // for Jade, Tech Reborn, Energized Power
+    maven { // for additional entity attributes (Mythic Metals dependency)
+        name = 'modrinth'
+        url = 'https://api.modrinth.com/maven/'
+    }
+
+    maven { // for Jade, compat datagen dependencies
         name = 'Curse'
         url = 'https://www.cursemaven.com'
         content {
             includeGroup 'curse.maven'
         }
+    }
+
+    maven { // for cardinal components (datagen dependency)
+        name = 'Lady Snake'
+        url = 'https://maven.ladysnake.org/releases'
     }
 
     maven { // for EMI
@@ -61,7 +71,26 @@ repositories {
 }
 
 fabricApi {
-    configureDataGeneration()
+    configureDataGeneration {
+        modId = "oritech"
+        dependencies {
+            // Tech Reborn
+            modImplementation "curse.maven:techreborn-233564:${tech_reborn_version_id}"
+            modImplementation "curse.maven:reborncore-237903:${reborn_core_version_id}"
+
+            // Energized Power
+            modImplementation "curse.maven:energized-power-782147:${energized_power_version_id}"
+
+            // Alloy Forgery
+            modImplementation "curse.maven:alloy-forgery-438718:${alloy_forgery_version_id}"
+
+            // Mythic Metals
+            modImplementation "curse.maven:mythicmetals-410127:${mythic_metals_version_id}"
+            modRuntimeOnly "org.ladysnake.cardinal-components-api:cardinal-components-base:${cardinal_components_version}"
+            modRuntimeOnly "org.ladysnake.cardinal-components-api:cardinal-components-entity:${cardinal_components_version}"
+            modRuntimeOnly "maven.modrinth:additionalentityattributes:${additional_entity_attributes_version}"
+        }
+    }
 }
 
 dependencies {
@@ -109,13 +138,6 @@ dependencies {
         case "disabled": break
         default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, or disabled.")
     }
-
-    // Tech Reborn - for compatibility datagen
-    modImplementation "curse.maven:techreborn-233564:${tech_reborn_version_id}"
-    modImplementation "curse.maven:reborncore-237903:${reborn_core_version_id}"
-
-    // Energized Power - for compatibility datagen
-    modImplementation "curse.maven:energized-power-782147:${energized_power_version_id}"
 }
 
 processResources {

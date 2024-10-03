@@ -15,6 +15,7 @@ import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.network.NetworkContent;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.ITEM_SLOT;
 
@@ -23,6 +24,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     private ButtonComponent whiteListButton;
     private ButtonComponent nbtButton;
     private final FlowLayout[] gridContainers = new FlowLayout[8];
+    private Map<Integer, ItemStack> cachedItems;
     
     public ItemFilterScreen(ItemFilterScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -33,12 +35,13 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         return OwoUIAdapter.create(this, Containers::verticalFlow);
     }
     
-    private void updateItemFilters() {
+    public void updateItemFilters() {
         
-        Oritech.LOGGER.debug("loading item filters: " + handler.blockEntity.getFilterSettings().items());
+        cachedItems = handler.blockEntity.getFilterSettings().items();
+        Oritech.LOGGER.debug("loading item filters: " + cachedItems);
         
         for (int i = 0; i < 8; i++) {
-            var storedStack = handler.blockEntity.getFilterSettings().items().getOrDefault(i, ItemStack.EMPTY);
+            var storedStack = cachedItems.getOrDefault(i, ItemStack.EMPTY);
             
             var container = gridContainers[i];
             // if empty and one is set, remove it
@@ -154,7 +157,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         var whitelist = data.useWhitelist();
         var newWhitelist = !whitelist;
         var newData = new ItemFilterBlockEntity.FilterData(data.useNbt(), newWhitelist, data.items());
-        handler.blockEntity.setFilterSettings(newData); // this is only on client
+        updateFilterSettings(newData); // this is only on client
         
         updateButtons();
         sendUpdateToServer();
@@ -166,7 +169,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         var nbt = data.useNbt();
         var newNbt = !nbt;
         var newData = new ItemFilterBlockEntity.FilterData(newNbt, data.useWhitelist(), data.items());
-        handler.blockEntity.setFilterSettings(newData); // this is only on client
+        updateFilterSettings(newData); // this is only on client
         
         updateButtons();
         sendUpdateToServer();
@@ -186,7 +189,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
             var itemFilters = new HashMap<>(oldData.items());
             itemFilters.remove(idIndex);
             var newData = new ItemFilterBlockEntity.FilterData(oldData.useNbt(), oldData.useWhitelist(), itemFilters);
-            handler.blockEntity.setFilterSettings(newData);
+            updateFilterSettings(newData); // this is only on client
             sendUpdateToServer();
             
             return false;
@@ -208,11 +211,16 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         var itemFilters = new HashMap<>(oldData.items());
         itemFilters.put(idIndex, displayStack);
         var newData = new ItemFilterBlockEntity.FilterData(oldData.useNbt(), oldData.useWhitelist(), itemFilters);
-        handler.blockEntity.setFilterSettings(newData);
+        updateFilterSettings(newData); // this is only on client
         
         Oritech.LOGGER.debug("stored map: " + itemFilters);
         sendUpdateToServer();
         
         return true;
+    }
+
+    private void updateFilterSettings(ItemFilterBlockEntity.FilterData filterData) {
+        handler.blockEntity.setFilterSettings(filterData);
+        cachedItems = filterData.items();
     }
 }

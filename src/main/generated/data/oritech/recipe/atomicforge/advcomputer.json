@@ -2,10 +2,10 @@
   "type": "oritech:atomic_forge",
   "ingredients": [
     {
-      "item": "oritech:silicon_wafer"
+      "item": "oritech:plastic_sheet"
     },
     {
-      "item": "oritech:plastic_sheet"
+      "item": "oritech:silicon_wafer"
     },
     {
       "item": "oritech:silicon_wafer"

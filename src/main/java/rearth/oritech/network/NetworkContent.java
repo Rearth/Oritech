@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
@@ -14,6 +15,7 @@ import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
+import rearth.oritech.block.entity.machines.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
@@ -52,6 +54,8 @@ public class NetworkContent {
     
     public record MachineSetupEventPacket(BlockPos position) {
     }
+    
+    public record AcceleratorParticleRenderPacket(BlockPos position, List<Vec3d> particleTrail) {}
     
     public record DroneCardEventPacket(BlockPos position, String message) {
     }
@@ -266,6 +270,16 @@ public class NetworkContent {
             
         }));
         
+        MACHINE_CHANNEL.registerClientbound(AcceleratorParticleRenderPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
+                acceleratorBlock.setDisplayTrail(message.particleTrail);
+            }
+            
+        }));
+        
         MACHINE_CHANNEL.registerClientbound(PumpWorkSyncPacket.class, ((message, access) -> {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
@@ -429,7 +443,7 @@ public class NetworkContent {
             }
             
         }));
-        
+
         UI_CHANNEL.registerServerbound(EnchanterSelectionPacket.class, ((message, access) -> {
             
             var entity = access.player().getWorld().getBlockEntity(message.position);

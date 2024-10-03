@@ -62,13 +62,13 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
             costLabel.zIndex(1);
         }
         
-        var result = getStablizationTitle();
+        var result = getStabilizationTitle();
         stabilizationLabel.text(result.formatted(Formatting.BLACK));
         
     }
     
     @NotNull
-    private MutableText getStablizationTitle() {
+    private MutableText getStabilizationTitle() {
         var currentSouls = handler.catalyst.collectedSouls;
         var baseSouls = handler.catalyst.baseSoulCapacity;
         var maxSouls = handler.catalyst.maxSouls;

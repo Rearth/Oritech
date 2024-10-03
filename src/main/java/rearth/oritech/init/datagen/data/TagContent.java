@@ -57,5 +57,16 @@ public class TagContent {
     // trees
     public static final TagKey<Block> CUTTER_LOGS_MINEABLE = TagKey.of(RegistryKeys.BLOCK, Oritech.id("mineable/cutter_logs"));
     public static final TagKey<Block> CUTTER_LEAVES_MINEABLE = TagKey.of(RegistryKeys.BLOCK, Oritech.id("mineable/cutter_leaves"));
-    
+
+    // dyes
+    public static final TagKey<Item> RAW_WHITE_DYE = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/dyes/white"));
+    public static final TagKey<Item> RAW_LIGHT_GRAY_DYE = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/dyes/light_gray"));
+    public static final TagKey<Item> RAW_BLACK_DYE = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/dyes/black"));
+    public static final TagKey<Item> RAW_RED_DYE = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/dyes/red"));
+    public static final TagKey<Item> RAW_ORANGE_DYE = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/dyes/orange"));
+    public static final TagKey<Item> RAW_YELLOW_DYE = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/dyes/yellow"));
+    public static final TagKey<Item> RAW_CYAN_DYE = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/dyes/cyan"));
+    public static final TagKey<Item> RAW_BLUE_DYE = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/dyes/blue"));
+    public static final TagKey<Item> RAW_MAGENTA_DYE = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/dyes/magenta"));
+    public static final TagKey<Item> RAW_PINK_DYE = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/dyes/pink"));
 }

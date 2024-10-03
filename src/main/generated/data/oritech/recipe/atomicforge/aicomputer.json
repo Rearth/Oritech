@@ -2,10 +2,10 @@
   "type": "oritech:atomic_forge",
   "ingredients": [
     {
-      "item": "oritech:advanced_computing_engine"
+      "item": "oritech:duratium_ingot"
     },
     {
-      "item": "oritech:duratium_ingot"
+      "item": "oritech:advanced_computing_engine"
     },
     {
       "item": "oritech:advanced_computing_engine"

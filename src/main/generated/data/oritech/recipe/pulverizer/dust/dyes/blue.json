@@ -1,0 +1,15 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "tag": "c:raw_materials/dyes/blue"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:white_dye"
+    }
+  ],
+  "time": 300
+}

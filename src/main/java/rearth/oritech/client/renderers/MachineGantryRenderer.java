@@ -24,6 +24,17 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
     private static final float BEAM_DEPTH = 3 / 16f;
     private static final Random renderRandom = Random.create(100);
     
+    
+    @Override
+    public int getRenderDistance() {
+        return 128;
+    }
+    
+    @Override
+    public boolean rendersOutsideBoundingBox(FrameInteractionBlockEntity blockEntity) {
+        return true;
+    }
+    
     @Override
     public void render(FrameInteractionBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         
