@@ -37,7 +37,7 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
     public void setCustomAnimations(T laserEntity, long instanceId, AnimationState<T> animationState) {
         
         if (laserEntity.getCurrentTarget() == null) return;
-        var target = Vec3d.of(laserEntity.getCurrentTarget());
+        var target = laserEntity.getVisualTarget();
         
         if (laserEntity.isTargetingDeepdrill()) {
             var drillId = laserEntity.getCurrentTarget().asLong();

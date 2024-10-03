@@ -168,6 +168,8 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
       BlockContent.MACHINE_EXTENDER,
       BlockContent.MACHINE_CAPACITOR_ADDON,
       BlockContent.CAPACITOR_ADDON_EXTENDER,
+      BlockContent.QUARRY_ADDON,
+      BlockContent.MACHINE_HUNTER_ADDON,
       BlockContent.QUARRY_ADDON
     ).build();
     
