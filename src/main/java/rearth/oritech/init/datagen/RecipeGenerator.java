@@ -58,6 +58,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addComponents(exporter);
         addOreChains(exporter);
         addAlloys(exporter);
+        addParticleCollisions(exporter);
         addDusts(exporter);
         addDecorative(exporter);
         addVanillaAdditions(exporter);
@@ -527,6 +528,10 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addAlloyRecipe(exporter, Ingredient.ofItems(Items.IRON_INGOT), Ingredient.fromTag(TagContent.COAL_DUSTS), ItemContent.STEEL_INGOT, 1, 0.3333f, "steel");
     }
     
+    private void addParticleCollisions(RecipeExporter exporter) {
+        addParticleCollisionRecipe(exporter, Ingredient.ofItems(Items.COAL), Ingredient.ofItems(Items.APPLE), new ItemStack(ItemContent.BANANA), 30, "debug");
+    }
+    
     private void addDusts(RecipeExporter exporter) {
         addDustRecipe(exporter, Ingredient.ofItems(Items.COPPER_INGOT), ItemContent.COPPER_DUST, "copper");
         addDustRecipe(exporter, Ingredient.ofItems(Items.IRON_INGOT), ItemContent.IRON_DUST, "iron");
@@ -586,6 +591,10 @@ public class RecipeGenerator extends FabricRecipeProvider {
         }
     }
     
+    private static void addParticleCollisionRecipe(RecipeExporter exporter, Ingredient A, Ingredient B, ItemStack result, int requiredSpeed, String suffix) {
+        var particle = new OritechRecipe(requiredSpeed, List.of(A, B), List.of(result), RecipeContent.PARTICLE_COLLISION, null, null);
+        exporter.accept(Oritech.id("particle/" + suffix), particle, null);
+    }
     
     public static void addGrinderRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, String suffix) {
         addGrinderRecipe(exporter, ingot, dust, 1, suffix);

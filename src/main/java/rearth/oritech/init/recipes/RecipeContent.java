@@ -19,6 +19,7 @@ public class RecipeContent {
     public static final OritechRecipeType LAVA_GENERATOR = register(Oritech.id("lava_generator"));
     public static final OritechRecipeType STEAM_ENGINE = register(Oritech.id("steam_engine"));
     public static final OritechRecipeType DEEP_DRILL = register(Oritech.id("deep_drill"));
+    public static final OritechRecipeType PARTICLE_COLLISION = register(Oritech.id("particle_collision"));
 
     private static OritechRecipeType register(Identifier name) {
 

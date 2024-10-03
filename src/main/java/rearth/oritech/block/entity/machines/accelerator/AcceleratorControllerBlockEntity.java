@@ -1,33 +1,42 @@
 package rearth.oritech.block.entity.machines.accelerator;
 
 import io.wispforest.owo.util.VectorRandomUtils;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.Geometry;
+import rearth.oritech.util.*;
 
 import java.util.List;
 
-public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity> {
+public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity>, InventoryProvider {
     
     private static final int RF_ACCELERATE_COST = 10;
     
     private AcceleratorParticleLogic.ActiveParticle particle;
+    public ItemStack activeItemParticle = ItemStack.EMPTY;
+    
     private AcceleratorParticleLogic particleLogic;
     
+    private final SimpleInventory inventory = new SimpleSidedInventory(2, new InventorySlotAssignment(0, 1, 1, 1));   // 0 = input, 1 = output
+
     // client data
     public List<Vec3d> displayTrail;
     
@@ -40,8 +49,15 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         if (world.isClient) return;
         initParticleLogic();
         
+        // try insert item as particle
+        if (particle == null && !inventory.getStack(0).isEmpty() && inventory.getStack(1).isEmpty()) {
+            injectParticle();
+        }
+        
         if (particle != null)
             particleLogic.update(particle);
+        
+        
     }
     
     private void initParticleLogic() {
@@ -59,11 +75,13 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             var startPosition = (BlockPos) posBehind;
             var nextGate = particleLogic.findNextGate(startPosition, directionRight, 1);
             particle = new AcceleratorParticleLogic.ActiveParticle(startPosition.toCenterPos(), 1, nextGate, startPosition);
+            activeItemParticle = inventory.getStack(0).split(1);
         }
     }
     
     public void removeParticleDueToCollision() {
         this.particle = null;
+        this.activeItemParticle = ItemStack.EMPTY;
     }
     
     public void onParticleExited(Vec3d from, Vec3d to, BlockPos lastGate, Vec3d exitDirection) {
@@ -75,7 +93,9 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     
     public void onParticleCollided(float relativeSpeed, Vec3d collision, BlockPos secondController, AcceleratorControllerBlockEntity secondControllerEntity) {
         
-        particle = null;
+        var success = tryCraftResult(relativeSpeed, activeItemParticle, secondControllerEntity.activeItemParticle);
+        
+        this.removeParticleDueToCollision();
         secondControllerEntity.removeParticleDueToCollision();
         
         var particleCount = Math.max(Math.sqrt(Math.sqrt(relativeSpeed)), 3);
@@ -85,6 +105,36 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         }
         
         ParticleContent.PARTICLE_COLLIDE.spawn(world, collision);
+    }
+    
+    private boolean tryCraftResult(float speed, ItemStack inputA, ItemStack inputB) {
+        
+        if (inputA == null || inputA.isEmpty() || inputB == null || inputB.isEmpty()) return false;
+        
+        var inputInv = new SimpleCraftingInventory(inputA, inputB);
+        var candidate = world.getRecipeManager().getFirstMatch(RecipeContent.PARTICLE_COLLISION, inputInv, world);
+        
+        if (candidate.isEmpty()) {
+            // try again in different order
+            inputInv = new SimpleCraftingInventory(inputB, inputA);
+            candidate = world.getRecipeManager().getFirstMatch(RecipeContent.PARTICLE_COLLISION, inputInv, world);
+        }
+        
+        if (candidate.isEmpty()) return false;
+        
+        var recipe = candidate.get().value();
+        
+        var requiredSpeed = recipe.getTime();
+        if (speed < requiredSpeed) return false;
+        
+        var result = recipe.getResults();
+        if (inventory.heldStacks.get(1).getItem().equals(result.get(0).getItem())) {
+            inventory.heldStacks.get(1).increment(1);
+        } else {
+            inventory.setStack(1, result.get(0).copy());
+        }
+        
+        return true;
     }
     
     public void onParticleMoved(List<Vec3d> positions) {
@@ -148,5 +198,10 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         
         particle.velocity += 1;
         
+    }
+    
+    @Override
+    public InventoryStorage getInventory(Direction direction) {
+        return InventoryStorage.of(inventory, direction);
     }
 }

@@ -137,6 +137,9 @@ dependencies {
 }
 
 processResources {
+    from 'src/main/generated'
+    from 'src/main/resources'
+
     inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
@@ -144,28 +147,12 @@ processResources {
     }
 }
 
-// doesnt seem to work
-//tasks.withType(JavaExec).configureEach {
-//    print(name)
-//    if (name.contains("runClient")) {
-//        classpath = classpath.filter { file ->
-//            !file.name.contains("energized-power") &&
-//            !file.name.contains("alloy-forgery") &&
-//            !file.name.contains("mythicmetals") &&
-//            !file.name.contains("cardinal-components") &&
-//            !file.name.contains("additionalentityattributes")
-//            // && !file.name.contains("techreborn")
-//            // && !file.name.contains("reborncore")
-//        }
-//    }
-//}
-
 tasks.withType(JavaCompile).configureEach {
     it.options.release = 21
 }
 
 tasks.withType(AbstractCopyTask).configureEach {
-    setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
 }
 
 java {
