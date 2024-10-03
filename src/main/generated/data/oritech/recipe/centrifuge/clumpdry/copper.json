@@ -1,0 +1,19 @@
+{
+  "type": "oritech:centrifuge",
+  "ingredients": [
+    {
+      "item": "oritech:copper_clump"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:copper_dust"
+    },
+    {
+      "count": 3,
+      "id": "oritech:small_gold_dust"
+    }
+  ],
+  "time": 400
+}

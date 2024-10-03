@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "minecraft:enchanting_table"
+    },
+    "c": {
+      "item": "oritech:super_ai_chip"
+    },
+    "f": {
+      "item": "oritech:fluxite"
+    },
+    "m": {
+      "item": "minecraft:obsidian"
+    },
+    "s": {
+      "item": "oritech:adamant_ingot"
+    }
+  },
+  "pattern": [
+    "fff",
+    "mcm",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:enchantment_catalyst_block"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_powered_furnace_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:powered_furnace_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/electricfurnacealt"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_powered_furnace_block"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/electricfurnacealt"
+    ]
+  }
+}

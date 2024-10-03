@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 50,
+  "experience": 0.5,
+  "group": "oritech",
+  "ingredient": {
+    "item": "oritech:small_iron_dust"
+  },
+  "result": {
+    "id": "minecraft:iron_nugget"
+  }
+}

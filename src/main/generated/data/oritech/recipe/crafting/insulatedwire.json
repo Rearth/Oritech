@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "tag": "c:ingots/nickel"
+    }
+  },
+  "pattern": [
+    "   ",
+    "###"
+  ],
+  "result": {
+    "count": 4,
+    "id": "oritech:insulated_wire"
+  }
+}

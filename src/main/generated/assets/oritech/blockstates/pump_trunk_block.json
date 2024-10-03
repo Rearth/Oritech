@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/pump_trunk_block"
+    }
+  }
+}

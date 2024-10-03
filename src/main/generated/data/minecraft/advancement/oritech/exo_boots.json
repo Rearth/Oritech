@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:oritech/assembler",
+  "criteria": {
+    "got_exo_boots": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:exo_boots"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": {
+      "translate": "advancements.oritech.exo_boots.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "oritech:exo_boots"
+    },
+    "title": {
+      "translate": "advancements.oritech.exo_boots"
+    }
+  },
+  "requirements": [
+    [
+      "got_exo_boots"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

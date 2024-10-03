@@ -1,0 +1,15 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "item": "minecraft:quartz"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:quartz_dust"
+    }
+  ],
+  "time": 300
+}

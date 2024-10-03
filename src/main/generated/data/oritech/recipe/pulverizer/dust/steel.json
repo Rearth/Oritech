@@ -1,0 +1,15 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "tag": "c:ingots/steel"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:steel_dust"
+    }
+  ],
+  "time": 300
+}

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "oritech:raw_biopolymer"
+    },
+    "e": {
+      "item": "minecraft:glass_bottle"
+    },
+    "m": {
+      "item": "minecraft:rotten_flesh"
+    },
+    "s": {
+      "item": "minecraft:rotten_flesh"
+    }
+  },
+  "pattern": [
+    " a ",
+    "aea",
+    "mss"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:weed_killer"
+  }
+}

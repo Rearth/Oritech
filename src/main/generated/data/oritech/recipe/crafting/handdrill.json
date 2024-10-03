@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "oritech:enderic_compound"
+    },
+    "e": {
+      "item": "oritech:adamant_ingot"
+    },
+    "m": {
+      "item": "oritech:motor"
+    },
+    "s": {
+      "tag": "c:ingots/steel"
+    }
+  },
+  "pattern": [
+    " a ",
+    "aea",
+    "mss"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:hand_drill"
+  }
+}

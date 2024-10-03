@@ -1,0 +1,15 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "item": "oritech:electrum_ingot"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:electrum_dust"
+    }
+  ],
+  "time": 300
+}

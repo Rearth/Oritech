@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:oritech/centrifuge",
+  "criteria": {
+    "got_plastic": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:plastic_sheet"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": {
+      "translate": "advancements.oritech.plastic.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "oritech:plastic_sheet"
+    },
+    "title": {
+      "translate": "advancements.oritech.plastic"
+    }
+  },
+  "requirements": [
+    [
+      "got_plastic"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

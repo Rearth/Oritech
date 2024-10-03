@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:oritech/generator",
+  "criteria": {
+    "got_steam_engine": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:steam_engine_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": {
+      "translate": "advancements.oritech.steam_engine.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "oritech:steam_engine_block"
+    },
+    "title": {
+      "translate": "advancements.oritech.steam_engine"
+    }
+  },
+  "requirements": [
+    [
+      "got_steam_engine"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

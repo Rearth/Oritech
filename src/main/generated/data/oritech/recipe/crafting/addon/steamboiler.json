@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "tag": "oritech:plating"
+    },
+    "c": {
+      "item": "minecraft:copper_ingot"
+    },
+    "f": {
+      "item": "oritech:fluid_pipe"
+    },
+    "s": {
+      "item": "oritech:adamant_ingot"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:steam_boiler_addon"
+  }
+}

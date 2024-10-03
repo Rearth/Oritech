@@ -1,0 +1,15 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "item": "minecraft:blaze_rod"
+    }
+  ],
+  "results": [
+    {
+      "count": 4,
+      "id": "minecraft:blaze_powder"
+    }
+  ],
+  "time": 200
+}

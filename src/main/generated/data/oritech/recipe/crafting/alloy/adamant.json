@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "tag": "c:ingots/nickel"
+    },
+    "b": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "pattern": [
+    "aa ",
+    "bb "
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:adamant_ingot"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_iron_plating_slab": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:iron_plating_slab"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/slab/iron"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_iron_plating_slab"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/slab/iron"
+    ]
+  }
+}

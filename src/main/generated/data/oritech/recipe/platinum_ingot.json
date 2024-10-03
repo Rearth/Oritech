@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "oritech:platinum_nugget"
+    },
+    {
+      "item": "oritech:platinum_nugget"
+    },
+    {
+      "item": "oritech:platinum_nugget"
+    },
+    {
+      "item": "oritech:platinum_nugget"
+    },
+    {
+      "item": "oritech:platinum_nugget"
+    },
+    {
+      "item": "oritech:platinum_nugget"
+    },
+    {
+      "item": "oritech:platinum_nugget"
+    },
+    {
+      "item": "oritech:platinum_nugget"
+    },
+    {
+      "item": "oritech:platinum_nugget"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:platinum_ingot"
+  }
+}

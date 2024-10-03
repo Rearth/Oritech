@@ -1,28 +1,5 @@
 {
   "values": [
-    "mythicmetals:adamantite_helmet",
-    "mythicmetals:aquarium_helmet",
-    "mythicmetals:banglum_helmet",
-    "mythicmetals:bronze_helmet",
-    "mythicmetals:carmot_helmet",
-    "mythicmetals:celestium_helmet",
-    "mythicmetals:copper_helmet",
-    "mythicmetals:durasteel_helmet",
-    "mythicmetals:hallowed_helmet",
-    "mythicmetals:kyber_helmet",
-    "mythicmetals:legendary_banglum_helmet",
-    "mythicmetals:metallurgium_helmet",
-    "mythicmetals:midas_gold_helmet",
-    "mythicmetals:mythril_helmet",
-    "mythicmetals:orichalcum_helmet",
-    "mythicmetals:osmium_helmet",
-    "mythicmetals:palladium_helmet",
-    "mythicmetals:prometheum_helmet",
-    "mythicmetals:runite_helmet",
-    "mythicmetals:silver_helmet",
-    "mythicmetals:star_platinum_helmet",
-    "mythicmetals:steel_helmet",
-    "mythicmetals:stormyx_helmet",
-    "mythicmetals:tidesinger_helmet"
+    "oritech:exo_helmet"
   ]
 }

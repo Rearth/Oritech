@@ -1,0 +1,15 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "item": "minecraft:gravel"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:sand"
+    }
+  ],
+  "time": 300
+}

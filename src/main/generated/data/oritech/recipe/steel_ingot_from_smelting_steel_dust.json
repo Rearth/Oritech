@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 1.0,
+  "group": "oritech",
+  "ingredient": {
+    "item": "oritech:steel_dust"
+  },
+  "result": {
+    "id": "oritech:steel_ingot"
+  }
+}

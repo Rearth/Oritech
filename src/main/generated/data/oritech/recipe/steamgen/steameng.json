@@ -1,0 +1,10 @@
+{
+  "type": "oritech:steam_engine",
+  "fluidInput": {
+    "amount": 32,
+    "variant": "oritech:still_steam"
+  },
+  "ingredients": [],
+  "results": [],
+  "time": 1
+}

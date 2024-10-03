@@ -1,0 +1,15 @@
+{
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "item": "minecraft:bone"
+    }
+  ],
+  "results": [
+    {
+      "count": 8,
+      "id": "minecraft:bone_meal"
+    }
+  ],
+  "time": 200
+}

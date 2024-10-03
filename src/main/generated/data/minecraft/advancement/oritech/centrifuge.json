@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:oritech/assembler",
+  "criteria": {
+    "got_centrifuge": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:centrifuge_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": {
+      "translate": "advancements.oritech.centrifuge.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "oritech:centrifuge_block"
+    },
+    "title": {
+      "translate": "advancements.oritech.centrifuge"
+    }
+  },
+  "requirements": [
+    [
+      "got_centrifuge"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:oritech/assembler",
+  "criteria": {
+    "got_exo_chest": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:exo_chestplate"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": {
+      "translate": "advancements.oritech.exo_chest.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "oritech:exo_chestplate"
+    },
+    "title": {
+      "translate": "advancements.oritech.exo_chest"
+    }
+  },
+  "requirements": [
+    [
+      "got_exo_chest"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
