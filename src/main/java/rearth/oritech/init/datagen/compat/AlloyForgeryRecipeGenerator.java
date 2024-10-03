@@ -19,11 +19,11 @@ public class AlloyForgeryRecipeGenerator {
         offerAFAlloyRecipe(exporter, TagContent.NICKEL_INGOTS, ItemContent.FLUXITE.asItem(), ItemContent.ENERGITE_INGOT.asItem(), 1, 1, 10, "energite");
         offerAFAlloyRecipe(exporter, ConventionalItemTags.IRON_INGOTS, TagContent.COAL_DUSTS, ItemContent.STEEL_INGOT.asItem(), 1, 1, 5, "steel");
 
-        offerAFAlloyRecipe(exporter, ItemContent.COPPER_GEM.asItem(), ItemContent.COPPER_GEM.asItem(), Items.COPPER_INGOT, 4, 1, 5, "gems/copper");
-        offerAFAlloyRecipe(exporter, ItemContent.IRON_GEM.asItem(), ItemContent.IRON_GEM.asItem(), Items.IRON_INGOT, 4, 1, 10, "gems/iron");
-        offerAFAlloyRecipe(exporter, ItemContent.GOLD_GEM.asItem(), ItemContent.GOLD_GEM.asItem(), Items.GOLD_INGOT, 4, 1, 10, "gems/gold");
-        offerAFAlloyRecipe(exporter, ItemContent.NICKEL_GEM.asItem(), ItemContent.NICKEL_GEM.asItem(), ItemContent.NICKEL_INGOT.asItem(), 4, 1, 10, "gems/nickel");
-        offerAFAlloyRecipe(exporter, ItemContent.PLATINUM_GEM.asItem(), ItemContent.PLATINUM_GEM.asItem(), ItemContent.PLATINUM_INGOT.asItem(), 4, 1, 20, "gems/platinum");
+        offerAFAlloyGemRecipe(exporter, ItemContent.COPPER_GEM.asItem(), Items.COPPER_INGOT, 4, 1, 5, "gems/copper");
+        offerAFAlloyGemRecipe(exporter, ItemContent.IRON_GEM.asItem(), Items.IRON_INGOT, 4, 1, 10, "gems/iron");
+        offerAFAlloyGemRecipe(exporter, ItemContent.GOLD_GEM.asItem(), Items.GOLD_INGOT, 4, 1, 10, "gems/gold");
+        offerAFAlloyGemRecipe(exporter, ItemContent.NICKEL_GEM.asItem(), ItemContent.NICKEL_INGOT.asItem(), 4, 1, 10, "gems/nickel");
+        offerAFAlloyGemRecipe(exporter, ItemContent.PLATINUM_GEM.asItem(), ItemContent.PLATINUM_INGOT.asItem(), 4, 1, 20, "gems/platinum");
     }
 
     private static void offerAFAlloyRecipe(RecipeExporter exporter, TagKey<Item> inputA, Item inputB, Item result, int resultCount, int minForgeTier, int fuelPerTick, String suffix) {
@@ -37,12 +37,10 @@ public class AlloyForgeryRecipeGenerator {
             .offerTo(exporter, "compat/alloyforgery/" + suffix);
     }
 
-    private static void offerAFAlloyRecipe(RecipeExporter exporter, Item inputA, Item inputB, Item result, int resultCount, int minForgeTier, int fuelPerTick, String suffix) {
-        AlloyForgeryRecipeBuilder.create(result)
-            .input(inputA, 1)
+    private static void offerAFAlloyGemRecipe(RecipeExporter exporter, Item inputA, Item result, int resultCount, int minForgeTier, int fuelPerTick, String suffix) {
+        AlloyForgeryRecipeBuilder.create(result, resultCount)
+            .input(inputA, 2)
             .criterion(RecipeGenerator.hasItem(inputA), RecipeGenerator.conditionsFromItem(inputA))
-            .input(inputB, 1)
-            .criterion(RecipeGenerator.hasItem(inputB), RecipeGenerator.conditionsFromItem(inputB))
             .setMinimumForgeTier(minForgeTier)
             .setFuelPerTick(fuelPerTick)
             .offerTo(exporter, "compat/alloyforgery/" + suffix);
