@@ -7,3 +7,7 @@ accessible method net/minecraft/block/AbstractBlock onUse (Lnet/minecraft/block/
 accessible method net/minecraft/block/BuddingAmethystBlock randomTick (Lnet/minecraft/block/BlockState;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/random/Random;)V
 accessible method net/minecraft/block/ComposterBlock registerCompostableItem (FLnet/minecraft/item/ItemConvertible;)V
 accessible field net/minecraft/client/network/ClientPlayerEntity client Lnet/minecraft/client/MinecraftClient;
+accessible field net/minecraft/item/Item components Lnet/minecraft/component/ComponentMap;
+mutable field net/minecraft/item/Item components Lnet/minecraft/component/ComponentMap;
+accessible method net/minecraft/item/Item$Settings getValidatedComponents ()Lnet/minecraft/component/ComponentMap;
+

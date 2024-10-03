@@ -57,8 +57,8 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
     private static final RawAnimation SILK_ANIM = RawAnimation.begin().thenLoop("silk_touch");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
-    public PromethiumPickaxeItem(ToolMaterial material, TagKey<Block> effectiveBlocks, Settings settings) {
-        super(material, effectiveBlocks, settings);
+    public PromethiumPickaxeItem(ToolMaterial toolMaterial, TagKey<Block> effectiveBlocks, Settings settings) {
+        super(toolMaterial, effectiveBlocks, settings);
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
     

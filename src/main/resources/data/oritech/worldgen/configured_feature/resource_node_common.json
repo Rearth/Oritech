@@ -1,7 +1,8 @@
 {
   "type": "oritech:resource_node",
   "config": {
-    "nodeSize": 5,
+    "nodeSize": 6,
+    "nodeOreChance": 0.4,
     "boulderRadius": 3,
     "nodeOres": [
       "oritech:resource_node_copper",
@@ -12,8 +13,7 @@
       "oritech:resource_node_nickel",
       "oritech:resource_node_nickel",
       "oritech:resource_node_coal",
-      "oritech:resource_node_coal",
-      "minecraft:bedrock"
+      "oritech:resource_node_coal"
     ],
     "boulderOres": [
       "minecraft:deepslate_iron_ore",
@@ -34,6 +34,6 @@
       "minecraft:deepslate"
     ],
     "overlayBlock": "oritech:oil_fluid_block",
-    "overlayHeight": 3
+    "overlayHeight": 5
   }
 }

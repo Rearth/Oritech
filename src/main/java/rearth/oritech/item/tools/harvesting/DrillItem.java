@@ -26,8 +26,8 @@ public class DrillItem extends MiningToolItem implements OritechEnergyItem {
     public static final int BAR_STEP_COUNT = 13;
     private final float energyUsageMultiplier = 10f;
     
-    public DrillItem(ToolMaterial material, TagKey<Block> effectiveBlocks, Item.Settings settings) {
-        super(material, effectiveBlocks, settings);
+    public DrillItem(ToolMaterial toolMaterial, TagKey<Block> effectiveBlocks, Item.Settings settings) {
+        super(toolMaterial, effectiveBlocks, settings);
     }
     
     @Override
