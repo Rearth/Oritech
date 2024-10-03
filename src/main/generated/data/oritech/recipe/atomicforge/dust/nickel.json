@@ -2,10 +2,10 @@
   "type": "oritech:atomic_forge",
   "ingredients": [
     {
-      "item": "oritech:enderic_compound"
+      "item": "oritech:nickel_dust"
     },
     {
-      "item": "oritech:nickel_dust"
+      "item": "oritech:enderic_compound"
     },
     {
       "item": "oritech:enderic_compound"

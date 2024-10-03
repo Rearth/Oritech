@@ -3,6 +3,7 @@ package rearth.oritech.init;
 import io.wispforest.lavender.book.LavenderBookItem;
 import io.wispforest.owo.registration.annotations.IterationIgnored;
 import io.wispforest.owo.registration.reflect.ItemRegistryContainer;
+import net.minecraft.block.ComposterBlock;
 import net.minecraft.component.type.FoodComponents;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.BucketItem;
@@ -25,6 +26,7 @@ import java.util.List;
 public class ItemContent implements ItemRegistryContainer {
 
     @ItemGroupTarget(Groups.components)
+    @Compostable(0.65F)
     public static final Item BANANA = new Item(new Item.Settings().food(FoodComponents.APPLE));
     @ItemGroupTarget(Groups.equipment)
     public static final Item TARGET_DESIGNATOR = new LaserTargetDesignator(new Item.Settings().maxCount(1));
@@ -116,11 +118,13 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item HEISENBERG_COMPENSATOR = new Item(new Item.Settings().maxCount(1));
     public static final Item OVERCHARGED_CRYSTAL = new CustomTooltipItem(new Item.Settings().maxCount(1), "tooltip.oritech.overchargedcrystal");
     public static final Item SUPERCONDUCTOR = new Item(new Item.Settings());
+    @Compostable(1.0F)
     public static final Item PACKED_WHEAT = new Item(new Item.Settings());
     public static final Item QUARTZ_DUST = new Item(new Item.Settings());
     
     // bio
-    public static final Item BIOMASS = new Item(new Item.Settings());
+    @Compostable(0.3F)
+    public static final Item BIOMASS = new Item(new Item.Settings().food(FoodComponents.POISONOUS_POTATO));
     public static final Item SOLID_BIOFUEL = new Item(new Item.Settings());
 
     @Override
@@ -134,6 +138,10 @@ public class ItemContent implements ItemRegistryContainer {
         
         if (!field.isAnnotationPresent(NoModelGeneration.class)) {
             ModelGenerator.autoRegisteredModels.add(value);
+        }
+
+        if (field.isAnnotationPresent(Compostable.class)) {
+            ComposterBlock.registerCompostableItem(field.getAnnotation(Compostable.class).value(), value);
         }
 
         ItemGroups.add(targetGroup, value);
@@ -152,5 +160,11 @@ public class ItemContent implements ItemRegistryContainer {
     @Target({ElementType.FIELD})
     public @interface ItemGroupTarget {
         Groups value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    public @interface Compostable {
+        float value();
     }
 }

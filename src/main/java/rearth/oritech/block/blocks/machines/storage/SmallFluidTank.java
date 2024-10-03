@@ -13,10 +13,15 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -33,9 +38,16 @@ import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
 import rearth.oritech.init.BlockContent;
 
 public class SmallFluidTank extends Block implements BlockEntityProvider {
+    public static final BooleanProperty LIT = Properties.LIT;
     
     public SmallFluidTank(Settings settings) {
         super(settings);
+        this.setDefaultState((BlockState)this.getDefaultState().with(LIT, false));
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(new Property[]{LIT});
     }
     
     @Override

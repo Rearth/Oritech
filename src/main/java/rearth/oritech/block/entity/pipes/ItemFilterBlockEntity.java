@@ -45,7 +45,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
     
     protected final FilterBlockInventory inventory = new FilterBlockInventory(1);
     
-    protected FilterData filterSettings = new FilterData(false, false, new HashMap<>());
+    protected FilterData filterSettings = new FilterData(false, true, new HashMap<>());
     protected BlockApiCache<Storage<ItemVariant>, Direction> lookupCache;
     
     @Override

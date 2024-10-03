@@ -40,6 +40,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.blocks.machines.storage.SmallFluidTank;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -100,6 +101,8 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         super.readNbt(nbt, registryLookup);
         SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
         Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+        // set blockstate when placing a tank
+        markDirty();
     }
     
     @Override
@@ -220,14 +223,20 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     }
     
     public int getComparatorOutput() {
+        if (fluidStorage.isResourceBlank()) return 0;
+
         var fillPercentage = fluidStorage.amount / (float) fluidStorage.getCapacity();
-        return (int) (fillPercentage * 16);
+        return (int) (1 + fillPercentage * 14);
     }
     
     @Override
     public void markDirty() {
         super.markDirty();
         this.netDirty = true;
+        if (world != null) {
+            var blockState = world.getBlockState(getPos());
+            world.setBlockState(getPos(), blockState.with(SmallFluidTank.LIT, isGlowingFluid()));
+        }
     }
     
     @Override
@@ -290,6 +299,10 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     @Override
     public Storage<FluidVariant> getFluidStorage(Direction direction) {
         return fluidStorage;
+    }
+
+    public boolean isGlowingFluid() {
+        return fluidStorage.amount > 0 && fluidStorage.variant.isOf(Fluids.LAVA);
     }
     
     @Override
