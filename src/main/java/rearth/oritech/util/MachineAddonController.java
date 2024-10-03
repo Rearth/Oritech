@@ -20,17 +20,29 @@ import java.util.*;
 public interface MachineAddonController {
     
     List<BlockPos> getConnectedAddons();
+    
     List<BlockPos> getOpenSlots();
+    
     BlockPos getMachinePos();
+    
     World getMachineWorld();
+    
     Direction getFacingForAddon();
+    
     DynamicEnergyStorage getStorageForAddon();
+    
     SimpleInventory getInventoryForAddon();
+    
     ScreenProvider getScreenProvider();
+    
     List<Vec3i> getAddonSlots();
+    
     BaseAddonData getBaseAddonData();
+    
     void setBaseAddonData(BaseAddonData data);
+    
     long getDefaultCapacity();
+    
     long getDefaultInsertRate();
     
     default float getCoreQuality() {
@@ -102,7 +114,7 @@ public interface MachineAddonController {
         for (int i = 0; i < maxIterationCount; i++) {
             if (queuedPositions.isEmpty()) break;
             
-            for(var candidatePos : queuedPositions) {
+            for (var candidatePos : queuedPositions) {
                 if (searchedPositions.contains(candidatePos)) continue;
                 searchedPositions.add(candidatePos);
                 toRemove.add(candidatePos);
@@ -159,10 +171,8 @@ public interface MachineAddonController {
             speed *= addonSettings.speedMultiplier();
             efficiency *= addonSettings.efficiencyMultiplier();
             
-            if (addonSettings.acceptEnergy()) {
-                energyAmount += addonSettings.addedCapacity();
-                energyInsert += addonSettings.addedInsert();
-            }
+            energyAmount += addonSettings.addedCapacity();
+            energyInsert += addonSettings.addedInsert();
             
             getAdditionalStatFromAddon(addon);
         }
@@ -254,9 +264,15 @@ public interface MachineAddonController {
         );
     }
     
-    record AddonBlock(MachineAddonBlock addonBlock, BlockState state, BlockPos pos, AddonBlockEntity addonEntity) {}
-    record BaseAddonData(float speed, float efficiency, long energyBonusCapacity, long energyBonusTransfer) {}
-    record AddonUiData(List<BlockPos> positions, List<BlockPos> openSlots, float efficiency, float speed, BlockPos ownPosition) {}
+    record AddonBlock(MachineAddonBlock addonBlock, BlockState state, BlockPos pos, AddonBlockEntity addonEntity) {
+    }
+    
+    record BaseAddonData(float speed, float efficiency, long energyBonusCapacity, long energyBonusTransfer) {
+    }
+    
+    record AddonUiData(List<BlockPos> positions, List<BlockPos> openSlots, float efficiency, float speed,
+                       BlockPos ownPosition) {
+    }
     
     BaseAddonData DEFAULT_ADDON_DATA = new BaseAddonData(1, 1, 0, 0);
     

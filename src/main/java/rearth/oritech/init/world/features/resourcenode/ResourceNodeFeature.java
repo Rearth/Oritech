@@ -7,6 +7,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.util.math.noise.PerlinNoiseSampler;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.gen.feature.Feature;
@@ -23,7 +25,7 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
     
     @Override
     public boolean generate(FeatureContext<ResourceNodeFeatureConfig> context) {
-        
+
         var world = context.getWorld();
         var origin = context.getOrigin();
         
@@ -75,21 +77,26 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
         
         var radius = context.getConfig().nodeSize();
         var overlayBlock = Registries.BLOCK.get(context.getConfig().overlayBlock()).getDefaultState();
-        
-        for (int x = 0; x < radius; x++) {
-            for (int y = 0; y < radius; y++) {
-                var pos = startPos.add(x, 0, y);
+        var overlayHeight = context.getConfig().overlayHeight();
+
+        var noise = new PerlinNoiseSampler(random);
+
+        // the bottom of the "bowl" should start below the top layer of bedrock
+        BlockPos centerPos = startPos.up(radius - 2);
+
+        for (BlockPos pos : BlockPos.iterateOutwards(centerPos, radius, radius, radius)) {
+            // skip anything outside the radius, or outside the vertical cutoff
+            if (Math.sqrt(pos.getSquaredDistance(centerPos)) + noise.sample(pos.getX(), pos.getY(), pos.getZ()) > radius
+                || pos.getY() >= startPos.getY() + overlayHeight + 3 + noise.sample(pos.getX(), pos.getY() + 2, pos.getZ())) continue;
+            // randomly replace some blocks below bedrock level with resource nodes
+            if (pos.getY() <= startPos.getY() + 1 && random.nextDouble() <= context.getConfig().nodeOreChance()) {
                 world.setBlockState(pos, getRandomBlockFromList(ores, random), 0x10);
-            }
-        }
-        
-        // overlay it with something
-        for (int x = -1; x <= radius; x++) {
-            for (int y = -1; y <= radius; y++) {
-                var pos = startPos.add(x, 0, y);
-                for (int i = 0; i < context.getConfig().overlayHeight(); i++) {
-                    world.setBlockState(pos.up(1 + i), overlayBlock, 0x10);
-                }
+            // set blocks between bedrock and bedrock + overlayHeight to overlayBlock
+            } else if (pos.getY() > startPos.getY() + 1 && pos.getY() <= startPos.getY() + overlayHeight + 1) {
+                world.setBlockState(pos, overlayBlock, 0x10);
+            // set anything between overlay and vertical cutoff to air
+            } else if (pos.getY() > startPos.getY() + 1) {
+                world.setBlockState(pos, Blocks.AIR.getDefaultState(), 0x10);
             }
         }
     }
@@ -98,19 +105,15 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
         
         var world = context.getWorld();
         var random = context.getRandom();
-        var movedCenter = new Vec3d(startPos.getX() - random.nextFloat(), startPos.getY() - random.nextFloat(), startPos.getZ() - random.nextFloat());
         var radius = context.getConfig().boulderRadius();
+        var movedCenter = startPos.offset(Axis.pickRandomAxis(random), random.nextBetween(0, radius-1));
         var ores = context.getConfig().boulderOres();
+
+        var noise = new PerlinNoiseSampler(random);
         
-        for (int x = -radius; x <= radius; x++) {
-            for (int y = -radius; y <= radius; y++) {
-                for (int z = -radius; z <= radius; z++) {
-                    var pos = startPos.add(x, y, z);
-                    var distance = movedCenter.distanceTo(pos.toCenterPos());
-                    if (distance > radius) continue;
-                    world.setBlockState(pos, getRandomBlockFromList(ores, random), 0x10);
-                }
-            }
+        for (BlockPos pos : BlockPos.iterateOutwards(movedCenter, radius, radius, radius)) {
+            if (Math.sqrt(pos.getSquaredDistance(movedCenter)) > radius + noise.sample(pos.getX(), pos.getY(), pos.getZ())) continue;
+            world.setBlockState(pos, getRandomBlockFromList(ores, random), 0x10);
         }
     }
 }
