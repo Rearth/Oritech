@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 0.2,
+  "ingredient": {
+    "item": "mythicmetals:raw_tin"
+  },
+  "result": {
+    "id": "mythicmetals:tin_ingot"
+  }
+}

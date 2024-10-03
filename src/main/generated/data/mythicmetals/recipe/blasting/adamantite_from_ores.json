@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 1.5,
+  "ingredient": [
+    {
+      "item": "mythicmetals:deepslate_adamantite_ore"
+    },
+    {
+      "item": "mythicmetals:adamantite_ore"
+    }
+  ],
+  "result": {
+    "id": "mythicmetals:adamantite_ingot"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "mythicmetals:nuggets_enabled"
+    }
+  ],
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 0.1,
+  "ingredient": [
+    {
+      "item": "mythicmetals:adamantite_helmet"
+    },
+    {
+      "item": "mythicmetals:adamantite_chestplate"
+    },
+    {
+      "item": "mythicmetals:adamantite_leggings"
+    },
+    {
+      "item": "mythicmetals:adamantite_boots"
+    }
+  ],
+  "result": {
+    "id": "mythicmetals:adamantite_nugget"
+  }
+}

@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/crop",
-  "textures": {
-    "crop": "oritech:block/wither_crop_block_stage1"
-  }
-}

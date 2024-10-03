@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 1.0,
+  "ingredient": {
+    "item": "mythicmetals:raw_stormyx"
+  },
+  "result": {
+    "id": "mythicmetals:stormyx_ingot"
+  }
+}

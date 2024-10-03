@@ -1,0 +1,27 @@
+{
+  "feature": "mythicmetals:ore_unobtainium",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 1
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:trapezoid",
+        "max_inclusive": {
+          "absolute": 5
+        },
+        "min_inclusive": {
+          "absolute": -54
+        }
+      }
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

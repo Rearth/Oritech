@@ -1,5 +1,28 @@
 {
   "values": [
-    "oritech:exo_chestplate"
+    "mythicmetals:adamantite_chestplate",
+    "mythicmetals:aquarium_chestplate",
+    "mythicmetals:banglum_chestplate",
+    "mythicmetals:bronze_chestplate",
+    "mythicmetals:carmot_chestplate",
+    "mythicmetals:celestium_chestplate",
+    "mythicmetals:copper_chestplate",
+    "mythicmetals:durasteel_chestplate",
+    "mythicmetals:hallowed_chestplate",
+    "mythicmetals:kyber_chestplate",
+    "mythicmetals:legendary_banglum_chestplate",
+    "mythicmetals:metallurgium_chestplate",
+    "mythicmetals:midas_gold_chestplate",
+    "mythicmetals:mythril_chestplate",
+    "mythicmetals:orichalcum_chestplate",
+    "mythicmetals:osmium_chestplate",
+    "mythicmetals:palladium_chestplate",
+    "mythicmetals:prometheum_chestplate",
+    "mythicmetals:runite_chestplate",
+    "mythicmetals:silver_chestplate",
+    "mythicmetals:star_platinum_chestplate",
+    "mythicmetals:steel_chestplate",
+    "mythicmetals:stormyx_chestplate",
+    "mythicmetals:tidesinger_chestplate"
   ]
 }

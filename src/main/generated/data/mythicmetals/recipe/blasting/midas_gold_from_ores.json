@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 1.0,
+  "ingredient": {
+    "item": "mythicmetals:midas_gold_ore"
+  },
+  "result": {
+    "id": "mythicmetals:midas_gold_ingot"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 0.7,
+  "ingredient": [
+    {
+      "item": "mythicmetals:deepslate_prometheum_ore"
+    },
+    {
+      "item": "mythicmetals:prometheum_ore"
+    }
+  ],
+  "result": {
+    "id": "mythicmetals:prometheum_ingot"
+  }
+}

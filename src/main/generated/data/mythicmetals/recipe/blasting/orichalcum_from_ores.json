@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 1.5,
+  "ingredient": [
+    {
+      "item": "mythicmetals:tuff_orichalcum_ore"
+    },
+    {
+      "item": "mythicmetals:smooth_basalt_orichalcum_ore"
+    },
+    {
+      "item": "mythicmetals:deepslate_orichalcum_ore"
+    },
+    {
+      "item": "mythicmetals:orichalcum_ore"
+    }
+  ],
+  "result": {
+    "id": "mythicmetals:orichalcum_ingot"
+  }
+}

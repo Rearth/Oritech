@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 0.7,
+  "ingredient": {
+    "item": "mythicmetals:quadrillum_ore"
+  },
+  "result": {
+    "id": "mythicmetals:quadrillum_ingot"
+  }
+}

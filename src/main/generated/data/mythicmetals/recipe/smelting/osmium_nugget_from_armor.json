@@ -1,0 +1,28 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "mythicmetals:nuggets_enabled"
+    }
+  ],
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 0.1,
+  "ingredient": [
+    {
+      "item": "mythicmetals:osmium_helmet"
+    },
+    {
+      "item": "mythicmetals:osmium_chestplate"
+    },
+    {
+      "item": "mythicmetals:osmium_leggings"
+    },
+    {
+      "item": "mythicmetals:osmium_boots"
+    }
+  ],
+  "result": {
+    "id": "mythicmetals:osmium_nugget"
+  }
+}

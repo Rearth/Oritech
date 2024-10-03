@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "oritech:block/nickel_plating_block",
-    "side": "oritech:block/nickel_plating_block",
-    "top": "oritech:block/nickel_plating_block"
-  }
-}

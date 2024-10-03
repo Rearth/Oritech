@@ -1,0 +1,27 @@
+{
+  "feature": "mythicmetals:ore_carmot",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 1
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:uniform",
+        "max_inclusive": {
+          "absolute": 10
+        },
+        "min_inclusive": {
+          "absolute": -24
+        }
+      }
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

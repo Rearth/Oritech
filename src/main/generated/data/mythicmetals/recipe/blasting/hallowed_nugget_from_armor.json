@@ -1,0 +1,28 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "mythicmetals:nuggets_enabled"
+    }
+  ],
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 0.1,
+  "ingredient": [
+    {
+      "item": "mythicmetals:hallowed_helmet"
+    },
+    {
+      "item": "mythicmetals:hallowed_chestplate"
+    },
+    {
+      "item": "mythicmetals:hallowed_leggings"
+    },
+    {
+      "item": "mythicmetals:hallowed_boots"
+    }
+  ],
+  "result": {
+    "id": "mythicmetals:hallowed_nugget"
+  }
+}

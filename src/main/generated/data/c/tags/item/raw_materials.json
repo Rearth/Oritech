@@ -1,6 +1,22 @@
 {
   "values": [
-    "oritech:raw_nickel",
-    "oritech:raw_platinum"
+    "#mythicmetals:raw_materials/adamantite",
+    "#mythicmetals:raw_materials/aquarium",
+    "#mythicmetals:raw_materials/banglum",
+    "#mythicmetals:raw_materials/carmot",
+    "#mythicmetals:raw_materials/kyber",
+    "#mythicmetals:raw_materials/manganese",
+    "#mythicmetals:raw_materials/midas_gold",
+    "#mythicmetals:raw_materials/mythril",
+    "#mythicmetals:raw_materials/orichalcum",
+    "#mythicmetals:raw_materials/osmium",
+    "#mythicmetals:raw_materials/palladium",
+    "#mythicmetals:raw_materials/platinum",
+    "#mythicmetals:raw_materials/prometheum",
+    "#mythicmetals:raw_materials/quadrillum",
+    "#mythicmetals:raw_materials/runite",
+    "#mythicmetals:raw_materials/silver",
+    "#mythicmetals:raw_materials/stormyx",
+    "#mythicmetals:raw_materials/tin"
   ]
 }

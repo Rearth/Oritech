@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 1.2,
+  "ingredient": [
+    {
+      "item": "mythicmetals:deepslate_carmot_ore"
+    },
+    {
+      "item": "mythicmetals:carmot_ore"
+    }
+  ],
+  "result": {
+    "id": "mythicmetals:carmot_ingot"
+  }
+}

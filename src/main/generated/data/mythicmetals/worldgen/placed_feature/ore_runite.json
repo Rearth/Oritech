@@ -1,0 +1,27 @@
+{
+  "feature": "mythicmetals:ore_runite",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 1
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:trapezoid",
+        "max_inclusive": {
+          "absolute": 53
+        },
+        "min_inclusive": {
+          "absolute": 39
+        }
+      }
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 1.0,
+  "ingredient": {
+    "item": "mythicmetals:raw_runite"
+  },
+  "result": {
+    "id": "mythicmetals:runite_ingot"
+  }
+}

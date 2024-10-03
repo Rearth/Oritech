@@ -1,0 +1,37 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_material": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "mythicmetals:tuff_orichalcum_ore",
+              "mythicmetals:smooth_basalt_orichalcum_ore",
+              "mythicmetals:deepslate_orichalcum_ore",
+              "mythicmetals:orichalcum_ore"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "mythicmetals:blasting/orichalcum_from_ores"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_material"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "mythicmetals:blasting/orichalcum_from_ores"
+    ]
+  }
+}

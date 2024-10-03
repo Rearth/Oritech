@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 0.7,
+  "ingredient": {
+    "item": "mythicmetals:raw_prometheum"
+  },
+  "result": {
+    "id": "mythicmetals:prometheum_ingot"
+  }
+}

@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "oritech:block/machine_plating_block",
-    "side": "oritech:block/machine_plating_block",
-    "top": "oritech:block/machine_plating_block"
-  }
-}
