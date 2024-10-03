@@ -12,6 +12,8 @@ import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.decorative.TechDoorBlockEntity;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
+import rearth.oritech.block.entity.machines.accelerator.AcceleratorControllerBlockEntity;
+import rearth.oritech.block.entity.machines.accelerator.AcceleratorSensorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.*;
 import rearth.oritech.block.entity.machines.generators.*;
 import rearth.oritech.block.entity.machines.interaction.*;
@@ -135,6 +137,9 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     public static final BlockEntityType<EnchanterBlockEntity> ENCHANTER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(EnchanterBlockEntity::new, BlockContent.ENCHANTER_BLOCK).build();
     
     public static final BlockEntityType<SpawnerControllerBlockEntity> SPAWNER_CONTROLLER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(SpawnerControllerBlockEntity::new, BlockContent.SPAWNER_CONTROLLER_BLOCK).build();
+    
+    public static final BlockEntityType<AcceleratorControllerBlockEntity> ACCELERATOR_CONTROLLER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(AcceleratorControllerBlockEntity::new, BlockContent.ACCELERATOR_CONTROLLER).build();
+    public static final BlockEntityType<AcceleratorSensorBlockEntity> ACCELERATOR_SENSOR_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(AcceleratorSensorBlockEntity::new, BlockContent.ACCELERATOR_SENSOR).build();
     
     public static final BlockEntityType<InventoryProxyAddonBlockEntity> INVENTORY_PROXY_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(InventoryProxyAddonBlockEntity::new, BlockContent.MACHINE_INVENTORY_PROXY_ADDON).build();
     
