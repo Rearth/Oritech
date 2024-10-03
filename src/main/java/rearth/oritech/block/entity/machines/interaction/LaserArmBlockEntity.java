@@ -136,14 +136,16 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
-        if (world.isClient() || !isActive(state) || redstonePowered || (hunterAddons == 0 && currentTarget == null) || energyStorage.getAmount() < energyRequiredToFire())
+        if (world.isClient() || !isActive(state))
             return;
         
-        if (hunterAddons > 0) {
-            fireAtLivingEntities(world, pos, state, blockEntity);
-        }
-        else {
-            fireAtBlocks(world, pos, state, blockEntity);
+        if (!redstonePowered && energyStorage.getAmount() >= energyRequiredToFire()) {
+            if (hunterAddons > 0) {
+                fireAtLivingEntities(world, pos, state, blockEntity);
+            }
+            else if (currentTarget != null) {
+                fireAtBlocks(world, pos, state, blockEntity);
+            }
         }
     
         if (networkDirty)
@@ -324,23 +326,6 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
 
     private boolean validTarget(LivingEntity entity) {
         return entity.isAlive() && canSee(entity) && huntedTarget(entity) && entity.getPos().isInRange(pos.up().toCenterPos(), hunterRange());
-    }
-
-    private boolean huntedTarget(LivingEntity entity) {
-        switch (hunterTargetMode) {
-            // Regardless of mode, laser will always target player to charge energy storing chestplate
-            case HunterTargetMode.HOSTILE_ONLY:
-                return entity instanceof Monster; 
-            case HunterTargetMode.HOSTILE_NEUTRAL:
-                // Not including Allay, Villagers, Trader, Iron Golem, Snow Golem
-                // Also not including pets
-                if ((entity instanceof AnimalEntity animal && animal.getLovingPlayer() == null) || entity instanceof WaterCreatureEntity)
-                    return true;
-                return entity instanceof Monster;
-            case HunterTargetMode.ALL:
-                return true;
-        }
-        return false;
     }
 
     private boolean huntedTarget(LivingEntity entity) {

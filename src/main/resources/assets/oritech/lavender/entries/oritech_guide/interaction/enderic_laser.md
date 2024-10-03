@@ -57,13 +57,13 @@ The laser ignores all input and output limits, and can fill the energy storage o
 **Machine Hunter Addon**
 
 When the enderic laser has a machine hunter addon, it will target mobs instead of blocks. Addon upgrades still work when hunting mobs: the yield addon will make the
-mobs drop more loot, the more hunter addons will extend the target scan range, the crop filter will avoid killing baby animals.
-
-If you are wearing an [exo chestplate](^oritech:tools/exo_armor) then the enderic laser will charge it for you.
+mobs drop more loot, the more hunter addons will extend the target scan range, speed addons will increase the damage done (and reduce the energy efficiency), and the crop filter will avoid killing baby animals.
 
 ;;;;;
 
-** Hunter Targeting **
+If you are wearing an [exo chestplate](^oritech:tools/exo_armor) then the enderic laser will charge it for you.
+
+**Hunter Targeting**
 
 Use a [target designator](^oritech:tools/target_designator) on the enderic laser to change targeting modes. The default is attacking monsters only, but you can also have it attack animals or even wandering traders. Be careful where you use it and how you set the targeting, because you could end up killing things you don't want to kill.
 
