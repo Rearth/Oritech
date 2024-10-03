@@ -61,6 +61,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addDusts(exporter);
         addDecorative(exporter);
         addVanillaAdditions(exporter);
+        addDyes(exporter);
         
         TechRebornRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(TechReborn.MOD_ID))));
         EnergizedPowerRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(EnergizedPowerMod.MODID))));    
@@ -86,6 +87,34 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addAssemblerRecipe(exporter, Ingredient.ofItems(Items.PAPER), Ingredient.ofItems(Items.PAPER), Ingredient.ofItems(Items.PAPER), Ingredient.ofItems(Items.LEATHER), Items.BOOK, 2, 1f, "book");
         // reinforced deepslate
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.DURATIUM_INGOT), Ingredient.ofItems(Items.DEEPSLATE), Items.REINFORCED_DEEPSLATE, 100, "reinfdeepslate");
+        // cobblestone to gravel
+        addPulverizerRecipe(exporter, Ingredient.fromTag(ConventionalItemTags.COBBLESTONES), Items.GRAVEL, "gravel");
+        // gravel to sand
+        addPulverizerRecipe(exporter, Ingredient.ofItems(Items.GRAVEL), Items.SAND, "sand_from_gravel");
+        // sandstone to sand
+        addPulverizerRecipe(exporter, Ingredient.fromTag(ConventionalItemTags.SANDSTONE_BLOCKS), Items.SAND, "sand_from_sandstone");
+        // red sandstone to red sand
+        addPulverizerRecipe(exporter, Ingredient.fromTag(ConventionalItemTags.RED_SANDSTONE_BLOCKS), Items.RED_SAND, "red_sand");
+        // centrifuge dirt into clay
+        addCentrifugeFluidRecipe(exporter, Ingredient.fromTag(ItemTags.DIRT), Items.CLAY, Fluids.WATER, 0.25f, null, 0, 1.0f, "clay");
+        // create dirt from sand + biomass
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, Items.DIRT, 2).input('s', Items.SAND).input('b', ItemContent.BIOMASS).pattern("sb").pattern("bs").criterion(hasItem(ItemContent.BIOMASS), conditionsFromItem(ItemContent.BIOMASS)).offerTo(exporter);
+        // dripstone from dripstone block
+        addPulverizerRecipe(exporter, Ingredient.ofItems(Items.DRIPSTONE_BLOCK), Items.POINTED_DRIPSTONE, 4, "dripstone");
+        addGrinderRecipe(exporter, Ingredient.ofItems(Items.DRIPSTONE_BLOCK), Items.POINTED_DRIPSTONE, 4, "dripstone");
+    }
+
+    private void addDyes(RecipeExporter exporter) {
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RAW_WHITE_DYE), Items.WHITE_DYE, "dyes/white");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RAW_LIGHT_GRAY_DYE), Items.WHITE_DYE, "dyes/light_gray");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RAW_BLACK_DYE), Items.WHITE_DYE, "dyes/black");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RAW_RED_DYE), Items.WHITE_DYE, "dyes/red");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RAW_ORANGE_DYE), Items.WHITE_DYE, "dyes/orange");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RAW_YELLOW_DYE), Items.WHITE_DYE, "dyes/yellow");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RAW_CYAN_DYE), Items.WHITE_DYE, "dyes/cyan");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RAW_BLUE_DYE), Items.WHITE_DYE, "dyes/blue");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RAW_MAGENTA_DYE), Items.WHITE_DYE, "dyes/magenta");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RAW_PINK_DYE), Items.WHITE_DYE, "dyes/pink");
     }
     
     private void addDeepDrillOres(RecipeExporter exporter) {
@@ -123,6 +152,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // biomass
         addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.BIOMASS), ItemContent.BIOMASS, 1, "biobasic");
         addPulverizerRecipe(exporter, Ingredient.ofItems(ItemContent.PACKED_WHEAT), ItemContent.BIOMASS, 16, "packagedwheatbio");
+        addPulverizerRecipe(exporter, Ingredient.ofItems(Items.HAY_BLOCK), ItemContent.BIOMASS, 16, "hay_block");
         addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.BIOMASS), Ingredient.ofItems(ItemContent.BIOMASS), Ingredient.ofItems(ItemContent.BIOMASS), Ingredient.fromTag(ItemTags.PLANKS), ItemContent.SOLID_BIOFUEL, 1, "solidbiofuel");
     }
     
@@ -339,6 +369,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // plastic
         offer2x2CompactingRecipe(exporter, RecipeCategory.MISC, ItemContent.PACKED_WHEAT, Items.WHEAT);
         addCentrifugeFluidRecipe(exporter, Ingredient.ofItems(ItemContent.PACKED_WHEAT), ItemContent.RAW_BIOPOLYMER, Fluids.WATER, 0.25f, null, 0, 1f, "biopolymer");
+        addCentrifugeFluidRecipe(exporter, Ingredient.ofItems(ItemContent.SOLID_BIOFUEL), ItemContent.RAW_BIOPOLYMER, Fluids.WATER, 0.25f, null, 0, 1f, "biopolymer_biomass");
         addCentrifugeFluidRecipe(exporter, Ingredient.fromTag(ItemTags.SAND), ItemContent.POLYMER_RESIN, FluidContent.STILL_OIL, 0.1f, null, 0, 0.5f, "polymerresin");
         addCentrifugeFluidRecipe(exporter, Ingredient.ofItems(ItemContent.RAW_BIOPOLYMER), ItemContent.PLASTIC_SHEET, Fluids.WATER, 0.5f, null, 0, 1f, "plasticoil");
         addCentrifugeFluidRecipe(exporter, Ingredient.ofItems(ItemContent.POLYMER_RESIN), ItemContent.PLASTIC_SHEET, Fluids.WATER, 0.5f, null, 0, 0.33f, "plasticbio");
@@ -643,7 +674,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
     
     // A is inserted twice, surrounding B
     private void addAtomicForgeRecipe(RecipeExporter exporter, Ingredient A, Ingredient B, Item result, int time, String suffix) {
-        var entry = new OritechRecipe(time, List.of(A, B, A), List.of(new ItemStack(result)), RecipeContent.ATOMIC_FORGE, null, null);
+        var entry = new OritechRecipe(time, List.of(B, A, A), List.of(new ItemStack(result)), RecipeContent.ATOMIC_FORGE, null, null);
         exporter.accept(Oritech.id("atomicforge/" + suffix), entry, null);
     }
     
@@ -689,7 +720,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         var centrifugeClumpWet = new OritechRecipe((int) (600 * timeMultiplier), List.of(Ingredient.ofItems(clump)), List.of(new ItemStack(dust, 2)), RecipeContent.CENTRIFUGE_FLUID, new FluidStack(Fluids.WATER, 81000), null);
         
         // gems
-        var atomicForgeDust = new OritechRecipe(3, List.of(gemCatalyst, Ingredient.ofItems(dust), gemCatalyst), List.of(new ItemStack(gem, 1)), RecipeContent.ATOMIC_FORGE, null, null);
+        var atomicForgeDust = new OritechRecipe(3, List.of(Ingredient.ofItems(dust), gemCatalyst, gemCatalyst), List.of(new ItemStack(gem, 1)), RecipeContent.ATOMIC_FORGE, null, null);
         var foundryGem = new OritechRecipe(800, List.of(Ingredient.ofItems(gem), Ingredient.ofItems(gem)), List.of(new ItemStack(ingot, 4)), RecipeContent.FOUNDRY, null, null);
         
         // smelting/compacting

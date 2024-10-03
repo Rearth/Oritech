@@ -2,10 +2,10 @@
   "type": "oritech:atomic_forge",
   "ingredients": [
     {
-      "item": "oritech:duratium_ingot"
+      "item": "minecraft:deepslate"
     },
     {
-      "item": "minecraft:deepslate"
+      "item": "oritech:duratium_ingot"
     },
     {
       "item": "oritech:duratium_ingot"

@@ -71,6 +71,16 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new SmallStorageBlockEntity(pos, state);
     }
+
+    @Override
+    protected boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+    
+    @Override
+    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return ((SmallStorageBlockEntity) world.getBlockEntity(pos)).getComparatorOutput();
+    }
     
     @Override
     public boolean emitsRedstonePower(BlockState state) {

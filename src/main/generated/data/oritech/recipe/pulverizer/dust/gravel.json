@@ -1,0 +1,15 @@
+{
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "tag": "c:cobblestones"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:gravel"
+    }
+  ],
+  "time": 300
+}

@@ -439,7 +439,7 @@ public class NetworkContent {
             }
             
         }));
-        
+
         UI_CHANNEL.registerServerbound(EnchanterSelectionPacket.class, ((message, access) -> {
             
             var entity = access.player().getWorld().getBlockEntity(message.position);

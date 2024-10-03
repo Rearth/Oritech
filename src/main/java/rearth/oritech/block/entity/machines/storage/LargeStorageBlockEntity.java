@@ -56,7 +56,8 @@ public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBl
     
     @Override
     public int getComparatorEnergyAmount() {
-        return (int) ((energyStorage.amount / (float) energyStorage.capacity) * 15);
+        if (energyStorage.amount == 0) return 0;
+        return (int) (1 + ((energyStorage.amount / (float) energyStorage.capacity) * 14));
     }
     
     @Override
@@ -66,7 +67,7 @@ public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBl
         var stack = inventory.getStack(slot);
         if (stack.isEmpty()) return 0;
         
-        return (int) ((stack.getCount() / (float) stack.getMaxCount()) * 15);
+        return (int) (1 + (stack.getCount() / (float) stack.getMaxCount()) * 15);
     }
     
     @Override

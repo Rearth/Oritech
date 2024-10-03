@@ -2,10 +2,10 @@
   "type": "oritech:atomic_forge",
   "ingredients": [
     {
-      "item": "oritech:overcharged_crystal"
+      "item": "oritech:heisenberg_compensator"
     },
     {
-      "item": "oritech:heisenberg_compensator"
+      "item": "oritech:overcharged_crystal"
     },
     {
       "item": "oritech:overcharged_crystal"

@@ -2,10 +2,10 @@
   "type": "oritech:atomic_forge",
   "ingredients": [
     {
-      "tag": "c:silicon"
+      "tag": "c:carbon_fibre"
     },
     {
-      "tag": "c:carbon_fibre"
+      "tag": "c:silicon"
     },
     {
       "tag": "c:silicon"
