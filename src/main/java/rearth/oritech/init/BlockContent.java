@@ -24,6 +24,7 @@ import rearth.oritech.block.blocks.machines.addons.SteamBoilerAddonBlock;
 import rearth.oritech.block.blocks.machines.generators.*;
 import rearth.oritech.block.blocks.machines.interaction.*;
 import rearth.oritech.block.blocks.machines.processing.*;
+import rearth.oritech.block.blocks.machines.storage.CreativeStorageBlock;
 import rearth.oritech.block.blocks.machines.storage.LargeStorageBlock;
 import rearth.oritech.block.blocks.machines.storage.SmallFluidTank;
 import rearth.oritech.block.blocks.machines.storage.SmallStorageBlock;
@@ -114,6 +115,9 @@ public class BlockContent implements BlockRegistryContainer {
     @DispenserPlace
     public static final Block SMALL_STORAGE_BLOCK = new SmallStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY));
     public static final Block LARGE_STORAGE_BLOCK = new LargeStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @NoAutoDrop
+    @DispenserPlace
+    public static final Block CREATIVE_STORAGE_BLOCK = new CreativeStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).hardness(-1.0F));
     @NoAutoDrop
     @DispenserPlace
     public static final Block SMALL_TANK_BLOCK = new SmallFluidTank(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY).luminance(Blocks.createLightLevelFromLitBlockState(15)));

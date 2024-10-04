@@ -19,6 +19,7 @@ import rearth.oritech.block.entity.machines.addons.*;
 import rearth.oritech.block.entity.machines.generators.*;
 import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.*;
+import rearth.oritech.block.entity.machines.storage.CreativeStorageBlockEntity;
 import rearth.oritech.block.entity.machines.storage.LargeStorageBlockEntity;
 import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
 import rearth.oritech.block.entity.machines.storage.SmallStorageBlockEntity;
@@ -153,6 +154,9 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<LargeStorageBlockEntity> LARGE_STORAGE_ENTITY = FabricBlockEntityTypeBuilder.create(LargeStorageBlockEntity::new, BlockContent.LARGE_STORAGE_BLOCK).build();
+    @AssignSidedInventory
+    @AssignSidedEnergy
+    public static final BlockEntityType<CreativeStorageBlockEntity> CREATIVE_STORAGE_ENTITY = FabricBlockEntityTypeBuilder.create(CreativeStorageBlockEntity::new, BlockContent.CREATIVE_STORAGE_BLOCK).build();
     
     @AssignSidedInventory
     @AssignSidedFluid

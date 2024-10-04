@@ -251,6 +251,7 @@
   "block.oritech.drone_port_block": "无人机港",
   "block.oritech.small_storage_block": "便携能量存储",
   "block.oritech.large_storage_block": "大型能量存储",
+  "block.oritech.creative_storage_block": "创造能量存储",
   "block.oritech.small_tank_block": "便携储罐",
   "block.oritech.placer_block": "方块放置器",
   "block.oritech.destroyer_block": "方块破坏器",

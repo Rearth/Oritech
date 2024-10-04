@@ -322,6 +322,7 @@
   "block.oritech.drone_port_block": "Drone Port",
   "block.oritech.small_storage_block": "Portable Energy Storage",
   "block.oritech.large_storage_block": "Large Energy Storage",
+  "block.oritech.creative_storage_block": "Creative Energy Storage",
   "block.oritech.small_tank_block": "Portable Tank",
   "block.oritech.placer_block": "Placer Block",
   "block.oritech.destroyer_block": "Destroyer Block",

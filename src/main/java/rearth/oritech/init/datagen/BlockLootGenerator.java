@@ -58,6 +58,7 @@ public class BlockLootGenerator extends FabricBlockLootTableProvider {
 
         addCustomDataDrop(BlockContent.SMALL_TANK_BLOCK);
         addCustomDataDrop(BlockContent.SMALL_STORAGE_BLOCK);
+        addCustomDataDrop(BlockContent.CREATIVE_STORAGE_BLOCK);
         
         LootCondition.Builder cropDropBuilder = BlockStatePropertyLootCondition.builder(BlockContent.WITHER_CROP_BLOCK)
                                            .properties(StatePredicate.Builder.create().exactMatch(CropBlock.AGE, 7));
