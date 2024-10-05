@@ -2,6 +2,7 @@ package rearth.oritech.block.blocks.machines.accelerator;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.entity.player.PlayerEntity;
@@ -50,6 +51,11 @@ public class AcceleratorPassthroughBlock extends HorizontalFacingBlock {
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         super.onDestroyedByExplosion(world, pos, explosion);
         AcceleratorParticleLogic.resetCachedGate(pos);
+    }
+    
+    @Override
+    protected BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
     }
     
     @Override

@@ -133,7 +133,7 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block WITHER_CROP_BLOCK = new WitheredCropBlock(FabricBlockSettings.copyOf(Blocks.WHEAT));
     
     public static final Block ACCELERATOR_RING = new AcceleratorRingBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
-    public static final Block ACCELERATOR_MOTOR = new AcceleratorMotorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block ACCELERATOR_MOTOR = new AcceleratorMotorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().notSolid());
     public static final Block ACCELERATOR_CONTROLLER = new AcceleratorControllerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block ACCELERATOR_SENSOR = new AcceleratorSensorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     

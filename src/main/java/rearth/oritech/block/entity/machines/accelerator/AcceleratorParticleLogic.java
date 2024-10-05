@@ -257,7 +257,7 @@ public class AcceleratorParticleLogic {
     }
     
     public static float getMaxGateDist(float speed) {
-        return (float) Math.clamp(Math.sqrt(speed), 2, 8);
+        return (float) Math.clamp(Math.sqrt(speed) / 2, 2, 10);
     }
     
     public static float getRequiredBendDist(float speed) {

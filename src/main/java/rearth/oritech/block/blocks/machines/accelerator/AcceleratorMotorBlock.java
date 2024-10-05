@@ -1,7 +1,6 @@
 package rearth.oritech.block.blocks.machines.accelerator;
 
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
@@ -10,6 +9,8 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.accelerator.AcceleratorMotorBlockEntity;
 
@@ -19,6 +20,11 @@ public class AcceleratorMotorBlock extends AcceleratorPassthroughBlock implement
     
     public AcceleratorMotorBlock(Settings settings) {
         super(settings);
+    }
+    
+    @Override
+    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return Block.createCuboidShape(0, 0, 0, 16, 7, 16);
     }
     
     @Nullable
