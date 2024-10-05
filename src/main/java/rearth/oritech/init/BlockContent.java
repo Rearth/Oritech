@@ -24,10 +24,7 @@ import rearth.oritech.block.blocks.machines.addons.SteamBoilerAddonBlock;
 import rearth.oritech.block.blocks.machines.generators.*;
 import rearth.oritech.block.blocks.machines.interaction.*;
 import rearth.oritech.block.blocks.machines.processing.*;
-import rearth.oritech.block.blocks.machines.storage.CreativeStorageBlock;
-import rearth.oritech.block.blocks.machines.storage.LargeStorageBlock;
-import rearth.oritech.block.blocks.machines.storage.SmallFluidTank;
-import rearth.oritech.block.blocks.machines.storage.SmallStorageBlock;
+import rearth.oritech.block.blocks.machines.storage.*;
 import rearth.oritech.block.blocks.pipes.*;
 import rearth.oritech.block.fluid.MineralFluidBlock;
 import rearth.oritech.init.datagen.BlockLootGenerator;
@@ -121,6 +118,10 @@ public class BlockContent implements BlockRegistryContainer {
     @NoAutoDrop
     @DispenserPlace
     public static final Block SMALL_TANK_BLOCK = new SmallFluidTank(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY).luminance(Blocks.createLightLevelFromLitBlockState(15)));
+
+    @NoAutoDrop
+    @DispenserPlace
+    public static final Block CREATIVE_TANK_BLOCK = new CreativeFluidTank(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).luminance(Blocks.createLightLevelFromLitBlockState(15)).hardness(-1.0F));
     
     public static final Block PLACER_BLOCK = new PlacerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block DESTROYER_BLOCK = new DestroyerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());

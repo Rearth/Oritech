@@ -57,6 +57,7 @@ public class BlockLootGenerator extends FabricBlockLootTableProvider {
         addDrop(BlockContent.ENERGY_PIPE_CONNECTION, BlockContent.ENERGY_PIPE);
 
         addCustomDataDrop(BlockContent.SMALL_TANK_BLOCK);
+        addCustomDataDrop(BlockContent.CREATIVE_TANK_BLOCK);
         addCustomDataDrop(BlockContent.SMALL_STORAGE_BLOCK);
         addCustomDataDrop(BlockContent.CREATIVE_STORAGE_BLOCK);
         

@@ -253,6 +253,7 @@
   "block.oritech.large_storage_block": "大型能量存储",
   "block.oritech.creative_storage_block": "创造能量存储",
   "block.oritech.small_tank_block": "便携储罐",
+  "block.oritech.creative_tank_block": "创造储罐",
   "block.oritech.placer_block": "方块放置器",
   "block.oritech.destroyer_block": "方块破坏器",
   "block.oritech.fertilizer_block": "方块施肥器",

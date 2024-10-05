@@ -55,51 +55,48 @@ import rearth.oritech.util.SimpleSidedInventory;
 import java.util.Arrays;
 import java.util.List;
 
-public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<SmallFluidTankEntity> {
-    
+public class CreativeFluidTankEntity extends BlockEntity implements FluidProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<CreativeFluidTankEntity> {
+
     private boolean netDirty = false;
     private int lastComparatorOutput = 0;
+    private boolean hasFluid = false;
 
     public final SimpleSidedInventory inventory = new SimpleSidedInventory(2, new InventorySlotAssignment(0, 1, 1, 1)) {
         @Override
         public void markDirty() {
-            SmallFluidTankEntity.this.markDirty();
+            CreativeFluidTankEntity.this.markDirty();
         }
     };
-    
+
     private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
         @Override
         protected FluidVariant getBlankVariant() {
             return FluidVariant.blank();
         }
-        
+
         @Override
         protected long getCapacity(FluidVariant variant) {
-            return (Oritech.CONFIG.portableTankCapacityBuckets() * FluidConstants.BUCKET);
+            return Long.MAX_VALUE;
         }
-        
+
         @Override
         protected void onFinalCommit() {
             super.onFinalCommit();
-            SmallFluidTankEntity.this.markDirty();
+            CreativeFluidTankEntity.this.markDirty();
         }
     };
 
-    public SingleVariantStorage<FluidVariant> getOwnFluidStorage() {
-        return fluidStorage;
+    public CreativeFluidTankEntity(BlockPos pos, BlockState state) {
+        super(BlockEntitiesContent.CREATIVE_TANK_ENTITY, pos, state);
     }
-    
-    public SmallFluidTankEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.SMALL_TANK_ENTITY, pos, state);
-    }
-    
+
     @Override
     public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
         Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
     }
-    
+
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
@@ -108,64 +105,68 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         // set blockstate when placing a tank
         markDirty();
     }
-    
+
     @Override
     protected void addComponents(ComponentMap.Builder componentMapBuilder) {
         super.addComponents(componentMapBuilder);
     }
-    
+
     @Override
     protected void readComponents(ComponentsAccess components) {
         super.readComponents(components);
     }
-    
+
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, SmallFluidTankEntity blockEntity) {
+    public void tick(World world, BlockPos pos, BlockState state, CreativeFluidTankEntity blockEntity) {
         // fill/drain buckets
-        
+
         if (world.isClient) return;
-        
+
         if (world.getTime() % 100 == 0) netDirty = true;    // to ensure this syncs when no charges are triggered, and inventory isn't opened
-        
+
+        // automatically refill or empty
+        if (hasFluid) fluidStorage.amount = fluidStorage.getCapacity() - FluidConstants.BUCKET;  //
+        else fluidStorage.amount = 0;
+
         processBuckets();
-        
+
         if ((world.getTime() + this.pos.getY()) % 20 == 0 && fluidStorage.amount > 0)
             outputToBelow();
-        
+
         if (netDirty) {
             updateComparators(world, pos, state);
             updateNetwork();
         }
-        
+
     }
-    
+
     private void outputToBelow() {
         var tankCandidate = world.getBlockEntity(pos.down(), BlockEntitiesContent.SMALL_TANK_ENTITY);
-        
+
         if (tankCandidate.isEmpty()) return;
         var belowTank = tankCandidate.get();
         var ownTank = this.fluidStorage;
-        var targetTank = belowTank.fluidStorage;
-        
+        var targetTank = belowTank.getOwnFluidStorage();
+
         try (var tx = Transaction.openOuter()) {
             var transferAmount = targetTank.insert(ownTank.variant, ownTank.amount, tx);
             var extracted = ownTank.extract(ownTank.variant, transferAmount, tx);
             if (transferAmount > 0 && transferAmount == extracted)
                 tx.commit();
         }
-        
+
     }
-    
-    
+
+
     private void updateComparators(World world, BlockPos pos, BlockState state) {
         var previous = lastComparatorOutput;
         lastComparatorOutput = getComparatorOutput();
-        
+
         if (previous != lastComparatorOutput) {
             world.updateComparators(pos, state.getBlock());
         }
     }
-    
+
     private void processBuckets() {
         var inStack = inventory.getStack(0);
 
@@ -210,29 +211,29 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
                 inventory.heldStacks.set(0, inStack);
                 tx.commit();
             }
-            
+
             // shouldn't be necessary, since tx.commit should already be marking this dirty
             this.markDirty();
         }
     }
-    
+
     private void updateNetwork() {
         netDirty = false;
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SingleVariantFluidSyncPacket(pos, Registries.FLUID.getId(fluidStorage.variant.getFluid()).toString(), fluidStorage.amount));
     }
-    
+
     private boolean outputCanAcceptBucket(ItemStack bucket) {
         var slot = inventory.getStack(1);
         return (slot.isEmpty() || (slot.isStackable() && ItemStack.areItemsAndComponentsEqual(slot, bucket) && slot.getCount() < slot.getMaxCount()));
     }
-    
+
     public int getComparatorOutput() {
         if (fluidStorage.isResourceBlank()) return 0;
 
         var fillPercentage = fluidStorage.amount / (float) fluidStorage.getCapacity();
         return (int) (1 + fillPercentage * 14);
     }
-    
+
     @Override
     public void markDirty() {
         super.markDirty();
@@ -242,64 +243,64 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
             world.setBlockState(getPos(), blockState.with(SmallFluidTank.LIT, isGlowingFluid()));
         }
     }
-    
+
     @Override
     public Object getScreenOpeningData(ServerPlayerEntity player) {
         return new ModScreens.BasicData(pos);
     }
-    
+
     @Override
     public Text getDisplayName() {
         return Text.of("");
     }
-    
+
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         this.markDirty();
         return new BasicMachineScreenHandler(syncId, playerInventory, this);
     }
-    
+
     @Override
     public InventoryStorage getInventory(Direction direction) {
         return InventoryStorage.of(inventory, direction);
     }
-    
+
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(new GuiSlot(0, 50, 40), new GuiSlot(1, 100, 40, true));
     }
-    
+
     @Override
     public BarConfiguration getFluidConfiguration() {
         return new BarConfiguration(70, 18, 21, 60);
     }
-    
+
     @Override
     public float getDisplayedEnergyUsage() {
         return 0;
     }
-    
+
     @Override
     public float getProgress() {
         return 0;
     }
-    
+
     @Override
     public InventoryInputMode getInventoryInputMode() {
         return InventoryInputMode.FILL_LEFT_TO_RIGHT;
     }
-    
+
     @Override
     public Inventory getDisplayedInventory() {
         return inventory;
     }
-    
+
     @Override
     public ScreenHandlerType<?> getScreenHandlerType() {
         return ModScreens.TANK_SCREEN;
     }
-    
+
     @Override
     public Storage<FluidVariant> getFluidStorage(Direction direction) {
         return fluidStorage;
@@ -308,24 +309,44 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     public boolean isGlowingFluid() {
         return fluidStorage.amount > 0 && fluidStorage.variant.isOf(Fluids.LAVA);
     }
-    
+
     @Override
     public @Nullable SingleVariantStorage<FluidVariant> getForDirectFluidAccess() {
         return fluidStorage;
     }
-    
+
     @Override
     public boolean showEnergy() {
         return false;
     }
-    
+
     @Override
     public boolean showProgress() {
         return false;
     }
-    
+
     @Override
     public boolean inputOptionsEnabled() {
         return false;
     }
+
+    public void setFluid(Fluid fluid) {
+        try (var tx = Transaction.openOuter()) {
+            fluidStorage.variant = FluidVariant.of(fluid);
+            hasFluid = true;
+            tx.commit();
+        }
+        this.markDirty();
+    }
+
+    public void removeFluid() {
+        try (var tx = Transaction.openOuter()) {
+            fluidStorage.variant = FluidVariant.blank();
+            hasFluid = false;
+            tx.commit();
+        }
+        this.markDirty();
+    }
+
+
 }
