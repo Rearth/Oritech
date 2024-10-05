@@ -56,6 +56,7 @@ public class NetworkContent {
     }
     
     public record AcceleratorParticleRenderPacket(BlockPos position, List<Vec3d> particleTrail) {}
+    public record AcceleratorParticleInsertEventPacket(BlockPos position) {}
     
     public record DroneCardEventPacket(BlockPos position, String message) {
     }
@@ -271,7 +272,27 @@ public class NetworkContent {
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
             if (entity instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
-                acceleratorBlock.setDisplayTrail(message.particleTrail);
+                acceleratorBlock.onReceiveMovement(message.particleTrail);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(AcceleratorControllerBlockEntity.LastEventPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position());
+            
+            if (entity instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
+                acceleratorBlock.onReceivedEvent(message);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(AcceleratorParticleInsertEventPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position());
+            
+            if (entity instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
+                acceleratorBlock.onParticleInsertedClient();
             }
             
         }));

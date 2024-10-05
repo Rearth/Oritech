@@ -1,32 +1,45 @@
 package rearth.oritech.block.entity.machines.accelerator;
 
 import io.wispforest.owo.util.VectorRandomUtils;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.client.ui.AcceleratorScreenHandler;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.SoundContent;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 
 import java.util.List;
 
-public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity>, InventoryProvider {
+public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity>, InventoryProvider, ExtendedScreenHandlerFactory, ScreenProvider {
     
     private static final int RF_ACCELERATE_COST = 10;
     
@@ -36,9 +49,11 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     private AcceleratorParticleLogic particleLogic;
     
     private final SimpleInventory inventory = new SimpleSidedInventory(2, new InventorySlotAssignment(0, 1, 1, 1));   // 0 = input, 1 = output
-
+    
     // client data
     public List<Vec3d> displayTrail;
+    public LastEventPacket lastEvent = new LastEventPacket(pos, ParticleEvent.IDLE, 0, pos, 1, ItemStack.EMPTY);
+    private MovingSoundInstance movingSound;
     
     public AcceleratorControllerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ACCELERATOR_CONTROLLER_BLOCK_ENTITY, pos, state);
@@ -57,9 +72,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         if (particle != null)
             particleLogic.update(particle);
         
-        
     }
-    
     private void initParticleLogic() {
         if (particleLogic == null) particleLogic = new AcceleratorParticleLogic(pos, (ServerWorld) world, this);
     }
@@ -76,6 +89,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             var nextGate = particleLogic.findNextGate(startPosition, directionRight, 1);
             particle = new AcceleratorParticleLogic.ActiveParticle(startPosition.toCenterPos(), 1, nextGate, startPosition);
             activeItemParticle = inventory.getStack(0).split(1);
+            
+            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AcceleratorParticleInsertEventPacket(pos));
         }
     }
     
@@ -84,7 +99,11 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         this.activeItemParticle = ItemStack.EMPTY;
     }
     
-    public void onParticleExited(Vec3d from, Vec3d to, BlockPos lastGate, Vec3d exitDirection) {
+    public void onParticleExited(Vec3d from, Vec3d to, BlockPos lastGate, Vec3d exitDirection, ParticleEvent reason) {
+        
+        var eventPosition = BlockPos.ofFloored(particle.position);
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new LastEventPacket(pos, reason, particle.velocity, eventPosition, particle.lastBendDistance + particle.lastBendDistance2, activeItemParticle));
+        
         this.particle = null;
         
         var renderedTrail = List.of(from, to);
@@ -94,6 +113,9 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     public void onParticleCollided(float relativeSpeed, Vec3d collision, BlockPos secondController, AcceleratorControllerBlockEntity secondControllerEntity) {
         
         var success = tryCraftResult(relativeSpeed, activeItemParticle, secondControllerEntity.activeItemParticle);
+        
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new LastEventPacket(pos, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.ofFloored(particle.position), particle.lastBendDistance + particle.lastBendDistance2, activeItemParticle));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new LastEventPacket(secondController, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.ofFloored(particle.position), particle.lastBendDistance + particle.lastBendDistance2, activeItemParticle));
         
         this.removeParticleDueToCollision();
         secondControllerEntity.removeParticleDueToCollision();
@@ -138,17 +160,34 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     public void onParticleMoved(List<Vec3d> positions) {
-        if (positions.size() > 1) {
-            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AcceleratorParticleRenderPacket(pos, positions));
-        }
+        
+        if (positions.size() <= 1) return;
+        
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AcceleratorParticleRenderPacket(pos, positions));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new LastEventPacket(pos, ParticleEvent.ACCELERATING, particle.velocity, BlockPos.ofFloored(particle.position), particle.lastBendDistance + particle.lastBendDistance2, activeItemParticle));
+        
     }
     
     public AcceleratorParticleLogic.ActiveParticle getParticle() {
         return particle;
     }
     
-    public void setDisplayTrail(List<Vec3d> displayTrail) {
+    public void onParticleInsertedClient() {
+        var soundPos = pos.toCenterPos();
+        world.playSound(soundPos.x, soundPos.y, soundPos.z, SoundContent.CABLE_MOVING, SoundCategory.BLOCKS, 1f, 1f, true);
+    }
+    
+    public void onReceiveMovement(List<Vec3d> displayTrail) {
         this.displayTrail = displayTrail;
+        
+        if (displayTrail.size() >= 2) {
+            var pitch = Math.pow(lastEvent.lastEventSpeed, 0.1);
+            for (int i = 1; i < displayTrail.size(); i++) {
+                var soundPos = displayTrail.get(i);
+                world.playSound(soundPos.x, soundPos.y, soundPos.z, SoundContent.PARTICLE_MOVING, SoundCategory.BLOCKS, 2f, (float) pitch, true);
+            }
+        }
+        
     }
     
     // returns the amount of moment used
@@ -200,8 +239,102 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         
     }
     
+    public void onReceivedEvent(LastEventPacket event) {
+        this.lastEvent = event;
+        
+        var soundPos = event.lastEventPosition.toCenterPos();
+        if (event.lastEvent.equals(ParticleEvent.COLLIDED)) {
+            world.playSound(soundPos.x, soundPos.y, soundPos.z, SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.BLOCKS, 5f, 1, true);
+        } else if (event.lastEvent.equals(ParticleEvent.EXITED_FAST) || event.lastEvent.equals(ParticleEvent.EXITED_NO_GATE)) {
+            world.playSound(soundPos.x, soundPos.y, soundPos.z, SoundEvents.ENTITY_WIND_CHARGE_WIND_BURST.value(), SoundCategory.BLOCKS, 3f, 1, true);
+        }
+        
+    }
+    
     @Override
     public InventoryStorage getInventory(Direction direction) {
         return InventoryStorage.of(inventory, direction);
+    }
+    
+    @Override
+    public Object getScreenOpeningData(ServerPlayerEntity player) {
+        return new ModScreens.BasicData(pos);
+    }
+    
+    @Override
+    public Text getDisplayName() {
+        return Text.literal("");
+    }
+    
+    @Nullable
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+        return new AcceleratorScreenHandler(syncId, playerInventory, this);
+    }
+    
+    @Override
+    public List<GuiSlot> getGuiSlots() {
+        return List.of(new GuiSlot(0, 7, 10),
+          new GuiSlot(1, 7, 60, true));
+    }
+    
+    @Override
+    public boolean showEnergy() {
+        return false;
+    }
+    
+    @Override
+    public float getDisplayedEnergyUsage() {
+        return 0;
+    }
+    
+    @Override
+    public float getProgress() {
+        return 0;
+    }
+    
+    @Override
+    public InventoryInputMode getInventoryInputMode() {
+        return InventoryInputMode.FILL_LEFT_TO_RIGHT;
+    }
+    
+    @Override
+    public Inventory getDisplayedInventory() {
+        return inventory;
+    }
+    
+    @Override
+    public ScreenHandlerType<?> getScreenHandlerType() {
+        return ModScreens.ACCELERATOR_SCREEN;
+    }
+    
+    @Override
+    public boolean inputOptionsEnabled() {
+        return false;
+    }
+    
+    @Override
+    public boolean showProgress() {
+        return false;
+    }
+    
+    public record LastEventPacket(BlockPos position,
+                                  ParticleEvent lastEvent,
+// for no gate found events, we can calculate the acceptable dist based on speed
+                                  float lastEventSpeed,
+// this is particle speed usually, and collision speed for collisions
+                                  BlockPos lastEventPosition,  // where it collided/exited
+                                  float minBendDist,   // acceptable dist can be calculated from dist
+                                  ItemStack activeParticle
+    ) {
+    }
+    
+    public enum ParticleEvent {
+        IDLE,   // nothing was insert yet
+        ERROR,  // no ring was found
+        ACCELERATING,   // particle is in collider
+        COLLIDED,
+        EXITED_FAST,    // particle was too fast to take curve
+        EXITED_NO_GATE  // no gate found in range
     }
 }
