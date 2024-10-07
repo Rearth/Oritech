@@ -133,6 +133,7 @@
   "tooltip.oritech.exo_leggings": "Increases movement speed",
   "tooltip.oritech.exo_chestplate": "Charges equipped energy items",
   "tooltip.oritech.exo_helmet": "Grants night vision",
+  "tooltip.oritech.black_hole": "DON'T PLACE THIS unless you know what you're doing.",
   "tooltip.oritech.weed_killer": "Removes all grass and plants in a wide radius",
 
   "tooltip.oritech.intelligence_item": [
@@ -390,6 +391,9 @@
   "block.oritech.industrial_glass_block": "Industrial Glass",
   "block.oritech.capacitor_addon_extender": "Power Bank Addon",
   "block.oritech.treefeller_block": "Tree Cutter",
+  "block.oritech.black_hole_block": [
+    { "text": "Black Hole", "color": "#cc66ff" }
+  ],
   "block.oritech.enchantment_catalyst_block": [
     { "text": "Arcane Catalyst", "color": "#cc66ff" }
   ],

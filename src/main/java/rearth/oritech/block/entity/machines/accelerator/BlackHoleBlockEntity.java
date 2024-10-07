@@ -39,7 +39,7 @@ public class BlackHoleBlockEntity extends BlockEntity implements BlockEntityTick
         
         for (var candidate : BlockPos.iterateOutwards(pos, PULL_RANGE, PULL_RANGE, PULL_RANGE)) {
             var candidateState = world.getBlockState(candidate);
-            if (candidate.equals(pos) || candidateState.isAir() || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK)) continue;
+            if (candidate.equals(pos) || candidateState.isAir() || candidateState.isLiquid() || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK)) continue;
             
             currentlyPullingFrom = candidate;
             currentlyPulling = candidateState;

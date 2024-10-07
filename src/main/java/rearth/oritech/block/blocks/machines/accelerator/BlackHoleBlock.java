@@ -4,7 +4,13 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
@@ -12,6 +18,8 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.accelerator.BlackHoleBlockEntity;
+
+import java.util.List;
 
 public class BlackHoleBlock extends Block implements BlockEntityProvider {
     
@@ -46,6 +54,11 @@ public class BlackHoleBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
+    protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        entity.kill();
+    }
+    
+    @Override
     public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
         double d = (double)pos.getX() + random.nextDouble();
         double e = (double)pos.getY() + 0.8;
@@ -53,4 +66,8 @@ public class BlackHoleBlock extends Block implements BlockEntityProvider {
         world.addParticle(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
     }
     
+    @Override
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        tooltip.add(Text.translatable("tooltip.oritech.black_hole").formatted(Formatting.GOLD));
+    }
 }

@@ -5,6 +5,8 @@ import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.Portal;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.LivingEntity;
@@ -13,6 +15,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -73,6 +76,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             particleLogic.update(particle);
         
     }
+    
     private void initParticleLogic() {
         if (particleLogic == null) particleLogic = new AcceleratorParticleLogic(pos, (ServerWorld) world, this);
     }
@@ -112,7 +116,15 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     
     public void onParticleCollided(float relativeSpeed, Vec3d collision, BlockPos secondController, AcceleratorControllerBlockEntity secondControllerEntity) {
         
-        var success = tryCraftResult(relativeSpeed, activeItemParticle, secondControllerEntity.activeItemParticle);
+        // create end portal area when two ender pearls collide, nether portal for two firecharges
+        if (relativeSpeed > 1000 && activeItemParticle.getItem().equals(Items.ENDER_PEARL) && secondControllerEntity.activeItemParticle.getItem().equals(Items.ENDER_PEARL)) {
+            spawnEndPortal(BlockPos.ofFloored(collision));
+        } else if (relativeSpeed > 1000 && activeItemParticle.getItem().equals(Items.FIRE_CHARGE) && secondControllerEntity.activeItemParticle.getItem().equals(Items.FIRE_CHARGE)) {
+            spawnNetherPortal(BlockPos.ofFloored(collision));
+        } else {
+            var success = tryCraftResult(relativeSpeed, activeItemParticle, secondControllerEntity.activeItemParticle);
+        }
+        
         
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new LastEventPacket(pos, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.ofFloored(particle.position), particle.lastBendDistance + particle.lastBendDistance2, activeItemParticle));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new LastEventPacket(secondController, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.ofFloored(particle.position), particle.lastBendDistance + particle.lastBendDistance2, activeItemParticle));
@@ -157,6 +169,76 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         }
         
         return true;
+    }
+    
+    private void spawnEndPortal(BlockPos pos) {
+        
+        // create small end area around the portal
+        for (var candidate : BlockPos.iterateOutwards(pos, 8, 4, 8)) {
+            
+            var dist = candidate.toCenterPos().distanceTo(pos.toCenterPos());
+            if (world.random.nextFloat() < dist / 8) continue;
+            
+            var candidateState = world.getBlockState(candidate);
+            if (candidateState.isAir() || candidateState.isReplaceable() || candidateState.getBlock().getHardness() < 0)
+                continue;
+            
+            world.setBlockState(candidate, Blocks.END_STONE.getDefaultState());
+            
+            // generate chorus flowers
+            if (world.random.nextFloat() > 0.8) {
+                var stateAbove = world.getBlockState(candidate.up());
+                if (stateAbove.isAir() || stateAbove.isReplaceable()) {
+                    for (int i = 1; i < world.random.nextBetween(3, 6); i++) {
+                        stateAbove = world.getBlockState(candidate.up(i));
+                        if (stateAbove.isAir() || stateAbove.isReplaceable())
+                            world.setBlockState(candidate.up(i), Blocks.CHORUS_PLANT.getDefaultState());
+                    }
+                }
+            }
+        }
+        
+        // create portal itself
+        world.setBlockState(pos, Blocks.END_PORTAL.getDefaultState());
+        world.setBlockState(pos.north(), Blocks.END_STONE.getDefaultState());
+        world.setBlockState(pos.east(), Blocks.END_STONE.getDefaultState());
+        world.setBlockState(pos.south(), Blocks.END_STONE.getDefaultState());
+        world.setBlockState(pos.west(), Blocks.END_STONE.getDefaultState());
+    }
+    
+    private void spawnNetherPortal(BlockPos pos) {
+        
+        // create small nether area around the portal
+        for (var candidate : BlockPos.iterateOutwards(pos, 12, 4, 12)) {
+            
+            var dist = candidate.toCenterPos().distanceTo(pos.toCenterPos());
+            if (world.random.nextFloat() < dist / 12) continue;
+            
+            var candidateState = world.getBlockState(candidate);
+            if (candidateState.isAir() || candidateState.isReplaceable() || candidateState.getBlock().getHardness() < 0)
+                continue;
+            
+            world.setBlockState(candidate, Blocks.NETHERRACK.getDefaultState());
+            
+            // generate fires
+            if (world.random.nextFloat() > 0.8) {
+                var stateAbove = world.getBlockState(candidate.up());
+                if (stateAbove.isAir() || stateAbove.isReplaceable()) {
+                    world.setBlockState(candidate.up(), Blocks.FIRE.getDefaultState());
+                }
+            }
+        }
+        
+        // spawn obsidian frame (3x4), with 2 portal blocks in the center
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 4; y++) {
+                world.setBlockState(pos.add(x, y, 0), Blocks.OBSIDIAN.getDefaultState());
+            }
+        }
+        
+        world.setBlockState(pos.add(1, 1, 0), Blocks.NETHER_PORTAL.getDefaultState());
+        world.setBlockState(pos.add(1, 2, 0), Blocks.NETHER_PORTAL.getDefaultState());
+        
     }
     
     public void onParticleMoved(List<Vec3d> positions) {
@@ -206,6 +288,14 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     public float handleParticleBlockCollision(BlockPos checkPos, AcceleratorParticleLogic.ActiveParticle particle, float remainingMomentum, BlockState hitState) {
         
         var blockHardness = hitState.getHardness(world, checkPos);
+        
+        // todo config values for this number and portal creation numbers
+        // hit portal, create black hole with explosion
+        if (remainingMomentum > 5000 && hitState.getBlock() instanceof Portal) {
+            createBlackHole(checkPos);
+            return remainingMomentum;
+        }
+        
         if (blockHardness < 0)  // unbreakable block
             return remainingMomentum;
         
@@ -216,6 +306,16 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         }
         
         return blockHardness;
+    }
+    
+    private void createBlackHole(BlockPos checkPos) {
+        ParticleContent.MELTDOWN_IMMINENT.spawn(world, checkPos.toCenterPos(), 30);
+        
+        var center = checkPos.toCenterPos();
+        world.createExplosion(null, center.x, center.y, center.z, 10, false, World.ExplosionSourceType.BLOCK);
+        
+        world.removeBlock(checkPos, false);
+        world.setBlockState(checkPos, BlockContent.BLACK_HOLE_BLOCK.getDefaultState());
     }
     
     public void handleParticleMotorInteraction(BlockPos motorBlock) {
