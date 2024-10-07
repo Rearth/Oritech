@@ -1,13 +1,14 @@
 package rearth.oritech.block.blocks.machines.accelerator;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.accelerator.BlackHoleBlockEntity;
@@ -25,6 +26,11 @@ public class BlackHoleBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
+    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return Block.createCuboidShape(7, 7, 7, 10, 10, 10);
+    }
+    
+    @Override
     protected BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.ENTITYBLOCK_ANIMATED;
     }
@@ -38,4 +44,13 @@ public class BlackHoleBlock extends Block implements BlockEntityProvider {
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
+    
+    @Override
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        double d = (double)pos.getX() + random.nextDouble();
+        double e = (double)pos.getY() + 0.8;
+        double f = (double)pos.getZ() + random.nextDouble();
+        world.addParticle(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
+    }
+    
 }
