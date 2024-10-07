@@ -76,7 +76,7 @@ public class CreativeFluidTankEntity extends BlockEntity implements FluidProvide
 
         @Override
         protected long getCapacity(FluidVariant variant) {
-            return Long.MAX_VALUE;
+            return (Oritech.CONFIG.portableTankCapacityBuckets() * FluidConstants.BUCKET);
         }
 
         @Override

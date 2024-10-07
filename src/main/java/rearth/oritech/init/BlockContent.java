@@ -28,6 +28,7 @@ import rearth.oritech.block.blocks.machines.storage.*;
 import rearth.oritech.block.blocks.pipes.*;
 import rearth.oritech.block.fluid.MineralFluidBlock;
 import rearth.oritech.init.datagen.BlockLootGenerator;
+import rearth.oritech.item.other.CreativeFluidTankBlockItem;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.util.item.OritechGeoItem;
 
@@ -274,6 +275,8 @@ public class BlockContent implements BlockRegistryContainer {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), getGeoBlockItem(value, identifier, field.getAnnotation(UseGeoBlockItem.class).scale()));
         } else if (value.equals(BlockContent.SMALL_TANK_BLOCK)) {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), new SmallFluidTankBlockItem(value, new Item.Settings()));
+        } else if (value.equals(BlockContent.CREATIVE_TANK_BLOCK)) {
+            Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), new CreativeFluidTankBlockItem(value, new Item.Settings()));
         } else {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), createBlockItem(value, identifier));
         }

@@ -533,6 +533,8 @@
   "tooltip.oritech.tool_mode.area_range.single": "Mode: Single",
   "config.jade.plugin_oritech.machine_core_controller": "Oritech Controller Link View",
 
+  "tooltip.oritech.creative_tank": "Right click with a bucket to set or an empty one to empty",
+
   "text.config.oritech-config.title": "Oritech Settings",
   "text.config.oritech-config.section.machineSettings": "Machines",
   "text.config.oritech-config.category.processingMachines": "Processing Machines",
