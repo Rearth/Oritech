@@ -13,8 +13,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.UnbreakableComponent;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.TargetPredicate;
-import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.passive.AnimalEntity;
@@ -329,30 +327,25 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
 
     private boolean huntedTarget(LivingEntity entity) {
-        switch (hunterTargetMode) {
+        // Not including Allay, Villagers, Trader, Iron Golem, Snow Golem
+        // Also not including pets
+        return switch (hunterTargetMode) {
             // Regardless of mode, laser will always target player to charge energy storing chestplate
-            case HunterTargetMode.HOSTILE_ONLY:
-                return entity instanceof Monster; 
-            case HunterTargetMode.HOSTILE_NEUTRAL:
-                // Not including Allay, Villagers, Trader, Iron Golem, Snow Golem
-                // Also not including pets
+            case HunterTargetMode.HOSTILE_ONLY -> entity instanceof Monster;
+            case HunterTargetMode.HOSTILE_NEUTRAL -> {
                 if ((entity instanceof AnimalEntity animal && animal.getLovingPlayer() == null) || entity instanceof WaterCreatureEntity)
-                    return true;
-                return entity instanceof Monster;
-            case HunterTargetMode.ALL:
-                return true;
-        }
-        return false;
+                    yield true;
+                yield entity instanceof Monster;
+            }
+            case HunterTargetMode.ALL -> true;
+        };
     }
 
     // this only gets called if we don't have a target (e.g. null or not valid)
     private void loadNextLivingTarget() {
-        // delay between searches
-        if ((world.getTime() + pos.asLong()) % 20 != 0)
-            return;
         
-        // load targets if we don't have any
-        if (pendingLivingTargets.isEmpty()) {
+        // load targets if we don't have any (only every 10 ticks to save performance
+        if (pendingLivingTargets.isEmpty() && (world.getTime() + pos.asLong()) % 10 == 0) {
             updateEntityTargets();
         }
         

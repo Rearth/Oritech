@@ -2,23 +2,23 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "c": {
+    "b": {
       "tag": "oritech:plating"
     },
-    "s": {
+    "c": {
       "item": "minecraft:iron_sword"
     },
-    "p": {
+    "f": {
       "item": "oritech:plastic_sheet"
     },
-    "m": {
+    "s": {
       "item": "oritech:motor"
     }
   },
   "pattern": [
-    "ppp",
-    "psp",
-    "mcm"
+    "fff",
+    "fcf",
+    "sbs"
   ],
   "result": {
     "count": 1,
