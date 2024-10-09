@@ -40,14 +40,20 @@ public class LaserTargetDesignator extends Item {
         }
         
         if (targetBlockState.getBlock().equals(BlockContent.LASER_ARM_BLOCK)
-              && context.getWorld().getBlockEntity(targetPos) instanceof LaserArmBlockEntity laserEntity
-              && context.getStack().contains(ComponentContent.TARGET_POSITION)) {
-            var target = context.getStack().get(ComponentContent.TARGET_POSITION);
+              && context.getWorld().getBlockEntity(targetPos) instanceof LaserArmBlockEntity laserEntity) {
             
-            var success = laserEntity.setTargetFromDesignator(target);
-            if (success)
-                context.getPlayer().sendMessage(Text.translatable("message.oritech.target_designator.position_saved"));
-            return success ? ActionResult.SUCCESS : ActionResult.FAIL;
+            if (laserEntity.hunterAddons > 0) {
+                laserEntity.cycleHunterTargetMode();
+                context.getPlayer().sendMessage(Text.translatable("message.oritech.target_designator.hunter_target", Text.translatable(laserEntity.hunterTargetMode.message)));
+                return ActionResult.SUCCESS;
+            } else if (context.getStack().contains(ComponentContent.TARGET_POSITION)) {
+                var target = context.getStack().get(ComponentContent.TARGET_POSITION);
+
+                var success = laserEntity.setTargetFromDesignator(target);
+                if (success)
+                    context.getPlayer().sendMessage(Text.translatable("message.oritech.target_designator.position_saved"));
+                return success ? ActionResult.SUCCESS : ActionResult.FAIL;
+            }
         }
         
         if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT_BLOCK)

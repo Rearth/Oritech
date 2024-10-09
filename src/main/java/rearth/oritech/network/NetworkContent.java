@@ -85,7 +85,7 @@ public class NetworkContent {
     public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {
     }   // this goes both ways
     
-    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize, int yieldAddons) {
+    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize, int yieldAddons, int hunterAddons, int hunterTargetMode, boolean cropAddon, int targetEntityId) {
     }
     public record DeepDrillSyncPacket(BlockPos position, long lastWorkTime) {
     }
@@ -179,6 +179,10 @@ public class NetworkContent {
                 laserArmBlock.setLastFiredAt(message.lastFiredAt);
                 laserArmBlock.areaSize = message.areaSize;
                 laserArmBlock.yieldAddons = message.yieldAddons;
+                laserArmBlock.hunterAddons = message.hunterAddons;
+                laserArmBlock.hasCropFilterAddon = message.cropAddon;
+                laserArmBlock.setLivingTargetFromNetwork(message.targetEntityId);
+                laserArmBlock.hunterTargetMode = LaserArmBlockEntity.HunterTargetMode.fromValue(message.hunterTargetMode);
             }
             
         }));

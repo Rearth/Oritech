@@ -8,7 +8,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -22,20 +24,48 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import rearth.oritech.block.behavior.LaserArmBlockBehavior;
+import rearth.oritech.block.behavior.LaserArmEntityBehavior;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.List;
+import java.util.Map;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 public class LaserArmBlock extends Block implements BlockEntityProvider {
+
+    private static final LaserArmBlockBehavior DEFAULT_BLOCK_BEHAVIOR = new LaserArmBlockBehavior();
+    public static final Map<Block, LaserArmBlockBehavior> BLOCK_BEHAVIORS = new Object2ObjectOpenHashMap<>();
+    private static final LaserArmEntityBehavior DEFAULT_ENTITY_BEHAVIOR = new LaserArmEntityBehavior();
+    public static final Map<EntityType<?>, LaserArmEntityBehavior> ENTITY_BEHAVIORS = new Object2ObjectOpenHashMap<>();
     
     public LaserArmBlock(Settings settings) {
         super(settings);
         setDefaultState(getDefaultState().with(ASSEMBLED, false).with(Properties.HORIZONTAL_FACING, Direction.NORTH));
+        LaserArmBlockBehavior.registerDefaults();
+        LaserArmEntityBehavior.registerDefaults();
+    }
+
+    public static void registerBlockBehavior(Block targetBlock, LaserArmBlockBehavior behavior) {
+        BLOCK_BEHAVIORS.put(targetBlock, behavior);
+    }
+
+    public static void registerEntityBehavior(EntityType<?> entityType, LaserArmEntityBehavior behavior) {
+        ENTITY_BEHAVIORS.put(entityType, behavior);
+    }
+
+    public static LaserArmBlockBehavior getBehaviorForBlock(Block targetBlock) {
+        return (LaserArmBlockBehavior)BLOCK_BEHAVIORS.getOrDefault(targetBlock, DEFAULT_BLOCK_BEHAVIOR);
+    }
+
+    public static LaserArmEntityBehavior getBehaviorForEntity(EntityType<?> targetEntityType) {
+        return (LaserArmEntityBehavior)ENTITY_BEHAVIORS.getOrDefault(targetEntityType, DEFAULT_ENTITY_BEHAVIOR);
     }
     
     @Override

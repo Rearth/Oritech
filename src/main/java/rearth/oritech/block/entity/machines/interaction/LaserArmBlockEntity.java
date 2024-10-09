@@ -2,22 +2,32 @@ package rearth.oritech.block.entity.machines.interaction;
 
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.BuddingAmethystBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.UnbreakableComponent;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.TargetPredicate;
+import net.minecraft.entity.damage.DamageSources;
+import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.mob.WaterCreatureEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -27,24 +37,22 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.blocks.MachineCoreBlock;
-import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
+import rearth.oritech.block.blocks.machines.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
-import rearth.oritech.block.entity.machines.processing.AtomicForgeBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.datagen.data.TagContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -61,6 +69,7 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyProvider, ScreenProvider, ExtendedScreenHandlerFactory, MultiblockMachineController, MachineAddonController, InventoryProvider {
     
+    public static final String LASER_PLAYER_NAME = "oritech_laser";
     private static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
     
     // storage
@@ -95,19 +104,26 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
     public int areaSize = 1;
     public int yieldAddons = 0;
+    public int hunterAddons = 0;
+    public boolean hasCropFilterAddon = false;
     
     // config
     private final int range = Oritech.CONFIG.laserArmConfig.range();
+
+    private Vec3d laserHead;
     
     // working data
     private BlockPos targetDirection;
     private BlockPos currentTarget;
+    public HunterTargetMode hunterTargetMode = HunterTargetMode.HOSTILE_ONLY;
+    private LivingEntity currentLivingTarget;
     private long lastFiredAt;
     private int progress;
     private int targetBlockEnergyNeeded = BLOCK_BREAK_ENERGY;
     private boolean networkDirty;
     private boolean redstonePowered;
     private ArrayDeque<BlockPos> pendingArea;
+    private final ArrayDeque<LivingEntity> pendingLivingTargets = new ArrayDeque<>();
     
     // needed only on client
     public Vec3d lastRenderPosition;
@@ -115,92 +131,83 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     public LaserArmBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.LASER_ARM_ENTITY, pos, state);
+        laserHead = Vec3d.of(pos.up()).add(0.5, 0.55, 0.5);
     }
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
-        if (world.isClient() || !isActive(state) || redstonePowered || currentTarget == null || energyStorage.getAmount() < energyRequiredToFire())
+        if (world.isClient() || !isActive(state))
             return;
         
-        var targetBlock = currentTarget;
-        var targetBlockState = world.getBlockState(targetBlock);
-        var targetBlockEntity = world.getBlockEntity(targetBlock);
-        
-        
-        var storageCandidate = EnergyStorage.SIDED.find(world, targetBlock, targetBlockState, targetBlockEntity, null);
-        if (targetBlockEntity instanceof AtomicForgeBlockEntity atomicForgeEntity) {
-            storageCandidate = atomicForgeEntity.getEnergyStorage();
-        } else if (targetBlockEntity instanceof DeepDrillEntity deepDrillEntity) {
-            storageCandidate = deepDrillEntity.getStorage(null);
-        } else if (targetBlockEntity instanceof EnchantmentCatalystBlockEntity catalyst) {
-            storageCandidate = catalyst.energyStorage;
-        }
-        
-        var fired = false;
-        
-        if (storageCandidate != null) {
-            var insertAmount = storageCandidate.getCapacity() - storageCandidate.getAmount();
-            if (insertAmount < 10) return;
-            var transferCapacity = Math.min(insertAmount, energyRequiredToFire());
-            fired = true;
-            
-            if (storageCandidate instanceof DynamicEnergyStorage dynamicStorage) {
-                dynamicStorage.amount += transferCapacity;  // direct transfer, allowing to insert into any container, even when inserting isnt allowed (e.g. atomic forge)
-                dynamicStorage.onFinalCommit(); // gross abuse of transaction system to force it to sync
-            } else {
-                // probably not how this should be used, but whatever
-                try (var tx = Transaction.openOuter()) {
-                    storageCandidate.insert(transferCapacity, tx);
-                    tx.commit();
-                }
+        if (!redstonePowered && energyStorage.getAmount() >= energyRequiredToFire()) {
+            if (hunterAddons > 0) {
+                fireAtLivingEntities(world, pos, state, blockEntity);
             }
-        } else if (targetBlockState.getBlock() instanceof BuddingAmethystBlock amethystBlock &&!canPassThrough(targetBlockState)) {
-            if (buddingAmethystCanGrow(world, targetBlockState, targetBlock)) {
-                fired = true;
-                amethystBlock.randomTick(targetBlockState, (ServerWorld) world, targetBlock, world.random);
-                ParticleContent.ACCELERATING.spawn(world, Vec3d.of(targetBlock));
-            }
-        } else if (!canPassThrough(targetBlockState) && !isSearchTerminatorBlock(targetBlockState)) {
-            fired = true;
-            progress += energyRequiredToFire();
-            
-            if (progress >= targetBlockEnergyNeeded) {
-                finishBlockBreaking(targetBlock, targetBlockState);
+            else if (currentTarget != null) {
+                fireAtBlocks(world, pos, state, blockEntity);
             }
         }
-        
-        if (fired) {
-            energyStorage.amount -= energyRequiredToFire();
-            networkDirty = true;
-            lastFiredAt = world.getTime();
-        } else if (world.getTime() % 40 == 0) {
-            findNextBlockBreakTarget();
-        }
-        
+    
         if (networkDirty)
             updateNetwork();
-        
     }
 
-    private boolean buddingAmethystCanGrow(World world, BlockState blockState, BlockPos pos) {
-        if (!blockState.isOf(Blocks.BUDDING_AMETHYST))
-            return false;
+    private void fireAtBlocks(World world, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
+        var targetBlockPos = currentTarget;
+        var targetBlockState = world.getBlockState(targetBlockPos);
+        var targetBlock = targetBlockState.getBlock();
+        var targetBlockEntity = world.getBlockEntity(targetBlockPos);
 
-        for (var direction : Direction.values()) {
-            var growingPos = pos.offset(direction);
-            var growingState = world.getBlockState(growingPos);
-            if (BuddingAmethystBlock.canGrowIn(growingState) || isUnfinishedAmethyst(growingState))
-                return true;
+        LaserArmBlockBehavior behavior = LaserArmBlock.getBehaviorForBlock(targetBlock);
+        boolean fired = false;
+        if (behavior.fireAtBlock(world, this, targetBlock, targetBlockPos, targetBlockState, targetBlockEntity)) {
+            energyStorage.amount -= energyRequiredToFire();
+            lastFiredAt = world.getTime();
+            networkDirty = true;
+        } else {
+            findNextBlockBreakTarget();
+        }
+    }
+
+    private void fireAtLivingEntities(World world, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
+        // check that there is a target, that is still alive and still in range
+        if (currentLivingTarget != null && validTarget(currentLivingTarget)) {
+
+            var behavior = LaserArmBlock.getBehaviorForEntity(currentLivingTarget.getType());
+            if (behavior.fireAtEntity(world, this, currentLivingTarget)) {
+                energyStorage.amount -= energyRequiredToFire();
+                this.targetDirection = currentLivingTarget.getBlockPos();
+                lastFiredAt = world.getTime();
+                networkDirty = true;
+            } else {
+                pendingLivingTargets.remove(currentLivingTarget);
+                currentLivingTarget = null;
+                currentTarget = null;
+                networkDirty = true;
+            };
+        } else {
+            loadNextLivingTarget();
         }
 
-        return false;
     }
     
     public void setRedstonePowered(boolean redstonePowered) {
         this.redstonePowered = redstonePowered;
     }
+
+    public void addBlockBreakProgress(int progress) {
+        this.progress += progress;
+    }
+
+    public int getBlockBreakProgress() {
+        return this.progress;
+    }
+
+    public int getTargetBlockEnergyNeeded() {
+        return targetBlockEnergyNeeded;
+    }
     
-    private void finishBlockBreaking(BlockPos targetPos, BlockState targetBlockState) {
+    public void finishBlockBreaking(BlockPos targetPos, BlockState targetBlockState) {
         progress -= targetBlockEnergyNeeded;
         
         var targetEntity = world.getBlockEntity(targetPos);
@@ -234,9 +241,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         findNextBlockBreakTarget();
     }
     
-    private PlayerEntity getLaserPlayerEntity() {
+    public PlayerEntity getLaserPlayerEntity() {
         if (laserPlayerEntity == null) {
-            laserPlayerEntity = new PlayerEntity(world, pos, 0, new GameProfile(UUID.randomUUID(), "laser")) {
+            laserPlayerEntity = new PlayerEntity(world, pos, 0, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME)) {
                 @Override
                 public boolean isSpectator() {
                     return false;
@@ -246,7 +253,26 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
                 public boolean isCreative() {
                     return false;
                 }
+
+                @Override
+                public boolean canTakeDamage() {
+                    return false;
+                }
+
+                @Override
+                public boolean giveItemStack(ItemStack itemStack) {
+                    LaserArmBlockEntity.this.inventory.addStack(itemStack);
+                    return true;
+                }
             };
+        }
+
+        if (hunterAddons > 0 && yieldAddons > 0) {
+            var lootingSword = new ItemStack(Items.NETHERITE_SWORD);
+            lootingSword.set(DataComponentTypes.UNBREAKABLE, new UnbreakableComponent(false));
+            var lootingEntry = world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(Enchantments.LOOTING).get();
+            lootingSword.addEnchantment(lootingEntry, Math.min(yieldAddons, 3));
+            laserPlayerEntity.getInventory().main.set(laserPlayerEntity.getInventory().selectedSlot, lootingSword);
         }
         
         return laserPlayerEntity;
@@ -262,9 +288,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         }
         
         var direction = Vec3d.of(targetDirection.subtract(pos.up())).normalize();
-        var from = Vec3d.of(pos.up()).add(0.5, 0.55, 0.5).add(direction.multiply(1.5));
+        var from = laserHead.add(direction.multiply(1.5));
         
-        var nextBlock = basicRaycast(from, direction, range);
+        var nextBlock = basicRaycast(from, direction, range, 0.45F);
         if (nextBlock == null) return;
         
         var maxSize = (int) from.distanceTo(nextBlock.toCenterPos()) - 1;
@@ -276,6 +302,80 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         trySetNewTarget(nextBlock, false);
         
     }
+
+    private double hunterRange() {
+        // hunter range is 2^hunterAddons, with max 3 hunterAddons
+        // range should be calculated near the center of the laser head's cube, so add 0.5 to start counting range from side of cube
+        return Math.pow(4, Math.min(hunterAddons, 3)) + 0.5;
+    }
+
+    private boolean canSee(LivingEntity entity) {
+        if (entity.getWorld() != this.getWorld() || entity.isInvisible()) {
+            return false;
+        } else {
+            var target = entity.getEyePos();
+            var direction = target.subtract(laserHead).normalize();
+            if (laserHead.distanceTo(target) > 128.0) {
+                return false;
+            } else {
+                // can see if basicRaycast() doesn't find anything it can't pass through between laser and target
+                return basicRaycast(laserHead.add(direction.multiply(1.5)), direction, (int)(laserHead.distanceTo(target) - 1), 0.2f) == null;
+            }
+        }
+    }
+
+    private boolean validTarget(LivingEntity entity) {
+        return entity.isAlive() && canSee(entity) && huntedTarget(entity) && entity.getPos().isInRange(pos.up().toCenterPos(), hunterRange());
+    }
+
+    private boolean huntedTarget(LivingEntity entity) {
+        switch (hunterTargetMode) {
+            // Regardless of mode, laser will always target player to charge energy storing chestplate
+            case HunterTargetMode.HOSTILE_ONLY:
+                return entity instanceof Monster; 
+            case HunterTargetMode.HOSTILE_NEUTRAL:
+                // Not including Allay, Villagers, Trader, Iron Golem, Snow Golem
+                // Also not including pets
+                if ((entity instanceof AnimalEntity animal && animal.getLovingPlayer() == null) || entity instanceof WaterCreatureEntity)
+                    return true;
+                return entity instanceof Monster;
+            case HunterTargetMode.ALL:
+                return true;
+        }
+        return false;
+    }
+
+    // this only gets called if we don't have a target (e.g. null or not valid)
+    private void loadNextLivingTarget() {
+        // delay between searches
+        if ((world.getTime() + pos.asLong()) % 20 != 0)
+            return;
+        
+        // load targets if we don't have any
+        if (pendingLivingTargets.isEmpty()) {
+            updateEntityTargets();
+        }
+        
+        // assign first target from cached, distance sorted target list
+        while (!pendingLivingTargets.isEmpty()) {
+            var candidate = pendingLivingTargets.pop();
+            if (validTarget(candidate)) {
+                currentLivingTarget = candidate;
+                currentTarget = candidate.getBlockPos();
+                return;
+            }
+        }
+    }
+    
+    private void updateEntityTargets() {
+        var entityRange = hunterRange();
+        // Only sort the list when getting a new list of entities in range.
+        // The entities can move around so the sort order isn't guaranteed to be correct, but it should be good enough.
+        // There's no need to spend the time re-sorting the list every time the laser needs to pick a new target from the cached list.
+        var targets = world.getEntitiesByClass(LivingEntity.class, new Box(laserHead.x - entityRange, laserHead.y - entityRange, laserHead.z - entityRange, laserHead.x + entityRange, laserHead.y + entityRange, laserHead.z + entityRange), EntityPredicates.VALID_LIVING_ENTITY.and(EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR));
+        targets.sort(Comparator.comparingDouble((entity) -> entity.squaredDistanceTo(laserHead)));
+        pendingLivingTargets.addAll(targets);
+    }
     
     // returns the first block in an X*X*X cube, from the outside in
     private ArrayDeque<BlockPos> findNextAreaBlockTarget(BlockPos center, int scanDist) {
@@ -286,7 +386,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             for (int y = -scanDist; y < scanDist; y++) {
                 for (int z = -scanDist; z < scanDist; z++) {
                     var pos = center.add(x, y, z);
-                    if (!canPassThrough(world.getBlockState(pos)) && !center.equals(pos))
+                    if (!canPassThrough(world.getBlockState(pos), pos) && !center.equals(pos))
                         targets.add(pos);
                 }
             }
@@ -296,46 +396,47 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         return new ArrayDeque<>(targets);
     }
     
-    private BlockPos basicRaycast(Vec3d from, Vec3d direction, int range) {
-        
-        var searchOffset = 0.45;
+    private BlockPos basicRaycast(Vec3d from, Vec3d direction, int range, float searchOffset) {
         
         for (float i = 0; i < range; i += 0.3f) {
             var to = from.add(direction.multiply(i));
-            var targetBlockPos = BlockPos.ofFloored(to.add(0, 0.3f, 0));
+            var targetBlockPos = BlockPos.ofFloored(to.add(0, searchOffset, 0));
             var targetState = world.getBlockState(targetBlockPos);
             if (isSearchTerminatorBlock(targetState)) return null;
-            if (!canPassThrough(targetState)) return targetBlockPos;
+            if (!canPassThrough(targetState, targetBlockPos)) return targetBlockPos;
+
+            if (searchOffset == 0.0F)
+                return null;
             
             var offsetTop = to.add(0, -searchOffset, 0);
             targetBlockPos = BlockPos.ofFloored(offsetTop);
             targetState = world.getBlockState(targetBlockPos);
             if (isSearchTerminatorBlock(targetState)) return null;
-            if (!canPassThrough(targetState)) return targetBlockPos;
+            if (!canPassThrough(targetState, targetBlockPos)) return targetBlockPos;
             
             var offsetLeft = to.add(-searchOffset, 0, 0);
             targetBlockPos = BlockPos.ofFloored(offsetLeft);
             targetState = world.getBlockState(targetBlockPos);
             if (isSearchTerminatorBlock(targetState)) return null;
-            if (!canPassThrough(targetState)) return targetBlockPos;
+            if (!canPassThrough(targetState, targetBlockPos)) return targetBlockPos;
             
             var offsetRight = to.add(searchOffset, 0, 0);
             targetBlockPos = BlockPos.ofFloored(offsetRight);
             targetState = world.getBlockState(targetBlockPos);
             if (isSearchTerminatorBlock(targetState)) return null;
-            if (!canPassThrough(targetState)) return targetBlockPos;
+            if (!canPassThrough(targetState, targetBlockPos)) return targetBlockPos;
             
             var offsetFront = to.add(0, 0, searchOffset);
             targetBlockPos = BlockPos.ofFloored(offsetFront);
             targetState = world.getBlockState(targetBlockPos);
             if (isSearchTerminatorBlock(targetState)) return null;
-            if (!canPassThrough(targetState)) return targetBlockPos;
+            if (!canPassThrough(targetState, targetBlockPos)) return targetBlockPos;
             
             var offsetBack = to.add(0, 0, -searchOffset);
             targetBlockPos = BlockPos.ofFloored(offsetBack);
             targetState = world.getBlockState(targetBlockPos);
             if (isSearchTerminatorBlock(targetState)) return null;
-            if (!canPassThrough(targetState)) return targetBlockPos;
+            if (!canPassThrough(targetState, targetBlockPos)) return targetBlockPos;
         }
         
         return null;
@@ -345,8 +446,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         return state.getBlock().equals(Blocks.TARGET);
     }
     
-    private boolean canPassThrough(BlockState state) {
-        return state.isAir() || state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || isUnfinishedAmethyst(state) || state.isLiquid();
+    public boolean canPassThrough(BlockState state, BlockPos blockPos) {
+        // When targetting entities, don't let grass, vines, small mushrooms, pressure plates, etc. get in the way of the laser
+        return state.isAir() || state.isLiquid() || state.isIn(TagContent.LASER_PASSTHROUGH) || (hunterAddons > 0 && !state.isSolidBlock(world, blockPos));
     }
     
     @Override
@@ -354,6 +456,8 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         
         areaSize = 1;
         yieldAddons = 0;
+        hunterAddons = 0;
+        hasCropFilterAddon = false;
         
         MachineAddonController.super.gatherAddonStats(addons);
     }
@@ -364,22 +468,27 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         
         if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON))
             areaSize++;
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_HUNTER_ADDON))
+            hunterAddons++;
         if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON))
             yieldAddons++;
+        if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON))
+            hasCropFilterAddon = true;
         
     }
     
-    private boolean isUnfinishedAmethyst(BlockState state) {
-        return state.isOf(Blocks.SMALL_AMETHYST_BUD) || state.isOf(Blocks.MEDIUM_AMETHYST_BUD) || state.isOf(Blocks.LARGE_AMETHYST_BUD);
-    }
-    
-    private int energyRequiredToFire() {
+    public int energyRequiredToFire() {
         return (int) (Oritech.CONFIG.laserArmConfig.energyPerTick() * (1 / addonData.speed()));
+    }
+
+    public float getDamageTick() {
+        return (Oritech.CONFIG.laserArmConfig.damageTickBase() * (1 / addonData.speed()));
     }
     
     private void updateNetwork() {
+        var entityId = currentLivingTarget != null ? currentLivingTarget.getId() : -1;
         var sendTarget = currentTarget != null ? currentTarget : BlockPos.ORIGIN;
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons, hunterAddons, hunterTargetMode.value, hasCropFilterAddon, entityId));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
         networkDirty = false;
     }
@@ -389,6 +498,10 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         findNextBlockBreakTarget();
         
         return success;
+    }
+
+    public void cycleHunterTargetMode() {
+        hunterTargetMode = hunterTargetMode.next();
     }
     
     private boolean trySetNewTarget(BlockPos targetPos, boolean alsoSetDirection) {
@@ -430,6 +543,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         nbt.putBoolean("redstone", redstonePowered);
         nbt.putInt("areaSize", areaSize);
         nbt.putInt("yieldAddons", yieldAddons);
+        nbt.putInt("hunterAddons", hunterAddons);
+        nbt.putBoolean("cropAddon", hasCropFilterAddon);
+        nbt.putInt("hunterTargetMode", hunterTargetMode.value);
         
         if (targetDirection != null && currentTarget != null) {
             nbt.putLong("target_position", currentTarget.asLong());
@@ -459,6 +575,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         currentTarget = BlockPos.fromLong(nbt.getLong("target_position"));
         areaSize = nbt.getInt("areaSize");
         yieldAddons = nbt.getInt("yieldAddons");
+        hunterAddons = nbt.getInt("hunterAddons");
+        hunterTargetMode = HunterTargetMode.fromValue(nbt.getInt("hunterTargetMode"));
+        hasCropFilterAddon = nbt.getBoolean("cropAddon");
         
         if (nbt.contains("pendingPositions")) {
             pendingArea = Arrays.stream(nbt.getLongArray("pendingPositions")).mapToObj(BlockPos::fromLong).collect(Collectors.toCollection(ArrayDeque::new));
@@ -624,8 +743,29 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         return currentTarget;
     }
     
+    public Vec3d getVisualTarget() {
+        if (hunterAddons > 0 && currentLivingTarget != null) {
+            return currentLivingTarget.getEyePos().subtract(0.5f, 0, 0.5f);
+        } else {
+            return Vec3d.of(getCurrentTarget()).add(0, 0.5, 0);
+        }
+    }
+    
     public void setCurrentTarget(BlockPos currentTarget) {
         this.currentTarget = currentTarget;
+    }
+    
+    public void setLivingTargetFromNetwork(int id) {
+        if (id == -1) {
+            currentLivingTarget = null;
+        } else {
+            var candidate = world.getEntityById(id);
+            if (candidate instanceof LivingEntity livingEntity) {
+                currentLivingTarget = livingEntity;
+            } else {
+                currentLivingTarget = null;
+            }
+        }
     }
     
     public long getLastFiredAt() {
@@ -675,8 +815,15 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     @Override
     public List<Pair<Text, Text>> getExtraExtensionLabels() {
-        if (areaSize == 1 && yieldAddons == 0) return ScreenProvider.super.getExtraExtensionLabels();
-        return List.of(new Pair<>(Text.translatable("title.oritech.machine.addon_range", areaSize), Text.translatable("tooltip.oritech.laser_arm.addon_range")), new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")));
+        if (areaSize == 1 && yieldAddons == 0 && hunterAddons == 0) return ScreenProvider.super.getExtraExtensionLabels();
+        if (hunterAddons > 0)
+            return List.of(
+                new Pair<>(Text.translatable("title.oritech.machine.addon_range", (int)hunterRange()), Text.translatable("tooltip.oritech.laser_arm.addon_hunter_range")),
+                new Pair<>(Text.translatable("title.oritech.laser_arm.addon_hunter_damage", String.format("%.2f", getDamageTick())), Text.translatable("tooltip.oritech.laser_arm.addon_hunter_damage")),
+                new Pair<>(Text.translatable("title.oritech.machine.addon_looting", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_looting")));
+        return List.of(
+            new Pair<>(Text.translatable("title.oritech.machine.addon_range", areaSize), Text.translatable("tooltip.oritech.laser_arm.addon_range")),
+            new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")));
     }
     
     @Override
@@ -742,5 +889,32 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     @Override
     public Text getDisplayName() {
         return Text.literal("");
+    }
+
+    public enum HunterTargetMode {
+        HOSTILE_ONLY(1, "message.oritech.target_designator.hunter_hostile"),
+        HOSTILE_NEUTRAL(2, "message.oritech.target_designator.hunter_neutral"),
+        ALL(3, "message.oritech.target_designator.hunter_all");
+
+        public final int value;
+        public final String message;
+        HunterTargetMode(int value, String message) {
+            this.value = value;
+            this.message = message;
+        }
+
+        private static final Map<Integer, HunterTargetMode> map = new HashMap<Integer, HunterTargetMode>();
+        static {
+            for (HunterTargetMode targetMode: HunterTargetMode.values())
+                map.put(targetMode.value, targetMode);
+        }
+
+        public static HunterTargetMode fromValue(int i) {
+            return map.getOrDefault(i, HOSTILE_ONLY);
+        }
+
+        public HunterTargetMode next() {
+            return values()[(ordinal() + 1) % values().length];
+        }
     }
 }

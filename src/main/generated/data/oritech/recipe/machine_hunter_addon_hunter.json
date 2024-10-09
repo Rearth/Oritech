@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "tag": "oritech:plating"
+    },
+    "s": {
+      "item": "minecraft:iron_sword"
+    },
+    "p": {
+      "item": "oritech:plastic_sheet"
+    },
+    "m": {
+      "item": "oritech:motor"
+    }
+  },
+  "pattern": [
+    "ppp",
+    "psp",
+    "mcm"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:machine_hunter_addon"
+  }
+}
