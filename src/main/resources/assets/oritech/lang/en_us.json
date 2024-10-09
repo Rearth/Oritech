@@ -264,6 +264,7 @@
   "rei.process.oritech:steam_engine": "Steam Usage",
   "rei.process.oritech:bio_generator": "Biomass Churning",
   "rei.process.oritech:fuel_generator": "Fuel Burning",
+  "rei.process.oritech:particle_collision": "Fuel Burning",
   "rei.title.oritech.cookingtime": "%ds (%d ticks)",
 
   "emi.category.oritech.pulverizer": "Pulverizing",
@@ -277,7 +278,9 @@
   "emi.category.oritech.steam_engine": "Steam Usage",
   "emi.category.oritech.bio_generator": "Biomass Churning",
   "emi.category.oritech.fuel_generator": "Fuel Burning",
+  "emi.category.oritech.particle_collision": "Particle Collision",
   "emi.title.oritech.cookingtime": "%ds (%d ticks)",
+  "emi.title.oritech.collisionspeed": "Required collision energy: %sJ",
 
   "itemgroup.oritech.machines": "Oritech Machines",
   "itemgroup.oritech.components": "Oritech Components",

@@ -55,6 +55,8 @@ public class BlackHoleBlock extends Block implements BlockEntityProvider {
     
     @Override
     protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        // yes this will also kill creative players. This is intentional. Don't annoy me about this by opening a bugfix PR
+        // (looking at you jshipley)
         entity.kill();
     }
     
