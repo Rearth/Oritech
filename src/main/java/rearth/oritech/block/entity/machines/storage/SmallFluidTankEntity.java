@@ -15,7 +15,6 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
@@ -190,7 +189,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
             // empty input bucket
             var emptyBucket = ItemVariant.of(Items.BUCKET, inStack.getComponentChanges()).toStack();
             if (!outputCanAcceptBucket(emptyBucket)) return;
-            Fluid bucketFluid = ((BucketItemAccessor) inStack.getItem()).fabric_getFluid();
+            var bucketFluid = ((BucketItemAccessor) inStack.getItem()).fabric_getFluid();
             if (bucketFluid == Fluids.EMPTY) return;
 
             try (var tx = Transaction.openOuter()) {

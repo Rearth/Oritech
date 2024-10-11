@@ -1,15 +1,15 @@
 package rearth.oritech.util;
 
-import java.util.stream.IntStream;
-
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 
+import java.util.stream.IntStream;
+
 public class SimpleSidedInventory extends SimpleInventory implements SidedInventory {
 
-    private final InventorySlotAssignment slotAssignment;
+    public final InventorySlotAssignment slotAssignment;
 
     public SimpleSidedInventory(int size, InventorySlotAssignment slotAssignment) {
         super(size);

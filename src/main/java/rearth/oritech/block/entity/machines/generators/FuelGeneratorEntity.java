@@ -3,7 +3,6 @@ package rearth.oritech.block.entity.machines.generators;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.block.BlockState;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
@@ -15,11 +14,9 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.Geometry;
-import rearth.oritech.util.InventorySlotAssignment;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.List;
@@ -59,23 +56,8 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    public InventorySlotAssignment getSlots() {
-        return new InventorySlotAssignment(0, 0, 0, 0);
-    }
-    
-    @Override
-    public List<GuiSlot> getGuiSlots() {
-        return List.of();
-    }
-    
-    @Override
     public ScreenHandlerType<?> getScreenHandlerType() {
         return ModScreens.FUEL_GENERATOR_SCREEN;
-    }
-    
-    @Override
-    public int getInventorySize() {
-        return 0;
     }
     
     @Override
