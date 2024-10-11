@@ -20,9 +20,7 @@ import rearth.oritech.block.entity.machines.addons.*;
 import rearth.oritech.block.entity.machines.generators.*;
 import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.*;
-import rearth.oritech.block.entity.machines.storage.LargeStorageBlockEntity;
-import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
-import rearth.oritech.block.entity.machines.storage.SmallStorageBlockEntity;
+import rearth.oritech.block.entity.machines.storage.*;
 import rearth.oritech.block.entity.pipes.EnergyPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -155,10 +153,17 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<LargeStorageBlockEntity> LARGE_STORAGE_ENTITY = FabricBlockEntityTypeBuilder.create(LargeStorageBlockEntity::new, BlockContent.LARGE_STORAGE_BLOCK).build();
+    @AssignSidedInventory
+    @AssignSidedEnergy
+    public static final BlockEntityType<CreativeStorageBlockEntity> CREATIVE_STORAGE_ENTITY = FabricBlockEntityTypeBuilder.create(CreativeStorageBlockEntity::new, BlockContent.CREATIVE_STORAGE_BLOCK).build();
     
     @AssignSidedInventory
     @AssignSidedFluid
     public static final BlockEntityType<SmallFluidTankEntity> SMALL_TANK_ENTITY = FabricBlockEntityTypeBuilder.create(SmallFluidTankEntity::new, BlockContent.SMALL_TANK_BLOCK).build();
+
+    @AssignSidedInventory
+    @AssignSidedFluid
+    public static final BlockEntityType<CreativeFluidTankEntity> CREATIVE_TANK_ENTITY = FabricBlockEntityTypeBuilder.create(CreativeFluidTankEntity::new, BlockContent.CREATIVE_TANK_BLOCK).build();
     
     @AssignSidedFluid
     public static final BlockEntityType<FluidPipeInterfaceEntity> FLUID_PIPE_ENTITY = FabricBlockEntityTypeBuilder.create(FluidPipeInterfaceEntity::new, BlockContent.FLUID_PIPE_CONNECTION).build();
