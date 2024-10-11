@@ -24,19 +24,16 @@ public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEnti
     @Override
     public long getDefaultCapacity() {
         return Long.MAX_VALUE;
-        // return Oritech.CONFIG.smallEnergyStorage.energyCapacity();
     }
 
     @Override
     public long getDefaultInsertRate() {
         return Long.MAX_VALUE;
-        // return Oritech.CONFIG.smallEnergyStorage.maxEnergyInsertion();
     }
 
     @Override
     public long getDefaultExtractionRate() {
         return Long.MAX_VALUE;
-        //return Oritech.CONFIG.smallEnergyStorage.maxEnergyExtraction();
     }
 
     public int getComparatorOutput() {

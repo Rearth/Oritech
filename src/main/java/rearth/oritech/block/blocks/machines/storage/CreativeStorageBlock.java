@@ -1,67 +1,87 @@
 package rearth.oritech.block.blocks.machines.storage;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContextParameterSet;
-import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.state.StateManager;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.storage.CreativeStorageBlockEntity;
-import rearth.oritech.init.BlockContent;
 
 import java.util.List;
+import java.util.Objects;
 
-public class CreativeStorageBlock extends SmallStorageBlock  {
+import static rearth.oritech.block.blocks.machines.storage.SmallStorageBlock.TARGET_DIR;
+import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
+public class CreativeStorageBlock extends Block implements BlockEntityProvider {
+    
     public CreativeStorageBlock(Settings settings) {
         super(settings);
+        this.setDefaultState(getDefaultState().with(TARGET_DIR, Direction.NORTH));
+    }
+    
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(TARGET_DIR);
+    }
+    
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return Objects.requireNonNull(super.getPlacementState(ctx)).with(TARGET_DIR, ctx.getPlayerLookDirection().getOpposite());
+    }
+    
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
     }
 
     @Override
     public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new CreativeStorageBlockEntity(pos, state);
     }
-
+    
     @Override
-    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        return ((CreativeStorageBlockEntity) world.getBlockEntity(pos)).getComparatorOutput();
-    }
-
-    @Override
-    protected List<ItemStack> getDroppedStacks(BlockState state, LootContextParameterSet.Builder builder) {
-        var droppedStacks = super.getDroppedStacks(state, builder);
-
-        var blockEntity = (BlockEntity)builder.getOptional(LootContextParameters.BLOCK_ENTITY);
-        if (blockEntity instanceof CreativeStorageBlockEntity storageEntity)
-            droppedStacks.addAll(storageEntity.inventory.getHeldStacks());
-
-        return droppedStacks;
-    }
-
-    @NotNull
-    private static ItemStack getStackWithData(WorldView world, BlockPos pos) {
-        var stack = new ItemStack(BlockContent.CREATIVE_STORAGE_BLOCK.asItem());
-        var storageEntity = (CreativeStorageBlockEntity) world.getBlockEntity(pos);
-
-        if (storageEntity.getStorage(null).getAmount() > 0) {
-            var nbt = new NbtCompound();
-            storageEntity.writeNbt(nbt, world.getRegistryManager());
-            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        
+        if (!world.isClient) {
+            var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
+            player.openHandledScreen(handler);
         }
-
-        return stack;
+        
+        return ActionResult.SUCCESS;
     }
-
+    
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Nullable
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
-        return getStackWithData(world, pos);
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> {
+            if (blockEntity instanceof BlockEntityTicker ticker)
+                ticker.tick(world1, pos, state1, blockEntity);
+        };
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        super.appendTooltip(stack, context, tooltip, options);
+        addMachineTooltip(tooltip, this, this);
     }
 
 }

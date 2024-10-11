@@ -28,7 +28,6 @@ import rearth.oritech.block.blocks.machines.storage.*;
 import rearth.oritech.block.blocks.pipes.*;
 import rearth.oritech.block.fluid.MineralFluidBlock;
 import rearth.oritech.init.datagen.BlockLootGenerator;
-import rearth.oritech.item.other.CreativeFluidTankBlockItem;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.util.item.OritechGeoItem;
 
@@ -119,9 +118,9 @@ public class BlockContent implements BlockRegistryContainer {
     @DispenserPlace
     public static final Block SMALL_STORAGE_BLOCK = new SmallStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY));
     public static final Block LARGE_STORAGE_BLOCK = new LargeStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
-    @NoAutoDrop
     @DispenserPlace
     public static final Block CREATIVE_STORAGE_BLOCK = new CreativeStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).hardness(-1.0F));
+    
     @NoAutoDrop
     @DispenserPlace
     public static final Block SMALL_TANK_BLOCK = new SmallFluidTank(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY).luminance(Blocks.createLightLevelFromLitBlockState(15)));
@@ -281,10 +280,8 @@ public class BlockContent implements BlockRegistryContainer {
         
         if (field.isAnnotationPresent(UseGeoBlockItem.class)) {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), getGeoBlockItem(value, identifier, field.getAnnotation(UseGeoBlockItem.class).scale()));
-        } else if (value.equals(BlockContent.SMALL_TANK_BLOCK)) {
+        } else if (value.equals(BlockContent.SMALL_TANK_BLOCK) || value.equals(BlockContent.CREATIVE_TANK_BLOCK)) {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), new SmallFluidTankBlockItem(value, new Item.Settings()));
-        } else if (value.equals(BlockContent.CREATIVE_TANK_BLOCK)) {
-            Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), new CreativeFluidTankBlockItem(value, new Item.Settings()));
         } else {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), createBlockItem(value, identifier));
         }

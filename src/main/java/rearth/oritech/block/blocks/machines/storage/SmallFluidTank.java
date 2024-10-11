@@ -13,7 +13,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
@@ -21,33 +20,30 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
-
-import java.util.List;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
 import rearth.oritech.init.BlockContent;
+
+import java.util.List;
 
 public class SmallFluidTank extends Block implements BlockEntityProvider {
     public static final BooleanProperty LIT = Properties.LIT;
     
     public SmallFluidTank(Settings settings) {
         super(settings);
-        this.setDefaultState((BlockState)this.getDefaultState().with(LIT, false));
+        this.setDefaultState(this.getDefaultState().with(LIT, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(new Property[]{LIT});
+        builder.add(LIT);
     }
     
     @Override
@@ -58,7 +54,7 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new SmallFluidTankEntity(pos, state);
+        return new SmallFluidTankEntity(pos, state, false);
     }
     
     @Override
@@ -100,18 +96,22 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     
     @NotNull
     private static ItemStack getStackWithData(WorldView world, BlockPos pos) {
-        var stack = new ItemStack(BlockContent.SMALL_TANK_BLOCK.asItem());
         var tankEntity = (SmallFluidTankEntity) world.getBlockEntity(pos);
+        var stack = getBasePickStack(tankEntity.isCreative);
         
         if (tankEntity.getForDirectFluidAccess().amount > 0) {
             var nbt = new NbtCompound();
             tankEntity.writeNbt(nbt, world.getRegistryManager());
             stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
             var fluidName = FluidVariantAttributes.getName(tankEntity.getForDirectFluidAccess().variant);
-            stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable("block.oritech.small_tank_block")));
+            stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable(tankEntity.isCreative ? "block.oritech.creative_tank_block" : "block.oritech.small_tank_block")));
         }
         
         return stack;
+    }
+    
+    public static ItemStack getBasePickStack(boolean creative) {
+        return new ItemStack(creative ? BlockContent.CREATIVE_TANK_BLOCK.asItem() : BlockContent.SMALL_TANK_BLOCK.asItem());
     }
     
     @Override

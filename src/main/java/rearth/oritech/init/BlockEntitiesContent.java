@@ -159,11 +159,11 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     
     @AssignSidedInventory
     @AssignSidedFluid
-    public static final BlockEntityType<SmallFluidTankEntity> SMALL_TANK_ENTITY = FabricBlockEntityTypeBuilder.create(SmallFluidTankEntity::new, BlockContent.SMALL_TANK_BLOCK).build();
+    public static final BlockEntityType<SmallFluidTankEntity> SMALL_TANK_ENTITY = FabricBlockEntityTypeBuilder.create((pos, state) -> new SmallFluidTankEntity(pos, state, false), BlockContent.SMALL_TANK_BLOCK).build();
 
     @AssignSidedInventory
     @AssignSidedFluid
-    public static final BlockEntityType<CreativeFluidTankEntity> CREATIVE_TANK_ENTITY = FabricBlockEntityTypeBuilder.create(CreativeFluidTankEntity::new, BlockContent.CREATIVE_TANK_BLOCK).build();
+    public static final BlockEntityType<SmallFluidTankEntity> CREATIVE_TANK_ENTITY = FabricBlockEntityTypeBuilder.create((pos, state) -> new SmallFluidTankEntity(pos, state, true), BlockContent.CREATIVE_TANK_BLOCK).build();
     
     @AssignSidedFluid
     public static final BlockEntityType<FluidPipeInterfaceEntity> FLUID_PIPE_ENTITY = FabricBlockEntityTypeBuilder.create(FluidPipeInterfaceEntity::new, BlockContent.FLUID_PIPE_CONNECTION).build();
