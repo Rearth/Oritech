@@ -214,7 +214,7 @@
   "title.oritech.enchanter.souls_used": "%d / %d 灵魂已使用",
   "title.oritech.laser_arm.addon_range": "%d Size",
   "title.oritech.machine.addon_hunter_range": "%d Scan distance",
-  "tooltip.oritech.laser_arm.addon_hunter_range": "Effective beam range",
+  "tooltip.oritech.laser_arm.addon_hunter_range": "有效光束范围",
   "title.oritech.laser_arm.addon_hunter_damage": "%d Damage",
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Effective Beam Damage",
   "title.oritech.machine.addon_looting": "%d Looting",
