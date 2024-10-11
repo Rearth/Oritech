@@ -103,6 +103,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // dripstone from dripstone block
         addPulverizerRecipe(exporter, Ingredient.ofItems(Items.DRIPSTONE_BLOCK), Items.POINTED_DRIPSTONE, 4, "dripstone");
         addGrinderRecipe(exporter, Ingredient.ofItems(Items.DRIPSTONE_BLOCK), Items.POINTED_DRIPSTONE, 4, "dripstone");
+        // shroomlight from logs and 3 glowstone
+        addAssemblerRecipe(exporter, Ingredient.fromTag(ItemTags.LOGS), Ingredient.ofItems(Items.GLOWSTONE), Ingredient.ofItems(Items.GLOWSTONE), Ingredient.ofItems(Items.GLOWSTONE), Items.SHROOMLIGHT, 1f, "shroomlight");
     }
 
     private void addDyes(RecipeExporter exporter) {
@@ -530,7 +532,26 @@ public class RecipeGenerator extends FabricRecipeProvider {
     }
     
     private void addParticleCollisions(RecipeExporter exporter) {
-        addParticleCollisionRecipe(exporter, Ingredient.ofItems(Items.COAL), Ingredient.ofItems(Items.APPLE), new ItemStack(ItemContent.BANANA), 30, "debug");
+        // diamond from coal dust
+        addParticleCollisionRecipe(exporter, Ingredient.fromTag(TagContent.COAL_DUSTS), Ingredient.fromTag(TagContent.COAL_DUSTS), new ItemStack(Items.DIAMOND), 500, "diamond");
+        // overcharged crystal from fluxite and electrum dust
+        addParticleCollisionRecipe(exporter, Ingredient.ofItems(ItemContent.FLUXITE), Ingredient.ofItems(ItemContent.ELECTRUM_DUST), new ItemStack(ItemContent.OVERCHARGED_CRYSTAL), 1000, "overcharged_crystal");
+        // platinum from gold dust
+        addParticleCollisionRecipe(exporter, Ingredient.fromTag(TagContent.GOLD_DUSTS), Ingredient.fromTag(TagContent.GOLD_DUSTS), new ItemStack(ItemContent.PLATINUM_DUST), 500, "platinum_dust");
+        // enderic compound from redstone and flesh
+        addParticleCollisionRecipe(exporter, Ingredient.ofItems(Items.REDSTONE), Ingredient.ofItems(Items.ROTTEN_FLESH), new ItemStack(ItemContent.ENDERIC_COMPOUND), 500, "enderic_compound");
+        // fluxite from electrum dust and redstone
+        addParticleCollisionRecipe(exporter, Ingredient.ofItems(ItemContent.ELECTRUM_DUST), Ingredient.ofItems(Items.REDSTONE), new ItemStack(ItemContent.FLUXITE), 1000, "fluxite");
+        // netherite scrap from adamant dust and netherrack
+        addParticleCollisionRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_DUST), Ingredient.ofItems(Items.NETHERRACK), new ItemStack(Items.NETHERITE_SCRAP), 2500, "netherite");
+        // elytra from feather and saddle
+        addParticleCollisionRecipe(exporter, Ingredient.ofItems(Items.FEATHER), Ingredient.ofItems(Items.SADDLE), new ItemStack(Items.ELYTRA), 10000, "elytra");
+        // nether star from overcharged crystal and netherite
+        addParticleCollisionRecipe(exporter, Ingredient.ofItems(ItemContent.OVERCHARGED_CRYSTAL), Ingredient.ofItems(Items.NETHERITE_INGOT), new ItemStack(Items.NETHER_STAR), 15000, "nether_star");
+        // echo shard from ender pearl and amethyst shard
+        addParticleCollisionRecipe(exporter, Ingredient.ofItems(Items.ENDER_PEARL), Ingredient.ofItems(Items.AMETHYST_SHARD), new ItemStack(Items.ECHO_SHARD), 1000, "echo_shard");
+        // heavy core from reinforced deepslate block and duration dust
+        addParticleCollisionRecipe(exporter, Ingredient.ofItems(Items.REINFORCED_DEEPSLATE), Ingredient.ofItems(ItemContent.DURATIUM_DUST), new ItemStack(Items.HEAVY_CORE), 8000, "heavy_core");
     }
     
     private void addDusts(RecipeExporter exporter) {

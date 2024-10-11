@@ -18,7 +18,7 @@ public class OritechEMIParticleCollisionRecipe extends BasicEmiRecipe {
     private final OritechRecipe recipe;
     
     public OritechEMIParticleCollisionRecipe(RecipeEntry<OritechRecipe> entry, EmiRecipeCategory category) {
-        super(category, entry.id(), 150, 60);
+        super(category, entry.id(), 160, 60);
         
         recipe = entry.value();
         recipe.getInputs().forEach(ingredient -> this.inputs.add(EmiIngredient.of(ingredient)));
@@ -34,7 +34,7 @@ public class OritechEMIParticleCollisionRecipe extends BasicEmiRecipe {
         widgets.addSlot(this.inputs.get(1), 96, 20);
         
         
-        widgets.addSlot(this.outputs.get(0), 70, 20).recipeContext(this).drawBack(false);
+        widgets.addSlot(this.outputs.get(0), 69, 20).recipeContext(this).drawBack(false);
         widgets.addText(Text.translatable("emi.title.oritech.collisionspeed", this.recipe.getTime()), 0, (int) (getDisplayHeight() * 0.88), 0xFFFFFF, true);
         
     }

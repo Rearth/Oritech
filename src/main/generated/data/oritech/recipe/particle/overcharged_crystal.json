@@ -1,0 +1,18 @@
+{
+  "type": "oritech:particle_collision",
+  "ingredients": [
+    {
+      "item": "oritech:fluxite"
+    },
+    {
+      "item": "oritech:electrum_dust"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:overcharged_crystal"
+    }
+  ],
+  "time": 1000
+}
