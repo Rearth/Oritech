@@ -39,6 +39,9 @@ public class OritechEMIPlugin implements EmiPlugin {
         registerOritechCategory(registry, manager, RecipeContent.LAVA_GENERATOR, BlockContent.LAVA_GENERATOR_BLOCK, LavaGeneratorEntity.class);
         registerOritechCategory(registry, manager, RecipeContent.STEAM_ENGINE, BlockContent.STEAM_ENGINE_BLOCK, SteamEngineEntity.class);
         
+        // others
+        registerParticleAccelerator(registry, manager, RecipeContent.PARTICLE_COLLISION);
+        
         registry.addWorkstation(VanillaEmiRecipeCategories.SMELTING, EmiStack.of(BlockContent.POWERED_FURNACE_BLOCK));
         
     }
@@ -58,6 +61,23 @@ public class OritechEMIPlugin implements EmiPlugin {
         manager.listAllOfType(recipeType)
           .stream()
           .map(entry -> new OritechEMIRecipe(entry, category, screenProviderSource, finalBlockState))
+          .forEach(registry::addRecipe);
+        
+    }
+    
+    private void registerParticleAccelerator(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType) {
+        
+        var machine = BlockContent.ACCELERATOR_CONTROLLER;
+        
+        var icon = EmiStack.of(machine);
+        var category = new EmiRecipeCategory(recipeType.getIdentifier(), icon);
+        
+        registry.addCategory(category);
+        registry.addWorkstation(category, icon);
+        
+        manager.listAllOfType(recipeType)
+          .stream()
+          .map(entry -> new OritechEMIParticleCollisionRecipe(entry, category))
           .forEach(registry::addRecipe);
         
     }

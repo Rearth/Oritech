@@ -16,6 +16,7 @@ import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.machines.accelerator.AcceleratorControllerBlockEntity;
+import rearth.oritech.block.entity.machines.accelerator.BlackHoleBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
@@ -56,6 +57,7 @@ public class NetworkContent {
     }
     
     public record AcceleratorParticleRenderPacket(BlockPos position, List<Vec3d> particleTrail) {}
+    public record AcceleratorParticleInsertEventPacket(BlockPos position) {}
     
     public record DroneCardEventPacket(BlockPos position, String message) {
     }
@@ -83,7 +85,7 @@ public class NetworkContent {
     public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {
     }   // this goes both ways
     
-    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize, int yieldAddons) {
+    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize, int yieldAddons, int hunterAddons, int hunterTargetMode, boolean cropAddon, int targetEntityId) {
     }
     public record DeepDrillSyncPacket(BlockPos position, long lastWorkTime) {
     }
@@ -92,6 +94,9 @@ public class NetworkContent {
     }
     
     public record EnchanterSelectionPacket(BlockPos position, String enchantment) {
+    }
+    
+    public record BlackHoleSuckPacket(BlockPos position, BlockPos from, long startedAt, long duration) {
     }
     
     public record EnchanterSyncPacket(BlockPos position, long energy, int progress, int maxProgress, int requiredCatalysts, int availableCatalysts) {
@@ -174,6 +179,10 @@ public class NetworkContent {
                 laserArmBlock.setLastFiredAt(message.lastFiredAt);
                 laserArmBlock.areaSize = message.areaSize;
                 laserArmBlock.yieldAddons = message.yieldAddons;
+                laserArmBlock.hunterAddons = message.hunterAddons;
+                laserArmBlock.hasCropFilterAddon = message.cropAddon;
+                laserArmBlock.setLivingTargetFromNetwork(message.targetEntityId);
+                laserArmBlock.hunterTargetMode = LaserArmBlockEntity.HunterTargetMode.fromValue(message.hunterTargetMode);
             }
             
         }));
@@ -271,7 +280,27 @@ public class NetworkContent {
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
             if (entity instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
-                acceleratorBlock.setDisplayTrail(message.particleTrail);
+                acceleratorBlock.onReceiveMovement(message.particleTrail);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(AcceleratorControllerBlockEntity.LastEventPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position());
+            
+            if (entity instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
+                acceleratorBlock.onReceivedEvent(message);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(AcceleratorParticleInsertEventPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position());
+            
+            if (entity instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
+                acceleratorBlock.onParticleInsertedClient();
             }
             
         }));
@@ -311,6 +340,16 @@ public class NetworkContent {
             if (entity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
                 generatorBlock.setCurrentMaxBurnTime(message.burnTime);
                 generatorBlock.isProducingSteam = message.steamAddon;
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(BlackHoleSuckPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof BlackHoleBlockEntity hole) {
+                hole.onClientPullEvent(message);
             }
             
         }));

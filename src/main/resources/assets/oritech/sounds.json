@@ -78,5 +78,13 @@
     "sounds": [
       "oritech:squish"
     ]
+  },
+  "particle_moving": {
+    "sounds": [
+      {
+        "name": "oritech:particle_moving",
+        "volume": 0.1
+      }
+    ]
   }
 }

@@ -49,7 +49,7 @@ public class AcceleratorParticleLogic {
         while (availableDistance > 0.001) {
             
             if (particle.nextGate == null) {
-                exitParticle(particle, new Vec3d(0, 0, 0));
+                exitParticle(particle, new Vec3d(0, 0, 0), AcceleratorControllerBlockEntity.ParticleEvent.ERROR);
                 return;
             }
             
@@ -87,7 +87,7 @@ public class AcceleratorParticleLogic {
                 
                 // no gate built / too slow
                 if (nextGate == null) {
-                    exitParticle(particle, Vec3d.of(nextDirection));
+                    exitParticle(particle, Vec3d.of(nextDirection), AcceleratorControllerBlockEntity.ParticleEvent.EXITED_NO_GATE);
                     return;
                 }
                 
@@ -99,10 +99,9 @@ public class AcceleratorParticleLogic {
                     
                     var combinedDist = particle.lastBendDistance + particle.lastBendDistance2;
                     
-                    var requiredDist = Math.sqrt(particle.velocity) / 3;
+                    var requiredDist = getRequiredBendDist(particle.velocity);
                     if (combinedDist <= requiredDist) {
-                        System.out.println("too fast! speed: " + particle.velocity + " at bend dist " + combinedDist);
-                        exitParticle(particle, Vec3d.of(particle.nextGate.subtract(particle.lastGate)));
+                        exitParticle(particle, Vec3d.of(particle.nextGate.subtract(particle.lastGate)), AcceleratorControllerBlockEntity.ParticleEvent.EXITED_FAST);
                         return;
                     }
                     
@@ -144,14 +143,14 @@ public class AcceleratorParticleLogic {
         particle.velocity = remainingMomentum;
     }
     
-    private void exitParticle(ActiveParticle particle, Vec3d direction) {
+    private void exitParticle(ActiveParticle particle, Vec3d direction, AcceleratorControllerBlockEntity.ParticleEvent reason) {
         
         var exitFrom = particle.position;
         
         var distance = Math.max(Math.sqrt(particle.velocity), 0.9) * 0.9;
         var exitTo = exitFrom.add(direction.multiply(distance));
         
-        entity.onParticleExited(exitFrom, exitTo, particle.lastGate, direction);
+        entity.onParticleExited(exitFrom, exitTo, particle.lastGate, direction, reason);
         
         var searchDist = (int) distance;
         var searchDirection = new Vec3i((int) Math.round(direction.x), 0, (int) Math.round(direction.z));
@@ -257,10 +256,18 @@ public class AcceleratorParticleLogic {
         
     }
     
+    public static float getMaxGateDist(float speed) {
+        return (float) Math.clamp(Math.sqrt(speed) / 2, 2, 10);
+    }
+    
+    public static float getRequiredBendDist(float speed) {
+        return (float) (Math.sqrt(speed) / 3);
+    }
+    
     @Nullable
     private BlockPos findNextGateCached(BlockPos from, Vec3i direction, float speed) {
         
-        var maxDist = Math.clamp(Math.sqrt(speed), 2, 8);
+        var maxDist = getMaxGateDist(speed);
         var key = new CompPair<>(from, direction);
         
         if (cachedGates.containsKey(key)) {
@@ -284,7 +291,7 @@ public class AcceleratorParticleLogic {
     public BlockPos findNextGate(BlockPos from, Vec3i direction, float speed) {
         
         // longer empty areas only work at higher speeds
-        var maxDist = Math.clamp(Math.sqrt(speed), 2, 8);
+        var maxDist = getMaxGateDist(speed);
         
         for (int i = 1; i <= maxDist; i++) {
             var candidatePos = from.add(direction.multiply(i));
