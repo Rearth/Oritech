@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "oritech:accelerator_ring"
+    },
+    "b": {
+      "item": "minecraft:observer"
+    }
+  },
+  "pattern": [
+    "ab "
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:accelerator_sensor"
+  }
+}

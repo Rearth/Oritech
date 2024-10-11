@@ -37,9 +37,7 @@ public class AcceleratorMotorBlock extends AcceleratorPassthroughBlock implement
     @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         var showExtra = Screen.hasControlDown();
-        if (!showExtra) {
-            tooltip.add(Text.translatable("tooltip.oritech.item_extra_info").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
-        } else {
+        if (showExtra) {
             tooltip.add(Text.translatable("tooltip.oritech.accelerator_motor").formatted(Formatting.GRAY));
         }
         
