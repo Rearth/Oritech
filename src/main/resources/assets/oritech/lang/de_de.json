@@ -168,6 +168,7 @@
   "tooltip.oritech.energy_indicator": "%d/%d RF",
   "tooltip.oritech.energy_max_transfer": "Max Transfer Rate: ",
   "tooltip.oritech.energy_transfer_rate": "%d RF/t",
+  "tooltip.oritech.energy_capacity": "%d RF/t",
   "title.oritech.machine.addon_range": "%d Range",
   "tooltip.oritech.block_destroyer.addon_range": "Maximum digging depth",
   "tooltip.oritech.laser_arm.addon_range": "Effective beam radius",
