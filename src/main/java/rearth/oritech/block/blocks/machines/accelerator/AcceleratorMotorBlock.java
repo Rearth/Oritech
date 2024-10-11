@@ -13,6 +13,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.accelerator.AcceleratorMotorBlockEntity;
+import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;
 
@@ -41,5 +42,7 @@ public class AcceleratorMotorBlock extends AcceleratorPassthroughBlock implement
         } else {
             tooltip.add(Text.translatable("tooltip.oritech.accelerator_motor").formatted(Formatting.GRAY));
         }
+        
+        TooltipHelper.addMachineTooltip(tooltip, this, this);
     }
 }

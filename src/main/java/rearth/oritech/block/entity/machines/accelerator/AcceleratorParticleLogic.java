@@ -9,6 +9,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.machines.accelerator.AcceleratorPassthroughBlock;
 import rearth.oritech.block.blocks.machines.accelerator.AcceleratorRingBlock;
 import rearth.oritech.init.BlockContent;
@@ -18,8 +19,6 @@ import java.util.*;
 
 // move this into a second class to keep the entity class smaller and focus on recipe handling, work interaction, etc.
 public class AcceleratorParticleLogic {
-    
-    private static final int MAX_VELOCITY = 15000;
     private final BlockPos pos;
     private final ServerWorld world;
     private final AcceleratorControllerBlockEntity entity;
@@ -257,11 +256,11 @@ public class AcceleratorParticleLogic {
     }
     
     public static float getMaxGateDist(float speed) {
-        return (float) Math.clamp(Math.sqrt(speed) / 2, 2, 10);
+        return (float) Math.clamp(Math.sqrt(speed) / 2, 2, Oritech.CONFIG.maxGateDist());
     }
     
     public static float getRequiredBendDist(float speed) {
-        return (float) (Math.sqrt(speed) / 3);
+        return (float) (Math.sqrt(speed) / Oritech.CONFIG.bendFactor());
     }
     
     @Nullable
@@ -374,8 +373,8 @@ public class AcceleratorParticleLogic {
         public float velocity;
         public BlockPos nextGate;
         public BlockPos lastGate;
-        public float lastBendDistance = MAX_VELOCITY;
-        public float lastBendDistance2 = MAX_VELOCITY;
+        public float lastBendDistance = 15000;
+        public float lastBendDistance2 = 15000;
         
         public ActiveParticle(Vec3d position, float velocity, BlockPos nextGate, BlockPos lastGate) {
             this.position = position;

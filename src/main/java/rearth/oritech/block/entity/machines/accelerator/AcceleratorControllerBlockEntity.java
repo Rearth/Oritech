@@ -30,6 +30,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.AcceleratorScreenHandler;
@@ -43,8 +44,6 @@ import rearth.oritech.util.*;
 import java.util.List;
 
 public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity>, InventoryProvider, ExtendedScreenHandlerFactory, ScreenProvider {
-    
-    private static final int RF_ACCELERATE_COST = 10;
     
     private AcceleratorParticleLogic.ActiveParticle particle;
     public ItemStack activeItemParticle = ItemStack.EMPTY;
@@ -117,9 +116,9 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     public void onParticleCollided(float relativeSpeed, Vec3d collision, BlockPos secondController, AcceleratorControllerBlockEntity secondControllerEntity) {
         
         // create end portal area when two ender pearls collide, nether portal for two firecharges
-        if (relativeSpeed > 1000 && activeItemParticle.getItem().equals(Items.ENDER_PEARL) && secondControllerEntity.activeItemParticle.getItem().equals(Items.ENDER_PEARL)) {
+        if (relativeSpeed > Oritech.CONFIG.endPortalRequiredSpeed() && activeItemParticle.getItem().equals(Items.ENDER_PEARL) && secondControllerEntity.activeItemParticle.getItem().equals(Items.ENDER_PEARL)) {
             spawnEndPortal(BlockPos.ofFloored(collision));
-        } else if (relativeSpeed > 1000 && activeItemParticle.getItem().equals(Items.FIRE_CHARGE) && secondControllerEntity.activeItemParticle.getItem().equals(Items.FIRE_CHARGE)) {
+        } else if (relativeSpeed > Oritech.CONFIG.netherPortalRequiredSpeed() && activeItemParticle.getItem().equals(Items.FIRE_CHARGE) && secondControllerEntity.activeItemParticle.getItem().equals(Items.FIRE_CHARGE)) {
             spawnNetherPortal(BlockPos.ofFloored(collision));
         } else {
             var success = tryCraftResult(relativeSpeed, activeItemParticle, secondControllerEntity.activeItemParticle);
@@ -289,9 +288,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         
         var blockHardness = hitState.getHardness(world, checkPos);
         
-        // todo config values for this number and portal creation numbers
         // hit portal, create black hole with explosion
-        if (remainingMomentum > 5000 && hitState.getBlock() instanceof Portal) {
+        if (remainingMomentum > Oritech.CONFIG.blackHoleRequiredSpeed() && hitState.getBlock() instanceof Portal) {
             createBlackHole(checkPos);
             return remainingMomentum;
         }
@@ -327,7 +325,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var availableEnergy = storage.getAmount();
         
         var speed = particle.velocity;
-        var cost = speed * RF_ACCELERATE_COST;
+        var cost = speed * Oritech.CONFIG.accelerationRFCost();
         if (availableEnergy < cost) return;
         
         try (var tx = Transaction.openOuter()) {
