@@ -49,30 +49,30 @@ public class AcceleratorSensorBlockEntity extends BlockEntity implements BlockEn
         } else if (measuredSpeed <= 10) {
             return 1;
         } else if (measuredSpeed <= 50) {
-            return 3;
+            return 2;
         } else if (measuredSpeed <= 75) {
-            return 4;
+            return 3;
         } else if (measuredSpeed <= 100) {
-            return 5;
+            return 4;
         } else if (measuredSpeed <= 150) {
-            return 6;
+            return 5;
         } else if (measuredSpeed <= 250) {
-            return 7;
+            return 6;
         } else if (measuredSpeed <= 500) {
-            return 8;
+            return 7;
         } else if (measuredSpeed <= 750) {
-            return 9;
+            return 8;
         } else if (measuredSpeed <= 1000) {
-            return 10;
+            return 9;
         } else if (measuredSpeed <= 2500) {
-            return 11;
+            return 10;
         } else if (measuredSpeed <= 5000) {
-            return 12;
+            return 11;
         } else if (measuredSpeed <= 7500) {
             return 12;
         } else if (measuredSpeed <= 10000) {
             return 13;
-        } else if (measuredSpeed <= 12500) {
+        } else if (measuredSpeed <= 15000) {
             return 14;
         }
         
