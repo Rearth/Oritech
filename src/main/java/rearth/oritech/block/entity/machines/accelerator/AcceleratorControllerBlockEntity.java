@@ -16,6 +16,8 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -73,6 +75,46 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         
         if (particle != null)
             particleLogic.update(particle);
+        
+    }
+    
+    @Override
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
+        
+        if (particle != null && activeItemParticle != null && activeItemParticle != ItemStack.EMPTY) {
+            var data = new NbtCompound();
+            data.putFloat("speed", particle.velocity);
+            data.putFloat("posX", (float) particle.position.x);
+            data.putFloat("posY", (float) particle.position.y);
+            data.putFloat("posZ", (float) particle.position.z);
+            data.putLong("lastGate", particle.lastGate.asLong());
+            data.putLong("nextGate", particle.nextGate.asLong());
+            data.put("item", activeItemParticle.encode(registryLookup));
+            nbt.put("particle", data);
+        } else {
+            nbt.remove("particle");
+        }
+        
+    }
+    
+    @Override
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+        
+        if (nbt.contains("particle")) {
+            var data = nbt.getCompound("particle");
+            var speed = data.getFloat("speed");
+            var posX = data.getFloat("posX");
+            var posY = data.getFloat("posY");
+            var posZ = data.getFloat("posZ");
+            var lastGate = BlockPos.fromLong(data.getLong("lastGate"));
+            var nextGate = BlockPos.fromLong(data.getLong("nextGate"));
+            var item = ItemStack.fromNbt(registryLookup, data.get("item"));
+            
+            item.ifPresent(stack -> activeItemParticle = stack);
+            particle = new AcceleratorParticleLogic.ActiveParticle(new Vec3d(posX, posY, posZ), speed, lastGate, nextGate);
+        }
         
     }
     
