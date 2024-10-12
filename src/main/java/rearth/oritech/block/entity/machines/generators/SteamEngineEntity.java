@@ -256,6 +256,11 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
+    public boolean bucketInputAllowed() {
+        return false;
+    }
+    
+    @Override
     public long getDefaultCapacity() {
         return Oritech.CONFIG.generators.steamEngineData.energyCapacity();
     }

@@ -1,0 +1,18 @@
+{
+  "type": "oritech:particle_collision",
+  "ingredients": [
+    {
+      "tag": "c:dusts/gold"
+    },
+    {
+      "tag": "c:dusts/gold"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:platinum_dust"
+    }
+  ],
+  "time": 500
+}

@@ -48,6 +48,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
     
     public static final ExtendedScreenHandlerType<CatalystScreenHandler, BasicData> CATALYST_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(CatalystScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<EnchanterScreenHandler, BasicData> ENCHANTER_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(EnchanterScreenHandler.class), BasicData.PACKET_CODEC);
+    public static final ExtendedScreenHandlerType<AcceleratorScreenHandler, BasicData> ACCELERATOR_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(AcceleratorScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<DroneScreenHandler, BasicData> DRONE_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(DroneScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<RedstoneAddonScreenHandler, BasicData> REDSTONE_ADDON_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(RedstoneAddonScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<CentrifugeScreenHandler, UpgradableData> CENTRIFUGE_SCREEN = new ExtendedScreenHandlerType<>(new UpgradeFactory<>(CentrifugeScreenHandler.class), UpgradableData.PACKET_CODEC);
@@ -61,6 +62,7 @@ public class ModScreens implements AutoRegistryContainer<ScreenHandlerType<?>> {
         HandledScreens.register(ATOMIC_FORGE_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         HandledScreens.register(CATALYST_SCREEN, CatalystScreen::new);
         HandledScreens.register(ENCHANTER_SCREEN, EnchanterScreen::new);
+        HandledScreens.register(ACCELERATOR_SCREEN, AcceleratorScreen::new);
         
         HandledScreens.register(PULVERIZER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(GRINDER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);

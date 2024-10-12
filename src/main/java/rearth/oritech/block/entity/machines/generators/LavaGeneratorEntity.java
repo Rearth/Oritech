@@ -16,7 +16,6 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.InventorySlotAssignment;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.List;
@@ -61,23 +60,8 @@ public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    public InventorySlotAssignment getSlots() {
-        return new InventorySlotAssignment(0, 0, 0, 0);
-    }
-    
-    @Override
-    public List<GuiSlot> getGuiSlots() {
-        return List.of();
-    }
-    
-    @Override
     public ScreenHandlerType<?> getScreenHandlerType() {
         return ModScreens.LAVA_GENERATOR_SCREEN;
-    }
-    
-    @Override
-    public int getInventorySize() {
-        return 0;
     }
     
     @Override

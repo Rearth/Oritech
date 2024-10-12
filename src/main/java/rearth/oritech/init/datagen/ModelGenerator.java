@@ -44,7 +44,9 @@ public class ModelGenerator extends FabricModelProvider {
         
         blockStateModelGenerator.registerSimpleState(BlockContent.SMALL_STORAGE_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.LARGE_STORAGE_BLOCK);
+        blockStateModelGenerator.registerSimpleState(BlockContent.CREATIVE_STORAGE_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.SMALL_TANK_BLOCK);
+        blockStateModelGenerator.registerSimpleState(BlockContent.CREATIVE_TANK_BLOCK);
         
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.PLACER_BLOCK);
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.DESTROYER_BLOCK);
@@ -105,6 +107,10 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.ACCELERATOR_MOTOR);
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.ACCELERATOR_CONTROLLER);
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.ACCELERATOR_SENSOR);
+        blockStateModelGenerator.registerSimpleState(BlockContent.BLACK_HOLE_BLOCK);
+        blockStateModelGenerator.registerSimpleState(BlockContent.BLACK_HOLE_INNER);
+        blockStateModelGenerator.registerSimpleState(BlockContent.BLACK_HOLE_MIDDLE);
+        blockStateModelGenerator.registerSimpleState(BlockContent.BLACK_HOLE_OUTER);
         
         // metals
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.NICKEL_ORE);

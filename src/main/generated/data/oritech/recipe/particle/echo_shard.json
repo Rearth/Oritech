@@ -2,17 +2,17 @@
   "type": "oritech:particle_collision",
   "ingredients": [
     {
-      "item": "minecraft:coal"
+      "item": "minecraft:ender_pearl"
     },
     {
-      "item": "minecraft:apple"
+      "item": "minecraft:amethyst_shard"
     }
   ],
   "results": [
     {
       "count": 1,
-      "id": "oritech:banana"
+      "id": "minecraft:echo_shard"
     }
   ],
-  "time": 30
+  "time": 1000
 }

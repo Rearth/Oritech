@@ -1,0 +1,133 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [64, 64],
+	"textures": {
+		"0": "oritech:block/black_hole_block",
+		"particle": "oritech:block/machine_particle_texture"
+	},
+	"elements": [
+		{
+			"name": "surround",
+			"from": [11.25, 4.75, 4.75],
+			"to": [11.25, 11.25, 11.25],
+			"rotation": {"angle": 0, "axis": "y", "origin": [14.5, -7, -7]},
+			"faces": {
+				"north": {"uv": [12, 2, 12, 4], "texture": "#0"},
+				"east": {"uv": [2, 0, 4, 2], "texture": "#0"},
+				"south": {"uv": [14, 2, 14, 4], "texture": "#0"},
+				"west": {"uv": [0, 0, 2, 2], "texture": "#0"},
+				"up": {"uv": [12, 2, 12, 0], "texture": "#0"},
+				"down": {"uv": [12, 0, 12, 2], "texture": "#0"}
+			}
+		},
+		{
+			"name": "surround",
+			"from": [4.75, 11.25, 4.75],
+			"to": [11.25, 11.25, 11.25],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.75, -0.75, 0.75]},
+			"faces": {
+				"north": {"uv": [2, 10, 4, 10], "texture": "#0"},
+				"east": {"uv": [0, 10, 2, 10], "texture": "#0"},
+				"south": {"uv": [6, 10, 8, 10], "texture": "#0"},
+				"west": {"uv": [4, 10, 6, 10], "texture": "#0"},
+				"up": {"uv": [4, 2, 2, 0], "texture": "#0"},
+				"down": {"uv": [2, 0, 0, 2], "texture": "#0"}
+			}
+		},
+		{
+			"name": "surround",
+			"from": [4.75, 4.75, 4.75],
+			"to": [11.25, 4.75, 11.25],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.75, -7.25, 0.75]},
+			"faces": {
+				"north": {"uv": [2, 6, 4, 6], "texture": "#0"},
+				"east": {"uv": [0, 6, 2, 6], "texture": "#0"},
+				"south": {"uv": [6, 6, 8, 6], "texture": "#0"},
+				"west": {"uv": [4, 6, 6, 6], "texture": "#0"},
+				"up": {"uv": [2, 0, 0, 2], "texture": "#0"},
+				"down": {"uv": [4, 0, 2, 2], "texture": "#0"}
+			}
+		},
+		{
+			"name": "surround",
+			"from": [4.75, 4.75, 11.25],
+			"to": [11.25, 11.25, 11.25],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.75, -7.25, -0.75]},
+			"faces": {
+				"north": {"uv": [0, 0, 2, 2], "texture": "#0"},
+				"east": {"uv": [0, 0, 0, 2], "texture": "#0"},
+				"south": {"uv": [2, 0, 4, 2], "texture": "#0"},
+				"west": {"uv": [2, 0, 2, 2], "texture": "#0"},
+				"up": {"uv": [2, 0, 0, 0], "texture": "#0"},
+				"down": {"uv": [4, 0, 2, 0], "texture": "#0"}
+			}
+		},
+		{
+			"name": "surround",
+			"from": [4.75, 4.75, 4.75],
+			"to": [11.25, 11.25, 4.75],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.75, -7.25, -7.25]},
+			"faces": {
+				"north": {"uv": [2, 0, 4, 2], "texture": "#0"},
+				"east": {"uv": [0, 0, 0, 2], "texture": "#0"},
+				"south": {"uv": [0, 0, 2, 2], "texture": "#0"},
+				"west": {"uv": [2, 0, 2, 2], "texture": "#0"},
+				"up": {"uv": [2, 0, 0, 0], "texture": "#0"},
+				"down": {"uv": [4, 0, 2, 0], "texture": "#0"}
+			}
+		},
+		{
+			"name": "surround",
+			"from": [4.75, 4.75, 4.75],
+			"to": [4.75, 11.25, 11.25],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.75, -7.25, -7.25]},
+			"faces": {
+				"north": {"uv": [12, 2, 12, 4], "texture": "#0"},
+				"east": {"uv": [0, 0, 2, 2], "texture": "#0"},
+				"south": {"uv": [14, 2, 14, 4], "texture": "#0"},
+				"west": {"uv": [2, 0, 4, 2], "texture": "#0"},
+				"up": {"uv": [12, 2, 12, 0], "texture": "#0"},
+				"down": {"uv": [12, 0, 12, 2], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [75, 45, 0],
+			"translation": [0, 2.5, 0],
+			"scale": [0.375, 0.375, 0.375]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [75, 45, 0],
+			"translation": [0, 2.5, 0],
+			"scale": [0.375, 0.375, 0.375]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, 45, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, 225, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"ground": {
+			"translation": [0, 3, 0],
+			"scale": [0.25, 0.25, 0.25]
+		},
+		"gui": {
+			"rotation": [30, 225, 0],
+			"scale": [0.625, 0.625, 0.625]
+		},
+		"fixed": {
+			"scale": [0.5, 0.5, 0.5]
+		}
+	},
+	"groups": [
+		{
+			"name": "surround",
+			"origin": [7, -8, -8],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4, 5]
+		}
+	]
+}

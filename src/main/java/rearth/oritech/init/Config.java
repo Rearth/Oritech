@@ -52,6 +52,14 @@ public class Config {
     public int catalystHyperMultiplier = 2;
     public int spawnerCostMultiplier = 1;
     
+    @SectionHeader("particleAccelerator")
+    public int maxGateDist = 10;
+    public int bendFactor = 3;
+    public int accelerationRFCost = 10;
+    public int endPortalRequiredSpeed = 10000;
+    public int netherPortalRequiredSpeed = 5000;
+    public int blackHoleRequiredSpeed = 15000;
+    
     @SectionHeader("clientSettings")
     @Sync(Option.SyncMode.NONE)
     @RestartRequired
@@ -109,6 +117,7 @@ public class Config {
         public long maxEnergyInsertion = 512;
         public long energyPerTick = 128;
         public int blockBreakEnergyBase = 1024; // multiplied by block hardness
+        public float damageTickBase = 2;
         public int range = 128;
     }
     

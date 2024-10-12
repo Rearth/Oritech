@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:accelerator_motor"
+    },
+    "c": {
+      "item": "minecraft:dropper"
+    },
+    "f": {
+      "item": "oritech:duratium_ingot"
+    },
+    "s": {
+      "item": "oritech:flux_gate"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:accelerator_controller"
+  }
+}
