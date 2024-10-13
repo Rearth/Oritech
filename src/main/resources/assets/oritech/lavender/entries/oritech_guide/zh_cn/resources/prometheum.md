@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Prometheum",
+  "title": "钷",
   "icon": "oritech:prometheum_ingot",
   "category": "oritech:resources",
   "associated_items": [
@@ -10,6 +10,6 @@
 }
 ```
 
-Prometheum is an advanced material that can only be produced in an [atomic forge](^oritech:processing/atomic_forge).
+钷晶锭 (Prometheum Ingot)是一种只能在[原子锻造器](^oritech:processing/atomic_forge)中生产的超级材料。
 
-It is used for crafting [prometheum tools](^oritech:tools/prometheum_tools) and the ultimate (tier 7) machine core.
+其被用于制作各类[钷晶工具](^oritech:tools/prometheum_tools)和终极机器核心（等级7）。

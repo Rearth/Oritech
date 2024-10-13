@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Crude Oil",
+  "title": "原油",
   "icon": "oritech:oil_bucket",
   "category": "oritech:resources",
   "associated_items": [
@@ -13,6 +13,6 @@
 
 ;;;;;
 
-Pockets of crude oil can be found in many places underground. They are also common near the surface in desert biomes where they can be seen gushing out from the ground.
+您可以在地下许多地方发现油田。在生物群系——沙漠附近经常可以发现井喷的油田。
 
-Crude oil can be processed with a [centrifuge](^oritech:processing/centrifuge) (with [fluid addon](^oritech:processing/addons)) into plastic sheets or turbofuel.
+原油可以在安装了[流体处理插件](^oritech:processing/addons)的[离心机](^oritech:processing/centrifuge)中被离心分离为石油树脂或涡轮燃料。

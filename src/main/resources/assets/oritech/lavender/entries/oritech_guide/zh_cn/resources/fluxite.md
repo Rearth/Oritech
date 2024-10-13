@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Fluxite",
+  "title": "辐水晶",
   "icon": "oritech:fluxite",
   "category": "oritech:resources",
   "associated_items": [
@@ -10,9 +10,9 @@
 }
 ```
 
-Fluxite is an important component of the flux gate, which is required for building some of the more advanced machines. The best way to obtain fluxite is by mining an amethyst cluster with an [enderic easer](^oritech:interaction/enderic_laser).
+辐水晶是磁通门 (Flux Gate)的重要组成部分，磁通门是制作一些更加先进的机器时所需的材料。采集能量水晶的最佳方式就是使用[末影激光器](^oritech:interaction/enderic_laser)开采紫水晶簇。
 
-Fluxite can also be found when processing [platinum](^oritech:resources/platinum) ores.
+对[铂](^oritech:resources/platinum)矿石进行某些处理时同样能得到辐水晶。
 
 ;;;;;
 

@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Adamant",
+  "title": "精镍",
   "icon": "oritech:adamant_ingot",
   "category": "oritech:resources",
   "associated_items": [
@@ -11,12 +11,12 @@
 }
 ```
 
-Adamant is a basic alloy that is used to create the [assembler](^oritech:processing/assembler), [steam boiler addon](^oritech:logistics/steam), machine cores, and other components and tools.
+精镍锭是用于制作[装配机](^oritech:processing/assembler)、[蒸汽锅炉插件](^oritech:logistics/steam)、机器核心、各类部件和工具的基础合金。
 
-Adamant can be created in a crafting grid:
+精镍锭可以在工作台中合成：
 
-<recipe;oritech:adamant_ingotmanualadamant>
+<recipe;oritech:crafting/alloy/adamant>
 
 ;;;;;
 
-The [foundry](^oritech:processing/foundry) can produce more adamant with less diamond and nickel.
+[铸造工厂](^oritech:processing/foundry)可以用更少的钻石和镍锭合成更多的精镍锭。

@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Ore Boulder",
+  "title": "巨大矿团",
   "icon": "oritech:deepslate_nickel_ore",
   "category": "oritech:resources"
 }
@@ -10,10 +10,10 @@
 
 ;;;;;
 
-Ore boulders are found on the surface of the world. They're made out of deepslate and are rich in ores.
+您可以在主世界的地表找到巨大矿团。其主要由深板岩组成，内含大量矿石。
 
-Remember where you found them!
+请记住它们的位置！
 
-[Resource nodes](^oritech:resources/resource_node) can be found below ore boulders near bedrock, and are often covered by pockets of [crude oil](^oritech:resources/crude_oil) or water.
+在巨大矿团所处位置的基岩层附近可以发现[资源节点](^oritech:resources/resource_node)，资源节点通常会被[原油](^oritech:resources/crude_oil)或水所覆盖。
 
-The ores in the ore boulder indicate which ores can be found in the resource node below.
+巨大矿团下的资源点的种类与在巨大矿团中发现的矿物种类一致。

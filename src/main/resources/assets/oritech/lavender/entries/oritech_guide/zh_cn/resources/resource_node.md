@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Resource node",
+  "title": "资源节点",
   "icon": "oritech:resource_node_platinum",
   "category": "oritech:resources",
   "associated_items": [
@@ -18,14 +18,12 @@
 }
 ```
 
-Resource nodes are found throughout the world, appearing in clusters just on top of the bedrock layer. There are resource nodes for all overworld ore types. They are usually covered by a small pocket of [crude oil](^oritech:resources/crude_oil).
+资源点遍布主世界各处，其会成群出现在基岩层。 所有矿石存在与之对应的资源点，它们通常会被[原油](^oritech:resources/crude_oil)或水所覆盖。
 
-Resource nodes can only be mined with a [bedrock extractor](^oritech:interaction/deepdrill).
-
-On the surface, the location of a resource node cluster can be identified by the
+资源点只能被[基岩层钻机](^oritech:interaction/deepdrill)开采。
 
 ;;;;;
 
 ![resource_node](oritech:textures/book/resource_node.png,fit)
 
-occurrence of an [ore boulder](^oritech:resources/ore_boulder). The ore boulder also identifies the type of ores found in the cluster.
+资源点的位置可以通过寻找位于其上方的[巨大矿团](^oritech:resources/ore_boulder)来确定。通过观察巨大矿团还能确定资源点的种类。

@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Enderic Compound",
+  "title": "末影化合物",
   "icon": "oritech:enderic_compound",
   "category": "oritech:resources",
   "associated_items": [
@@ -10,6 +10,6 @@
 }
 ```
 
-Enderic Compound is a strange but useful substance that can be obtained by crushing ender pearls in a [pulverizer](^oritech:processing/pulverizer) or [fragment forge](^oritech:processing/fragment_forge), or by processing sculk in a [centrifuge](^oritech:processing/centrifuge).
+末影化合物是一种奇妙物质，其可以通过[磨粉机](^oritech:processing/pulverizer)研磨， [粉碎工厂](^oritech:processing/fragment_forge)粉碎末影珍珠，亦或是使用[离心机](^oritech:processing/centrifuge)离心分离幽匿块后获得。
 
-Enderic Compound can be used to make budding amethyst in an [assembler](^oritech:processing/assembler), or to duplicate ores with an [atomic forge](^oritech:processing/atomic_forge).
+末影化合物可用于在[装配器](^oritech:processing/assembler)中装配成紫水晶母岩，或是在[原子锻造器](^oritech:processing/atomic_forge)中成为倍矿处理的原材料。

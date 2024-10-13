@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Electrum",
+  "title": "琥珀金",
   "icon": "oritech:electrum_ingot",
   "category": "oritech:resources",
   "associated_items": [
@@ -11,12 +11,12 @@
 }
 ```
 
-Electrum is a basic alloy that is used to create [generators](^oritech:logistics/generators), [energy pipes](^oritech:logistics/energy), and other components, machines, and addons.
+琥珀金锭是用于制作各类[发电机](^oritech:logistics/generators)、[能量管道](^oritech:logistics/energy)、部件、机器和升级插件的基础合金锭。
 
-Electrum can be created in a crafting grid:
+琥珀金锭可以在工作台中合成：
 
-<recipe;oritech:electrum_ingotmanualelectrum>
+<recipe;oritech:crafting/alloy/electrum>
 
 ;;;;;
 
-The [foundry](^oritech:processing/foundry) can produce more electrum with less gold and redstone.
+[铸造工厂](^oritech:processing/foundry)可以用更少的金锭和红石粉合成更多的琥珀金锭。

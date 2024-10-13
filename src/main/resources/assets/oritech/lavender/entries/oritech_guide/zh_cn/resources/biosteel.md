@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "生物质钢",
+  "title": "有机钢锭",
   "icon": "oritech:biosteel_ingot",
   "category": "oritech:resources",
   "associated_items": [
@@ -11,6 +11,6 @@
 }
 ```
 
-Biosteel is an alloy of [steel](^oritech:resources/steel) and raw biopolymer that can only be made in a [foundry](^oritech:processing/foundry).
+有机钢锭只能在[铸造工厂](^oritech:processing/foundry)中由[钢锭](^oritech:resources/steel)和粗有机聚合物合金化后铸造而成。
 
-It can be used in many places that steel is accepted, and is also needed to make [bio generators](^oritech:logistics/generators) and [machine speed addons](^oritech:processing/speed_addon).
+它可以在很多需要钢锭的地方替代钢锭，制作[生物质能发电机](^oritech:logistics/generators)和[机器速度插件](^oritech:processing/speed_addon)时同样需要有机钢锭。

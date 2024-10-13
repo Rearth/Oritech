@@ -6,4 +6,4 @@
 }
 ```
 
-还有许多全新的资源等待您去探索——挖掘——运输和加工！
+There are many exciting new resources to discover, mine, transport, and process.

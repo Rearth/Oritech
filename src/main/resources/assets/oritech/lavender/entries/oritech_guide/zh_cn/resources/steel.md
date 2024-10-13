@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Steel",
+  "title": "钢",
   "icon": "oritech:steel_ingot",
   "category": "oritech:resources",
   "associated_items": [
@@ -11,12 +11,12 @@
 }
 ```
 
-Steel is a basic alloy that is used to create the wires, coils, motors, and plating that are used to build all of the other machines.
+钢锭是一种用于制作细导线、电磁线圈和电动马达等物品的基础合金锭。
 
-Steel can be created in a crafting grid:
+钢锭可以在工作台中合成：
 
-<recipe;oritech:steel_ingotmanualsteel>
+<recipe;oritech:crafting/alloy/steel>
 
 ;;;;;
 
-The [foundry](^oritech:processing/foundry) can produce more steel with less iron and coal.
+[铸造工厂](^oritech:processing/foundry)可以用更少的铁锭和煤炭合成更多的钢锭。

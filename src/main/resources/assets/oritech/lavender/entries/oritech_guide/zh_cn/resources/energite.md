@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Energite",
+  "title": "辐镍晶",
   "icon": "oritech:energite_ingot",
   "category": "oritech:resources",
   "associated_items": [
@@ -11,6 +11,6 @@
 }
 ```
 
-Energite is an alloy of [nickel](^oritech:resources/nickel) and [fluxite](^oritech:resources/fluxite) that can only be made in a [foundry](^oritech:processing/foundry).
+辐镍晶锭只能在[铸造工厂](^oritech:processing/foundry)中由[镍锭](^oritech:resources/nickel)和[辐水晶](^oritech:resources/fluxite)合金化后铸造而成。
 
-It is used for batteries, machine addons, and components that are used to create some machines that generate or store energy.
+其被用于制作各类电池、和那些用于储存能量的插件。

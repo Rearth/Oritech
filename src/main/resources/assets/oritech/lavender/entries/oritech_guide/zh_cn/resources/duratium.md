@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Duratium",
+  "title": "昶铂",
   "icon": "oritech:duratium_ingot",
   "category": "oritech:resources",
   "associated_items": [
@@ -11,6 +11,6 @@
 }
 ```
 
-Duratium is an alloy of [platinum](^oritech:resources/platinum) and netherite that can only be made in a [foundry](^oritech:processing/foundry).
+昶（chǎng）铂锭只能在[铸造工厂](^oritech:processing/foundry)中由[铂锭](^oritech:resources/platinum)和下界合金锭合金化后铸造而成。
 
-It is used to build the [atomic forge](^oritech:processing/atomic_forge), [bedrock extractor](^oritech:processing/bedrock_extractor) and the ultra (tier 6) machine core.
+其被用于制作[原子锻造器](^oritech:processing/atomic_forge)、基岩层钻机 [基岩层钻机](^oritech:processing/bedrock_extractor)和超级机器核心（等级6）。
