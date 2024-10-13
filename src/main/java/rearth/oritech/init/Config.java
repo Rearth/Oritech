@@ -39,7 +39,7 @@ public class Config {
     public int fluidPipeExtractIntervalDuration = 3;
     public float fluidPipeInternalStorageBuckets = 2f;
     public long energyPipeTransferRate = 10_000;
-    public long superConductorTransferRate = 2_097_152;
+    public long superConductorTransferRate = 4_194_304;
     
     @SectionHeader("worldGeneration")
     public boolean generateOres = true;
