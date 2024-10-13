@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "oritech:item/superconductor"
-  }
+  "parent": "oritech:block/superconductor"
 }

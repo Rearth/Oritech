@@ -108,6 +108,7 @@
   "tooltip.oritech.spawner": "Traps the first mob that walks on it in a cage underneath.",
   "tooltip.oritech.spawner2": "Collects and uses souls from entities parting nearby.",
   "tooltip.oritech.soul_crop": "Grown on soul soil. Contains a soul.",
+  "tooltip.oritech.superconductor": "Cannot connect to normal energy pipes.",
 
   "tooltip.oritech.addon_speed_desc": "Operation Speed ",
   "tooltip.oritech.addon_efficiency_desc": "Energy Efficiency ",
@@ -313,6 +314,7 @@
   "block.oritech.machine_frame_block": "Machine Frame",
   "block.oritech.fluid_pipe": "Fluid Pipe",
   "block.oritech.energy_pipe": "Energy Pipe",
+  "block.oritech.superconductor": "Superconductor",
   "block.oritech.item_pipe": "Item Pipe",
   "block.oritech.item_filter_block": "Item Filter",
   "block.oritech.fluid_pipe_connection": "Fluid Pipe Connection",

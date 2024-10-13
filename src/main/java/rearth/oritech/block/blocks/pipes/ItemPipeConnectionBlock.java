@@ -98,12 +98,12 @@ public class ItemPipeConnectionBlock extends GenericPipeConnectionBlock {
     }
     
     @Override
-    public boolean connectToBlockType(Block block) {
+    public boolean connectToOwnBlockType(Block block) {
         return block instanceof ItemPipeBlock || block instanceof ItemPipeConnectionBlock;
     }
     
     @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
-        return ITEM_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new GenericPipeInterfaceEntity.PipeNetworkData());
+        return ITEM_PIPE_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 }

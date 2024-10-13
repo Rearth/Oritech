@@ -281,8 +281,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // deep drill
         offerAtomicForgeRecipe(exporter, BlockContent.DEEP_DRILL_BLOCK.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.HEISENBERG_COMPENSATOR), Ingredient.ofItems(ItemContent.OVERCHARGED_CRYSTAL), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), "deepdrill");
         // drone port
-        offerAtomicForgeRecipe(exporter, BlockContent.DRONE_PORT_BLOCK.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), "droneport");
-        offerAtomicForgeRecipe(exporter, BlockContent.DRONE_PORT_BLOCK.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), Ingredient.ofItems(ItemContent.SUPER_AI_CHIP), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), "droneportalt");
+        offerAtomicForgeRecipe(exporter, BlockContent.DRONE_PORT_BLOCK.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(BlockContent.SUPERCONDUCTOR.asItem()), Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), "droneport");
+        offerAtomicForgeRecipe(exporter, BlockContent.DRONE_PORT_BLOCK.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(BlockContent.SUPERCONDUCTOR.asItem()), Ingredient.ofItems(ItemContent.SUPER_AI_CHIP), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), "droneportalt");
         
         // arcane catalyst
         offerFurnaceRecipe(exporter, BlockContent.ENCHANTMENT_CATALYST_BLOCK.asItem(), Ingredient.ofItems(Items.ENCHANTING_TABLE), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(Items.OBSIDIAN), Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), Ingredient.ofItems(ItemContent.FLUXITE), "catalyst");
@@ -298,9 +298,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         // particle accelerator
         // motor
-        offerParticleMotorRecipe(exporter, BlockContent.ACCELERATOR_MOTOR.asItem(), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), "particlemotor");
+        offerParticleMotorRecipe(exporter, BlockContent.ACCELERATOR_MOTOR.asItem(), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), Ingredient.ofItems(BlockContent.SUPERCONDUCTOR.asItem()), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), "particlemotor");
         // ring
-        offerDrillRecipe(exporter, BlockContent.ACCELERATOR_RING.asItem(), Ingredient.ofItems(BlockContent.INDUSTRIAL_GLASS_BLOCK.asItem()), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(Items.REDSTONE_TORCH), "acceleratorring");
+        offerDrillRecipe(exporter, BlockContent.ACCELERATOR_RING.asItem(), Ingredient.ofItems(BlockContent.INDUSTRIAL_GLASS_BLOCK.asItem()), Ingredient.ofItems(BlockContent.SUPERCONDUCTOR.asItem()), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(Items.REDSTONE_TORCH), "acceleratorring");
         // controller
         offerGeneratorRecipe(exporter, BlockContent.ACCELERATOR_CONTROLLER.asItem(), Ingredient.ofItems(BlockContent.ACCELERATOR_MOTOR.asItem()), Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.ofItems(Items.DROPPER), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), "particlecontroller");
         // sensor
@@ -331,7 +331,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_4.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.ENDERIC_COMPOUND), "core4");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_5.asItem(), Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.ADVANCED_COMPUTING_ENGINE), "core5");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_6.asItem(), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), Ingredient.ofItems(ItemContent.DUBIOS_CONTAINER), "core6");
-        offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_7.asItem(), Ingredient.ofItems(ItemContent.PROMETHEUM_INGOT), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), "core7");
+        offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_7.asItem(), Ingredient.ofItems(ItemContent.PROMETHEUM_INGOT), Ingredient.ofItems(BlockContent.SUPERCONDUCTOR.asItem()), "core7");
         
         // machine extender
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_EXTENDER.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(BlockContent.MACHINE_CORE_2.asItem()), "extender");
@@ -414,8 +414,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // endgame components
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.SUPER_AI_CHIP), ItemContent.HEISENBERG_COMPENSATOR, 100, "compensator");
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.ADAMANT_INGOT), Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), ItemContent.HEISENBERG_COMPENSATOR, 100, "compensatoralt");
-        offerMotorRecipe(exporter, ItemContent.OVERCHARGED_CRYSTAL, Ingredient.ofItems(Items.AMETHYST_BLOCK), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), Ingredient.ofItems(ItemContent.SUPERCONDUCTOR), "overchargedcrystal");
-        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.fromTag(TagContent.WIRES), Ingredient.ofItems(ItemContent.DUBIOS_CONTAINER), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), ItemContent.SUPERCONDUCTOR, 2f, "superconductor");
+        offerMotorRecipe(exporter, ItemContent.OVERCHARGED_CRYSTAL, Ingredient.ofItems(Items.AMETHYST_BLOCK), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), Ingredient.ofItems(BlockContent.SUPERCONDUCTOR.asItem()), "overchargedcrystal");
+        addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.fromTag(TagContent.WIRES), Ingredient.ofItems(ItemContent.DUBIOS_CONTAINER), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), BlockContent.SUPERCONDUCTOR.asItem(), 2f, "superconductor");
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.OVERCHARGED_CRYSTAL), Ingredient.ofItems(ItemContent.HEISENBERG_COMPENSATOR), ItemContent.PROMETHEUM_INGOT, 1000, "prometheum");
     }
     

@@ -1,0 +1,100 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/superconductor_inner"
+      }
+    },
+    {
+      "when": {
+        "north": "1|2",
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/superconductor_outer"
+      }
+    },
+    {
+      "when": {
+        "south": "1|2",
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/superconductor_outer",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "east": "1|2",
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/superconductor_outer",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "west": "1|2",
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/superconductor_outer",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "1|2",
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/superconductor_outer",
+        "x": -90
+      }
+    },
+    {
+      "when": {
+        "down": "1|2",
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/superconductor_outer",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "1|2",
+        "straight": "true"
+      },
+      "apply": {
+        "model": "oritech:block/superconductor_straight",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "east": "1|2",
+        "straight": "true"
+      },
+      "apply": {
+        "model": "oritech:block/superconductor_straight",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "north": "1|2",
+        "straight": "true"
+      },
+      "apply": {
+        "model": "oritech:block/superconductor_straight"
+      }
+    }
+  ]
+}

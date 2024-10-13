@@ -6,7 +6,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.pipes.EnergyPipeInterfaceEntity;
@@ -14,11 +13,11 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 import team.reborn.energy.api.EnergyStorage;
 
-import static rearth.oritech.block.blocks.pipes.EnergyPipeBlock.ENERGY_PIPE_DATA;
+import static rearth.oritech.block.blocks.pipes.SuperConductorBlock.SUPERCONDUCTOR_DATA;
 
-public class EnergyPipeConnectionBlock extends GenericPipeConnectionBlock {
+public class SuperConductorConnectionBlock extends GenericPipeConnectionBlock {
     
-    public EnergyPipeConnectionBlock(Settings settings) {
+    public SuperConductorConnectionBlock(Settings settings) {
         super(settings);
     }
     
@@ -35,44 +34,31 @@ public class EnergyPipeConnectionBlock extends GenericPipeConnectionBlock {
     
     @Override
     public BlockState getConnectionBlock() {
-        return BlockContent.ENERGY_PIPE_CONNECTION.getDefaultState();
+        return BlockContent.SUPERCONDUCTOR_CONNECTION.getDefaultState();
     }
     
     @Override
     public BlockState getNormalBlock() {
-        return BlockContent.ENERGY_PIPE.getDefaultState();
-    }
-
-    @Override
-    protected VoxelShape[] createShapes() {
-        VoxelShape inner = Block.createCuboidShape(6, 6, 6, 10, 10, 10);
-        VoxelShape north = Block.createCuboidShape(6, 6, 0, 10, 10, 6);
-        VoxelShape east = Block.createCuboidShape(0, 6, 6, 6, 10, 10);
-        VoxelShape south = Block.createCuboidShape(6, 6, 10, 10, 10, 16);
-        VoxelShape west = Block.createCuboidShape(10, 6, 6, 16, 10, 10);
-        VoxelShape up = Block.createCuboidShape(6, 10, 6, 10, 16, 10);
-        VoxelShape down = Block.createCuboidShape(6, 0, 6, 10, 6, 10);
-        
-        return new VoxelShape[]{inner, north, west, south, east, up, down};
+        return BlockContent.SUPERCONDUCTOR.getDefaultState();
     }
     
     @Override
     public String getPipeTypeName() {
-        return "energy";
+        return "superconductor";
     }
     
     @Override
     public boolean connectToOwnBlockType(Block block) {
-        return block instanceof EnergyPipeBlock || block instanceof EnergyPipeConnectionBlock;
+        return block instanceof SuperConductorBlock || block instanceof SuperConductorConnectionBlock;
     }
     
     @Override
     public boolean isCompatibleTarget(Block block) {
-        return !block.equals(BlockContent.SUPERCONDUCTOR_CONNECTION);
+        return !block.equals(BlockContent.ENERGY_PIPE_CONNECTION);
     }
     
     @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
-        return ENERGY_PIPE_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+        return SUPERCONDUCTOR_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 }
