@@ -82,7 +82,6 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
             playerEntity.removeStatusEffect(StatusEffects.NIGHT_VISION);
     }
     
-    // Create our armor model/renderer for Fabric and return it
     @Override
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
@@ -93,16 +92,12 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
                 
                 if (this.renderer == null)
                     this.renderer = new ExosuitArmorRenderer();
-                // This prepares our GeoArmorRenderer for the current render frame.
-                // These parameters may be null however, so we don't do anything further with them
-                this.renderer.prepForRender(livingEntity, itemStack, equipmentSlot, original);
                 
                 return this.renderer;
             }
         });
     }
     
-    // Let's add our animation controller
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, 20, state -> PlayState.STOP));
