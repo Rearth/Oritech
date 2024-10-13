@@ -90,43 +90,43 @@
   "tooltip.oritech.addon_fluid_desc": "Позволяет перерабатывать жидкость. Применяется для центрифуги",
   "tooltip.oritech.addon_acceptor_desc": "Действует в качестве энергетического прокси",
   "tooltip.oritech.addon_crop_desc": "Применяется для Блокировки Разрушителя и Эндеррического Лазера (Enderic Laser). Пропускает невыращенные культуры или животных",
-  "tooltip.oritech.addon_proxy_desc": "Allows access to specific inventory slots",
-  "tooltip.oritech.addon_proxy_select": "Select proxy target slot",
-  "tooltip.oritech.addon_quarry_desc": "Applicable to block destroyer and Enderic Laser. Increases working area size",
-  "tooltip.oritech.addon_hunter_desc": "Applicable to Enderic Laser. Targets living entities",
-  "tooltip.oritech.addon_redstone_desc": "Allows further redstone and comparator configuration",
-  "tooltip.oritech.addon_capacity_desc": "Energy Capacity ",
-  "tooltip.oritech.addon_transfer_desc": "Energy Transfer Rate ",
-  "tooltip.oritech.addon_extender_desc": "Allows additional addons to be connected",
-  "tooltip.oritech.addon_boiler_desc": "Allows a generator to produce steam instead of RF. Input water at this addon, and extract steam from it",
-  "tooltip.oritech.overchargedcrystal": "Unending amounts of raw energy seem to be contained within it.",
-  "tooltip.oritech.fluxite": "Can also be created by harvesting grown amethyst with an enderic laser",
-  "tooltip.oritech.promethium_axe": "Sneak while harvesting to break the entire tree",
-  "tooltip.oritech.promethium_pick": "Shift + right click to switch mode",
-  "tooltip.oritech.frame_needed": "Must be built on a machine frame",
-  "tooltip.oritech.exo_boots": "Prevents all fall damage",
-  "tooltip.oritech.exo_leggings": "Increases movement speed",
-  "tooltip.oritech.exo_chestplate": "Charges equipped energy items",
-  "tooltip.oritech.exo_helmet": "Grants night vision",
-  "tooltip.oritech.black_hole": "DON'T PLACE THIS unless you know what you're doing.",
-  "tooltip.oritech.weed_killer": "Removes all grass and plants in a wide radius",
+  "tooltip.oritech.addon_proxy_desc": "Разрешить доступ к определенным слотам инвентаря",
+  "tooltip.oritech.addon_proxy_select": "Выбрать место для прокси",
+  "tooltip.oritech.addon_quarry_desc": "Применяется для блокирования разрушителя и лазера эндерика. Увеличивает размер рабочей зоны",
+  "tooltip.oritech.addon_hunter_desc": "Применяется для эндерического лазера. Цели живых сущностей",
+  "tooltip.oritech.addon_redstone_desc": "Позволяет изменять настройки редстоуна и компаратора",
+  "tooltip.oritech.addon_capacity_desc": "Емкость:",
+  "tooltip.oritech.addon_transfer_desc": "Скорость передачи энергии ",
+  "tooltip.oritech.addon_extender_desc": "Позволяет подключать дополнительные аддоны",
+  "tooltip.oritech.addon_boiler_desc": "Позволяет генератору производить пар вместо RF. Входная вода на этом дополнении, извлекать из него пар",
+  "tooltip.oritech.overchargedcrystal": "По-видимому, количество необработанных энергоносителей в нём сдерживается.",
+  "tooltip.oritech.fluxite": "Можно также создать путем вырубки выращенного аметиста с помощью эндометрического лазера",
+  "tooltip.oritech.promethium_axe": "Прокрадываться во время сбора урожая, чтобы сломать все дерево",
+  "tooltip.oritech.promethium_pick": "Shift + right click для переключения режима",
+  "tooltip.oritech.frame_needed": "Должно быть построено на раме машины",
+  "tooltip.oritech.exo_boots": "Предотвращает весь урон от падения",
+  "tooltip.oritech.exo_leggings": "Увеличивает скорость передвижения",
+  "tooltip.oritech.exo_chestplate": "Заряды оснащенные энергетическими предметами",
+  "tooltip.oritech.exo_helmet": "Дает ночное зрение.",
+  "tooltip.oritech.black_hole": "НЕ МЕНЯЙТЕ ЭТО, если не знаете, что вы делаете.",
+  "tooltip.oritech.weed_killer": "Удаляет все травы и растения в широком радиусе",
   "tooltip.oritech.intelligence_item": [
     {
-      "text": "Gained by capturing a viable entity with the ",
+      "text": "Получено путем захвата жизнеспособной сущности с ",
       "italic": true,
-      "color": "gray"
+      "color": "серый"
     },
     {
       "translate": "item.oritech.dubios_container",
       "italic": true,
-      "color": "gray"
+      "color": "серый"
     }
   ],
   "tooltip.oritech.capture_item_desc_1": [
     {
       "text": "Can capture the brain of a small, magical intelligent flying creature. The",
       "italic": true,
-      "color": "gray"
+      "color": "серый"
     }
   ],
   "tooltip.oritech.capture_item_desc_2": [
@@ -138,14 +138,14 @@
     {
       "text": " might fit that description. Although they always try to take the item",
       "italic": true,
-      "color": "gray"
+      "color": "серый"
     }
   ],
   "tooltip.oritech.capture_item_desc_3": [
     {
       "text": "from you. Perhaps you might also find another similar entity to capture.",
       "italic": true,
-      "color": "gray"
+      "color": "серый"
     }
   ],
   "title.oritech.redstone_addon": [
