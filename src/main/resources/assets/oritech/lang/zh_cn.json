@@ -247,7 +247,7 @@
   "emi.category.oritech.fuel_generator": "燃料燃烧",
   "emi.category.oritech.particle_collision": "Particle Collision",
   "emi.title.oritech.cookingtime": "%d秒（%d刻）",
-  "emi.title.oritech.collisionspeed": "Required collision energy: %sJ",
+  "emi.title.oritech.collisionspeed": "所需碰撞能量： %sJ",
   "itemgroup.oritech.machines": "Oritech 机械",
   "itemgroup.oritech.components": "Oritech 组件",
   "itemgroup.oritech.decorative": "Oritech 方块",
@@ -685,7 +685,7 @@
   "text.config.oritech-config.option.bendFactor": "Particle Curve Requirement Factor",
   "text.config.oritech-config.option.accelerationRFCost": "Base Particle Acceleration Cost",
   "text.config.oritech-config.option.maxGateDist": "Maximum Particle Gate Distance",
-  "text.config.oritech-config.option.endPortalRequiredSpeed": "Minimum End Portal Collision Energy",
+  "text.config.oritech-config.option.endPortalRequiredSpeed": "末地传送门产生最小对撞能量",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "下界传送门产生最小对撞能量",
   "text.config.oritech-config.option.blackHoleRequiredSpeed": "黑洞产生最小对撞能量"
 }
