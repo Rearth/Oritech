@@ -15,7 +15,7 @@ Steel is a basic alloy that is used to create the wires, coils, motors, and plat
 
 Steel can be created in a crafting grid:
 
-<recipe;oritech:steel_ingotmanualsteel>
+<recipe;oritech:crafting/alloy/steel>
 
 ;;;;;
 

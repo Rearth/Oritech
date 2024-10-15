@@ -15,7 +15,7 @@ Electrum is a basic alloy that is used to create [generators](^oritech:logistics
 
 Electrum can be created in a crafting grid:
 
-<recipe;oritech:electrum_ingotmanualelectrum>
+<recipe;oritech:crafting/alloy/electrum>
 
 ;;;;;
 
