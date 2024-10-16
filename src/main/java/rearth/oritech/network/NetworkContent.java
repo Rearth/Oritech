@@ -2,6 +2,7 @@ package rearth.oritech.network;
 
 import io.wispforest.owo.network.OwoNetChannel;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -23,9 +24,12 @@ import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.machines.interaction.*;
 import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
+import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.item.tools.armor.JetpackItem;
 import rearth.oritech.util.*;
+import team.reborn.energy.api.EnergyStorage;
 
 import java.util.List;
 import java.util.Map;
@@ -117,6 +121,8 @@ public class NetworkContent {
     public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn, String fluidTypeOut,
                                             long amountOut) {
     }
+    
+    public record JetpackUsageUpdatePacket(long energyStored, String fluidType, long fluidAmount) {}
     
     public record InventorySyncPacket(BlockPos position, List<ItemStack> heldStacks) {
     }
@@ -479,7 +485,7 @@ public class NetworkContent {
             
         }));
 
-        UI_CHANNEL.registerServerbound(EnchanterSelectionPacket.class, ((message, access) -> {
+        UI_CHANNEL.registerServerbound(EnchanterSelectionPacket.class, (message, access) -> {
             
             var entity = access.player().getWorld().getBlockEntity(message.position);
             
@@ -487,7 +493,17 @@ public class NetworkContent {
                 enchanter.handleEnchantmentSelection(message);
             }
             
-        }));
+        });
+        
+        UI_CHANNEL.registerServerbound(JetpackUsageUpdatePacket.class, (message, access) -> {
+            var player = access.player();
+            var stack = player.getEquippedStack(EquipmentSlot.CHEST);
+            if (!(stack.getItem() instanceof JetpackItem)) return;
+            
+            stack.set(EnergyStorage.ENERGY_COMPONENT, message.energyStored);
+            stack.set(ComponentContent.STORED_FLUID, new FluidStack(Registries.FLUID.get(Identifier.of(message.fluidType)), message.fluidAmount));
+            
+        });
         
     }
     
