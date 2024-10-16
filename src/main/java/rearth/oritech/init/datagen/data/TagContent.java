@@ -52,6 +52,7 @@ public class TagContent {
     // blocks
     public static final TagKey<Block> DRILL_MINEABLE = TagKey.of(RegistryKeys.BLOCK, Oritech.id("mineable/drill"));
     public static final TagKey<Block> RESOURCE_NODES = TagKey.of(RegistryKeys.BLOCK, Oritech.id("resource_nodes"));
+    public static final TagKey<Block> LASER_PASSTHROUGH = TagKey.of(RegistryKeys.BLOCK, Oritech.id("laser_passthrough"));
 
     // trees
     public static final TagKey<Block> CUTTER_LOGS_MINEABLE = TagKey.of(RegistryKeys.BLOCK, Oritech.id("mineable/cutter_logs"));

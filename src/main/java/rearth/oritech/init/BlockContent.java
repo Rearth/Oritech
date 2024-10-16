@@ -24,9 +24,7 @@ import rearth.oritech.block.blocks.machines.addons.SteamBoilerAddonBlock;
 import rearth.oritech.block.blocks.machines.generators.*;
 import rearth.oritech.block.blocks.machines.interaction.*;
 import rearth.oritech.block.blocks.machines.processing.*;
-import rearth.oritech.block.blocks.machines.storage.LargeStorageBlock;
-import rearth.oritech.block.blocks.machines.storage.SmallFluidTank;
-import rearth.oritech.block.blocks.machines.storage.SmallStorageBlock;
+import rearth.oritech.block.blocks.machines.storage.*;
 import rearth.oritech.block.blocks.pipes.*;
 import rearth.oritech.block.fluid.MineralFluidBlock;
 import rearth.oritech.init.datagen.BlockLootGenerator;
@@ -47,6 +45,7 @@ public class BlockContent implements BlockRegistryContainer {
     
     public static final Block FLUID_PIPE = new FluidPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final Block ENERGY_PIPE = new EnergyPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
+    public static final Block SUPERCONDUCTOR = new SuperConductorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final Block ITEM_PIPE = new ItemPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final Block ITEM_FILTER_BLOCK = new ItemFilterBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     
@@ -54,6 +53,8 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block FLUID_PIPE_CONNECTION = new FluidPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     @NoBlockItem
     public static final Block ENERGY_PIPE_CONNECTION = new EnergyPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
+    @NoBlockItem
+    public static final Block SUPERCONDUCTOR_CONNECTION = new SuperConductorConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     @NoBlockItem
     public static final Block ITEM_PIPE_CONNECTION = new ItemPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     
@@ -73,6 +74,12 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block QUARRY_BEAM_RING = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque().luminance(5));
     @NoBlockItem
     public static final Block QUARRY_BEAM_TARGET = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    @NoBlockItem
+    public static final Block BLACK_HOLE_INNER = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    @NoBlockItem
+    public static final Block BLACK_HOLE_MIDDLE = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    @NoBlockItem
+    public static final Block BLACK_HOLE_OUTER = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
     
     @NoBlockItem
     public static final Block ADDON_INDICATOR_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS));
@@ -114,9 +121,16 @@ public class BlockContent implements BlockRegistryContainer {
     @DispenserPlace
     public static final Block SMALL_STORAGE_BLOCK = new SmallStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY));
     public static final Block LARGE_STORAGE_BLOCK = new LargeStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    @DispenserPlace
+    public static final Block CREATIVE_STORAGE_BLOCK = new CreativeStorageBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).hardness(-1.0F));
+    
     @NoAutoDrop
     @DispenserPlace
     public static final Block SMALL_TANK_BLOCK = new SmallFluidTank(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY).luminance(Blocks.createLightLevelFromLitBlockState(15)));
+
+    @NoAutoDrop
+    @DispenserPlace
+    public static final Block CREATIVE_TANK_BLOCK = new CreativeFluidTank(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).luminance(Blocks.createLightLevelFromLitBlockState(15)).hardness(-1.0F));
     
     public static final Block PLACER_BLOCK = new PlacerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block DESTROYER_BLOCK = new DestroyerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
@@ -133,9 +147,10 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block WITHER_CROP_BLOCK = new WitheredCropBlock(FabricBlockSettings.copyOf(Blocks.WHEAT));
     
     public static final Block ACCELERATOR_RING = new AcceleratorRingBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
-    public static final Block ACCELERATOR_MOTOR = new AcceleratorMotorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block ACCELERATOR_MOTOR = new AcceleratorMotorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().luminance(5));
     public static final Block ACCELERATOR_CONTROLLER = new AcceleratorControllerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block ACCELERATOR_SENSOR = new AcceleratorSensorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block BLACK_HOLE_BLOCK = new BlackHoleBlock(FabricBlockSettings.copyOf(Blocks.END_PORTAL).nonOpaque());
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block PUMP_BLOCK = new PumpBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
@@ -153,6 +168,7 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block MACHINE_YIELD_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_YIELD_ADDON_SHAPE));
     public static final Block CROP_FILTER_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.CROP_FILTER_ADDON_SHAPE));
     public static final Block QUARRY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.QUARRY_ADDON_SHAPE));
+    public static final Block MACHINE_HUNTER_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_HUNTER_ADDON_SHAPE));
     public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withEfficiencyMultiplier(0.9f).withBoundingShape(MachineAddonBlock.MACHINE_EFFICIENCY_ADDON_SHAPE));
     public static final Block MACHINE_CAPACITOR_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withAddedCapacity(2_000_000).withAddedInsert(1_000).withBoundingShape(MachineAddonBlock.MACHINE_CAPACITOR_ADDON_SHAPE));
     public static final Block MACHINE_ACCEPTOR_ADDON = new MachineAddonBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withAddedCapacity(500_000).withAddedInsert(2000).withAcceptEnergy(true).withBoundingShape(MachineAddonBlock.MACHINE_ACCEPTOR_ADDON_SHAPE));
@@ -267,7 +283,7 @@ public class BlockContent implements BlockRegistryContainer {
         
         if (field.isAnnotationPresent(UseGeoBlockItem.class)) {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), getGeoBlockItem(value, identifier, field.getAnnotation(UseGeoBlockItem.class).scale()));
-        } else if (value.equals(BlockContent.SMALL_TANK_BLOCK)) {
+        } else if (value.equals(BlockContent.SMALL_TANK_BLOCK) || value.equals(BlockContent.CREATIVE_TANK_BLOCK)) {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), new SmallFluidTankBlockItem(value, new Item.Settings()));
         } else {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), createBlockItem(value, identifier));

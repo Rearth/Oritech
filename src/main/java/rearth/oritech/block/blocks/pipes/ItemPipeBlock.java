@@ -74,7 +74,7 @@ public class ItemPipeBlock extends GenericPipeBlock {
     }
     
     @Override
-    public boolean connectToBlockType(Block block) {
+    public boolean connectToOwnBlockType(Block block) {
         return block instanceof ItemPipeBlock || block instanceof ItemPipeConnectionBlock;
     }
     

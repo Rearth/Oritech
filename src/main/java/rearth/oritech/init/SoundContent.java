@@ -4,7 +4,6 @@ import io.wispforest.owo.registration.reflect.AutoRegistryContainer;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 
 public class SoundContent implements AutoRegistryContainer<SoundEvent> {
@@ -25,6 +24,7 @@ public class SoundContent implements AutoRegistryContainer<SoundEvent> {
     public static final SoundEvent SIZZLING_SOUND = SoundEvent.of(Oritech.id("sizzling_sound"));
     public static final SoundEvent SQUISH = SoundEvent.of(Oritech.id("squish"));
     public static final SoundEvent PRESS = SoundEvent.of(Oritech.id("press"));
+    public static final SoundEvent PARTICLE_MOVING = SoundEvent.of(Oritech.id("particle_moving"));
     
     @Override
     public Registry<SoundEvent> getRegistry() {

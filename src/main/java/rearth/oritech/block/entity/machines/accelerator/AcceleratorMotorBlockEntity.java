@@ -14,7 +14,7 @@ import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 public class AcceleratorMotorBlockEntity extends BlockEntity implements EnergyProvider {
     
-    private final EnergyStorage energyStorage = new SimpleEnergyStorage(1_000_000, 1_000_000, 1_000_000);
+    private final EnergyStorage energyStorage = new SimpleEnergyStorage(5_000_000, 5_000_000, 5_000_000);
     
     public AcceleratorMotorBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ACCELERATOR_MOTOR_BLOCK_ENTITY, pos, state);

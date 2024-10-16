@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import rearth.oritech.block.blocks.pipes.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.ItemPipeBlock;
+import rearth.oritech.block.blocks.pipes.SuperConductorBlock;
 import rearth.oritech.block.entity.machines.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.machines.accelerator.AcceleratorParticleLogic;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
@@ -85,6 +86,10 @@ public class Oritech implements ModInitializer {
             var itemDataId = "item_" + regKey.getNamespace() + "_" + regKey.getPath();
             var itemResult = world.getPersistentStateManager().getOrCreate(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, itemDataId);
             ItemPipeBlock.ITEM_PIPE_DATA.put(regKey, itemResult);
+            
+            var superConductorDataId = "superconductor_" + regKey.getNamespace() + "_" + regKey.getPath();
+            var superConductorResult = world.getPersistentStateManager().getOrCreate(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, superConductorDataId);
+            SuperConductorBlock.SUPERCONDUCTOR_DATA.put(regKey, superConductorResult);
         });
     }
 }

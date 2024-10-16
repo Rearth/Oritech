@@ -1,0 +1,18 @@
+{
+  "type": "oritech:particle_collision",
+  "ingredients": [
+    {
+      "tag": "c:dusts/coal"
+    },
+    {
+      "tag": "c:dusts/coal"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:diamond"
+    }
+  ],
+  "time": 500
+}

@@ -2,17 +2,27 @@ package rearth.oritech.block.blocks.machines.accelerator;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.accelerator.AcceleratorParticleLogic;
 
+import java.util.List;
 import java.util.Objects;
 
 public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
@@ -35,6 +45,11 @@ public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return Objects.requireNonNull(super.getPlacementState(ctx)).with(BENT, 0).with(REDSTONE_STATE, 3);
+    }
+    
+    @Override
+    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return Block.createCuboidShape(2, 0, 2, 14, 12, 14);
     }
     
     // allow redstone to connect
@@ -77,5 +92,15 @@ public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
         AcceleratorParticleLogic.resetCachedGate(pos);
         
         return ActionResult.SUCCESS;
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        var showExtra = Screen.hasControlDown();
+        if (!showExtra) {
+            tooltip.add(Text.translatable("tooltip.oritech.item_extra_info").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
+        } else {
+            tooltip.add(Text.translatable("tooltip.oritech.accelerator_ring").formatted(Formatting.GRAY));
+        }
     }
 }

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_accelerator_ring": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:accelerator_ring"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/acceleratorring"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_accelerator_ring"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/acceleratorring"
+    ]
+  }
+}

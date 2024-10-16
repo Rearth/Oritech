@@ -1,6 +1,5 @@
 package rearth.oritech.item.tools.harvesting;
 
-import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -10,7 +9,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EntityPose;
@@ -24,7 +22,6 @@ import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -78,10 +75,6 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
     }
     
     @Override
-    public boolean canBeEnchantedWith(ItemStack stack, RegistryEntry<Enchantment> enchantment, EnchantingContext context) {
-        return super.canBeEnchantedWith(stack, enchantment, context) && !enchantment.getKey().get().equals(Enchantments.SILK_TOUCH);
-    }
-    
     public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
         if (!world.isClient && miner instanceof PlayerEntity player) {
             if (isAreaEnabled(stack) && !player.isInPose(EntityPose.CROUCHING)) {

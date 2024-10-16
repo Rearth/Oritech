@@ -11,6 +11,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.pipes.EnergyPipeBlock;
+import rearth.oritech.block.blocks.pipes.SuperConductorBlock;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.EnergyProvider;
 import team.reborn.energy.api.EnergyStorage;
@@ -23,11 +25,21 @@ import java.util.stream.Collectors;
 
 public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implements EnergyProvider {
     
-    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(Oritech.CONFIG.energyPipeTransferRate(), Oritech.CONFIG.energyPipeTransferRate(), Oritech.CONFIG.energyPipeTransferRate());
+    private final SimpleEnergyStorage energyStorage;
     private final HashMap<BlockPos, BlockApiCache<EnergyStorage, Direction>> lookupCache = new HashMap<>();
+    private final boolean isSuperConductor;
     
     public EnergyPipeInterfaceEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ENERGY_PIPE_ENTITY, pos, state);
+        
+        isSuperConductor = state.getBlock().equals(BlockContent.SUPERCONDUCTOR_CONNECTION);
+        
+        if (isSuperConductor) {
+            energyStorage = new SimpleEnergyStorage(Oritech.CONFIG.superConductorTransferRate(), Oritech.CONFIG.superConductorTransferRate(), Oritech.CONFIG.superConductorTransferRate());
+        } else {
+            energyStorage = new SimpleEnergyStorage(Oritech.CONFIG.energyPipeTransferRate(), Oritech.CONFIG.energyPipeTransferRate(), Oritech.CONFIG.energyPipeTransferRate());
+        }
+        
     }
     
     @Override
@@ -56,7 +68,9 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
         
         if (world.isClient || energyStorage.getAmount() <= 0) return;
         
-        var data = EnergyPipeBlock.ENERGY_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
+        var dataSource = isSuperConductor ? SuperConductorBlock.SUPERCONDUCTOR_DATA : EnergyPipeBlock.ENERGY_PIPE_DATA;
+        
+        var data = dataSource.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
         var targets = findNetworkTargets(pos, data);
         
         if (targets == null) return;    // this should never happen

@@ -1,18 +1,13 @@
 package rearth.oritech.block.entity.machines.storage;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.InsertionOnlyStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.fabricmc.fabric.impl.transfer.context.SingleSlotContainerItemContext;
 import net.fabricmc.fabric.mixin.transfer.BucketItemAccessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -20,11 +15,9 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -45,20 +38,15 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.FluidProvider;
-import rearth.oritech.util.InventoryInputMode;
-import rearth.oritech.util.InventoryProvider;
-import rearth.oritech.util.InventorySlotAssignment;
-import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.SimpleSidedInventory;
+import rearth.oritech.util.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<SmallFluidTankEntity> {
     
     private boolean netDirty = false;
     private int lastComparatorOutput = 0;
+    public final boolean isCreative;
 
     public final SimpleSidedInventory inventory = new SimpleSidedInventory(2, new InventorySlotAssignment(0, 1, 1, 1)) {
         @Override
@@ -67,7 +55,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         }
     };
     
-    private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
+    public final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
         @Override
         protected FluidVariant getBlankVariant() {
             return FluidVariant.blank();
@@ -85,8 +73,9 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         }
     };
     
-    public SmallFluidTankEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.SMALL_TANK_ENTITY, pos, state);
+    public SmallFluidTankEntity(BlockPos pos, BlockState state, boolean isCreative) {
+        super(isCreative ? BlockEntitiesContent.CREATIVE_TANK_ENTITY : BlockEntitiesContent.SMALL_TANK_ENTITY, pos, state);
+        this.isCreative = isCreative;
     }
     
     @Override
@@ -123,6 +112,15 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
         
         if (world.getTime() % 100 == 0) netDirty = true;    // to ensure this syncs when no charges are triggered, and inventory isn't opened
         
+        // in creative, set tank fill level
+        if (isCreative) {
+            if (fluidStorage.variant != FluidVariant.blank()) {
+                fluidStorage.amount = fluidStorage.getCapacity() - FluidConstants.BUCKET;  //leave space to insert a bit
+            } else {
+                fluidStorage.amount = 0;
+            }
+        }
+        
         processBuckets();
         
         if ((world.getTime() + this.pos.getY()) % 20 == 0 && fluidStorage.amount > 0)
@@ -136,6 +134,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     }
     
     private void outputToBelow() {
+        if (isCreative) return;
         var tankCandidate = world.getBlockEntity(pos.down(), BlockEntitiesContent.SMALL_TANK_ENTITY);
         
         if (tankCandidate.isEmpty()) return;
@@ -190,7 +189,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
             // empty input bucket
             var emptyBucket = ItemVariant.of(Items.BUCKET, inStack.getComponentChanges()).toStack();
             if (!outputCanAcceptBucket(emptyBucket)) return;
-            Fluid bucketFluid = ((BucketItemAccessor) inStack.getItem()).fabric_getFluid();
+            var bucketFluid = ((BucketItemAccessor) inStack.getItem()).fabric_getFluid();
             if (bucketFluid == Fluids.EMPTY) return;
 
             try (var tx = Transaction.openOuter()) {

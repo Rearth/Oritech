@@ -7,6 +7,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
@@ -58,14 +59,19 @@ public class TooltipHelper {
             if (entity instanceof MachineBlockEntity machineEntity) {
                 var energyRate = machineEntity.getEnergyPerTick();
                 if (entity instanceof UpgradableGeneratorBlockEntity) {
-                    tooltip.add(Text.translatable("tooltip.oritech.generator_rate_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", energyRate)));
+                    tooltip.add(Text.translatable("tooltip.oritech.generator_rate_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", energyRate).formatted(Formatting.GOLD)));
                 } else if (entity instanceof MachineBlockEntity) {
-                    tooltip.add(Text.translatable("tooltip.oritech.machine_rate_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", energyRate)));
+                    tooltip.add(Text.translatable("tooltip.oritech.machine_rate_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", energyRate).formatted(Formatting.GOLD)));
                 }
+            } else if (entity instanceof ExpandableEnergyStorageBlockEntity energyStorage) {
+                var transferRate = energyStorage.getDefaultExtractionRate();
+                tooltip.add(Text.translatable("tooltip.oritech.energy_max_transfer").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", transferRate).formatted(Formatting.GOLD)));
             }
+            
+            
             if (entity instanceof EnergyProvider energyProvider) {
                 var maxStorage = getEnergyText(energyProvider.getStorage(null).getCapacity());
-                tooltip.add(Text.translatable("tooltip.oritech.machine_capacity_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", maxStorage)));
+                tooltip.add(Text.translatable("tooltip.oritech.machine_capacity_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_capacity", maxStorage).formatted(Formatting.GOLD)));
                 
                 if (energyProvider instanceof AtomicForgeBlockEntity || energyProvider instanceof DeepDrillEntity)
                     tooltip.add(Text.translatable("tooltip.oritech.needs_laser_power").formatted(Formatting.BOLD));

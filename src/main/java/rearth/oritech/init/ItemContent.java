@@ -117,7 +117,6 @@ public class ItemContent implements ItemRegistryContainer {
     public static final Item UNHOLY_INTELLIGENCE = new CustomTooltipItem(new Item.Settings().maxCount(1), "tooltip.oritech.intelligence_item");
     public static final Item HEISENBERG_COMPENSATOR = new Item(new Item.Settings().maxCount(1));
     public static final Item OVERCHARGED_CRYSTAL = new CustomTooltipItem(new Item.Settings().maxCount(1), "tooltip.oritech.overchargedcrystal");
-    public static final Item SUPERCONDUCTOR = new Item(new Item.Settings());
     @Compostable(1.0F)
     public static final Item PACKED_WHEAT = new Item(new Item.Settings());
     public static final Item QUARTZ_DUST = new Item(new Item.Settings());

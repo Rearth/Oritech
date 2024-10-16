@@ -52,7 +52,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         var startOffset = new Vector3f(0, 1.55f, 0);
         var startPos = Vec3d.of(laserEntity.getPos()).add(0.5, 1.55, 0.5);
         
-        var targetPos = Vec3d.of(laserEntity.getCurrentTarget()).add(0, 0.5, 0);   // convert to block center
+        var targetPos = laserEntity.getVisualTarget();
         if (laserEntity.isTargetingAtomicForge()) { // adjust so the beam end faces one of the corner pillars
             var moveX = 0.5;
             var moveZ = 0.5;

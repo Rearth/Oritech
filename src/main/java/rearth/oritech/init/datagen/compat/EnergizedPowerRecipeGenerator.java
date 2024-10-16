@@ -1,7 +1,5 @@
 package rearth.oritech.init.datagen.compat;
 
-import java.util.List;
-
 import me.jddev0.ep.item.ModItems;
 import me.jddev0.ep.recipe.AlloyFurnaceRecipe;
 import me.jddev0.ep.recipe.AssemblingMachineRecipe;
@@ -20,6 +18,8 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.datagen.RecipeGenerator;
 import rearth.oritech.init.datagen.data.TagContent;
+
+import java.util.List;
 
 public class EnergizedPowerRecipeGenerator {
 
@@ -184,7 +184,7 @@ public class EnergizedPowerRecipeGenerator {
                 new AssemblingMachineRecipe.IngredientWithCount(Ingredient.fromTag(TagContent.WIRES), 1),
                 new AssemblingMachineRecipe.IngredientWithCount(Ingredient.ofItems(ItemContent.DUBIOS_CONTAINER), 1),
                 new AssemblingMachineRecipe.IngredientWithCount(Ingredient.ofItems(ItemContent.ENERGITE_INGOT), 1)},
-            new ItemStack(ItemContent.SUPERCONDUCTOR), "superconductor");
+            new ItemStack(BlockContent.SUPERCONDUCTOR.asItem()), "superconductor");
     }
 
     public static void addOritechOreFiltrationRecipes(RecipeExporter exporter) {
