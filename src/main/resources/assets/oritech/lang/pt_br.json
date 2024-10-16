@@ -199,6 +199,7 @@
   "title.oritech.machine_option_enabled": "🔨 Habilitado",
   "tooltip.oritech.pulverizer_dust_combine": "Combina automaticamente pequenos pós em lingotes",
   "tooltip.oritech.fluid_content": "%f mB %s",
+  "tooltip.oritech.jetpack_fuel": "%f/%f mB %s",
   "tooltip.oritech.fluid_empty": "Vazio",
   "tooltip.oritech.progress_indicator": "%d / %d ticks\n(base %d ticks)",
   "title.oritech.catalyst.stable": "Estável",
