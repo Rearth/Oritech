@@ -16,7 +16,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.ToolMaterial;
@@ -32,9 +31,9 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.RaycastContext.FluidHandling;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
 import rearth.oritech.init.ComponentContent;
@@ -76,44 +75,11 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
     
     @Override
     public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
-        if (!world.isClient && miner instanceof PlayerEntity player) {
-            if (isAreaEnabled(stack) && !player.isInPose(EntityPose.CROUCHING)) {
-                List<Vec3i> breakPositions;
-                var hitSide = player.raycast(2.0F, 0.0F, false);
-                if (!(hitSide instanceof BlockHitResult))
-                    return true;
-                var blockSide = ((BlockHitResult)hitSide).getSide();
-                Oritech.LOGGER.info("Raycasting to side: {}", blockSide);
-                var playerSide = player.getFacing();
-                Oritech.LOGGER.info("player facing side: {}", playerSide);
-                if (blockSide == Direction.UP || blockSide == Direction.DOWN) {
-                    var direction = player.getHorizontalFacing();
-                    if (direction == Direction.NORTH || direction == Direction.SOUTH) {
-                        breakPositions = List.of(new Vec3i(0, 0, 1), new Vec3i(0, 0, -1));
-                    } else {
-                        breakPositions = List.of(new Vec3i(1, 0, 0), new Vec3i(-1, 0, 0));
-                    }
-                } else {
-                    breakPositions = List.of(new Vec3i(0, 1, 0), new Vec3i(0, -1, 0));
-                }
-
-                for (var offset : breakPositions) {
-                    var worldPos = pos.add(offset);
-                    var worldState = world.getBlockState(worldPos);
-                    if (canMine(worldState, world, worldPos, player) && worldState.isIn(TagContent.DRILL_MINEABLE)) {
-                        var blockState = world.getBlockState(worldPos);
-                        var blockEntity = world.getBlockEntity(worldPos);
-                        // drop stacks before breaking block, because world.breakBlock doesn't apply item enchantments if drop is enabled
-                        Block.dropStacks(blockState, world, worldPos, blockEntity, player, stack);
-                        world.breakBlock(worldPos, false, player);
-                    }
-                }
-            } else if (stack.contains(DataComponentTypes.INTANGIBLE_PROJECTILE)) {
-                var enchantments = stack.getEnchantments();
-                var builder = new ItemEnchantmentsComponent.Builder(enchantments);
-                builder.remove(elem -> elem.matchesKey(Enchantments.SILK_TOUCH));
-                stack.set(DataComponentTypes.ENCHANTMENTS, builder.build());
-            }
+        if (!world.isClient && stack.contains(DataComponentTypes.INTANGIBLE_PROJECTILE)) {
+            var enchantments = stack.getEnchantments();
+            var builder = new ItemEnchantmentsComponent.Builder(enchantments);
+            builder.remove(elem -> elem.matchesKey(Enchantments.SILK_TOUCH));
+            stack.set(DataComponentTypes.ENCHANTMENTS, builder.build());
         }
         
         return true;
@@ -144,19 +110,58 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
     }
     
     // called as event in Oritech initializer
+    // area mode: 
     // adds a temporary silk touch, which is then removed in the after break event
     public static boolean preMine(World world, PlayerEntity player, BlockPos pos, BlockState blockState, BlockEntity blockEntity) {
         
-        var stack = player.getStackInHand(Hand.MAIN_HAND);
-        if (stack != null && stack.getItem().equals(ToolsContent.PROMETHIUM_PICKAXE) && !isAreaEnabled(stack)) {
+        var handStack = player.getMainHandStack();
+        if (handStack == null || !handStack.isOf(ToolsContent.PROMETHIUM_PICKAXE)) return true;
+
+        // break additional blocks in preMine (Block.onBreak) instead of postMine (Block.onBroken)
+        // so that the block still exists when determining which face of the block the player was looking at
+        if (isAreaEnabled(handStack) && !player.isInPose(EntityPose.CROUCHING)) {
+
+            // use the block face and player look direction to determine which additional blocks to break
+            List<Vec3i> breakPositions;
+            var playerHit = player.raycast(player.getBlockInteractionRange(), 0.0F, false);
+            if (playerHit instanceof BlockHitResult blockHit) {
+                var blockSide = blockHit.getSide();
+
+                if (blockSide == Direction.UP || blockSide == Direction.DOWN) {
+                    var direction = player.getHorizontalFacing();
+                    if (direction == Direction.NORTH || direction == Direction.SOUTH) {
+                        breakPositions = List.of(new Vec3i(0, 0, 1), new Vec3i(0, 0, -1));
+                    } else {
+                        breakPositions = List.of(new Vec3i(1, 0, 0), new Vec3i(-1, 0, 0));
+                    }
+                } else {
+                    breakPositions = List.of(new Vec3i(0, 1, 0), new Vec3i(0, -1, 0));
+                }
+
+                // break additional blocks
+                for (var offset : breakPositions) {
+                    var offsetPos = pos.add(offset);
+                    var offsetState = world.getBlockState(offsetPos);
+                    if (offsetState.isIn(TagContent.DRILL_MINEABLE)) {
+                        var offsetEntity = world.getBlockEntity(offsetPos);
+                        // drop stacks before breaking additional block, because world.breakBlock doesn't apply item enchantments if drop is enabled
+                        // this will ONLY apply item enchantments that affect block drops, and will not apply enchants like vein mining
+                        Block.dropStacks(offsetState, world, offsetPos, offsetEntity, player, handStack);
+                        world.breakBlock(offsetPos, false, player);
+                    }
+                }
+            }
+        }
+        
+        if (!isAreaEnabled(handStack)) {
             
             // do silk touch
-            var hasExistingSilkTouch = EnchantmentHelper.getEnchantments(stack).getEnchantments().stream().anyMatch(elem -> elem.matchesKey(Enchantments.SILK_TOUCH));
+            var hasExistingSilkTouch = EnchantmentHelper.getEnchantments(handStack).getEnchantments().stream().anyMatch(elem -> elem.matchesKey(Enchantments.SILK_TOUCH));
             
             if (!hasExistingSilkTouch) {
                 var registryEntry = world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(Enchantments.SILK_TOUCH).get();
-                stack.addEnchantment(registryEntry, 1);
-                stack.set(DataComponentTypes.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
+                handStack.addEnchantment(registryEntry, 1);
+                handStack.set(DataComponentTypes.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
             }
         }
         
