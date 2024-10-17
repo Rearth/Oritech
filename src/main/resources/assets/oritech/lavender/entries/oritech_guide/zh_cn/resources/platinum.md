@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Platinum",
+  "title": "铂",
   "icon": "oritech:platinum_ingot",
   "category": "oritech:resources",
   "associated_items": [
@@ -18,6 +18,6 @@
 }
 ```
 
-Platinum is an important resource. Like diamond, it can be difficult to find. Platinum ores can be found most frequently while mining near bedrock. It can also be found easily in the End.
+铂是一种十分重要的资源，其同钻石般难以被找到。您可以时常在基岩层附近发现深层铂矿石 (Deepslate Platinum Ore)，同样也能很轻松地在末地发现末地铂矿石 (Endstone Platinum Ore)。
 
-Platinum can also be found while processing [nickel](^oritech:resources/nickel) in a [fragment forge](^oritech:processing/fragment_forge).
+铂还可以通过在[粉碎工厂](^oritech:processing/fragment_forge)中对[镍](^oritech:resources/nickel)原料进行加工后获得。
