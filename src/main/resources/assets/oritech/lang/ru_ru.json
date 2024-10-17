@@ -199,7 +199,7 @@
   "title.oritech.machine_option_enabled": "🔨 Включено",
   "tooltip.oritech.pulverizer_dust_combine": "Авто-комбинирование небольших пылей в слитках",
   "tooltip.oritech.fluid_content": "%f мБ %s",
-  "tooltip.oritech.jetpack_fuel": "%f/%f mB %s",
+  "tooltip.oritech.jetpack_fuel": "%f мБ %s",
   "tooltip.oritech.fluid_empty": "Пустой",
   "tooltip.oritech.progress_indicator": "%d / %d тактов\n(базовые %d такты)",
   "title.oritech.catalyst.stable": "Стабильное",
