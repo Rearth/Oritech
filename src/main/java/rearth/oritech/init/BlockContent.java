@@ -154,6 +154,7 @@ public class BlockContent implements BlockRegistryContainer {
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block PUMP_BLOCK = new PumpBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block CHARGER_BLOCK = new ChargerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block MACHINE_CORE_1 = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 1);
     public static final Block MACHINE_CORE_2 = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 2);

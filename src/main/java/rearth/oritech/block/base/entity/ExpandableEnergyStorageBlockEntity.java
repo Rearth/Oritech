@@ -109,7 +109,6 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         
         energyStorage.amount = Math.min(energyStorage.capacity, energyStorage.amount + Oritech.CONFIG.overchargedCrystalChargeRate());
         energyStorage.onFinalCommit();
-        
     }
     
     private void outputEnergy() {

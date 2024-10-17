@@ -11,10 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.registry.entry.RegistryEntry;
 import rearth.oritech.init.datagen.data.TagContent;
-import rearth.oritech.item.tools.armor.BackstorageExoArmorItem;
-import rearth.oritech.item.tools.armor.ExoArmorItem;
-import rearth.oritech.item.tools.armor.JetpackExoArmorItem;
-import rearth.oritech.item.tools.armor.JetpackItem;
+import rearth.oritech.item.tools.armor.*;
 import rearth.oritech.item.tools.harvesting.*;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 import team.reborn.energy.api.EnergyStorage;
@@ -42,6 +39,8 @@ public class ToolsContent implements ItemRegistryContainer {
     
     public static final Item JETPACK = new JetpackItem(JETPACK_MATERIAL, ArmorItem.Type.CHESTPLATE, UNBREAKING_SETTINGS);
     public static final Item EXO_JETPACK = new JetpackExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, UNBREAKING_SETTINGS);
+    public static final Item JETPACK_ELYTRA = new JetpackElytraItem(JETPACK_MATERIAL, ArmorItem.Type.CHESTPLATE, UNBREAKING_SETTINGS);
+    public static final Item JETPACK_EXO_ELYTRA = new JetpackExoElytraItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, UNBREAKING_SETTINGS);
     
     
     public static final Item CHAINSAW = new ChainsawItem(ELECTRIC_MATERIAL, UNBREAKING_SETTINGS.attributeModifiers(AxeItem.createAttributeModifiers(ELECTRIC_MATERIAL, 5f, -2.4f)));
