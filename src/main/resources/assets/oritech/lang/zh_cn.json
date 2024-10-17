@@ -676,7 +676,7 @@
   "text.config.oritech-config.option.fluidPipeExtractIntervalDuration": "流体管道提取间隔时长",
   "text.config.oritech-config.option.fluidPipeInternalStorageBuckets": "流体管道内部储量（以桶计）",
   "text.config.oritech-config.option.energyPipeTransferRate": "能量线缆传输速率",
-  "text.config.oritech-config.option.superConductorTransferRate": "Superconductor Transfer Rate",
+  "text.config.oritech-config.option.superConductorTransferRate": "超导体传输速率",
   "text.config.oritech-config.section.clientSettings": "仅客户端",
   "text.config.oritech-config.option.tightMachineAddonHitboxes": "紧致的机器插件碰撞箱",
   "text.config.oritech-config.option.tightMachineFrameHitboxes": "紧致的机器框架碰撞箱",
