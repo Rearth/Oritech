@@ -107,6 +107,7 @@
   "tooltip.oritech.exo_boots": "Prevents all fall damage",
   "tooltip.oritech.exo_leggings": "Increases movement speed",
   "tooltip.oritech.exo_chestplate": "Charges equipped energy items",
+  "tooltip.oritech.exo_jetpack": "Charges equipped energy items and flies",
   "tooltip.oritech.exo_helmet": "Grants night vision",
   "tooltip.oritech.black_hole": "DON'T PLACE THIS unless you know what you're doing.",
   "tooltip.oritech.weed_killer": "Removes all grass and plants in a wide radius",
