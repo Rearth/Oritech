@@ -13,6 +13,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import rearth.oritech.init.datagen.data.TagContent;
 import rearth.oritech.item.tools.armor.BackstorageExoArmorItem;
 import rearth.oritech.item.tools.armor.ExoArmorItem;
+import rearth.oritech.item.tools.armor.JetpackExoArmorItem;
 import rearth.oritech.item.tools.armor.JetpackItem;
 import rearth.oritech.item.tools.harvesting.*;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
@@ -29,6 +30,7 @@ public class ToolsContent implements ItemRegistryContainer {
                                                                .component(DataComponentTypes.UNBREAKABLE, new UnbreakableComponent(true));
     
     public static final RegistryEntry<ArmorMaterial> EXOSUIT_MATERIAL = ArmorMaterials.DIAMOND;
+    public static final RegistryEntry<ArmorMaterial> JETPACK_MATERIAL = ArmorMaterials.LEATHER;
     public static final ToolMaterial ELECTRIC_MATERIAL = new ElectricToolMaterial();
     public static final ToolMaterial PROMETHIUM_MATERIAL = new PromethiumToolMaterial();
     
@@ -38,7 +40,8 @@ public class ToolsContent implements ItemRegistryContainer {
     public static final Item EXO_BOOTS = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.BOOTS, UNBREAKING_SETTINGS);
     
     
-    public static final Item JETPACK = new JetpackItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, UNBREAKING_SETTINGS);
+    public static final Item JETPACK = new JetpackItem(JETPACK_MATERIAL, ArmorItem.Type.CHESTPLATE, UNBREAKING_SETTINGS);
+    public static final Item EXO_JETPACK = new JetpackExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, UNBREAKING_SETTINGS);
     
     
     public static final Item CHAINSAW = new ChainsawItem(ELECTRIC_MATERIAL, UNBREAKING_SETTINGS.attributeModifiers(AxeItem.createAttributeModifiers(ELECTRIC_MATERIAL, 5f, -2.4f)));

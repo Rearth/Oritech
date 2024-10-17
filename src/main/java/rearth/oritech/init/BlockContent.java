@@ -75,11 +75,11 @@ public class BlockContent implements BlockRegistryContainer {
     @NoBlockItem
     public static final Block QUARRY_BEAM_TARGET = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
     @NoBlockItem
-    public static final Block BLACK_HOLE_INNER = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    public static final Block BLACK_HOLE_INNER = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque().luminance(5));
     @NoBlockItem
-    public static final Block BLACK_HOLE_MIDDLE = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    public static final Block BLACK_HOLE_MIDDLE = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque().luminance(5));
     @NoBlockItem
-    public static final Block BLACK_HOLE_OUTER = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    public static final Block BLACK_HOLE_OUTER = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque().luminance(5));
     
     @NoBlockItem
     public static final Block ADDON_INDICATOR_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS));
@@ -150,7 +150,7 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block ACCELERATOR_MOTOR = new AcceleratorMotorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().luminance(5));
     public static final Block ACCELERATOR_CONTROLLER = new AcceleratorControllerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block ACCELERATOR_SENSOR = new AcceleratorSensorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
-    public static final Block BLACK_HOLE_BLOCK = new BlackHoleBlock(FabricBlockSettings.copyOf(Blocks.END_PORTAL).nonOpaque());
+    public static final Block BLACK_HOLE_BLOCK = new BlackHoleBlock(FabricBlockSettings.copyOf(Blocks.END_PORTAL).luminance(12).nonOpaque());
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block PUMP_BLOCK = new PumpBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());

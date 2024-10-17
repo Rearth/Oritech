@@ -27,7 +27,7 @@ import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.item.tools.armor.JetpackItem;
+import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.util.*;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -498,7 +498,7 @@ public class NetworkContent {
         UI_CHANNEL.registerServerbound(JetpackUsageUpdatePacket.class, (message, access) -> {
             var player = access.player();
             var stack = player.getEquippedStack(EquipmentSlot.CHEST);
-            if (!(stack.getItem() instanceof JetpackItem)) return;
+            if (!(stack.getItem() instanceof BaseJetpackItem)) return;
             
             stack.set(EnergyStorage.ENERGY_COMPONENT, message.energyStored);
             stack.set(ComponentContent.STORED_FLUID, new FluidStack(Registries.FLUID.get(Identifier.of(message.fluidType)), message.fluidAmount));
