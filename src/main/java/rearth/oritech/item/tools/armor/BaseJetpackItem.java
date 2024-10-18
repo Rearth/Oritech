@@ -12,6 +12,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.LaserArmRenderer;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.FluidContent;
@@ -32,7 +34,7 @@ public interface BaseJetpackItem extends OritechEnergyItem {
     long getFuelCapacity();
     float getSpeed();
     
-    default void tickJetpack(ItemStack stack, Entity entity) {
+    default void tickJetpack(ItemStack stack, Entity entity, World world) {
         
         if (!(entity instanceof PlayerEntity player)) return;
         
@@ -82,14 +84,24 @@ public interface BaseJetpackItem extends OritechEnergyItem {
         // this will currently only for instances of this class
         NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.JetpackUsageUpdatePacket(getStoredEnergy(stack), fluid.toString(), fluidStack.amount()));
         
-        // todo particles
+        var playerForward = player.getRotationVecClient();
+        var playerRight = playerForward.normalize().rotateY(-90);
+        var particleCenter = player.getEyePos().add(0, -1.1, 0).subtract(playerForward.multiply(0.2f));
+        var particlePosA = particleCenter.add(playerRight.multiply(0.4f));
+        var particlePosB = particleCenter.add(playerRight.multiply(-0.4f));
+        
+        var direction = new Vec3d(0, -1, 0);
+        if (forward) direction = playerForward.normalize().multiply(-1).add(0, -1, 0);
+        
+        ParticleContent.JETPACK_EXHAUST.spawn(world, particlePosA, direction);
+        ParticleContent.JETPACK_EXHAUST.spawn(world, particlePosB, direction);
     }
     
     private static void processUpwardsMotion(PlayerEntity player, float powerMultiplier, boolean upOnly) {
         var velocity = player.getMovement();
         
         var verticalMultiplier = LaserArmRenderer.lerp(powerMultiplier, 1, 0.6f);
-        var power = 0.14f * verticalMultiplier;
+        var power = 0.13f * verticalMultiplier;
         var dampeningFactor = 1.7f;
         
         if (!upOnly) power *= 0.7f;
@@ -102,7 +114,7 @@ public interface BaseJetpackItem extends OritechEnergyItem {
     
     private static void processSideMotion(PlayerEntity player, boolean right, float powerMultiplier) {
         var modifier = right ? 1 : -1;  // either go full speed ahead, or slowly backwards
-        var power = 0.07f * powerMultiplier;
+        var power = 0.05f * powerMultiplier;
         
         // get existing movement
         var movement = player.getMovement();
@@ -121,7 +133,7 @@ public interface BaseJetpackItem extends OritechEnergyItem {
     
     private static void processForwardMotion(PlayerEntity player, boolean forward, float powerMultiplier) {
         var modifier = forward ? 1f : -0.4;  // either go full speed ahead, or slowly backwards
-        var power = 0.1f * powerMultiplier;
+        var power = 0.08f * powerMultiplier;
         
         // get existing movement
         var movement = player.getMovement();
@@ -151,6 +163,7 @@ public interface BaseJetpackItem extends OritechEnergyItem {
     }
     
     default void addJetpackTooltip(ItemStack stack, List<Text> tooltip, boolean includeEnergy) {
+        
         var text = Text.translatable("tooltip.oritech.energy_indicator", this.getStoredEnergy(stack), this.getEnergyCapacity(stack));
         if (includeEnergy) tooltip.add(text.formatted(Formatting.GOLD));
         
@@ -163,7 +176,7 @@ public interface BaseJetpackItem extends OritechEnergyItem {
         
         var fluidStack = getStoredFluid(stack);
         if (fluidStack.amount() > getFuelUsage() && isValidFuel(fluidStack.variant())) {
-            return 0xff1f8f;
+            return 0xbafc03;
         }
         
         return 0xff7007;

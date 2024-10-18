@@ -106,6 +106,11 @@ public class ParticleContent {
         ClientParticles.spawn(ParticleTypes.GUST, world, pos, 0);
     }));
     
+    public static final ParticleSystem<Vec3d> JETPACK_EXHAUST = PARTICLE_CONTROLLER.register(Vec3d.class, ((world, pos, data) -> {
+        ClientParticles.setVelocity(data);
+        ClientParticles.spawn(ParticleTypes.SMOKE, world, pos, 0.1);
+    }));
+    
     public static final ParticleSystem<Void> ACCELERATING = PARTICLE_CONTROLLER.register(Void.class, (world, pos, data) -> {
         spawnCubeOutline(ParticleTypes.SCULK_CHARGE_POP, pos, 1, 5, 3);
         ClientParticles.reset();

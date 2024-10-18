@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
@@ -26,7 +27,7 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         
         if (world.isClient && MinecraftClient.getInstance().player.isFallFlying()) {
-            tickJetpack(stack, entity);
+            tickJetpack(stack, entity, world);
         } else {
             super.inventoryTick(stack, world, entity, slot, selected);
         }
@@ -57,6 +58,8 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        var hint = Text.translatable("tooltip.oritech.jetpack_usage").formatted(Formatting.GRAY, Formatting.ITALIC);
+        tooltip.add(hint);
         super.appendTooltip(stack, context, tooltip, type);
         addJetpackTooltip(stack, tooltip, false);
     }

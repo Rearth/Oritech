@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -42,7 +43,7 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
-        tickJetpack(stack, entity);
+        tickJetpack(stack, entity, world);
     }
     
     @Override
@@ -67,6 +68,8 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        var hint = Text.translatable("tooltip.oritech.jetpack_usage").formatted(Formatting.GRAY, Formatting.ITALIC);
+        tooltip.add(hint);
         addJetpackTooltip(stack, tooltip, true);
     }
     

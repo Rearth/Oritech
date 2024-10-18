@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -46,7 +47,7 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
         super.inventoryTick(stack, world, entity, slot, selected);
         
         if (world.isClient && MinecraftClient.getInstance().player.isFallFlying()) {
-            tickJetpack(stack, entity);
+            tickJetpack(stack, entity, world);
         }
     }
     
@@ -80,6 +81,8 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        var hint = Text.translatable("tooltip.oritech.jetpack_usage").formatted(Formatting.GRAY, Formatting.ITALIC);
+        tooltip.add(hint);
         addJetpackTooltip(stack, tooltip, true);
     }
     
