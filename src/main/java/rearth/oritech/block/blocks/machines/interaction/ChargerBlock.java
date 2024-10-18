@@ -19,6 +19,8 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.interaction.ChargerBlockEntity;
@@ -44,8 +46,8 @@ public class ChargerBlock extends HorizontalFacingBlock implements BlockEntityPr
     }
     
     @Override
-    protected BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return Block.createCuboidShape(0, 0, 0, 16, 8, 16);
     }
     
     @Override

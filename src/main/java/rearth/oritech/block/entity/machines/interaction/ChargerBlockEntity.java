@@ -28,6 +28,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ComponentContent;
@@ -79,7 +80,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     private boolean networkDirty = false;
     
     public ChargerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.CHARGER_BLOCK, pos, state);
+        super(BlockEntitiesContent.CHARGER_BLOCK_ENTITY, pos, state);
     }
     
     @Override
@@ -107,6 +108,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
         }
         
         if (networkDirty) {
+            ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.toCenterPos().add(0.1, 0.1, 0), 1);
             updateNetwork();
         }
         
@@ -220,7 +222,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     
     @Override
     public List<GuiSlot> getGuiSlots() {
-        return List.of(new GuiSlot(0, 40, 24), new GuiSlot(1, 100, 25));
+        return List.of(new GuiSlot(0, 56, 38), new GuiSlot(1, 117, 38));
     }
     
     @Override
@@ -245,11 +247,6 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     
     @Override
     public boolean inputOptionsEnabled() {
-        return false;
-    }
-    
-    @Override
-    public boolean showProgress() {
         return false;
     }
     

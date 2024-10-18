@@ -107,7 +107,7 @@ public class BlockEntitiesContent implements AutoRegistryContainer<BlockEntityTy
     @AssignSidedInventory
     @AssignSidedFluid
     @AssignSidedEnergy
-    public static final BlockEntityType<ChargerBlockEntity> CHARGER_BLOCK = FabricBlockEntityTypeBuilder.create(ChargerBlockEntity::new, BlockContent.CHARGER_BLOCK).build();
+    public static final BlockEntityType<ChargerBlockEntity> CHARGER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(ChargerBlockEntity::new, BlockContent.CHARGER_BLOCK).build();
     
     @AssignSidedEnergy
     public static final BlockEntityType<EnergyAcceptorAddonBlockEntity> ENERGY_ACCEPTOR_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(EnergyAcceptorAddonBlockEntity::new, BlockContent.MACHINE_ACCEPTOR_ADDON).build();
