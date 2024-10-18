@@ -1,13 +1,16 @@
 {
-	"required": true,
-	"package": "rearth.oritech.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"ShulkerEntityMixin",
-		"PlayerEntityMixin",
-		"LivingEntityMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "package": "rearth.oritech.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "LivingEntityMixin",
+    "PlayerEntityMixin",
+    "ShulkerEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "ElytraFeatureRendererMixin"
+  ]
 }

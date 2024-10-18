@@ -11,7 +11,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 
 import java.util.List;
 
@@ -36,6 +38,11 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
             doVanillaElytraTick(entity, chestStack);
         
         return true;
+    }
+    
+    @Override
+    public Identifier getModel() {
+        return Oritech.id("armor/exo_armor_jetpack");
     }
     
     @Override

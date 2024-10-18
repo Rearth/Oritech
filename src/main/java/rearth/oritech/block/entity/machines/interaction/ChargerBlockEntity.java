@@ -12,9 +12,13 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -28,6 +32,7 @@ import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
+import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.EnergyStorageUtil;
@@ -71,6 +76,8 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
         }
     };
     
+    private boolean networkDirty = false;
+    
     public ChargerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.CHARGER_BLOCK, pos, state);
     }
@@ -99,16 +106,49 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
             }
         }
         
+        if (networkDirty) {
+            updateNetwork();
+        }
+        
+    }
+    
+    @Override
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
+        SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
+        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+        nbt.putLong("energy_stored", energyStorage.amount);
+    }
+    
+    @Override
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+        SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
+        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+        energyStorage.amount = nbt.getLong("energy_stored");
+    }
+    
+    private void updateNetwork() {
+        networkDirty = false;
+        
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SingleVariantFluidSyncPacket(pos, Registries.FLUID.getId(fluidStorage.variant.getFluid()).toString(), fluidStorage.amount));
     }
     
     // return true if nothing is left to charge
     private boolean chargeItems() {
+        
+        var container = ContainerItemContext.ofSingleSlot(inventoryStorage.getSlot(0)).find(EnergyStorage.ITEM);
+        if (container == null) return true;
+        
         var moved = EnergyStorageUtil.move(this.energyStorage,
-          ContainerItemContext.ofSingleSlot(inventoryStorage.getSlot(0)).find(EnergyStorage.ITEM),
+          container,
           Long.MAX_VALUE,
           null);
         
-        return moved == 0;
+        if (moved > 0) networkDirty = true;
+        
+        return container.getAmount() >= container.getCapacity();
     }
     
     // return true if nothing is left to fill
@@ -131,10 +171,11 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
                   && (container.variant().equals(FluidVariant.blank()) || container.variant().equals(fluidStorage.variant))) {
                 
                 // actually fill jetpack
-                
                 var newAmount = container.amount() + usedRate;
                 inputItem.set(ComponentContent.STORED_FLUID, new FluidStack(fluidStorage.variant, newAmount));
                 fluidStorage.amount -= usedRate;
+                
+                networkDirty = true;
                 
             }
             return false;
@@ -158,6 +199,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+        updateNetwork();
         return new BasicMachineScreenHandler(syncId, playerInventory, this);
     }
     

@@ -19,6 +19,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
@@ -91,11 +92,15 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
             public @Nullable <T extends LivingEntity> BipedEntityModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable BipedEntityModel<T> original) {
                 
                 if (this.renderer == null)
-                    this.renderer = new ExosuitArmorRenderer();
+                    this.renderer = new ExosuitArmorRenderer(getModel(), Oritech.id("armor/exo_armor"));
                 
                 return this.renderer;
             }
         });
+    }
+    
+    public Identifier getModel() {
+        return Oritech.id("armor/exo_armor");
     }
     
     @Override

@@ -78,8 +78,11 @@ public interface BaseJetpackItem extends OritechEnergyItem {
         
         var fluidStack = getStoredFluid(stack);
         var fluid = Registries.FLUID.getId(fluidStack.variant().getFluid());
+        
         // this will currently only for instances of this class
         NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.JetpackUsageUpdatePacket(getStoredEnergy(stack), fluid.toString(), fluidStack.amount()));
+        
+        // todo particles
     }
     
     private static void processUpwardsMotion(PlayerEntity player, float powerMultiplier, boolean upOnly) {
@@ -136,9 +139,9 @@ public interface BaseJetpackItem extends OritechEnergyItem {
     
     default boolean tryUseFluid(ItemStack stack) {
         var fluidStack = getStoredFluid(stack);
-        if (fluidStack.amount() < getFuelCapacity() || !isValidFuel(fluidStack.variant()))
+        if (fluidStack.amount() < getFuelUsage() || !isValidFuel(fluidStack.variant()))
             return false;
-        var res = new FluidStack(fluidStack.variant(), fluidStack.amount() - getFuelCapacity());
+        var res = new FluidStack(fluidStack.variant(), fluidStack.amount() - getFuelUsage());
         stack.set(ComponentContent.STORED_FLUID, res);
         return true;
     }
