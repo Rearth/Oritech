@@ -73,7 +73,7 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements SimpleEnerg
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return 5000;
+        return 10_000;
     }
     
     @Override

@@ -78,4 +78,9 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     public long getFuelCapacity() {
         return 4 * FluidConstants.BUCKET;
     }
+    
+    @Override
+    public long getEnergyMaxInput(ItemStack stack) {
+        return 20_000;
+    }
 }

@@ -67,4 +67,9 @@ public class JetpackExoArmorItem extends BackstorageExoArmorItem implements Base
     public long getFuelCapacity() {
         return 4 * FluidConstants.BUCKET;
     }
+    
+    @Override
+    public long getEnergyMaxInput(ItemStack stack) {
+        return 20_000;
+    }
 }

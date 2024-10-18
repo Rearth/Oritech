@@ -14,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -78,26 +79,40 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     public void tick(World world, BlockPos pos, BlockState state, ChargerBlockEntity blockEntity) {
         if (world.isClient) return;
         
+        // stop if no input is given, or it's a stackable item
+        if (inventory.getStack(0).isEmpty() || inventory.getStack(0).getCount() > 1) return;
+        
         var isFull = true;
         
         // try charge item
-        chargeItems();
+        if (!chargeItems()) isFull = false;
         
         // try filling item
-        fillItems();
+        if (!fillItems()) isFull = false;
         
         // move charged and/or filled item to right
+        if (isFull) {
+            var outSlot = inventory.getStack(1);
+            if (outSlot.isEmpty()) {
+                inventory.setStack(1, inventory.getStack(0));
+                inventory.setStack(0, ItemStack.EMPTY);
+            }
+        }
         
     }
     
-    private void chargeItems() {
-        EnergyStorageUtil.move(this.energyStorage,
+    // return true if nothing is left to charge
+    private boolean chargeItems() {
+        var moved = EnergyStorageUtil.move(this.energyStorage,
           ContainerItemContext.ofSingleSlot(inventoryStorage.getSlot(0)).find(EnergyStorage.ITEM),
           Long.MAX_VALUE,
           null);
+        
+        return moved == 0;
     }
     
-    private void fillItems() {
+    // return true if nothing is left to fill
+    private boolean fillItems() {
         
         var inputItem = inventory.getStack(0);
         var rate = (long) (FluidConstants.BUCKET * 0.05f);
@@ -108,9 +123,10 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
             var container = jetpackItem.getStoredFluid(inputItem);
             var usedRate = Math.min(rate, jetpackItem.getFuelCapacity() - container.amount());
             
+            if (container.amount() >= jetpackItem.getFuelCapacity()) return true;
+            
             // ensure jetpack can be filled from storage
             if (fluidStorage.amount > usedRate
-                  && container.amount() < jetpackItem.getFuelCapacity()
                   && jetpackItem.isValidFuel(fluidStorage.variant)
                   && (container.variant().equals(FluidVariant.blank()) || container.variant().equals(fluidStorage.variant))) {
                 
@@ -121,6 +137,10 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
                 fluidStorage.amount -= usedRate;
                 
             }
+            return false;
+            
+        } else {
+            return true;
         }
         
     }
