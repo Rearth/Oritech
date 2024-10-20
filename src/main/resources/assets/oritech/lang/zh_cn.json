@@ -85,6 +85,7 @@
   "tooltip.oritech.soul_crop": "在灵魂土上生长。包含一个灵魂。",
   "tooltip.oritech.superconductor": "不能连接至普通的能量线缆",
   "tooltip.oritech.jetpack_usage": "需要电力或涡轮燃料来飞行。",
+  "tooltip.oritech.charger": "Used to charge and fill equipment.",
   "tooltip.oritech.addon_speed_desc": "处理速度 ",
   "tooltip.oritech.addon_efficiency_desc": "能量效率 ",
   "tooltip.oritech.addon_yield_desc": "加倍粉碎工厂的副产品数量。提高方块破坏器和末影激光的方块破坏产出。",
@@ -370,7 +371,7 @@
   "block.oritech.treefeller_block": "伐木器",
   "block.oritech.black_hole_block": [
     {
-      "text": "黑洞",
+      "text": "Black Hole (WIP)",
       "color": "#cc66ff"
     }
   ],
