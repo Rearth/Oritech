@@ -739,7 +739,7 @@
   "text.config.oritech-config.option.machineVolumeMultiplier": "机器声音音量",
   "text.config.oritech-config.section.particleAccelerator": "粒子加速器",
   "text.config.oritech-config.option.bendFactor": "粒子转弯距离需求因数",
-  "text.config.oritech-config.option.accelerationRFCost": "基础粒子加速消耗",
+  "text.config.oritech-config.option.accelerationRFCost": "Base Particle RF Acceleration Cost",
   "text.config.oritech-config.option.maxGateDist": "粒子门距离上限",
   "text.config.oritech-config.option.endPortalRequiredSpeed": "末地传送门产生最小对撞能量",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "下界传送门产生最小对撞能量",
