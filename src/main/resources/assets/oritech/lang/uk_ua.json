@@ -739,7 +739,7 @@
   "text.config.oritech-config.option.machineVolumeMultiplier": "Machine Sound Volume",
   "text.config.oritech-config.section.particleAccelerator": "Particle Accelerator",
   "text.config.oritech-config.option.bendFactor": "Particle Curve Requirement Factor",
-  "text.config.oritech-config.option.accelerationRFCost": "Base Particle Acceleration Cost",
+  "text.config.oritech-config.option.accelerationRFCost": "Base Particle RF Acceleration Cost",
   "text.config.oritech-config.option.maxGateDist": "Maximum Particle Gate Distance",
   "text.config.oritech-config.option.endPortalRequiredSpeed": "Minimum End Portal Collision Energy",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "Minimum Nether Portal Collision Energy",
