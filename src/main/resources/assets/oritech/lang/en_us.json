@@ -110,6 +110,7 @@
   "tooltip.oritech.soul_crop": "Grown on soul soil. Contains a soul.",
   "tooltip.oritech.superconductor": "Cannot connect to normal energy pipes.",
   "tooltip.oritech.jetpack_usage": "Needs electricity or turbofuel to fly.",
+  "tooltip.oritech.charger": "Used to charge and fill equipment.",
 
   "tooltip.oritech.addon_speed_desc": "Operation Speed ",
   "tooltip.oritech.addon_efficiency_desc": "Energy Efficiency ",
@@ -416,7 +417,7 @@
   "block.oritech.capacitor_addon_extender": "Power Bank Addon",
   "block.oritech.treefeller_block": "Tree Cutter",
   "block.oritech.black_hole_block": [
-    { "text": "Black Hole", "color": "#cc66ff" }
+    { "text": "Black Hole (WIP)", "color": "#cc66ff" }
   ],
   "block.oritech.enchantment_catalyst_block": [
     { "text": "Arcane Catalyst", "color": "#cc66ff" }
