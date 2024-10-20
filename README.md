@@ -61,6 +61,7 @@ The following translations are available:
 - English
 - Chinese (by PlatinumOak)
 - Brazilian Portuguese (by RenanEuzebio)
+- Russian (by nuchohent)
 
 ## Built With
 
@@ -130,6 +131,7 @@ In detail, these are the following items that are from the above-mentioned sourc
   * Tech Door, Lever, Button
   * Machine Platings
   * Metal Beam
+  * Charger Model (heavily modified)
 * From [malcolmriley's unused-textures repo](https://github.com/malcolmriley/unused-textures)
   * Oil fluid textures (the dark gas texture)
   * The withered crop textures
