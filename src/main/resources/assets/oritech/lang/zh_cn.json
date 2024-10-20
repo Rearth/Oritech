@@ -85,7 +85,7 @@
   "tooltip.oritech.soul_crop": "在灵魂土上生长。包含一个灵魂。",
   "tooltip.oritech.superconductor": "不能连接至普通的能量线缆",
   "tooltip.oritech.jetpack_usage": "需要电力或涡轮燃料来飞行。",
-  "tooltip.oritech.charger": "Used to charge and fill equipment.",
+  "tooltip.oritech.charger": "可用于为装备充能",
   "tooltip.oritech.addon_speed_desc": "处理速度 ",
   "tooltip.oritech.addon_efficiency_desc": "能量效率 ",
   "tooltip.oritech.addon_yield_desc": "加倍粉碎工厂的副产品数量。提高方块破坏器和末影激光的方块破坏产出。",
@@ -371,7 +371,7 @@
   "block.oritech.treefeller_block": "伐木器",
   "block.oritech.black_hole_block": [
     {
-      "text": "Black Hole (WIP)",
+      "text": "黑洞（未完成）",
       "color": "#cc66ff"
     }
   ],
@@ -490,8 +490,8 @@
   "item.oritech.hand_drill": "手钻",
   "item.oritech.jetpack": "喷气背包",
   "item.oritech.exo_jetpack": "Exo 喷气背包",
-  "item.oritech.jetpack_elytra": "Boosted Elytra",
-  "item.oritech.jetpack_exo_elytra": "Boosted Exo Elytra",
+  "item.oritech.jetpack_elytra": "强化鞘翅",
+  "item.oritech.jetpack_exo_elytra": "强化Exo鞘翅",
   "item.oritech.oritech_guide": "Oritech 手册",
   "item.oritech.promethium_axe": [
     {
@@ -671,7 +671,7 @@
   "text.config.oritech-config.option.itemPipeTransferAmount": "物流管道传输速率",
   "text.config.oritech-config.section.worldGeneration": "世界生成",
   "text.config.oritech-config.option.generateOres": "生成矿石",
-  "text.config.oritech-config.section.equipment": "Equipment",
+  "text.config.oritech-config.section.equipment": "装备",
   "text.config.oritech-config.category.charger": "Charger",
   "text.config.oritech-config.category.basicJetpack": "Basic Jetpack",
   "text.config.oritech-config.category.exoJetpack": "Exo 喷气背包",
@@ -739,7 +739,7 @@
   "text.config.oritech-config.option.machineVolumeMultiplier": "机器声音音量",
   "text.config.oritech-config.section.particleAccelerator": "粒子加速器",
   "text.config.oritech-config.option.bendFactor": "粒子转弯距离需求因数",
-  "text.config.oritech-config.option.accelerationRFCost": "Base Particle RF Acceleration Cost",
+  "text.config.oritech-config.option.accelerationRFCost": "粒子加速RF消耗基数",
   "text.config.oritech-config.option.maxGateDist": "粒子门距离上限",
   "text.config.oritech-config.option.endPortalRequiredSpeed": "末地传送门产生最小对撞能量",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "下界传送门产生最小对撞能量",
