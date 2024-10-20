@@ -85,6 +85,7 @@
   "tooltip.oritech.soul_crop": "Росток на земле души. Содержит душу.",
   "tooltip.oritech.superconductor": "Не удается подключиться к обычным энергетическим трубам.",
   "tooltip.oritech.jetpack_usage": "Needs electricity or turbofuel to fly.",
+  "tooltip.oritech.charger": "Used to charge and fill equipment.",
   "tooltip.oritech.addon_speed_desc": "Скорость работы ",
   "tooltip.oritech.addon_efficiency_desc": "Энергоэффективность",
   "tooltip.oritech.addon_yield_desc": "Удваивает количество побочного продукта во Фрагментной Кузне. Увеличивает выработку блока в Разрушителе Блоков и Эндеррическом Лазере",
@@ -370,7 +371,7 @@
   "block.oritech.treefeller_block": "Деревянный резак",
   "block.oritech.black_hole_block": [
     {
-      "text": "Чёрная Дыра",
+      "text": "Black Hole (WIP)",
       "color": "#cc66ff"
     }
   ],
