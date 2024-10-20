@@ -2,7 +2,9 @@ package rearth.oritech.init;
 
 import io.wispforest.owo.config.Option;
 import io.wispforest.owo.config.annotation.*;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 
+// thank gpt for being able to translate the language keys for all this. It would be horror to type these all out
 @io.wispforest.owo.config.annotation.Config(name = "oritech-config", wrapperName = "OritechConfig")
 @Modmenu(modId = "oritech")
 @Sync(Option.SyncMode.OVERRIDE_CLIENT)
@@ -40,6 +42,24 @@ public class Config {
     public float fluidPipeInternalStorageBuckets = 2f;
     public long energyPipeTransferRate = 10_000;
     public long superConductorTransferRate = 4_194_304;
+    
+    @SectionHeader("equipment")
+    @Nest
+    public BasicEnergyMachineData charger = new BasicEnergyMachineData(500_000, 10_000, 5000, 0);
+    @Nest
+    public JetpackData basicJetpack = new JetpackData(100_000, 4 * FluidConstants.BUCKET, 128, (int) (10 * (FluidConstants.BUCKET / 1000)), 1024, 1f);
+    @Nest
+    public JetpackData exoJetpack = new JetpackData(500_000, 16 * FluidConstants.BUCKET, 256, (int) (15 * (FluidConstants.BUCKET / 1000)), 10_000, 2.5f);
+    @Nest
+    public JetpackData elytraJetpack = new JetpackData(100_000, 4 * FluidConstants.BUCKET, 128, (int) (10 * (FluidConstants.BUCKET / 1000)), 1024, 0.8f);
+    @Nest
+    public JetpackData exoElytraJetpack = new JetpackData(500_000, 16 * FluidConstants.BUCKET, 256, (int) (15 * (FluidConstants.BUCKET / 1000)), 10_000, 1.6f);
+    @Nest
+    public ToolData exoChestplate = new ToolData(500_000, 10_000, 10_000);
+    @Nest
+    public ToolData basicDrill = new ToolData(10_000, 10, 512);
+    @Nest
+    public ToolData chainSaw = new ToolData(10_000, 10, 512);
     
     @SectionHeader("worldGeneration")
     public boolean generateOres = true;
@@ -161,6 +181,36 @@ public class Config {
             this.maxEnergyInsertion = maxEnergyInsertion;
             this.maxEnergyExtraction = maxEnergyExtraction;
             this.energyPerTick = energyPerTick;
+        }
+    }
+    
+    public static class JetpackData {
+        public long energyCapacity;
+        public long fuelCapacity;
+        public int energyUsage;
+        public int fuelUsage;
+        public int chargeSpeed;
+        public float speed;
+        
+        public JetpackData(long energyCapacity, long fuelCapacity, int energyUsage, int fuelUsage, int chargeSpeed, float speed) {
+            this.energyCapacity = energyCapacity;
+            this.fuelCapacity = fuelCapacity;
+            this.energyUsage = energyUsage;
+            this.fuelUsage = fuelUsage;
+            this.chargeSpeed = chargeSpeed;
+            this.speed = speed;
+        }
+    }
+    
+    public static class ToolData {
+        public long energyCapacity;
+        public long energyUsage;
+        public int chargeSpeed;
+        
+        public ToolData(long energyCapacity, long energyUsage, int chargeSpeed) {
+            this.energyCapacity = energyCapacity;
+            this.energyUsage = energyUsage;
+            this.chargeSpeed = chargeSpeed;
         }
     }
     

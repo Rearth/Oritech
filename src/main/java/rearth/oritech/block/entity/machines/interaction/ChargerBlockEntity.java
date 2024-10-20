@@ -27,6 +27,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
@@ -42,7 +43,7 @@ import java.util.List;
 
 public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidProvider, EnergyProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
     
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50_000, 10_000, 512) {
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.charger.energyCapacity(), Oritech.CONFIG.charger.maxEnergyInsertion(), Oritech.CONFIG.charger.maxEnergyExtraction()) {
         @Override
         public void onFinalCommit() {
             super.onFinalCommit();

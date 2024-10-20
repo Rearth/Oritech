@@ -107,31 +107,31 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     
     @Override
     public float getSpeed() {
-        return 1f;
+        return Oritech.CONFIG.basicJetpack.speed();
     }
     
     @Override
     public int getRfUsage() {
-        return 128;
+        return Oritech.CONFIG.basicJetpack.energyUsage();
     }
     
     @Override
     public int getFuelUsage() {
-        return (int) (10 * (FluidConstants.BUCKET / 1000));
+        return Oritech.CONFIG.basicJetpack.fuelUsage();
     }
     
     @Override
     public long getFuelCapacity() {
-        return 4 * FluidConstants.BUCKET;
+        return Oritech.CONFIG.basicJetpack.fuelCapacity();
     }
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return 100_000;
+        return Oritech.CONFIG.basicJetpack.energyCapacity();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return 1024;
+        return Oritech.CONFIG.basicJetpack.chargeSpeed();
     }
 }

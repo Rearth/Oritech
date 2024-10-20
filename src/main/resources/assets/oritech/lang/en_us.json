@@ -1,76 +1,52 @@
 {
   "advancements.oritech.begin": "Oritech",
   "advancements.oritech.begin.description": "Nickel & Dime - Start your technological adventure by acquiring some raw nickel. Shine on, you crazy miner!",
-
   "advancements.oritech.generator": "Power Up!",
   "advancements.oritech.generator.description": "Generate some serious power with a basic generator. Electrifying, isn't it?",
-
   "advancements.oritech.furnace": "Furnace of the future",
   "advancements.oritech.furnace.description": "Get your hands on a powered furnace. Things are heating up now!",
-
   "advancements.oritech.pulverizer": "Crushing It",
   "advancements.oritech.pulverizer.description": "Obtain a pulverizer and turn your ores into dust. Rock 'n' roll!",
-
   "advancements.oritech.foundry": "Melt Down",
   "advancements.oritech.foundry.description": "Acquire a foundry and start forging powerful alloys. Alchemy at its finest!",
-
   "advancements.oritech.assembler": "Assembly Line",
   "advancements.oritech.assembler.description": "Get an assembler and start putting things together. It's all coming together now!",
-
   "advancements.oritech.exo_boots": "Boots like Feathers",
   "advancements.oritech.exo_boots.description": "Craft Exo Boots and say goodbye to fall damage. Gravity? Never heard of it!",
-
   "advancements.oritech.exo_legs": "Leg Day",
   "advancements.oritech.exo_legs.description": "Craft Exo Leggings and get a leg up on the competition. Stronger, faster, better!",
-
   "advancements.oritech.exo_chest": "Heart of Steel",
   "advancements.oritech.exo_chest.description": "Craft an Exo Chestplate and protect your core. Iron Man, who?",
-
   "advancements.oritech.exo_helmet": "Head Start",
   "advancements.oritech.exo_helmet.description": "Craft an Exo Helmet and get ahead in the game. Mind over matter!",
-
   "advancements.oritech.drill": "Drill Sergeant",
   "advancements.oritech.drill.description": "Obtain a hand drill and start boring through the earth. Dig deep, soldier!",
-
   "advancements.oritech.resource_node": "Glittering Prizes",
   "advancements.oritech.resource_node.description": "Find a resource node. Unlimited wealth awaits!",
-
   "advancements.oritech.centrifuge": "Spin Doctor",
   "advancements.oritech.centrifuge.description": "Acquire a centrifuge and separate the good from the bad. Spin to win!",
-
   "advancements.oritech.plastic": "Fantastic Plastic",
   "advancements.oritech.plastic.description": "Get your hands on a plastic sheet. It's not just fantastic, it's plastic!",
-
   "advancements.oritech.catalyst": "Arcane Tinkerer",
   "advancements.oritech.catalyst.description": "Acquire an Arcane Stabilizer (Warning: May contain souls!)",
-
   "advancements.oritech.overenchanted": "Arcane Engineer",
   "advancements.oritech.overenchanted.description": "Acquire an item with level X enchantment. What explosions?",
-
   "advancements.oritech.laser": "Laser Focus",
   "advancements.oritech.laser.description": "Obtain a laser arm block. Power up, mine fluxite, and dig through the earth. Pew pew, you're unstoppable",
-
   "advancements.oritech.fluxite": "Fluxite",
   "advancements.oritech.fluxite.description": "Acquire some fluxite. Great Scott, we're going back to the future!",
-
   "advancements.oritech.atomicforge": "Atomic Smith",
   "advancements.oritech.atomicforge.description": "Get an atomic forge and start crafting like a pro. It's atomic!",
-
   "advancements.oritech.promethium": "Promethean Fire",
   "advancements.oritech.promethium.description": "Obtain a promethium ingot. You've stolen fire from the gods!",
-
   "advancements.oritech.ultimate_core": "The Ultimate Machine",
   "advancements.oritech.ultimate_core.description": "Obtain an ultimate machine core. Now you can add excessive addons!",
-
   "advancements.oritech.gold_gem": "Legendary Alchemist",
   "advancements.oritech.gold_gem.description": "Learn the secret art of turning gold into more gold!",
-
   "advancements.oritech.ai": "Artificial Brilliance",
   "advancements.oritech.ai.description": "Get a Super AI Chip. Skynet who? It's not just smart, it's super smart!",
-
   "advancements.oritech.unholy": "Unholy Knowledge",
   "advancements.oritech.unholy.description": "Acquire an unholy intelligence. Knowledge is power, but this is something else!",
-
   "button.oritech.input_mode_fill_left_to_right": "Default",
   "button.oritech.input_mode_fill_evenly": "Fill Evenly",
   "button.oritech.input_mode_fill_matching_recipe": "Match Recipe",
@@ -78,7 +54,6 @@
   "tooltip.oritech.input_mode_fill_evenly": "Fills items evenly. New items are always\nput into the lowest matching slot.",
   "tooltip.oritech.input_mode_fill_matching_recipe": "Inserts items balanced according to matching recipes.\nIf there is no recipe that uses an item, it will not be\ninserted.",
   "title.oritech.details": "Details",
-
   "tooltip.oritech.item_extra_info": "Hold ctrl for more info",
   "tooltip.oritech.addon_desc": "Addon slots: ",
   "tooltip.oritech.core_desc": "Multiblock. Required Machine Cores: ",
@@ -111,7 +86,6 @@
   "tooltip.oritech.superconductor": "Cannot connect to normal energy pipes.",
   "tooltip.oritech.jetpack_usage": "Needs electricity or turbofuel to fly.",
   "tooltip.oritech.charger": "Used to charge and fill equipment.",
-
   "tooltip.oritech.addon_speed_desc": "Operation Speed ",
   "tooltip.oritech.addon_efficiency_desc": "Energy Efficiency ",
   "tooltip.oritech.addon_yield_desc": "Doubles byproduct amount in Fragment Forge. Increases block breaking yield in Block Destroyer and Enderic Laser",
@@ -127,7 +101,6 @@
   "tooltip.oritech.addon_transfer_desc": "Energy Transfer Rate ",
   "tooltip.oritech.addon_extender_desc": "Allows additional addons to be connected",
   "tooltip.oritech.addon_boiler_desc": "Allows a generator to produce steam instead of RF. Input water at this addon, and extract steam from it",
-
   "tooltip.oritech.overchargedcrystal": "Unending amounts of raw energy seem to be contained within it.",
   "tooltip.oritech.fluxite": "Can also be created by harvesting grown amethyst with an enderic laser",
   "tooltip.oritech.promethium_axe": "Sneak while harvesting to break the entire tree",
@@ -141,7 +114,6 @@
   "tooltip.oritech.exo_helmet": "Grants night vision",
   "tooltip.oritech.black_hole": "DON'T PLACE THIS unless you know what you're doing.",
   "tooltip.oritech.weed_killer": "Removes all grass and plants in a wide radius",
-
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Gained by capturing a viable entity with the ",
@@ -154,7 +126,6 @@
       "color": "gray"
     }
   ],
-
   "tooltip.oritech.capture_item_desc_1": [
     {
       "text": "Can capture the brain of a small, magical intelligent flying creature. The",
@@ -181,7 +152,6 @@
       "color": "gray"
     }
   ],
-
   "title.oritech.redstone_addon": [
     {
       "text": "Please select a target slot",
@@ -198,9 +168,7 @@
   "title.oritech.redstone_output_active": "Activity Measure",
   "tooltip.oritech.redstone_input_control": "Enables the machine to be disabled via a redstone signal to this addon",
   "title.oritech.redstone_input_control": "Control Input",
-  
   "title.oritech.inventory_proxy": "Machine Inventory Access",
-
   "tooltip.oritech.energy_stored": "Stored: %d RF",
   "tooltip.oritech.energy_indicator": "%d/%d RF",
   "tooltip.oritech.energy_max_transfer": "Max Transfer Rate: ",
@@ -212,17 +180,14 @@
   "title.oritech.machine.addon_fortune": "%d Fortune",
   "tooltip.oritech.machine.addon_fortune": "Yield addon count. 3 is the effective maximum",
   "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many layers of machine\naddons can be added to this block.\n\nUse better cores to increase this\n\nCurrent quality progress: %s",
-
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
   "tooltip.oritech.billion_abbrev": "B",
-
   "title.oritech.machine_speed": "⌛ %s%% ",
   "tooltip.oritech.machine_speed": "Processing Speed",
   "title.oritech.machine_efficiency": "⚡ %s%% ",
   "tooltip.oritech.machine_efficiency": "Energy Efficiency",
   "title.oritech.machine_energy_production": "↗ %d RF/t ",
-
   "tooltip.oritech.steam_energy_production": "Total production (includes chained generators)",
   "title.oritech.steam_production": "\uD83D\uDEDE %s su/t",
   "tooltip.oritech.steam_production": "Amount of steam droplets produced per tick. Any excess will be lost when the storage is full.",
@@ -231,36 +196,29 @@
   "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Charged\n\nMaximum Usage: %s RF/t",
   "title.oritech.machine.no_addons": "No addons connected",
   "button.oritech.machine.addons": "Addons",
-
   "title.oritech.machine.capacitor_added_capacity": "\uD83D\uDD0B %d RF ",
   "tooltip.oritech.machine.capacitor_added_capacity": "Added Capacity",
   "title.oritech.machine.capacitor_added_throughput": "\uD83D\uDD0B %d RF/t",
   "tooltip.oritech.machine.capacitor_added_throughput": "Added Throughput",
-
   "title.oritech.machine_option_enabled": "\uD83D\uDD28 Enabled",
   "tooltip.oritech.pulverizer_dust_combine": "Auto-combines small dusts to ingots",
   "tooltip.oritech.fluid_content": "%f mB %s",
   "tooltip.oritech.jetpack_fuel": "%f/%f mB %s",
   "tooltip.oritech.fluid_empty": "Empty",
   "tooltip.oritech.progress_indicator": "%d / %d ticks\n(base %d ticks)",
-
   "title.oritech.catalyst.stable": "Stable",
   "title.oritech.catalyst.stabilized": "Stabilized",
   "title.oritech.catalyst.semi_stable": "Semi-Stable",
   "title.oritech.catalyst.unstable": "Unstable",
-
   "tooltip.oritech.spawner.collected_souls": "%d / %d Souls",
-
   "tooltip.oritech.accelerator": "Injects particles into particle accelerator guide rings.",
   "tooltip.oritech.accelerator_motor": "Uses energy to speed up particles moving through it.",
   "tooltip.oritech.accelerator_ring": "Used to define the route of particles. Can be right-clicked to turn one end. Redstone-controllable.",
   "tooltip.oritech.accelerator_sensor": "Emits a redstone signal based on the speed of particles passing through.",
-
   "button.oritech.enchanter.bane_of_long_names": "Bane of long names",
   "title.oritech.enchanter.catalysts_available": "%d / %d catalysts available",
   "title.oritech.enchanter.catalysts": "%d / %d Catalysts",
   "title.oritech.enchanter.souls_used": "%d / %d Souls used",
-
   "title.oritech.laser_arm.addon_range": "%d Size",
   "title.oritech.machine.addon_hunter_range": "%d Scan distance",
   "tooltip.oritech.laser_arm.addon_hunter_range": "Effective beam range",
@@ -268,7 +226,6 @@
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Effective Beam Damage",
   "title.oritech.machine.addon_looting": "%d Looting",
   "tooltip.oritech.machine.addon_looting": "Yield addon count. 3 is the effective maximum",
-
   "rei.process.oritech:pulverizer": "Pulverizing",
   "rei.process.oritech:grinder": "Fragmenting",
   "rei.process.oritech:assembler": "Assembling",
@@ -282,7 +239,6 @@
   "rei.process.oritech:fuel_generator": "Fuel Burning",
   "rei.process.oritech:particle_collision": "Fuel Burning",
   "rei.title.oritech.cookingtime": "%ds (%d ticks)",
-
   "emi.category.oritech.pulverizer": "Pulverizing",
   "emi.category.oritech.grinder": "Fragmenting",
   "emi.category.oritech.assembler": "Assembling",
@@ -297,12 +253,10 @@
   "emi.category.oritech.particle_collision": "Particle Collision",
   "emi.title.oritech.cookingtime": "%ds (%d ticks)",
   "emi.title.oritech.collisionspeed": "Required collision energy: %sJ",
-
   "itemgroup.oritech.machines": "Oritech Machines",
   "itemgroup.oritech.components": "Oritech Components",
   "itemgroup.oritech.decorative": "Oritech Blocks",
   "itemgroup.oritech.equipment": "Oritech Equipment",
-
   "tooltip.oritech.soul_count_tooltip": "Souls",
   "tooltip.oritech.cost_tooltip": "Cost: ",
   "tooltip.oritech.catalyst_stable": "Stable",
@@ -314,7 +268,6 @@
   "tooltip.oritech.enchanter_souls_used": " Souls Used",
   "tooltip.oritech.enchanter_selection": "Select Enchantment",
   "tooltip.oritech.creative_tank": "Right click with a bucket to set or an empty one to empty",
-
   "block.oritech.banana_block": "Banana Block",
   "block.oritech.machine_frame_block": "Machine Frame",
   "block.oritech.fluid_pipe": "Fluid Pipe",
@@ -417,13 +370,22 @@
   "block.oritech.capacitor_addon_extender": "Power Bank Addon",
   "block.oritech.treefeller_block": "Tree Cutter",
   "block.oritech.black_hole_block": [
-    { "text": "Black Hole (WIP)", "color": "#cc66ff" }
+    {
+      "text": "Black Hole (WIP)",
+      "color": "#cc66ff"
+    }
   ],
   "block.oritech.enchantment_catalyst_block": [
-    { "text": "Arcane Catalyst", "color": "#cc66ff" }
+    {
+      "text": "Arcane Catalyst",
+      "color": "#cc66ff"
+    }
   ],
   "block.oritech.enchanter_block": [
-    { "text": "Stabilized Enchanter", "color": "#cc66ff" }
+    {
+      "text": "Stabilized Enchanter",
+      "color": "#cc66ff"
+    }
   ],
   "block.oritech.spawner_controller_block": "Spawner Controller",
   "block.oritech.spawner_cage_block": "Spawner Cage",
@@ -432,7 +394,6 @@
   "block.oritech.accelerator_motor": "Particle Accelerator Linear Motor",
   "block.oritech.accelerator_controller": "Particle Accelerator",
   "block.oritech.accelerator_sensor": "Particle Accelerator Sensor",
-
   "item.oritech.banana": "Banana",
   "item.oritech.weed_killer": "Weed Killer",
   "item.oritech.target_designator": "Target Designator",
@@ -483,7 +444,10 @@
   "item.oritech.energite_ingot": "Energite Ingot",
   "item.oritech.energite_dust": "Energite Dust",
   "item.oritech.prometheum_ingot": [
-    { "text": "Prometheum", "color": "#ffd505" }
+    {
+      "text": "Prometheum",
+      "color": "#ffd505"
+    }
   ],
   "item.oritech.steel_ingot": "Steel Ingot",
   "item.oritech.steel_dust": "Steel Dust",
@@ -530,25 +494,26 @@
   "item.oritech.jetpack_exo_elytra": "Boosted Exo Elytra",
   "item.oritech.oritech_guide": "Oritech Manual",
   "item.oritech.promethium_axe": [
-    { "text": "Prometheum Battleaxe", "color": "#ffd505" }
+    {
+      "text": "Prometheum Battleaxe",
+      "color": "#ffd505"
+    }
   ],
   "item.oritech.promethium_pickaxe": [
-    { "text": "Prometheum Pickaxe", "color": "#ffd505" }
+    {
+      "text": "Prometheum Pickaxe",
+      "color": "#ffd505"
+    }
   ],
-
   "message.oritech.catalyst.cost": "Cost: %d",
-
   "message.oritech.deep_drill.ore_placement": "Machine must be placed on ore nodes",
   "message.oritech.generator.production_rate": "Production rate: %d with core multiplier: %d",
   "message.oritech.machine.missing_core": "Machine is not assembled. Please add missing core blocks",
   "message.oritech.machine_frame.missing_frame": "Missing frame. Add an empty rectangular frame behind the machine using machine frame blocks",
-
   "message.oritech.enchanter.insert_item": "Insert Item",
-
   "message.oritech.drone.invalid_distance": "Target must be at least 50 blocks away.\n(current distance: %d)",
   "message.oritech.drone.target_set": "Target port set.\nDrone will deliver whenever the inventory is not empty.",
   "message.oritech.drone.target_invalid": "Target is not a valid drone port.\nEnsure that the target port is loaded and active.",
-
   "message.oritech.pump.starting": "Starting",
   "message.oritech.pump.extending": "Trunk is extending...",
   "message.oritech.pump.initializing": "Pump is initializing... (This might take a moment for large bodies of liquid)",
@@ -557,10 +522,8 @@
   "message.oritech.pump.low_energy": "Not enough energy!",
   "message.oritech.pump.pump_finished": "All liquids have been pumped",
   "message.oritech.pump.full": "Tank is full",
-
   "message.oritech.spawner.no_cage": "Missing mob cage!",
   "message.oritech.spawner.no_mob": "No mob caught. Move a mob on top to load it into the spawner",
-
   "message.oritech.target_designator.position_invalid": "Invalid position for drone port, target port must be at least 50 blocks away",
   "message.oritech.target_designator.position_saved": "Position saved to machine",
   "message.oritech.target_designator.position_stored": "Position stored",
@@ -570,13 +533,11 @@
   "message.oritech.target_designator.hunter_all": "all non-player mobs",
   "tooltip.oritech.target_designator.set_to": "Set to: [%s]",
   "tooltip.oritech.target_designator.no_target": "No target set",
-
   "message.oritech.tool_mode.area_effect": "Area Effect",
   "message.oritech.tool_mode.silk_touch": "Silk Touch",
   "tooltip.oritech.tool_mode.area_range.area": "Mode: Area",
   "tooltip.oritech.tool_mode.area_range.single": "Mode: Single",
   "config.jade.plugin_oritech.machine_core_controller": "Oritech Controller Link View",
-
   "text.oritech.accelerator.ui.waiting.0": "Waiting.",
   "text.oritech.accelerator.ui.waiting.1": "Waiting..",
   "text.oritech.accelerator.ui.waiting.2": "Waiting...",
@@ -593,7 +554,6 @@
   "text.oritech.accelerator.ui.exited": "Particle Exited",
   "text.oritech.accelerator.ui.exited.stats": "Coordinates %s\nLast Curve Dist: %s\nMin Curve Dist: %s",
   "text.oritech.accelerator.ui.exited.nogate": "Coordinates %s\nNo gate in range\nRange: %s",
-
   "text.config.oritech-config.title": "Oritech Settings",
   "text.config.oritech-config.section.machineSettings": "Machines",
   "text.config.oritech-config.category.processingMachines": "Processing Machines",
@@ -711,6 +671,52 @@
   "text.config.oritech-config.option.itemPipeTransferAmount": "Item Pipe Transfer Amount",
   "text.config.oritech-config.section.worldGeneration": "World Generation",
   "text.config.oritech-config.option.generateOres": "Generate Ores",
+  "text.config.oritech-config.section.equipment": "Equipment",
+  "text.config.oritech-config.category.charger": "Charger",
+  "text.config.oritech-config.category.basicJetpack": "Basic Jetpack",
+  "text.config.oritech-config.category.exoJetpack": "Exo Jetpack",
+  "text.config.oritech-config.category.elytraJetpack": "Elytra Jetpack",
+  "text.config.oritech-config.category.exoElytraJetpack": "Exo Elytra Jetpack",
+  "text.config.oritech-config.category.exoChestplate": "Exo Chestplate",
+  "text.config.oritech-config.category.basicDrill": "Basic Drill",
+  "text.config.oritech-config.category.chainSaw": "Chain Saw",
+  "text.config.oritech-config.option.charger.energyCapacity": "Charger Energy Capacity",
+  "text.config.oritech-config.option.charger.maxEnergyInsertion": "Charger Max Energy Insertion",
+  "text.config.oritech-config.option.charger.maxEnergyExtraction": "Charger Max Energy Extraction",
+  "text.config.oritech-config.option.charger.energyPerTick": "Charger Energy Per Tick",
+  "text.config.oritech-config.option.basicJetpack.energyCapacity": "Basic Jetpack Energy Capacity",
+  "text.config.oritech-config.option.basicJetpack.fuelCapacity": "Basic Jetpack Fuel Capacity",
+  "text.config.oritech-config.option.basicJetpack.energyUsage": "Basic Jetpack Energy Usage",
+  "text.config.oritech-config.option.basicJetpack.fuelUsage": "Basic Jetpack Fuel Usage",
+  "text.config.oritech-config.option.basicJetpack.chargeSpeed": "Basic Jetpack Charge Speed",
+  "text.config.oritech-config.option.basicJetpack.speed": "Basic Jetpack Speed",
+  "text.config.oritech-config.option.exoJetpack.energyCapacity": "Exo Jetpack Energy Capacity",
+  "text.config.oritech-config.option.exoJetpack.fuelCapacity": "Exo Jetpack Fuel Capacity",
+  "text.config.oritech-config.option.exoJetpack.energyUsage": "Exo Jetpack Energy Usage",
+  "text.config.oritech-config.option.exoJetpack.fuelUsage": "Exo Jetpack Fuel Usage",
+  "text.config.oritech-config.option.exoJetpack.chargeSpeed": "Exo Jetpack Charge Speed",
+  "text.config.oritech-config.option.exoJetpack.speed": "Exo Jetpack Speed",
+  "text.config.oritech-config.option.elytraJetpack.energyCapacity": "Elytra Jetpack Energy Capacity",
+  "text.config.oritech-config.option.elytraJetpack.fuelCapacity": "Elytra Jetpack Fuel Capacity",
+  "text.config.oritech-config.option.elytraJetpack.energyUsage": "Elytra Jetpack Energy Usage",
+  "text.config.oritech-config.option.elytraJetpack.fuelUsage": "Elytra Jetpack Fuel Usage",
+  "text.config.oritech-config.option.elytraJetpack.chargeSpeed": "Elytra Jetpack Charge Speed",
+  "text.config.oritech-config.option.elytraJetpack.speed": "Elytra Jetpack Speed",
+  "text.config.oritech-config.option.exoElytraJetpack.energyCapacity": "Exo Elytra Jetpack Energy Capacity",
+  "text.config.oritech-config.option.exoElytraJetpack.fuelCapacity": "Exo Elytra Jetpack Fuel Capacity",
+  "text.config.oritech-config.option.exoElytraJetpack.energyUsage": "Exo Elytra Jetpack Energy Usage",
+  "text.config.oritech-config.option.exoElytraJetpack.fuelUsage": "Exo Elytra Jetpack Fuel Usage",
+  "text.config.oritech-config.option.exoElytraJetpack.chargeSpeed": "Exo Elytra Jetpack Charge Speed",
+  "text.config.oritech-config.option.exoElytraJetpack.speed": "Exo Elytra Jetpack Speed",
+  "text.config.oritech-config.option.exoChestplate.energyCapacity": "Exo Chestplate Energy Capacity",
+  "text.config.oritech-config.option.exoChestplate.energyUsage": "Exo Chestplate Energy Usage",
+  "text.config.oritech-config.option.exoChestplate.chargeSpeed": "Exo Chestplate Charge Speed",
+  "text.config.oritech-config.option.basicDrill.energyCapacity": "Basic Drill Energy Capacity",
+  "text.config.oritech-config.option.basicDrill.energyUsage": "Basic Drill Energy Usage",
+  "text.config.oritech-config.option.basicDrill.chargeSpeed": "Basic Drill Charge Speed",
+  "text.config.oritech-config.option.chainSaw.energyCapacity": "Chain Saw Energy Capacity",
+  "text.config.oritech-config.option.chainSaw.energyUsage": "Chain Saw Energy Usage",
+  "text.config.oritech-config.option.chainSaw.chargeSpeed": "Chain Saw Charge Speed",
   "text.config.oritech-config.section.arcane": "Arcane",
   "text.config.oritech-config.option.enchanterCostMultiplier": "Enchanter Soul Cost Multiplier",
   "text.config.oritech-config.option.catalystBaseSouls": "Catalyst Base Soul Capacity",
