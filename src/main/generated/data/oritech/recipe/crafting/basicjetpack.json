@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "i": {
+      "item": "oritech:advanced_battery"
+    },
+    "o": {
+      "item": "minecraft:gunpowder"
+    },
+    "r": {
+      "tag": "c:ingots/steel"
+    },
+    "t": {
+      "item": "minecraft:leather"
+    }
+  },
+  "pattern": [
+    " t ",
+    "rrr",
+    "oio"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:jetpack"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "minecraft:elytra"
+    },
+    "c": {
+      "item": "oritech:jetpack"
+    },
+    "f": {
+      "item": "minecraft:gunpowder"
+    },
+    "s": {
+      "item": "oritech:processing_unit"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:jetpack_elytra"
+  }
+}
