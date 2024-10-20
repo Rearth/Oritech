@@ -85,6 +85,7 @@
   "tooltip.oritech.soul_crop": "Cultivado em solo da alma. Contém uma alma.",
   "tooltip.oritech.superconductor": "Cannot connect to normal energy pipes.",
   "tooltip.oritech.jetpack_usage": "Needs electricity or turbofuel to fly.",
+  "tooltip.oritech.charger": "Used to charge and fill equipment.",
   "tooltip.oritech.addon_speed_desc": "Velocidade de Operação ",
   "tooltip.oritech.addon_efficiency_desc": "Eficiência Energética ",
   "tooltip.oritech.addon_yield_desc": "Dobra a quantidade de subprodutos na Fragment Forge. Aumenta o rendimento de quebra de blocos no Block Destroyer e Enderic Laser",
@@ -370,7 +371,7 @@
   "block.oritech.treefeller_block": "Cortador de Árvores",
   "block.oritech.black_hole_block": [
     {
-      "text": "Black Hole",
+      "text": "Black Hole (WIP)",
       "color": "#cc66ff"
     }
   ],
