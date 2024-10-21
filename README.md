@@ -56,6 +56,7 @@ Extra mod compatibilities (allowing metals and other components to be processed 
 - Alloy Forgery
 - Tech Reborn
 - Energized Power
+- Mythic Metals
 
 The following translations are available:
 - English
