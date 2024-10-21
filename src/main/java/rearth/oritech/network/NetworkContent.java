@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -499,6 +500,9 @@ public class NetworkContent {
             var player = access.player();
             var stack = player.getEquippedStack(EquipmentSlot.CHEST);
             if (!(stack.getItem() instanceof BaseJetpackItem)) return;
+            
+            // to prevent dedicated servers from kicking the player for flying
+            player.networkHandler.floatingTicks = 0;
             
             stack.set(EnergyStorage.ENERGY_COMPONENT, message.energyStored);
             stack.set(ComponentContent.STORED_FLUID, new FluidStack(Registries.FLUID.get(Identifier.of(message.fluidType)), message.fluidAmount));
