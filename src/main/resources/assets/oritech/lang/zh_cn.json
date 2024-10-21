@@ -673,7 +673,7 @@
   "text.config.oritech-config.option.generateOres": "生成矿石",
   "text.config.oritech-config.section.equipment": "装备",
   "text.config.oritech-config.category.charger": "充能器",
-  "text.config.oritech-config.category.basicJetpack": "Basic Jetpack",
+  "text.config.oritech-config.category.basicJetpack": "基础喷气背包",
   "text.config.oritech-config.category.exoJetpack": "Exo 喷气背包",
   "text.config.oritech-config.category.elytraJetpack": "Elytra Jetpack",
   "text.config.oritech-config.category.exoElytraJetpack": "Exo Elytra Jetpack",
