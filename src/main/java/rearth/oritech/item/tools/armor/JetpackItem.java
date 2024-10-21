@@ -1,6 +1,5 @@
 package rearth.oritech.item.tools.armor;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -43,7 +42,9 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
-        tickJetpack(stack, entity, world);
+        
+        if (world.isClient)
+            tickJetpack(stack, entity, world);
     }
     
     @Override
