@@ -1,6 +1,5 @@
 package rearth.oritech.item.tools.armor;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -43,7 +42,9 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
-        tickJetpack(stack, entity, world);
+        
+        if (world.isClient)
+            tickJetpack(stack, entity, world);
     }
     
     @Override
@@ -107,31 +108,31 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     
     @Override
     public float getSpeed() {
-        return 1f;
+        return Oritech.CONFIG.basicJetpack.speed();
     }
     
     @Override
     public int getRfUsage() {
-        return 128;
+        return Oritech.CONFIG.basicJetpack.energyUsage();
     }
     
     @Override
     public int getFuelUsage() {
-        return (int) (10 * (FluidConstants.BUCKET / 1000));
+        return Oritech.CONFIG.basicJetpack.fuelUsage();
     }
     
     @Override
     public long getFuelCapacity() {
-        return 4 * FluidConstants.BUCKET;
+        return Oritech.CONFIG.basicJetpack.fuelCapacity();
     }
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return 100_000;
+        return Oritech.CONFIG.basicJetpack.energyCapacity();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return 1024;
+        return Oritech.CONFIG.basicJetpack.chargeSpeed();
     }
 }

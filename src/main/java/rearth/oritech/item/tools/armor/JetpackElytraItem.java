@@ -120,31 +120,31 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     
     @Override
     public float getSpeed() {
-        return 0.7f;
+        return Oritech.CONFIG.elytraJetpack.speed();
     }
     
     @Override
     public int getRfUsage() {
-        return 128;
+        return (int) Oritech.CONFIG.elytraJetpack.energyUsage();
     }
     
     @Override
     public int getFuelUsage() {
-        return (int) (10 * (FluidConstants.BUCKET / 1000));
+        return Oritech.CONFIG.elytraJetpack.fuelUsage();
     }
     
     @Override
     public long getFuelCapacity() {
-        return 4 * FluidConstants.BUCKET;
+        return Oritech.CONFIG.elytraJetpack.fuelCapacity();
     }
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return 100_000;
+        return Oritech.CONFIG.elytraJetpack.energyCapacity();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return 1024;
+        return Oritech.CONFIG.elytraJetpack.chargeSpeed();
     }
 }

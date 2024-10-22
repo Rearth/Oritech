@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:exo_chestplate"
+    },
+    "c": {
+      "item": "oritech:jetpack_elytra"
+    },
+    "f": {
+      "item": "oritech:plastic_sheet"
+    },
+    "s": {
+      "item": "oritech:small_tank_block"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:jetpack_exo_elytra"
+  }
+}

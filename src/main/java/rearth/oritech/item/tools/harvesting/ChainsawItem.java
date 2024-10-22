@@ -13,6 +13,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import team.reborn.energy.api.base.SimpleEnergyItem;
 
@@ -21,7 +22,7 @@ import java.util.List;
 public class ChainsawItem extends AxeItem implements OritechEnergyItem {
     
     public static final int BAR_STEP_COUNT = 13;
-    private final float energyUsageMultiplier = 10f;
+    private final float energyUsageMultiplier = Oritech.CONFIG.chainSaw.energyUsage();
     
     public ChainsawItem(ToolMaterial toolMaterial, Item.Settings settings) {
         super(toolMaterial, settings);
@@ -82,5 +83,15 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
     @Override
     public int getItemBarColor(ItemStack stack) {
         return 0xff7007;
+    }
+    
+    @Override
+    public long getEnergyCapacity(ItemStack stack) {
+        return Oritech.CONFIG.chainSaw.energyCapacity();
+    }
+    
+    @Override
+    public long getEnergyMaxInput(ItemStack stack) {
+        return Oritech.CONFIG.chainSaw.chargeSpeed();
     }
 }

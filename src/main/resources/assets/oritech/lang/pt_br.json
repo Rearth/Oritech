@@ -1,64 +1,52 @@
 {
   "advancements.oritech.begin": "Oritech",
   "advancements.oritech.begin.description": "Níquel e Centavo - Comece sua aventura tecnológica adquirindo um pouco de níquel bruto. Brilhe, minerador maluco!",
-
   "advancements.oritech.generator": "Energia Total!",
   "advancements.oritech.generator.description": "Gere energia de verdade com um gerador básico. Eletrizante, não é?",
-
   "advancements.oritech.furnace": "Forno do Futuro",
   "advancements.oritech.furnace.description": "Coloque suas mãos em um forno elétrico. As coisas estão esquentando agora!",
-
   "advancements.oritech.pulverizer": "Moendo Tudo",
   "advancements.oritech.pulverizer.description": "Obtenha um pulverizador e transforme seus minérios em pó. Rock 'n' roll!",
-
   "advancements.oritech.foundry": "Derretendo",
   "advancements.oritech.foundry.description": "Adquira uma fundição e comece a forjar ligas poderosas. Alquimia em seu melhor!",
-
   "advancements.oritech.assembler": "Linha de Montagem",
   "advancements.oritech.assembler.description": "Pegue um montador e comece a juntar as peças. Tudo está se encaixando agora!",
-
   "advancements.oritech.exo_boots": "Botas Leves como Penas",
   "advancements.oritech.exo_boots.description": "Crie Botas Exo e dê adeus ao dano por queda. Gravidade? Nunca ouvi falar!",
-
   "advancements.oritech.exo_legs": "Dia das Pernas",
   "advancements.oritech.exo_legs.description": "Crie Calças Exo e ganhe vantagem sobre a concorrência. Mais fortes, mais rápidas, melhores!",
-
   "advancements.oritech.exo_chest": "Coração de Aço",
   "advancements.oritech.exo_chest.description": "Crie uma Peitoral Exo e proteja seu núcleo. Homem de Ferro, quem?",
-
   "advancements.oritech.exo_helmet": "Vantagem de Cabeça",
   "advancements.oritech.exo_helmet.description": "Crie um Capacete Exo e saia na frente no jogo. Mente sobre matéria!",
-
   "advancements.oritech.drill": "Sargento da Furadeira",
   "advancements.oritech.drill.description": "Obtenha uma furadeira manual e comece a perfurar a terra. Cave fundo, soldado!",
-
+  "advancements.oritech.resource_node": "Glittering Prizes",
+  "advancements.oritech.resource_node.description": "Find a resource node. Unlimited wealth awaits!",
   "advancements.oritech.centrifuge": "Mestre da Centrifugação",
   "advancements.oritech.centrifuge.description": "Adquira uma centrífuga e separe o bom do ruim. Gire para vencer!",
-
   "advancements.oritech.plastic": "Plástico Fantástico",
   "advancements.oritech.plastic.description": "Coloque suas mãos em uma folha de plástico. Não é apenas fantástico, é plástico!",
-
   "advancements.oritech.catalyst": "Artífice Arcano",
   "advancements.oritech.catalyst.description": "Adquira um Estabilizador Arcano (Aviso: Pode conter almas!)",
-
+  "advancements.oritech.overenchanted": "Arcane Engineer",
+  "advancements.oritech.overenchanted.description": "Acquire an item with level X enchantment. What explosions?",
   "advancements.oritech.laser": "Foco Laser",
   "advancements.oritech.laser.description": "Obtenha um bloco de braço laser. Carregue, minere fluxita e cave na terra. Pew pew, você é imbatível!",
-
   "advancements.oritech.fluxite": "Fluxita",
   "advancements.oritech.fluxite.description": "Adquira um pouco de fluxita. Grande Scott, estamos voltando para o futuro!",
-
   "advancements.oritech.atomicforge": "Ferreiro Atômico",
   "advancements.oritech.atomicforge.description": "Obtenha uma forja atômica e comece a criar como um profissional. É atômico!",
-
   "advancements.oritech.promethium": "Fogo Prometeano",
   "advancements.oritech.promethium.description": "Obtenha uma barra de prometium. Você roubou o fogo dos deuses!",
-
+  "advancements.oritech.ultimate_core": "The Ultimate Machine",
+  "advancements.oritech.ultimate_core.description": "Obtain an ultimate machine core. Now you can add excessive addons!",
+  "advancements.oritech.gold_gem": "Legendary Alchemist",
+  "advancements.oritech.gold_gem.description": "Learn the secret art of turning gold into more gold!",
   "advancements.oritech.ai": "Brilhantismo Artificial",
   "advancements.oritech.ai.description": "Obtenha um Chip de Super IA. Skynet quem? Não é apenas inteligente, é super inteligente!",
-
   "advancements.oritech.unholy": "Conhecimento Profano",
   "advancements.oritech.unholy.description": "Adquira uma inteligência profana. Conhecimento é poder, mas isso é algo a mais!",
-
   "button.oritech.input_mode_fill_left_to_right": "Padrão",
   "button.oritech.input_mode_fill_evenly": "Preencher Uniformemente",
   "button.oritech.input_mode_fill_matching_recipe": "Combinar Receita",
@@ -66,7 +54,6 @@
   "tooltip.oritech.input_mode_fill_evenly": "Distribui itens uniformemente. Novos itens são sempre colocados no slot correspondente mais baixo.",
   "tooltip.oritech.input_mode_fill_matching_recipe": "Insere itens de acordo com receitas correspondentes. Se não houver receita que use um item, ele não será inserido.",
   "title.oritech.details": "Detalhes",
-
   "tooltip.oritech.item_extra_info": "Segure Ctrl para mais informações",
   "tooltip.oritech.addon_desc": "Slots Adicionais: ",
   "tooltip.oritech.core_desc": "Multi-bloco. Núcleos de Máquina Necessários: ",
@@ -96,7 +83,9 @@
   "tooltip.oritech.spawner": "Aprisiona o primeiro mob que pisa sobre ele em uma jaula abaixo.",
   "tooltip.oritech.spawner2": "Coleta e usa almas de entidades próximas.",
   "tooltip.oritech.soul_crop": "Cultivado em solo da alma. Contém uma alma.",
-
+  "tooltip.oritech.superconductor": "Cannot connect to normal energy pipes.",
+  "tooltip.oritech.jetpack_usage": "Needs electricity or turbofuel to fly.",
+  "tooltip.oritech.charger": "Used to charge and fill equipment.",
   "tooltip.oritech.addon_speed_desc": "Velocidade de Operação ",
   "tooltip.oritech.addon_efficiency_desc": "Eficiência Energética ",
   "tooltip.oritech.addon_yield_desc": "Dobra a quantidade de subprodutos na Fragment Forge. Aumenta o rendimento de quebra de blocos no Block Destroyer e Enderic Laser",
@@ -106,12 +95,12 @@
   "tooltip.oritech.addon_proxy_desc": "Permite acesso a slots de inventário específicos",
   "tooltip.oritech.addon_proxy_select": "Selecionar slot de proxy alvo",
   "tooltip.oritech.addon_quarry_desc": "Aplicável ao destruidor de blocos e Enderic Laser. Aumenta o tamanho da área de trabalho",
+  "tooltip.oritech.addon_hunter_desc": "Applicable to Enderic Laser. Targets living entities",
   "tooltip.oritech.addon_redstone_desc": "Permite configuração adicional de redstone e comparadores",
   "tooltip.oritech.addon_capacity_desc": "Capacidade de Energia ",
   "tooltip.oritech.addon_transfer_desc": "Taxa de Transferência de Energia ",
   "tooltip.oritech.addon_extender_desc": "Permite que addons adicionais sejam conectados",
   "tooltip.oritech.addon_boiler_desc": "Permite que um gerador produza vapor em vez de RF. Insira água neste addon e extraia vapor dele",
-
   "tooltip.oritech.overchargedcrystal": "Quantidades infinitas de energia bruta parecem estar contidas dentro dele.",
   "tooltip.oritech.fluxite": "Também pode ser criado colhendo ametista cultivada com um enderic laser",
   "tooltip.oritech.promethium_axe": "Aperte Shift enquanto colhe para derrubar a árvore inteira",
@@ -120,9 +109,11 @@
   "tooltip.oritech.exo_boots": "Previne todo dano por queda",
   "tooltip.oritech.exo_leggings": "Aumenta a velocidade de movimento",
   "tooltip.oritech.exo_chestplate": "Carrega itens de energia equipados",
+  "tooltip.oritech.exo_jetpack": "Carrega itens de energia equipados",
+  "tooltip.oritech.jetpack_exo_elytra": "Carrega itens de energia equipados",
   "tooltip.oritech.exo_helmet": "Concede visão noturna",
+  "tooltip.oritech.black_hole": "DON'T PLACE THIS unless you know what you're doing.",
   "tooltip.oritech.weed_killer": "Remove toda a grama e plantas em um amplo raio",
-
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Obtido ao capturar uma entidade viável com o ",
@@ -135,7 +126,6 @@
       "color": "gray"
     }
   ],
-
   "tooltip.oritech.capture_item_desc_1": [
     {
       "text": "Pode capturar o cérebro de uma pequena criatura mágica inteligente voadora. O",
@@ -162,7 +152,6 @@
       "color": "gray"
     }
   ],
-
   "title.oritech.redstone_addon": [
     {
       "text": "Por favor, selecione um slot alvo",
@@ -179,62 +168,64 @@
   "title.oritech.redstone_output_active": "Medida de Atividade",
   "tooltip.oritech.redstone_input_control": "Permite que a máquina seja desativada via um sinal de redstone para este addon",
   "title.oritech.redstone_input_control": "Entrada de Controle",
-  
   "title.oritech.inventory_proxy": "Acesso ao Inventário da Máquina",
-
   "tooltip.oritech.energy_stored": "Armazenado: %d RF",
   "tooltip.oritech.energy_indicator": "%d/%d RF",
   "tooltip.oritech.energy_max_transfer": "Taxa Máxima de Transferência: ",
   "tooltip.oritech.energy_transfer_rate": "%d RF/t",
+  "tooltip.oritech.energy_capacity": "%d RF",
   "title.oritech.machine.addon_range": "%d Alcance",
   "tooltip.oritech.block_destroyer.addon_range": "Profundidade máxima de escavação",
   "tooltip.oritech.laser_arm.addon_range": "Raio efetivo do feixe",
   "title.oritech.machine.addon_fortune": "%d Sorte",
   "tooltip.oritech.machine.addon_fortune": "Contagem de addon de rendimento. 3 é o máximo efetivo",
   "tooltip.oritech.machine.quality": "Qualidade da Máquina: %d\n\nControla quantas camadas de addons de máquina\npodem ser adicionadas a este bloco.\n\nUse núcleos melhores para aumentar isso\n\nProgresso atual de qualidade: %s",
-
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
   "tooltip.oritech.billion_abbrev": "B",
-
   "title.oritech.machine_speed": "⌛ %s%% ",
   "tooltip.oritech.machine_speed": "Velocidade de Processamento",
   "title.oritech.machine_efficiency": "⚡ %s%% ",
   "tooltip.oritech.machine_efficiency": "Eficiência Energética",
   "title.oritech.machine_energy_production": "↗ %d RF/t ",
-
   "tooltip.oritech.steam_energy_production": "Produção total (inclui geradores encadeados)",
-  "title.oritech.steam_production": "\uD83D\uDEDE %s su/t",
+  "title.oritech.steam_production": "🛞 %s su/t",
   "tooltip.oritech.steam_production": "Quantidade de gotas de vapor produzidas por tick. Qualquer excesso será perdido quando o armazenamento estiver cheio.",
-  "title.oritech.steam_consumption": "\uD83D\uDEDE %s su/t",
+  "title.oritech.steam_consumption": "🛞 %s su/t",
   "tooltip.oritech.steam_consumption": "Consumo total de vapor em unidades de armazenamento (gotas) por tick (inclui geradores encadeados)",
   "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Carregado\n\nUso Máximo: %s RF/t",
   "title.oritech.machine.no_addons": "Nenhum addon conectado",
   "button.oritech.machine.addons": "Addons",
-
-  "title.oritech.machine.capacitor_added_capacity": "\uD83D\uDD0B %d RF ",
+  "title.oritech.machine.capacitor_added_capacity": "🔋 %d RF ",
   "tooltip.oritech.machine.capacitor_added_capacity": "Capacidade Adicionada",
-  "title.oritech.machine.capacitor_added_throughput": "\uD83D\uDD0B %d RF/t",
+  "title.oritech.machine.capacitor_added_throughput": "🔋 %d RF/t",
   "tooltip.oritech.machine.capacitor_added_throughput": "Throughput Adicionado",
-
-  "title.oritech.machine_option_enabled": "\uD83D\uDD28 Habilitado",
+  "title.oritech.machine_option_enabled": "🔨 Habilitado",
   "tooltip.oritech.pulverizer_dust_combine": "Combina automaticamente pequenos pós em lingotes",
   "tooltip.oritech.fluid_content": "%f mB %s",
+  "tooltip.oritech.jetpack_fuel": "%f/%f mB %s",
   "tooltip.oritech.fluid_empty": "Vazio",
   "tooltip.oritech.progress_indicator": "%d / %d ticks\n(base %d ticks)",
-
   "title.oritech.catalyst.stable": "Estável",
   "title.oritech.catalyst.stabilized": "Estabilizado",
   "title.oritech.catalyst.semi_stable": "Semi-Estável",
   "title.oritech.catalyst.unstable": "Instável",
-
   "tooltip.oritech.spawner.collected_souls": "%d / %d Almas",
-
+  "tooltip.oritech.accelerator": "Injects particles into particle accelerator guide rings.",
+  "tooltip.oritech.accelerator_motor": "Uses energy to speed up particles moving through it.",
+  "tooltip.oritech.accelerator_ring": "Used to define the route of particles. Can be right-clicked to turn one end. Redstone-controllable.",
+  "tooltip.oritech.accelerator_sensor": "Emits a redstone signal based on the speed of particles passing through.",
   "button.oritech.enchanter.bane_of_long_names": "Flagelo de nomes longos",
   "title.oritech.enchanter.catalysts_available": "%d / %d catalisadores disponíveis",
   "title.oritech.enchanter.catalysts": "%d / %d Catalisadores",
   "title.oritech.enchanter.souls_used": "%d / %d Almas usadas",
-
+  "title.oritech.laser_arm.addon_range": "%d Size",
+  "title.oritech.machine.addon_hunter_range": "%d Scan distance",
+  "tooltip.oritech.laser_arm.addon_hunter_range": "Effective beam range",
+  "title.oritech.laser_arm.addon_hunter_damage": "%d Damage",
+  "tooltip.oritech.laser_arm.addon_hunter_damage": "Effective Beam Damage",
+  "title.oritech.machine.addon_looting": "%d Looting",
+  "tooltip.oritech.machine.addon_looting": "Contagem de addon de rendimento. 3 é o máximo efetivo",
   "rei.process.oritech:pulverizer": "Pulverizando",
   "rei.process.oritech:grinder": "Fragmentando",
   "rei.process.oritech:assembler": "Montando",
@@ -246,8 +237,8 @@
   "rei.process.oritech:steam_engine": "Uso de Vapor",
   "rei.process.oritech:bio_generator": "Transformação de Biomassa",
   "rei.process.oritech:fuel_generator": "Queima de Combustível",
+  "rei.process.oritech:particle_collision": "Queima de Combustível",
   "rei.title.oritech.cookingtime": "%ds (%d ticks)",
-
   "emi.category.oritech.pulverizer": "Pulverizando",
   "emi.category.oritech.grinder": "Fragmentando",
   "emi.category.oritech.assembler": "Montando",
@@ -259,13 +250,13 @@
   "emi.category.oritech.steam_engine": "Uso de Vapor",
   "emi.category.oritech.bio_generator": "Transformação de Biomassa",
   "emi.category.oritech.fuel_generator": "Queima de Combustível",
+  "emi.category.oritech.particle_collision": "Particle Collision",
   "emi.title.oritech.cookingtime": "%ds (%d ticks)",
-
+  "emi.title.oritech.collisionspeed": "Required collision energy: %sJ",
   "itemgroup.oritech.machines": "Máquinas Oritech",
   "itemgroup.oritech.components": "Componentes Oritech",
   "itemgroup.oritech.decorative": "Blocos Oritech",
   "itemgroup.oritech.equipment": "Equipamentos Oritech",
-
   "tooltip.oritech.soul_count_tooltip": "Almas",
   "tooltip.oritech.cost_tooltip": "Custo: ",
   "tooltip.oritech.catalyst_stable": "Estável",
@@ -276,11 +267,12 @@
   "tooltip.oritech.enchanter_item_needed": "Inserir Item",
   "tooltip.oritech.enchanter_souls_used": " Almas Usadas",
   "tooltip.oritech.enchanter_selection": "Selecionar Encantamento",
-
+  "tooltip.oritech.creative_tank": "Right click with a bucket to set or an empty one to empty",
   "block.oritech.banana_block": "Bloco de Banana",
   "block.oritech.machine_frame_block": "Estrutura de Máquina",
   "block.oritech.fluid_pipe": "Tubo de Fluido",
   "block.oritech.energy_pipe": "Tubo de Energia",
+  "block.oritech.superconductor": "Supercondutor",
   "block.oritech.item_pipe": "Tubo de Item",
   "block.oritech.item_filter_block": "Filtro de Item",
   "block.oritech.fluid_pipe_connection": "Conexão do Tubo de Fluido",
@@ -308,9 +300,12 @@
   "block.oritech.laser_arm_block": "Laser Endérico",
   "block.oritech.deep_drill_block": "Extrator de Bedrock",
   "block.oritech.drone_port_block": "Porto de Drone",
+  "block.oritech.charger_block": "Equipment Charger",
   "block.oritech.small_storage_block": "Armazenamento de Energia Portátil",
   "block.oritech.large_storage_block": "Grande Armazenamento de Energia",
+  "block.oritech.creative_storage_block": "Creative Energy Storage",
   "block.oritech.small_tank_block": "Tanque Portátil",
+  "block.oritech.creative_tank_block": "Creative Tank",
   "block.oritech.placer_block": "Colocador de Blocos",
   "block.oritech.destroyer_block": "Destruidor de Blocos",
   "block.oritech.fertilizer_block": "Fertilizante de Blocos",
@@ -328,6 +323,7 @@
   "block.oritech.steam_boiler_addon": "Addon de Caldeira a Vapor",
   "block.oritech.crop_filter_addon": "Addon de Filtro de Plantações",
   "block.oritech.quarry_addon": "Addon de Pedreira",
+  "block.oritech.machine_hunter_addon": "Machine Hunter Addon",
   "block.oritech.machine_efficiency_addon": "Addon de Eficiência da Máquina",
   "block.oritech.machine_capacitor_addon": "Addon de Capacitor da Máquina",
   "block.oritech.machine_acceptor_addon": "Addon de Aceitação da Máquina",
@@ -356,7 +352,7 @@
   "block.oritech.tech_button": "Botão Industrial",
   "block.oritech.tech_lever": "Alavanca Industrial",
   "block.oritech.tech_door": "Porta Industrial",
-  "block.oritech.tech_door_hinge": "Hinge de Porta Industrial",
+  "block.oritech.tech_door_hinge": "Porta Industrial",
   "block.oritech.metal_beam_block": "Viga de Suporte Industrial",
   "block.oritech.machine_plating_block": "Revestimento Reforçado de Cobre",
   "block.oritech.machine_plating_slab": "Slab de Revestimento Reforçado de Cobre",
@@ -365,24 +361,39 @@
   "block.oritech.iron_plating_block": "Revestimento Reforçado de Ferro",
   "block.oritech.iron_plating_slab": "Slab de Revestimento Reforçado de Ferro",
   "block.oritech.iron_plating_stairs": "Escadas de Revestimento Reforçado de Ferro",
-  "block.oritech.iron_plating_pressure_plate": "Placa de Pressão de Revestimento Reforçado de Ferro",
+  "block.oritech.iron_plating_pressure_plate": "Placa de Pressão de Revestimento Reforçado de Cobre",
   "block.oritech.nickel_plating_block": "Revestimento Reforçado de Níquel",
   "block.oritech.nickel_plating_slab": "Slab de Revestimento Reforçado de Níquel",
   "block.oritech.nickel_plating_stairs": "Escadas de Revestimento Reforçado de Níquel",
-  "block.oritech.nickel_plating_pressure_plate": "Placa de Pressão de Revestimento Reforçado de Níquel",
+  "block.oritech.nickel_plating_pressure_plate": "Placa de Pressão de Revestimento Reforçado de Cobre",
   "block.oritech.industrial_glass_block": "Vidro Industrial",
   "block.oritech.capacitor_addon_extender": "Addon de Banco de Energia",
   "block.oritech.treefeller_block": "Cortador de Árvores",
+  "block.oritech.black_hole_block": [
+    {
+      "text": "Black Hole (WIP)",
+      "color": "#cc66ff"
+    }
+  ],
   "block.oritech.enchantment_catalyst_block": [
-    { "text": "Catalisador Arcano", "color": "#cc66ff" }
+    {
+      "text": "Catalisador Arcano",
+      "color": "#cc66ff"
+    }
   ],
   "block.oritech.enchanter_block": [
-    { "text": "Encantador Estabilizado", "color": "#cc66ff" }
+    {
+      "text": "Encantador Estabilizado",
+      "color": "#cc66ff"
+    }
   ],
   "block.oritech.spawner_controller_block": "Controlador de Spawner",
   "block.oritech.spawner_cage_block": "Gaiola de Spawner",
   "block.oritech.wither_crop_block": "Flores de Alma",
-
+  "block.oritech.accelerator_ring": "Particle Accelerator Guide Ring",
+  "block.oritech.accelerator_motor": "Particle Accelerator Linear Motor",
+  "block.oritech.accelerator_controller": "Particle Accelerator",
+  "block.oritech.accelerator_sensor": "Particle Accelerator Sensor",
   "item.oritech.banana": "Banana",
   "item.oritech.weed_killer": "Herbicida",
   "item.oritech.target_designator": "Designador de Alvo",
@@ -433,7 +444,10 @@
   "item.oritech.energite_ingot": "Lingote de Energita",
   "item.oritech.energite_dust": "Pó de Energita",
   "item.oritech.prometheum_ingot": [
-    { "text": "Prometheum", "color": "#ffd505" }
+    {
+      "text": "Prometheum",
+      "color": "#ffd505"
+    }
   ],
   "item.oritech.steel_ingot": "Lingote de Aço",
   "item.oritech.steel_dust": "Pó de Aço",
@@ -442,7 +456,7 @@
   "item.oritech.enderic_compound": "Composto Endérico",
   "item.oritech.strange_matter": "Matéria Estranha",
   "item.oritech.fine_wire": "Fio Fino",
-  "item.oritech.insulated_wire": "Fio Isolado",
+  "item.oritech.insulated_wire": "Fio Fino",
   "item.oritech.magnetic_coil": "Bobina Magnética",
   "item.oritech.motor": "Motor",
   "item.oritech.basic_battery": "Bateria Básica",
@@ -474,27 +488,32 @@
   "item.oritech.exo_boots": "Botas Exo",
   "item.oritech.chainsaw": "Serra Elétrica",
   "item.oritech.hand_drill": "Furadeira Manual",
+  "item.oritech.jetpack": "Jetpack",
+  "item.oritech.exo_jetpack": "Exo Jetpack",
+  "item.oritech.jetpack_elytra": "Boosted Elytra",
+  "item.oritech.jetpack_exo_elytra": "Boosted Exo Elytra",
   "item.oritech.oritech_guide": "Manual Oritech",
   "item.oritech.promethium_axe": [
-    { "text": "Machadinha de Prometeu", "color": "#ffd505" }
+    {
+      "text": "Machadinha de Prometeu",
+      "color": "#ffd505"
+    }
   ],
   "item.oritech.promethium_pickaxe": [
-    { "text": "Picareta de Prometeu", "color": "#ffd505" }
+    {
+      "text": "Picareta de Prometeu",
+      "color": "#ffd505"
+    }
   ],
-
   "message.oritech.catalyst.cost": "Custo: %d",
-
   "message.oritech.deep_drill.ore_placement": "A máquina deve ser colocada sobre nódulos de minério",
   "message.oritech.generator.production_rate": "Taxa de produção: %d com multiplicador de núcleo: %d",
   "message.oritech.machine.missing_core": "A máquina não está montada. Adicione os blocos de núcleo que estão faltando",
   "message.oritech.machine_frame.missing_frame": "Estrutura ausente. Adicione uma estrutura retangular vazia atrás da máquina usando blocos de estrutura de máquina",
-
-  "message.oritech.enchanter.insert_item": "Insira o Item",
-
+  "message.oritech.enchanter.insert_item": "Inserir Item",
   "message.oritech.drone.invalid_distance": "O alvo deve estar a pelo menos 50 blocos de distância.\n(distância atual: %d)",
   "message.oritech.drone.target_set": "Porto de alvo definido.\nO drone irá entregar sempre que o inventário não estiver vazio.",
   "message.oritech.drone.target_invalid": "O alvo não é um porto de drone válido.\nCertifique-se de que o porto de destino está carregada e ativa.",
-
   "message.oritech.pump.starting": "Iniciando",
   "message.oritech.pump.extending": "O tronco está se estendendo...",
   "message.oritech.pump.initializing": "A bomba está inicializando... (Isso pode levar um momento para grandes volumes de líquido)",
@@ -503,22 +522,38 @@
   "message.oritech.pump.low_energy": "Energia insuficiente!",
   "message.oritech.pump.pump_finished": "Todos os líquidos foram bombeados",
   "message.oritech.pump.full": "Tanque está cheio",
-
   "message.oritech.spawner.no_cage": "Cápsula de mob ausente!",
   "message.oritech.spawner.no_mob": "Nenhum mob capturado. Movimente um mob em cima para carregá-lo no spawner",
-
   "message.oritech.target_designator.position_invalid": "Posição inválida para o porto do drone, a porto alvo deve estar a pelo menos 50 blocos de distância",
   "message.oritech.target_designator.position_saved": "Posição salva na máquina",
   "message.oritech.target_designator.position_stored": "Posição armazenada",
+  "message.oritech.target_designator.hunter_target": "Hunter target set to %s",
+  "message.oritech.target_designator.hunter_hostile": "hostile mobs only",
+  "message.oritech.target_designator.hunter_neutral": "hostile and neutral mobs (pets excluded)",
+  "message.oritech.target_designator.hunter_all": "all non-player mobs",
   "tooltip.oritech.target_designator.set_to": "Definido para: [%s]",
   "tooltip.oritech.target_designator.no_target": "Nenhum alvo definido",
-
   "message.oritech.tool_mode.area_effect": "Efeito de Área",
   "message.oritech.tool_mode.silk_touch": "Toque Suave",
   "tooltip.oritech.tool_mode.area_range.area": "Modo: Área",
   "tooltip.oritech.tool_mode.area_range.single": "Modo: Único",
   "config.jade.plugin_oritech.machine_core_controller": "Visão do Link do Controlador Oritech",
-
+  "text.oritech.accelerator.ui.waiting.0": "Waiting.",
+  "text.oritech.accelerator.ui.waiting.1": "Waiting..",
+  "text.oritech.accelerator.ui.waiting.2": "Waiting...",
+  "text.oritech.accelerator.ui.waiting": "Insert item to accelerate",
+  "text.oritech.accelerator.ui.error": "Error",
+  "text.oritech.accelerator.ui.nogate": "No valid gate found",
+  "text.oritech.accelerator.ui.nogate.more": "Gate needs to be\npointed to the side",
+  "text.oritech.accelerator.ui.accelerating": "Accelerating",
+  "text.oritech.accelerator.ui.accelerating.speed": "Speed: %s m/s",
+  "text.oritech.accelerator.ui.accelerating.stats": "Max Gate Dist: %s\nMin Curve Dist: %s",
+  "text.oritech.accelerator.ui.collision": "Collision Details",
+  "text.oritech.accelerator.ui.collision.stats": "Collision Power: %sJ",
+  "text.oritech.accelerator.ui.collision.position": "Coordinates %s",
+  "text.oritech.accelerator.ui.exited": "Particle Exited",
+  "text.oritech.accelerator.ui.exited.stats": "Coordinates %s\nLast Curve Dist: %s\nMin Curve Dist: %s",
+  "text.oritech.accelerator.ui.exited.nogate": "Coordinates %s\nNo gate in range\nRange: %s",
   "text.config.oritech-config.title": "Configurações Oritech",
   "text.config.oritech-config.section.machineSettings": "Máquinas",
   "text.config.oritech-config.category.processingMachines": "Máquinas de Processamento",
@@ -560,7 +595,7 @@
   "text.config.oritech-config.option.processingMachines.pulverizerData.energyPerTick": "Energia por Tick",
   "text.config.oritech-config.category.generators": "Geradores",
   "text.config.oritech-config.option.generators.animationSpeedMultiplier": "Multiplicador de Velocidade de Animação",
-  "text.config.oritech-config.option.generators.rfToSteamRation": "Relação RF -> Vapor",
+  "text.config.oritech-config.option.generators.rfToSteamRation": "RF -> Steam Ration",
   "text.config.oritech-config.option.generators.rfToSteamRation.tooltip": "Aplica-se a geradores com o addon de vapor. Quantos mb de vapor serão produzidos em vez do RF usual",
   "text.config.oritech-config.category.generators.basicGeneratorData": "Dados do Gerador Básico",
   "text.config.oritech-config.option.generators.basicGeneratorData.energyCapacity": "Capacidade de Energia",
@@ -597,6 +632,7 @@
   "text.config.oritech-config.option.laserArmConfig.maxEnergyInsertion": "Máxima Inserção de Energia",
   "text.config.oritech-config.option.laserArmConfig.energyPerTick": "Energia por Tick",
   "text.config.oritech-config.option.laserArmConfig.blockBreakEnergyBase": "Base de Energia para Quebra de Blocos",
+  "text.config.oritech-config.option.laserArmConfig.damageTickBase": "Damage Per Tick Base",
   "text.config.oritech-config.option.laserArmConfig.range": "Alcance",
   "text.config.oritech-config.category.deepDrillConfig": "Configuração do Perfurador Profundo",
   "text.config.oritech-config.option.deepDrillConfig.energyCapacity": "Capacidade de Energia",
@@ -624,7 +660,7 @@
   "text.config.oritech-config.option.smallEnergyStorage.maxEnergyInsertion": "Máxima Inserção de Energia",
   "text.config.oritech-config.option.smallEnergyStorage.maxEnergyExtraction": "Máxima Extração de Energia",
   "text.config.oritech-config.option.smallEnergyStorage.energyPerTick": "Energia por Tick",
-  "text.config.oritech-config.category.largeEnergyStorage": "Armazenamento de Energia Grande",
+  "text.config.oritech-config.category.largeEnergyStorage": "Grande Armazenamento de Energia",
   "text.config.oritech-config.option.largeEnergyStorage.energyCapacity": "Capacidade de Energia",
   "text.config.oritech-config.option.largeEnergyStorage.maxEnergyInsertion": "Máxima Inserção de Energia",
   "text.config.oritech-config.option.largeEnergyStorage.maxEnergyExtraction": "Máxima Extração de Energia",
@@ -635,6 +671,52 @@
   "text.config.oritech-config.option.itemPipeTransferAmount": "Quantidade de Transferência do Tubo de Itens",
   "text.config.oritech-config.section.worldGeneration": "Geração do Mundo",
   "text.config.oritech-config.option.generateOres": "Gerar Minérios",
+  "text.config.oritech-config.section.equipment": "Equipment",
+  "text.config.oritech-config.category.charger": "Charger",
+  "text.config.oritech-config.category.basicJetpack": "Basic Jetpack",
+  "text.config.oritech-config.category.exoJetpack": "Exo Jetpack",
+  "text.config.oritech-config.category.elytraJetpack": "Elytra Jetpack",
+  "text.config.oritech-config.category.exoElytraJetpack": "Exo Elytra Jetpack",
+  "text.config.oritech-config.category.exoChestplate": "Peitoral Exo",
+  "text.config.oritech-config.category.basicDrill": "Basic Drill",
+  "text.config.oritech-config.category.chainSaw": "Chain Saw",
+  "text.config.oritech-config.option.charger.energyCapacity": "Charger Energy Capacity",
+  "text.config.oritech-config.option.charger.maxEnergyInsertion": "Charger Max Energy Insertion",
+  "text.config.oritech-config.option.charger.maxEnergyExtraction": "Charger Max Energy Extraction",
+  "text.config.oritech-config.option.charger.energyPerTick": "Charger Energy Per Tick",
+  "text.config.oritech-config.option.basicJetpack.energyCapacity": "Basic Jetpack Energy Capacity",
+  "text.config.oritech-config.option.basicJetpack.fuelCapacity": "Basic Jetpack Fuel Capacity",
+  "text.config.oritech-config.option.basicJetpack.energyUsage": "Basic Jetpack Energy Usage",
+  "text.config.oritech-config.option.basicJetpack.fuelUsage": "Basic Jetpack Fuel Usage",
+  "text.config.oritech-config.option.basicJetpack.chargeSpeed": "Basic Jetpack Charge Speed",
+  "text.config.oritech-config.option.basicJetpack.speed": "Basic Jetpack Speed",
+  "text.config.oritech-config.option.exoJetpack.energyCapacity": "Exo Jetpack Energy Capacity",
+  "text.config.oritech-config.option.exoJetpack.fuelCapacity": "Exo Jetpack Fuel Capacity",
+  "text.config.oritech-config.option.exoJetpack.energyUsage": "Exo Jetpack Energy Usage",
+  "text.config.oritech-config.option.exoJetpack.fuelUsage": "Exo Jetpack Fuel Usage",
+  "text.config.oritech-config.option.exoJetpack.chargeSpeed": "Exo Jetpack Charge Speed",
+  "text.config.oritech-config.option.exoJetpack.speed": "Exo Jetpack Speed",
+  "text.config.oritech-config.option.elytraJetpack.energyCapacity": "Elytra Jetpack Energy Capacity",
+  "text.config.oritech-config.option.elytraJetpack.fuelCapacity": "Elytra Jetpack Fuel Capacity",
+  "text.config.oritech-config.option.elytraJetpack.energyUsage": "Elytra Jetpack Energy Usage",
+  "text.config.oritech-config.option.elytraJetpack.fuelUsage": "Elytra Jetpack Fuel Usage",
+  "text.config.oritech-config.option.elytraJetpack.chargeSpeed": "Elytra Jetpack Charge Speed",
+  "text.config.oritech-config.option.elytraJetpack.speed": "Elytra Jetpack Speed",
+  "text.config.oritech-config.option.exoElytraJetpack.energyCapacity": "Exo Elytra Jetpack Energy Capacity",
+  "text.config.oritech-config.option.exoElytraJetpack.fuelCapacity": "Exo Elytra Jetpack Fuel Capacity",
+  "text.config.oritech-config.option.exoElytraJetpack.energyUsage": "Exo Elytra Jetpack Energy Usage",
+  "text.config.oritech-config.option.exoElytraJetpack.fuelUsage": "Exo Elytra Jetpack Fuel Usage",
+  "text.config.oritech-config.option.exoElytraJetpack.chargeSpeed": "Exo Elytra Jetpack Charge Speed",
+  "text.config.oritech-config.option.exoElytraJetpack.speed": "Exo Elytra Jetpack Speed",
+  "text.config.oritech-config.option.exoChestplate.energyCapacity": "Exo Chestplate Energy Capacity",
+  "text.config.oritech-config.option.exoChestplate.energyUsage": "Exo Chestplate Energy Usage",
+  "text.config.oritech-config.option.exoChestplate.chargeSpeed": "Exo Chestplate Charge Speed",
+  "text.config.oritech-config.option.basicDrill.energyCapacity": "Basic Drill Energy Capacity",
+  "text.config.oritech-config.option.basicDrill.energyUsage": "Basic Drill Energy Usage",
+  "text.config.oritech-config.option.basicDrill.chargeSpeed": "Basic Drill Charge Speed",
+  "text.config.oritech-config.option.chainSaw.energyCapacity": "Chain Saw Energy Capacity",
+  "text.config.oritech-config.option.chainSaw.energyUsage": "Chain Saw Energy Usage",
+  "text.config.oritech-config.option.chainSaw.chargeSpeed": "Chain Saw Charge Speed",
   "text.config.oritech-config.section.arcane": "Arcano",
   "text.config.oritech-config.option.enchanterCostMultiplier": "Multiplicador de Custo do Encantador",
   "text.config.oritech-config.option.catalystBaseSouls": "Capacidade Base de Almas do Catalisador",
@@ -649,9 +731,17 @@
   "text.config.oritech-config.option.fluidPipeExtractIntervalDuration": "Duração do Intervalo de Extração do Tubo de Fluido",
   "text.config.oritech-config.option.fluidPipeInternalStorageBuckets": "Armazenamento Interno do Tubo de Fluido em Baldes",
   "text.config.oritech-config.option.energyPipeTransferRate": "Taxa de Transferência do Tubo de Energia",
+  "text.config.oritech-config.option.superConductorTransferRate": "Superconductor Transfer Rate",
   "text.config.oritech-config.section.clientSettings": "Apenas Cliente",
   "text.config.oritech-config.option.tightMachineAddonHitboxes": "Hitboxes de Addons de Máquina Apertadas",
   "text.config.oritech-config.option.tightMachineFrameHitboxes": "Hitboxes de Estruturas de Máquina Apertadas",
   "text.config.oritech-config.option.tightCableHitboxes": "Hitboxes de Cabos Apertadas",
-  "text.config.oritech-config.option.machineVolumeMultiplier": "Multiplicador de Volume do Som da Máquina"
+  "text.config.oritech-config.option.machineVolumeMultiplier": "Multiplicador de Volume do Som da Máquina",
+  "text.config.oritech-config.section.particleAccelerator": "Particle Accelerator",
+  "text.config.oritech-config.option.bendFactor": "Particle Curve Requirement Factor",
+  "text.config.oritech-config.option.accelerationRFCost": "Base Particle Acceleration Cost",
+  "text.config.oritech-config.option.maxGateDist": "Maximum Particle Gate Distance",
+  "text.config.oritech-config.option.endPortalRequiredSpeed": "Minimum End Portal Collision Energy",
+  "text.config.oritech-config.option.netherPortalRequiredSpeed": "Minimum Nether Portal Collision Energy",
+  "text.config.oritech-config.option.blackHoleRequiredSpeed": "Minimum Black Hole Collision Energy"
 }

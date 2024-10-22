@@ -14,6 +14,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.EnergyStorageUtil;
 import team.reborn.energy.api.base.SimpleEnergyItem;
@@ -68,17 +69,17 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements SimpleEnerg
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return 500_000;
+        return Oritech.CONFIG.exoChestplate.energyCapacity();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return 10_000;
+        return Oritech.CONFIG.exoChestplate.chargeSpeed();
     }
     
     @Override
     public long getEnergyMaxOutput(ItemStack stack) {
-        return 5000;
+        return Oritech.CONFIG.exoChestplate.energyUsage();
     }
     
     @Override

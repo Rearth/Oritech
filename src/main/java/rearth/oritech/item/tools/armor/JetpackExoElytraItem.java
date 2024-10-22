@@ -65,32 +65,37 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     }
     
     @Override
-    public float getSpeed() {
-        return 1.6f;
-    }
-    
-    @Override
     public boolean requireUpward() {
         return true;
     }
     
     @Override
+    public float getSpeed() {
+        return Oritech.CONFIG.exoElytraJetpack.speed();
+    }
+    
+    @Override
     public int getRfUsage() {
-        return 256;
+        return Oritech.CONFIG.exoElytraJetpack.energyUsage();
     }
     
     @Override
     public int getFuelUsage() {
-        return (int) (10 * (FluidConstants.BUCKET / 1000));
+        return Oritech.CONFIG.exoElytraJetpack.fuelUsage();
     }
     
     @Override
     public long getFuelCapacity() {
-        return 4 * FluidConstants.BUCKET;
+        return Oritech.CONFIG.exoElytraJetpack.fuelCapacity();
+    }
+    
+    @Override
+    public long getEnergyCapacity(ItemStack stack) {
+        return Oritech.CONFIG.exoElytraJetpack.energyCapacity();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return 20_000;
+        return Oritech.CONFIG.exoElytraJetpack.chargeSpeed();
     }
 }

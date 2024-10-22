@@ -14,12 +14,14 @@ import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
 import nourl.mythicmetals.MythicMetals;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
@@ -181,6 +183,19 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // feet (silicon + plating)
         offerFeetRecipe(exporter, ToolsContent.EXO_BOOTS, Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.fromTag(TagContent.SILICON), "exoboots");
         
+        // basic jetpack main
+        offerParticleMotorRecipe(exporter, ToolsContent.JETPACK, of(TagContent.STEEL_INGOTS), of(Items.LEATHER), of(ItemContent.ADVANCED_BATTERY), of(Items.GUNPOWDER), "basicjetpack");
+        // jetpack alt
+        offerParticleMotorRecipe(exporter, ToolsContent.JETPACK, of(TagContent.STEEL_INGOTS), of(Items.LEATHER), of(Items.REDSTONE_BLOCK), of(Items.BLAZE_POWDER), "basicjetpackalt");
+        // exo jetpack
+        offerGeneratorRecipe(exporter, ToolsContent.EXO_JETPACK, of(ToolsContent.JETPACK), of(BlockContent.SMALL_TANK_BLOCK), of(ToolsContent.EXO_CHESTPLATE), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "exojetpack");
+        // boosted elytra
+        offerGeneratorRecipe(exporter, ToolsContent.JETPACK_ELYTRA, of(Items.ELYTRA), of(ItemContent.PROCESSING_UNIT), of(ToolsContent.JETPACK), of(Items.GUNPOWDER), "boostedelytra");
+        // exo elytra (exo jetpack + elytra)
+        offerGeneratorRecipe(exporter, ToolsContent.JETPACK_EXO_ELYTRA, of(ToolsContent.EXO_JETPACK), of(ItemContent.PROCESSING_UNIT), of(Items.ELYTRA), of(Items.GUNPOWDER), "exoboostedelytra");
+        // exo elytra (boosted elytra + exo chestplate)
+        offerGeneratorRecipe(exporter, ToolsContent.JETPACK_EXO_ELYTRA, of(ToolsContent.EXO_CHESTPLATE), of(BlockContent.SMALL_TANK_BLOCK), of(ToolsContent.JETPACK_ELYTRA), of(ItemContent.PLASTIC_SHEET), "exoboostedelytraalt");
+        
         // guidebook (any ingot + lapis)
         offerHelmetRecipe(exporter, ItemContent.ORITECH_GUIDE, Ingredient.fromTag(ConventionalItemTags.INGOTS), Ingredient.ofItems(Items.LAPIS_LAZULI), "guidebook");
     }
@@ -248,6 +263,10 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerGeneratorRecipe(exporter, BlockContent.FUEL_GENERATOR_BLOCK.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(BlockContent.BASIC_GENERATOR_BLOCK), Ingredient.ofItems(ItemContent.ENDERIC_LENS), Ingredient.fromTag(TagContent.STEEL_INGOTS), "fuelgen");
         // large solar
         offerGeneratorRecipe(exporter, BlockContent.BIG_SOLAR_PANEL_BLOCK.asItem(), Ingredient.ofItems(BlockContent.BASIC_GENERATOR_BLOCK.asItem()), Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), Ingredient.ofItems(ItemContent.FLUXITE), "solar");
+        
+        // charger
+        offerAtomicForgeRecipe(exporter, BlockContent.CHARGER_BLOCK.asItem(), of(Items.CHEST),  of(BlockContent.ENERGY_PIPE), of(Items.REDSTONE_BLOCK), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "charger");
+        offerAtomicForgeRecipe(exporter, BlockContent.CHARGER_BLOCK.asItem(), of(Items.CHEST),  of(BlockContent.ENERGY_PIPE), of(ItemContent.PROCESSING_UNIT), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "chargeralt");
         
         // small storage
         offerAtomicForgeRecipe(exporter, BlockContent.SMALL_STORAGE_BLOCK.asItem(), Ingredient.ofItems(ItemContent.BASIC_BATTERY), Ingredient.fromTag(TagContent.SILICON), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.WIRES), "smallstorage");
@@ -609,6 +628,14 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addPulverizerRecipe(exporter, Ingredient.fromTag(ItemTags.WOOL), Items.STRING, 3, "string");
         // ancient debris
         addGrinderRecipe(exporter, Ingredient.ofItems(Items.ANCIENT_DEBRIS), Items.NETHERITE_SCRAP, 2, "netheritescrap");
+    }
+    
+    private Ingredient of(ItemConvertible item) {
+        return Ingredient.ofItems(item);
+    }
+    
+    private Ingredient of(TagKey<Item> item) {
+        return Ingredient.fromTag(item);
     }
     
     private void addDustRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, String suffix) {
