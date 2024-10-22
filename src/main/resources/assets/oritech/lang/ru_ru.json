@@ -36,7 +36,7 @@
   "advancements.oritech.fluxite": "Флюксит",
   "advancements.oritech.fluxite.description": "Добудьте флюкс. Великий Скотт, мы возвращаемся в будущее!",
   "advancements.oritech.atomicforge": "Атомный кузнец",
-  "advancements.oritech.atomicforge.description": "Получи атомную кузницу и начните создавать как \"настоящий про\". Это атомно!",
+  "advancements.oritech.atomicforge.description": "Получи атомную кузницу и начните создавать как настоящий про. Это атомно!",
   "advancements.oritech.promethium": "Прометейский огонь",
   "advancements.oritech.promethium.description": "Получите слиток промета. Вы украли огонь у богов!",
   "advancements.oritech.ultimate_core": "Ультимативная машина",
@@ -118,19 +118,19 @@
     {
       "text": "Получено путем захвата жизнеспособной сущности с ",
       "italic": true,
-      "color": "серый"
+      "color": "gray"
     },
     {
       "translate": "контейнер с товаром",
       "italic": true,
-      "color": "серый"
+      "color": "gray"
     }
   ],
   "tooltip.oritech.capture_item_desc_1": [
     {
       "text": "Позволяет захватывать мозг небольшого волшебного разумного существа.",
       "italic": true,
-      "color": "серый"
+      "color": "gray"
     }
   ],
   "tooltip.oritech.capture_item_desc_2": [
@@ -142,20 +142,20 @@
     {
       "text": " может соответствовать этому описанию. Хотя они всегда пытаются взять элемент",
       "italic": true,
-      "color": "серый"
+      "color": "gray"
     }
   ],
   "tooltip.oritech.capture_item_desc_3": [
     {
       "text": "от вас, может быть, вы также найдете другую аналогичную сущность для захвата.",
       "italic": true,
-      "color": "серый"
+      "color": "gray"
     }
   ],
   "title.oritech.redstone_addon": [
     {
       "text": "Пожалуйста, выберите нужный слот",
-      "color": "темный_серый"
+      "color": "dark_gray"
     }
   ],
   "tooltip.oritech.redstone_output_power": "Сопоставители будут измерять накопитель энергии",
@@ -323,7 +323,7 @@
   "block.oritech.steam_boiler_addon": "Дополнение для парового бойлера",
   "block.oritech.crop_filter_addon": "Обрезать дополнение фильтра",
   "block.oritech.quarry_addon": "Дополнение для карьеров",
-  "block.oritech.machine_hunter_addon": "Дополнение \"Машинный охотник\"",
+  "block.oritech.machine_hunter_addon": "Дополнение Машинный охотник",
   "block.oritech.machine_efficiency_addon": "Дополнение для эффективности машины",
   "block.oritech.machine_capacitor_addon": "Дополнение для конденсатора машины",
   "block.oritech.machine_acceptor_addon": "Дополнение для приемника машины",
@@ -403,7 +403,7 @@
   "item.oritech.nickel_ingot": "Слиток никеля",
   "item.oritech.raw_nickel": "Необработанный никель",
   "item.oritech.nickel_clump": "Никелевая глыба",
-  "item.oritech.small_nickel_clump": "Небольшая никелевая глыба\n",
+  "item.oritech.small_nickel_clump": "Небольшая никелевая глыба",
   "item.oritech.nickel_dust": "Никелевая пыль",
   "item.oritech.small_nickel_dust": "Маленькая никелевая пыль",
   "item.oritech.nickel_gem": "Никелевый Самоцвет",
@@ -422,7 +422,7 @@
   "item.oritech.small_iron_dust": "Маленькая железная пыль",
   "item.oritech.iron_gem": "Железный Самоцвет",
   "item.oritech.copper_clump": "Медная глыба",
-  "item.oritech.small_copper_clump": "Небольшая медная глыба\n",
+  "item.oritech.small_copper_clump": "Небольшая медная глыба",
   "item.oritech.copper_dust": "Медная пыль",
   "item.oritech.small_copper_dust": "Маленькая никелевая пыль",
   "item.oritech.copper_gem": "Медный Самоцвет",
