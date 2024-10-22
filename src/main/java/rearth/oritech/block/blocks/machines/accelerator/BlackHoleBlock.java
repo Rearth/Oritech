@@ -76,11 +76,4 @@ public class BlackHoleBlock extends Block implements BlockEntityProvider {
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         tooltip.add(Text.translatable("tooltip.oritech.black_hole").formatted(Formatting.GOLD));
     }
-
-    @Override
-    @Nullable
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        if (!Oritech.CONFIG.enableBlackHoleBlock()) return null;
-        return super.getPlacementState(ctx);
-    }
 }

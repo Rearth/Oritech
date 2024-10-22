@@ -738,8 +738,6 @@
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "Minimum Nether Portal Collision Energy",
   "text.config.oritech-config.option.blackHoleRequiredSpeed": "Minimum Black Hole Collision Energy",
   "text.config.oritech-config.section.blackHole": "Black Hole",
-  "text.config.oritech-config.option.enableBlackHoleBlock": "Enable Black Hole",
-  "text.config.oritech-config.option.enableBlackHoleBlock.tooltip": "If disabled, black holes will not be placeable and placed ones will not suck in blocks.",
   "text.config.oritech-config.option.pullTimeMultiplier": "Black Hole Pull Time Multiplier",
   "text.config.oritech-config.option.pullRange": "Black Hole Pull Range",
   "text.config.oritech-config.option.idleWaitTicks": "Black Hole Idle Wait Ticks"

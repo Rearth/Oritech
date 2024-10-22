@@ -26,7 +26,7 @@ public class BlackHoleBlockEntity extends BlockEntity implements BlockEntityTick
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, BlackHoleBlockEntity blockEntity) {
-        if (world.isClient || waitTicks-- > 0 || !Oritech.CONFIG.enableBlackHoleBlock()) return;
+        if (world.isClient || waitTicks-- > 0) return;
         
         if (currentlyPullingFrom != null && pullingStartedAt + pullTime < world.getTime()) {
             currentlyPullingFrom = null;

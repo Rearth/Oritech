@@ -62,7 +62,6 @@ public class Config {
     public int blackHoleRequiredSpeed = 15000;
 
     @SectionHeader("blackHole")
-    public boolean enableBlackHoleBlock = true;
     public int pullTimeMultiplier = 8;
     public int pullRange = 16;
     public int idleWaitTicks = 200;
