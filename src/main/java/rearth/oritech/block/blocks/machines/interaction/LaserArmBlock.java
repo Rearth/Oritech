@@ -1,5 +1,6 @@
 package rearth.oritech.block.blocks.machines.interaction;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -10,7 +11,6 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,8 +24,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.behavior.LaserArmEntityBehavior;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
@@ -61,11 +59,11 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
     }
 
     public static LaserArmBlockBehavior getBehaviorForBlock(Block targetBlock) {
-        return (LaserArmBlockBehavior)BLOCK_BEHAVIORS.getOrDefault(targetBlock, DEFAULT_BLOCK_BEHAVIOR);
+        return BLOCK_BEHAVIORS.getOrDefault(targetBlock, DEFAULT_BLOCK_BEHAVIOR);
     }
 
     public static LaserArmEntityBehavior getBehaviorForEntity(EntityType<?> targetEntityType) {
-        return (LaserArmEntityBehavior)ENTITY_BEHAVIORS.getOrDefault(targetEntityType, DEFAULT_ENTITY_BEHAVIOR);
+        return ENTITY_BEHAVIORS.getOrDefault(targetEntityType, DEFAULT_ENTITY_BEHAVIOR);
     }
     
     @Override
@@ -136,10 +134,10 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         
-        if (!world.isClient() && state.get(ASSEMBLED)) {
+        if (!world.isClient()) {
             
             var entity = world.getBlockEntity(pos);
-            if (entity instanceof MultiblockMachineController machineEntity) {
+            if (state.get(ASSEMBLED) && entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
             

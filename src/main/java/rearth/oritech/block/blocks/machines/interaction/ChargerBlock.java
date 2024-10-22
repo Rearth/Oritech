@@ -6,6 +6,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
@@ -69,6 +70,23 @@ public class ChargerBlock extends HorizontalFacingBlock implements BlockEntityPr
         }
         
         return ActionResult.SUCCESS;
+    }
+    
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        
+        if (!world.isClient) {
+            var entity = (ChargerBlockEntity) world.getBlockEntity(pos);
+            var stacks = entity.inventory.heldStacks;
+            for (var stack : stacks) {
+                if (!stack.isEmpty()) {
+                    var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+                    world.spawnEntity(itemEntity);
+                }
+            }
+        }
+        
+        return super.onBreak(world, pos, state, player);
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})

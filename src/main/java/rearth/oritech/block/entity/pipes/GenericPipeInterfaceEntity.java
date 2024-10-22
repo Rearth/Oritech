@@ -14,7 +14,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.PersistentState;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.blocks.pipes.GenericPipeConnectionBlock;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,11 +40,11 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                 connectedMachines.add(pos.south());
             if (newState.get(EAST) == 2)
                 connectedMachines.add(pos.east());
-            if (newState.get(GenericPipeConnectionBlock.WEST) == 2)
+            if (newState.get(WEST) == 2)
                 connectedMachines.add(pos.west());
-            if (newState.get(GenericPipeConnectionBlock.UP) == 2)
+            if (newState.get(UP) == 2)
                 connectedMachines.add(pos.up());
-            if (newState.get(GenericPipeConnectionBlock.DOWN) == 2)
+            if (newState.get(DOWN) == 2)
                 connectedMachines.add(pos.down());
             
             data.machineInterfaces.put(pos, connectedMachines);
