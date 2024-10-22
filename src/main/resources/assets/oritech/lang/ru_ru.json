@@ -743,5 +743,9 @@
   "text.config.oritech-config.option.maxGateDist": "Максимальное расстояние врат частиц",
   "text.config.oritech-config.option.endPortalRequiredSpeed": "Минимальная энергия портала Энда",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "Минимальная энергия Портала Незера",
-  "text.config.oritech-config.option.blackHoleRequiredSpeed": "Минимальная энергия столкновения черной дыры"
+  "text.config.oritech-config.option.blackHoleRequiredSpeed": "Минимальная энергия столкновения черной дыры",
+  "text.config.oritech-config.section.blackHole": "Black Hole",
+  "text.config.oritech-config.option.pullTimeMultiplier": "Black Hole Pull Time Multiplier",
+  "text.config.oritech-config.option.pullRange": "Black Hole Pull Range",
+  "text.config.oritech-config.option.idleWaitTicks": "Black Hole Idle Wait Ticks"
 }
