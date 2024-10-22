@@ -80,6 +80,11 @@ public class Config {
     public int endPortalRequiredSpeed = 10000;
     public int netherPortalRequiredSpeed = 5000;
     public int blackHoleRequiredSpeed = 15000;
+
+    @SectionHeader("blackHole")
+    public int pullTimeMultiplier = 8;
+    public int pullRange = 16;
+    public int idleWaitTicks = 200;
     
     @SectionHeader("clientSettings")
     @Sync(Option.SyncMode.NONE)

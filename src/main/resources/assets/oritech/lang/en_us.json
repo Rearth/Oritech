@@ -743,5 +743,9 @@
   "text.config.oritech-config.option.maxGateDist": "Maximum Particle Gate Distance",
   "text.config.oritech-config.option.endPortalRequiredSpeed": "Minimum End Portal Collision Energy",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "Minimum Nether Portal Collision Energy",
-  "text.config.oritech-config.option.blackHoleRequiredSpeed": "Minimum Black Hole Collision Energy"
+  "text.config.oritech-config.option.blackHoleRequiredSpeed": "Minimum Black Hole Collision Energy",
+  "text.config.oritech-config.section.blackHole": "Black Hole",
+  "text.config.oritech-config.option.pullTimeMultiplier": "Black Hole Pull Time Multiplier",
+  "text.config.oritech-config.option.pullRange": "Black Hole Pull Range",
+  "text.config.oritech-config.option.idleWaitTicks": "Black Hole Idle Wait Ticks"
 }

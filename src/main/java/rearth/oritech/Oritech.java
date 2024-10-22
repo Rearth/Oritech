@@ -18,6 +18,7 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.harvesting.PromethiumAxeItem;
