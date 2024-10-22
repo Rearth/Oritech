@@ -743,5 +743,9 @@
   "text.config.oritech-config.option.maxGateDist": "粒子门距离上限",
   "text.config.oritech-config.option.endPortalRequiredSpeed": "末地传送门产生最小对撞能量",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "下界传送门产生最小对撞能量",
-  "text.config.oritech-config.option.blackHoleRequiredSpeed": "黑洞产生最小对撞能量"
+  "text.config.oritech-config.option.blackHoleRequiredSpeed": "黑洞产生最小对撞能量",
+  "text.config.oritech-config.section.blackHole": "Black Hole",
+  "text.config.oritech-config.option.pullTimeMultiplier": "Black Hole Pull Time Multiplier",
+  "text.config.oritech-config.option.pullRange": "Black Hole Pull Range",
+  "text.config.oritech-config.option.idleWaitTicks": "Black Hole Idle Wait Ticks"
 }
