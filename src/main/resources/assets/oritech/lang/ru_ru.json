@@ -85,6 +85,7 @@
   "tooltip.oritech.soul_crop": "Росток на земле души. Содержит душу.",
   "tooltip.oritech.superconductor": "Не удается подключиться к обычным энергетическим трубам.",
   "tooltip.oritech.jetpack_usage": "Needs electricity or turbofuel to fly.",
+  "tooltip.oritech.jetpack_usage2": "Is faster with turbofuel.",
   "tooltip.oritech.charger": "Used to charge and fill equipment.",
   "tooltip.oritech.addon_speed_desc": "Скорость работы ",
   "tooltip.oritech.addon_efficiency_desc": "Энергоэффективность",
