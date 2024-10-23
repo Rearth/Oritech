@@ -21,6 +21,6 @@ A centrifuge will be needed to make process some resources and create
 
 components that will be needed for further progress.
 
-<recipe;oritech:assembler_block_assembler>
+<recipe;oritech:crafting/assembler>
 
-<recipe;oritech:centrifuge_block_centrifugealt>
+<recipe;oritech:crafting/centrifugealt>

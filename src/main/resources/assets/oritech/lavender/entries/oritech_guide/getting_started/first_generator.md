@@ -9,7 +9,7 @@
 
 Build a [basic generator](^oritech:processing/generators).
 
-<recipe;oritech:basic_generator_block_basicgen>
+<recipe;oritech:crafting/basicgen>
 
 This won't generate nearly enough power, but it's enough to get you started.
 
