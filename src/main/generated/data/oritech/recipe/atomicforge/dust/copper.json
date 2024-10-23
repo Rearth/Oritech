@@ -2,7 +2,7 @@
   "type": "oritech:atomic_forge",
   "ingredients": [
     {
-      "item": "oritech:copper_dust"
+      "item": "oritech:copper_gem"
     },
     {
       "item": "oritech:enderic_compound"
@@ -13,9 +13,9 @@
   ],
   "results": [
     {
-      "count": 1,
-      "id": "oritech:copper_gem"
+      "count": 2,
+      "id": "oritech:copper_dust"
     }
   ],
-  "time": 3
+  "time": 20
 }
