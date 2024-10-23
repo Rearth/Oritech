@@ -78,6 +78,9 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         var hint = Text.translatable("tooltip.oritech.jetpack_usage").formatted(Formatting.GRAY, Formatting.ITALIC);
         tooltip.add(hint);
+        hint = Text.translatable("tooltip.oritech.jetpack_usage2").formatted(Formatting.GRAY, Formatting.ITALIC);
+        tooltip.add(hint);
+        
         addJetpackTooltip(stack, tooltip, true);
     }
     

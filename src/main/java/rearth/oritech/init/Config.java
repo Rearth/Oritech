@@ -47,13 +47,13 @@ public class Config {
     @Nest
     public BasicEnergyMachineData charger = new BasicEnergyMachineData(500_000, 10_000, 5000, 0);
     @Nest
-    public JetpackData basicJetpack = new JetpackData(100_000, 4 * FluidConstants.BUCKET, 128, (int) (10 * (FluidConstants.BUCKET / 1000)), 1024, 0.65f);
+    public JetpackData basicJetpack = new JetpackData(100_000, 4 * FluidConstants.BUCKET, 128, (int) (10 * (FluidConstants.BUCKET / 1000)), 1024, 0.4f);
     @Nest
-    public JetpackData exoJetpack = new JetpackData(5_000_000, 32 * FluidConstants.BUCKET, 256, (int) (15 * (FluidConstants.BUCKET / 1000)), 10_000, 1.8f);
+    public JetpackData exoJetpack = new JetpackData(5_000_000, 32 * FluidConstants.BUCKET, 256, (int) (15 * (FluidConstants.BUCKET / 1000)), 10_000, 1.5f);
     @Nest
-    public JetpackData elytraJetpack = new JetpackData(100_000, 4 * FluidConstants.BUCKET, 128, (int) (10 * (FluidConstants.BUCKET / 1000)), 1024, 0.7f);
+    public JetpackData elytraJetpack = new JetpackData(100_000, 4 * FluidConstants.BUCKET, 128, (int) (10 * (FluidConstants.BUCKET / 1000)), 1024, 0.6f);
     @Nest
-    public JetpackData exoElytraJetpack = new JetpackData(5_000_000, 32 * FluidConstants.BUCKET, 256, (int) (15 * (FluidConstants.BUCKET / 1000)), 10_000, 1.5f);
+    public JetpackData exoElytraJetpack = new JetpackData(5_000_000, 32 * FluidConstants.BUCKET, 256, (int) (15 * (FluidConstants.BUCKET / 1000)), 10_000, 1.4f);
     @Nest
     public ToolData exoChestplate = new ToolData(5_000_000, 10_000, 10_000);
     @Nest

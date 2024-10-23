@@ -20,6 +20,7 @@ import rearth.oritech.init.FluidContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.FluidStack;
+import rearth.oritech.util.TooltipHelper;
 import team.reborn.energy.api.base.SimpleEnergyItem;
 
 import java.util.List;
@@ -184,7 +185,7 @@ public interface BaseJetpackItem extends OritechEnergyItem {
     
     default void addJetpackTooltip(ItemStack stack, List<Text> tooltip, boolean includeEnergy) {
         
-        var text = Text.translatable("tooltip.oritech.energy_indicator", this.getStoredEnergy(stack), this.getEnergyCapacity(stack));
+        var text = Text.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
         if (includeEnergy) tooltip.add(text.formatted(Formatting.GOLD));
         
         var container = getStoredFluid(stack);

@@ -1,7 +1,6 @@
 package rearth.oritech.item.tools.armor;
 
 import net.fabricmc.fabric.api.entity.event.v1.FabricElytraItem;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -60,6 +59,9 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         var hint = Text.translatable("tooltip.oritech.jetpack_usage").formatted(Formatting.GRAY, Formatting.ITALIC);
         tooltip.add(hint);
+        hint = Text.translatable("tooltip.oritech.jetpack_usage2").formatted(Formatting.GRAY, Formatting.ITALIC);
+        tooltip.add(hint);
+        
         super.appendTooltip(stack, context, tooltip, type);
         addJetpackTooltip(stack, tooltip, false);
     }
