@@ -35,6 +35,13 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
+    
+    // these are shared between all jetpacks
+    // set to the world time where last ground contact was recorded
+    public static long LAST_GROUND_CONTACT = Long.MAX_VALUE;
+    // set to true if space has been pressed at least once AFTER loosing ground contact (to avoid flying forwards when dropping of a cliff
+    public static boolean PRESSED_SPACE = false;
+    
     public JetpackItem(RegistryEntry<ArmorMaterial> material, Type type, Item.Settings settings) {
         super(material, type, settings);
     }

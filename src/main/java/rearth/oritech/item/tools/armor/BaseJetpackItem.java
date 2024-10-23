@@ -55,6 +55,8 @@ public interface BaseJetpackItem extends OritechEnergyItem {
         var isActive = up;
         if (!requireUpward()) isActive = up || horizontal;
         
+        if (!isJetpackStarted(player, world, up)) return;
+        
         if (!isActive || player.isOnGround() || player.isSubmergedInWater()) return;
         
         var powerMultiplier = getSpeed();
@@ -97,6 +99,24 @@ public interface BaseJetpackItem extends OritechEnergyItem {
         ParticleContent.JETPACK_EXHAUST.spawn(world, particlePosB, direction);
     }
     
+    private static boolean isJetpackStarted(PlayerEntity player, World world, boolean up) {
+        
+        var grounded = player.isOnGround() || player.isSubmergedInWater();
+        
+        if (grounded) {
+            JetpackItem.LAST_GROUND_CONTACT = world.getTime();
+            JetpackItem.PRESSED_SPACE = false;
+            return false;
+        } else {
+            var flightTime = world.getTime() - JetpackItem.LAST_GROUND_CONTACT;
+            
+            if (flightTime < 5) return false;
+            if (up) JetpackItem.PRESSED_SPACE = true;
+            
+            return JetpackItem.PRESSED_SPACE;
+        }
+    }
+    
     private static void processUpwardsMotion(PlayerEntity player, float powerMultiplier, boolean upOnly) {
         var velocity = player.getMovement();
         
@@ -114,7 +134,7 @@ public interface BaseJetpackItem extends OritechEnergyItem {
     
     private static void processSideMotion(PlayerEntity player, boolean right, float powerMultiplier) {
         var modifier = right ? 1 : -1;  // either go full speed ahead, or slowly backwards
-        var power = 0.05f * powerMultiplier;
+        var power = 0.04f * powerMultiplier;
         
         // get existing movement
         var movement = player.getMovement();
@@ -133,7 +153,7 @@ public interface BaseJetpackItem extends OritechEnergyItem {
     
     private static void processForwardMotion(PlayerEntity player, boolean forward, float powerMultiplier) {
         var modifier = forward ? 1f : -0.4;  // either go full speed ahead, or slowly backwards
-        var power = 0.08f * powerMultiplier;
+        var power = 0.06f * powerMultiplier;
         
         // get existing movement
         var movement = player.getMovement();
