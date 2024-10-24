@@ -51,6 +51,14 @@ public class FluidPipeBlock extends GenericPipeBlock {
     public String getPipeTypeName() {
         return "fluid";
     }
+    
+    // to connect when a neighboring block emits a block update (e.g. the centrifuge getting a fluid addon)
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        
+        world.setBlockState(pos, getStateForNeighborUpdate(state, null, null, world, pos, sourcePos), Block.NOTIFY_LISTENERS, 0);
+    }
 
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {

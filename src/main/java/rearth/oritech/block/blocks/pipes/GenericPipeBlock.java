@@ -207,6 +207,8 @@ public abstract class GenericPipeBlock extends Block {
         var pipeBlock = (GenericPipeBlock) state.getBlock();
         var lookup = pipeBlock.getSidesLookup();
         
+        System.out.println(pos);
+        
         // transform to interface when machine is placed as neighbor
         if (!(state.getBlock() instanceof GenericPipeConnectionBlock) &&
               (hasMachineInDirection(Direction.NORTH, world, pos, lookup)
