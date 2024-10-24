@@ -107,17 +107,17 @@
   "tooltip.oritech.promethium_axe": "Підкрадайтеся під час збору врожаю, щоб зламати все дерево",
   "tooltip.oritech.promethium_pick": "Shift + праве натискання для перемикання режиму",
   "tooltip.oritech.frame_needed": "Повинен бути побудований на рамі машини",
-  "tooltip.oritech.exo_boots": "Prevents all fall damage",
-  "tooltip.oritech.exo_leggings": "Increases movement speed",
-  "tooltip.oritech.exo_chestplate": "Charges equipped energy items",
-  "tooltip.oritech.exo_jetpack": "Charges equipped energy items",
-  "tooltip.oritech.jetpack_exo_elytra": "Charges equipped energy items",
-  "tooltip.oritech.exo_helmet": "Grants night vision",
-  "tooltip.oritech.black_hole": "DON'T PLACE THIS unless you know what you're doing.",
-  "tooltip.oritech.weed_killer": "Removes all grass and plants in a wide radius",
+  "tooltip.oritech.exo_boots": "Запобігає будь-яким пошкодженням при падінні",
+  "tooltip.oritech.exo_leggings": "Збільшує швидкість пересування",
+  "tooltip.oritech.exo_chestplate": "Заряджає обладнані енергетичні предмети",
+  "tooltip.oritech.exo_jetpack": "Заряджає обладнані енергетичні предмети",
+  "tooltip.oritech.jetpack_exo_elytra": "Заряджає обладнані енергетичні предмети",
+  "tooltip.oritech.exo_helmet": "Дарує нічне бачення",
+  "tooltip.oritech.black_hole": "НЕ РОЗМІЩУЙТЕ ЦЕ, якщо не знаєте, що робите.",
+  "tooltip.oritech.weed_killer": "Видаляє всю траву та рослини в широкому радіусі",
   "tooltip.oritech.intelligence_item": [
     {
-      "text": "Gained by capturing a viable entity with the ",
+      "text": "Отримано шляхом захоплення життєздатного підприємства з",
       "italic": true,
       "color": "gray"
     },
@@ -129,58 +129,58 @@
   ],
   "tooltip.oritech.capture_item_desc_1": [
     {
-      "text": "Can capture the brain of a small, magical intelligent flying creature. The",
+      "text": "Може захопити мозок маленької чарівної розумної літаючої істоти. ",
       "italic": true,
       "color": "gray"
     }
   ],
   "tooltip.oritech.capture_item_desc_2": [
     {
-      "text": "Allay",
+      "text": "Еллай",
       "color": "#26d0ff",
       "italic": true
     },
     {
-      "text": " might fit that description. Although they always try to take the item",
+      "text": "може підходити під цей опис. Хоча вони завжди намагаються забрати предмет",
       "italic": true,
       "color": "gray"
     }
   ],
   "tooltip.oritech.capture_item_desc_3": [
     {
-      "text": "from you. Perhaps you might also find another similar entity to capture.",
+      "text": "від вас. Можливо, ви також знайдете іншу подібну сутність, яку варто зафіксувати.",
       "italic": true,
       "color": "gray"
     }
   ],
   "title.oritech.redstone_addon": [
     {
-      "text": "Please select a target slot",
+      "text": "Виберіть цільовий слот",
       "color": "dark_gray"
     }
   ],
-  "tooltip.oritech.redstone_output_power": "Comparators will measure the energy storage",
-  "title.oritech.redstone_output_power": "Power Measure",
-  "tooltip.oritech.redstone_output_slot": "Comparators will measure selected inventory slot",
-  "title.oritech.redstone_output_slot": "Inventory Slot Measure",
-  "tooltip.oritech.redstone_output_progress": "Comparators will measure the current recipe progress",
-  "title.oritech.redstone_output_progress": "Progress Measure",
-  "tooltip.oritech.redstone_output_active": "Comparators will measure whether the machine is currently working",
-  "title.oritech.redstone_output_active": "Activity Measure",
-  "tooltip.oritech.redstone_input_control": "Enables the machine to be disabled via a redstone signal to this addon",
-  "title.oritech.redstone_input_control": "Control Input",
-  "title.oritech.inventory_proxy": "Machine Inventory Access",
+  "tooltip.oritech.redstone_output_power": "Компаратори вимірюватимуть накопичення енергії",
+  "title.oritech.redstone_output_power": "Вимірювання потужності",
+  "tooltip.oritech.redstone_output_slot": "Компаратори виміряють обраний слот інвентаризації",
+  "title.oritech.redstone_output_slot": "Інвентаризаційний вимір слота",
+  "tooltip.oritech.redstone_output_progress": "Компаратори вимірюватимуть поточний хід виконання рецепта",
+  "title.oritech.redstone_output_progress": "Показник прогресу",
+  "tooltip.oritech.redstone_output_active": "Компаратори вимірюють, чи працює машина в даний момент",
+  "title.oritech.redstone_output_active": "Показник активності",
+  "tooltip.oritech.redstone_input_control": "Дозволяє вимкнути машину за допомогою сигналу червоного каменю до цього аддона",
+  "title.oritech.redstone_input_control": "Вхід керування",
+  "title.oritech.inventory_proxy": "Доступ до інвентаризації машин",
   "tooltip.oritech.energy_stored": "Зберегти: %d RF",
   "tooltip.oritech.energy_indicator": "%d/%d RF",
-  "tooltip.oritech.energy_max_transfer": "Max Transfer Rate: ",
+  "tooltip.oritech.energy_max_transfer": "Максимальна швидкість передачі даних: ",
   "tooltip.oritech.energy_transfer_rate": "%d RF/t",
   "tooltip.oritech.energy_capacity": "%d RF",
-  "title.oritech.machine.addon_range": "%d Range",
-  "tooltip.oritech.block_destroyer.addon_range": "Maximum digging depth",
-  "tooltip.oritech.laser_arm.addon_range": "Effective beam radius",
-  "title.oritech.machine.addon_fortune": "%d Fortune",
-  "tooltip.oritech.machine.addon_fortune": "Yield addon count. 3 is the effective maximum",
-  "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many layers of machine\naddons can be added to this block.\n\nUse better cores to increase this\n\nCurrent quality progress: %s",
+  "title.oritech.machine.addon_range": "%d Діапазон",
+  "tooltip.oritech.block_destroyer.addon_range": "Максимальна глибина копання",
+  "tooltip.oritech.laser_arm.addon_range": "Ефективний радіус променя",
+  "title.oritech.machine.addon_fortune": "%d Везіння",
+  "tooltip.oritech.machine.addon_fortune": "Кількість аддонів для врожайності. 3 - ефективний максимум",
+  "tooltip.oritech.machine.quality": "Якість машини: %d\n\nКерує кількістю шарів машини\nаддонів може бути додано до цього блоку.\n\nВикористовуйте кращі ядра, щоб збільшити цей показник\n\nПоточний прогрес якості: %s",
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
   "tooltip.oritech.billion_abbrev": "B",
@@ -226,7 +226,7 @@
   "title.oritech.laser_arm.addon_hunter_damage": "%d Damage",
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Effective Beam Damage",
   "title.oritech.machine.addon_looting": "%d Looting",
-  "tooltip.oritech.machine.addon_looting": "Yield addon count. 3 is the effective maximum",
+  "tooltip.oritech.machine.addon_looting": "Кількість аддонів для врожайності. 3 - ефективний максимум",
   "rei.process.oritech:pulverizer": "Pulverizing",
   "rei.process.oritech:grinder": "Fragmenting",
   "rei.process.oritech:assembler": "Assembling",
