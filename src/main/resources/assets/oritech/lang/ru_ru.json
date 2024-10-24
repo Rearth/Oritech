@@ -85,6 +85,7 @@
   "tooltip.oritech.soul_crop": "Росток на земле души. Содержит душу.",
   "tooltip.oritech.superconductor": "Не удается подключиться к обычным энергетическим трубам.",
   "tooltip.oritech.jetpack_usage": "Needs electricity or turbofuel to fly.",
+  "tooltip.oritech.jetpack_usage2": "Is faster with turbofuel.",
   "tooltip.oritech.charger": "Used to charge and fill equipment.",
   "tooltip.oritech.addon_speed_desc": "Скорость работы ",
   "tooltip.oritech.addon_efficiency_desc": "Энергоэффективность",
@@ -743,5 +744,9 @@
   "text.config.oritech-config.option.maxGateDist": "Максимальное расстояние врат частиц",
   "text.config.oritech-config.option.endPortalRequiredSpeed": "Минимальная энергия портала Энда",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "Минимальная энергия Портала Незера",
-  "text.config.oritech-config.option.blackHoleRequiredSpeed": "Минимальная энергия столкновения черной дыры"
+  "text.config.oritech-config.option.blackHoleRequiredSpeed": "Минимальная энергия столкновения черной дыры",
+  "text.config.oritech-config.section.blackHole": "Black Hole",
+  "text.config.oritech-config.option.pullTimeMultiplier": "Black Hole Pull Time Multiplier",
+  "text.config.oritech-config.option.pullRange": "Black Hole Pull Range",
+  "text.config.oritech-config.option.idleWaitTicks": "Black Hole Idle Wait Ticks"
 }

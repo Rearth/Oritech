@@ -85,6 +85,7 @@
   "tooltip.oritech.soul_crop": "在灵魂土上生长。包含一个灵魂。",
   "tooltip.oritech.superconductor": "不能连接至普通的能量线缆",
   "tooltip.oritech.jetpack_usage": "需要电力或涡轮燃料来飞行。",
+  "tooltip.oritech.jetpack_usage2": "Is faster with turbofuel.",
   "tooltip.oritech.charger": "可用于为装备充能",
   "tooltip.oritech.addon_speed_desc": "处理速度 ",
   "tooltip.oritech.addon_efficiency_desc": "能量效率 ",
@@ -743,5 +744,9 @@
   "text.config.oritech-config.option.maxGateDist": "粒子门距离上限",
   "text.config.oritech-config.option.endPortalRequiredSpeed": "末地传送门产生最小对撞能量",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "下界传送门产生最小对撞能量",
-  "text.config.oritech-config.option.blackHoleRequiredSpeed": "黑洞产生最小对撞能量"
+  "text.config.oritech-config.option.blackHoleRequiredSpeed": "黑洞产生最小对撞能量",
+  "text.config.oritech-config.section.blackHole": "Black Hole",
+  "text.config.oritech-config.option.pullTimeMultiplier": "Black Hole Pull Time Multiplier",
+  "text.config.oritech-config.option.pullRange": "Black Hole Pull Range",
+  "text.config.oritech-config.option.idleWaitTicks": "Black Hole Idle Wait Ticks"
 }
