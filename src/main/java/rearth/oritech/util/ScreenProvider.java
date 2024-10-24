@@ -50,6 +50,8 @@ public interface ScreenProvider {
     default boolean showProgress() {
         return true;
     }
+    
+    default boolean showArmor() {return false;}
 
     default BarConfiguration getEnergyConfiguration() {
         return new BarConfiguration(7, 24, 15, 54);

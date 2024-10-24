@@ -157,11 +157,24 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         if (showExtensionPanel()) {
             rootComponent.child(
-              Containers.horizontalFlow(Sizing.fixed(176 + 250), Sizing.fixed(166 + 40))        // span entire inner area
+              Containers.horizontalFlow(Sizing.fixed(176 + 250), Sizing.fixed(166 + 40))
                 .child(Containers.horizontalFlow(Sizing.content(), Sizing.content())
                          .child(buildExtensionPanel())
                          .surface(Surface.PANEL)
                          .positioning(Positioning.absolute(176 + 117, 30)))
+                .positioning(Positioning.relative(50, 50))
+                .zIndex(-1)
+            );
+        }
+        
+        // equipment panel
+        if (handler.armorSlots != null) {
+            rootComponent.child(
+              Containers.horizontalFlow(Sizing.fixed(176 + 250), Sizing.fixed(166 + 40))
+                .child(Containers.horizontalFlow(Sizing.content(), Sizing.content())
+                         .child(buildEquipmentPanel())
+                         .surface(Surface.PANEL)
+                         .positioning(Positioning.absolute(176 - 80, 30)))
                 .positioning(Positioning.relative(50, 50))
                 .zIndex(-1)
             );
@@ -282,6 +295,48 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         updateSettingsButtons();
         
         return container;
+    }
+    
+    private Component buildEquipmentPanel() {
+        
+        var container = Containers.verticalFlow(Sizing.content(), Sizing.content());
+        container.surface(Surface.PANEL_INSET);
+        container.horizontalAlignment(HorizontalAlignment.CENTER);
+        
+        container.padding(Insets.of(2));
+        container.margins(Insets.of(6));
+        
+        for (int i = 0; i < handler.armorSlots.size(); i++) {
+            var slotId = handler.armorSlots.get(i);
+            
+            var slotContainer = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+            
+            var slotComponent = slotAsComponent(slotId);
+            var background = Components.texture(getEquipmentSlotTexture(i), 0, 0, 16, 16, 16, 16);
+            
+            slotContainer.child(slotComponent);
+            slotContainer.child(background.positioning(Positioning.absolute(0, 0)));
+            
+            container.child(slotContainer.margins(Insets.of(1)));
+            
+            // separator box
+            if (i < handler.armorSlots.size() - 1)
+                container.child(Components.box(Sizing.fixed(18), Sizing.fixed(1)).color(new Color(0.8f, 0.8f, 0.8f)));
+        }
+        
+        return container;
+    }
+    
+    private Identifier getEquipmentSlotTexture(int armorSlot) {
+        return switch (armorSlot) {
+            case 4 -> Identifier.of("minecraft", "textures/item/empty_armor_slot_boots.png");
+            case 3 -> Identifier.of("minecraft", "textures/item/empty_armor_slot_leggings.png");
+            case 2 -> Identifier.of("minecraft", "textures/item/empty_armor_slot_chestplate.png");
+            case 1 -> Identifier.of("minecraft", "textures/item/empty_armor_slot_helmet.png");
+            case 0 -> Identifier.of("minecraft", "textures/item/empty_slot_axe.png");
+            default -> null;
+        };
+        
     }
     
     public void addExtensionComponents(FlowLayout container) {
