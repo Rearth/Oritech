@@ -141,7 +141,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             if (hunterAddons > 0) {
                 fireAtLivingEntities(world, pos, state, blockEntity);
             }
-            else if (currentTarget != null) {
+            else if (currentTarget != null && !currentTarget.equals(BlockPos.ZERO)) {
                 fireAtBlocks(world, pos, state, blockEntity);
             }
         }
