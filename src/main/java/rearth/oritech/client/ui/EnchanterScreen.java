@@ -8,7 +8,6 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.OverlayContainer;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
-import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -81,7 +80,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         
         
         var registry = handler.enchanter.getWorld().getRegistryManager().get(RegistryKeys.ENCHANTMENT);
-        var canBeEnchanted = registry.stream().anyMatch(elem -> stack.canBeEnchantedWith(registry.getEntry(elem), EnchantingContext.ACCEPTABLE));
+        var canBeEnchanted = registry.stream().anyMatch(elem -> elem.isAcceptableItem(stack));
         
         openEnchantmentSelection.active(hasSelection && canBeEnchanted);
         
@@ -105,7 +104,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     private void openSelectionPanel() {
         // find enchantments
         var registry = handler.enchanter.getWorld().getRegistryManager().get(RegistryKeys.ENCHANTMENT);
-        var all = registry.stream().map(registry::getEntry).filter(entry -> currentItem.canBeEnchantedWith(entry, EnchantingContext.ACCEPTABLE)).toList();
+        var all = registry.stream().map(registry::getEntry).filter(entry -> entry.value().isAcceptableItem(currentItem)).toList();
         
         if (all.isEmpty()) return;
         

@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "minecraft:chest"
+    },
+    "c": {
+      "item": "oritech:processing_unit"
+    },
+    "f": {
+      "tag": "c:ingots/steel"
+    },
+    "m": {
+      "item": "oritech:energy_pipe"
+    },
+    "s": {
+      "item": "minecraft:dispenser"
+    }
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:charger_block"
+  }
+}

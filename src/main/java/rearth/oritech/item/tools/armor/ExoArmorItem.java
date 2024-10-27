@@ -19,6 +19,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
@@ -82,7 +83,6 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
             playerEntity.removeStatusEffect(StatusEffects.NIGHT_VISION);
     }
     
-    // Create our armor model/renderer for Fabric and return it
     @Override
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
@@ -92,17 +92,17 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
             public @Nullable <T extends LivingEntity> BipedEntityModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable BipedEntityModel<T> original) {
                 
                 if (this.renderer == null)
-                    this.renderer = new ExosuitArmorRenderer();
-                // This prepares our GeoArmorRenderer for the current render frame.
-                // These parameters may be null however, so we don't do anything further with them
-                this.renderer.prepForRender(livingEntity, itemStack, equipmentSlot, original);
+                    this.renderer = new ExosuitArmorRenderer(getModel(), Oritech.id("armor/exo_armor"));
                 
                 return this.renderer;
             }
         });
     }
     
-    // Let's add our animation controller
+    public Identifier getModel() {
+        return Oritech.id("armor/exo_armor");
+    }
+    
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, 20, state -> PlayState.STOP));

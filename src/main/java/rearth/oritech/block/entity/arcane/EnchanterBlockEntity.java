@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.arcane;
 
 import io.wispforest.owo.util.VectorRandomUtils;
-import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
@@ -114,7 +113,7 @@ public class EnchanterBlockEntity extends BlockEntity
               || !inventory.getStack(1).isEmpty()
               || !content.getItem().isEnchantable(content)
               || selectedEnchantment == null
-              || !content.canBeEnchantedWith(selectedEnchantment, EnchantingContext.ACCEPTABLE)) {
+              || !selectedEnchantment.value().isAcceptableItem(content)) {
             progress = 0;
             return;
         }

@@ -77,7 +77,11 @@ public abstract class GenericPipeBlock extends Block {
     
     protected static boolean isValidConnectionTarget(Block block, World world, Direction direction, BlockPos pos, GenericPipeBlock self) {
         var lookup = self.getSidesLookup();
-        return self.connectToBlockType(block) || lookup.find(world, pos, direction) != null;
+        return self.connectToOwnBlockType(block) || (lookup.find(world, pos, direction) != null && self.isCompatibleTarget(block));
+    }
+    
+    public boolean isCompatibleTarget(Block block) {
+        return true;
     }
     
     public abstract BlockApiLookup<?, Direction> getSidesLookup();
@@ -86,7 +90,7 @@ public abstract class GenericPipeBlock extends Block {
     public abstract BlockState getNormalBlock();
     public abstract String getPipeTypeName();
     
-    public abstract boolean connectToBlockType(Block block);
+    public abstract boolean connectToOwnBlockType(Block block);
     
     public abstract GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world);
     

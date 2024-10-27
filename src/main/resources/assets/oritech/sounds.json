@@ -79,6 +79,11 @@
       "oritech:squish"
     ]
   },
+  "short_servo": {
+    "sounds": [
+      "oritech:short_servo"
+    ]
+  },
   "particle_moving": {
     "sounds": [
       {

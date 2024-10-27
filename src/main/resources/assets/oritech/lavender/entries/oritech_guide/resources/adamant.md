@@ -15,7 +15,7 @@ Adamant is a basic alloy that is used to create the [assembler](^oritech:process
 
 Adamant can be created in a crafting grid:
 
-<recipe;oritech:adamant_ingotmanualadamant>
+<recipe;oritech:crafting/alloy/adamant>
 
 ;;;;;
 

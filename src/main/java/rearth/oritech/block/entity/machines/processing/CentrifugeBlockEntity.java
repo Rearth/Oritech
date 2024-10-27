@@ -196,6 +196,12 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
     
     @Override
+    public void initAddons() {
+        super.initAddons();
+        world.updateNeighbors(pos, getCachedState().getBlock()); // trigger block update to allow pipes to connect
+    }
+    
+    @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
         if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON)) {
             hasFluidAddon = true;
@@ -303,7 +309,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     // sides can access both tanks, but insert only to input tank, and extract only from output tank
     @Override
     public Storage<FluidVariant> getFluidStorage(Direction direction) {
-        if (!hasFluidAddon) return exposedOutput;
+        if (!hasFluidAddon) return null;
         if (direction == null) return combinedTanks;
         return switch (direction) {
             case DOWN -> outputStorage;

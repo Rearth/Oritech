@@ -13,6 +13,6 @@ As soon as you can, you will want to build a [pulverizer](^oritech:processing/pu
 
 ;;;;;
 
-<recipe;oritech:steel_ingotmanualsteel>
+<recipe;oritech:crafting/alloy/steel>
 
-<recipe;oritech:electrum_ingotmanualelectrum>
+<recipe;oritech:crafting/alloy/electrum>

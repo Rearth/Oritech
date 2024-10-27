@@ -124,6 +124,12 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
         }
         
         var targets = findNetworkTargets(pos, data);
+        
+        if (targets == null) {
+            System.err.println("Yeah your pipe network likely is too long");
+            return;
+        }
+        
         var netHash = targets.hashCode();
         
         if (netHash != filteredTargetsNetHash) {

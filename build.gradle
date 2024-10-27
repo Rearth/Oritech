@@ -64,7 +64,7 @@ repositories {
         url = 'https://maven.ladysnake.org/releases'
     }
 
-    maven { // for EMI
+    maven { // for EMI and Mod Menu
         name = 'TerraformersMC'
         url 'https://maven.terraformersmc.com/'
     }
@@ -120,6 +120,9 @@ dependencies {
         case "disabled": break
         default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, or disabled.")
     }
+
+    // mod menu
+    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
     // dependencies for datagen
     // Tech Reborn

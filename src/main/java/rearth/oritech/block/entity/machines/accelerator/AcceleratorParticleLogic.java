@@ -146,7 +146,7 @@ public class AcceleratorParticleLogic {
         
         var exitFrom = particle.position;
         
-        var distance = Math.max(Math.sqrt(particle.velocity), 0.9) * 0.9;
+        var distance = Math.max(Math.sqrt(particle.velocity), 0.4) * 0.9;
         var exitTo = exitFrom.add(direction.multiply(distance));
         
         entity.onParticleExited(exitFrom, exitTo, particle.lastGate, direction, reason);

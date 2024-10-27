@@ -2,20 +2,20 @@
   "type": "oritech:atomic_forge",
   "ingredients": [
     {
-      "item": "oritech:nickel_dust"
+      "item": "oritech:nickel_gem"
     },
     {
-      "item": "oritech:enderic_compound"
+      "item": "oritech:fluxite"
     },
     {
-      "item": "oritech:enderic_compound"
+      "item": "oritech:fluxite"
     }
   ],
   "results": [
     {
-      "count": 1,
-      "id": "oritech:nickel_gem"
+      "count": 2,
+      "id": "oritech:nickel_dust"
     }
   ],
-  "time": 3
+  "time": 20
 }

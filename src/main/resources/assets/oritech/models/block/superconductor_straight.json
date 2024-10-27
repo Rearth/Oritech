@@ -1,0 +1,23 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "oritech:block/superconductor",
+		"particle": "oritech:block/machine_particle_texture"
+	},
+	"elements": [
+		{
+			"name": "straight",
+			"from": [5, 5, 0],
+			"to": [11, 11, 16],
+			"faces": {
+				"north": {"uv": [3, 6, 6, 9], "texture": "#0"},
+				"east": {"uv": [0, 11.5, 8, 14.5], "texture": "#0"},
+				"south": {"uv": [3, 6, 6, 9], "texture": "#0"},
+				"west": {"uv": [0, 11.5, 8, 14.5], "texture": "#0"},
+				"up": {"uv": [0, 11.5, 8, 14.5], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [0, 11.5, 8, 14.5], "rotation": 90, "texture": "#0"}
+			}
+		}
+	]
+}

@@ -62,12 +62,17 @@ public class EnergyPipeConnectionBlock extends GenericPipeConnectionBlock {
     }
     
     @Override
-    public boolean connectToBlockType(Block block) {
+    public boolean connectToOwnBlockType(Block block) {
         return block instanceof EnergyPipeBlock || block instanceof EnergyPipeConnectionBlock;
     }
     
     @Override
+    public boolean isCompatibleTarget(Block block) {
+        return !block.equals(BlockContent.SUPERCONDUCTOR_CONNECTION);
+    }
+    
+    @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
-        return ENERGY_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new GenericPipeInterfaceEntity.PipeNetworkData());
+        return ENERGY_PIPE_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 }

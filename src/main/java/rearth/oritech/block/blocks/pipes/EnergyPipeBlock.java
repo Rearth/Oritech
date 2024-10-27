@@ -62,8 +62,13 @@ public class EnergyPipeBlock extends GenericPipeBlock {
     }
     
     @Override
-    public boolean connectToBlockType(Block block) {
+    public boolean connectToOwnBlockType(Block block) {
         return block instanceof EnergyPipeBlock || block instanceof EnergyPipeConnectionBlock;
+    }
+    
+    @Override
+    public boolean isCompatibleTarget(Block block) {
+        return !block.equals(BlockContent.SUPERCONDUCTOR_CONNECTION);
     }
     
     @Override

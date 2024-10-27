@@ -84,12 +84,12 @@ public class FluidPipeConnectionBlock extends GenericPipeConnectionBlock {
     }
     
     @Override
-    public boolean connectToBlockType(Block block) {
+    public boolean connectToOwnBlockType(Block block) {
         return block instanceof FluidPipeBlock || block instanceof FluidPipeConnectionBlock;
     }
     
     @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
-        return FLUID_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new GenericPipeInterfaceEntity.PipeNetworkData());
+        return FLUID_PIPE_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 }

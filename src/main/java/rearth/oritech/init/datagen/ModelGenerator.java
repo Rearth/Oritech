@@ -25,10 +25,6 @@ public class ModelGenerator extends FabricModelProvider {
     public ModelGenerator(FabricDataOutput output) {
         super(output);
     }
-
-    public static TextureMap stairsOrientable(Block block, Block baseBlock) {
-        return new TextureMap().put(TextureKey.FRONT, TextureMap.getSubId(block, "_front")).put(TextureKey.SIDE, TextureMap.getSubId(block, "_side")).put(TextureKey.TOP, TextureMap.getSubId(block, "_top")).put(TextureKey.BACK, TextureMap.getId(baseBlock)).put(TextureKey.BOTTOM, TextureMap.getId(baseBlock));
-    }
     
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
@@ -36,9 +32,11 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleState(BlockContent.MACHINE_FRAME_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.FLUID_PIPE);
         blockStateModelGenerator.registerSimpleState(BlockContent.ENERGY_PIPE);
+        blockStateModelGenerator.registerSimpleState(BlockContent.SUPERCONDUCTOR);
         blockStateModelGenerator.registerSimpleState(BlockContent.ITEM_PIPE);
         blockStateModelGenerator.registerSimpleState(BlockContent.FLUID_PIPE_CONNECTION);
         blockStateModelGenerator.registerSimpleState(BlockContent.ENERGY_PIPE_CONNECTION);
+        blockStateModelGenerator.registerSimpleState(BlockContent.SUPERCONDUCTOR_CONNECTION);
         blockStateModelGenerator.registerSimpleState(BlockContent.ITEM_PIPE_CONNECTION);
         blockStateModelGenerator.registerSimpleState(BlockContent.ITEM_FILTER_BLOCK);
         
@@ -53,6 +51,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(BlockContent.FERTILIZER_BLOCK);
         
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.PUMP_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerSimpleState(BlockContent.CHARGER_BLOCK);
         
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.ADDON_INDICATOR_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.BLOCK_DESTROYER_HEAD);
@@ -166,6 +165,10 @@ public class ModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(ToolsContent.EXO_BOOTS, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.CHAINSAW, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.HAND_DRILL, Models.GENERATED);
+        itemModelGenerator.register(ToolsContent.JETPACK, Models.GENERATED);
+        itemModelGenerator.register(ToolsContent.EXO_JETPACK, Models.GENERATED);
+        itemModelGenerator.register(ToolsContent.JETPACK_ELYTRA, Models.GENERATED);
+        itemModelGenerator.register(ToolsContent.JETPACK_EXO_ELYTRA, Models.GENERATED);
         
         itemModelGenerator.register(ItemContent.ORITECH_GUIDE, Models.GENERATED);
         

@@ -320,6 +320,11 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     }
     
     @Override
+    public boolean showExpansionPanel() {
+        return false;
+    }
+    
+    @Override
     public boolean inputOptionsEnabled() {
         return false;
     }

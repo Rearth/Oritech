@@ -14,7 +14,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.PersistentState;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.blocks.pipes.GenericPipeConnectionBlock;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +22,7 @@ import static rearth.oritech.block.blocks.pipes.GenericPipeBlock.*;
 
 public abstract class GenericPipeInterfaceEntity extends BlockEntity implements BlockEntityTicker<GenericPipeInterfaceEntity> {
     
-    public static final int MAX_SEARCH_COUNT = 256;
+    public static final int MAX_SEARCH_COUNT = 2048;
     
     public GenericPipeInterfaceEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -41,11 +40,11 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                 connectedMachines.add(pos.south());
             if (newState.get(EAST) == 2)
                 connectedMachines.add(pos.east());
-            if (newState.get(GenericPipeConnectionBlock.WEST) == 2)
+            if (newState.get(WEST) == 2)
                 connectedMachines.add(pos.west());
-            if (newState.get(GenericPipeConnectionBlock.UP) == 2)
+            if (newState.get(UP) == 2)
                 connectedMachines.add(pos.up());
-            if (newState.get(GenericPipeConnectionBlock.DOWN) == 2)
+            if (newState.get(DOWN) == 2)
                 connectedMachines.add(pos.down());
             
             data.machineInterfaces.put(pos, connectedMachines);
@@ -211,9 +210,9 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
     }
     
     public static final class PipeNetworkData extends PersistentState {
-        public final HashMap<BlockPos, Integer> pipeNetworkLinks = new HashMap<>();
+        public final HashMap<BlockPos, Integer> pipeNetworkLinks = new HashMap<>(); // which blockpos belongs to which network (ID)
         public final HashSet<BlockPos> pipes = new HashSet<>();
-        public final HashMap<BlockPos, Set<BlockPos>> machineInterfaces = new HashMap<>(); // list of machines per interface
+        public final HashMap<BlockPos, Set<BlockPos>> machineInterfaces = new HashMap<>(); // list of machines per interface/connection block
         public final HashMap<Integer, Set<BlockPos>> pipeNetworks = new HashMap<>();   // networks are never updated, and instead always replaced by new ones with different ids
         public final HashMap<Integer, Set<Pair<BlockPos, Direction>>> pipeNetworkInterfaces = new HashMap<>(); // list of machines that are connected to the network
         

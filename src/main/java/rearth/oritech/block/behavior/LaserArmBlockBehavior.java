@@ -2,11 +2,7 @@ package rearth.oritech.block.behavior;
 
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.BuddingAmethystBlock;
-import net.minecraft.block.CropBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -36,6 +32,8 @@ public class LaserArmBlockBehavior {
 
         // has an energy storage, try to transfer power to it
         var storageCandidate = EnergyStorage.SIDED.find(world, blockPos, blockState, blockEntity, null);
+        // if the storage is not exposed (e.g. catalyst / deep drill / atomic forge), get it directly
+        if (storageCandidate == null && blockEntity instanceof EnergyProvider provider) storageCandidate = provider.getStorage(null);
         if (storageCandidate != null)
             return transferPowerBehavior.fireAtBlock(world, laserEntity, block, blockPos, blockState, blockEntity);
         

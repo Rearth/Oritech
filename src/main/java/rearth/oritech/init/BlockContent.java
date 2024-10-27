@@ -45,6 +45,7 @@ public class BlockContent implements BlockRegistryContainer {
     
     public static final Block FLUID_PIPE = new FluidPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final Block ENERGY_PIPE = new EnergyPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
+    public static final Block SUPERCONDUCTOR = new SuperConductorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final Block ITEM_PIPE = new ItemPipeBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final Block ITEM_FILTER_BLOCK = new ItemFilterBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     
@@ -52,6 +53,8 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block FLUID_PIPE_CONNECTION = new FluidPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     @NoBlockItem
     public static final Block ENERGY_PIPE_CONNECTION = new EnergyPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
+    @NoBlockItem
+    public static final Block SUPERCONDUCTOR_CONNECTION = new SuperConductorConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     @NoBlockItem
     public static final Block ITEM_PIPE_CONNECTION = new ItemPipeConnectionBlock(FabricBlockSettings.copyOf(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     
@@ -72,11 +75,11 @@ public class BlockContent implements BlockRegistryContainer {
     @NoBlockItem
     public static final Block QUARRY_BEAM_TARGET = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
     @NoBlockItem
-    public static final Block BLACK_HOLE_INNER = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    public static final Block BLACK_HOLE_INNER = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque().luminance(5));
     @NoBlockItem
-    public static final Block BLACK_HOLE_MIDDLE = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    public static final Block BLACK_HOLE_MIDDLE = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque().luminance(5));
     @NoBlockItem
-    public static final Block BLACK_HOLE_OUTER = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque());
+    public static final Block BLACK_HOLE_OUTER = new Block(FabricBlockSettings.copyOf(Blocks.CHAIN).nonOpaque().luminance(5));
     
     @NoBlockItem
     public static final Block ADDON_INDICATOR_BLOCK = new Block(FabricBlockSettings.copyOf(Blocks.GLASS));
@@ -147,10 +150,11 @@ public class BlockContent implements BlockRegistryContainer {
     public static final Block ACCELERATOR_MOTOR = new AcceleratorMotorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().luminance(5));
     public static final Block ACCELERATOR_CONTROLLER = new AcceleratorControllerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block ACCELERATOR_SENSOR = new AcceleratorSensorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
-    public static final Block BLACK_HOLE_BLOCK = new BlackHoleBlock(FabricBlockSettings.copyOf(Blocks.END_PORTAL).nonOpaque());
+    public static final Block BLACK_HOLE_BLOCK = new BlackHoleBlock(FabricBlockSettings.copyOf(Blocks.END_PORTAL).luminance(12).nonOpaque());
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block PUMP_BLOCK = new PumpBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block CHARGER_BLOCK = new ChargerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block MACHINE_CORE_1 = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 1);
     public static final Block MACHINE_CORE_2 = new MachineCoreBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), 2);

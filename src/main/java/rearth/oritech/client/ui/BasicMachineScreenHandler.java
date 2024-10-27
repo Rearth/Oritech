@@ -21,6 +21,9 @@ import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.ScreenProvider;
 import team.reborn.energy.api.EnergyStorage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BasicMachineScreenHandler extends ScreenHandler {
     
     @NotNull
@@ -46,6 +49,7 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     
     protected BlockState machineBlock;
     protected BlockEntity blockEntity;
+    protected List<Integer> armorSlots;
     
     public BasicMachineScreenHandler(int syncId, PlayerInventory inventory, ModScreens.BasicData setupData) {
         this(syncId, inventory, inventory.player.getWorld().getBlockEntity(setupData.pos()));
@@ -100,6 +104,14 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         
         SlotGenerator.begin(this::addSlot, 8, 84)
           .playerInventory(playerInventory);
+        
+        if (screenData.showArmor()) {
+            armorSlots = new ArrayList<>(5);
+            for (int i = playerInventory.armor.size(); i >= 0; i--) {
+                var index = this.addSlot(new Slot(playerInventory, 36 + i, -20, i * 19));
+                armorSlots.add(index.id);
+            }
+        }
     }
     
     public void addMachineSlot(int inventorySlot, int x, int y, boolean output) {

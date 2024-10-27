@@ -1,21 +1,19 @@
 package rearth.oritech.item.tools.harvesting;
 
-import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import team.reborn.energy.api.base.SimpleEnergyItem;
 
@@ -24,7 +22,7 @@ import java.util.List;
 public class DrillItem extends MiningToolItem implements OritechEnergyItem {
     
     public static final int BAR_STEP_COUNT = 13;
-    private final float energyUsageMultiplier = 10f;
+    private final float energyUsageMultiplier = Oritech.CONFIG.basicDrill.energyUsage();
     
     public DrillItem(ToolMaterial toolMaterial, TagKey<Block> effectiveBlocks, Item.Settings settings) {
         super(toolMaterial, effectiveBlocks, settings);
@@ -62,11 +60,6 @@ public class DrillItem extends MiningToolItem implements OritechEnergyItem {
     }
     
     @Override
-    public boolean canBeEnchantedWith(ItemStack stack, RegistryEntry<Enchantment> enchantment, EnchantingContext context) {
-        return super.canBeEnchantedWith(stack, enchantment, context);
-    }
-    
-    @Override
     public int getItemBarStep(ItemStack stack) {
         var energyItem = (SimpleEnergyItem) stack.getItem();
         return Math.round((energyItem.getStoredEnergy(stack) * 100f / energyItem.getEnergyCapacity(stack)) * BAR_STEP_COUNT) / 100;
@@ -80,5 +73,15 @@ public class DrillItem extends MiningToolItem implements OritechEnergyItem {
     @Override
     public int getItemBarColor(ItemStack stack) {
         return 0xff7007;
+    }
+    
+    @Override
+    public long getEnergyCapacity(ItemStack stack) {
+        return Oritech.CONFIG.basicDrill.energyCapacity();
+    }
+    
+    @Override
+    public long getEnergyMaxInput(ItemStack stack) {
+        return Oritech.CONFIG.basicDrill.chargeSpeed();
     }
 }

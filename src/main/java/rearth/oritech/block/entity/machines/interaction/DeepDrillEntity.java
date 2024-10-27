@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.inventory.Inventories;
@@ -22,7 +21,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.datagen.data.TagContent;
@@ -46,7 +44,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     
     // work data
     private boolean initialized;
-    private List<Block> targetedOre = new ArrayList<>();
+    private final List<Block> targetedOre = new ArrayList<>();
     private int progress;
     private long lastWorkTime;
     private boolean networkDirty;
@@ -99,7 +97,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, DeepDrillEntity blockEntity) {
-        if (world.isClient() || !initialized) return;
+        if (world.isClient() || !initialized || targetedOre.isEmpty()) return;
         if (!inventory.isEmpty() && inventory.heldStacks.get(0).getCount() >= inventory.heldStacks.get(0).getMaxCount())
             return;    // inv full
         

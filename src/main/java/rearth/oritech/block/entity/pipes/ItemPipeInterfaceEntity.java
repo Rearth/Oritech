@@ -70,6 +70,7 @@ public class ItemPipeInterfaceEntity extends GenericPipeInterfaceEntity {
         if (stackToMove.isEmpty()) return;
         
         var targets = findNetworkTargets(pos, data);
+        if (targets == null) return;
         
         var netHash = targets.hashCode();
         
