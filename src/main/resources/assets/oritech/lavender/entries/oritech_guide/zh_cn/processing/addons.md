@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Addons",
+  "title": "插件",
   "icon": "oritech:machine_extender",
   "category": "oritech:processing",
   "associated_items": [
@@ -20,36 +20,33 @@
 }
 ```
 
-To upgrade machines in oritech, addons are used. They are blocks that need to be attached to the machine itself or a connected machine extender. Addons can do a variety
-of things, such as increasing speed, energy efficiency, giving access to specific inventory slots, and much more.
+要想在Oritech中升级机器，您需要用到各类插件。
+
+插件是依附在机器上或是与扩展组件相连的方块。插件能提高机器的处理速度和能效，亦或是提供其它功能。
 
 ;;;;;
 
-Machines can only accept addons at specific positions. To view these, either check the "addons" UI page, or look for these markers on the machine:
-![machine_marker](oritech:textures/book/addon_marker.png,fit)
+扩展组件/插件只能安装在机器的特定位置（下文统称为“插槽”）。您可以在机器GUI中的“插件”选项卡中查看插槽位置和已安装插件，或直接在机器上寻找如图的插槽标记：
+![插件标记](oritech:textures/book/addon_marker.png,fit)
 
 ;;;;;
 
-Addons will be activated when the machine is right-clicked. To indicate that, the pink parts of an addon turn blue when in use. To extend the available number of addon slots,
-you can use machine extenders. These are specific addons that don't directly influence the machine, but allow addons to be placed on them, which then count towards the machine they are connected to.
+安装插件后，对机器点击鼠标右键即可激活插件。当一个插件的粉红色部分变为蓝色时，这意味着其已被激活。
 
-
-The maximum layers of machine extenders you can
+您可以通过安装扩展组件来增加插槽数量，这些扩展组件可以与插件相连并使其能作用于机器。
 
 ;;;;;
 
-use depends on the machine quality. If you have a machine with a core quality of 1, you can't use any extender. Each additional extender that 
-goes **through** another extender requires an increase in core quality of 1.
+扩展组件可安装的层数上限取决于机器等级。机器等级为I时无法安装任何插件。
 
-The core quality never directly counts the amount of machine extenders you have active. Instead, it counts through how many
-extenders an addon has to go to be connected to the machine. If this number is greater than the core quality, the addon 
+机器核心品质从不直接统计激活的插件数量。相反，它统计插件连接到机器所需的扩展器数量。如果此数量大于核心品质，则插件将不会连接。请参阅下图的演示：
 
 ;;;;;
 
-will not be connected. See this image for a small demonstration:
 ![machine_addons](oritech:textures/book/extenders.png,fit)
 
 ;;;;;
 
-As mentioned before, only the number of extenders between a machine and an addon is counted. This means you can branch the extenders and everything will work:
+正如之前所说，只会统计机器和插件之间的扩展器数量。这意味着您可以为插件提供多个分支，而所有插件都将正常工作：
+
 ![addon_branching](oritech:textures/book/addon_branching.png,fit)

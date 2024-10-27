@@ -1,9 +1,9 @@
 ```json
 {
-  "title": "Processing",
+  "title": "加工处理",
   "icon": "oritech:assembler_block",
   "ordinal": 2
 }
 ```
 
-This chapter details how Oritech machines work and interact with each other. We'll explore how to build, upgrade and automate them.
+本章将讲述如何使用Oritech中的机器并使其联动。重点内容包括如何搭建、升级和实现各类机器的自动化。

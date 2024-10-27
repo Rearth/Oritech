@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Foundry",
+  "title": "铸造工厂",
   "icon": "oritech:foundry_block",
   "category": "oritech:processing",
   "associated_items": [
@@ -9,8 +9,8 @@
 }
 ```
 
-![Foundry](oritech:textures/book/foundry.png,fit)
+![铸造工厂](oritech:textures/book/foundry.png,fit)
 
 ;;;;;
 
-The foundry does one thing, and it does it well. The foundry creates all of the alloys needed to make Oritech machines. *Some* of the alloys can also be crafted by hand, but that uses more resources than using the alloy forge.
+铸造工厂是专精生产合金锭的一把好手。铸造工厂能够生产制作所有Oritech机器时所需的合金锭。*一些*合金锭可以直接在铸造工厂以外的地方合成，但这样做会消耗更多材料。

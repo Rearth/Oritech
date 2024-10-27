@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Fragment Forge",
+  "title": "粉碎工厂",
   "icon": "oritech:fragment_forge_block",
   "category": "oritech:processing",
   "associated_items": [
@@ -9,16 +9,16 @@
 }
 ```
 
-![Fragment Forge](oritech:textures/book/fragment_forge.png,fit)
+![粉碎工厂](oritech:textures/book/fragment_forge.png,fit)
 
 ;;;;;
 
-The fragment forge is your first stop in turning ores into ingots.
+粉碎工厂是倍矿处理过程中的第一站。
 
-Fragmenting ore blocks creates raw ores, and fragmenting raw ores creates ore dusts.
+其可用于粉碎原矿以获得相应粗矿，亦或是粉碎粗矿以获得对应的矿物碎块。
 
-When fragmenting ore blocks and raw ores, the fragment forge will output more that it is given. Sometimes it will even give additional ores of a different type.
+当粉碎原矿和粗矿时，粉碎工厂能输出于原料数量相对而言更多的产物。有时候其还会产出与原料种类不同的产物。
 
 ;;;;;
 
-Most [addons](^oritech:processing/addons) affect the operation of the fragment forge. The machine yield addon will cause the fragment forge to produce additional byproducts.
+大多数[插件](^oritech:processing/addons)都可以安装在粉碎工厂上。产量升级插件可以提高粉碎工厂副产物的产量。

@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Pulverizer",
+  "title": "磨粉机",
   "icon": "oritech:pulverizer_block",
   "category": "oritech:processing",
   "associated_items": [
@@ -9,8 +9,8 @@
 }
 ```
 
-![Pulverizer](oritech:textures/book/pulverizer.png,fit)
+![磨粉机](oritech:textures/book/pulverizer.png,fit)
 
 ;;;;;
 
-The pulverizer is a slow and simple block that pulverizes ores and biomass. It is available before the [fragment forge](^oritech:processing/fragment_forge), but even after you build a fragment forge you may still want to continue using a pulverizer to grind biomass or coal dust.
+磨粉机是一个效率低下且构造简单的单方块机器。其在您拥有[粉碎工厂](^oritech:processing/fragment_forge)之前是非常有用的。哪怕在之后的旅途您也会用它生产生物质或煤粉。

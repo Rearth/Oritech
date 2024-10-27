@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Generators",
+  "title": "发电机",
   "icon": "oritech:basic_generator_block",
   "category": "oritech:processing",
   "associated_items": [
@@ -14,38 +14,38 @@
 }
 ```
 
-Generators are used to generate the energy ({gold}RF{}) used by all of the other machines and tools in Oritech.
+发电机被用于生产适配Oritech中所有机器和工具的能源 ({gold}RF{})。
 
 ;;;;;
 
 ![basic_generator](oritech:textures/book/basic_generator.png,fit)
 
-The Basic Generator burns fuel (just like a furnace) and generates {gold}32 RF/t{}.
+基础发电机像熔炉一样燃烧燃料以产出电力，效率为{gold}32RF/t{}。
 
 ;;;;;
 
 ![lava_generator](oritech:textures/book/lava_generator.png,fit)
 
-The Lava Generator burns lava inserted with a [fluid pipe](^oritech:logistics/fluid_transport). It has 2 [addon slots](^oritech:processing/addons), and generates {gold}64 RF/t{}.
+熔岩发电机使用[流体管道](^oritech:logistics/fluid_transport)获取熔岩以产出电力，其拥有两个[插槽](^oritech:processing/addons)。初始状态下效率为{gold}64RF/t{}。
 
 ;;;;;
 
 ![bio_generator](oritech:textures/book/bio_generator.png,fit)
 
-The Bio Generator burns biomass. It has 2 [addon slots](^oritech:processing/addons), and generates {gold}64 RF/t{}.
+生物质发电机燃烧生物质以产出电力，其拥有两个[插槽](^oritech:processing/addons)。初始状态下效率为{gold}64RF/t{}。
 
 ;;;;;
 
 ![large_solar_panel](oritech:textures/book/large_solar_panel.png,fit)
 
-The Large Solar Panel can generate between {gold}32 RF/t{} and {gold}224 RF/t{}, depending on the [machine cores](^oritech:processing/multiblocks) used.
+大型太阳能电池板发电效率在{gold}32RF/t{}和{gold}224RF/t{}之间，其效率取决于搭建时使用的[机器核心](^oritech:processing/multiblocks)的等级。
 
 ;;;;;
 
 ![fuel_generator](oritech:textures/book/fuel_generator.png,fit)
 
-The Fuel Generator burns [crude oil](^oritech:resources/crude_oil) or turbofuel. It has 2 [addon slots](^oritech:processing/addons), and generates {gold}256 RF/t{}.
+燃料发电机 (Fuel Generator)燃烧[原油](^oritech:resources/crude_oil)或涡轮燃料(Turbofuel)以产出电力，其拥有两个[插槽](^oritech:processing/addons)。初始状态下效率为{gold}256RF/t{}。
 
 ;;;;;
 
-For advanced energy generation, read [Steam Engine](^oritech:processing/steam_engine).
+欲进一步了解发电机，请参阅[蒸汽动力](^oritech:processing/steam_engine)一章。

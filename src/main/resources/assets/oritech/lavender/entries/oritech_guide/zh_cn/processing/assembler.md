@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Assembler",
+  "title": "自动装配机",
   "icon": "oritech:assembler_block",
   "category": "oritech:processing",
   "associated_items": [
@@ -9,10 +9,10 @@
 }
 ```
 
-![Assembler](oritech:textures/book/assembler.png,fit)
+![自动装配机](oritech:textures/book/assembler.png,fit)
 
 ;;;;;
 
-The assembler has a 2x2 crafting grid, and will automatically assemble items as long as it has energy, items in the input slots, and space to put the finished product in the output slot.
+自动装配机拥有一个2x2的合成空间，其在能量充足且有原料输入的情况下会自动合成物品。
 
-Some machine components can be crafted without an assembler, but crafting that way uses up more resources.
+一些机器零件可以直接在自动装配机以外的地方合成，但这样做会消耗更多材料。

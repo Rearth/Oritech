@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Atomic Forge",
+  "title": "原子融合厂",
   "icon": "oritech:atomic_forge_block",
   "category": "oritech:processing",
   "associated_items": [
@@ -9,10 +9,10 @@
 }
 ```
 
-![Atomic Forge](oritech:textures/book/atomic_forge.png,fit)
+![原子融合厂](oritech:textures/book/atomic_forge.png,fit)
 
 ;;;;;
 
-The atomic forge is a powerful machine that can create advanced computer chips, create reinforced deepslate, and even duplicate ores.
+原子融合厂是一种用于生产计算机芯片、强化深板岩，乃至复制矿石的强大机器。
 
-Energy pipes cannot connect directly to an atomic forge, it needs to be powered by an [enderic laser](^oritech:interaction/enderic_laser).
+请注意，其无法通过能量线缆获取能量，您需要使用[末影激光器](^oritech:interaction/enderic_laser)为其提供能量。

@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Multiblocks",
+  "title": "多方块结构",
   "icon": "oritech:machine_core_6",
   "category": "oritech:processing",
   "associated_items": [
@@ -16,21 +16,24 @@
 }
 ```
 
-Some machines need additional machine cores to function. These must be placed at specific positions relative to the machine itself. The amount of 
-cores needed for a machine is listed in the machines' tooltip. Cores cannot be shared between machines.
+一些机器（多方块结构）需要使用机器核心来搭建。
 
-To begin the multiblock construction, first place down the machine itself.
+机器核心必须被放置在与机器本体（单方块）相邻的特定位置上。不同机器所需的机器核心数量会在其本体的补充说明中标明。
 
-;;;;;
-
-When right-clicking the machine, all blocks that need to be cores will be highlighted for a few seconds. You can then place the cores there. Alternatively,
-you can right-click the machine with a core in your hand. This will automatically place the next core. Note that this only works if the target locations are unobstructed.
-If there is an obstacle, the block will be highlighted instead.
+机器核心不能被共享，即单个或数个相连的机器核心不能同时与两个或以上的机器本体相连。
 
 ;;;;;
 
-Each machine core has a quality associated with it. Using better machine cores results increases the total quality of the machine.
+在开始搭建机器之前，首先需要放置其本体。
 
-To view the resulting quality of a machine,
-hover over the machine icon in the top left of the UI. The machine quality itself does not directly affect the machine operation. Instead, it is used to determine
-how many addons can be added to a machine. If you don't plan on adding addons to the machine, you can use the cheapest cores.
+接着请对机器本体点击鼠标右键，此时会高亮显示所有需要被放置机器核心的位置数秒。您需要在高亮显示的位置上放置机器核心。
+
+此外，您可以在手持机器核心的状态下直接对机器本体点击鼠标右键以直接将机器核心放置在指定位置。请注意，该操作只能将机器核心自动放置在未被阻挡的位置。
+
+如若指定位置存在其它方块，则高亮显示该位置。
+
+;;;;;
+
+机器核心分为七级 (Ⅰ~Ⅶ)。使用更好的机器核心来搭建机器可以提高机器等级。
+
+若想查看机器等级，请将鼠标悬停在机器GUI左上角的正方体图标上。机器等级并不会对机器的运行产生实质性的影响。但其决定扩展组件/插件可安装的层数上限。如果一台机器无法安装插件，您可以选择使用最低等级的机器核心来搭建机器。

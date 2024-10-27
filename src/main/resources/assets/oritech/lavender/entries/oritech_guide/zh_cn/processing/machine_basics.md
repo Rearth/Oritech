@@ -1,17 +1,20 @@
 ```json
 {
-  "title": "Machine Basics",
+  "title": "机器基础",
   "icon": "oritech:assembler_block",
   "category": "oritech:processing",
   "ordinal": 0
 }
 ```
 
-All oritech machines require energy to operate.
+所有机器都需要能量才能正常运行。
 
-The top side is item-input only, while the sides can be used to insert and extract. The bottom only allows item extraction.
+关于物品的输入和输出：
+1.机器顶部只能被用于物品的输入；
+2.机器侧面可以被用于物品的输入和输出；
+3.机器的底部只能被用于物品的输出。
 
 ;;;;;
 
-The items contained in a machine will always be dropped when the machine is destroyed, while the energy and fluids contained will be lost. Machines can be broken using a pickaxe.
-There's no need for a special wrench or anything similar.
+当机器被破坏时，其内的物品总是会以掉落物的形式出现，但其存储的能量和流体会直接消失。
+机器能直接被镐破坏，无需扳手这类特殊物品。
