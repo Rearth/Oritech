@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Enderic Laser",
+  "title": "末影激光臂",
   "icon": "oritech:laser_arm_block",
   "category": "oritech:interaction",
   "associated_items": [
@@ -13,51 +13,45 @@
 }
 ```
 
-![enderic laser](oritech:textures/book/enderic_laser.png,fit)
-
-The enderic laser utilizes
+![末影激光臂](oritech:textures/book/enderic_laser.png,fit)
 
 ;;;;;
 
-huge amounts of energy to fire a laser beam in a specific direction.
+末影激光臂使用大量能量以向特定方向发射激光。
 
- In most cases, this results in the block being destroyed. 
-The dropped blocks are then placed in the inventory. Any blocks that don't fit into the inventory will be lost, so you may want to use an [item pipe](^oritech:logistics/item_transport) to keep getting items.
-
-;;;;;
-
-**Control**
-
-To set the target direction of the laser, select a target with the [target designator](^oritech:tools/target_designator) item. Then shift+right-click the **bottom** laser block to assign the target. The laser will keep firing in the target direction as long as there is something to target. 
-
-*Note that you're only setting the target direction. This means that the laser will also destroy blocks before and behind the target*.
-A redstone signal disables the laser.
-
-The maximum range is 64.
+通常情况下，被激光命中的方块会被破坏，其掉落物会被存入末影激光臂的内部。任何多余的掉落物会直接消失，所以您可以通过使用[物流管道](^oritech:logistics/item_transport)来输出末影激光臂内的储物以保证其内部始终存在足够的存储空间。
 
 ;;;;;
 
-**Fluxite Harvesting**
+**控制**
 
+手持[目标指示器](^oritech:tools/target_designator)对指定位置点击鼠标右键以确定激光的射击方向。之后请在潜行状态下对末影激光臂的**下半部分**点击鼠标右键以将指定位置信息导入其中。只要目标方向存在方块，末影激光臂就会持续工作。
 
-The huge amounts of energy from the enderic laser cause grown amethyst clusters to transform into fluxite when they are destroyed.
+*注意：您只是设置了激光的的射击方向。这意味着末影激光臂将破坏目标方块后射击方向一线上的方块。*
+
+高电平的红石信号可以使末影激光臂停止工作。激光的最大长度为64格。
+
+;;;;;
+
+**采集能量水晶**
+
+激光蕴含的巨大能量会使紫水晶簇过载以至于紫水晶簇被破坏后会掉落能量水晶 (Fluxite)。
 <block;minecraft:amethyst_cluster>
 
-They also speed up amethyst growth when aimed at the budding amethyst itself.
+激光同样能加速紫晶芽的生长。
 
 ;;;;;
 
-**Energy Transfer**
+**能量传输**
 
-When the enderic laser is targeting a block that can store energy (e.g. any machine), it will fill the energy storage of the machine.
-The laser ignores all input and output limits, and can fill the energy storage of machines that may not accept energy from cables directly.
+当目标方块为能够存储能量的方块（例如：任何机器方块）时，末影激光臂可以向其传输能量。这种传输方式能够忽略所有能量输入和输出的限制，并向不能直接通过能量线缆获取能量的机器传输能量。
 
 ;;;;;
 
-**More details**
+**更多信息**
 
-The laser beam will target any block, but it passes through glass (and not-grown amethysts). Quarry addons will increase the width of the excavated area.
+激光能够瞄准任何方块，但它只能穿过玻璃和紫晶芽。采石场插件 (Quarry Addon)能增加激光的宽度。
 
-The laser itself only has 1 addon slot available at the bottom. Addons will only affect the speed and efficiency of block breaking, energy transfer can only benefit from speed upgrades.
+末影激光臂只有一个底部插槽。插件只会影响激光破坏方块时的速度和末影激光臂的能效，能量传输速率只受速度升级插件的影响。
 
-A target block will stop the laser from going any further, while not being destroyed.
+一个不能被激光破坏的方块能够阻挡激光的传播。

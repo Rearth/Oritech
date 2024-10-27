@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Tree Cutter",
+  "title": "砍树机",
   "icon": "oritech:treefeller_block",
   "category": "oritech:interaction",
   "associated_items": [
@@ -12,8 +12,8 @@
 
 <block;oritech:treefeller_block>
 
-When powered by {gold}RF{}, the tree cutter will cut down an entire tree including the leaves. The tree cutter will only cut logs up to 7 blocks away, so it may not reach the top of large trees.
+向砍树机输入{gold}RF{}后，其能砍伐包括树叶在内的整棵树。
 
 ;;;;;
 
-The logs, leaves, and drops from the leaves will be stored in the tree cutter's internal inventory.
+砍伐所得的原木、树叶和破坏树叶产生的掉落物会被存入砍树机内部。

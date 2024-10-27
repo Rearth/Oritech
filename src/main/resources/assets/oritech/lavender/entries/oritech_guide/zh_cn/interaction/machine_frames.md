@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Machine Frames",
+  "title": "机器框架",
   "icon": "oritech:machine_frame_block",
   "category": "oritech:interaction",
   "associated_items": [
@@ -13,19 +13,18 @@
 }
 ```
 
-The *[block placer](^oritech:interaction/block_placer), [block destroyer](^oritech:interaction/block_destroyer) and [fertilizer](^oritech:interaction/fertilizer)* all operate on a gantry that is built with machine frames. The machine frame designates
-the area the machines operate in. It needs to be rectangular and empty inside.
+*[方块放置器](^oritech:interaction/block_placer), [方块破坏器](^oritech:interaction/block_destroyer)和[施肥机](^oritech:interaction/fertilizer)*都需要在由机器框架搭建的龙门架上工作。龙门架的大小决定机器的工作范围，其形状只能是空心矩形。
 
-The machines always target the blocks **below** the frame.
+机器的朝向总是对准龙门架的**下方**。
 
-Any number of machines can operate on the same machine frame. To do so, simply place multiple machines
+任意数量的不同机器可以在同一龙门架上运行。为此您只需直接在同一龙门架上放置机器即可。
 
 ;;;;;
 
-on the frame. The machines always iterate through all blocks in the frame area. 
+机器工作时会遍历其工作范围内的所有方块。 
 
-All machines that operate on machine frames can use most addons. 
+所有在龙门架上运行的机器可以安装大部分插件。
 
-The speed addon increases both the movement and operation speed.
+比如：速度升级插件可以提高机器遍历时的移动速度和处理速度。
 
 <block;oritech:machine_speed_addon>

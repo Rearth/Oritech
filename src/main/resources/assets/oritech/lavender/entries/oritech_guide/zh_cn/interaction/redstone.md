@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Redstone",
+  "title": "红石",
   "icon": "oritech:energy_pipe",
   "category": "oritech:interaction",
   "associated_items": [
@@ -10,10 +10,8 @@
 }
 ```
 
-Some Oritech machines can directly interact with redstone, such as the portable tank and the portable energy storage. The portable tanks content can be measured using a comparator, 
-and the portable energy storages' output can be disabled with a redstone signal. For all other blocks, a "Redstone Addon Controller" is required.
+一些Oritech中的机器能直接与红石元件联动，比如说便携流体储罐和便携蓄电池。您可以使用红石比较器来检测便携流体储罐的流体储量，还能使用红石信号来启用或禁用便携蓄电池的能量输出。对于其它机器，若想实现类似上述的效果，一个红石控制单元插件是不可或缺的。
 
 ;;;;;
 
-The redstone addon controller can be attached just like any other addon, and can be configured via the UI. When configured, the data can be read using a comparator. The comparator signal will be
-output from the addon, not the machine itself. The machine can also be disabled with a redstone signal to the addon.
+红石控制单元插件可以同其它插件一般安装在机器插槽上，并且可以通过GUI调整其模式。配置后可以使用红石比较器来读取相关数据。除此之外，红石信号还能控制机器的启停。红石信号会从红石控制单元插件处而不是机器本体处发射。

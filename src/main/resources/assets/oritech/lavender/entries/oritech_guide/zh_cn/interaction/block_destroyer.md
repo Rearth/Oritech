@@ -12,20 +12,18 @@
 
 <block;oritech:destroyer_block[machine_assembled=true]>
 
-The block destroyer is used to, as you guessed it, destroy blocks. It's a [multi-block](^oritech:processing/multiblocks) that operates on a [machine frame](^oritech:interaction:machine_frames), and targets the block layer directly below the frame.
+正如您所想的那样，方块破坏器是用于破坏由[机器框架](^oritech:interaction/machine_frames)搭建的龙门架下方方块的[多方块结构](^oritech:processing/multiblocks)。
 
 ;;;;;
 
-The time and energy it takes to break a block is based on the blocks' hardness. The block destroyer tries to destroy all blocks below. To allow farming usage, the crop filter addon can be installed.
-This will cause the block destroyer to skip all non-finished crops.
-
+破坏一个方块所需的时间和能量取决于被破坏方块的硬度。方块破坏器总是会试图破坏位于其工作范围内的所有方块。通过安装作物过滤插件可以使其自动跳过未成熟作物并收获成熟作物。
 
 <block;oritech:crop_filter_addon>
 
 ;;;;;
 
-By adding quarry addons, the block destroyer can also be used as a quarry. Each quarry addon multiplies the range by 8. 
+通过安装采石场插件可以将方块破坏器作为采石场使用。每个采石场插件可以使方块破坏器的最大破坏距离乘以8。
 
-This means one addon gives it 8 range, 2 addons give 64 range, and 3 addons give 512 range.
+这意味着安装一个采石场插件可以使方块破坏器破坏距离变为8格，两个采石场插件可以使其破坏距离变为64格，而三个采石场插件可以使其破坏距离达到512格。
 
 <block;oritech:quarry_addon>

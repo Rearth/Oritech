@@ -1,10 +1,9 @@
 ```json
 {
-  "title": "World interaction machines",
+  "title": "世界交互机器",
   "icon": "oritech:fertilizer_block",
   "ordinal": 3
 }
 ```
 
-Oritech doesn't just contain machines that directly transform items. The machines in this category can be used to directly
-influence and transform the world.
+Oritech并非只有直接处理物品的机器。本章将会介绍可以直接影响和改变环境的机器。

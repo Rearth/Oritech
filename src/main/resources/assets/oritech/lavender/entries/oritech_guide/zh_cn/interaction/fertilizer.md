@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Fertilizer",
+  "title": "施肥机",
   "icon": "oritech:fertilizer_block",
   "category": "oritech:interaction",
   "associated_items": [
@@ -12,8 +12,8 @@
 
 <block;oritech:fertilizer_block>
 
-Used to fertilize crops below the connected [machine frame](^oritech:interaction/machine_frames). Requires water and energy to operate. The effect on the blocks below is similar to bonemeal being applied, albeit less strong.
+用于给由[机器框架](^oritech:interaction/machine_frames)搭建的龙门架下方的作物施肥的施肥机。施肥机需要水和能量才能正常工作，其能对下方的作物提供类似骨粉但效果相较于骨粉稍弱的催熟效果，
 
 ;;;;;
 
-Also hydrates the farmland below.
+同时还能浇灌干涸的耕地。

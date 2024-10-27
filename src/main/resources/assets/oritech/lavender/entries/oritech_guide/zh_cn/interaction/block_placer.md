@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Block Placer",
+  "title": "方块放置器",
   "icon": "oritech:placer_block",
   "category": "oritech:interaction",
   "associated_items": [
@@ -12,6 +12,6 @@
 
 <block;oritech:placer_block>
 
-Yes, the block placer places blocks from its inventory on the layer below the [machine frame](^oritech:interaction/machine_frames). The block placer can also be used to plant seeds in farmland, or saplings.
+顾名思义，方块放置器能将其存储的方块放置在由[机器框架](^oritech:interaction/machine_frames)搭建的龙门架下方。其还能用于在耕地上种植作物或是树苗。
 
-There's not much more to say here.
+真的不用再说什么了。

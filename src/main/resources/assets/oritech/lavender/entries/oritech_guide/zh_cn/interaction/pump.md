@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Pump",
+  "title": "电动泵",
   "icon": "oritech:pump_block",
   "category": "oritech:interaction",
   "associated_items": [
@@ -12,12 +12,10 @@
 
 <block;oritech:pump_block>
 
-The pump is used to pump liquids from below. When placed, it will extend a trunk down until a liquid or obstruction is found. Once a liquid has been found, it will
-scan the liquid body and store all positions to
+电动泵被用于从其下方抽取流体。但电动泵被放置时，它会下放管道直至发现流体或是障碍物（非流体方块）。一旦电动泵发现流体，其会扫描流体记录当前抽取流体的位置信息。
 
 ;;;;;
 
-pump from. The pump can drain liquid bodies of size 100 000 or smaller. Note that the initialization may take a few
-seconds for large targets.
+电动泵可以排干体积为100000格或以下的流体。对于大体积流体，电动泵工作前的初始化进程可能会耗费数秒的时间。
 
-Drained fluids are put into the internal storage. Up to 4 buckets per second can be pumped, at an energy cost of {gold}512 RF{} per block.
+抽取的流体会被存入其内部。电动泵每秒最多可以泵送4桶 (4000mB)流体，此时抽取每格 (1000mB)流体需要{gold}512RF{}。
