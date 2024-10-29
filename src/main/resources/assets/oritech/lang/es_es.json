@@ -116,7 +116,7 @@
 "tooltip.oritech.jetpack_exo_elytra": "Carga objetos de energía equipados",
 "tooltip.oritech.exo_helmet": "Otorga visión nocturna",
 "tooltip.oritech.black_hole": "NO COLOQUES ESTO a menos que sepas lo que estás haciendo.",
-"tooltip.oritech.weed_killer": "Elimina toda la hierba y plantas en un radio amplio"
+"tooltip.oritech.weed_killer": "Elimina toda la hierba y plantas en un radio amplio",
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Obtenido al capturar una entidad viable con el ",
@@ -190,7 +190,7 @@
   "tooltip.oritech.machine_speed": "Velocidad de Procesamiento",
   "title.oritech.machine_efficiency": "⚡ %s%% ",
   "tooltip.oritech.machine_efficiency": "Eficiencia Energética",
-  "title.oritech.machine_energy_production": "↗ %d RF/t "
+  "title.oritech.machine_energy_production": "↗ %d RF/t ",
   "tooltip.oritech.steam_energy_production": "Producción total (incluye generadores en cadena)",
   "title.oritech.steam_production": "↗ %s RF/t",
   "tooltip.oritech.steam_production": "Cantidad de gotas de vapor producidas por tick. El exceso se perderá cuando el almacenamiento esté lleno.",
@@ -224,7 +224,7 @@
   "title.oritech.enchanter.souls_used": "%d / %d Almas usadas",
   "title.oritech.laser_arm.addon_range": "Tamaño %d",
   "title.oritech.machine.addon_hunter_range": "Distancia de escaneo %d",
-  "tooltip.oritech.laser_arm.addon_hunter_range": "Alcance efectivo del rayo"
+  "tooltip.oritech.laser_arm.addon_hunter_range": "Alcance efectivo del rayo",
     "title.oritech.laser_arm.addon_hunter_damage": "%d Daño",
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Daño efectivo del rayo",
   "title.oritech.machine.addon_looting": "Botín %d",
@@ -272,7 +272,7 @@
   "tooltip.oritech.enchanter_selection": "Seleccionar encantamiento",
   "tooltip.oritech.creative_tank": "Haz clic derecho con un cubo para fijar o vacío para vaciar",
   "block.oritech.banana_block": "Bloque de plátano",
-  "block.oritech.machine_frame_block": "Marco de máquina"
+  "block.oritech.machine_frame_block": "Marco de máquina",
   "block.oritech.fluid_pipe": "Tubería de Fluidos",
   "block.oritech.energy_pipe": "Tubería de Energía",
   "block.oritech.superconductor": "Superconductor",
@@ -282,7 +282,7 @@
   "block.oritech.energy_pipe_connection": "Conexión de Tubería de Energía",
   "block.oritech.item_pipe_connection": "Conexión de Tubería de Objetos",
   "block.oritech.frame_gantry_arm": "Brazo de pórtico de estructura",
-  "block.oritech.block_destroyer_head": "Cabeza destructora de bloques"
+  "block.oritech.block_destroyer_head": "Cabeza destructora de bloques",
   "block.oritech.block_placer_head": "Cabeza colocadora de bloques",
   "block.oritech.block_fertilizer_head": "Fertilizador de bloques",
   "block.oritech.pump_trunk_block": "Tronco de bomba",
@@ -299,8 +299,8 @@
   "block.oritech.fuel_generator_block": "Generador de combustible",
   "block.oritech.basic_generator_block": "Generador básico",
   "block.oritech.big_solar_panel_block": "Panel solar grande",
-  "block.oritech.powered_furnace_block": "Horno eléctrico"
-  "block.oritech.laser_arm_block": "Láser endérico"
+  "block.oritech.powered_furnace_block": "Horno eléctrico",
+  "block.oritech.laser_arm_block": "Láser endérico",
   "block.oritech.deep_drill_block": "Extractor de Bedrock",
   "block.oritech.drone_port_block": "Puerto de Drones",
   "block.oritech.charger_block": "Cargador de Equipamiento",
@@ -319,7 +319,7 @@
   "block.oritech.machine_core_4": "Núcleo de máquina avanzado",
   "block.oritech.machine_core_5": "Núcleo de máquina élite",
   "block.oritech.machine_core_6": "Núcleo de máquina ultra",
-  "block.oritech.machine_core_7": "Núcleo de máquina definitivo"
+  "block.oritech.machine_core_7": "Núcleo de máquina definitivo",
 "block.oritech.machine_speed_addon": "Complemento de velocidad de máquina",
   "block.oritech.machine_fluid_addon": "Complemento de fluidos de máquina",
   "block.oritech.machine_yield_addon": "Complemento de rendimiento de máquina",
@@ -429,7 +429,7 @@
   "item.oritech.copper_dust": "Polvo de cobre",
   "item.oritech.small_copper_dust": "Pequeño polvo de cobre",
   "item.oritech.copper_gem": "Gema de cobre",
-  "item.oritech.copper_nugget": "Pepita de cobre"
+  "item.oritech.copper_nugget": "Pepita de cobre",
 "item.oritech.gold_clump": "Grumo de oro",
   "item.oritech.small_gold_clump": "Pequeño grumo de oro",
   "item.oritech.gold_dust": "Polvo de oro",
@@ -445,7 +445,7 @@
   "item.oritech.electrum_ingot": "Lingote de electrum",
   "item.oritech.electrum_dust": "Polvo de electrum",
   "item.oritech.energite_ingot": "Lingote de energita",
-  "item.oritech.energite_dust": "Polvo de energita"
+  "item.oritech.energite_dust": "Polvo de energita",
   "item.oritech.prometheum_ingot": [
     {
       "text": "Prometheum",
@@ -752,3 +752,4 @@
   "text.config.oritech-config.option.pullRange": "Rango de Atracción del Agujero Negro",
   "text.config.oritech-config.option.idleWaitTicks": "Ticks de Espera Inactiva del Agujero Negro"
 }
+
