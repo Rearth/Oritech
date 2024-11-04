@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Resources",
+  "title": "Ressources",
   "icon": "minecraft:diamond_pickaxe",
   "ordinal": 1
 }

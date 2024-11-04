@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Processing",
+  "title": "Traitement",
   "icon": "oritech:assembler_block",
   "ordinal": 2
 }

@@ -1,6 +1,6 @@
 ```json
 {
-  "title": "Getting Started",
+  "title": "Bien Débuter",
   "icon": "oritech:basic_generator_block",
   "ordinal": 0
 }
