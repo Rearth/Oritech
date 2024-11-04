@@ -1,0 +1,57 @@
+```json
+{
+  "title": "Modules",
+  "icon": "oritech:machine_extender",
+  "category": "oritech:processing",
+  "associated_items": [
+    "oritech:machine_extender",
+    "oritech:capacitor_addon_extender",
+    "oritech:machine_speed_addon",
+    "oritech:machine_efficiency_addon",
+    "oritech:machine_capacitor_addon",
+    "oritech:machine_fluid_addon",
+    "oritech:machine_yield_addon",
+    "oritech:crop_filter_addon",
+    "oritech:quarry_addon",
+    "oritech:machine_acceptor_addon",
+    "oritech:machine_inventory_proxy_addon"
+  ],
+  "ordinal": 2
+}
+```
+
+Pour améliorer les machines dans Oritech, des modules sont utilisés. Ce sont des blocs qui doivent être attachés directement à la machine elle-même ou à un block de module de machine. Les modules peuvent accomplir une variété de tâches, comme augmenter la vitesse, l'efficacité énergétique, donner accès à des emplacements d'inventaire spécifiques, et bien plus.
+
+;;;;;
+
+Les machines peuvent accepter des modules qu'à des positions spécifiques. Vous pouvez soit vérifier la page "modules" de l'interface, soit chercher ces marqueurs sur la machine:
+![Connecteur de Modules](oritech:textures/book/addon_marker.png,fit)
+
+;;;;;
+
+Les modules seront activés lorsque vous faites un clic droit sur la machine. Pour l'indiquer, les parties roses d'un module deviennent bleues lorsqu'il est en cours d'utilisation. Pour étendre le nombre d'emplacements de modules disponibles, vous pouvez utiliser des block de module de machine. 
+
+
+Ce sont des modules spécifiques qui n'influencent pas directement la machine mais permettent d'y placer d'autres modules, 
+
+;;;;;
+
+qui seront alors comptés pour la machine à laquelle ils sont connectés.
+
+Le nombre maximum de couches de block de module que vous pouvez utiliser dépend de la qualité de la machine. Si vous avez une machine avec une qualité de noyau de 1, vous ne pouvez pas utiliser de block de module. Chaque block de module supplémentaire passant **à travers** un autre prolongateur nécessite une augmentation de 1 de la qualité du noyau.
+
+;;;;;
+
+La qualité du noyau ne compte jamais directement le nombre de block de module que vous avez actifs. Au lieu de cela, elle mesure combien de block de module un module doit traverser pour être connecté à la machine. Si ce nombre dépasse la qualité du noyau, le module ne sera pas connecté. Voici une image pour une petite démonstration:
+
+;;;;;
+
+![Modules de Machine](oritech:textures/book/extenders.png,fit)
+
+;;;;;
+
+Comme mentionné précédemment, seul le nombre de block de module entre une machine et un module est pris en compte. Cela signifie que vous pouvez ramifier les block de module et tout fonctionnera:
+
+;;;;;
+
+![Modules ramifier](oritech:textures/book/addon_branching.png,fit)

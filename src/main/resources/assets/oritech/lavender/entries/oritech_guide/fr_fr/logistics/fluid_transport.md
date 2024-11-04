@@ -1,0 +1,26 @@
+```json
+{
+  "title": "Transport de Liquides",
+  "icon": "oritech:fluid_pipe",
+  "category": "oritech:logistics",
+  "associated_items": [
+    "oritech:fluid_pipe",
+    "oritech:small_tank_block"
+  ]
+}
+```
+
+Les tuyaux de liquide fonctionnent de manière similaire aux conduits d'objet. Cependant, ils possèdent également un petit réservoir interne. Comme les conduits d'objet, lorsqu'ils sont réglés pour extraire, ils prélèvent des liquides de tous les blocs adjacents. Cependant, contrairement aux conduits d'objet, les blocs peuvent également pousser des liquides dans un tuyau,
+
+;;;;;
+
+qui le déplace ensuite vers le réservoir de liquide disponible.
+
+
+Pour stocker des liquides, vous pouvez utiliser un réservoir de liquide. Les petits réservoirs de liquide peuvent contenir jusqu'à *256* seaux de liquide. Lorsqu'il est cassé, le petit réservoir conserve tout son contenu dans les données NBT de l'objet. Une sortie de comparateur reflétera l'état de remplissage du réservoir. 
+
+;;;;;
+
+Les réservoirs empilés laisseront automatiquement le liquide s'écouler vers le bas.
+
+<block;oritech:small_tank_block>

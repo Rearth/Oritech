@@ -1,0 +1,29 @@
+```json
+{
+  "title": "Forge à Fragmentation",
+  "icon": "oritech:fragment_forge_block",
+  "category": "oritech:processing",
+  "associated_items": [
+    "oritech:fragment_forge_block"
+  ]
+}
+```
+
+![Forge à Fragmentation](oritech:textures/book/fragment_forge.png,fit)
+
+;;;;;
+
+La forge à fragmentation est votre première étape pour transformer des minerais en lingots.
+
+
+La fragmentation des blocs de minerai crée des minerais bruts, et la fragmentation des minerais bruts crée des poussières de minerai.
+
+
+Lors de la fragmentation de blocs de minerai et de minerais bruts, la forge à fragmentation produira plus que ce qui est introduit. Parfois, elle fournira même 
+
+;;;;;
+
+des minerais supplémentaires d'un type différent.
+
+
+La plupart des [modules](^oritech:processing/addons) influencent le fonctionnement de la forge à fragmentation. Le module de rendement de machine permettra à la forge à fragmentation de produire des sous-produits supplémentaires.

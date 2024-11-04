@@ -1,0 +1,25 @@
+```json
+{
+  "title": "Pompe",
+  "icon": "oritech:pump_block",
+  "category": "oritech:interaction",
+  "associated_items": [
+    "oritech:pump_block"
+  ],
+  "ordinal": 4
+}
+```
+
+<block;oritech:pump_block>
+
+La pompe est utilisée pour pomper des liquides depuis en **dessous**. Lorsqu'elle est placée, elle étendra un tube vers le bas jusqu'à trouver un liquide ou une obstruction. Une fois un liquide trouvé,
+
+;;;;;
+
+elle analysera la masse de liquide et enregistrera toutes les positions à partir desquelles pomper.
+
+
+La pompe peut drainer une taille de 100000 ou moins. L'initialisation peut prendre quelques secondes pour de grandes cibles.
+
+
+Les fluides drainés sont stockés dans le réservoir interne. Jusqu'à 4 seaux par seconde peuvent être pompés, avec un coût énergétique de {gold}512 RF{} par bloc.

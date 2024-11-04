@@ -1,0 +1,26 @@
+```json
+{
+  "title": "Fragmentation des Minerais",
+  "icon": "oritech:platinum_clump",
+  "category": "oritech:getting_started",
+  "ordinal": 5
+}
+```
+
+Une [forge à fragmentation](^oritech:processing/fragment_forge) peut améliorer le rendement des minerais. Lorsque vous traitez des minerais dans une forge à fragmentation, ils sont divisés en morceau et en petits morceau.
+
+9 petits morceau peuvent être combinés pour former un morceau, et les morceau peuvent être traités dans une [centrifugeuse](^oritech:processing/centrifuge) pour les transformer en poussières et 
+
+;;;;;
+
+petites poussières, qui peuvent être fondues dans un fourneau.
+
+
+Vous pouvez mettre des minerais bruts dans une forge à fragmentation, mais pour certains minerais, vous obtiendrez de meilleurs résultats si vous les minez avec une pioche enchantée "Toucher de soie" et mettez les blocs de minerai dans la forge.
+
+
+La forge à fragmentation et la centrifugeuse peuvent 
+
+;;;;;
+
+également produire des minerais secondaires. Par exemple, le traitement du [nickel](^oritech:resources/nickel) vous donnera du nickel et peut également vous donner un peu de [platine](^oritech:resources/platinum).
