@@ -1,0 +1,25 @@
+---
+title: Énergie
+icon: oritech:energy_pipe
+---
+
+Oritech utilise le **RF** pour alimenter toutes ses machines. Il utilise l'API Reborn Energy pour ce faire. Cela signifie qu'Oritech est compatible avec tous les mods utilisant le système d'énergie de Tech Reborn, qui inclut actuellement presque tous les mods utilisant l'énergie sur Fabric.
+
+Il n'existe qu'un seul niveau de câble, capable de transférer jusqu'à 10k RF/t.
+
+Les générateurs émettent l'énergie, et toutes les autres machines acceptent l'énergie de tous les côtés (et ne la renvoient pas). Les câbles eux-mêmes stockent jusqu'à {gold}10k RF{} dans chaque connexion de machine si l'énergie ne peut pas être transmise.
+
+Vous pouvez utiliser des blocs de stockage d'énergie. Ils sont disponibles en 2 tailles et peuvent être étendus avec des modules. C'est blocs acceptent l'énergie avec un port 🟢 vert, et peuvent la sortir que par le seul port 🔴 rouge.
+
+Un signal de redstone désactivera toute sortie d'énergie.
+
+<center>
+<ModAsset location="oritech:small_storage_block" width={256} />
+</center>
+
+L'énergie peut également être transférée sans fil en utilisant un [laser enderique](../interaction/enderic_laser).
+
+<center>
+<ModAsset location="oritech:area/enderic_laser_energy" width={512} />
+</center>
+

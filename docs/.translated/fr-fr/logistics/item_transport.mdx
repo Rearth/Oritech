@@ -1,0 +1,34 @@
+---
+title: Transport d'Objets
+icon: oritech:item_filter_block
+---
+
+Oritech inclut des conduits de transport d'objets et des blocs de filtre d'objet pour répondre à vos besoins logistiques. Les conduits d'objet se connectent entre eux et à tous les inventaires adjacents.
+
+
+Contrairement aux autres conduits, les conduits d'objet n'ont pas d'inventaire. Cela signifie que les autres blocs (comme un entonnoir) ne peuvent pas insérer des objets dans le réseau de conduits par eux-mêmes.
+
+
+Au lieu de cela, un conduit d'objet peut être configuré pour extraire d'un inventaire proche. Pour ce faire, faites simplement un clic droit sur un bloc de conduit (qui est connecté à quelque chose). Si vous avez plusieurs inventaires connectés au même bloc de conduit, vous remarquerez que toutes les connexions passent en mode extraction. 
+
+C'est une limitation actuelle des conduits d'Oritech. Si vous configurez un bloc de conduit pour extraire, il essayera d'extraire de tous les blocs qui sont connectés à ce bloc de conduit. Donc, pour réellement transporter quoi que ce soit, votre réseau de conduits doit consister en au moins 2 blocs.
+
+Les objets extraits seront placés dans l'inventaire disponible le **plus proche** dans le réseau.
+
+La portée maximale de transfert est de 64 blocs. Tout réseau plus long que cela doit être divisé.
+
+Les conduits extraient toujours à partir du premier emplacement non vide d'un inventaire. Si l'objet ne peut pas être placé dans un inventaire du réseau de conduits, cela bloquera le conduit pour extraire de cet inventaire.
+
+---
+
+**Filtre d'objet**
+
+<center>
+<ModAsset location="oritech:item_filter_block" width={256} />
+</center>
+
+Pour filtrer quels objets vont où, vous pouvez utiliser des filtres d'objets. Ce sont des blocs que vous pouvez placer à côté de l'inventaire cible. Il a 5 côtés d'entrée, et sort toujours vers le côté qu'il regarde.
+
+Il n'accepte que les objets qui correspondent au filtre défini via l'interface, et les envoie automatiquement vers l'inventaire cible.
+
+Cependant, il n'extrait pas automatiquement des objets des inventaires voisins.

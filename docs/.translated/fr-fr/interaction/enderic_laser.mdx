@@ -1,0 +1,87 @@
+---
+title: Laser Enderique
+icon: oritech:laser_arm_block
+---
+
+<center>
+<ModAsset location="oritech:area/enderic_laser" width={512} />
+</center>
+
+Le laser enderique utilise de grandes quantités d'énergie pour projeter un faisceau laser dans une direction spécifique.
+
+Dans la plupart des cas, cela entraîne la destruction du bloc ciblé. Les blocs détruits sont ensuite placés dans l'inventaire. Tous les blocs qui ne rentrent pas dans l'inventaire seront perdus, il peut donc être judicieux d'utiliser un [conduit d'objet](../logistics/item_transport) pour récupérer les objets.
+
+---
+
+**Controle**
+
+Pour définir la direction cible du laser, sélectionnez une cible avec l'objet [Sélecteur de cible](../tools/target_designator). 
+
+
+Ensuite, faites un clic droit tout en maintenant la touche "Shift" sur le bloc **inférieur** du laser pour assigner la cible. 
+
+
+Le laser continuera de tirer dans cette direction tant qu'il est activé.
+
+*Notez que vous ne définissez que la direction de la cible. Cela signifie que le laser détruira également les blocs avant et derrière la cible.*
+
+
+Un signal de redstone désactive le laser.
+
+
+La portée maximale est de 64 blocs.
+
+---
+
+**Récolte de Fluxite**
+
+Les énormes quantités d'énergie du laser enderique font que les grappes d'améthyste mûres se transforment en fluxite lorsqu'elles sont détruites.
+
+<center>
+<ModAsset location="oritech:area/laser_fluxite" width={512} />
+</center>
+
+Elles accélèrent également la croissance de l'améthyste lorsqu'elles sont dirigées vers la druse d'améthyste.
+
+---
+
+**Transfert d'Énergie**
+
+
+Lorsque le laser enderique cible un bloc capable de stocker de l'énergie, il remplira le stockage d'énergie de la machine. Le laser ignore toutes les limites d'entrée et de sortie, et peut remplir le stockage d'énergie de machines qui peuvent ne pas accepter l'énergie directement des câbles.
+
+---
+
+**Module de chasseur de machine**
+
+
+Lorsque le laser enderique est équipé d'un module de chasseur de machine, il ciblera les créatures au lieu des blocs. Les améliorations de module fonctionnent toujours lors de la chasse aux créatures : le module de rendement fera que les créatures lâchent plus de butin, 
+
+
+les modules chasseurs supplémentaires étendront la portée de balayage des cibles, les modules de vitesse augmenteront les dégâts infligés (et réduiront l'efficacité énergétique), et le filtre de culture évitera de tuer les bébés animaux.
+
+
+Si vous portez une [plastron exo](../tools/exo_armor), le laser enderique le chargera pour vous.
+
+---
+
+**Ciblage du Chasseur**
+
+
+Utilisez un [sélecteur de cible](../tools/target_designator) sur le laser enderique pour changer les modes de ciblage. Par défaut, il n'attaque que les monstres, mais vous pouvez aussi le faire attaquer des animaux ou même des marchands ambulants. Faites attention à l'endroit où vous l'utilisez et à la façon dont vous réglez le ciblage, car vous pourriez finir par tuer des choses que vous ne voulez pas tuer.
+
+---
+
+**More details**
+
+
+Le faisceau laser ciblera n'importe quel bloc, mais il traverse le verre (et les améthystes non mûres). Les modules de carrière augmenteront la largeur de la zone excavée.
+
+
+Le laser lui-même n'a qu'un seul emplacement de module disponible en dessous. Les modules n'affecteront que la vitesse et l'efficacité du cassage des blocs; 
+
+
+le transfert d'énergie ne peut bénéficier que des améliorations de vitesse.
+
+
+Un bloc cible arrêtera le laser sans être détruit, l'empêchant d'aller plus loin.
