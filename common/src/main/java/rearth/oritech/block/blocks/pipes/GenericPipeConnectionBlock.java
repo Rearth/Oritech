@@ -12,7 +12,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
-import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
@@ -22,32 +21,7 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     public GenericPipeConnectionBlock(Settings settings) {
         super(settings);
     }
-    
-    public static BlockState addInterfaceState(BlockState state, World world, BlockPos pos) {
-        
-        var baseState = GenericPipeBlock.addConnectionState(state, world, pos);
-        var lookup = ((GenericPipeBlock) state.getBlock()).apiValidationFunction();
-        
-        var northConnected = checkConnection(pos.north(), world, Direction.SOUTH, lookup) ? 2 : baseState.get(NORTH);
-        var eastConnected = checkConnection(pos.east(), world, Direction.WEST, lookup) ? 2 : baseState.get(EAST);
-        var southConnected = checkConnection(pos.south(), world, Direction.NORTH, lookup) ? 2 : baseState.get(SOUTH);
-        var westConnected = checkConnection(pos.west(), world, Direction.EAST, lookup) ? 2 : baseState.get(WEST);
-        var upConnected = checkConnection(pos.up(), world, Direction.DOWN, lookup) ? 2 : baseState.get(UP);
-        var downConnected = checkConnection(pos.down(), world, Direction.UP, lookup) ? 2 : baseState.get(DOWN);
-        
-        return baseState
-                 .with(NORTH, northConnected)
-                 .with(EAST, eastConnected)
-                 .with(SOUTH, southConnected)
-                 .with(WEST, westConnected)
-                 .with(UP, upConnected)
-                 .with(DOWN, downConnected);
-    }
-    
-    private static boolean checkConnection(BlockPos pos, World world, Direction direction, TriFunction<World, BlockPos, Direction, Boolean> lookup) {
-        return lookup.apply(world, pos, direction) && !(world.getBlockState(pos).getBlock() instanceof GenericPipeBlock);
-    }
-    
+
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
         if (oldState.getBlock().equals(state.getBlock())) return;
@@ -67,16 +41,16 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         var baseState = super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
-        var interfaceState = addInterfaceState(baseState, (World) world, pos);
-        
-        if (interfaceState.get(NORTH) != 2
-              && interfaceState.get(SOUTH) != 2
-              && interfaceState.get(WEST) != 2
-              && interfaceState.get(EAST) != 2
-              && interfaceState.get(UP) != 2
-              && interfaceState.get(DOWN) != 2) {
-            var normalPipeState = getNormalBlock();
-            normalPipeState = GenericPipeBlock.addConnectionState(normalPipeState, (World) world, pos);
+        var interfaceState = PipeConnectionHelper.addInterfaceStates(baseState, (World) world, pos);
+
+        if (interfaceState.get(NORTH) != GenericPipeBlock.MACHINE_CONNECTION
+                && interfaceState.get(SOUTH) != GenericPipeBlock.MACHINE_CONNECTION
+                && interfaceState.get(WEST) != GenericPipeBlock.MACHINE_CONNECTION
+                && interfaceState.get(EAST) != GenericPipeBlock.MACHINE_CONNECTION
+                && interfaceState.get(UP) != GenericPipeBlock.MACHINE_CONNECTION
+                && interfaceState.get(DOWN) != GenericPipeBlock.MACHINE_CONNECTION) {
+            var normalPipeState = PipeConnectionHelper.addDisabledConnectionStates(getNormalBlock(), interfaceState);
+            normalPipeState = PipeConnectionHelper.addConnectionStates(normalPipeState, (World) world, pos);
             return normalPipeState;
         }
         
@@ -87,7 +61,25 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
         
         return interfaceState;
     }
-    
+
+    @Override
+    protected BlockState updatePipeState(BlockState state, World world, BlockPos pos) {
+        var baseState = PipeConnectionHelper.addInterfaceStates(state, world, pos);
+
+        if (baseState.get(NORTH) != GenericPipeBlock.MACHINE_CONNECTION
+                && baseState.get(SOUTH) != GenericPipeBlock.MACHINE_CONNECTION
+                && baseState.get(WEST) != GenericPipeBlock.MACHINE_CONNECTION
+                && baseState.get(EAST) != GenericPipeBlock.MACHINE_CONNECTION
+                && baseState.get(UP) != GenericPipeBlock.MACHINE_CONNECTION
+                && baseState.get(DOWN) != GenericPipeBlock.MACHINE_CONNECTION) {
+            var normalPipeState = PipeConnectionHelper.addDisabledConnectionStates(getNormalBlock(), baseState);
+            normalPipeState = PipeConnectionHelper.addConnectionStates(normalPipeState, world, pos);
+            return normalPipeState;
+        }
+
+        return baseState;
+    }
+
     @SuppressWarnings("rawtypes")
     @Nullable
     @Override
