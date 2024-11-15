@@ -114,49 +114,72 @@ public abstract class GenericPipeBlock extends Block {
     
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-
         if (oldState.getBlock().equals(state.getBlock())) return;
-        updatePipeState(state, world, pos);
-    }
-
-    protected BlockState updatePipeState(BlockState state, World world, BlockPos pos) {
         var stateBase = PipeConnectionHelper.addConnectionStates(state, world, pos);
 
         // transform to interface block on placement when machine is neighbor
         if (!state.isOf(getConnectionBlock().getBlock()) && PipeConnectionHelper.hasNeighboringMachine(state, world, pos)) {
-            return PipeConnectionHelper.addInterfaceStates(PipeConnectionHelper.addDisabledConnectionStates(getConnectionBlock(), stateBase), world, pos);
+            var interfaceState = PipeConnectionHelper.addInterfaceStates(PipeConnectionHelper.addDisabledConnectionStates(getConnectionBlock(), stateBase), world, pos);
+            world.setBlockState(pos, interfaceState);
         } else {
             GenericPipeInterfaceEntity.addNode(world, pos, false, state, getNetworkData(world));
         }
-
-        return stateBase;
     }
 
     @Override
     protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (stack.isOf(Items.DIAMOND_HOE)) {
-            var newState = state;
-
-            var side = hit.getSide();
-            if (side == Direction.NORTH)
-                newState = newState.with(NORTH, newState.get(NORTH) == CONNECTION_DISABLED ? NO_CONNECTION : CONNECTION_DISABLED);
-            else if (side == Direction.EAST)
-                newState = newState.with(EAST, newState.get(EAST) == CONNECTION_DISABLED ? NO_CONNECTION : CONNECTION_DISABLED);
-            else if (side == Direction.SOUTH)
-                newState = newState.with(SOUTH, newState.get(SOUTH) == CONNECTION_DISABLED ? NO_CONNECTION : CONNECTION_DISABLED);
-            else if (side == Direction.WEST)
-                newState = newState.with(WEST, newState.get(WEST) == CONNECTION_DISABLED ? NO_CONNECTION : CONNECTION_DISABLED);
-            else if (side == Direction.UP)
-                newState = newState.with(UP, newState.get(UP) == CONNECTION_DISABLED ? NO_CONNECTION : CONNECTION_DISABLED);
-            else
-                newState = newState.with(DOWN, newState.get(DOWN) == CONNECTION_DISABLED ? NO_CONNECTION : CONNECTION_DISABLED);
-
-            state = updatePipeState(newState, world, pos);
-            world.setBlockState(pos, state);
+        if (stack.isOf(Items.DIAMOND_HOE)) { // TODO: replace with wrench item
+            toggleSideConnection(state, hit.getSide(), world, pos);
             return ItemActionResult.SUCCESS;
         }
 
         return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+    }
+
+    /**
+     * Toggles the connection state of a pipe side between disabled and enabled.
+     *
+     * @param state The current pipe block-state
+     * @param side  The side to toggle the connection state
+     * @param world The target world
+     * @param pos   The target pipe position
+     */
+    protected void toggleSideConnection(BlockState state, Direction side, World world, BlockPos pos) {
+        var property = PipeConnectionHelper.directionToProperty(side);
+        var newState = state.with(property, state.get(property) == CONNECTION_DISABLED ? NO_CONNECTION : CONNECTION_DISABLED);
+        newState = PipeConnectionHelper.addConnectionStates(newState, world, pos);
+
+        // transform to interface block if side is being enabled and machine is connected
+        if (!newState.isOf(getConnectionBlock().getBlock()) && newState.get(property) != CONNECTION_DISABLED && PipeConnectionHelper.hasMachineInDirection(side, world, pos, apiValidationFunction())) {
+            var interfaceState = PipeConnectionHelper.addInterfaceStates(PipeConnectionHelper.addDisabledConnectionStates(getConnectionBlock(), newState), world, pos);
+            world.setBlockState(pos, interfaceState);
+        } else {
+            world.setBlockState(pos, newState);
+            GenericPipeInterfaceEntity.addNode(world, pos, false, newState, getNetworkData(world));
+
+            // update neighbor if it's a pipe
+            updateNeighborState(world, pos.offset(side));
+        }
+    }
+
+    /**
+     * Updates the neighbor state of a pipe block.
+     * Used to update the neighboring pipe block when a connection is toggled.
+     *
+     * @param world The target world
+     * @param pos   The target pipe position
+     */
+    protected void updateNeighborState(World world, BlockPos pos) {
+        var state = world.getBlockState(pos);
+        if (state.isOf(getConnectionBlock().getBlock())) {
+            var neighborStateBase = PipeConnectionHelper.addInterfaceStates(state, world, pos);
+            world.setBlockState(pos, neighborStateBase);
+            GenericPipeInterfaceEntity.addNode(world, pos, true, neighborStateBase, getNetworkData(world));
+        } else if (state.isOf(getNormalBlock().getBlock())) {
+            var neighborStateBase = PipeConnectionHelper.addConnectionStates(state, world, pos);
+            world.setBlockState(pos, neighborStateBase);
+            GenericPipeInterfaceEntity.addNode(world, pos, false, neighborStateBase, getNetworkData(world));
+        }
     }
     
     @Override
@@ -202,7 +225,6 @@ public abstract class GenericPipeBlock extends Block {
             var stateBase = PipeConnectionHelper.addDisabledConnectionStates(getConnectionBlock(), state);
             return PipeConnectionHelper.addInterfaceStates(stateBase, world, pos);
         }
-
         return PipeConnectionHelper.addConnectionStates(state, world, pos);
     }
 
@@ -323,6 +345,14 @@ public abstract class GenericPipeBlock extends Block {
             return true;
         }
 
+        /**
+         * Check if a connection between a pipe and a machine is valid.
+         * @param pos The target pipe position
+         * @param world The target world
+         * @param direction The direction to check (IMPORTANT: This is the direction from the target to the current pipe)
+         * @param lookup The lookup function {@link GenericPipeBlock#apiValidationFunction()}
+         * @return Boolean whether the connection is valid
+         */
         public static boolean isValidInterfaceConnection(BlockPos pos, World world, Direction direction, TriFunction<World, BlockPos, Direction, Boolean> lookup) {
             return lookup.apply(world, pos, direction) && !(world.getBlockState(pos).getBlock() instanceof GenericPipeBlock);
         }

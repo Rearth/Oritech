@@ -31,22 +31,22 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
     }
 
     public static void addNode(World world, BlockPos pos, boolean isInterface, BlockState newState, PipeNetworkData data) {
-        Oritech.LOGGER.info("registering/updating node: " + pos);
+        Oritech.LOGGER.debug("registering/updating node: " + pos);
         
         data.pipes.add(pos);
         if (isInterface) {
             var connectedMachines = new HashSet<BlockPos>(6);
-            if (newState.get(NORTH) == 2)
+            if (newState.get(NORTH) == MACHINE_CONNECTION)
                 connectedMachines.add(pos.north());
-            if (newState.get(SOUTH) == 2)
+            if (newState.get(SOUTH) == MACHINE_CONNECTION)
                 connectedMachines.add(pos.south());
-            if (newState.get(EAST) == 2)
+            if (newState.get(EAST) == MACHINE_CONNECTION)
                 connectedMachines.add(pos.east());
-            if (newState.get(WEST) == 2)
+            if (newState.get(WEST) == MACHINE_CONNECTION)
                 connectedMachines.add(pos.west());
-            if (newState.get(UP) == 2)
+            if (newState.get(UP) == MACHINE_CONNECTION)
                 connectedMachines.add(pos.up());
-            if (newState.get(DOWN) == 2)
+            if (newState.get(DOWN) == MACHINE_CONNECTION)
                 connectedMachines.add(pos.down());
             
             data.machineInterfaces.put(pos, connectedMachines);
@@ -58,7 +58,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
     }
 
     public static void removeNode(World world, BlockPos pos, boolean wasInterface, BlockState oldState, PipeNetworkData data) {
-        Oritech.LOGGER.info("removing node: " + pos);
+        Oritech.LOGGER.debug("removing node: " + pos);
         
         var oldNetwork = data.pipeNetworkLinks.getOrDefault(pos, -1);
         
@@ -67,21 +67,21 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         
         data.pipeNetworks.remove(oldNetwork);
         data.pipeNetworkInterfaces.remove(oldNetwork);
+        data.pipeNetworkLinks.remove(pos);
         
         // re-calculate old network, is either shorter or split into multiple ones (starting from ones this block was connected to)
         if (oldNetwork != -1) {
-            if (oldState.get(NORTH) != 0)
+            if (oldState.get(NORTH) > CONNECTION_DISABLED)
                 updateFromNode(world, pos.north(), data);
-            if (oldState.get(SOUTH) != 0)
+            if (oldState.get(SOUTH) > CONNECTION_DISABLED)
                 updateFromNode(world, pos.south(), data);
-            if (oldState.get(EAST) != 0)
+            if (oldState.get(EAST) > CONNECTION_DISABLED)
                 updateFromNode(world, pos.east(), data);
-            if (oldState.get(WEST) != 0) {
+            if (oldState.get(WEST) > CONNECTION_DISABLED)
                 updateFromNode(world, pos.west(), data);
-            }
-            if (oldState.get(UP) != 0)
+            if (oldState.get(UP) > CONNECTION_DISABLED)
                 updateFromNode(world, pos.up(), data);
-            if (oldState.get(DOWN) != 0)
+            if (oldState.get(DOWN) > CONNECTION_DISABLED)
                 updateFromNode(world, pos.down(), data);
         }
         
@@ -94,8 +94,8 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         var foundNetwork = new HashSet<>(searchInstance.complete());
         var foundMachines = findConnectedMachines(foundNetwork, data);
 
-        Oritech.LOGGER.info("Nodes:    " + foundNetwork.size() + " | " + foundNetwork);
-        Oritech.LOGGER.info("Machines: " + foundMachines.size() + " | " + foundMachines.stream().map(elem -> elem.getLeft() + ":" + elem.getRight()).toList());
+        Oritech.LOGGER.debug("Nodes:    " + foundNetwork.size() + " | " + foundNetwork);
+        Oritech.LOGGER.debug("Machines: " + foundMachines.size() + " | " + foundMachines.stream().map(elem -> elem.getLeft() + ":" + elem.getRight()).toList());
         
         var netID = foundNetwork.hashCode();
         data.pipeNetworks.put(netID, foundNetwork);
@@ -207,6 +207,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                     continue;
                 }
 
+                // check if the target can connect to the neighbor
                 if (PipeConnectionHelper.canConnectInDirection(targetState, direction) && PipeConnectionHelper.isValidConnection((GenericPipeBlock) targetState.getBlock(), world, neighbor, direction.getOpposite())) {
                     nextTargets.add(neighbor);
                 }
