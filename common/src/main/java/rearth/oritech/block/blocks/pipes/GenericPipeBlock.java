@@ -126,7 +126,7 @@ public abstract class GenericPipeBlock extends Block {
         if (!state.isOf(getConnectionBlock().getBlock()) && PipeConnectionHelper.hasNeighboringMachine(state, world, pos)) {
             return PipeConnectionHelper.addInterfaceStates(PipeConnectionHelper.addDisabledConnectionStates(getConnectionBlock(), stateBase), world, pos);
         } else {
-            GenericPipeInterfaceEntity.addNode(pos, false, state, getNetworkData(world));
+            GenericPipeInterfaceEntity.addNode(world, pos, false, state, getNetworkData(world));
         }
 
         return stateBase;
@@ -171,7 +171,7 @@ public abstract class GenericPipeBlock extends Block {
     }
     
     protected void onBlockRemoved(BlockPos pos, BlockState oldState, World world) {
-        GenericPipeInterfaceEntity.removeNode(pos, false, oldState, getNetworkData(world));
+        GenericPipeInterfaceEntity.removeNode(world, pos, false, oldState, getNetworkData(world));
     }
     
     protected VoxelShape[] createShapes() {

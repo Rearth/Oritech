@@ -25,7 +25,7 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
         if (oldState.getBlock().equals(state.getBlock())) return;
-        GenericPipeInterfaceEntity.addNode(pos, true, state, getNetworkData(world));
+        GenericPipeInterfaceEntity.addNode(world, pos, true, state, getNetworkData(world));
         
         var regKey = world.getRegistryKey().getValue();
         var dataId = getPipeTypeName() + "_" + regKey.getNamespace() + "_" + regKey.getPath();
@@ -35,13 +35,14 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     
     @Override
     protected void onBlockRemoved(BlockPos pos, BlockState oldState, World world) {
-        GenericPipeInterfaceEntity.removeNode(pos, true, oldState, getNetworkData(world));
+        GenericPipeInterfaceEntity.removeNode(world, pos, true, oldState, getNetworkData(world));
     }
     
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        var worldImp = (World) world;
         var baseState = super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
-        var interfaceState = PipeConnectionHelper.addInterfaceStates(baseState, (World) world, pos);
+        var interfaceState = PipeConnectionHelper.addInterfaceStates(baseState, worldImp, pos);
 
         if (interfaceState.get(NORTH) != GenericPipeBlock.MACHINE_CONNECTION
                 && interfaceState.get(SOUTH) != GenericPipeBlock.MACHINE_CONNECTION
@@ -50,13 +51,13 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
                 && interfaceState.get(UP) != GenericPipeBlock.MACHINE_CONNECTION
                 && interfaceState.get(DOWN) != GenericPipeBlock.MACHINE_CONNECTION) {
             var normalPipeState = PipeConnectionHelper.addDisabledConnectionStates(getNormalBlock(), interfaceState);
-            normalPipeState = PipeConnectionHelper.addConnectionStates(normalPipeState, (World) world, pos);
+            normalPipeState = PipeConnectionHelper.addConnectionStates(normalPipeState, worldImp, pos);
             return normalPipeState;
         }
         
         if (!interfaceState.equals(state)) {
             // reload connection when state has changed (e.g. machine added/removed)
-            GenericPipeInterfaceEntity.addNode(pos, true, interfaceState, getNetworkData((World) world));
+            GenericPipeInterfaceEntity.addNode(worldImp, pos, true, interfaceState, getNetworkData(worldImp));
         }
         
         return interfaceState;
