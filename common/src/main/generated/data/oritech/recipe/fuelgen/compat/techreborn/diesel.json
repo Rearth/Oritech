@@ -1,0 +1,18 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "techreborn"
+      ]
+    }
+  ],
+  "type": "oritech:fuel_generator",
+  "fluidInputAmount": 8100,
+  "fluidInputVariant": "techreborn:diesel",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [],
+  "results": [],
+  "time": 2560
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "oritech:nickel_block"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "oritech:nickel_ingot"
+  }
+}

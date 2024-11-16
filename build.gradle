@@ -2,6 +2,18 @@ plugins {
     id 'dev.architectury.loom' version '1.7-SNAPSHOT' apply false
     id 'architectury-plugin' version '3.4-SNAPSHOT'
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+    id 'org.sinytra.wiki.toolkit' version '0.1.16'
+}
+
+wiki {
+    docs {
+        oritech {
+            // The path to the folder containing the documentation metadata file (sinytra-wiki.json)
+            root = file('docs')
+            exportedAssetNamespaces = ['oritech']
+            wikiAccessToken = System.getenv('WIKI_TOKEN')
+        }
+    }
 }
 
 architectury {
@@ -52,6 +64,11 @@ subprojects {
         maven { // jade
             name = 'CurseMaven'
             url "https://beta.cursemaven.com"
+        }
+
+        maven {
+            name = "Sinytra"
+            url "https://maven.su5ed.dev/releases"
         }
     }
 

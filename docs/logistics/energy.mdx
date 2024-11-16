@@ -1,0 +1,25 @@
+---
+title: Energy
+icon: oritech:energy_pipe
+---
+
+Oritech uses **RF** to power all of its machines, utilizing the Reborn Energy API on fabric or FE on neoforge.
+This ensures compatibility with all energy-using mods on fabric and neoforge.
+
+There is only one cable tier available, capable of transferring up to **10k RF/t**. If that's not enough, there's also superconductors, capable of transferring **4M RF/t**
+
+Generators will always output energy, and all other machines accept energy from all sides without outputting it again.
+The cables themselves store up to **10k RF** at each machine connection if they can't output the energy.
+
+To buffer and store energy, you can use energy storage blocks. They're available in two sizes and can be massively expanded using addons.
+Energy storage blocks accept energy from all sides through a 🟢 *green port* and can only output through the single 🔴 *red port*. A redstone signal will disable all energy output.
+
+<center>
+<ModAsset location="oritech:small_storage_block" width={256} />
+</center>
+
+Energy can also be transferred wireless using an enderic laser. See [enderic laser](../interaction/enderic_laser).
+
+<center>
+<ModAsset location="oritech:area/enderic_laser_energy" width={512} />
+</center>

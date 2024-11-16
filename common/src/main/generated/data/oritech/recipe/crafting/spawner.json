@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "c": {
-      "item": "oritech:spawner_cage_block"
+      "item": "minecraft:respawn_anchor"
     },
     "p": {
       "item": "oritech:spawner_cage_block"

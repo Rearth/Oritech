@@ -27,6 +27,8 @@ public class OritechREIPlugin implements REIClientPlugin {
     @Override
     public void registerCategories(CategoryRegistry registry) {
         
+        System.out.println("REI setup");
+        
         // recipe types
         registerOritechCategory(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, PulverizerBlockEntity.class, icon));
         registerOritechCategory(registry, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, FragmentForgeBlockEntity.class, icon));

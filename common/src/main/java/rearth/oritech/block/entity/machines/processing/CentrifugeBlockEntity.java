@@ -302,8 +302,8 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
     
     @Override
-    protected float getAnimationSpeed() {
-        return super.getAnimationSpeed() * 3;
+    public int getAnimationDuration() {
+        return 20 * 9;
     }
     
     // this will allow full access on top and bottom to specific tank kinds (allowing both insertion and extraction)

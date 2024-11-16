@@ -1,0 +1,16 @@
+---
+title: Bedrock Extractor
+icon: oritech:deep_drill_block
+---
+
+<center>
+<ModAsset location="oritech:area/bedrock_extraction" width={800} />
+</center>
+
+The bedrock extractor can mine ores from below bedrock at locations where [ore resource nodes](../resources/resource_node) are found.
+This [multiblock](../processing/multiblocks) machine can only operate when placed on resource nodes and must be powered using [enderic lasers](../interaction/enderic_laser).
+
+When right-clicked, it will show the targeted resource nodes below. It will target the first visible ore node below (in a 3x3 area). It will go up to 3 blocks down.
+
+When in operation, the bedrock extractor mines ores directly below it, covering the entire 3x3 area. Each operation randomly selects one of the blocks below. Not all blocks need to be ore nodes.
+Try to find a spot with the most ores right below the extractor for the highest yield.

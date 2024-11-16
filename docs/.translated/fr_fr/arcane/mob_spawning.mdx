@@ -1,0 +1,13 @@
+---
+title: Génération d'entités
+icon: oritech:spawner_controller_block
+---
+
+<ModAsset location="oritech:spawner_controller_block" />
+
+Les entités peuvent être générés en combinant un Contrôleur de génération avec une Cage de génération en dessous. Selon la taille de l'entité générée, une taille de cage différente sera nécessaire.
+
+Le type d'entités généré est déterminé par la première entité à passer sur le contrôleur, et ne peut être changé qu'en remplaçant le contrôleur. 
+Le contrôleur collectera des âmes et les utilisera pour générer le mob défini. Le coût en âmes dépend des PV du mob généré. Il ne générera des mobs que si une surface vide est disponible à proximité.
+
+Lorsque le type d'entité est défini (ou lorsqu'on clique droit s'il est invalide), le spawner mettra en évidence la taille de la cage de génération requise en dessous. Vous pouvez également cliquer droit sur le contrôleur pour obtenir des informations sur l'état opérationnel actuel.

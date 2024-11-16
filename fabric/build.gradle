@@ -9,17 +9,6 @@ architectury {
 
 loom {
     accessWidenerPath.set(project(":common").loom.accessWidenerPath)
-
-    runs {
-        datagen {
-            inherit server
-            "Data Generation"
-            vmArg "-Dfabric-api.datagen"
-            vmArg "-Dfabric-api.datagen.output-dir=${project(":common").file("src/main/generated")}"
-            vmArg "-Dfabric-api.datagen.modid=oritech"
-            runDir "build/datagen"
-        }
-    }
 }
 
 configurations {
@@ -46,7 +35,8 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
 
     // Architectury API. This is optional, and you can comment it out if you don't need it.
-    modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
+    // modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
+    modImplementation "dev.architectury:architectury-fabric:13.0.6" // because gradle is stupid and my local setup is broken somewhere but deleting the cache doesnt seem to fix it
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
@@ -56,18 +46,24 @@ dependencies {
         transitive = false
     }
 
+    // yes yes all this needs to be cleaned up, and recipe viewers made conditional, but I'm waiting to clean up the CSL mess first
+
     // owo lib
-    modImplementation "io.wispforest:owo-lib:0.12.15+1.21"
+    modImplementation "io.wispforest:owo-lib:0.12.11+1.21"
 
     // geckolib
     modImplementation "software.bernie.geckolib:geckolib-fabric-1.21.1:4.6.6"
 
     // CSL
     // include modApi("earth.terrarium.common_storage_lib:common-storage-lib-fabric-1.21:0.0.5")
-    modImplementation files('common-storage-lib-fabric-1.21-0.0.8.jar')
-    modImplementation files('common-storage-lib-data-fabric-1.21-0.0.9.jar')
-    modImplementation files('common-storage-lib-resources-fabric-1.21-0.0.8.jar')
-    modImplementation files('common-storage-lib-lookup-fabric-1.21-0.0.8.jar')
+    // yeah this is super weird, I have no idea why I have to list the subprojects, and why the include doesn't work here, or why the 0.0.6 jar doesnt work
+    modApi files('common-storage-lib-fabric-1.21-0.0.8.jar')
+    modApi files('common-storage-lib-data-fabric-1.21-0.0.9.jar')
+    modApi files('common-storage-lib-resources-fabric-1.21-0.0.8.jar')
+    modApi files('common-storage-lib-lookup-fabric-1.21-0.0.8.jar')
+
+    // include(files('common-storage-lib-fabric-1.21-0.0.8.jar'))
+
     // JADE (needed for addon)
     modImplementation "curse.maven:jade-324717:5639994"
 
@@ -77,6 +73,13 @@ dependencies {
     // EMI
     modRuntimeOnly "dev.emi:emi-fabric:1.1.12+1.21"
 
+    // REI
+    // modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:16.0.754"
+
+}
+
+remapJar {
+    nestedJars.from(file('common-storage-lib-fabric-1.21-0.0.6.jar'))
 }
 
 processResources {

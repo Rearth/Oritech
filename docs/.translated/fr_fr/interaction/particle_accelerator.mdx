@@ -1,0 +1,91 @@
+---
+title: Particle Accelerator
+icon: oritech:area/accelerator_ring_area
+---
+
+L'accélérateur de particules permet la creation d'éléments complexe. La particule commence à partir du bloc accélérateur. Un anneau de guidage doit être placé juste devant le contrôleur.
+
+<center>
+<ModAsset location="oritech:area/accelerator_ring_area" width={500} />
+</center>
+
+Une fois insérée, la particule voyagera le long d'une route définie avec les anneau de guidage. Ils peuvent être dirigé à 45 degrés d'un côté ou de l'autre avec clic droit. Selon la vitesse, la distance autorisée entre les blocs guides augmente.
+
+La distance maximale est calculée avec la formule suivante :
+
+> clamp(sqrt(speed), 2, 10)
+
+Cela signifie essentiellement qu'à des vitesses plus élevées, la distance entre les blocs guides peut être plus grande.
+
+---
+
+**Commutateur Redstone**
+
+Lorsqu'un anneau de guidage a 45 degrés est alimenté, il dirigera les particules tout droit, et lorsqu'il est non alimenté, il les guidera dans la direction d'origine. Cependant, une particule peut également entrer par l'autre direction. Ceci est visualisé avec le petit tube en verre rouge. Elle suivra le chemin du tube blanc, et peut entrer à la fois par le tube rouge et le tube blanc.
+
+<center>
+<ModAsset location="oritech:area/accelerator_switch_area" width={500} />
+</center>
+
+À des vitesses plus élevées, la particule ne pourra plus prendre de virages trop serrés. Elle sortira alors des anneaux de guidage et sera projetée dans le monde. Si la distance entre les anneaux de guidage est trop grande, ou si aucun anneau proche n'est trouvé, elle sera également projetée dans le monde. La distance minimale entre les virages est calculée ainsi :
+
+> sqrt(speed) / 3
+
+---
+
+**Interactions**
+
+Lorsque la particule sort des anneaux, elle blesse les entités sur son chemin et détruit les blocs jusqu'à ce que le momentum soit épuisé (basés sur ca vitesse). Lorsque deux particules entrent en collision (provenant de contrôleurs différents).
+
+Lors du passage à travers un Moteur linéaire, la particule accélérera de 1 m/s. Cela nécessite que le moteur soit alimenté. La consommation d'énergie augmente avec la vitesse.
+
+Les Moteur linéaire et les capteurs peuvent être utilisés comme guides droits.
+
+---
+
+**Capteurs de Vitesse**
+
+La vitesse des particules peut être mesurée avec un capteur. Un comparateur peut alors être utilisé pour obtenir un signal redstone basé sur la vitesse des particules. Le tableau suivant montre la vitesse requise pour chaque niveau de redstone :
+
+1. 0
+2. 10
+3. 50
+4. 75
+5. 100
+6. 150
+7. 250
+8. 500
+9. 750
+10. 1000
+11. 2500
+12. 5000
+13. 7500
+14. 10000
+15. 15000
+
+---
+
+**Conception de l'Accélérateur**
+
+
+Les accélérateurs de particules peuvent être construits de différentes manières, en fonction de leurs objectifs. Vous pouvez construire une ligne droite de moteurs pour simplement projeter les particules sur quelque chose. Cependant, si vous voulez atteindre des vitesses plus élevées,
+
+une conception circulaire est généralement beaucoup plus efficace. Lorsqu'on essaie d'atteindre certains éléments, des anneaux très larges peuvent être nécessaires.
+
+Comme les particules lentes nécessitent que les anneaux guides soient proches les uns des autres, il est souvent logique de commencer avec un petit anneau, puis d'utiliser la redstone pour l'emmener dans un anneau plus grand.
+
+Plusieurs boucle d'anneaux peuvent être nécessaires.
+
+---
+
+**Incursions Dimensionnelles**
+
+<Callout variant="warning">
+    Cette section est basée sur des notes de chercheurs expérimentaux et n'est pas officiellement approuvée par *oritech inc*
+</Callout>
+
+Lorsque certains éléments entrent en collision avec trop d'énergie, vous déchirerez un trou dans l'espace-temps, créant une petite incursion dimensionnelle. Comme la quantité d'énergie requise pour réaliser cela est immense, on sait très peu de choses sur ces incursions et ce qui les déclenche. 
+
+Les chercheurs ont noté que la collision de charge de feu avec une énergie de collision supérieure à 5000J semble rapprocher le Nether. Les perles de l'ender avec plus de 10000J faire de même pour la dimension de l'End.
+
+Il y a des rumeurs de scientifiques essayant de bombarder l'une de ces incursions avec des vitesses dépassant les valeurs les plus élevées mesurées. Cependant, aucun n'a vécu pour raconter l'histoire.

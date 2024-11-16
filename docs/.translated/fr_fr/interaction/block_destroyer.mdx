@@ -1,0 +1,25 @@
+---
+title: Destructeur de Blocs
+icon: oritech:destroyer_block
+---
+
+<center>
+<ModAsset location="oritech:area/destroyer_block" width={512} />
+</center>
+
+Le destructeur de blocs est utilisé pour ... détruire des blocs! C'est une structure [multi-bloc](../processing/multiblocks) qui fonctionne avec un [cadre de machine](../interaction/machine_frames) et cible la couche de blocs située directement sous le cadre.
+
+Le temps et l'énergie pour détruire un bloc dépendent de la dureté de celui-ci. Le destructeur tente de détruire tous les blocs en dessous. Pour une utilisation agricole, le module de filtre de culture peut être installé, il fera en sorte que le destructeur ignore les cultures non mûres.
+
+<center>
+<ModAsset location="oritech:crop_filter_addon" width={256} />
+</center>
+
+En ajoutant des modules de carrière, le destructeur de blocs peut également être utilisé comme une carrière. Chaque module de carrière multiplie la portée par 8.
+
+Cela signifie qu'un module donne une portée de 8, deux module donnent une portée de 64, etc.
+
+
+<center>
+<ModAsset location="oritech:quarry_addon" width={256} />
+</center>

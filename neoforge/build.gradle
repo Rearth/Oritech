@@ -33,10 +33,8 @@ repositories {
         name = 'NeoForged'
         url = 'https://maven.neoforged.net/releases'
     }
-
-    maven {
-        name = "Sinytra"
-        url "https://maven.su5ed.dev/releases"
+    flatDir {
+        dir './libs'
     }
 }
 
@@ -68,13 +66,18 @@ dependencies {
 
     // CSL
     // because CSL currently loads in energized power in a wrong version
-    modRuntimeOnly files('common-storage-lib-neoforge-1.21-0.0.8.jar')
+    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-neoforge-1.21:0.0.8')
+    // modRuntimeOnly files('common-storage-lib-neoforge-1.21-0.0.8.jar')
     modRuntimeOnly files('common-storage-lib-data-neoforge-1.21-0.0.8.jar')
     modRuntimeOnly files('common-storage-lib-resources-neoforge-1.21-0.0.8.jar')
     modRuntimeOnly files('common-storage-lib-lookup-neoforge-1.21-0.0.8.jar')
 
     // jade
     modImplementation "curse.maven:jade-324717:5846105"
+
+    // REI
+    modCompileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"
+    // modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"
 
     // EMI
     modRuntimeOnly "dev.emi:emi-neoforge:1.1.12+1.21"

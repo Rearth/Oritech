@@ -20,9 +20,6 @@
     "client": [
       "rearth.oritech.fabric.client.OritechFabricModClient"
     ],
-    "fabric-datagen": [
-      "rearth.oritech.fabric.OritechDataGenerator"
-    ],
     "rei_client": [
       "rearth.oritech.init.compat.rei.OritechREIPlugin"
     ],

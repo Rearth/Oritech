@@ -5,11 +5,11 @@ import io.wispforest.owo.registration.reflect.BlockRegistryContainer.NoBlockItem
 import net.minecraft.block.*;
 import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
 import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.MachineCoreBlock;
@@ -26,7 +26,6 @@ import rearth.oritech.block.blocks.machines.interaction.*;
 import rearth.oritech.block.blocks.machines.processing.*;
 import rearth.oritech.block.blocks.machines.storage.*;
 import rearth.oritech.block.blocks.pipes.*;
-import rearth.oritech.init.datagen.BlockLootGenerator;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.util.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.item.OritechGeoItem;
@@ -36,8 +35,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
 
 public class BlockContent implements ArchitecturyBlockRegistryContainer {
+    
+    public static Set<Block> autoRegisteredDrops = new HashSet<>();
     
     public static final Block SPAWNER_CAGE_BLOCK = new SpawnerCageBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     
@@ -268,6 +271,34 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block TECH_DOOR = new TechDoorBlock(AbstractBlock.Settings.copy(Blocks.IRON_DOOR).strength(8f));
     @NoBlockItem
     public static final Block TECH_DOOR_HINGE = new TechDoorBlockHinge(AbstractBlock.Settings.copy(Blocks.IRON_DOOR).strength(8f));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block STEEL_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block ENERGITE_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block NICKEL_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block BIOSTEEL_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block PLATINUM_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block ADAMANT_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.DIAMOND_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block ELECTRUM_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block DURATIUM_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.NETHERITE_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block BIOMASS_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block PLASTIC_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).sounds(BlockSoundGroup.SHROOMLIGHT));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block FLUXITE_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block SILICON_BLOCK = new SlimeBlock(AbstractBlock.Settings.copy(Blocks.SLIME_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RAW_NICKEL_BLOCK = new SlimeBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RAW_PLATINUM_BLOCK = new SlimeBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
     //endregion
     
     @Override
@@ -289,7 +320,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
         }
         
         if (!field.isAnnotationPresent(NoAutoDrop.class)) {
-            BlockLootGenerator.autoRegisteredDrops.add(value);
+            autoRegisteredDrops.add(value);
         }
 
         if (field.isAnnotationPresent(DispenserPlace.class)) {

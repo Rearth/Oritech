@@ -82,7 +82,7 @@ public class DeepDrillBlock extends Block implements BlockEntityProvider {
                 return ActionResult.SUCCESS;
             }
             
-            if (!deepDrill.init()) {
+            if (!deepDrill.init(true)) {
                 player.sendMessage(Text.translatable("message.oritech.deep_drill.ore_placement"));
                 return ActionResult.SUCCESS;
             }

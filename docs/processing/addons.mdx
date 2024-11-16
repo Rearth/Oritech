@@ -1,0 +1,34 @@
+---
+title: Addons
+icon: oritech:machine_extender
+---
+
+To upgrade machines in Oritech, addons are used. They are blocks that need to be attached to the machine itself or a connected machine extender.
+Addons can perform a variety of functions, such as increasing speed, improving energy efficiency, providing access to specific inventory slots, and more.
+
+Machines can only accept addons at specific positions. To view these, either check the "addons" UI page or look for these markers on the machine:
+
+<center>
+<ModAsset location="oritech:area/addon_marker" width={300} />
+</center>
+
+Addons are activated when the machine is right-clicked. To indicate activation, the pink parts of an addon turn blue when in use.
+To extend the available number of addon slots, you can use machine extenders. These specific addons don't directly influence the machine but allow
+addons to be placed on them, which then count towards the machine they are connected to.
+
+The maximum layers of machine extenders you can use depends on the machine quality. If you have a machine with a core quality of 1,
+you can't use any extender. Each additional extender that goes **through** another extender requires an increase in core quality of 1.
+
+The core quality never directly counts the number of machine extenders you have active. Instead, it counts through how many extenders
+an addon has to pass to be connected to the machine. If this number is greater than the core quality, the addon will not be connected.
+See this image for a small demonstration:
+
+<center>
+<ModAsset location="oritech:area/extenders" width={700} />
+</center>
+
+As mentioned before, only the number of extenders between a machine and an addon is counted. This means you can branch the extenders, and everything will work:
+
+<center>
+<ModAsset location="oritech:area/addon_branching" width={700} />
+</center>

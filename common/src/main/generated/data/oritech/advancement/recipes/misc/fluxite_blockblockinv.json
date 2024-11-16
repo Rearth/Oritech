@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_fluxite_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:fluxite_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:fluxite_blockblockinv"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_fluxite_block"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:fluxite_blockblockinv"
+    ]
+  }
+}

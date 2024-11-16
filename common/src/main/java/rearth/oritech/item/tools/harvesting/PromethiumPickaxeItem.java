@@ -11,7 +11,6 @@ import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -30,14 +29,17 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.ToolsContent;
-import rearth.oritech.init.datagen.data.TagContent;
+import rearth.oritech.init.TagContent;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
@@ -107,21 +109,13 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
         
         return super.use(world, user, hand);
     }
-    
-    // called as event in Oritech initializer
-    // area mode: 
-    // adds a temporary silk touch, which is then removed in the after break event
-    public static boolean preMine(World world, PlayerEntity player, BlockPos pos, BlockState blockState, BlockEntity blockEntity) {
-        
+
+    public static List<BlockPos> getOffsetBlocks(World world, PlayerEntity player, BlockPos pos) {
         var handStack = player.getMainHandStack();
-        if (handStack == null || !handStack.isOf(ToolsContent.PROMETHIUM_PICKAXE)) return true;
+        if (handStack == null || !handStack.isOf(ToolsContent.PROMETHIUM_PICKAXE)) return List.of();
 
-        // break additional blocks in preMine (Block.onBreak) instead of postMine (Block.onBroken)
-        // so that the block still exists when determining which face of the block the player was looking at
-        if (isAreaEnabled(handStack) && !player.isInPose(EntityPose.CROUCHING)) {
-
-            // use the block face and player look direction to determine which additional blocks to break
-            List<Vec3i> breakPositions;
+        if (isAreaEnabled(handStack) && !player.isSneaking()) {
+            List<BlockPos> breakBlocks;
             var playerHit = player.raycast(player.getBlockInteractionRange(), 0.0F, false);
             if (playerHit instanceof BlockHitResult blockHit) {
                 var blockSide = blockHit.getSide();
@@ -129,31 +123,41 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
                 if (blockSide == Direction.UP || blockSide == Direction.DOWN) {
                     var direction = player.getHorizontalFacing();
                     if (direction == Direction.NORTH || direction == Direction.SOUTH) {
-                        breakPositions = List.of(new Vec3i(0, 0, 1), new Vec3i(0, 0, -1));
+                        breakBlocks = List.of(pos.north(), pos.south());
                     } else {
-                        breakPositions = List.of(new Vec3i(1, 0, 0), new Vec3i(-1, 0, 0));
+                        breakBlocks = List.of(pos.east(), pos.west());
                     }
                 } else {
-                    breakPositions = List.of(new Vec3i(0, 1, 0), new Vec3i(0, -1, 0));
+                    breakBlocks = List.of(pos.up(), pos.down());
                 }
-
-                // break additional blocks
-                for (var offset : breakPositions) {
-                    var offsetPos = pos.add(offset);
-                    var offsetState = world.getBlockState(offsetPos);
-                    if (offsetState.isIn(TagContent.DRILL_MINEABLE)) {
-                        var offsetEntity = world.getBlockEntity(offsetPos);
-                        // drop stacks before breaking additional block, because world.breakBlock doesn't apply item enchantments if drop is enabled
-                        // this will ONLY apply item enchantments that affect block drops, and will not apply enchants like vein mining
-                        Block.dropStacks(offsetState, world, offsetPos, offsetEntity, player, handStack);
-                        world.breakBlock(offsetPos, false, player);
-                    }
-                }
+                return ImmutableList.copyOf(Iterables.filter(breakBlocks, p -> world.getBlockState(p).isIn(TagContent.DRILL_MINEABLE)));
             }
         }
-        
-        if (!isAreaEnabled(handStack)) {
-            
+
+        return List.of();
+    }
+    
+    // called as event in Oritech initializer
+    // area mode: breaks 3x1 blocks unless player is sneaking
+    // silk touch mode: adds a temporary silk touch, which is then removed in the after break event
+    public static boolean preMine(World world, PlayerEntity player, BlockPos pos, BlockState blockState, BlockEntity blockEntity) {
+
+        var handStack = player.getMainHandStack();
+        if (handStack == null || !handStack.isOf(ToolsContent.PROMETHIUM_PICKAXE)) return true;
+
+        // break additional blocks in preMine (Block.onBreak) instead of postMine (Block.onBroken)
+        // so that the block still exists when determining which face of the block the player was looking at
+        if (isAreaEnabled(handStack)) {
+            // break additional blocks
+            for (var offsetPos : getOffsetBlocks(world, player, pos)) {
+                // drop stacks before breaking additional block, because world.breakBlock doesn't apply item enchantments if drop is enabled
+                // this will ONLY apply item enchantments that affect block drops, and will not apply enchants like vein mining
+                var offsetState = world.getBlockState(offsetPos);
+                var offsetEntity = world.getBlockEntity(offsetPos);
+                Block.dropStacks(offsetState, world, offsetPos, offsetEntity, player, handStack);
+                world.breakBlock(offsetPos, false, player);
+            }
+        } else {
             // do silk touch
             var hasExistingSilkTouch = EnchantmentHelper.getEnchantments(handStack).getEnchantments().stream().anyMatch(elem -> elem.matchesKey(Enchantments.SILK_TOUCH));
             
@@ -163,7 +167,6 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
                 handStack.set(DataComponentTypes.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
             }
         }
-        
         
         return true;
     }

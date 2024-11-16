@@ -7,7 +7,7 @@
 <h3 align="center">Oritech</h3>
 
 <div align="center">
-  A minecraft fabric tech mod, currently still WIP. Just like this readme.
+  A minecraft fabric / neoforge tech mod, currently still WIP. Just like this readme.
   <br/>
   <br/>
   <a href="https://github.com/rearth/Oritech"><strong>Explore the docs TODO»</strong></a>
@@ -44,46 +44,41 @@
 
 An upcoming tech mod for minecraft fabric. Features advanced ore processing, powered tools and armor, and much much more.
 
+Wiki is available online (https://moddedmc.org/en/mod/oritech/docs)
+
 Currently in very early access, numerous bugs and issues are to be expected.
 
 If you want to contribute, suggest ideas or just see what's planned, make sure to check out the GitHub discussions for this project (https://github.com/Rearth/Oritech/discussions).
 
 Includes REI and EMI compatibility.
 
-Forge-compatible with sinytra connector on 1.21.
+[//]: # (Extra mod compatibilities &#40;allowing metals and other components to be processed in Oritech machines, and vice-versa&#41; for the following mode are included:)
 
-Extra mod compatibilities (allowing metals and other components to be processed in Oritech machines, and vice-versa) for the following mode are included:
-- Alloy Forgery
-- Tech Reborn
-- Energized Power
-- Mythic Metals
+[//]: # (- Alloy Forgery)
+
+[//]: # (- Tech Reborn)
+
+[//]: # (- Energized Power)
+
+[//]: # (- Mythic Metals)
 
 The following translations are available:
 - English
 - Chinese (by PlatinumOak)
 - Brazilian Portuguese (by RenanEuzebio)
 - Russian (by nuchohent)
+- Ukrainian (by nuchohent)
+- Spanish (by Seyronh)
+- Turkish (by RuyaSavascisi)
+- French (by kikipunk)
+- Polish (by plhappylemonpl)
 
 ## Built With
 
-- Fabric API
+- Fabric API (or FFAPI)
 - Owo lib (for all the GUIs, config, and much more)
 - Geckolib (for the animations)
-- Lavender (for the guide book)
 - Blockbench (to create and animate the models)
-
-## Installation
-
-Install it just like any mod by dragging it into the mods folder. Make sure you have the following dependencies installed (newer version might work too):
-
-- Minecraft Version: fabric-1.21
-- Fabric loader 0.15.9
-- Fabric api 0.97.0+1.20.4
-- Owo lib 0.12.6+1.20.3
-- Lavender 0.1.7+1.20.3
-- Geckolib 1.20.4:4.4.4
-- Reborn Energy API 3.0.0
-- Athena 4.0.0 (important: If you have sodium installed, Athena, and in turn Oritech, will break without indium)
 
 ## Roadmap
 
@@ -148,3 +143,5 @@ In detail, these are the following items that are from the above-mentioned sourc
 * Ycar, for creating all tiers of the machine core textures
 * BBoldt and BLOKBUSTR, for fixing a series of issues with the textures, and generally improving and redesigning almost all the metal component textures
 * jshipley, for a lot of contributions with new features, block, mechanics and bugfixes
+* CrazyMiner34, for improvements to item rendering in 3rd person
+* NovaKatt, for creating most of the metal / compacted block textures

@@ -1,0 +1,13 @@
+{
+  "machine_basics.mdx": "Informations Générales",
+  "multiblocks.mdx": "Multibloc",
+  "addons.mdx": "Modules",
+  "pulverizer.mdx": "Pulvérisateur",
+  "assembler.mdx": "Assembleur",
+  "centrifuge.mdx": "Centrifugeuse",
+  "foundry.mdx": "Fonderie",
+  "fragment_forge.mdx": "Forge à Fragmentation",
+  "atomic_forge.mdx": "Forge Atomique",
+  "generators.mdx": "Générateurs",
+  "steam_engine.mdx": "Energie Vapeur"
+}

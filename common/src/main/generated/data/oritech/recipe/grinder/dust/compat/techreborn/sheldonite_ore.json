@@ -1,0 +1,35 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "techreborn"
+      ]
+    }
+  ],
+  "type": "oritech:grinder",
+  "fluidInputAmount": 0,
+  "fluidInputVariant": "minecraft:empty",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:ores/sheldonite"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "techreborn:platinum_dust"
+    },
+    {
+      "count": 1,
+      "id": "techreborn:nickel_dust"
+    },
+    {
+      "count": 2,
+      "id": "techreborn:iridium_nugget"
+    }
+  ],
+  "time": 200
+}

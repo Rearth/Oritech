@@ -12,3 +12,4 @@ accessible field net/minecraft/item/Item components Lnet/minecraft/component/Com
 mutable field net/minecraft/item/Item components Lnet/minecraft/component/ComponentMap;
 accessible method net/minecraft/item/Item$Settings getValidatedComponents ()Lnet/minecraft/component/ComponentMap;
 accessible field net/minecraft/server/network/ServerPlayNetworkHandler floatingTicks I
+accessible method net/minecraft/client/render/WorldRenderer drawCuboidShapeOutline (Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/util/shape/VoxelShape;DDDFFFF)V

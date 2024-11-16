@@ -1,0 +1,24 @@
+---
+title: Block Destroyer
+icon: oritech:destroyer_block
+---
+
+<center>
+<ModAsset location="oritech:area/destroyer_block" width={512} />
+</center>
+
+The block destroyer is used to, as you might guess, destroy blocks. It's a [multi-block](../processing/multiblocks) that operates on a [machine frame](../interaction/machine_frames) and targets the block layer directly below the frame.
+
+The time and energy required to break a block depend on the block's hardness. The block destroyer attempts to destroy all blocks below. To enable farming use, the crop filter addon can be installed, which causes the block destroyer to skip all non-finished crops.
+
+<center>
+<ModAsset location="oritech:crop_filter_addon" width={256} />
+</center>
+
+By adding quarry addons, the block destroyer can also function as a quarry. Each quarry addon multiplies the range by 8.
+
+This means one addon provides an 8-block range, two addons give a 64-block range, and three addons extend it to a 512-block range.
+
+<center>
+<ModAsset location="oritech:quarry_addon" width={256} />
+</center>

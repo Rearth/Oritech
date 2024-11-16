@@ -1,0 +1,93 @@
+---
+title: Particle Accelerator
+icon: oritech:area/accelerator_ring_area
+---
+
+The particle accelerator is used to, as you might guess, accelerate particles.
+The particle starts from the particle accelerator block, where you can insert any item to be used as a particle.
+A straight guide ring needs to be placed right behind the controller, facing to the side, with visuals aligning correctly.
+
+<center>
+<ModAsset location="oritech:area/accelerator_ring_area" width={500} />
+</center>
+
+Once inserted, the particle travels along a route defined by the guide rings. They can be right-clicked to add a 45-degree turn on one side.
+Another guide ring needs to be in the particle's path as defined by the guide rings. Depending on the speed, the allowed distance between guide blocks increases.
+
+The maximum distance is calculated with the following formula:
+
+> clamp(sqrt(speed), 2, 10)
+
+This means that at higher speeds, the distance between guide blocks can be larger.
+
+---
+
+**Redstone Switches**
+
+When a redstone signal is applied to a non-straight guide block, it becomes a switch block. When powered on, it leads particles straight; when powered off, it guides them into the original curved direction. A particle can also enter from the 'other' direction, visualized by the smaller red glass tube, following the path of the white tube, and entering from both the red and white tubes.
+
+<center>
+<ModAsset location="oritech:area/accelerator_switch_area" width={500} />
+</center>
+
+At higher speeds, the particle can't take tight turns. If the last full 90-degree turn is too close, it exits the guided path and shoots out into the world. If the distance between guide blocks is too big, or no next guide is found, it will also shoot out. The minimum distance between turns is calculated as follows:
+
+> sqrt(speed) / 3
+
+---
+
+**Interactions**
+
+Entities hit by the particle take damage based on the particle's speed. When exiting the guided path, it also harms entities in its path and destroys blocks until momentum is depleted. When two particles collide (from different controllers), they can create new items.
+
+Passing through an accelerator motor speeds up the particle by 1 m/s, requiring the motor to be powered. The power requirement increases with speed. Both particle motors and sensors can be used as straight guides.
+
+---
+
+**Speed Sensors**
+
+A particle's speed can be measured with a particle sensor. A comparator can then provide a redstone signal based on the particle's speed. The following table shows the required speed for each redstone level:
+
+1. 0
+2. 10
+3. 50
+4. 75
+5. 100
+6. 150
+7. 250
+8. 500
+9. 750
+10. 1000
+11. 2500
+12. 5000
+13. 7500
+14. 10000
+15. 15000
+
+<center>
+<ModAsset location="oritech:area/accelerator_speed_area" width={600} />
+</center>
+
+---
+
+**Accelerator Design**
+
+Particle accelerators can be built in various ways, depending on their goals. A straight line of motors can shoot particles at something, but higher speeds are more efficiently reached with a circular design. Very large rings might be needed to reach certain elements. Slow particles require guide rings to be close together, so starting in a small ring and then using redstone to move to a larger ring often makes sense.
+
+Multiple ring stages might be necessary for some cases.
+
+---
+
+**Dimensional Incursions**
+
+<Callout variant="warning">
+    This section is based on notes from experimental researchers, and is not officially endorsed by *oritech inc*
+</Callout>
+
+When certain elements collide with excessive energy, they can rip a **hole in space-time**, leading to a *small dimensional incursion*.
+The energy required to achieve this is immense, and little is known about these incursions and their triggers.
+Researchers have noted that colliding fire charges with a collision energy over 5000J seems to bring the nether closer.
+Ender pearls with more than 10000J appear to do the same for the end dimension.
+
+There are unsettling rumors of reckless scientists attempting to bombard these incursion points with speeds that defy known limits,
+aiming to create singularities of their own. However, none have returned to share their findings, leaving their fates shrouded in mystery.

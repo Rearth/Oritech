@@ -1,0 +1,29 @@
+---
+title: Steam Power
+icon: oritech:steam_boiler_addon
+---
+
+<center>
+<ModAsset location="oritech:area/steam_power" width={1000} />
+</center>
+
+All generators (except the basic generator) can be upgraded to produce steam by adding a steam boiler addon.
+When added, the machine will no longer directly produce RF. Instead, it will produce steam at a rate of 2:1.
+To produce steam, water will be consumed. Water and steam can be pumped in and out directly from the addon, but not the machine itself.
+
+To utilize the steam, a steam engine can be used to produce RF from it. It takes steam as input and outputs water.
+However, during the process, around 20% of the water will be lost, so a steady supply of water is needed for the generators.
+
+<Callout variant="info">
+    Steam engines will not work if their water or energy storage is completely full. Always ensure that the water can go somewhere. With some tanks, comparators and redstone
+    you can probably build a self-sustaining loop.
+</Callout>
+
+Multiple steam engines can be chained together. They'll share the energy storage, water,
+and steam tank from the first engine in line, working cooperatively. A steam engine's speed varies based on the stored steam.
+More steam results in more pressure, making it operate faster.
+The speed is scaled linearly based on the steam tank's fill percentage, with a maximum multiplier of 10 when the tank is full.
+
+However, the efficiency of the engine varies based on the speed. Higher efficiency results in more RF per steam unit produced.
+The machine's efficiency is highest when operating at around 700% speed. Anything lower or higher than that will result in a less ideal yield.
+Energy will be output from the red machine slots. Fluid ports are marked blue.

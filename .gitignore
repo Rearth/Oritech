@@ -26,6 +26,7 @@ bin/
 .classpath
 .project
 */.cache
+common/src/main/generated/.cache/
 
 # macos
 

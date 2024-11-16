@@ -1,0 +1,128 @@
+plugins {
+    id 'com.github.johnrengelman.shadow'
+}
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+loom {
+    accessWidenerPath.set(project(":common").loom.accessWidenerPath)
+
+    runs {
+        datagen {
+            inherit server
+            "Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${project(":common").file("src/main/generated")}"
+            vmArg "-Dfabric-api.datagen.modid=oritech"
+            runDir "build/datagen"
+        }
+    }
+}
+
+configurations {
+    common {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
+
+    // Files in this configuration will be bundled into your mod using the Shadow plugin.
+    // Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
+    shadowBundle {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+}
+
+repositories {
+    maven { // for additional entity attributes (Mythic Metals dependency)
+        name = 'modrinth'
+        url = 'https://api.modrinth.com/maven/'
+    }
+
+    maven { // for cardinal components (datagen dependency)
+        name = 'Lady Snake'
+        url = 'https://maven.ladysnake.org/releases'
+    }
+}
+
+dependencies {
+    // implementation project(path: ':common')  // no idea why it needs to be modImplementation instead of implementation like in the in the normal fabric gradle
+    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
+
+    // Architectury API. This is optional, and you can comment it out if you don't need it.
+    modImplementation "dev.architectury:architectury-fabric:13.0.6"
+
+    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+    shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
+
+    // Energy API
+    include modApi("teamreborn:energy:4.1.0") {
+        transitive = false
+    }
+
+    // yes yes all this needs to be cleaned up, and recipe viewers made conditional, but I'm waiting to clean up the CSL mess first
+
+    // owo lib
+    modImplementation "io.wispforest:owo-lib:0.12.11+1.21"
+
+    // geckolib
+    modImplementation "software.bernie.geckolib:geckolib-fabric-1.21.1:4.6.6"
+
+    // CSL
+    // include modApi("earth.terrarium.common_storage_lib:common-storage-lib-fabric-1.21:0.0.5")
+    // yeah this is super weird, I have no idea why I have to list the subprojects, and why the include doesn't work here, or why the 0.0.6 jar doesnt work
+    modApi files('common-storage-lib-fabric-1.21-0.0.8.jar')
+    modApi files('common-storage-lib-data-fabric-1.21-0.0.9.jar')
+    modApi files('common-storage-lib-resources-fabric-1.21-0.0.8.jar')
+    modApi files('common-storage-lib-lookup-fabric-1.21-0.0.8.jar')
+
+    // JADE (needed for addon)
+    modImplementation "curse.maven:jade-324717:5639994"
+
+    // athena (CTM)
+    modRuntimeOnly "earth.terrarium.athena:athena-fabric-1.21:4.0.0"
+
+    // dependencies for datagen
+    // Tech Reborn
+    modImplementation "curse.maven:techreborn-233564:${tech_reborn_version_id}"
+    modImplementation "curse.maven:reborncore-237903:${reborn_core_version_id}"
+    // Energized Power
+    modImplementation "curse.maven:energized-power-782147:${energized_power_version_id}"
+    // Alloy Forgery
+    modImplementation "curse.maven:alloy-forgery-438718:${alloy_forgery_version_id}"
+    // Mythic Metals
+    modImplementation "curse.maven:mythicmetals-410127:${mythic_metals_version_id}"
+    modRuntimeOnly "org.ladysnake.cardinal-components-api:cardinal-components-base:${cardinal_components_version}"
+    modRuntimeOnly "org.ladysnake.cardinal-components-api:cardinal-components-entity:${cardinal_components_version}"
+    modRuntimeOnly "maven.modrinth:additionalentityattributes:${additional_entity_attributes_version}"
+}
+
+processResources {
+    inputs.property 'version', project.version
+
+    filesMatching('fabric.mod.json') {
+        expand version: project.version
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadowBundle]
+    archiveClassifier = 'dev-shadow'
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+}
+
+tasks.remapJar {
+    injectAccessWidener.set(true)
+}

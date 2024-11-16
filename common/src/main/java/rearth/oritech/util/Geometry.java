@@ -149,6 +149,14 @@ public class Geometry {
             if (face == BlockFace.CEILING)
                 return VoxelShapes.cuboid(1 - maxZ, 1 - maxY, 1 - maxX, 1 - minZ, 1 - minY, 1 - minX);
         }
+
+        if (facing == Direction.UP) {
+            return VoxelShapes.cuboid(minX, 1 - maxZ, minY, maxX, 1 - minZ, maxY);
+        }
+
+        if (facing == Direction.DOWN) {
+            return VoxelShapes.cuboid(minX, minZ, minY, maxX, maxZ, maxY);
+        }
                 
         return shape;
     }

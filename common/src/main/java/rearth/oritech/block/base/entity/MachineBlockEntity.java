@@ -426,8 +426,11 @@ public abstract class MachineBlockEntity extends BlockEntity
     protected float getAnimationSpeed() {
         if (getRecipeDuration() < 0) return 1;
         var recipeTicks = getRecipeDuration() * getSpeedMultiplier();
-        var animationTicks = 60f;    // 3s, length which all animations are defined as
-        return animationTicks / recipeTicks;
+        return (getAnimationDuration() / recipeTicks) * 0.99f;
+    }
+    
+    public int getAnimationDuration() {
+        return 60;  // 3s
     }
     
     protected int getRecipeDuration() {

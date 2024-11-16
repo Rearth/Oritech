@@ -1,0 +1,14 @@
+---
+title: Pump
+icon: oritech:pump_block
+---
+
+<center>
+<ModAsset location="oritech:area/pump_block" width={512} />
+</center>
+
+The pump is used to extract liquids from below. When placed, it extends a trunk downward until it encounters a liquid or obstruction. Once a liquid is found, it scans the liquid body and stores all positions to pump from.
+
+The pump can drain liquid bodies of size 100,000 or smaller. Note that initialization may take a few seconds for large targets.
+
+Drained fluids are stored in the internal storage. The pump can process up to 4 buckets per second, with an energy cost of 512 RF per block.

@@ -34,7 +34,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.datagen.data.TagContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -81,30 +81,32 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, TreefellerBlockEntity blockEntity) {
-        if (world.isClient || energyStorage.amount < LOG_COST) return;
+        if (world.isClient) return;
         
-        if (pendingBlocks.isEmpty() && world.getTime() % 20 == 0) {
-            findTarget();
-        }
-        
-        for (int i = 0; i < 6 && !pendingBlocks.isEmpty(); i++) {
-            var candidate = pendingBlocks.peekLast();
-            var candidateState = world.getBlockState(candidate);
-            var isLog = candidateState.isIn(TagContent.CUTTER_LOGS_MINEABLE);
-
-            var energyCost = isLog ? LOG_COST : LEAF_COST;
-            if (energyCost > energyStorage.amount) break;
+        if (energyStorage.amount >= LOG_COST) {
+            if (pendingBlocks.isEmpty() && world.getTime() % 20 == 0) {
+                findTarget();
+            }
             
-            var actionResult = breakTreeBlock(candidateState, candidate);
-            if (actionResult == ActionResult.FAIL) break;
-            pendingBlocks.pollLast();
-            if (actionResult == ActionResult.PASS) continue;
-            lastWorkedAt = world.getTime();
+            for (int i = 0; i < 6 && !pendingBlocks.isEmpty(); i++) {
+                var candidate = pendingBlocks.peekLast();
+                var candidateState = world.getBlockState(candidate);
+                var isLog = candidateState.isIn(TagContent.CUTTER_LOGS_MINEABLE);
 
-            energyStorage.amount -= energyCost;
-            this.markDirty();
-            
-            if (isLog) break; // only harvest 1 log, but multiple leaves
+                var energyCost = isLog ? LOG_COST : LEAF_COST;
+                if (energyCost > energyStorage.amount) break;
+                
+                var actionResult = breakTreeBlock(candidateState, candidate);
+                if (actionResult == ActionResult.FAIL) break;
+                pendingBlocks.pollLast();
+                if (actionResult == ActionResult.PASS) continue;
+                lastWorkedAt = world.getTime();
+
+                energyStorage.amount -= energyCost;
+                this.markDirty();
+                
+                if (isLog) break; // only harvest 1 log, but multiple leaves
+            }
         }
         
         if (world.getTime() % 10 == 0) {

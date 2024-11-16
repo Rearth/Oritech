@@ -1,0 +1,34 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "energizedpower"
+      ]
+    }
+  ],
+  "type": "energizedpower:alloy_furnace",
+  "inputs": [
+    {
+      "input": {
+        "item": "oritech:platinum_gem"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:platinum_gem"
+      }
+    }
+  ],
+  "output": {
+    "count": 4,
+    "item": "oritech:platinum_ingot"
+  },
+  "secondaryOutput": {
+    "output": {
+      "item": "minecraft:iron_ingot"
+    },
+    "percentages": []
+  },
+  "ticks": 800
+}

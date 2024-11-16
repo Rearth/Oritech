@@ -8,7 +8,6 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import rearth.oritech.init.datagen.ModelGenerator;
 import rearth.oritech.item.other.CustomTooltipItem;
 import rearth.oritech.item.other.MobCaptureItem;
 import rearth.oritech.item.tools.LaserTargetDesignator;
@@ -21,9 +20,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ItemContent implements ArchitecturyRegistryContainer<Item> {
+    
+    public static Set<Item> autoRegisteredModels = new HashSet<>();
 
     @ItemGroupTarget(Groups.components)
     @Compostable(0.65F)
@@ -132,7 +135,7 @@ public class ItemContent implements ArchitecturyRegistryContainer<Item> {
         }
         
         if (!field.isAnnotationPresent(NoModelGeneration.class)) {
-            ModelGenerator.autoRegisteredModels.add(value);
+            autoRegisteredModels.add(value);
         }
 
         if (field.isAnnotationPresent(Compostable.class)) {

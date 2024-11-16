@@ -1,0 +1,60 @@
+---
+title: Enderic Laser
+icon: oritech:laser_arm_block
+---
+
+<center>
+<ModAsset location="oritech:area/enderic_laser" width={512} />
+</center>
+
+The enderic laser utilizes vast amounts of energy to fire a laser beam in a specific direction. In most cases, this results in the block being destroyed. The dropped blocks are then placed in the inventory. Any blocks that don't fit into the inventory will be lost, so you may want to use an [item pipe](../logistics/item_transport) to continue collecting items.
+
+---
+
+**Control**
+
+To set the target direction of the laser, select a target with the [target designator](../tools/target_designator) item. Then shift + right-click the **bottom** laser block to assign the target. The laser will keep firing in the target direction as long as there is something to target.
+
+*Note that you're only setting the target direction. This means that the laser will also destroy blocks before and behind the target.* A redstone signal disables the laser.
+
+The maximum range is 64.
+
+---
+
+**Fluxite Harvesting**
+
+The immense energy from the enderic laser causes grown amethyst clusters to transform into fluxite when destroyed.
+
+<center>
+<ModAsset location="oritech:area/laser_fluxite" width={512} />
+</center>
+
+The laser also accelerates amethyst growth when aimed at the budding amethyst itself.
+
+---
+
+**Energy Transfer**
+
+When the enderic laser targets a block that can store energy (e.g., any machine), it will fill the machine's energy storage. The laser ignores all input and output limits and can fill the energy storage of machines that may not accept energy from cables directly.
+
+---
+
+**Machine Hunter Addon**
+
+When equipped with a machine hunter addon, the enderic laser targets mobs instead of blocks. Addon upgrades still function when hunting mobs: the yield addon increases loot drops, more hunter addons extend the target scan range, speed addons increase damage (reducing energy efficiency), and the crop filter avoids killing baby animals.
+
+If you are wearing an [exo chestplate](../tools/exo_armor), the enderic laser will charge it for you.
+
+**Hunter Targeting**
+
+Use a [target designator](../tools/target_designator) on the enderic laser to change targeting modes. The default mode is attacking monsters only, but it can also be set to attack animals or even wandering traders. Be cautious with its use and targeting settings, as you could unintentionally harm entities you don't wish to.
+
+---
+
+**More Details**
+
+The laser beam targets any block but passes through glass (and non-grown amethysts). Quarry addons increase the width of the excavated area.
+
+The laser itself has only one addon slot available at the bottom. Addons affect only the speed and efficiency of block breaking; energy transfer can benefit solely from speed upgrades.
+
+A target block will stop the laser from progressing further while remaining undestroyed.
