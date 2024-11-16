@@ -65,9 +65,7 @@ public class Wrench extends Item {
 
 			var result = ((Wrenchable) blockState.getBlock()).onWrenchUse(blockState, context, stack);
 			if (result == ActionResult.SUCCESS) {
-				var blockPos = context.getBlockPos();
 				stack.damage(1, player, LivingEntity.getSlotForHand(context.getHand()));
-
 				return ActionResult.success(false);
 			}
 		}
@@ -88,7 +86,7 @@ public class Wrench extends Item {
 		item.set(ComponentContent.WRENCH_DIRECTION.get(), newMode);
 
 		// Send a message to the player
-		player.sendMessage(Text.translatable("tooltip.oritech.wrench.direction_changed", Text.translatable("text.oritech.parameter." + Direction.byId(newMode).getName())), true); // TODO: Translate
+		player.sendMessage(Text.translatable("tooltip.oritech.wrench.direction_changed", Text.translatable("text.oritech.parameter." + Direction.byId(newMode).getName())), true);
 	}
 
 	@Override
@@ -97,11 +95,10 @@ public class Wrench extends Item {
 
 		var showFull = Screen.hasControlDown();
 		if (!showFull) {
-			// TODO: Translate
 			tooltip.add(Text.translatable("tooltip.oritech.item_extra_info").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
 		} else {
 			tooltip.add(Text.translatable("tooltip.oritech.wrench.description").formatted(Formatting.ITALIC, Formatting.GRAY));
-			tooltip.add(Text.translatable("tooltip.oritech.wrench.current_direction", Text.translatable("text.oritech.parameter." + getDirection(stack).getName())).formatted(Formatting.GRAY)); // TODO: Translate
+			tooltip.add(Text.translatable("tooltip.oritech.wrench.current_direction", Text.translatable("text.oritech.parameter." + getDirection(stack).getName())).formatted(Formatting.GRAY));
 		}
 	}
 
