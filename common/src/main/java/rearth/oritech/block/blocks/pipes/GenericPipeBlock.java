@@ -4,16 +4,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemActionResult;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -25,8 +23,9 @@ import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
+import rearth.oritech.item.tools.Wrench;
 
-public abstract class GenericPipeBlock extends Block {
+public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchable {
 
     public static final int NO_CONNECTION = 0;
     public static final int CONNECTION_DISABLED = 1;
@@ -127,13 +126,9 @@ public abstract class GenericPipeBlock extends Block {
     }
 
     @Override
-    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (stack.isOf(Items.DIAMOND_HOE)) { // TODO: replace with wrench item
-            toggleSideConnection(state, hit.getSide(), world, pos);
-            return ItemActionResult.SUCCESS;
-        }
-
-        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+    public ActionResult onWrenchUse(BlockState state, ItemUsageContext context, ItemStack stack) {
+        toggleSideConnection(state, Wrench.getDirection(stack), context.getWorld(), context.getBlockPos());
+        return ActionResult.SUCCESS;
     }
 
     /**
@@ -160,6 +155,9 @@ public abstract class GenericPipeBlock extends Block {
             // update neighbor if it's a pipe
             updateNeighborState(world, pos.offset(side));
         }
+
+        var soundGroup = getSoundGroup(state);
+        world.playSound(null, pos, soundGroup.getPlaceSound(), SoundCategory.BLOCKS, soundGroup.getVolume() * .5f, soundGroup.getPitch());
     }
 
     /**

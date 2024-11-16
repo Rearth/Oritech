@@ -1,11 +1,11 @@
-// 1.21.1	2024-11-05T22:34:18.9398332	Oritech/Tags for minecraft:block
+// 1.21.1	2024-11-15T10:51:31.891617	Oritech/Tags for minecraft:block
+8a1991bcc86bdd5db518500cc19301dc2c41d579 data\minecraft\tags\block\mineable\axe.json
+b410e66b7787a18c9100d2753a9a9cb303034b55 data\c\tags\block\ores.json
 d444197bfa15ab91774548ca604f9905ab61c596 data\oritech\tags\block\mineable\drill.json
+967cc2f83983a364a5e3dcea16ac984ec53c55ad data\minecraft\tags\block\needs_iron_tool.json
+4d1703385c7aa74f453c913e85d6533af9243af8 data\minecraft\tags\block\needs_stone_tool.json
+bf72358e121e9f0b5dc870751a3949be1d024fd7 data\minecraft\tags\block\mineable\pickaxe.json
+c82eb57b49aa9dbc9c884fef821fcffc49c78f6c data\oritech\tags\block\resource_nodes.json
 50f40da8dc75281783431d102df4c03a64d658ad data\oritech\tags\block\mineable\cutter_leaves.json
 d5c2fc7bd2d212f5b7cb0d39c6aa12f7c9cdf7a5 data\oritech\tags\block\mineable\cutter_logs.json
-8a1991bcc86bdd5db518500cc19301dc2c41d579 data\minecraft\tags\block\mineable\axe.json
 bfa1ef12ecd511922700f0a86281c70058ebb0d4 data\oritech\tags\block\laser_passthrough.json
-b410e66b7787a18c9100d2753a9a9cb303034b55 data\c\tags\block\ores.json
-4d1703385c7aa74f453c913e85d6533af9243af8 data\minecraft\tags\block\needs_stone_tool.json
-967cc2f83983a364a5e3dcea16ac984ec53c55ad data\minecraft\tags\block\needs_iron_tool.json
-c82eb57b49aa9dbc9c884fef821fcffc49c78f6c data\oritech\tags\block\resource_nodes.json
-5ab20a4943753f90a4f5d0d294fba13faa47e0a3 data\minecraft\tags\block\mineable\pickaxe.json

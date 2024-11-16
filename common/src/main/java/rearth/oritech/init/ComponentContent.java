@@ -24,10 +24,14 @@ public class ComponentContent {
     public static final RegistrySupplier<ComponentType<Boolean>> IS_AOE_ACTIVE_REG = COMPONENTS.register("is_aoe_active", () -> ComponentType.<Boolean>builder().codec(PrimitiveCodec.BOOL).packetCodec(PacketCodecs.BOOL).build());
     public static final RegistrySupplier<ComponentType<BlockPos>> TARGET_POSITION_REG = COMPONENTS.register("target_position", () -> ComponentType.<BlockPos>builder().codec(BlockPos.CODEC).packetCodec(BlockPos.PACKET_CODEC).build());
     public static final RegistrySupplier<ComponentType<FluidStack>> STORED_FLUID_REG = COMPONENTS.register("stored_fluid", () -> ComponentType.<FluidStack>builder().codec(FluidStack.CODEC).packetCodec(FluidStack.STREAM_CODEC).build());
+
+    public static final RegistrySupplier<ComponentType<Byte>> WRENCH_MODE_REG = COMPONENTS.register("wrench_direction", () -> ComponentType.<Byte>builder().codec(PrimitiveCodec.BYTE).packetCodec(PacketCodecs.BYTE).build());
     
     public static final Supplier<ComponentType<Boolean>> IS_AOE_ACTIVE = () -> (ComponentType<Boolean>) Registries.DATA_COMPONENT_TYPE.get(Oritech.id("is_aoe_active"));
     public static final Supplier<ComponentType<BlockPos>> TARGET_POSITION = () -> (ComponentType<BlockPos>) Registries.DATA_COMPONENT_TYPE.get(Oritech.id("target_position"));
     public static final Supplier<ComponentType<FluidStack>> STORED_FLUID = () -> (ComponentType<FluidStack>) Registries.DATA_COMPONENT_TYPE.get(Oritech.id("stored_fluid"));
+
+    public static final Supplier<ComponentType<Byte>> WRENCH_DIRECTION = () -> (ComponentType<Byte>) Registries.DATA_COMPONENT_TYPE.get(Oritech.id("wrench_direction"));
     
     public static void registerComponents() {
         COMPONENTS.register();

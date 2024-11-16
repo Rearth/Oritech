@@ -84,6 +84,11 @@
       "oritech:short_servo"
     ]
   },
+  "wrench_turn": {
+    "sounds": [
+      "oritech:wrench_turn"
+    ]
+  },
   "particle_moving": {
     "sounds": [
       {
