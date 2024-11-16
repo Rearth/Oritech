@@ -1,4 +1,4 @@
-// 1.21.1	2024-11-15T10:51:31.8861088	Oritech/Tags for minecraft:item
+// 1.21.1	2024-11-16T01:57:31.7302346	Oritech/Tags for minecraft:item
 967cc2f83983a364a5e3dcea16ac984ec53c55ad data\c\tags\item\ores\platinum.json
 3938afa280709db7e663d8e98bc35499e99f4465 data\c\tags\item\dusts\quartz.json
 01448c09b923ed9ab9740c6a8241fb82b420c438 data\c\tags\item\raw_ores\platinum.json
@@ -32,12 +32,13 @@ b9695ced816c6cdbeac9b4f7594e38eb1d64f4ec data\c\tags\item\ingots\nickel.json
 1e7787f3c82969583b508332e72b930c266a23ea data\c\tags\item\silicon.json
 1faf32c4f40a9f06d5ebda1262a8bcb42b297f21 data\minecraft\tags\item\enchantable\leg_armor.json
 4d1703385c7aa74f453c913e85d6533af9243af8 data\c\tags\item\ores\nickel.json
+155de923074b66735208812821929be4f3d64f9d data\minecraft\tags\item\enchantable\durability.json
 f8c69575215863c835f560299feeb75712ce6683 data\c\tags\item\raw_materials\dyes\cyan.json
 9f1de0053bd607611a915277b38cf84a98b538d4 data\c\tags\item\dusts\coal.json
 c5014d2e2fd9dfeff0eccb24fcef5ba63b05cc7e data\minecraft\tags\item\pickaxes.json
 c5014d2e2fd9dfeff0eccb24fcef5ba63b05cc7e data\minecraft\tags\item\shovels.json
 9d161493224f72f5f9ef2ed9e1497644ecae5e4f data\c\tags\item\raw_materials.json
-708eb3eff9ec76d18d0cbab3cdcccb49811e19a3 data\minecraft\tags\item\enchantable\chest_armor.json
+4c21d79a7483ec65617b13c3a16ab34feadd8bc8 data\minecraft\tags\item\enchantable\chest_armor.json
 be6c4c2dc33a085ceb8b891787891010226941ab data\c\tags\item\wires.json
 049ee0e4463da9f3cb029f34be5ab89d3ef8fab4 data\c\tags\item\raw_materials\dyes\light_gray.json
 9b1da9102be31e926825b45e871319bba7a120eb data\c\tags\item\dusts\platinum.json

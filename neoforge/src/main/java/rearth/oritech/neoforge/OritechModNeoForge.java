@@ -45,6 +45,11 @@ public final class OritechModNeoForge {
           "stored_fluid",
           builder -> builder.codec(FluidStack.CODEC).packetCodec(FluidStack.STREAM_CODEC)
         );
+
+        public static final DeferredHolder<ComponentType<?>, ComponentType<Byte>> WRENCH_DIRECTION = COMPONENT_REGISTRAR.registerComponentType(
+                "wrench_direction",
+                builder -> builder.codec(PrimitiveCodec.BYTE).packetCodec(PacketCodecs.BYTE)
+        );
         
         @SubscribeEvent
         public void register(RegisterEvent event) {

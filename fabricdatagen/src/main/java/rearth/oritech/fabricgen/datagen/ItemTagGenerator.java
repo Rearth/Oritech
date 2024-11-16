@@ -6,9 +6,9 @@ import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
-import rearth.oritech.init.TagContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.init.ToolsContent;
 
 import java.util.concurrent.CompletableFuture;
@@ -195,6 +195,9 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ToolsContent.EXO_LEGGINGS);
         getOrCreateTagBuilder(ItemTags.FOOT_ARMOR_ENCHANTABLE)
           .add(ToolsContent.EXO_BOOTS);
+
+        getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
+                .add(ItemContent.WRENCH);
         
     }
 }

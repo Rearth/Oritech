@@ -171,7 +171,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // weed killer
         offerDrillRecipe(exporter, ItemContent.WEED_KILLER, Ingredient.ofItems(Items.ROTTEN_FLESH), Ingredient.ofItems(Items.ROTTEN_FLESH), Ingredient.ofItems(ItemContent.RAW_BIOPOLYMER), Ingredient.ofItems(Items.GLASS_BOTTLE), "weedex");
         // wrench
-        offerWrenchRecipe(exporter, ItemContent.WRENCH, Ingredient.ofItems(ItemContent.STEEL_INGOT), Ingredient.ofItems(ItemContent.CARBON_FIBRE_STRANDS), Ingredient.ofItems(ItemContent.NICKEL_INGOT), "wrench");
+        offerWrenchRecipe(exporter, ItemContent.WRENCH, Ingredient.ofItems(ItemContent.NICKEL_INGOT), Ingredient.ofItems(ItemContent.STEEL_INGOT), "wrench");
 
         // helmet (enderic lens + machine plating)
         offerHelmetRecipe(exporter, ToolsContent.EXO_HELMET, Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.ENDERIC_LENS), "exohelm");
@@ -918,11 +918,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
     }
 
-    public void offerWrenchRecipe(RecipeExporter exporter, Item output, Ingredient A, Ingredient B, Ingredient C, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('a', A).input('b', B).input('c', C)
+    public void offerWrenchRecipe(RecipeExporter exporter, Item output, Ingredient A, Ingredient B, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('a', A).input('b', B)
                 .pattern(" a ")
                 .pattern(" ba")
-                .pattern("c  ");
+                .pattern("a  ");
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
     }
     

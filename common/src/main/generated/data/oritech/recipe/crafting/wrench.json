@@ -3,19 +3,16 @@
   "category": "misc",
   "key": {
     "a": {
-      "item": "oritech:steel_ingot"
+      "item": "oritech:nickel_ingot"
     },
     "b": {
-      "item": "oritech:carbon_fibre_strands"
-    },
-    "c": {
-      "item": "oritech:nickel_ingot"
+      "item": "oritech:steel_ingot"
     }
   },
   "pattern": [
     " a ",
     " ba",
-    "c  "
+    "a  "
   ],
   "result": {
     "count": 1,

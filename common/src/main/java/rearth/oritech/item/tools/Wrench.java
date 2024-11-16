@@ -66,7 +66,7 @@ public class Wrench extends Item {
 			var result = ((Wrenchable) blockState.getBlock()).onWrenchUse(blockState, context, stack);
 			if (result == ActionResult.SUCCESS) {
 				stack.damage(1, player, LivingEntity.getSlotForHand(context.getHand()));
-				return ActionResult.success(false);
+				return ActionResult.success(true);
 			}
 		}
 
