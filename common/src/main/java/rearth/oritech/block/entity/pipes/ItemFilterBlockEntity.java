@@ -31,7 +31,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.blocks.pipes.ItemFilterBlock;
+import rearth.oritech.block.blocks.pipes.item.ItemFilterBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.ItemFilterScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;

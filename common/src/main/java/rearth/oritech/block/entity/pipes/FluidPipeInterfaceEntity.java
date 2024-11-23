@@ -16,8 +16,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.blocks.pipes.FluidPipeBlock;
-import rearth.oritech.block.blocks.pipes.FluidPipeConnectionBlock;
+import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
+import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
+import rearth.oritech.block.blocks.pipes.fluid.FluidPipeConnectionBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.FluidProvider;
 
@@ -70,19 +71,21 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
-        if (world.isClient || world.getTime() % TRANSFER_PERIOD != 0) return;
+        var block = (ExtractablePipeConnectionBlock) state.getBlock();
+        if (world.isClient || world.getTime() % TRANSFER_PERIOD != 0 || !block.isExtractable(state)) return;
         
         var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
-        
+
         // try to fill internal storage from inputs (if extract true)
         // one transaction for each side
-        if (state.get(FluidPipeConnectionBlock.EXTRACT) && fluidStorage.amount < fluidStorage.getCapacity()) {
+        if (block.isExtractable(state) && fluidStorage.amount < fluidStorage.getCapacity()) {
             
             var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
             
             for (var sourcePos : sources) {
                 var offset = pos.subtract(sourcePos);
                 var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
+                if (!block.isSideExtractable(state, direction.getOpposite())) continue;
                 var sourceContainer = findFromCache(world, sourcePos, direction);
                 if (sourceContainer == null || !sourceContainer.supportsExtraction()) continue;
                 
@@ -134,13 +137,13 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
         
         if (netHash != filteredTargetsNetHash) {
             filteredFluidTargetsCached = targets.stream()
-                                           .filter(targetPos -> targetPos.getLeft().getManhattanDistance(pos) > 1)   // ignore neighbors basically, as this pipe is set to extract
                                            .filter(target -> {
-                                               var pipePos = target.getLeft().add(target.getRight().getVector());
+                                               var direction = target.getRight();
+                                               var pipePos = target.getLeft().add(direction.getVector());
                                                var pipeState = world.getBlockState(pipePos);
-                                               if (!(pipeState.getBlock() instanceof FluidPipeConnectionBlock))
+                                               if (!(pipeState.getBlock() instanceof FluidPipeConnectionBlock fluidBlock))
                                                    return true;   // edge case, this should never happen
-                                               var extracting = pipeState.get(FluidPipeConnectionBlock.EXTRACT);
+                                               var extracting = fluidBlock.isSideExtractable(pipeState, target.getRight().getOpposite());
                                                return !extracting;
                                            })
                                            .map(target -> findFromCache(world, target.getLeft(), target.getRight()))

@@ -35,55 +35,58 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     
     @Override
     protected void onBlockRemoved(BlockPos pos, BlockState oldState, World world) {
+        updateNeighbors(world, pos, false);
         GenericPipeInterfaceEntity.removeNode(world, pos, true, oldState, getNetworkData(world));
     }
     
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         var worldImp = (World) world;
-        var baseState = super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
-        var interfaceState = PipeConnectionHelper.addInterfaceStates(baseState, worldImp, pos);
+        //var interfaceState = addConnectionStates(state, worldImp, pos, false);
+        if (!hasNeighboringMachine(state, worldImp, pos, false)) {
+            var normalState = getNormalBlock();
+            return ((GenericPipeBlock) normalState.getBlock()).addConnectionStates(normalState, worldImp, pos, false);
+        }
 
-        if (interfaceState.get(NORTH) != GenericPipeBlock.MACHINE_CONNECTION
-                && interfaceState.get(SOUTH) != GenericPipeBlock.MACHINE_CONNECTION
-                && interfaceState.get(WEST) != GenericPipeBlock.MACHINE_CONNECTION
-                && interfaceState.get(EAST) != GenericPipeBlock.MACHINE_CONNECTION
-                && interfaceState.get(UP) != GenericPipeBlock.MACHINE_CONNECTION
-                && interfaceState.get(DOWN) != GenericPipeBlock.MACHINE_CONNECTION) {
-            var normalPipeState = PipeConnectionHelper.addDisabledConnectionStates(getNormalBlock(), interfaceState);
-            normalPipeState = PipeConnectionHelper.addConnectionStates(normalPipeState, worldImp, pos);
-            return normalPipeState;
+        var interfaceState = state;
+        if (!(neighborState.getBlock() instanceof GenericPipeBlock)) {
+            interfaceState = addConnectionStates(state, worldImp, pos, false);
+
+            if (!interfaceState.equals(state)) {
+                // reload connection when state has changed (e.g. machine added/removed)
+                GenericPipeInterfaceEntity.addNode(worldImp, pos, true, interfaceState, getNetworkData(worldImp));
+            }
         }
-        
-        if (!interfaceState.equals(state)) {
-            // reload connection when state has changed (e.g. machine added/removed)
-            GenericPipeInterfaceEntity.addNode(worldImp, pos, true, interfaceState, getNetworkData(worldImp));
-        }
-        
+
         return interfaceState;
     }
 
     @Override
     protected void toggleSideConnection(BlockState state, Direction side, World world, BlockPos pos) {
-        var property = PipeConnectionHelper.directionToProperty(side);
-        var newState = state.with(property, state.get(property) == CONNECTION_DISABLED ? NO_CONNECTION : CONNECTION_DISABLED);
-        newState = PipeConnectionHelper.addInterfaceStates(newState, world, pos);
+        var property = directionToProperty(side);
+        var createConnection = state.get(property) == NO_CONNECTION;
+
+        // check if connection would be valid if state is toggled
+        var targetPos = pos.offset(side);
+        if (createConnection && !isValidConnectionTarget(world.getBlockState(targetPos).getBlock(), world, side.getOpposite(), targetPos))
+            return;
+
+        // toggle connection state
+        int nextConnectionState = getNextConnectionState(state, side, world, pos, state.get(property));
+        var newState = addStraightState(state.with(property, nextConnectionState));
 
         // transform to interface block if side is being enabled and machine is connected
-        if ((newState.get(NORTH) != GenericPipeBlock.MACHINE_CONNECTION
-                && newState.get(SOUTH) != GenericPipeBlock.MACHINE_CONNECTION
-                && newState.get(WEST) != GenericPipeBlock.MACHINE_CONNECTION
-                && newState.get(EAST) != GenericPipeBlock.MACHINE_CONNECTION
-                && newState.get(UP) != GenericPipeBlock.MACHINE_CONNECTION
-                && newState.get(DOWN) != GenericPipeBlock.MACHINE_CONNECTION)) {
-            var interfaceState = PipeConnectionHelper.addConnectionStates(PipeConnectionHelper.addDisabledConnectionStates(getNormalBlock(), newState), world, pos);
-            world.setBlockState(pos, interfaceState);
+        if (!hasNeighboringMachine(newState, world, pos, false)) {
+            var normalBlock = (GenericPipeBlock) getNormalBlock().getBlock();
+            var interfaceState = normalBlock.addConnectionStates(normalBlock.getDefaultState(), world, pos, false);
+            interfaceState = interfaceState.with(normalBlock.directionToProperty(side), newState.get(property)); // Hacky way to copy connection state
+            world.setBlockState(pos, normalBlock.addStraightState(interfaceState));
         } else {
             world.setBlockState(pos, newState);
             GenericPipeInterfaceEntity.addNode(world, pos, true, newState, getNetworkData(world));
 
             // update neighbor if it's a pipe
-            updateNeighborState(world, pos.offset(side));
+            updateNeighbors(world, pos, true);
         }
     }
 

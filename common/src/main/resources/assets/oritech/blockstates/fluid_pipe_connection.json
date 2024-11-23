@@ -10,7 +10,7 @@
     },
     {
       "when": {
-        "north": "2|3",
+        "north": "1|2",
         "straight": "false"
       },
       "apply": {
@@ -19,7 +19,7 @@
     },
     {
       "when": {
-        "south": "2|3",
+        "south": "1|2",
         "straight": "false"
       },
       "apply": {
@@ -29,7 +29,7 @@
     },
     {
       "when": {
-        "east": "2|3",
+        "east": "1|2",
         "straight": "false"
       },
       "apply": {
@@ -39,7 +39,7 @@
     },
     {
       "when": {
-        "west": "2|3",
+        "west": "1|2",
         "straight": "false"
       },
       "apply": {
@@ -49,7 +49,7 @@
     },
     {
       "when": {
-        "up": "2|3",
+        "up": "1|2",
         "straight": "false"
       },
       "apply": {
@@ -59,7 +59,7 @@
     },
     {
       "when": {
-        "down": "2|3",
+        "down": "1|2",
         "straight": "false"
       },
       "apply": {
@@ -69,7 +69,7 @@
     },
     {
       "when": {
-        "down": "2|3",
+        "down": "1|2",
         "straight": "true"
       },
       "apply": {
@@ -79,7 +79,7 @@
     },
     {
       "when": {
-        "east": "2|3",
+        "east": "1|2",
         "straight": "true"
       },
       "apply": {
@@ -89,7 +89,7 @@
     },
     {
       "when": {
-        "north": "2|3",
+        "north": "1|2",
         "straight": "true"
       },
       "apply": {
@@ -98,8 +98,7 @@
     },
     {
       "when": {
-        "north": "3",
-        "extract": true
+        "north": "2"
       },
       "apply": {
         "model": "oritech:block/fluid_pipe_connection_outer"
@@ -107,8 +106,7 @@
     },
     {
       "when": {
-        "south": "3",
-        "extract": true
+        "south": "2"
       },
       "apply": {
         "model": "oritech:block/fluid_pipe_connection_outer",
@@ -117,8 +115,7 @@
     },
     {
       "when": {
-        "east": "3",
-        "extract": true
+        "east": "2"
       },
       "apply": {
         "model": "oritech:block/fluid_pipe_connection_outer",
@@ -127,8 +124,7 @@
     },
     {
       "when": {
-        "west": "3",
-        "extract": true
+        "west": "2"
       },
       "apply": {
         "model": "oritech:block/fluid_pipe_connection_outer",
@@ -137,8 +133,7 @@
     },
     {
       "when": {
-        "up": "3",
-        "extract": true
+        "up": "2"
       },
       "apply": {
         "model": "oritech:block/fluid_pipe_connection_outer",
@@ -147,8 +142,7 @@
     },
     {
       "when": {
-        "down": "3",
-        "extract": true
+        "down": "2"
       },
       "apply": {
         "model": "oritech:block/fluid_pipe_connection_outer",

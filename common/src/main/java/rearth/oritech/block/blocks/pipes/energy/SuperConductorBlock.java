@@ -1,4 +1,4 @@
-package rearth.oritech.block.blocks.pipes;
+package rearth.oritech.block.blocks.pipes.energy;
 
 import earth.terrarium.common_storage_lib.energy.EnergyApi;
 import net.minecraft.block.Block;
@@ -14,6 +14,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.function.TriFunction;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 

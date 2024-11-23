@@ -14,8 +14,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.blocks.pipes.ItemPipeBlock;
-import rearth.oritech.block.blocks.pipes.ItemPipeConnectionBlock;
+import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
+import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
+import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.*;
@@ -35,7 +36,8 @@ public class ItemPipeInterfaceEntity extends GenericPipeInterfaceEntity {
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
-        if (world.isClient || world.getTime() % TRANSFER_PERIOD != 0 || !state.get(ItemPipeConnectionBlock.EXTRACT))
+        var block = (ExtractablePipeConnectionBlock) state.getBlock();
+        if (world.isClient || world.getTime() % TRANSFER_PERIOD != 0 || !block.isExtractable(state))
             return;
         
         // find first itemstack from connected invs (that can be extracted)
@@ -51,6 +53,7 @@ public class ItemPipeInterfaceEntity extends GenericPipeInterfaceEntity {
             for (var sourcePos : sources) {
                 var offset = pos.subtract(sourcePos);
                 var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
+                if (!block.isSideExtractable(state, direction.getOpposite())) continue;
                 var inventory = findFromCache(world, sourcePos, direction);
                 if (inventory == null || !inventory.supportsExtraction()) continue;
                 
@@ -77,15 +80,16 @@ public class ItemPipeInterfaceEntity extends GenericPipeInterfaceEntity {
         if (netHash != filteredTargetsNetHash) {
             filteredTargetItemStorages = targets.stream()
                                            .filter(target -> {
-                                               var pipePos = target.getLeft().add(target.getRight().getVector());
+                                               var direction = target.getRight();
+                                               var pipePos = target.getLeft().add(direction.getVector());
                                                var pipeState = world.getBlockState(pipePos);
-                                               if (!(pipeState.getBlock() instanceof ItemPipeConnectionBlock))
+                                               if (!(pipeState.getBlock() instanceof ItemPipeConnectionBlock itemBlock))
                                                    return true;   // edge case, this should never happen
-                                               var extracting = pipeState.get(ItemPipeConnectionBlock.EXTRACT);
+                                               var extracting = itemBlock.isSideExtractable(pipeState, direction.getOpposite());
                                                return !extracting;
                                            })
                                            .map(target -> new Pair<>(findFromCache(world, target.getLeft(), target.getRight()), target.getLeft()))
-                                           .filter(obj -> Objects.nonNull(obj.getLeft()) && obj.getLeft().supportsInsertion() && obj.getRight().getManhattanDistance(pos) > 1)
+                    .filter(obj -> Objects.nonNull(obj.getLeft()) && obj.getLeft().supportsInsertion()) //&& obj.getRight().getManhattanDistance(pos) > 1)
                                            .sorted(Comparator.comparingInt(a -> a.getRight().getManhattanDistance(pos)))
                                            .toList();
             

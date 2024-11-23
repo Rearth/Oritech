@@ -1,52 +1,25 @@
-package rearth.oritech.block.blocks.pipes;
+package rearth.oritech.block.blocks.pipes.fluid;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
+import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 
-import static rearth.oritech.block.blocks.pipes.FluidPipeBlock.FLUID_PIPE_DATA;
+import static rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock.FLUID_PIPE_DATA;
 
-public class FluidPipeConnectionBlock extends GenericPipeConnectionBlock {
-    
-    public static final BooleanProperty EXTRACT = BooleanProperty.of("extract");
+public class FluidPipeConnectionBlock extends ExtractablePipeConnectionBlock {
     
     public FluidPipeConnectionBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(EXTRACT, false));
-    }
-    
-    @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
-        builder.add(EXTRACT);
-    }
-    
-    @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        
-        if (world.isClient) return ActionResult.SUCCESS;
-        
-        var oldExtract = state.get(EXTRACT);
-        world.setBlockState(pos, state.with(EXTRACT, !oldExtract));
-        Oritech.LOGGER.debug("changed extract to: " + !oldExtract);
-        
-        return ActionResult.SUCCESS;
     }
     
     @Override
@@ -58,13 +31,6 @@ public class FluidPipeConnectionBlock extends GenericPipeConnectionBlock {
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new FluidPipeInterfaceEntity(pos, state);
-    }
-
-    @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        var baseState = super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
-
-        return baseState.with(EXTRACT, state.get(EXTRACT));
     }
     
     @Override

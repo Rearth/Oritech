@@ -20,7 +20,7 @@ import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static rearth.oritech.block.blocks.pipes.GenericPipeBlock.*;
+import static rearth.oritech.block.blocks.pipes.GenericPipeBlock.NO_CONNECTION;
 
 public abstract class GenericPipeInterfaceEntity extends BlockEntity implements BlockEntityTicker<GenericPipeInterfaceEntity> {
     
@@ -31,24 +31,17 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
     }
 
     public static void addNode(World world, BlockPos pos, boolean isInterface, BlockState newState, PipeNetworkData data) {
-        Oritech.LOGGER.debug("registering/updating node: " + pos);
-        
+        Oritech.LOGGER.info("registering/updating node: " + pos);
+
         data.pipes.add(pos);
         if (isInterface) {
             var connectedMachines = new HashSet<BlockPos>(6);
-            if (newState.get(NORTH) == MACHINE_CONNECTION)
-                connectedMachines.add(pos.north());
-            if (newState.get(SOUTH) == MACHINE_CONNECTION)
-                connectedMachines.add(pos.south());
-            if (newState.get(EAST) == MACHINE_CONNECTION)
-                connectedMachines.add(pos.east());
-            if (newState.get(WEST) == MACHINE_CONNECTION)
-                connectedMachines.add(pos.west());
-            if (newState.get(UP) == MACHINE_CONNECTION)
-                connectedMachines.add(pos.up());
-            if (newState.get(DOWN) == MACHINE_CONNECTION)
-                connectedMachines.add(pos.down());
-            
+            var block = (GenericPipeBlock) newState.getBlock();
+            for (var neighbor : Direction.values()) {
+                if (block.isConnectingInDirection(newState, neighbor, false) && block.hasMachineInDirection(neighbor, world, pos, block.apiValidationFunction()))
+                    connectedMachines.add(pos.offset(neighbor));
+            }
+
             data.machineInterfaces.put(pos, connectedMachines);
         } else {
             data.machineInterfaces.remove(pos);
@@ -58,33 +51,34 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
     }
 
     public static void removeNode(World world, BlockPos pos, boolean wasInterface, BlockState oldState, PipeNetworkData data) {
-        Oritech.LOGGER.debug("removing node: " + pos);
-        
+        Oritech.LOGGER.info("removing node: " + pos);
+
         var oldNetwork = data.pipeNetworkLinks.getOrDefault(pos, -1);
-        
+
         data.pipes.remove(pos);
         if (wasInterface) data.machineInterfaces.remove(pos);
-        
+
         data.pipeNetworks.remove(oldNetwork);
         data.pipeNetworkInterfaces.remove(oldNetwork);
         data.pipeNetworkLinks.remove(pos);
-        
+
         // re-calculate old network, is either shorter or split into multiple ones (starting from ones this block was connected to)
+        var block = (GenericPipeBlock) oldState.getBlock();
         if (oldNetwork != -1) {
-            if (oldState.get(NORTH) > CONNECTION_DISABLED)
+            if (oldState.get(block.getNorthProperty()) != NO_CONNECTION)
                 updateFromNode(world, pos.north(), data);
-            if (oldState.get(SOUTH) > CONNECTION_DISABLED)
+            if (oldState.get(block.getSouthProperty()) != NO_CONNECTION)
                 updateFromNode(world, pos.south(), data);
-            if (oldState.get(EAST) > CONNECTION_DISABLED)
+            if (oldState.get(block.getEastProperty()) != NO_CONNECTION)
                 updateFromNode(world, pos.east(), data);
-            if (oldState.get(WEST) > CONNECTION_DISABLED)
+            if (oldState.get(block.getWestProperty()) != NO_CONNECTION)
                 updateFromNode(world, pos.west(), data);
-            if (oldState.get(UP) > CONNECTION_DISABLED)
+            if (oldState.get(block.getUpProperty()) != NO_CONNECTION)
                 updateFromNode(world, pos.up(), data);
-            if (oldState.get(DOWN) > CONNECTION_DISABLED)
+            if (oldState.get(block.getDownProperty()) != NO_CONNECTION)
                 updateFromNode(world, pos.down(), data);
         }
-        
+
         data.markDirty();
     }
 
@@ -96,31 +90,31 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
 
         Oritech.LOGGER.debug("Nodes:    " + foundNetwork.size() + " | " + foundNetwork);
         Oritech.LOGGER.debug("Machines: " + foundMachines.size() + " | " + foundMachines.stream().map(elem -> elem.getLeft() + ":" + elem.getRight()).toList());
-        
+
         var netID = foundNetwork.hashCode();
         data.pipeNetworks.put(netID, foundNetwork);
         data.pipeNetworkInterfaces.put(netID, foundMachines);
-        
+
         // these networks will be replaced, since these nodes now belong to the new network
         var networksToRemove = new HashSet<Integer>();
-        
+
         for (var node : foundNetwork) {
             networksToRemove.add(data.pipeNetworkLinks.getOrDefault(node, -1));
             data.pipeNetworkLinks.put(node, netID);
         }
-        
+
         networksToRemove.stream().filter(i -> i != -1 && i != netID).forEach(i -> {
             data.pipeNetworks.remove(i);
             data.pipeNetworkInterfaces.remove(i);
         });
-        
+
         data.markDirty();
     }
-    
+
     private static Set<Pair<BlockPos, Direction>> findConnectedMachines(Set<BlockPos> network, PipeNetworkData data) {
-        
+
         var res = new HashSet<Pair<BlockPos, Direction>>();
-        
+
         for (var node : network) {
             if (data.machineInterfaces.containsKey(node)) {
                 for (var machinePos : data.machineInterfaces.get(node)) {
@@ -130,24 +124,19 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                 }
             }
         }
-        
+
         return res;
     }
-    
+
     public static Set<Pair<BlockPos, Direction>> findNetworkTargets(BlockPos from, PipeNetworkData data) {
         var connectedNetwork = data.pipeNetworkLinks.getOrDefault(from, -1);
         if (connectedNetwork == -1) return new HashSet<>();
-        
+
         return data.pipeNetworkInterfaces.get(connectedNetwork);
     }
-    
-    @Override
-    public void markRemoved() {
-        super.markRemoved();
-    }
-    
+
     private static class FloodFillSearch {
-        
+
         final HashSet<BlockPos> checkedPositions = new HashSet<>();
         final HashSet<BlockPos> nextTargets = new HashSet<>();
         final Deque<BlockPos> foundTargets = new ArrayDeque<>();
@@ -159,74 +148,72 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
             this.world = world;
             nextTargets.add(startPosition);
         }
-        
+
         public Deque<BlockPos> complete() {
             var active = true;
             while (active) {
                 active = !nextGeneration();
             }
-            
+
             return foundTargets;
         }
-        
+
         // returns true when done
         @SuppressWarnings("unchecked")
         public boolean nextGeneration() {
-            
+
             var currentGeneration = (HashSet<BlockPos>) nextTargets.clone();
-            
+
             for (var target : currentGeneration) {
                 if (isValidTarget(target)) {
                     foundTargets.addLast(target);
                     addNeighborsToQueue(target);
                 }
-                
+
                 checkedPositions.add(target);
                 nextTargets.remove(target);
             }
-            
+
             if (cutoffSearch()) nextTargets.clear();
-            
+
             return nextTargets.isEmpty();
         }
-        
+
         private boolean cutoffSearch() {
             return foundTargets.size() >= MAX_SEARCH_COUNT;
         }
-        
+
         private boolean isValidTarget(BlockPos target) {
             return pipes.contains(target);
         }
-        
+
         private void addNeighborsToQueue(BlockPos self) {
             var targetState = world.getBlockState(self);
+
+            if (!(targetState.getBlock() instanceof GenericPipeBlock targetBlock)) return;
             for (var direction : Direction.values()) {
                 var neighbor = self.offset(direction);
+                if (checkedPositions.contains(neighbor)) continue;
                 if (!isValidTarget(neighbor)) {
                     checkedPositions.add(neighbor);
                     continue;
                 }
 
                 // check if the target can connect to the neighbor
-                if (PipeConnectionHelper.canConnectInDirection(targetState, direction) && PipeConnectionHelper.isValidConnection((GenericPipeBlock) targetState.getBlock(), world, neighbor, direction.getOpposite())) {
-                    nextTargets.add(neighbor);
-                }
+                if (!targetBlock.isConnectingInDirection(targetState, direction, false)) continue;
+
+                nextTargets.add(neighbor);
             }
         }
-        
-        private List<BlockPos> getNeighbors(BlockPos pos) {
-            return List.of(pos.up(), pos.down(), pos.north(), pos.east(), pos.south(), pos.west());
-        }
-        
     }
-    
+
     public static final class PipeNetworkData extends PersistentState {
         public final HashMap<BlockPos, Integer> pipeNetworkLinks = new HashMap<>(); // which blockpos belongs to which network (ID)
         public final HashSet<BlockPos> pipes = new HashSet<>();
         public final HashMap<BlockPos, Set<BlockPos>> machineInterfaces = new HashMap<>(); // list of machines per interface/connection block
         public final HashMap<Integer, Set<BlockPos>> pipeNetworks = new HashMap<>();   // networks are never updated, and instead always replaced by new ones with different ids
         public final HashMap<Integer, Set<Pair<BlockPos, Direction>>> pipeNetworkInterfaces = new HashMap<>(); // list of machines that are connected to the network
-        
+
         @Override
         public int hashCode() {
             int result = pipeNetworkLinks.hashCode();
@@ -236,13 +223,13 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
             result = 31 * result + pipeNetworkInterfaces.hashCode();
             return result;
         }
-        
+
         public static Type<PipeNetworkData> TYPE = new Type<>(PipeNetworkData::new, PipeNetworkData::fromNbt, null);
-        
+
         public static PipeNetworkData fromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-            
+
             var result = new PipeNetworkData();
-            
+
             if (nbt.contains("pipeNetworkLinks", NbtElement.LIST_TYPE)) {
                 var pipeNetworkLinksList = nbt.getList("pipeNetworkLinks", NbtElement.COMPOUND_TYPE);
                 for (var element : pipeNetworkLinksList) {
@@ -252,13 +239,13 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                     result.pipeNetworkLinks.put(pos, id);
                 }
             }
-            
+
             // Deserialize pipes
             if (nbt.contains("pipes", NbtElement.LIST_TYPE)) {
                 var pipesList = nbt.getList("pipes", NbtElement.LONG_TYPE);
                 pipesList.stream().map(element -> BlockPos.fromLong(((NbtLong) element).longValue())).forEach(result.pipes::add);
             }
-            
+
             // Deserialize machineInterfaces
             if (nbt.contains("machineInterfaces", NbtElement.COMPOUND_TYPE)) {
                 var machineInterfacesNbt = nbt.getCompound("machineInterfaces");
@@ -271,7 +258,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                     result.machineInterfaces.put(interfacePos, machines);
                 }
             }
-            
+
             // Deserialize pipeNetworks
             if (nbt.contains("pipeNetworks", NbtElement.COMPOUND_TYPE)) {
                 var pipeNetworksNbt = nbt.getCompound("pipeNetworks");
@@ -284,7 +271,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                     result.pipeNetworks.put(id, network);
                 }
             }
-            
+
             // Deserialize pipeNetworkInterfaces
             if (nbt.contains("pipeNetworkInterfaces", NbtElement.COMPOUND_TYPE)) {
                 var pipeNetworkInterfacesNbt = nbt.getCompound("pipeNetworkInterfaces");
@@ -301,15 +288,15 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                     result.pipeNetworkInterfaces.put(id, interfaces);
                 }
             }
-            
+
             result.markDirty();
-            
+
             return result;
         }
-        
+
         @Override
         public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-            
+
             // Serialize pipeNetworkLinks
             var pipeNetworkLinksList = new NbtList();
             pipeNetworkLinks.forEach((pos, id) -> {
@@ -319,26 +306,26 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                 pipeNetworkLinksList.add(entry);
             });
             nbt.put("pipeNetworkLinks", pipeNetworkLinksList);
-            
+
             // Serialize pipes
             var pipesList = new NbtList();
             pipes.forEach(pos -> pipesList.add(NbtLong.of(pos.asLong())));
             nbt.put("pipes", pipesList);
-            
+
             // Serialize machineInterfaces
             var machineInterfacesNbt = new NbtCompound();
             machineInterfaces.forEach((interfacePos, machines) -> {
                 machineInterfacesNbt.putLongArray(Long.toString(interfacePos.asLong()), machines.stream().map(BlockPos::asLong).collect(Collectors.toList()));
             });
             nbt.put("machineInterfaces", machineInterfacesNbt);
-            
+
             // Serialize pipeNetworks
             var pipeNetworksNbt = new NbtCompound();
             pipeNetworks.forEach((id, network) -> {
                 pipeNetworksNbt.putLongArray(id.toString(), network.stream().map(BlockPos::asLong).collect(Collectors.toList()));
             });
             nbt.put("pipeNetworks", pipeNetworksNbt);
-            
+
             // Serialize pipeNetworkInterfaces
             var pipeNetworkInterfacesNbt = new NbtCompound();
             pipeNetworkInterfaces.forEach((id, interfaces) -> {
@@ -352,9 +339,9 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                 pipeNetworkInterfacesNbt.put(id.toString(), interfacesList);
             });
             nbt.put("pipeNetworkInterfaces", pipeNetworkInterfacesNbt);
-            
+
             return nbt;
         }
     }
-    
+
 }

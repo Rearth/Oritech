@@ -1,37 +1,37 @@
-package rearth.oritech.block.blocks.pipes;
+package rearth.oritech.block.blocks.pipes.energy;
 
 import earth.terrarium.common_storage_lib.energy.EnergyApi;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.function.TriFunction;
-import rearth.oritech.Oritech;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.blocks.pipes.GenericPipeConnectionBlock;
+import rearth.oritech.block.entity.pipes.EnergyPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 
-import java.util.HashMap;
-import java.util.List;
+import static rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock.ENERGY_PIPE_DATA;
 
-public class EnergyPipeBlock extends GenericPipeBlock {
+public class EnergyPipeConnectionBlock extends GenericPipeConnectionBlock {
     
-    public static HashMap<Identifier, GenericPipeInterfaceEntity.PipeNetworkData> ENERGY_PIPE_DATA = new HashMap<>();
-    
-    public EnergyPipeBlock(Settings settings) {
+    public EnergyPipeConnectionBlock(Settings settings) {
         super(settings);
     }
     
     @Override
     public TriFunction<World, BlockPos, Direction, Boolean> apiValidationFunction() {
         return ((world, pos, direction) -> EnergyApi.BLOCK.isPresent(world, pos, null, null, direction));   // TODO check if this loads null values
+    }
+    
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new EnergyPipeInterfaceEntity(pos, state);
     }
     
     @Override
@@ -75,13 +75,5 @@ public class EnergyPipeBlock extends GenericPipeBlock {
     @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
         return ENERGY_PIPE_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
-    }
-    
-    @Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
-        var text = Text.translatable("tooltip.oritech.energy_max_transfer").formatted(Formatting.GRAY)
-            .append(Text.translatable("tooltip.oritech.energy_transfer_rate", Oritech.CONFIG.energyPipeTransferRate()).formatted(Formatting.GOLD));
-        tooltip.add(text);
-        super.appendTooltip(stack, context, tooltip, options);
     }
 }
