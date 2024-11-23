@@ -56,7 +56,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         // if burn time is zero, try to consume item thus adding burn time
         // if burn time is remaining, use up one tick of it
         
-        if (world.isClient || !isActive(state)) return;
+        if (world.isClient || !isActive(state) || disabledViaRedstone) return;
         
         // progress var is used as remaining burn time
         if (progress > 0) {

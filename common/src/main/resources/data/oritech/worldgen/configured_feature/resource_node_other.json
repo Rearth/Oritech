@@ -23,7 +23,7 @@
       "minecraft:deepslate",
       "minecraft:deepslate"
     ],
-    "overlayBlock": "oritech:oil_fluid_block",
+    "overlayBlock": "oritech:still_oil_block",
     "overlayHeight": 5
   }
 }

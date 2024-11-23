@@ -148,6 +148,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block FERTILIZER_BLOCK = new FertilizerBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block TREEFELLER_BLOCK = new TreefellerBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
+    @UseGeoBlockItem(scale = 0.7f)
+    public static final Block PIPE_BOOSTER_BLOCK = new PipeBoosterBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block ENCHANTMENT_CATALYST_BLOCK = new EnchantmentCatalystBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
@@ -162,6 +164,9 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block ACCELERATOR_CONTROLLER = new AcceleratorControllerBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block ACCELERATOR_SENSOR = new AcceleratorSensorBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block BLACK_HOLE_BLOCK = new BlackHoleBlock(AbstractBlock.Settings.copy(Blocks.END_PORTAL).luminance(item -> 12).nonOpaque());
+    // TODO geo item
+    // @UseGeoBlockItem(scale = 0.7f)
+    public static final Block PARTICLE_COLLECTOR_BLOCK = new ParticleCollectorBlock(AbstractBlock.Settings.copy(Blocks.GLASS).nonOpaque());
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block PUMP_BLOCK = new PumpBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());

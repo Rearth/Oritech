@@ -66,11 +66,10 @@ dependencies {
 
     // CSL
     // because CSL currently loads in energized power in a wrong version
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-neoforge-1.21:0.0.8')
-    // modRuntimeOnly files('common-storage-lib-neoforge-1.21-0.0.8.jar')
-    modRuntimeOnly files('common-storage-lib-data-neoforge-1.21-0.0.8.jar')
-    modRuntimeOnly files('common-storage-lib-resources-neoforge-1.21-0.0.8.jar')
-    modRuntimeOnly files('common-storage-lib-lookup-neoforge-1.21-0.0.8.jar')
+    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-neoforge-1.21:0.0.27')
+    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-data-neoforge-1.21:0.0.27')
+    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-resources-neoforge-1.21:0.0.27')
+    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-lookup-neoforge-1.21:0.0.27')
 
     // jade
     modImplementation "curse.maven:jade-324717:5846105"
@@ -103,4 +102,46 @@ remapJar {
 tasks.remapJar {
     injectAccessWidener = true
     atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+}
+
+
+
+publishMods {
+    file = remapJar.archiveFile
+    changelog = file("../changelog.md").getText()
+    type = ALPHA
+    modLoaders.add("neoforge")
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_API_KEY")
+        projectId = "4sYI62kA"
+        minecraftVersions.add("1.21.1")
+        minecraftVersions.add("1.21")
+
+        requires("owo-lib")
+        requires("geckolib")
+        requires("athena-ctm")
+        requires("forgified-fabric-api")
+
+        announcementTitle = "Neoforge Version on Modrinth"
+    }
+
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+        projectId = "1030830"
+        minecraftVersions.add("1.21.1")
+        minecraftVersions.add("1.21")
+
+        requires("owo-lib")
+        requires("geckolib")
+        requires("athena")
+        requires("forgified-fabric-api")
+
+        javaVersions.add(JavaVersion.VERSION_21)
+        clientRequired = true
+        serverRequired = true
+
+        projectSlug = "oritech"
+        announcementTitle = "Neoforge Version on CurseForge"
+    }
 }

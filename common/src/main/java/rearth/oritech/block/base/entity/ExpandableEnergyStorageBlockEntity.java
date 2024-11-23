@@ -108,7 +108,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         chargeItems();
         
         // todo caching for targets? Used to be BlockApiCache.create()
-        var target = getOutputPosition(pos, world);
+        var target = getOutputPosition(pos, getFacing());
         var candidate = EnergyApi.BLOCK.find(world, target.getRight(), target.getLeft());
         if (candidate != null) {
             TransferUtil.moveValue(energyStorage, candidate, Long.MAX_VALUE, false);
@@ -127,8 +127,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         }
     }
     
-    protected Pair<Direction, BlockPos> getOutputPosition(BlockPos pos, World world) {
-        var facing = getFacing();
+    public static Pair<Direction, BlockPos> getOutputPosition(BlockPos pos, Direction facing) {
         var blockInFront = (BlockPos) Geometry.offsetToWorldPosition(facing, new Vec3i(-1, 0, 0), pos);
         var worldOffset = blockInFront.subtract(pos);
         var direction = Direction.fromVector(worldOffset.getX(), worldOffset.getY(), worldOffset.getZ());

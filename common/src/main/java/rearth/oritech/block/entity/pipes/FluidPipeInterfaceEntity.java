@@ -43,7 +43,7 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
         
         @Override
         protected long getCapacity(FluidVariant variant) {
-            return (long) (MAX_TRANSFER_RATE * Oritech.CONFIG.fluidPipeInternalStorageBuckets());
+            return (long) (MAX_TRANSFER_RATE * Oritech.CONFIG.fluidPipeInternalStorageBuckets() * (isBoostAvailable() ? 10 : 1));
         }
         
         @Override
@@ -71,10 +71,14 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
-        var block = (ExtractablePipeConnectionBlock) state.getBlock();
-        if (world.isClient || world.getTime() % TRANSFER_PERIOD != 0 || !block.isExtractable(state)) return;
-        
-        var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
+        if (world.isClient) return;
+
+        // boosted pipe works every tick, otherwise only every N tick
+		var block = (ExtractablePipeConnectionBlock) state.getBlock();
+        if (world.getTime() % TRANSFER_PERIOD != 0 && !isBoostAvailable() || !block.isExtractable(state))
+            return;
+
+		var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
 
         // try to fill internal storage from inputs (if extract true)
         // one transaction for each side
@@ -157,11 +161,12 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
         
         var availableFluid = fluidStorage.getAmount();
         var ownType = fluidStorage.variant;
-        
+        var moved = 0L;
+
         try (var tx = Transaction.openOuter()) {
             for (var targetStorage : filteredFluidTargetsCached) {
                 var transferred = targetStorage.insert(ownType, availableFluid, tx);
-                fluidStorage.extract(ownType, transferred, tx);
+                moved += fluidStorage.extract(ownType, transferred, tx);
                 availableFluid -= transferred;
                 
                 if (availableFluid <= 0) break;
@@ -170,6 +175,9 @@ public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity impleme
             tx.commit();
         }
         
+        if (moved > 0)
+            onBoostUsed();
+
     }
     
     @Override

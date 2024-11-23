@@ -139,6 +139,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             }
             else if (currentTarget != null && !currentTarget.equals(BlockPos.ZERO)) {
                 fireAtBlocks(world, pos, state, blockEntity);
+            } else if (targetDirection != null && !targetDirection.equals(BlockPos.ORIGIN) && (world.getTime() + pos.getZ()) % 40 == 0) {
+                // target pos is set, but no target is found (e.g. all blocks already mined). Periodically scan again for new blocks.
+                findNextBlockBreakTarget();
             }
         }
     
@@ -285,7 +288,10 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         var from = laserHead.add(direction.multiply(1.5));
         
         var nextBlock = basicRaycast(from, direction, range, 0.45F);
-        if (nextBlock == null) return;
+        if (nextBlock == null) {
+            currentTarget = null;
+            return;
+        }
         
         var maxSize = (int) from.distanceTo(nextBlock.toCenterPos()) - 1;
         var scanDist = Math.min(areaSize, maxSize);
@@ -293,7 +299,9 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
             pendingArea = findNextAreaBlockTarget(nextBlock, scanDist);
         
         
-        trySetNewTarget(nextBlock, false);
+        if (!trySetNewTarget(nextBlock, false)) {
+            currentTarget = null;   // out of range or invalid for another reason
+        }
         
     }
 

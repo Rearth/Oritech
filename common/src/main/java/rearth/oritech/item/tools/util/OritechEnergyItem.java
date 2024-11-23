@@ -17,7 +17,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.random.Random;
 import rearth.oritech.Oritech;
-import rearth.oritech.util.SimpleEnergyStorage;
+import rearth.oritech.util.SimpleItemEnergyStorage;
 
 public interface OritechEnergyItem extends EnergyProvider.Item, FabricItem {
     default long getEnergyCapacity(ItemStack stack) {return 10_000;}
@@ -49,10 +49,10 @@ public interface OritechEnergyItem extends EnergyProvider.Item, FabricItem {
         var slot = PlayerContext.ofSlot(player, slotIndex);
         var storage = slot.find(EnergyApi.ITEM);
         
-        if (storage instanceof SimpleEnergyStorage simpleStorage) {
+        if (storage instanceof SimpleItemEnergyStorage simpleStorage) {
             var extracted = simpleStorage.extractIgnoringLimit(amount, false);
             if (extracted > 0) {
-                simpleStorage.update();
+                stack.set(Oritech.ENERGY_CONTENT.componentType(), storage.getStoredAmount());
             }
             
             return extracted == amount;
@@ -92,6 +92,6 @@ public interface OritechEnergyItem extends EnergyProvider.Item, FabricItem {
     
     @Override
     default ValueStorage getEnergy(ItemStack stack, ItemContext context) {
-        return new SimpleEnergyStorage(context, Oritech.ENERGY_CONTENT.componentType(), getEnergyCapacity(stack), getEnergyMaxInput(stack), getEnergyMaxOutput(stack));
+        return new SimpleItemEnergyStorage(context, Oritech.ENERGY_CONTENT.componentType(), getEnergyCapacity(stack), getEnergyMaxInput(stack), getEnergyMaxOutput(stack), stack);
     }
 }

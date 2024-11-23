@@ -1,6 +1,8 @@
 package rearth.oritech.init;
 
 import dev.architectury.registry.registries.RegistrySupplier;
+import earth.terrarium.common_storage_lib.energy.EnergyApi;
+import earth.terrarium.common_storage_lib.energy.EnergyProvider;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -77,6 +79,8 @@ public class ToolsContent implements ArchitecturyRegistryContainer<Item> {
             var variantStack = new ItemStack(value);
             variantStack.set(Oritech.ENERGY_CONTENT.componentType(), energyItem.getEnergyCapacity(variantStack));
             ItemGroups.add(targetGroup, variantStack);
+            
+            EnergyApi.ITEM.registerSelf((storage, context) -> ((EnergyProvider.Item) storage.getItem()).getEnergy(storage, context), value);
         }
         
     }

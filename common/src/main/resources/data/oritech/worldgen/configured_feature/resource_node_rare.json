@@ -27,7 +27,7 @@
       "minecraft:deepslate",
       "minecraft:deepslate"
     ],
-    "overlayBlock": "oritech:fuel_fluid_block",
+    "overlayBlock": "oritech:still_fuel_block",
     "overlayHeight": 5
   }
 }

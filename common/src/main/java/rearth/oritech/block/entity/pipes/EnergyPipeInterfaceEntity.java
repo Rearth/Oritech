@@ -18,6 +18,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.SimpleEnergyStorage;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,9 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     
     private final SimpleEnergyStorage energyStorage;
     private final boolean isSuperConductor;
+    
+    private List<ValueStorage> cachedTargets;
+    private int cacheHash;
     
     public EnergyPipeInterfaceEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ENERGY_PIPE_ENTITY, pos, state);
@@ -72,11 +76,20 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
         
         if (targets == null) return;    // this should never happen
         
-        // TODO caching of find results
-        var energyStorages = targets.stream()
+        var targetHash = targets.hashCode();
+        
+        List<ValueStorage> energyStorages;
+        
+        if (this.cacheHash == targetHash) {
+            energyStorages = this.cachedTargets;
+        } else {
+            energyStorages = targets.stream()
                                .map(target -> EnergyApi.BLOCK.find(world, target.getLeft(), target.getRight()))
                                .filter(obj -> Objects.nonNull(obj) && obj.allowsInsertion())
                                .collect(Collectors.toList());
+            this.cachedTargets = energyStorages;
+            this.cacheHash = targetHash;
+        }
         
         Collections.shuffle(energyStorages);
         

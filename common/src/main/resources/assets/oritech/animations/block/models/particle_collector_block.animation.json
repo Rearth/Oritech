@@ -1,0 +1,48 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"collect": {
+			"animation_length": 0.7917,
+			"bones": {
+				"waveRing": {
+					"position": {
+						"0.0": {
+							"vector": [0, 0, "-8-variable.distance*0.33"]
+						},
+						"0.2083": {
+							"vector": [0, 0, -2.5]
+						},
+						"0.7917": {
+							"vector": [0, 0, 0],
+							"easing": "easeOutSine"
+						}
+					},
+					"scale": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.2083": {
+							"vector": [1, 1, 1],
+							"easing": "easeOutSine"
+						},
+						"0.7917": {
+							"vector": [0, 0, 0],
+							"easing": "easeOutQuad"
+						}
+					}
+				}
+			}
+		},
+		"idle": {
+			"animation_length": 0.0833,
+			"bones": {
+				"waveRing": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

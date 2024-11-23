@@ -20,6 +20,7 @@ import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.machines.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.machines.accelerator.BlackHoleBlockEntity;
+import rearth.oritech.block.entity.machines.accelerator.ParticleCollectorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
@@ -65,6 +66,9 @@ public class NetworkContent {
     public record AcceleratorParticleInsertEventPacket(BlockPos position) {}
     
     public record DroneCardEventPacket(BlockPos position, String message) {
+    }
+    
+    public record ParticleAcceleratorAnimationPacket(BlockPos position) {
     }
     
     public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget,
@@ -385,6 +389,15 @@ public class NetworkContent {
                 var oldData = machine.getBaseAddonData();
                 var newData = new MachineAddonController.BaseAddonData(message.operationSpeed, oldData.efficiency(), oldData.energyBonusCapacity(), oldData.energyBonusTransfer());
                 machine.setBaseAddonData(newData);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(ParticleAcceleratorAnimationPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            if (entity instanceof ParticleCollectorBlockEntity machine) {
+                machine.playAnimation();
             }
             
         }));

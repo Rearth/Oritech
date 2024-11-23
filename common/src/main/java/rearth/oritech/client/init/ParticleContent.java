@@ -38,6 +38,12 @@ public class ParticleContent {
         ClientParticles.spawnEnchantParticles(world, data.start, data.end, 0.7f);
     });
     
+    public static final ParticleSystem<Vec3d> BLACK_HOLE_EMISSION = PARTICLE_CONTROLLER.register(Vec3d.class, (world, pos, data) -> {
+        var dist = (int) data.distanceTo(pos);
+        ClientParticles.setParticleCount(dist + world.random.nextInt(3));
+        ClientParticles.spawnLine(ParticleTypes.SCULK_CHARGE_POP, world, pos, data, 0.2f);
+    });
+    
     public static final ParticleSystem<Integer> FERTILIZER_EFFECT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(data);
         ClientParticles.spawnWithinBlock(ParticleTypes.HAPPY_VILLAGER, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z));

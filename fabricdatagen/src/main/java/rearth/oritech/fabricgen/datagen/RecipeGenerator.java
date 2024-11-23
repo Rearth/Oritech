@@ -282,6 +282,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerFurnaceRecipe(exporter, BlockContent.FERTILIZER_BLOCK.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.fromTag(TagContent.SILICON), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.ofItems(Items.COPPER_INGOT), "fertilizer");
         // tree feller
         offerGeneratorRecipe(exporter, BlockContent.TREEFELLER_BLOCK.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(Items.IRON_AXE), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.ELECTRUM_INGOT), "treefeller");
+        // pipe booster
+        offerTankRecipe(exporter, BlockContent.PIPE_BOOSTER_BLOCK.asItem(), of(BlockContent.ITEM_PIPE), of(ItemContent.MOTOR), of(BlockContent.FLUID_PIPE), "booster");
         
         // machine frame
         offerMachineFrameRecipe(exporter, BlockContent.MACHINE_FRAME_BLOCK.asItem(), Ingredient.ofItems(Items.IRON_BARS), Ingredient.fromTag(TagContent.NICKEL_INGOTS), 16, "frame");
@@ -321,6 +323,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerGeneratorRecipe(exporter, BlockContent.ACCELERATOR_CONTROLLER.asItem(), Ingredient.ofItems(BlockContent.ACCELERATOR_MOTOR.asItem()), Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.ofItems(Items.DROPPER), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), "particlecontroller");
         // sensor
         offerTwoComponentRecipe(exporter, BlockContent.ACCELERATOR_SENSOR.asItem(), Ingredient.ofItems(BlockContent.ACCELERATOR_RING.asItem()), Ingredient.ofItems(Items.OBSERVER), "particlesensor");
+        // collector
+        offerTankRecipe(exporter, BlockContent.PARTICLE_COLLECTOR_BLOCK.asItem(), of(BlockContent.SUPERCONDUCTOR.asItem()), of(BlockContent.BIG_SOLAR_PANEL_BLOCK.asItem()), of(ItemContent.HEISENBERG_COMPENSATOR), "particlecollector");
+        
         
         // addons
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_SPEED_ADDON.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.ofItems(ItemContent.BIOSTEEL_INGOT), Ingredient.ofItems(ItemContent.PLASTIC_SHEET), "addon/speed");
