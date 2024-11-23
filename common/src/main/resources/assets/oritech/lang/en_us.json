@@ -208,7 +208,6 @@
   "tooltip.oritech.fluid_content": "%f mB %s",
   "tooltip.oritech.jetpack_fuel": "%f/%f mB %s",
   "tooltip.oritech.fluid_empty": "Empty",
-  "tooltip.oritech.wrench.description": "Right-click to edit the connection type of pipes.\nShift-right-click to change the wrench direction.",
   "tooltip.oritech.wrench.current_direction": "Wrench direction: %s",
   "tooltip.oritech.wrench.direction_changed": "Wrench direction changed to: %s",
   "tooltip.oritech.progress_indicator": "%d / %d ticks\n(base %d ticks)",

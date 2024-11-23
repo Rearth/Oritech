@@ -31,7 +31,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
     }
 
     public static void addNode(World world, BlockPos pos, boolean isInterface, BlockState newState, PipeNetworkData data) {
-        Oritech.LOGGER.info("registering/updating node: " + pos);
+        Oritech.LOGGER.debug("registering/updating node: " + pos);
 
         data.pipes.add(pos);
         if (isInterface) {
@@ -51,7 +51,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
     }
 
     public static void removeNode(World world, BlockPos pos, boolean wasInterface, BlockState oldState, PipeNetworkData data) {
-        Oritech.LOGGER.info("removing node: " + pos);
+        Oritech.LOGGER.debug("removing node: " + pos);
 
         var oldNetwork = data.pipeNetworkLinks.getOrDefault(pos, -1);
 

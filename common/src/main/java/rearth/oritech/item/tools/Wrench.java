@@ -1,20 +1,23 @@
 package rearth.oritech.item.tools;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.SoundContent;
@@ -30,6 +33,8 @@ public class Wrench extends Item {
 	public static byte WEST = 4;
 	public static byte EAST = 5;
 
+	public static int ACTION_COOLDOWN = 8;
+
 	public Wrench(Settings settings) {
 		super(settings);
 	}
@@ -42,35 +47,32 @@ public class Wrench extends Item {
 	@Override
 	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
 		var stack = user.getStackInHand(hand);
-		if (!world.isClient && user.isSneaking()) {
-			rotateWrenchDirection(stack, user);
-			world.playSound(null, user.getBlockPos(), SoundContent.WRENCH_TURN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			return new TypedActionResult<>(ActionResult.SUCCESS_NO_ITEM_USED, stack);
-		}
-
+		useWrench(stack, user, hand, true);
 		return super.use(world, user, hand);
 	}
 
 	@Override
-	public ActionResult useOnBlock(ItemUsageContext context) {
-		var world = context.getWorld();
-		var player = context.getPlayer();
+	public float getMiningSpeed(ItemStack stack, BlockState state) {
+		return 100.f;
+	}
 
-		if (world.isClient || player == null || player.isSneaking()) return super.useOnBlock(context);
+	@Override
+	public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
+		if (miner.getItemCooldownManager().isCoolingDown(this)) return false;
 
-		var blockState = world.getBlockState(context.getBlockPos());
-		if (blockState.getBlock() instanceof Wrenchable) {
-			var stack = context.getStack();
-			world.playSound(null, player.getBlockPos(), SoundContent.WRENCH_TURN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-
-			var result = ((Wrenchable) blockState.getBlock()).onWrenchUse(blockState, context, stack);
-			if (result == ActionResult.SUCCESS) {
-				stack.damage(1, player, LivingEntity.getSlotForHand(context.getHand()));
-				return ActionResult.success(true);
-			}
+		var itemStack = miner.getMainHandStack();
+		if (itemStack.isOf(this)) {
+			useWrench(itemStack, miner, Hand.MAIN_HAND, false);
+			return false;
 		}
 
-		return super.useOnBlock(context);
+		itemStack = miner.getOffHandStack();
+		if (itemStack.isOf(this)) {
+			useWrench(itemStack, miner, Hand.OFF_HAND, false);
+			return false;
+		}
+
+		return false;
 	}
 
 	/**
@@ -79,27 +81,53 @@ public class Wrench extends Item {
 	 * @param item   The wrench item
 	 * @param player The player using the wrench
 	 */
-	protected void rotateWrenchDirection(ItemStack item, PlayerEntity player) {
-		// Rotate the wrench mode
-		byte mode = item.getOrDefault(ComponentContent.WRENCH_DIRECTION.get(), NORTH);
-		byte newMode = (byte) ((mode + 1) % 6);
-		item.set(ComponentContent.WRENCH_DIRECTION.get(), newMode);
+	protected void useWrench(ItemStack item, PlayerEntity player, Hand hand, boolean updateBlock) {
+		if (player.getItemCooldownManager().isCoolingDown(this)) return;
 
-		// Send a message to the player
-		player.sendMessage(Text.translatable("tooltip.oritech.wrench.direction_changed", Text.translatable("text.oritech.parameter." + Direction.byId(newMode).getName())), true);
+		player.getItemCooldownManager().set(this, ACTION_COOLDOWN);
+
+		if (player instanceof ServerPlayerEntity) {
+			// Wrench used on wrenchable block
+			var world = player.getWorld();
+			var result = raycast(world, player, RaycastContext.FluidHandling.NONE);
+			if (updateBlock && result.getType() == HitResult.Type.BLOCK) {
+				var blockPos = result.getBlockPos();
+				var blockState = world.getBlockState(blockPos);
+				if (blockState.getBlock() instanceof Wrenchable wrenchable) {
+					var resultAction = wrenchable.onWrenchUse(blockState, world, blockPos, player, hand, getDirection(item));
+					if (resultAction == ActionResult.SUCCESS) {
+						playSound(world, player);
+						item.damage(1, player, LivingEntity.getSlotForHand(hand));
+						return;
+					}
+				}
+			}
+
+			// Rotate the wrench mode
+			byte mode = item.getOrDefault(ComponentContent.WRENCH_DIRECTION.get(), NORTH);
+			byte newMode = (byte) ((mode + (player.isSneaking() ? -1 : 1)) % 6);
+			item.set(ComponentContent.WRENCH_DIRECTION.get(), newMode);
+
+			// Send a message to the player
+			player.sendMessage(Text.translatable("tooltip.oritech.wrench.direction_changed", Text.translatable("text.oritech.parameter." + Direction.byId(newMode).getName())), true);
+		}
+
+		playSound(player.getWorld(), player);
+	}
+
+	protected void playSound(World world, PlayerEntity player) {
+		world.playSound(player, player.getBlockPos(), SoundContent.WRENCH_TURN, SoundCategory.PLAYERS, 1.0f, 1.0f);
 	}
 
 	@Override
 	public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
 		super.appendTooltip(stack, context, tooltip, type);
+		tooltip.add(Text.translatable("tooltip.oritech.wrench.current_direction", Text.translatable("text.oritech.parameter." + getDirection(stack).getName())).formatted(Formatting.GRAY));
+	}
 
-		var showFull = Screen.hasControlDown();
-		if (!showFull) {
-			tooltip.add(Text.translatable("tooltip.oritech.item_extra_info").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
-		} else {
-			tooltip.add(Text.translatable("tooltip.oritech.wrench.description").formatted(Formatting.ITALIC, Formatting.GRAY));
-			tooltip.add(Text.translatable("tooltip.oritech.wrench.current_direction", Text.translatable("text.oritech.parameter." + getDirection(stack).getName())).formatted(Formatting.GRAY));
-		}
+	@Override
+	public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+		super.inventoryTick(stack, world, entity, slot, selected);
 	}
 
 	/**
@@ -108,12 +136,13 @@ public class Wrench extends Item {
 	public interface Wrenchable {
 		/**
 		 * Called when a wrench is used on the block
-		 *
-		 * @param state   The block state
-		 * @param context The usage context
-		 * @param stack   The wrench item stack
-		 * @return The result of the wrench use
+		 * @param state the block state
+		 * @param world the world
+		 * @param pos the block position
+		 * @param player the player using the wrench
+		 * @param wrenchDirection the direction the wrench is facing
+		 * @return the result of the wrench use
 		 */
-		ActionResult onWrenchUse(BlockState state, ItemUsageContext context, ItemStack stack);
+		ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, Direction wrenchDirection);
 	}
 }

@@ -6,13 +6,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -188,15 +187,16 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
 	}
 
 	@Override
-	public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
-		if (!player.isCreative()) {
+	public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+		if (!player.isCreative() && !world.isClient) {
 			onBlockRemoved(pos, state, world);
 		}
+		return super.onBreak(world, pos, state, player);
 	}
 
-    @Override
-    public ActionResult onWrenchUse(BlockState state, ItemUsageContext context, ItemStack stack) {
-        toggleSideConnection(state, Wrench.getDirection(stack), context.getWorld(), context.getBlockPos());
+	@Override
+	public ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, Direction wrenchDirection) {
+		toggleSideConnection(state, wrenchDirection, world, pos);
         return ActionResult.SUCCESS;
     }
 
