@@ -3,7 +3,7 @@ description: Report a bug or problem with Oritech
 body:
   - type: markdown
     attributes:
-      value: "*Please use the search functionality before reporting an issue. Some topics can alsoalready be found in the github discussions. Also take a look at the closed issues!*"
+      value: "*Please use the search functionality before reporting an issue. Some topics can also already be found in the github discussions. Also take a look at the closed issues!*"
   - type: textarea
     attributes:
       label: Issue description
@@ -29,17 +29,27 @@ body:
         - 1.20.4 (No longer being developed)
     validations:
       required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: On which platform did the issue occur?
+      options:
+        - Fabric
+        - Neoforge
+    validations:
+      required: true
   - type: input
     attributes:
-      label: Fabric loader version
-      description: What version of Fabric Loader are you using?
+      label: Loader version
+      description: What version of Fabric/Neoforge are you using?
       placeholder: e.g. 0.15.11
     validations:
       required: true
   - type: input
     attributes:
       label: Fabric API version
-      description: What version of Fabric API are you using?
+      description: What version of Fabric API (or forgified fabric api) are you using?
       placeholder: e.g. 0.100.3+1.21
     validations:
       required: true
@@ -48,7 +58,7 @@ body:
     attributes:
       label: Oritech version
       description: What version of Oritech are you using?
-      placeholder: e.g. 0.6.0
+      placeholder: e.g. 0.11.1
     validations:
       required: true
   - type: textarea
@@ -58,4 +68,4 @@ body:
   - type: input
     attributes:
       label: "If a (crash)log is relevant for this issue, link it here: (It's almost always relevant)"
-      description: "Please provide a [gist](https://gist.github.com/) / [pastebin](https://pastebin.com/) / etc link here. (Make sure that it isn't set to expire!)"
+      description: "Please provide a [mclogs](https://mclo.gs/) / [gist](https://gist.github.com/) / [pastebin](https://pastebin.com/) / etc link here. (Make sure that it isn't set to expire!)"

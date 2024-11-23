@@ -1,6 +1,6 @@
 name: Feature Request
 labels: enhancement
-description: Suggest an idea or enhancement for Mekanism
+description: Suggest an idea or enhancement for Oritech
 body:
   - type: markdown
     attributes:

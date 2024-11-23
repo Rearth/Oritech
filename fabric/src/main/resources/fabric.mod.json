@@ -8,7 +8,8 @@
     "Me! - rearth"
   ],
   "contact": {
-    "sources": "https://github.com/Rearth/Oritech/"
+    "sources": "https://github.com/Rearth/Oritech/",
+    "homepage": "https://moddedmc.org/en/mod/oritech/docs"
   },
   "license": "CC0-1.0",
   "icon": "assets/oritech/icon.png",
