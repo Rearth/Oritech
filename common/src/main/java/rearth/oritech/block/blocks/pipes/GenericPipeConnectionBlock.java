@@ -7,6 +7,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -62,14 +63,14 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     }
 
     @Override
-    protected void toggleSideConnection(BlockState state, Direction side, World world, BlockPos pos) {
+    protected boolean toggleSideConnection(BlockState state, Direction side, World world, BlockPos pos) {
         var property = directionToProperty(side);
         var createConnection = state.get(property) == NO_CONNECTION;
 
         // check if connection would be valid if state is toggled
         var targetPos = pos.offset(side);
         if (createConnection && !isValidConnectionTarget(world.getBlockState(targetPos).getBlock(), world, side.getOpposite(), targetPos))
-            return;
+            return false;
 
         // toggle connection state
         int nextConnectionState = getNextConnectionState(state, side, world, pos, state.get(property));
@@ -88,6 +89,12 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
             // update neighbor if it's a pipe
             updateNeighbors(world, pos, true);
         }
+
+        // play sound
+        var soundGroup = getSoundGroup(state);
+        world.playSound(null, pos, soundGroup.getPlaceSound(), SoundCategory.BLOCKS, soundGroup.getVolume() * .5f, soundGroup.getPitch());
+
+        return true;
     }
 
     @SuppressWarnings("rawtypes")

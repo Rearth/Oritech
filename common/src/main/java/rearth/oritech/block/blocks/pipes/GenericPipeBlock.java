@@ -14,6 +14,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
@@ -24,6 +25,9 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.item.tools.Wrench;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchable {
 
@@ -195,10 +199,58 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
 	}
 
 	@Override
-	public ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, Direction wrenchDirection) {
-		toggleSideConnection(state, wrenchDirection, world, pos);
-        return ActionResult.SUCCESS;
-    }
+	public ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand) {
+		var shapes = getActiveShapes(state);
+		var start = player.getCameraPosVec(0f);
+		var end = start.add(player.getRotationVec(0).multiply(5));
+
+		var targetShape = shapes.getFirst();
+		var distance = Double.MAX_VALUE;
+		var hitPos = Vec3d.ZERO;
+		for (var shape : shapes) {
+			var hitResult = shape.raycast(start, end, pos);
+			if (hitResult != null) {
+				var shapeDistance = hitResult.getPos().distanceTo(start);
+				if (shapeDistance < distance) {
+					distance = shapeDistance;
+					targetShape = shape;
+					hitPos = hitResult.getPos();
+				}
+			}
+		}
+
+		var center = targetShape.getBoundingBox().getCenter();
+		var diff = center.subtract(shapes.getFirst().getBoundingBox().getCenter());
+		if (diff.equals(Vec3d.ZERO)) {
+			// center hit
+			diff = hitPos.subtract(center.add(Vec3d.of(pos)));
+		}
+
+		return !toggleSideConnection(state, Direction.getFacing(diff.x, diff.y, diff.z), world, pos) ? ActionResult.FAIL : ActionResult.SUCCESS;
+	}
+
+	@Override
+	public ActionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, World world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, PlayerEntity player, Hand hand) {
+		return toggleSideConnection(state, neighborFace.getOpposite(), world, pos) ? ActionResult.SUCCESS : ActionResult.FAIL;
+	}
+
+	private List<VoxelShape> getActiveShapes(BlockState state) {
+		var shapes = new ArrayList<VoxelShape>();
+		shapes.add(boundingShapes[0]);
+		if (state.get(getNorthProperty()) != NO_CONNECTION)
+			shapes.add(boundingShapes[1]);
+		if (state.get(getEastProperty()) != NO_CONNECTION)
+			shapes.add(boundingShapes[2]);
+		if (state.get(getSouthProperty()) != NO_CONNECTION)
+			shapes.add(boundingShapes[3]);
+		if (state.get(getWestProperty()) != NO_CONNECTION)
+			shapes.add(boundingShapes[4]);
+		if (state.get(getUpProperty()) != NO_CONNECTION)
+			shapes.add(boundingShapes[5]);
+		if (state.get(getDownProperty()) != NO_CONNECTION)
+			shapes.add(boundingShapes[6]);
+		return shapes;
+	}
 
     /**
      * Toggles the connection state of a pipe side between disabled and enabled.
@@ -208,14 +260,14 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
      * @param world The target world
      * @param pos   The target pipe position
      */
-    protected void toggleSideConnection(BlockState state, Direction side, World world, BlockPos pos) {
+	protected boolean toggleSideConnection(BlockState state, Direction side, World world, BlockPos pos) {
 		var property = directionToProperty(side);
 		var createConnection = state.get(property) == NO_CONNECTION;
 
 		// check if connection would be valid if state is toggled
 		var targetPos = pos.offset(side);
 		if (createConnection && !isValidConnectionTarget(world.getBlockState(targetPos).getBlock(), world, side.getOpposite(), targetPos))
-			return;
+			return false;
 
 		// toggle connection state
 		int nextConnectionState = getNextConnectionState(state, side, world, pos, state.get(property));
@@ -237,6 +289,8 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
 		// play sound
         var soundGroup = getSoundGroup(state);
         world.playSound(null, pos, soundGroup.getPlaceSound(), SoundCategory.BLOCKS, soundGroup.getVolume() * .5f, soundGroup.getPitch());
+
+		return true;
 	}
 
 	/**
