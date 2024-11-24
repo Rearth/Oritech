@@ -81,7 +81,7 @@ public class Wrench extends Item {
 	}
 
 	protected void playSound(World world, PlayerEntity player) {
-		world.playSound(player, player.getBlockPos(), SoundContent.WRENCH_TURN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+		world.playSound(null, player.getBlockPos(), SoundContent.WRENCH_TURN, SoundCategory.PLAYERS, 1.0f, 1.0f);
 	}
 
 	/**
