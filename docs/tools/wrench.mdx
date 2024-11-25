@@ -1,13 +1,21 @@
 ---
 title: Wrench
 icon: oritech:wrench
+type: item
 ---
 
-The wrench is a tool which can be used to edit and break pipes. When used on a pipe connection, and will change the connection type. For example, if used on the north connection of a pipe, it will change only the north connection type.
+### Description
+The wrench is a tool which can be used to edit and break pipes. It is used to change the connection type in each independent direction of pipe, as well as to break pipes.
 
-Types of connections:
+### Types of Connections:
 - **Not Connected:** The pipe will not be connected to a neighboring block or target interface (machine, chest, fluid container, etc.)
 - **Connected:** The pipe will be connected to a neighboring block or target interface.
 - **Extract:** The pipe will extract items/fluids from the neighboring block or target interface.
 
-Additionally, the wrench can be used to break pipes at a quicker speed.
+### Crafting
+The wrench can be crafted using the following recipe:
+<CraftingRecipe
+    slots={['', 'oritech:nickel_ingot', '', '', 'oritech:steel_ingot', 'oritech:nickel_ingot', 'oritech:nickel_ingot', '', '']}
+    result='oritech:wrench'
+/>
+
