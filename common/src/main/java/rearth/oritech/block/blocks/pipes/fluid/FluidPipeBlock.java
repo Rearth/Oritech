@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.function.TriFunction;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
@@ -46,8 +47,8 @@ public class FluidPipeBlock extends GenericPipeBlock {
     @Override
     protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
-        
-        world.setBlockState(pos, getStateForNeighborUpdate(state, null, null, world, pos, sourcePos), Block.NOTIFY_LISTENERS, 0);
+
+        world.setBlockState(pos, getStateForNeighborUpdate(state, Direction.getFacing(Vec3d.of(sourcePos.subtract(pos))), world.getBlockState(sourcePos), world, pos, sourcePos), Block.NOTIFY_LISTENERS, 0);
     }
     
     @Override
