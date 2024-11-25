@@ -51,7 +51,7 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
 
         var interfaceState = state;
         if (!(neighborState.getBlock() instanceof GenericPipeBlock)) {
-            interfaceState = addConnectionStates(state, worldImp, pos, false);
+            interfaceState = addConnectionStates(state, worldImp, pos, direction);
 
             if (!interfaceState.equals(state)) {
                 // reload connection when state has changed (e.g. machine added/removed)

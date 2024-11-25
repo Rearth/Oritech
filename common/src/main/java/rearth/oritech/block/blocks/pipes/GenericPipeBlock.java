@@ -145,9 +145,9 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
 		var world = (World) worldAccess;
 
 		// transform to interface when machine is placed as neighbor
-		if (hasNeighboringMachine(state, world, pos, true)) {
+		if (apiValidationFunction().apply(world, neighborPos, direction.getOpposite())) {
 			var connectionBlock = getConnectionBlock();
-			return ((GenericPipeBlock) connectionBlock.getBlock()).addConnectionStates(connectionBlock, world, pos, false);
+			return ((GenericPipeBlock) connectionBlock.getBlock()).addConnectionStates(connectionBlock, world, pos, direction);
 		}
 
 		return state;
@@ -276,7 +276,7 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
         // transform to interface block if side is being enabled and machine is connected
 		if (!newState.isOf(getConnectionBlock().getBlock()) && createConnection && hasMachineInDirection(side, world, pos, apiValidationFunction())) {
 			var connectionState = getConnectionBlock();
-			var interfaceState = ((GenericPipeBlock) connectionState.getBlock()).addConnectionStates(connectionState, world, pos, false);
+			var interfaceState = ((GenericPipeBlock) connectionState.getBlock()).addConnectionStates(connectionState, world, pos, side);
             world.setBlockState(pos, interfaceState);
         } else {
             world.setBlockState(pos, newState);
@@ -309,6 +309,15 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
 			state = state.with(property, connection ? CONNECTION : NO_CONNECTION);
 		}
 
+		return addStraightState(state);
+	}
+
+	public BlockState addConnectionStates(BlockState state, World world, BlockPos pos, Direction createDirection) {
+		for (var direction : Direction.values()) {
+			var property = directionToProperty(direction);
+			var connection = shouldConnect(state, direction, pos, world, direction.equals(createDirection));
+			state = state.with(property, connection ? CONNECTION : NO_CONNECTION);
+		}
 		return addStraightState(state);
 	}
 
@@ -357,7 +366,8 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
 			return isValidConnectionTarget(targetState.getBlock(), world, direction.getOpposite(), targetPos);
 		} else if (targetState.getBlock() instanceof GenericPipeBlock pipeBlock) {
 			return pipeBlock.isConnectingInDirection(targetState, direction.getOpposite(), false);
-		} else return isValidInterfaceTarget(targetState.getBlock(), world, direction.getOpposite(), targetPos);
+		} else
+			return isConnectingInDirection(current, direction, false) && isValidInterfaceTarget(targetState.getBlock(), world, direction.getOpposite(), targetPos);
 	}
 
 	/**
