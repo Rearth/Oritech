@@ -312,6 +312,17 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
 		return addStraightState(state);
 	}
 
+	/**
+	 * Adds the connection states to the pipe block-state.
+	 * Attempts to create a connection ONLY in the specified direction.
+	 * Useful for when only one connection needs to be created.
+	 *
+	 * @param state           The current pipe block-state
+	 * @param world           The target world
+	 * @param pos             The target pipe position
+	 * @param createDirection The direction to create a connection in
+	 * @return The updated block-state
+	 */
 	public BlockState addConnectionStates(BlockState state, World world, BlockPos pos, Direction createDirection) {
 		for (var direction : Direction.values()) {
 			var property = directionToProperty(direction);
