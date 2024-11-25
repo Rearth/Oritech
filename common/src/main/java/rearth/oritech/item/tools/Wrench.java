@@ -1,6 +1,7 @@
 package rearth.oritech.item.tools;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.component.type.ToolComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -15,7 +16,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.SoundContent;
+
+import java.util.List;
 
 public class Wrench extends Item {
 
@@ -23,6 +27,19 @@ public class Wrench extends Item {
 
 	public Wrench(Settings settings) {
 		super(settings);
+	}
+
+	public static ToolComponent createToolComponent() {
+		return new ToolComponent(List.of(ToolComponent.Rule.ofAlwaysDropping(List.of(
+				BlockContent.ENERGY_PIPE,
+				BlockContent.SUPERCONDUCTOR,
+				BlockContent.FLUID_PIPE,
+				BlockContent.ITEM_PIPE,
+				BlockContent.ENERGY_PIPE_CONNECTION,
+				BlockContent.SUPERCONDUCTOR_CONNECTION,
+				BlockContent.FLUID_PIPE_CONNECTION,
+				BlockContent.ITEM_PIPE_CONNECTION
+		), 25f)), 1.f, 1);
 	}
 
 	@Override
