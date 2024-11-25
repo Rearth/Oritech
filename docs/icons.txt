@@ -99,3 +99,4 @@ textures/book/ore_boulder.png
 textures/book/resource_node
 treefeller_block
 treefeller_block
+wrench
