@@ -1,12 +1,7 @@
 package rearth.oritech.block.base.entity;
 
-import earth.terrarium.common_storage_lib.context.impl.SimpleItemContext;
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.item.impl.vanilla.WrappedVanillaContainer;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
-import earth.terrarium.common_storage_lib.storage.util.TransferUtil;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -43,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyProvider.BlockEntity, InventoryProvider, MachineAddonController, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
+public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyApi.BlockEnergyApi.EnergyProvider, InventoryProvider, MachineAddonController, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
     
     private final List<BlockPos> connectedAddons = new ArrayList<>();
     private final List<BlockPos> openSlots = new ArrayList<>();
@@ -64,16 +59,16 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     //own storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
     
-    private final ValueStorage outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
+    private final EnergyApi.EnergyContainer outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
-        public boolean allowsInsertion() {
+        public boolean supportsInsertion() {
             return false;
         }
     };
     
-    private final ValueStorage inputStorage = new DelegatingEnergyStorage(energyStorage, null) {
+    private final EnergyApi.EnergyContainer inputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
-        public boolean allowsExtraction() {
+        public boolean supportsExtraction() {
             return false;
         }
     };
@@ -111,7 +106,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         var target = getOutputPosition(pos, getFacing());
         var candidate = EnergyApi.BLOCK.find(world, target.getRight(), target.getLeft());
         if (candidate != null) {
-            TransferUtil.moveValue(energyStorage, candidate, Long.MAX_VALUE, false);
+            EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }
     }
     
@@ -120,10 +115,10 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         var heldStack = inventory.heldStacks.get(0);
         if (heldStack.isEmpty()) return;
         
-        var slot = SimpleItemContext.of(new WrappedVanillaContainer(inventory), 0);
+        var slot = ContainerItemContext.ofSingleSlot(getInventory(null).getSlot(0));
         var slotEnergyContainer = EnergyApi.ITEM.find(heldStack, slot);
         if (slotEnergyContainer != null) {
-            TransferUtil.moveValue(energyStorage, slotEnergyContainer, Long.MAX_VALUE, false);
+            EnergyApi.transfer(energyStorage, slotEnergyContainer, Long.MAX_VALUE, false);
         }
     }
     
@@ -165,7 +160,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         
         if (direction == null)
             return energyStorage;

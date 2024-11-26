@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.machines.generators;
 
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -16,6 +15,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.PassiveGeneratorBlockEntity;
 import rearth.oritech.block.blocks.machines.generators.BigSolarPanelBlock;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.util.EnergyApi;
 import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -124,7 +124,7 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     }
     
     @Override
-    public ValueStorage getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
         return null;
     }
     

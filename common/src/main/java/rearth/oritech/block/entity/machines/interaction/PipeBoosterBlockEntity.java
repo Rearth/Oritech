@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.machines.interaction;
 
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -16,6 +14,7 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.DynamicEnergyStorage;
+import rearth.oritech.util.EnergyApi;
 import rearth.oritech.util.Geometry;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -25,7 +24,7 @@ import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTicker<PipeBoosterBlockEntity>, GeoBlockEntity, EnergyProvider.BlockEntity {
+public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTicker<PipeBoosterBlockEntity>, GeoBlockEntity, EnergyApi.BlockEnergyApi.EnergyProvider {
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 4000, 0, this::markDirty);
@@ -106,7 +105,7 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
     }
     
     @Override
-    public ValueStorage getEnergy(@Nullable Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(@Nullable Direction direction) {
         return energyStorage;
     }
     

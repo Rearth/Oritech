@@ -1,6 +1,5 @@
 package rearth.oritech.util;
 
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EquipmentSlot;
@@ -38,7 +37,7 @@ public interface MultiblockMachineController {
     void setCoreQuality(float quality);
     float getCoreQuality();
     InventoryProvider getInventoryForLink();
-    ValueStorage getEnergyStorageForLink();
+    EnergyApi.EnergyContainer getEnergyStorageForLink();
     
     default void addMultiblockToNbt(NbtCompound nbt) {
         

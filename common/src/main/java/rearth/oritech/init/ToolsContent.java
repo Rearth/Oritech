@@ -1,8 +1,6 @@
 package rearth.oritech.init;
 
 import dev.architectury.registry.registries.RegistrySupplier;
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -18,12 +16,12 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
-import rearth.oritech.Oritech;
 import rearth.oritech.item.tools.armor.*;
 import rearth.oritech.item.tools.harvesting.*;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.ArchitecturyRegistryContainer;
+import rearth.oritech.util.EnergyApi;
 
 import java.lang.reflect.Field;
 
@@ -77,10 +75,10 @@ public class ToolsContent implements ArchitecturyRegistryContainer<Item> {
         
         if (value instanceof OritechEnergyItem energyItem) {
             var variantStack = new ItemStack(value);
-            variantStack.set(Oritech.ENERGY_CONTENT.componentType(), energyItem.getEnergyCapacity(variantStack));
+            variantStack.set(EnergyApi.ITEM.getEnergyComponent(), energyItem.getEnergyCapacity(variantStack));
             ItemGroups.add(targetGroup, variantStack);
             
-            EnergyApi.ITEM.registerSelf((storage, context) -> ((EnergyProvider.Item) storage.getItem()).getEnergy(storage, context), value);
+            EnergyApi.ITEM.registerForItem(() -> value);
         }
         
     }

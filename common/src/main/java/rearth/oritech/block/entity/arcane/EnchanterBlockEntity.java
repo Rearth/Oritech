@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.arcane;
 
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import io.wispforest.owo.util.VectorRandomUtils;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
@@ -49,7 +47,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class EnchanterBlockEntity extends BlockEntity
-  implements InventoryProvider, EnergyProvider.BlockEntity, GeoBlockEntity, ScreenProvider, BlockEntityTicker<EnchanterBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+  implements InventoryProvider, EnergyApi.BlockEnergyApi.EnergyProvider, GeoBlockEntity, ScreenProvider, BlockEntityTicker<EnchanterBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
     
     public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     public static final RawAnimation UNPOWERED = RawAnimation.begin().thenPlayAndHold("unpowered");
@@ -317,7 +315,7 @@ public class EnchanterBlockEntity extends BlockEntity
     }
     
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         return energyStorage;
     }
     

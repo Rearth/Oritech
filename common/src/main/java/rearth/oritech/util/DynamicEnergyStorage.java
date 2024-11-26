@@ -1,9 +1,7 @@
 package rearth.oritech.util;
 
-import earth.terrarium.common_storage_lib.storage.base.UpdateManager;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
-
-public class DynamicEnergyStorage implements ValueStorage, UpdateManager<Long> {
+public class DynamicEnergyStorage extends EnergyApi.EnergyContainer {
+    
     public long amount;
     public long capacity;
     public long maxInsert;
@@ -15,30 +13,6 @@ public class DynamicEnergyStorage implements ValueStorage, UpdateManager<Long> {
         this.maxInsert = maxInsert;
         this.maxExtract = maxExtract;
         this.onUpdate = onUpdate;
-    }
-    
-    @Override
-    public long getStoredAmount() {
-        return amount;
-    }
-    
-    @Override
-    public long getCapacity() {
-        return capacity;
-    }
-    
-    public void set(long amount) {
-        this.amount = amount;
-    }
-    
-    @Override
-    public boolean allowsInsertion() {
-        return true;
-    }
-    
-    @Override
-    public boolean allowsExtraction() {
-        return true;
     }
     
     @Override
@@ -68,13 +42,30 @@ public class DynamicEnergyStorage implements ValueStorage, UpdateManager<Long> {
     }
     
     @Override
-    public Long createSnapshot() {
+    public void setAmount(long amount) {
+        this.amount = amount;
+    }
+    
+    @Override
+    public long getAmount() {
         return amount;
     }
     
     @Override
-    public void readSnapshot(Long snapshot) {
-        this.amount = snapshot;
+    public long getCapacity() {
+        return capacity;
+    }
+    
+    public void setCapacity(long capacity) {
+        this.capacity = capacity;
+    }
+    
+    public void setMaxInsert(long maxInsert) {
+        this.maxInsert = maxInsert;
+    }
+    
+    public void setMaxExtract(long maxExtract) {
+        this.maxExtract = maxExtract;
     }
     
     @Override

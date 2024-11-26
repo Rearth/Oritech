@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.machines.interaction;
 
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -28,6 +26,7 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.EnergyApi;
 import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.SimpleEnergyStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -40,7 +39,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidProvider, EnergyProvider.BlockEntity, GeoBlockEntity {
+public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidProvider, EnergyApi.BlockEnergyApi.EnergyProvider, GeoBlockEntity {
     
     private static final int MAX_SEARCH_COUNT = 100_000;
     private static final int ENERGY_USAGE = 512;   // per block pumped
@@ -88,7 +87,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         super.writeNbt(nbt, registryLookup);
         SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
         nbt.putBoolean("initialized", initialized);
-        nbt.putLong("energy", energyStorage.getStoredAmount());
+        nbt.putLong("energy", energyStorage.getAmount());
         
         if (pendingLiquidPositions != null)
             nbt.putLongArray("pendingTargets", pendingLiquidPositions.stream().mapToLong(BlockPos::asLong).toArray());
@@ -99,7 +98,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         super.readNbt(nbt, registryLookup);
         initialized = nbt.getBoolean("initialized");
         SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
-        energyStorage.set(nbt.getLong("energy"));
+        energyStorage.setAmount(nbt.getLong("energy"));
         pendingLiquidPositions = Arrays.stream(nbt.getLongArray("pendingTargets")).mapToObj(BlockPos::fromLong).collect(Collectors.toCollection(ArrayDeque::new));
     }
     
@@ -178,7 +177,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     }
     
     private boolean hasEnoughEnergy() {
-        return energyStorage.getStoredAmount() >= ENERGY_USAGE;
+        return energyStorage.getAmount() >= ENERGY_USAGE;
     }
     
     private void useEnergy() {
@@ -275,7 +274,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     }
     
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         return energyStorage;
     }
     

@@ -63,14 +63,6 @@ dependencies {
 
     // athena (CTM)
     modRuntimeOnly "earth.terrarium.athena:athena-neoforge-1.21:4.0.0"
-
-    // CSL
-    // because CSL currently loads in energized power in a wrong version
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-neoforge-1.21:0.0.27')
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-data-neoforge-1.21:0.0.27')
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-resources-neoforge-1.21:0.0.27')
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-lookup-neoforge-1.21:0.0.27')
-
     // jade
     modImplementation "curse.maven:jade-324717:5846105"
 
@@ -80,6 +72,10 @@ dependencies {
 
     // EMI
     modRuntimeOnly "dev.emi:emi-neoforge:1.1.12+1.21"
+
+    // compat mods for ingame testing
+    modRuntimeOnly "curse.maven:energized-power-782147:5797585"
+    modRuntimeOnly "curse.maven:mekanism-268560:5680395"
 }
 
 processResources {

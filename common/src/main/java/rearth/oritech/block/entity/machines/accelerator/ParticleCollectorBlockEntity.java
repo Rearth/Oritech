@@ -1,9 +1,5 @@
 package rearth.oritech.block.entity.machines.accelerator;
 
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
-import earth.terrarium.common_storage_lib.storage.util.TransferUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FacingBlock;
 import net.minecraft.block.entity.BlockEntity;
@@ -18,6 +14,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.DynamicEnergyStorage;
+import rearth.oritech.util.EnergyApi;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -28,7 +25,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import static rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity.getOutputPosition;
 
-public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEntityTicker<ParticleCollectorBlockEntity>, EnergyProvider.BlockEntity, GeoBlockEntity {
+public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEntityTicker<ParticleCollectorBlockEntity>, EnergyApi.BlockEnergyApi.EnergyProvider, GeoBlockEntity {
     
     // TODO recipes, wiki
     
@@ -47,7 +44,7 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
     }
     
     @Override
-    public ValueStorage getEnergy(@Nullable Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(@Nullable Direction direction) {
         return energyStorage;
     }
     
@@ -76,20 +73,20 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
         var target = getOutputPosition(pos, getCachedState().get(FacingBlock.FACING).getOpposite());
         var candidate = EnergyApi.BLOCK.find(world, target.getRight(), target.getLeft());
         if (candidate != null) {
-            TransferUtil.moveValue(energyStorage, candidate, Long.MAX_VALUE, false);
+            EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }
     }
     
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        nbt.putLong("energy", energyStorage.getStoredAmount());
+        nbt.putLong("energy", energyStorage.getAmount());
     }
     
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        energyStorage.set(nbt.getLong("energy"));
+        energyStorage.setAmount(nbt.getLong("energy"));
     }
     
     @Override

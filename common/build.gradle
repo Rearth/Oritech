@@ -20,10 +20,6 @@ dependencies {
     modImplementation "io.wispforest:owo-lib:0.12.15+1.21"
     annotationProcessor modImplementation("io.wispforest:owo-lib:0.12.15+1.21")
 
-    // common storage lib (for energy api)
-    modCompileOnly "earth.terrarium.common_storage_lib:common-storage-lib-common-1.21:0.0.5"
-    // modRuntimeOnly "earth.terrarium.common_storage_lib:common-storage-lib-fabric-1.21:0.0.5"
-
     // geckolib
     modImplementation "software.bernie.geckolib:geckolib-fabric-1.21.1:4.6.6"
 

@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.machines.accelerator;
 
-import earth.terrarium.common_storage_lib.storage.base.UpdateManager;
 import io.wispforest.owo.util.VectorRandomUtils;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
@@ -392,15 +391,15 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var entity = world.getBlockEntity(motorBlock);
         if (!(entity instanceof AcceleratorMotorBlockEntity motorEntity)) return;
         
-        var storage = motorEntity.getEnergy(null);
-        var availableEnergy = storage.getStoredAmount();
+        var storage = motorEntity.getStorage(null);
+        var availableEnergy = storage.getAmount();
         
         var speed = particle.velocity;
         var cost = speed * Oritech.CONFIG.accelerationRFCost();
         if (availableEnergy < cost) return;
         
         storage.extract((long) cost, false);
-        if (storage instanceof UpdateManager<?> manager) manager.update();
+        storage.update();
         
         particle.velocity += 1;
         

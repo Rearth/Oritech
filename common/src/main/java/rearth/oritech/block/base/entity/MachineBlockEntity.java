@@ -1,7 +1,5 @@
 package rearth.oritech.block.base.entity;
 
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
@@ -46,7 +44,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public abstract class MachineBlockEntity extends BlockEntity
-  implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyProvider.BlockEntity, ScreenProvider, InventoryProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
+  implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyApi.BlockEnergyApi.EnergyProvider, ScreenProvider, InventoryProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
     
     // animations
     public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
@@ -464,7 +462,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         return energyStorage;
     }
     

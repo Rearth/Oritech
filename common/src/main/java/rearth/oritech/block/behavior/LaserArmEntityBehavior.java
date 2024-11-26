@@ -1,10 +1,6 @@
 package rearth.oritech.block.behavior;
 
-import earth.terrarium.common_storage_lib.context.impl.ModifyOnlyContext;
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.storage.util.TransferUtil;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
@@ -44,13 +40,15 @@ public class LaserArmEntityBehavior {
                 if (!(entity instanceof PlayerEntity player))
                     return false;
                 
-                var chestItem = player.getEquippedStack(EquipmentSlot.CHEST);
-                var context = new ModifyOnlyContext(chestItem);
-                var candidate = EnergyApi.ITEM.find(chestItem, context);
-                if (candidate != null) {
-                    var amount = TransferUtil.moveValue(laserEntity.getEnergyStorageForLink(), candidate, laserEntity.energyRequiredToFire(), false);
-                    return amount > 0;
-                }
+                // TODO
+//                var chestItem = player.getEquippedStack(EquipmentSlot.CHEST);
+//                var chestStorage =
+//                var slot = PlayerContainerItemContext.
+//                var candidate = EnergyApi.ITEM.find(chestItem, context);
+//                if (candidate != null) {
+//                    var amount = EnergyApi.transfer(laserEntity.getEnergyStorageForLink(), candidate, laserEntity.energyRequiredToFire(), false);
+//                    return amount > 0;
+//                }
                 
                 return false;
             }

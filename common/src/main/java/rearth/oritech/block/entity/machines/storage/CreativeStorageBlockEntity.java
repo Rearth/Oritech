@@ -23,17 +23,17 @@ public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEnti
 
     @Override
     public long getDefaultCapacity() {
-        return Long.MAX_VALUE;
+        return Integer.MAX_VALUE;
     }
 
     @Override
     public long getDefaultInsertRate() {
-        return Long.MAX_VALUE;
+        return Integer.MAX_VALUE;
     }
 
     @Override
     public long getDefaultExtractionRate() {
-        return Long.MAX_VALUE;
+        return Integer.MAX_VALUE;
     }
 
     public int getComparatorOutput() {
@@ -48,7 +48,7 @@ public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEnti
 
     @Override
     public void tick(World world, BlockPos pos, BlockState state, ExpandableEnergyStorageBlockEntity blockEntity) {
-        energyStorage.amount = Long.MAX_VALUE;
+        energyStorage.amount = Integer.MAX_VALUE;
         super.tick(world, pos, state, blockEntity);
     }
 }

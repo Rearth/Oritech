@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.machines;
 
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -17,7 +15,7 @@ import rearth.oritech.util.*;
 
 import java.util.Objects;
 
-public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyProvider.BlockEntity, FluidProvider {
+public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyApi.BlockEnergyApi.EnergyProvider, FluidProvider {
     
     private BlockPos controllerPos = BlockPos.ORIGIN;
     private MultiblockMachineController controllerEntity;
@@ -60,7 +58,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         return controllerEntity;
     }
     
-    private ValueStorage getMainStorage() {
+    private EnergyApi.EnergyContainer getMainStorage() {
         
         var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
         if (!isUsed) return null;
@@ -85,7 +83,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     }
     
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         if (getCachedController() == null || getCachedController().getEnergyStorageForLink() == null) {
             return null;
         } else {

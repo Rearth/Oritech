@@ -1,32 +1,22 @@
 package rearth.oritech.util;
 
-import earth.terrarium.common_storage_lib.storage.base.UpdateManager;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-public class DelegatingEnergyStorage implements ValueStorage, UpdateManager<Long> {
+public class DelegatingEnergyStorage extends EnergyApi.EnergyContainer {
     
-    protected final Supplier<ValueStorage> backingStorage;
+    protected final Supplier<EnergyApi.EnergyContainer> backingStorage;
     protected final BooleanSupplier validPredicate;
     
-    public DelegatingEnergyStorage(Supplier<ValueStorage> backingStorage, @Nullable BooleanSupplier validPredicate) {
+    public DelegatingEnergyStorage(Supplier<EnergyApi.EnergyContainer> backingStorage, @Nullable BooleanSupplier validPredicate) {
         this.backingStorage = backingStorage;
         this.validPredicate = validPredicate == null ? () -> true : validPredicate;
     }
     
-    public DelegatingEnergyStorage(ValueStorage backingStorage, @Nullable BooleanSupplier validPredicate) {
+    public DelegatingEnergyStorage(EnergyApi.EnergyContainer backingStorage, @Nullable BooleanSupplier validPredicate) {
         this(() -> backingStorage, validPredicate);
-    }
-    
-    @Override
-    public long getStoredAmount() {
-        if (validPredicate.getAsBoolean()) {
-            return backingStorage.get().getStoredAmount();
-        }
-        return 0;
     }
     
     @Override
@@ -38,19 +28,10 @@ public class DelegatingEnergyStorage implements ValueStorage, UpdateManager<Long
     }
     
     @Override
-    public boolean allowsInsertion() {
+    public void update() {
         if (validPredicate.getAsBoolean()) {
-            return backingStorage.get().allowsInsertion();
+            backingStorage.get().update();
         }
-        return false;
-    }
-    
-    @Override
-    public boolean allowsExtraction() {
-        if (validPredicate.getAsBoolean()) {
-            return backingStorage.get().allowsExtraction();
-        }
-        return false;
     }
     
     @Override
@@ -70,25 +51,17 @@ public class DelegatingEnergyStorage implements ValueStorage, UpdateManager<Long
     }
     
     @Override
-    public Long createSnapshot() {
-        if (validPredicate.getAsBoolean() && backingStorage.get() instanceof UpdateManager<?> manager) {
-            return (Long) manager.createSnapshot();
-        }
-        return 0L;
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    public void readSnapshot(Long snapshot) {
-        if (validPredicate.getAsBoolean() && backingStorage.get() instanceof UpdateManager<?> manager) {
-            ((UpdateManager<Long>) manager).readSnapshot(snapshot);
+    public void setAmount(long amount) {
+        if (validPredicate.getAsBoolean()) {
+            backingStorage.get().setAmount(amount);
         }
     }
     
     @Override
-    public void update() {
-        if (validPredicate.getAsBoolean() && backingStorage.get() instanceof UpdateManager<?> manager) {
-            manager.update();
+    public long getAmount() {
+        if (validPredicate.getAsBoolean()) {
+            return backingStorage.get().getAmount();
         }
+        return 0;
     }
 }

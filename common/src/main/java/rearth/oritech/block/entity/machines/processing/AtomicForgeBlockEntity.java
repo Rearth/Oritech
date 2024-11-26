@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.machines.processing;
 
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -12,6 +11,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.util.EnergyApi;
 import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public ValueStorage getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
         return null;
     }
     

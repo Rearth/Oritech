@@ -1,7 +1,6 @@
 package rearth.oritech.network;
 
 import dev.architectury.fluid.FluidStack;
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
 import io.wispforest.owo.network.OwoNetChannel;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.entity.EquipmentSlot;
@@ -222,7 +221,7 @@ public class NetworkContent {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
-            if (entity instanceof EnergyProvider.BlockEntity energyProvider && energyProvider.getEnergy(null) instanceof DynamicEnergyStorage storage) {
+            if (entity instanceof EnergyApi.BlockEnergyApi.EnergyProvider energyProvider && energyProvider.getStorage(null) instanceof DynamicEnergyStorage storage) {
                 storage.capacity = message.maxEnergy;
                 storage.amount = message.currentEnergy;
             }
@@ -517,7 +516,7 @@ public class NetworkContent {
             // to prevent dedicated servers from kicking the player for flying
             player.networkHandler.floatingTicks = 0;
             
-            stack.set(Oritech.ENERGY_CONTENT.componentType(), message.energyStored);
+            stack.set(EnergyApi.ITEM.getEnergyComponent(), message.energyStored);
             if (message.fluidAmount > 0)
                 stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidType)), message.fluidAmount));
             

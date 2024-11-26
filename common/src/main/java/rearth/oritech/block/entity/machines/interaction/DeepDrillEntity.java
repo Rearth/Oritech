@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.machines.interaction;
 
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
@@ -39,7 +37,7 @@ import java.util.List;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
-public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<DeepDrillEntity>, EnergyProvider.BlockEntity, GeoBlockEntity, InventoryProvider, MultiblockMachineController {
+public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<DeepDrillEntity>, EnergyApi.BlockEnergyApi.EnergyProvider, GeoBlockEntity, InventoryProvider, MultiblockMachineController {
     
     // work data
     private boolean initialized;
@@ -191,7 +189,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     }
     
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         return energyStorage;
     }
     
@@ -269,7 +267,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     }
     
     @Override
-    public ValueStorage getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
         return null;
     }
     

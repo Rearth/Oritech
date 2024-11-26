@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.machines.interaction;
 
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -55,7 +53,7 @@ import java.util.Objects;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
-public class DronePortEntity extends BlockEntity implements InventoryProvider, EnergyProvider.BlockEntity, GeoBlockEntity, BlockEntityTicker<DronePortEntity>, MultiblockMachineController, ExtendedScreenHandlerFactory, ScreenProvider {
+public class DronePortEntity extends BlockEntity implements InventoryProvider, EnergyApi.BlockEnergyApi.EnergyProvider, GeoBlockEntity, BlockEntityTicker<DronePortEntity>, MultiblockMachineController, ExtendedScreenHandlerFactory, ScreenProvider {
     
     public record DroneTransferData(List<ItemStack> transferredStacks, long arrivesAt) {
     }
@@ -322,7 +320,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     }
     
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         return energyStorage;
     }
     
@@ -384,7 +382,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, E
     }
     
     @Override
-    public ValueStorage getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
         return energyStorage;
     }
     

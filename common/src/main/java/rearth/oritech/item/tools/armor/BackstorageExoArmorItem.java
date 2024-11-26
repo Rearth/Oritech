@@ -1,9 +1,6 @@
 package rearth.oritech.item.tools.armor;
 
-import earth.terrarium.common_storage_lib.context.impl.ModifyOnlyContext;
-import earth.terrarium.common_storage_lib.context.impl.PlayerContext;
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.storage.util.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
@@ -17,6 +14,9 @@ import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
+import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.SimpleEnergyItemStorage;
+import rearth.oritech.util.SingleSlotHandler;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;
@@ -40,27 +40,26 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEner
         var isEquipped = ((PlayerEntity) entity).getEquippedStack(EquipmentSlot.CHEST).equals(stack);
         
         if (isPlayer && isEquipped) {
-            distributePower((PlayerEntity) entity, stack);
+            distributePower((PlayerEntity) entity, stack, slot);
         }
     }
     
-    private void distributePower(PlayerEntity player, ItemStack pack) {
+    private void distributePower(PlayerEntity player, ItemStack pack, int slot) {
         
-        var packIndex = OritechEnergyItem.findSlotIndex(pack, player);
-        var slot = PlayerContext.ofSlot(player, packIndex);
-        var storage = EnergyApi.ITEM.find(pack, slot);
-        if (storage == null) return;
-        if (storage.getStoredAmount() <= 10) return;
-        
+        var packStorage = new SimpleEnergyItemStorage(getEnergyMaxInput(pack), getEnergyMaxOutput(pack), getEnergyCapacity(pack), pack);
+        if (packStorage.getAmount() < 10) return;
+
         for (int i = 0; i < player.getInventory().size(); i++) {
             var stack = player.getInventory().getStack(i);
-            if (stack.isEmpty() || stack == pack || packIndex == i) continue;
+            if (stack.isEmpty() || stack == pack || slot == i) continue;
+
+            var stackContext = new SingleSlotHandler(stack);
+            var stackStorage = EnergyApi.ITEM.find(stack, ContainerItemContext.ofSingleSlot(stackContext));
+            if (stackStorage == null || stackStorage.getAmount() >= stackStorage.getCapacity()) continue;
             
-            var stackContext = PlayerContext.ofSlot(player, i);
-            var stackStorage = EnergyApi.ITEM.find(stack, stackContext);
-            if (stackStorage == null || stackStorage.getStoredAmount() >= stackStorage.getCapacity()) continue;
+            EnergyApi.transfer(packStorage, stackStorage, Long.MAX_VALUE, false);
             
-            TransferUtil.moveValue(storage, stackStorage, Long.MAX_VALUE, false);
+            player.getInventory().setStack(i, stackContext.getStack());
         }
     }
     

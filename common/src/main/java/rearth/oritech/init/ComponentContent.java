@@ -29,6 +29,9 @@ public class ComponentContent {
     public static final Supplier<ComponentType<BlockPos>> TARGET_POSITION = () -> (ComponentType<BlockPos>) Registries.DATA_COMPONENT_TYPE.get(Oritech.id("target_position"));
     public static final Supplier<ComponentType<FluidStack>> STORED_FLUID = () -> (ComponentType<FluidStack>) Registries.DATA_COMPONENT_TYPE.get(Oritech.id("stored_fluid"));
     
+    // because I can't seem to find a default component for this on neoforge
+    public static final Supplier<ComponentType<Long>> NEO_ENERGY_COMPONENT = () -> (ComponentType<Long>) Registries.DATA_COMPONENT_TYPE.get(Oritech.id("energy"));
+    
     public static void registerComponents() {
         COMPONENTS.register();
     }

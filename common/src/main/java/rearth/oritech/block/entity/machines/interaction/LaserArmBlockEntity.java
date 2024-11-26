@@ -1,9 +1,6 @@
 package rearth.oritech.block.entity.machines.interaction;
 
 import com.mojang.authlib.GameProfile;
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.Block;
@@ -67,7 +64,7 @@ import java.util.stream.Collectors;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
-public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyProvider.BlockEntity, ScreenProvider, ExtendedScreenHandlerFactory, MultiblockMachineController, MachineAddonController, InventoryProvider {
+public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyApi.BlockEnergyApi.EnergyProvider, ScreenProvider, ExtendedScreenHandlerFactory, MultiblockMachineController, MachineAddonController, InventoryProvider {
     
     public static final String LASER_PLAYER_NAME = "oritech_laser";
     private static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
@@ -133,7 +130,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         if (world.isClient() || !isActive(state))
             return;
         
-        if (!redstonePowered && energyStorage.getStoredAmount() >= energyRequiredToFire()) {
+        if (!redstonePowered && energyStorage.getAmount() >= energyRequiredToFire()) {
             if (hunterAddons > 0) {
                 fireAtLivingEntities(world, pos, state, blockEntity);
             }
@@ -608,7 +605,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     @Override
-    public ValueStorage getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
         return energyStorage;
     }
     
@@ -622,7 +619,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     // energyprovider
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         return energyStorage;
     }
     

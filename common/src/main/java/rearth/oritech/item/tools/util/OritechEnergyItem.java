@@ -1,11 +1,5 @@
 package rearth.oritech.item.tools.util;
 
-import earth.terrarium.common_storage_lib.context.ItemContext;
-import earth.terrarium.common_storage_lib.context.impl.IsolatedSlotContext;
-import earth.terrarium.common_storage_lib.context.impl.PlayerContext;
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
@@ -16,10 +10,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.random.Random;
-import rearth.oritech.Oritech;
-import rearth.oritech.util.SimpleItemEnergyStorage;
+import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.SimpleEnergyItemStorage;
 
-public interface OritechEnergyItem extends EnergyProvider.Item, FabricItem {
+public interface OritechEnergyItem extends EnergyApi.ItemEnergyApi.EnergyProvider, FabricItem {
+    
     default long getEnergyCapacity(ItemStack stack) {return 10_000;}
     
     default long getEnergyMaxInput(ItemStack stack) {
@@ -43,16 +38,11 @@ public interface OritechEnergyItem extends EnergyProvider.Item, FabricItem {
             amount = amount / (random.nextInt(unbreakingLevel) + 1);
         }
         
-        // this feels like a horrible abomination
-        var slotIndex = findSlotIndex(stack, player);
-        
-        var slot = PlayerContext.ofSlot(player, slotIndex);
-        var storage = slot.find(EnergyApi.ITEM);
-        
-        if (storage instanceof SimpleItemEnergyStorage simpleStorage) {
-            var extracted = simpleStorage.extractIgnoringLimit(amount, false);
+        var storage = getStorage(stack);
+        if (storage instanceof SimpleEnergyItemStorage itemStorage) {
+            var extracted = itemStorage.extractIgnoringLimit(amount, false);
             if (extracted > 0) {
-                stack.set(Oritech.ENERGY_CONTENT.componentType(), storage.getStoredAmount());
+                itemStorage.update();
             }
             
             return extracted == amount;
@@ -60,18 +50,6 @@ public interface OritechEnergyItem extends EnergyProvider.Item, FabricItem {
         
         return false;
         
-    }
-    
-    static int findSlotIndex(ItemStack stack, PlayerEntity player) {
-        var slotIndex = 0;
-        for (int i = 0; i < player.getInventory().size(); i++) {
-            var invStack = player.getInventory().getStack(i);
-            if (invStack == stack) {
-                slotIndex = i;
-                break;
-            }
-        }
-        return slotIndex;
     }
     
     // A hack to do this without context of the DRM
@@ -86,12 +64,11 @@ public interface OritechEnergyItem extends EnergyProvider.Item, FabricItem {
     }
     
     default long getStoredEnergy(ItemStack stack) {
-        var slot = new IsolatedSlotContext(stack);
-        return getEnergy(stack, slot).getStoredAmount();
+        return getStorage(stack).getAmount();
     }
     
     @Override
-    default ValueStorage getEnergy(ItemStack stack, ItemContext context) {
-        return new SimpleItemEnergyStorage(context, Oritech.ENERGY_CONTENT.componentType(), getEnergyCapacity(stack), getEnergyMaxInput(stack), getEnergyMaxOutput(stack), stack);
+    default EnergyApi.EnergyContainer getStorage(ItemStack stack) {
+        return new SimpleEnergyItemStorage(getEnergyMaxInput(stack), getEnergyMaxOutput(stack), getEnergyCapacity(stack), stack);
     }
 }

@@ -1,13 +1,8 @@
 package rearth.oritech.block.entity.machines.interaction;
 
 import dev.architectury.fluid.FluidStack;
-import earth.terrarium.common_storage_lib.context.impl.SimpleItemContext;
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.item.impl.vanilla.WrappedVanillaContainer;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
-import earth.terrarium.common_storage_lib.storage.util.TransferUtil;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
@@ -45,7 +40,7 @@ import rearth.oritech.util.*;
 
 import java.util.List;
 
-public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidProvider, EnergyProvider.BlockEntity, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
+public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidProvider, EnergyApi.BlockEnergyApi.EnergyProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
     
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.charger.energyCapacity(), Oritech.CONFIG.charger.maxEnergyInsertion(), Oritech.CONFIG.charger.maxEnergyExtraction(), this::markDirty);
     
@@ -149,15 +144,13 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     
     // return true if nothing is left to charge
     private boolean chargeItems() {
-        
         var heldStack = inventory.heldStacks.get(0);
         
-        var slot = SimpleItemContext.of(new WrappedVanillaContainer(inventory), 0);
+        var slot = ContainerItemContext.ofSingleSlot(getInventory(null).getSlot(0));
         var slotEnergyContainer = EnergyApi.ITEM.find(heldStack, slot);
         if (slotEnergyContainer != null) {
-            // this seems to reset other components of the stack? (fabric only)
-            TransferUtil.moveValue(energyStorage, slotEnergyContainer, Long.MAX_VALUE, false);
-            return slotEnergyContainer.getStoredAmount() >= slotEnergyContainer.getCapacity();
+            EnergyApi.transfer(energyStorage, slotEnergyContainer, Long.MAX_VALUE, false);
+            return slotEnergyContainer.getAmount() >= slotEnergyContainer.getCapacity();
         } else {
             return true;
         }
@@ -221,7 +214,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     }
     
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         return energyStorage;
     }
     

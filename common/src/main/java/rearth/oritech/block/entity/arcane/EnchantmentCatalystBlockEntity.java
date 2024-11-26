@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.arcane;
 
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
@@ -44,7 +42,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.List;
 
 public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
-  implements InventoryProvider, EnergyProvider.BlockEntity, ScreenProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+  implements InventoryProvider, EnergyApi.BlockEnergyApi.EnergyProvider, ScreenProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
     
     public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     public static final RawAnimation STABILIZED = RawAnimation.begin().thenLoop("stabilized");
@@ -85,9 +83,9 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         if (world.isClient) return;
         
         // check if powered, and adjust soul capacity
-        if (energyStorage.getStoredAmount() > 0) {
-            var gainedSoulCapacity = energyStorage.getStoredAmount() / Oritech.CONFIG.catalystRFPerSoul();
-            energyStorage.set(0);
+        if (energyStorage.getAmount() > 0) {
+            var gainedSoulCapacity = energyStorage.getAmount() / Oritech.CONFIG.catalystRFPerSoul();
+            energyStorage.setAmount(0);
             var newMax = baseSoulCapacity + gainedSoulCapacity;
             adjustMaxSouls(newMax);
             this.markDirty();
@@ -323,7 +321,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
 
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         return energyStorage;
     }
     

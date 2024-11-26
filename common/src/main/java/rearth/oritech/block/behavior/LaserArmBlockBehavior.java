@@ -1,8 +1,5 @@
 package rearth.oritech.block.behavior;
 
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.UpdateManager;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -17,6 +14,7 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.util.DynamicEnergyStorage;
+import rearth.oritech.util.EnergyApi;
 
 public class LaserArmBlockBehavior {
     static private LaserArmBlockBehavior noop;
@@ -33,7 +31,7 @@ public class LaserArmBlockBehavior {
         // has an energy storage, try to transfer power to it
         var storageCandidate = EnergyApi.BLOCK.find(world, blockPos, blockState, blockEntity, null);
         // if the storage is not exposed (e.g. catalyst / deep drill / atomic forge), get it directly
-        if (storageCandidate == null && blockEntity instanceof EnergyProvider.BlockEntity provider) storageCandidate = provider.getEnergy(null);
+        if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockEnergyApi.EnergyProvider provider) storageCandidate = provider.getStorage(null);
         if (storageCandidate != null)
             return transferPowerBehavior.fireAtBlock(world, laserEntity, block, blockPos, blockState, blockEntity);
         
@@ -67,10 +65,10 @@ public class LaserArmBlockBehavior {
             public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
                 var storageCandidate = EnergyApi.BLOCK.find(world, blockPos, blockState, blockEntity, null);
                 
-                if (storageCandidate == null && blockEntity instanceof EnergyProvider.BlockEntity energyProvider)
-                    storageCandidate = energyProvider.getEnergy(null);
+                if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockEnergyApi.EnergyProvider energyProvider)
+                    storageCandidate = energyProvider.getStorage(null);
                 
-                var insertAmount = storageCandidate.getCapacity() - storageCandidate.getStoredAmount();
+                var insertAmount = storageCandidate.getCapacity() - storageCandidate.getAmount();
                 if (insertAmount < 10)
                     return false;
                 
@@ -88,7 +86,7 @@ public class LaserArmBlockBehavior {
                     var inserted = storageCandidate.insert(transferCapacity, true);
                     if (inserted == transferCapacity) {
                         storageCandidate.insert(transferCapacity, false);
-                        if (storageCandidate instanceof UpdateManager<?> manager) manager.update();
+                        storageCandidate.update();
                         return true;
                     }
                     return false;

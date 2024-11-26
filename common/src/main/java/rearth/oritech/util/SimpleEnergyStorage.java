@@ -1,47 +1,78 @@
 package rearth.oritech.util;
 
-import earth.terrarium.common_storage_lib.context.ItemContext;
-import earth.terrarium.common_storage_lib.data.DataManager;
-import earth.terrarium.common_storage_lib.energy.impl.SimpleValueStorage;
-import net.minecraft.component.ComponentType;
-
-public class SimpleEnergyStorage extends SimpleValueStorage {
+public class SimpleEnergyStorage extends EnergyApi.EnergyContainer {
     private final long maxInsert;
     private final long maxExtract;
+    private final long capacity;
+    private final Runnable onUpdate;
     
-    public SimpleEnergyStorage(long capacity, long maxInsert, long maxExtract) {
-        super(capacity);
+    private long amount;
+    
+    public SimpleEnergyStorage(long maxInsert, long maxExtract, long capacity, Runnable onUpdate) {
         this.maxInsert = maxInsert;
         this.maxExtract = maxExtract;
+        this.capacity = capacity;
+        this.onUpdate = onUpdate;
     }
     
-    public SimpleEnergyStorage(ItemContext context, ComponentType<Long> componentType, long capacity, long maxInsert, long maxExtract) {
-        super(context, componentType, capacity);
+    public SimpleEnergyStorage(long maxInsert, long maxExtract, long capacity) {
         this.maxInsert = maxInsert;
         this.maxExtract = maxExtract;
-    }
-    
-    public SimpleEnergyStorage(Object entityOrBlockEntity, DataManager<Long> dataManager, long capacity, long maxInsert, long maxExtract) {
-        super(entityOrBlockEntity, dataManager, capacity);
-        this.maxInsert = maxInsert;
-        this.maxExtract = maxExtract;
+        this.capacity = capacity;
+        this.onUpdate = () -> {};
     }
     
     @Override
     public long insert(long amount, boolean simulate) {
-        return super.insert(Math.min(amount, maxInsert), simulate);
+        long inserted = Math.min(Math.min(maxInsert, amount), capacity - this.amount);
+        if (!simulate) {
+            this.amount += inserted;
+        }
+        return inserted;
     }
     
     public long insertIgnoringLimit(long amount, boolean simulate) {
-        return super.insert(amount, simulate);
+        long inserted = Math.min(amount, capacity - this.amount);
+        if (!simulate) {
+            this.amount += inserted;
+        }
+        return inserted;
     }
     
     @Override
     public long extract(long amount, boolean simulate) {
-        return super.extract(Math.min(maxExtract, amount), simulate);
+        long extracted = Math.min(Math.min(amount, maxExtract), this.amount);
+        if (!simulate) {
+            this.amount -= extracted;
+        }
+        return extracted;
     }
     
     public long extractIgnoringLimit(long amount, boolean simulate) {
-        return super.extract(amount, simulate);
+        long extracted = Math.min(amount, this.amount);
+        if (!simulate) {
+            this.amount -= extracted;
+        }
+        return extracted;
+    }
+    
+    @Override
+    public void setAmount(long amount) {
+        this.amount = amount;
+    }
+    
+    @Override
+    public long getAmount() {
+        return amount;
+    }
+    
+    @Override
+    public long getCapacity() {
+        return capacity;
+    }
+    
+    @Override
+    public void update() {
+        onUpdate.run();
     }
 }

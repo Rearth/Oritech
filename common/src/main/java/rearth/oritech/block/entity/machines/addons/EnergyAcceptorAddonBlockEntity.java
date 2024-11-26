@@ -1,18 +1,17 @@
 package rearth.oritech.block.entity.machines.addons;
 
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.DelegatingEnergyStorage;
+import rearth.oritech.util.EnergyApi;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;
 
-public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements EnergyProvider.BlockEntity {
+public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements EnergyApi.BlockEnergyApi.EnergyProvider {
     private final DelegatingEnergyStorage delegatedStorage = new DelegatingEnergyStorage(this::getMainStorage, this::isConnected);
     
     private MachineAddonController cachedController;
@@ -26,7 +25,7 @@ public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements 
         return isUsed && getCachedController() != null;
     }
     
-    private ValueStorage getMainStorage() {
+    private EnergyApi.EnergyContainer getMainStorage() {
         
         var isUsed = this.getCachedState().get(MachineAddonBlock.ADDON_USED);
         if (!isUsed) return null;
@@ -45,7 +44,7 @@ public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements 
     }
     
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         return delegatedStorage;
     }
 }

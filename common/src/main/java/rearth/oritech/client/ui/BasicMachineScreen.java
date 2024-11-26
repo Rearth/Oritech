@@ -255,7 +255,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     protected void updateEnergyBar() {
         
         var capacity = handler.energyStorage.getCapacity();
-        var amount = handler.energyStorage.getStoredAmount();
+        var amount = handler.energyStorage.getAmount();
         
         var fillAmount = (float) amount / capacity;
         var tooltipText = getEnergyTooltip(amount, capacity);

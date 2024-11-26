@@ -1,8 +1,6 @@
 package rearth.oritech.init;
 
 import dev.architectury.registry.registries.RegistrySupplier;
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -29,6 +27,7 @@ import rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.util.ArchitecturyRegistryContainer;
+import rearth.oritech.util.EnergyApi;
 import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventoryProvider;
 
@@ -231,7 +230,7 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     public void postProcessField(String namespace, BlockEntityType<?> value, String identifier, Field field, RegistrySupplier<BlockEntityType<?>> supplier) {
         
         if (field.isAnnotationPresent(AssignSidedEnergy.class))
-            EnergyApi.BLOCK.onRegister(registrar -> registrar.registerBlockEntities((blockEntity, direction) -> ((EnergyProvider.BlockEntity) blockEntity).getEnergy(direction), value));
+            EnergyApi.BLOCK.registerBlockEntity(() -> value);
         
         if (field.isAnnotationPresent(AssignSidedFluid.class))
             FluidStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((FluidProvider) blockEntity).getFluidStorage(direction), value);

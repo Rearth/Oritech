@@ -61,20 +61,6 @@ dependencies {
     // geckolib
     modImplementation "software.bernie.geckolib:geckolib-fabric-1.21.1:4.6.6"
 
-    // CSL
-    // include modApi("earth.terrarium.common_storage_lib:common-storage-lib-fabric-1.21:0.0.5")
-    // yeah this is super weird, I have no idea why I have to list the subprojects, and why the include doesn't work here, or why the 0.0.6 jar doesnt work
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-fabric-1.21:0.0.27')
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-data-fabric-1.21:0.0.27')
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-lookup-fabric-1.21:0.0.27')
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-resources-fabric-1.21:0.0.27')
-//    modApi files('common-storage-lib-fabric-1.21-0.0.8.jar')
-//    modApi files('common-storage-lib-data-fabric-1.21-0.0.9.jar')
-//    modApi files('common-storage-lib-resources-fabric-1.21-0.0.8.jar')
-//    modApi files('common-storage-lib-lookup-fabric-1.21-0.0.8.jar')
-
-    // include(files('common-storage-lib-fabric-1.21-0.0.8.jar'))
-
     // JADE (needed for addon)
     modImplementation "curse.maven:jade-324717:5639994"
 
@@ -89,6 +75,13 @@ dependencies {
 
     // mod menu
     modImplementation "com.terraformersmc:modmenu:11.0.3"
+
+    // compat mods for testing
+    // Tech Reborn
+    modImplementation "curse.maven:techreborn-233564:5608205"
+    modImplementation "curse.maven:reborncore-237903:5608204"
+    // Energized Power
+    modImplementation "curse.maven:energized-power-782147:5650292"
 
 }
 
