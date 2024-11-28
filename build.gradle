@@ -3,6 +3,7 @@ plugins {
     id 'architectury-plugin' version '3.4-SNAPSHOT'
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
     id 'org.sinytra.wiki.toolkit' version '0.1.16'
+    id "me.modmuss50.mod-publish-plugin" version "0.8.0"
 }
 
 wiki {
@@ -29,6 +30,7 @@ subprojects {
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
+    apply plugin: 'me.modmuss50.mod-publish-plugin'
 
     base {
         // Set up a suffixed format for the mod jar names, e.g. `example-fabric`.

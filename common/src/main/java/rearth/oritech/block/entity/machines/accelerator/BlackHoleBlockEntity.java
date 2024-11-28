@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.blocks.machines.accelerator.AcceleratorPassthroughBlock;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -49,7 +50,7 @@ public class BlackHoleBlockEntity extends BlockEntity implements BlockEntityTick
 
         for (var candidate : BlockPos.iterateOutwards(pos, pullRange, pullRange, pullRange)) {
             var candidateState = world.getBlockState(candidate);
-            if (candidate.equals(pos) || candidateState.isAir() || candidateState.isLiquid() || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK)) continue;
+            if (candidate.equals(pos) || candidateState.isAir() || candidateState.isLiquid() || candidateState.getBlock().equals(Blocks.MOVING_PISTON) || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK)) continue;
             
             currentlyPullingFrom = candidate;
             currentlyPulling = candidateState;
@@ -79,10 +80,9 @@ public class BlackHoleBlockEntity extends BlockEntity implements BlockEntityTick
                 // re-use existing result
                 ParticleContent.BLACK_HOLE_EMISSION.spawn(world, pos.toCenterPos(), cachedHit.getPos().toCenterPos());
                 cachedHit.onParticleCollided();
-                System.out.println("cache hit");
             } else {
                 // find target along exit line, and add it to cache
-                var impactPos = basicRaycast(pos.toCenterPos().add(pulledDir.multiply(1.2)), shootDir, 12);
+                var impactPos = basicRaycast(pos.toCenterPos().add(pulledDir.multiply(1.2)), shootDir, 12, world);
                 if (impactPos != null) {
                     ParticleContent.BLACK_HOLE_EMISSION.spawn(world, pos.toCenterPos(), impactPos.toCenterPos());
                     
@@ -90,7 +90,6 @@ public class BlackHoleBlockEntity extends BlockEntity implements BlockEntityTick
                     if (candidate instanceof ParticleCollectorBlockEntity collectorEntity) {
                         collectorEntity.onParticleCollided();
                         cachedCollectors.put(cacheKey, collectorEntity);
-                        System.out.println("cache miss");
                     } else {
                         // only cast one particle if no collector has been found (for performance sake to avoid all those searches)
                         break;
@@ -124,7 +123,7 @@ public class BlackHoleBlockEntity extends BlockEntity implements BlockEntityTick
         return cachedResult;
     }
     
-    private BlockPos basicRaycast(Vec3d from, Vec3d direction, int range) {
+    public static BlockPos basicRaycast(Vec3d from, Vec3d direction, int range, World world) {
         
         var checkedPositions = new HashSet<BlockPos>();
         
@@ -144,9 +143,9 @@ public class BlackHoleBlockEntity extends BlockEntity implements BlockEntityTick
     }
     
     
-    private boolean canPassThrough(BlockState state, BlockPos blockPos) {
+    private static boolean canPassThrough(BlockState state, BlockPos blockPos) {
         // When targetting entities, don't let grass, vines, small mushrooms, pressure plates, etc. get in the way of the laser
-        return state.isAir() || state.isLiquid() || state.isIn(TagContent.LASER_PASSTHROUGH);
+        return state.isAir() || state.isLiquid() || state.isIn(TagContent.LASER_PASSTHROUGH) || state.getBlock() instanceof AcceleratorPassthroughBlock;
     }
     
     public void onClientPullEvent(NetworkContent.BlackHoleSuckPacket packet) {

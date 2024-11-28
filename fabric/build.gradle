@@ -42,7 +42,8 @@ dependencies {
 
     // Architectury API. This is optional, and you can comment it out if you don't need it.
     // modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
-    modImplementation "dev.architectury:architectury-fabric:13.0.6" // because gradle is stupid and my local setup is broken somewhere but deleting the cache doesnt seem to fix it
+    modImplementation "dev.architectury:architectury-fabric:13.0.6"
+    // because gradle is stupid and my local setup is broken somewhere but deleting the cache doesnt seem to fix it
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
@@ -60,20 +61,6 @@ dependencies {
     // geckolib
     modImplementation "software.bernie.geckolib:geckolib-fabric-1.21.1:4.6.6"
 
-    // CSL
-    // include modApi("earth.terrarium.common_storage_lib:common-storage-lib-fabric-1.21:0.0.5")
-    // yeah this is super weird, I have no idea why I have to list the subprojects, and why the include doesn't work here, or why the 0.0.6 jar doesnt work
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-fabric-1.21:0.0.27')
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-data-fabric-1.21:0.0.27')
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-lookup-fabric-1.21:0.0.27')
-    include modApi('earth.terrarium.common_storage_lib:common-storage-lib-resources-fabric-1.21:0.0.27')
-//    modApi files('common-storage-lib-fabric-1.21-0.0.8.jar')
-//    modApi files('common-storage-lib-data-fabric-1.21-0.0.9.jar')
-//    modApi files('common-storage-lib-resources-fabric-1.21-0.0.8.jar')
-//    modApi files('common-storage-lib-lookup-fabric-1.21-0.0.8.jar')
-
-    // include(files('common-storage-lib-fabric-1.21-0.0.8.jar'))
-
     // JADE (needed for addon)
     modImplementation "curse.maven:jade-324717:5639994"
 
@@ -88,6 +75,13 @@ dependencies {
 
     // mod menu
     modImplementation "com.terraformersmc:modmenu:11.0.3"
+
+    // compat mods for testing
+//    // Tech Reborn
+//    modImplementation "curse.maven:techreborn-233564:5608205"
+//    modImplementation "curse.maven:reborncore-237903:5608204"
+//    // Energized Power
+//    modImplementation "curse.maven:energized-power-782147:5650292"
 
 }
 
@@ -111,3 +105,44 @@ remapJar {
 tasks.remapJar {
     injectAccessWidener.set(true)
 }
+
+publishMods {
+    file = remapJar.archiveFile
+    changelog = file("../CHANGELOG.md").getText()
+    type = ALPHA
+    modLoaders.add("fabric")
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_API_KEY")
+        projectId = "4sYI62kA"
+        minecraftVersions.add("1.21.1")
+        minecraftVersions.add("1.21")
+
+        requires("owo-lib")
+        requires("geckolib")
+        requires("athena-ctm")
+        requires("fabric-api")
+
+        announcementTitle = "Fabric Version on Modrinth"
+    }
+
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+        projectId = "1030830"
+        minecraftVersions.add("1.21.1")
+        minecraftVersions.add("1.21")
+
+        requires("owo-lib")
+        requires("geckolib")
+        requires("athena")
+        requires("fabric-api")
+
+        javaVersions.add(JavaVersion.VERSION_21)
+        clientRequired = true
+        serverRequired = true
+
+        projectSlug = "oritech"
+        announcementTitle = "Fabric Version on CurseForge"
+    }
+}
+

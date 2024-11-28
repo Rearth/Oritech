@@ -80,11 +80,14 @@ public class Config {
     public int endPortalRequiredSpeed = 10000;
     public int netherPortalRequiredSpeed = 5000;
     public int blackHoleRequiredSpeed = 15000;
+    public int collectorEnergyStorage = 1_000_000;
+    public float tachyonCollisionEnergyFactor = 1f;
 
     @SectionHeader("blackHole")
     public int pullTimeMultiplier = 8;
     public int pullRange = 16;
     public int idleWaitTicks = 200;
+    public int blackHoleTachyonEnergy = 50_000;
     
     @SectionHeader("clientSettings")
     @Sync(Option.SyncMode.NONE)

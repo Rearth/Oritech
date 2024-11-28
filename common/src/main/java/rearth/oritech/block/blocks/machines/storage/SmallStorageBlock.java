@@ -140,7 +140,7 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
         var stack = new ItemStack(BlockContent.SMALL_STORAGE_BLOCK.asItem());
         var storageEntity = (SmallStorageBlockEntity) world.getBlockEntity(pos);
         
-        if (storageEntity.getEnergy(null).getStoredAmount() > 0) {
+        if (storageEntity.getStorage(null).getAmount() > 0) {
             var nbt = new NbtCompound();
             storageEntity.writeNbt(nbt, world.getRegistryManager());
             stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));

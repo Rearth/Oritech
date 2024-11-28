@@ -1,6 +1,5 @@
 package rearth.oritech.util;
 
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EquipmentSlot;
@@ -23,6 +22,7 @@ import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public interface MultiblockMachineController {
     void setCoreQuality(float quality);
     float getCoreQuality();
     InventoryProvider getInventoryForLink();
-    ValueStorage getEnergyStorageForLink();
+    EnergyApi.EnergyContainer getEnergyStorageForLink();
     
     default void addMultiblockToNbt(NbtCompound nbt) {
         

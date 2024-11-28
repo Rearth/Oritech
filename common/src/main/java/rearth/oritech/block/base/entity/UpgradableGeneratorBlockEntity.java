@@ -1,7 +1,5 @@
 package rearth.oritech.block.base.entity;
 
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.storage.util.TransferUtil;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
@@ -26,6 +24,7 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +55,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         // if burn time is zero, try to consume item thus adding burn time
         // if burn time is remaining, use up one tick of it
         
-        if (world.isClient || !isActive(state)) return;
+        if (world.isClient || !isActive(state) || disabledViaRedstone) return;
         
         // progress var is used as remaining burn time
         if (progress > 0) {
@@ -230,13 +229,13 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     protected abstract Set<Pair<BlockPos, Direction>> getOutputTargets(BlockPos pos, World world);
     
     protected void outputEnergy() {
-        if (energyStorage.getStoredAmount() <= 0) return;
+        if (energyStorage.getAmount() <= 0) return;
         
         // todo caching for targets? Used to be BlockApiCache.create()
         for (var target : getOutputTargets(pos, world)) {
             var candidate = EnergyApi.BLOCK.find(world, target.getLeft(), target.getRight());
             if (candidate != null)
-                TransferUtil.moveValue(energyStorage, candidate, Long.MAX_VALUE, false);
+                EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }
     }
     

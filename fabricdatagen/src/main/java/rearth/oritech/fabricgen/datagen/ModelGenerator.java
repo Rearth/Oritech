@@ -78,6 +78,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.TREEFELLER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.STEAM_ENGINE_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.PIPE_BOOSTER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.PARTICLE_COLLECTOR_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_1);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_2);

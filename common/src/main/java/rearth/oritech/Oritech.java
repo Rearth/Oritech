@@ -2,13 +2,8 @@ package rearth.oritech;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.mojang.serialization.Codec;
-import earth.terrarium.common_storage_lib.data.DataManager;
-import earth.terrarium.common_storage_lib.data.DataManagerRegistry;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
@@ -36,9 +31,6 @@ public final class Oritech {
     public static final Logger LOGGER = LoggerFactory.getLogger("oritech");
     public static final OritechConfig CONFIG = OritechConfig.createAndLoad();
     
-    public static final DataManagerRegistry DATA_REGISTRY = new DataManagerRegistry(MOD_ID);
-    public static final DataManager<Long> ENERGY_CONTENT = DATA_REGISTRY.builder(() -> 0L).serialize(Codec.LONG).networkSerializer(PacketCodecs.VAR_LONG).withDataComponent().copyOnDeath().buildAndRegister("energy");
-    
     public static final Multimap<Identifier, Runnable> EVENT_MAP = initEventMap();
     
     public static Identifier id(String path) {
@@ -51,8 +43,6 @@ public final class Oritech {
         NetworkContent.registerChannels();
         ParticleContent.registerParticles();
         FeatureContent.initialize();
-        
-        DATA_REGISTRY.init();
         
         // for pipe data
         ServerLifecycleEvents.SERVER_STARTED.register(Oritech::onServerStarted);

@@ -54,6 +54,12 @@ public interface ScreenProvider {
     default boolean showArmor() {return false;}
     
     default boolean showExpansionPanel() {return true;}
+    
+    default boolean hasRedstoneControlAvailable() {return false;}
+    
+    default int receivedRedstoneSignal() {return 0;}
+    
+    default String currentRedstoneEffect() {return "";}
 
     default BarConfiguration getEnergyConfiguration() {
         return new BarConfiguration(7, 24, 15, 54);

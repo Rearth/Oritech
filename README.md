@@ -7,10 +7,10 @@
 <h3 align="center">Oritech</h3>
 
 <div align="center">
-  A minecraft fabric / neoforge tech mod, currently still WIP. Just like this readme.
+  A minecraft fabric / neoforge tech mod, currently in beta.
   <br/>
   <br/>
-  <a href="https://github.com/rearth/Oritech"><strong>Explore the docs TODO»</strong></a>
+  <a href="https://moddedmc.org/en/mod/oritech/docs"><strong>Explore the docs»</strong></a>
   <br/>
   <br/>
   <a href="https://github.com/rearth/Oritech/issues">Report Bug</a>

@@ -1,12 +1,7 @@
 package rearth.oritech.block.base.entity;
 
-import earth.terrarium.common_storage_lib.context.impl.SimpleItemContext;
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.item.impl.vanilla.WrappedVanillaContainer;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
-import earth.terrarium.common_storage_lib.storage.util.TransferUtil;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -38,12 +33,15 @@ import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyProvider.BlockEntity, InventoryProvider, MachineAddonController, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
+public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyApi.BlockProvider, InventoryProvider, MachineAddonController, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
     
     private final List<BlockPos> connectedAddons = new ArrayList<>();
     private final List<BlockPos> openSlots = new ArrayList<>();
@@ -64,16 +62,16 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     //own storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
     
-    private final ValueStorage outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
+    private final EnergyApi.EnergyContainer outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
-        public boolean allowsInsertion() {
+        public boolean supportsInsertion() {
             return false;
         }
     };
     
-    private final ValueStorage inputStorage = new DelegatingEnergyStorage(energyStorage, null) {
+    private final EnergyApi.EnergyContainer inputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
-        public boolean allowsExtraction() {
+        public boolean supportsExtraction() {
             return false;
         }
     };
@@ -108,10 +106,10 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         chargeItems();
         
         // todo caching for targets? Used to be BlockApiCache.create()
-        var target = getOutputPosition(pos, world);
+        var target = getOutputPosition(pos, getFacing());
         var candidate = EnergyApi.BLOCK.find(world, target.getRight(), target.getLeft());
         if (candidate != null) {
-            TransferUtil.moveValue(energyStorage, candidate, Long.MAX_VALUE, false);
+            EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }
     }
     
@@ -120,15 +118,14 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         var heldStack = inventory.heldStacks.get(0);
         if (heldStack.isEmpty()) return;
         
-        var slot = SimpleItemContext.of(new WrappedVanillaContainer(inventory), 0);
+        var slot = ContainerItemContext.ofSingleSlot(getInventory(null).getSlot(0));
         var slotEnergyContainer = EnergyApi.ITEM.find(heldStack, slot);
         if (slotEnergyContainer != null) {
-            TransferUtil.moveValue(energyStorage, slotEnergyContainer, Long.MAX_VALUE, false);
+            EnergyApi.transfer(energyStorage, slotEnergyContainer, Long.MAX_VALUE, false);
         }
     }
     
-    protected Pair<Direction, BlockPos> getOutputPosition(BlockPos pos, World world) {
-        var facing = getFacing();
+    public static Pair<Direction, BlockPos> getOutputPosition(BlockPos pos, Direction facing) {
         var blockInFront = (BlockPos) Geometry.offsetToWorldPosition(facing, new Vec3i(-1, 0, 0), pos);
         var worldOffset = blockInFront.subtract(pos);
         var direction = Direction.fromVector(worldOffset.getX(), worldOffset.getY(), worldOffset.getZ());
@@ -166,7 +163,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         
         if (direction == null)
             return energyStorage;
@@ -320,5 +317,22 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     public void setRedstonePowered(boolean isPowered) {
         this.redstonePowered = isPowered;
+    }
+    
+    @Override
+    public boolean hasRedstoneControlAvailable() {
+        return true;
+    }
+    
+    @Override
+    public int receivedRedstoneSignal() {
+        if (redstonePowered) return 15;
+        return world.getReceivedRedstonePower(pos);
+    }
+    
+    @Override
+    public String currentRedstoneEffect() {
+        if (receivedRedstoneSignal() > 0) return "tooltip.oritech.redstone_disabled_storage";
+        return "tooltip.oritech.redstone_enabled_direct";
     }
 }

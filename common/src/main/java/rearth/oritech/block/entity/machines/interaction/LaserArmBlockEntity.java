@@ -1,12 +1,8 @@
 package rearth.oritech.block.entity.machines.interaction;
 
 import com.mojang.authlib.GameProfile;
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.BuddingAmethystBlock;
@@ -47,6 +43,7 @@ import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.blocks.machines.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
+import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
@@ -56,6 +53,8 @@ import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -67,7 +66,7 @@ import java.util.stream.Collectors;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
-public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyProvider.BlockEntity, ScreenProvider, ExtendedScreenHandlerFactory, MultiblockMachineController, MachineAddonController, InventoryProvider {
+public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyApi.BlockProvider, ScreenProvider, ExtendedScreenHandlerFactory, MultiblockMachineController, MachineAddonController, InventoryProvider, RedstoneAddonBlockEntity.RedstoneControllable {
     
     public static final String LASER_PLAYER_NAME = "oritech_laser";
     private static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
@@ -133,7 +132,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         if (world.isClient() || !isActive(state))
             return;
         
-        if (!redstonePowered && energyStorage.getStoredAmount() >= energyRequiredToFire()) {
+        if (!redstonePowered && energyStorage.getAmount() >= energyRequiredToFire()) {
             if (hunterAddons > 0) {
                 fireAtLivingEntities(world, pos, state, blockEntity);
             }
@@ -212,7 +211,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         if (yieldAddons > 0) {
             dropped = DestroyerBlockEntity.getLootDrops(targetBlockState, (ServerWorld) world, targetPos, targetEntity, yieldAddons);
         } else {
-            dropped = Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetPos, targetEntity);
+            dropped = net.minecraft.block.Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetPos, targetEntity);
         }
         
         if (targetBlockState.getBlock().equals(Blocks.AMETHYST_CLUSTER)) {
@@ -485,7 +484,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     private void updateNetwork() {
         var entityId = currentLivingTarget != null ? currentLivingTarget.getId() : -1;
         var sendTarget = currentTarget != null ? currentTarget : BlockPos.ORIGIN;
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons, hunterAddons, hunterTargetMode.value, hasCropFilterAddon, entityId));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons, hunterAddons, hunterTargetMode.value, hasCropFilterAddon, entityId, redstonePowered));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
         networkDirty = false;
     }
@@ -608,7 +607,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     @Override
-    public ValueStorage getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
         return energyStorage;
     }
     
@@ -622,7 +621,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     // energyprovider
     @Override
-    public ValueStorage getEnergy(Direction direction) {
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
         return energyStorage;
     }
     
@@ -887,7 +886,57 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     public Text getDisplayName() {
         return Text.literal("");
     }
-
+    
+    @Override
+    public int getComparatorEnergyAmount() {
+        return (int) ((energyStorage.amount / (float) energyStorage.capacity) * 15);
+    }
+    
+    @Override
+    public int getComparatorSlotAmount(int slot) {
+        if (inventory.heldStacks.size() <= slot) return 0;
+        
+        var stack = inventory.getStack(slot);
+        if (stack.isEmpty()) return 0;
+        
+        return (int) ((stack.getCount() / (float) stack.getMaxCount()) * 15);
+    }
+    
+    @Override
+    public int getComparatorProgress() {
+        if (currentTarget == null || currentTarget.equals(BlockPos.ORIGIN)) return  0;
+        
+        return (int) (currentTarget.getSquaredDistance(pos) / range) * 15;
+    }
+    
+    @Override
+    public int getComparatorActiveState() {
+        var idleTicks = world.getTime() - lastFiredAt;
+        return idleTicks > 3 ? 15 : 0;
+    }
+    
+    @Override
+    public boolean hasRedstoneControlAvailable() {
+        return true;
+    }
+    
+    @Override
+    public int receivedRedstoneSignal() {
+        if (redstonePowered) return 15;
+        return world.getReceivedRedstonePower(pos);
+    }
+    
+    @Override
+    public String currentRedstoneEffect() {
+        if (redstonePowered) return "tooltip.oritech.redstone_disabled";
+        return "tooltip.oritech.redstone_enabled_direct";
+    }
+    
+    @Override
+    public void onRedstoneEvent(boolean isPowered) {
+        this.redstonePowered = isPowered;
+    }
+    
     public enum HunterTargetMode {
         HOSTILE_ONLY(1, "message.oritech.target_designator.hunter_hostile"),
         HOSTILE_NEUTRAL(2, "message.oritech.target_designator.hunter_neutral"),

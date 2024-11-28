@@ -39,11 +39,9 @@ public class ParticleContent {
     });
     
     public static final ParticleSystem<Vec3d> BLACK_HOLE_EMISSION = PARTICLE_CONTROLLER.register(Vec3d.class, (world, pos, data) -> {
-        var offset = data.subtract(pos);
-        var distance = offset.length();
-        var direction = offset.normalize();
-        ClientParticles.setVelocity(direction.multiply(1.5));
-        ClientParticles.spawnWithMaxAge(ParticleTypes.SCULK_CHARGE_POP, pos, (int) distance * 2);
+        var dist = (int) data.distanceTo(pos);
+        ClientParticles.setParticleCount(dist + world.random.nextInt(3));
+        ClientParticles.spawnLine(ParticleTypes.SCULK_CHARGE_POP, world, pos, data, 0.2f);
     });
     
     public static final ParticleSystem<Integer> FERTILIZER_EFFECT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {

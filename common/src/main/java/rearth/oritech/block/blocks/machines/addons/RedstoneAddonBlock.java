@@ -7,10 +7,14 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
@@ -19,6 +23,13 @@ public class RedstoneAddonBlock extends MachineAddonBlock {
     
     public RedstoneAddonBlock(Settings settings, AddonSettings addonSettings) {
         super(settings, addonSettings);
+        this.setDefaultState(getDefaultState().with(Properties.POWERED, false));
+    }
+    
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        super.appendProperties(builder);
+        builder.add(Properties.POWERED);
     }
     
     @Override
@@ -47,6 +58,15 @@ public class RedstoneAddonBlock extends MachineAddonBlock {
         var addonEntity = (RedstoneAddonBlockEntity) world.getBlockEntity(pos);
         addonEntity.setRedstonePowered(isPowered);
         
+    }
+    
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        
+        // TODO
+        var isPowered = world.isReceivingRedstonePower(pos);
+        
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos).with(Properties.POWERED, isPowered);
     }
     
     @Override

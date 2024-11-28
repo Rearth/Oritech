@@ -1,6 +1,5 @@
 package rearth.oritech.block.blocks.pipes;
 
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
@@ -17,6 +16,7 @@ import org.apache.commons.lang3.function.TriFunction;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +31,7 @@ public class EnergyPipeBlock extends GenericPipeBlock {
     
     @Override
     public TriFunction<World, BlockPos, Direction, Boolean> apiValidationFunction() {
-        return ((world, pos, direction) -> EnergyApi.BLOCK.isPresent(world, pos, null, null, direction));   // TODO check if this loads null values
+        return ((world, pos, direction) -> EnergyApi.BLOCK.find(world, pos, direction) != null);   // TODO check if this loads null values
     }
     
     @Override

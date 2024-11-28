@@ -1,44 +1,27 @@
-package rearth.oritech.util;
+package rearth.oritech.util.energy.containers;
 
-import earth.terrarium.common_storage_lib.storage.base.UpdateManager;
-import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
+import rearth.oritech.util.energy.EnergyApi;
 
-public class DynamicEnergyStorage implements ValueStorage, UpdateManager<Long> {
-    public long amount;
-    public long capacity;
-    public long maxInsert;
-    public long maxExtract;
+public class SimpleEnergyStorage extends EnergyApi.EnergyContainer {
+    private final long maxInsert;
+    private final long maxExtract;
+    private final long capacity;
     private final Runnable onUpdate;
     
-    public DynamicEnergyStorage(long capacity, long maxInsert, long maxExtract, Runnable onUpdate) {
-        this.capacity = capacity;
+    private long amount;
+    
+    public SimpleEnergyStorage(long maxInsert, long maxExtract, long capacity, Runnable onUpdate) {
         this.maxInsert = maxInsert;
         this.maxExtract = maxExtract;
+        this.capacity = capacity;
         this.onUpdate = onUpdate;
     }
     
-    @Override
-    public long getStoredAmount() {
-        return amount;
-    }
-    
-    @Override
-    public long getCapacity() {
-        return capacity;
-    }
-    
-    public void set(long amount) {
-        this.amount = amount;
-    }
-    
-    @Override
-    public boolean allowsInsertion() {
-        return true;
-    }
-    
-    @Override
-    public boolean allowsExtraction() {
-        return true;
+    public SimpleEnergyStorage(long maxInsert, long maxExtract, long capacity) {
+        this.maxInsert = maxInsert;
+        this.maxExtract = maxExtract;
+        this.capacity = capacity;
+        this.onUpdate = () -> {};
     }
     
     @Override
@@ -67,14 +50,27 @@ public class DynamicEnergyStorage implements ValueStorage, UpdateManager<Long> {
         return extracted;
     }
     
+    public long extractIgnoringLimit(long amount, boolean simulate) {
+        long extracted = Math.min(amount, this.amount);
+        if (!simulate) {
+            this.amount -= extracted;
+        }
+        return extracted;
+    }
+    
     @Override
-    public Long createSnapshot() {
+    public void setAmount(long amount) {
+        this.amount = amount;
+    }
+    
+    @Override
+    public long getAmount() {
         return amount;
     }
     
     @Override
-    public void readSnapshot(Long snapshot) {
-        this.amount = snapshot;
+    public long getCapacity() {
+        return capacity;
     }
     
     @Override

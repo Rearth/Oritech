@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.machines.accelerator;
 
-import earth.terrarium.common_storage_lib.storage.base.UpdateManager;
 import io.wispforest.owo.util.VectorRandomUtils;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
@@ -166,20 +165,48 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             var success = tryCraftResult(relativeSpeed, activeItemParticle, secondControllerEntity.activeItemParticle);
         }
         
-        
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new LastEventPacket(pos, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.ofFloored(particle.position), particle.lastBendDistance + particle.lastBendDistance2, activeItemParticle));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new LastEventPacket(secondController, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.ofFloored(particle.position), particle.lastBendDistance + particle.lastBendDistance2, activeItemParticle));
         
         this.removeParticleDueToCollision();
         secondControllerEntity.removeParticleDueToCollision();
         
-        var particleCount = Math.max(Math.sqrt(Math.sqrt(relativeSpeed)), 3);
-        for (int i = 0; i < particleCount + 5; i++) {
-            var offset = VectorRandomUtils.getRandomOffset(world, collision, particleCount * 1.5);
-            ParticleContent.WEED_KILLER.spawn(world, collision, new ParticleContent.LineData(collision, offset));
-        }
+        var particleCount = Math.pow(relativeSpeed, 0.5) / 2f + 1;
+        createCollisionParticles((int) relativeSpeed, collision, (int) particleCount);
         
         ParticleContent.PARTICLE_COLLIDE.spawn(world, collision);
+    }
+    
+    private void createCollisionParticles(int collisionEnergy, Vec3d collisionPosition, int shotCount) {
+        
+        var energyMultiplier = 3 * Oritech.CONFIG.tachyonCollisionEnergyFactor();
+        int energyPotential = (int) (Math.pow(collisionEnergy / 2f, 2) * energyMultiplier * Oritech.CONFIG.accelerationRFCost());    // exactly N times the amount of energy used to accelerate
+        var energyPerRay = energyPotential / shotCount;
+        var rayRange = shotCount / 3;
+        
+        var caughtParticles = 0;
+        
+        for (int i = 0; i < shotCount; i++) {
+            var offset = VectorRandomUtils.getRandomOffset(world, collisionPosition, rayRange);
+            var direction = offset.subtract(collisionPosition).normalize();
+            
+            var impactPos = BlackHoleBlockEntity.basicRaycast(collisionPosition.add(direction.multiply(1.2)), direction, rayRange, world);
+            if (impactPos != null) {
+                ParticleContent.BLACK_HOLE_EMISSION.spawn(world, collisionPosition, impactPos.toCenterPos());
+                // ParticleContent.DEBUG_BLOCK.spawn(world, Vec3d.of(impactPos));
+                
+                var candidate = world.getBlockEntity(impactPos);
+                if (candidate instanceof ParticleCollectorBlockEntity collectorEntity) {
+                    collectorEntity.onParticleCollided(energyPerRay);
+                    caughtParticles++;
+                }
+            } else {
+                ParticleContent.BLACK_HOLE_EMISSION.spawn(world, collisionPosition, offset);
+            }
+            
+            // System.out.println("caught: " + caughtParticles + " of " + shotCount);
+        }
+    
     }
     
     private boolean tryCraftResult(float speed, ItemStack inputA, ItemStack inputB) {
@@ -364,15 +391,15 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var entity = world.getBlockEntity(motorBlock);
         if (!(entity instanceof AcceleratorMotorBlockEntity motorEntity)) return;
         
-        var storage = motorEntity.getEnergy(null);
-        var availableEnergy = storage.getStoredAmount();
+        var storage = motorEntity.getStorage(null);
+        var availableEnergy = storage.getAmount();
         
         var speed = particle.velocity;
         var cost = speed * Oritech.CONFIG.accelerationRFCost();
         if (availableEnergy < cost) return;
         
         storage.extract((long) cost, false);
-        if (storage instanceof UpdateManager<?> manager) manager.update();
+        storage.update();
         
         particle.velocity += 1;
         

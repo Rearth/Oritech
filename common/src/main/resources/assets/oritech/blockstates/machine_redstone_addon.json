@@ -1,114 +1,224 @@
 {
   "variants": {
-    "face=wall,facing=north,addon_used=true": {
+    "face=wall,facing=north,addon_used=true,powered=true": {
+      "model": "oritech:block/machine_redstone_addon_powered",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=true,powered=false": {
       "model": "oritech:block/machine_redstone_addon_on",
       "x": 270,
       "y": 180
     },
-    "face=wall,facing=north,addon_used=false": {
+    "face=wall,facing=north,addon_used=false,powered=true": {
       "model": "oritech:block/machine_redstone_addon",
       "x": 270,
       "y": 180
     },
-    "face=wall,facing=south,addon_used=true": {
+    "face=wall,facing=north,addon_used=false,powered=false": {
+      "model": "oritech:block/machine_redstone_addon",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=south,addon_used=true,powered=true": {
+      "model": "oritech:block/machine_redstone_addon_powered",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=true,powered=false": {
       "model": "oritech:block/machine_redstone_addon_on",
       "x": 270,
       "y": 0
     },
-    "face=wall,facing=south,addon_used=false": {
+    "face=wall,facing=south,addon_used=false,powered=true": {
       "model": "oritech:block/machine_redstone_addon",
       "x": 270,
       "y": 0
     },
-    "face=wall,facing=west,addon_used=true": {
+    "face=wall,facing=south,addon_used=false,powered=false": {
+      "model": "oritech:block/machine_redstone_addon",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=west,addon_used=true,powered=true": {
+      "model": "oritech:block/machine_redstone_addon_powered",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=true,powered=false": {
       "model": "oritech:block/machine_redstone_addon_on",
       "x": 270,
       "y": 90
     },
-    "face=wall,facing=west,addon_used=false": {
+    "face=wall,facing=west,addon_used=false,powered=true": {
       "model": "oritech:block/machine_redstone_addon",
       "x": 270,
       "y": 90
     },
-    "face=wall,facing=east,addon_used=true": {
+    "face=wall,facing=west,addon_used=false,powered=false": {
+      "model": "oritech:block/machine_redstone_addon",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=east,addon_used=true,powered=true": {
+      "model": "oritech:block/machine_redstone_addon_powered",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=true,powered=false": {
       "model": "oritech:block/machine_redstone_addon_on",
       "x": 270,
       "y": 270
     },
-    "face=wall,facing=east,addon_used=false": {
+    "face=wall,facing=east,addon_used=false,powered=true": {
       "model": "oritech:block/machine_redstone_addon",
       "x": 270,
       "y": 270
     },
-    "face=floor,facing=north,addon_used=true": {
+    "face=wall,facing=east,addon_used=false,powered=false": {
+      "model": "oritech:block/machine_redstone_addon",
+      "x": 270,
+      "y": 270
+    },
+    "face=floor,facing=north,addon_used=true,powered=true": {
+      "model": "oritech:block/machine_redstone_addon_powered"
+    },
+    "face=floor,facing=north,addon_used=true,powered=false": {
       "model": "oritech:block/machine_redstone_addon_on"
     },
-    "face=floor,facing=north,addon_used=false": {
+    "face=floor,facing=north,addon_used=false,powered=true": {
       "model": "oritech:block/machine_redstone_addon"
     },
-    "face=floor,facing=south,addon_used=true": {
+    "face=floor,facing=north,addon_used=false,powered=false": {
+      "model": "oritech:block/machine_redstone_addon"
+    },
+    "face=floor,facing=south,addon_used=true,powered=true": {
+      "model": "oritech:block/machine_redstone_addon_powered",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=true,powered=false": {
       "model": "oritech:block/machine_redstone_addon_on",
       "y": 180
     },
-    "face=floor,facing=south,addon_used=false": {
+    "face=floor,facing=south,addon_used=false,powered=true": {
       "model": "oritech:block/machine_redstone_addon",
       "y": 180
     },
-    "face=floor,facing=west,addon_used=true": {
+    "face=floor,facing=south,addon_used=false,powered=false": {
+      "model": "oritech:block/machine_redstone_addon",
+      "y": 180
+    },
+    "face=floor,facing=west,addon_used=true,powered=true": {
+      "model": "oritech:block/machine_redstone_addon_powered",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=true,powered=false": {
       "model": "oritech:block/machine_redstone_addon_on",
       "y": 270
     },
-    "face=floor,facing=west,addon_used=false": {
+    "face=floor,facing=west,addon_used=false,powered=true": {
       "model": "oritech:block/machine_redstone_addon",
       "y": 270
     },
-    "face=floor,facing=east,addon_used=true": {
+    "face=floor,facing=west,addon_used=false,powered=false": {
+      "model": "oritech:block/machine_redstone_addon",
+      "y": 270
+    },
+    "face=floor,facing=east,addon_used=true,powered=true": {
+      "model": "oritech:block/machine_redstone_addon_powered",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=true,powered=false": {
       "model": "oritech:block/machine_redstone_addon_on",
       "y": 90
     },
-    "face=floor,facing=east,addon_used=false": {
+    "face=floor,facing=east,addon_used=false,powered=true": {
       "model": "oritech:block/machine_redstone_addon",
       "y": 90
     },
-    "face=ceiling,facing=north,addon_used=true": {
+    "face=floor,facing=east,addon_used=false,powered=false": {
+      "model": "oritech:block/machine_redstone_addon",
+      "y": 90
+    },
+    "face=ceiling,facing=north,addon_used=true,powered=true": {
+      "model": "oritech:block/machine_redstone_addon_powered",
+      "x": 180,
+      "y": 0
+    },
+    "face=ceiling,facing=north,addon_used=true,powered=false": {
       "model": "oritech:block/machine_redstone_addon_on",
       "x": 180,
       "y": 0
     },
-    "face=ceiling,facing=north,addon_used=false": {
+    "face=ceiling,facing=north,addon_used=false,powered=true": {
       "model": "oritech:block/machine_redstone_addon",
       "x": 180,
       "y": 0
     },
-    "face=ceiling,facing=south,addon_used=true": {
+    "face=ceiling,facing=north,addon_used=false,powered=false": {
+      "model": "oritech:block/machine_redstone_addon",
+      "x": 180,
+      "y": 0
+    },
+    "face=ceiling,facing=south,addon_used=true,powered=true": {
+      "model": "oritech:block/machine_redstone_addon_powered",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=true,powered=false": {
       "model": "oritech:block/machine_redstone_addon_on",
       "x": 180,
       "y": 180
     },
-    "face=ceiling,facing=south,addon_used=false": {
+    "face=ceiling,facing=south,addon_used=false,powered=true": {
       "model": "oritech:block/machine_redstone_addon",
       "x": 180,
       "y": 180
     },
-    "face=ceiling,facing=west,addon_used=true": {
-      "model": "oritech:block/machine_redstone_addon_on",
+    "face=ceiling,facing=south,addon_used=false,powered=false": {
+      "model": "oritech:block/machine_redstone_addon",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=west,addon_used=true,powered=true": {
+      "model": "oritech:block/machine_redstone_addon_powered",
       "x": 180,
       "y": 270
     },
-    "face=ceiling,facing=west,addon_used=false": {
+    "face=ceiling,facing=west,addon_used=true,powered=false": {
+      "model": "oritech:block/machine_redstone_addon_on",      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=false,powered=true": {
       "model": "oritech:block/machine_redstone_addon",
       "x": 180,
       "y": 270
     },
-    "face=ceiling,facing=east,addon_used=true": {
+    "face=ceiling,facing=west,addon_used=false,powered=false": {
+      "model": "oritech:block/machine_redstone_addon",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=east,addon_used=true,powered=true": {
+      "model": "oritech:block/machine_redstone_addon_powered",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=true,powered=false": {
       "model": "oritech:block/machine_redstone_addon_on",
       "x": 180,
       "y": 90
     },
-    "face=ceiling,facing=east,addon_used=false": {
+    "face=ceiling,facing=east,addon_used=false,powered=true": {
+      "model": "oritech:block/machine_redstone_addon",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=false,powered=false": {
       "model": "oritech:block/machine_redstone_addon",
       "x": 180,
       "y": 90
     }
   }
 }
+

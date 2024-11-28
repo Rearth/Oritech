@@ -15,9 +15,9 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
-import rearth.oritech.util.DynamicEnergyStorage;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,5 +118,17 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     @Override
     public float getEfficiencyMultiplier() {
         return getBaseAddonData().efficiency();
+    }
+    
+    @Override
+    public int receivedRedstoneSignal() {
+        if (disabledViaRedstone) return 15;
+        return world.getReceivedRedstonePower(pos);
+    }
+    
+    @Override
+    public String currentRedstoneEffect() {
+        if (disabledViaRedstone) return "tooltip.oritech.redstone_disabled";
+        return "tooltip.oritech.redstone_enabled";
     }
 }

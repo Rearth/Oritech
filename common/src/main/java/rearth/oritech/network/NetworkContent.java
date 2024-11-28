@@ -1,7 +1,6 @@
 package rearth.oritech.network;
 
 import dev.architectury.fluid.FluidStack;
-import earth.terrarium.common_storage_lib.energy.EnergyProvider;
 import io.wispforest.owo.network.OwoNetChannel;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.entity.EquipmentSlot;
@@ -20,6 +19,7 @@ import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.machines.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.machines.accelerator.BlackHoleBlockEntity;
+import rearth.oritech.block.entity.machines.accelerator.ParticleCollectorBlockEntity;
 import rearth.oritech.block.entity.machines.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
@@ -31,6 +31,8 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +44,8 @@ public class NetworkContent {
     
     // Server -> Client
     public record MachineSyncPacket(BlockPos position, long energy, long maxEnergy, long maxInsert, int progress,
-                                    OritechRecipe activeRecipe, InventoryInputMode inputMode, long lastWorkedAt) {
+                                    OritechRecipe activeRecipe, InventoryInputMode inputMode, long lastWorkedAt,
+                                    boolean disabledViaRedstone) {
     }
     
     // Client -> Server (e.g. from UI interactions
@@ -67,6 +70,9 @@ public class NetworkContent {
     public record DroneCardEventPacket(BlockPos position, String message) {
     }
     
+    public record ParticleAcceleratorAnimationPacket(BlockPos position) {
+    }
+    
     public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget,
                                              BlockPos areaMin, BlockPos areaMax) {
     }   // times are in ticks
@@ -87,10 +93,12 @@ public class NetworkContent {
     // for use with addon providers to sync energy state
     public record GenericEnergySyncPacket(BlockPos position, long currentEnergy, long maxEnergy) {}
     
+    public record GenericRedstoneSyncPacket(BlockPos position, boolean isPowered) {}
+    
     public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {
     }   // this goes both ways
     
-    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize, int yieldAddons, int hunterAddons, int hunterTargetMode, boolean cropAddon, int targetEntityId) {
+    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize, int yieldAddons, int hunterAddons, int hunterTargetMode, boolean cropAddon, int targetEntityId, boolean redstonePowered) {
     }
     public record DeepDrillSyncPacket(BlockPos position, long lastWorkTime) {
     }
@@ -190,6 +198,7 @@ public class NetworkContent {
                 laserArmBlock.hasCropFilterAddon = message.cropAddon;
                 laserArmBlock.setLivingTargetFromNetwork(message.targetEntityId);
                 laserArmBlock.hunterTargetMode = LaserArmBlockEntity.HunterTargetMode.fromValue(message.hunterTargetMode);
+                laserArmBlock.setRedstonePowered(message.redstonePowered);
             }
             
         }));
@@ -218,7 +227,7 @@ public class NetworkContent {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
-            if (entity instanceof EnergyProvider.BlockEntity energyProvider && energyProvider.getEnergy(null) instanceof DynamicEnergyStorage storage) {
+            if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getStorage(null) instanceof DynamicEnergyStorage storage) {
                 storage.capacity = message.maxEnergy;
                 storage.amount = message.currentEnergy;
             }
@@ -389,6 +398,15 @@ public class NetworkContent {
             
         }));
         
+        MACHINE_CHANNEL.registerClientbound(ParticleAcceleratorAnimationPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            if (entity instanceof ParticleCollectorBlockEntity machine) {
+                machine.playAnimation();
+            }
+            
+        }));
+        
         MACHINE_CHANNEL.registerClientbound(SteamEnginePacket.class, ((message, access) -> {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
@@ -504,7 +522,7 @@ public class NetworkContent {
             // to prevent dedicated servers from kicking the player for flying
             player.networkHandler.floatingTicks = 0;
             
-            stack.set(Oritech.ENERGY_CONTENT.componentType(), message.energyStored);
+            stack.set(EnergyApi.ITEM.getEnergyComponent(), message.energyStored);
             if (message.fluidAmount > 0)
                 stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidType)), message.fluidAmount));
             

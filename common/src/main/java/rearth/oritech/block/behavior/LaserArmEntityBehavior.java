@@ -1,8 +1,6 @@
 package rearth.oritech.block.behavior;
 
-import earth.terrarium.common_storage_lib.context.impl.ModifyOnlyContext;
-import earth.terrarium.common_storage_lib.energy.EnergyApi;
-import earth.terrarium.common_storage_lib.storage.util.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -15,6 +13,8 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.World;
 import rearth.oritech.block.blocks.machines.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.SingleSlotHandler;
 
 public class LaserArmEntityBehavior {
     static private LaserArmEntityBehavior transferPowerBehavior;
@@ -45,10 +45,9 @@ public class LaserArmEntityBehavior {
                     return false;
                 
                 var chestItem = player.getEquippedStack(EquipmentSlot.CHEST);
-                var context = new ModifyOnlyContext(chestItem);
-                var candidate = EnergyApi.ITEM.find(chestItem, context);
+                var candidate = EnergyApi.ITEM.find(chestItem, ContainerItemContext.ofSingleSlot(new SingleSlotHandler(chestItem)));
                 if (candidate != null) {
-                    var amount = TransferUtil.moveValue(laserEntity.getEnergyStorageForLink(), candidate, laserEntity.energyRequiredToFire(), false);
+                    var amount = EnergyApi.transfer(laserEntity.getEnergyStorageForLink(), candidate, laserEntity.energyRequiredToFire(), false);
                     return amount > 0;
                 }
                 
