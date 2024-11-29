@@ -7,10 +7,9 @@ Oritech includes item transport pipes and item filter blocks to meet your item l
 
 Unlike other pipes, item pipes do not have an inventory. This means that other blocks, such as hoppers, cannot insert items
 into the pipe network on their own. Instead, an item pipe can be set to extract from a nearby inventory.
-To do this, simply right-click a pipe block connected to something.
-If you have multiple inventories connected to the same pipe block, you'll notice that all connections turn to extraction mode.
-This is a current limitation of Oritech pipes. If you set a pipe block to extract, it will try to extract from all blocks connected to this pipe block.
-To actually transport anything, the pipe network must consist of at least two blocks.
+
+To toggle extraction mode, you must right-click the section of the pipe connected to the block you wish to extract from.
+Extraction will only be enabled if the pipe is connected to a block that supports extraction. Each pipe connection can be toggled independently.
 
 Extracted items will be placed into the **closest** available inventory further down the network.
 
