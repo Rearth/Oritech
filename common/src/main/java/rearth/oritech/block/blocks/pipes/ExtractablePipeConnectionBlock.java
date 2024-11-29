@@ -1,7 +1,11 @@
 package rearth.oritech.block.blocks.pipes;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.property.IntProperty;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -23,6 +27,21 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
 	}
 
 	@Override
+	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+		if (world.isClient) return super.onUse(state, world, pos, player, hit);
+
+		var interactDir = getInteractDirection(state, pos, player);
+		if (!hasMachineInDirection(interactDir, world, pos, apiValidationFunction()))
+			return super.onUse(state, world, pos, player, hit);
+
+		var property = directionToProperty(interactDir);
+		var connection = state.get(property);
+		world.setBlockState(pos, state.with(property, connection != EXTRACT ? EXTRACT : CONNECTION), Block.FORCE_STATE, 0);
+
+		return ActionResult.SUCCESS;
+	}
+
+	@Override
 	public BlockState addConnectionStates(BlockState state, World world, BlockPos pos, boolean createConnection) {
 		for (var direction : Direction.values()) {
 			var property = directionToProperty(direction);
@@ -32,6 +51,17 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
 			state = state.with(property, connection ? CONNECTION : NO_CONNECTION);
 		}
 
+		return addStraightState(state);
+	}
+
+	@Override
+	public BlockState addConnectionStates(BlockState state, World world, BlockPos pos, Direction createDirection) {
+		for (var direction : Direction.values()) {
+			var property = directionToProperty(direction);
+			var connection = shouldConnect(state, direction, pos, world, direction.equals(createDirection));
+			var newValue = connection ? isSideExtractable(state, direction) ? EXTRACT : CONNECTION : NO_CONNECTION;
+			state = state.with(property, newValue);
+		}
 		return addStraightState(state);
 	}
 
@@ -59,16 +89,6 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
 	 */
 	public boolean isSideExtractable(BlockState state, Direction side) {
 		return directionToPropertyValue(state, side) == EXTRACT;
-	}
-
-	@Override
-	protected int getNextConnectionState(BlockState state, Direction side, World world, BlockPos pos, int current) {
-		// Insert extract value if there is a machine in the direction
-		if (current == CONNECTION && hasMachineInDirection(side, world, pos, apiValidationFunction())) {
-			return EXTRACT;
-		}
-
-		return super.getNextConnectionState(state, side, world, pos, current);
 	}
 
 	@Override

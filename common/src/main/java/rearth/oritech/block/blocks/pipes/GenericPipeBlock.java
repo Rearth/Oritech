@@ -200,6 +200,15 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
 
 	@Override
 	public ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand) {
+		return !toggleSideConnection(state, getInteractDirection(state, pos, player), world, pos) ? ActionResult.FAIL : ActionResult.SUCCESS;
+	}
+
+	@Override
+	public ActionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, World world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, PlayerEntity player, Hand hand) {
+		return toggleSideConnection(state, neighborFace.getOpposite(), world, pos) ? ActionResult.SUCCESS : ActionResult.FAIL;
+	}
+
+	protected Direction getInteractDirection(BlockState state, BlockPos pos, PlayerEntity player) {
 		var shapes = getActiveShapes(state);
 		var start = player.getCameraPosVec(0f);
 		var end = start.add(player.getRotationVec(0).multiply(5));
@@ -209,29 +218,23 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
 		var hitPos = Vec3d.ZERO;
 		for (var shape : shapes) {
 			var hitResult = shape.raycast(start, end, pos);
-			if (hitResult != null) {
-				var shapeDistance = hitResult.getPos().distanceTo(start);
-				if (shapeDistance < distance) {
-					distance = shapeDistance;
-					targetShape = shape;
-					hitPos = hitResult.getPos();
-				}
+			if (hitResult == null) continue;
+
+			var shapeDistance = hitResult.getPos().distanceTo(start);
+			if (shapeDistance < distance) {
+				distance = shapeDistance;
+				targetShape = shape;
+				hitPos = hitResult.getPos();
 			}
 		}
 
 		var center = targetShape.getBoundingBox().getCenter();
 		var diff = center.subtract(shapes.getFirst().getBoundingBox().getCenter());
-		if (diff.equals(Vec3d.ZERO)) {
+		if (diff.equals(Vec3d.ZERO))
 			// center hit
 			diff = hitPos.subtract(center.add(Vec3d.of(pos)));
-		}
 
-		return !toggleSideConnection(state, Direction.getFacing(diff.x, diff.y, diff.z), world, pos) ? ActionResult.FAIL : ActionResult.SUCCESS;
-	}
-
-	@Override
-	public ActionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, World world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, PlayerEntity player, Hand hand) {
-		return toggleSideConnection(state, neighborFace.getOpposite(), world, pos) ? ActionResult.SUCCESS : ActionResult.FAIL;
+		return Direction.getFacing(diff.x, diff.y, diff.z);
 	}
 
 	private List<VoxelShape> getActiveShapes(BlockState state) {
