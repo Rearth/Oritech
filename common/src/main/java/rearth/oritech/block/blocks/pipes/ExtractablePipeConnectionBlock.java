@@ -9,6 +9,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import rearth.oritech.init.ItemContent;
 
 public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnectionBlock {
 
@@ -28,11 +29,11 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
 
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-		if (world.isClient) return super.onUse(state, world, pos, player, hit);
+		if (world.isClient) return player.isHolding(ItemContent.WRENCH) ? ActionResult.PASS : ActionResult.SUCCESS;
 
 		var interactDir = getInteractDirection(state, pos, player);
 		if (!hasMachineInDirection(interactDir, world, pos, apiValidationFunction()))
-			return super.onUse(state, world, pos, player, hit);
+			return ActionResult.PASS;
 
 		var property = directionToProperty(interactDir);
 		var connection = state.get(property);
