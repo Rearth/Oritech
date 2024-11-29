@@ -21,15 +21,14 @@ import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.*;
 
-public class ItemPipeInterfaceEntity extends GenericPipeInterfaceEntity {
+public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     
     private static final int TRANSFER_AMOUNT = Oritech.CONFIG.itemPipeTransferAmount();
     private static final int TRANSFER_PERIOD = Oritech.CONFIG.itemPipeIntervalDuration();
     
     private final HashMap<BlockPos, BlockApiCache<Storage<ItemVariant>, Direction>> lookupCache = new HashMap<>();
     private List<Pair<Storage<ItemVariant>, BlockPos>> filteredTargetItemStorages;
-    private int filteredTargetsNetHash;
-    
+
     public ItemPipeInterfaceEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ITEM_PIPE_ENTITY, pos, state);
     }

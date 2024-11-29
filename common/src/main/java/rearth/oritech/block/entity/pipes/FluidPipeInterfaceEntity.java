@@ -25,14 +25,13 @@ import rearth.oritech.util.FluidProvider;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FluidPipeInterfaceEntity extends GenericPipeInterfaceEntity implements FluidProvider {
+public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity implements FluidProvider {
     
     public static final int MAX_TRANSFER_RATE = (int) (FluidConstants.BUCKET * Oritech.CONFIG.fluidPipeExtractAmountBuckets());
     private static final int TRANSFER_PERIOD = Oritech.CONFIG.fluidPipeExtractIntervalDuration();
     
     private List<Storage<FluidVariant>> filteredFluidTargetsCached;
-    private int filteredTargetsNetHash;
-    
+
     private final HashMap<BlockPos, BlockApiCache<Storage<FluidVariant>, Direction>> lookupCache = new HashMap<>();
     
     private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {

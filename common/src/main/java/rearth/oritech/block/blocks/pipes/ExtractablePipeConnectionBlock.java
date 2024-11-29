@@ -9,7 +9,10 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import rearth.oritech.block.entity.pipes.ExtractablePipeInterfaceEntity;
 import rearth.oritech.init.ItemContent;
+
+import java.util.HashSet;
 
 public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnectionBlock {
 
@@ -40,7 +43,36 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
 		var connection = state.get(property);
 		world.setBlockState(pos, state.with(property, connection != EXTRACT ? EXTRACT : CONNECTION), Block.FORCE_STATE, 0);
 
+		// Invalidate cache
+		invalidateTargetCache(world, pos);
+
 		return ActionResult.SUCCESS;
+	}
+
+	/**
+	 * Invalidates the target cache of the block entity at the given position
+	 *
+	 * @param world the world
+	 * @param pos   the position
+	 */
+	protected void invalidateTargetCache(World world, BlockPos pos) {
+		var data = getNetworkData(world);
+		var network = data.pipeNetworkLinks.getOrDefault(pos, null);
+		if (network != null) {
+			var checked = new HashSet<BlockPos>();
+
+			// Invalidate all pipe connection nodes in the network
+			for (var pipeInterface : data.pipeNetworkInterfaces.get(network)) {
+				// Skip node if already checked (node has multiple interface connections)
+				var pipePos = pipeInterface.getLeft().offset(pipeInterface.getRight());
+				if (checked.contains(pipePos)) continue;
+
+				checked.add(pipePos);
+				var pipeEntity = world.getBlockEntity(pipePos);
+				if (pipeEntity instanceof ExtractablePipeInterfaceEntity)
+					((ExtractablePipeInterfaceEntity) pipeEntity).invalidateTargetCache();
+			}
+		}
 	}
 
 	@Override
