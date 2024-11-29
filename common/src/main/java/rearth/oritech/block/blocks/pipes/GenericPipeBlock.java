@@ -201,6 +201,11 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
 
 	@Override
 	public ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand) {
+		if (player.isSneaking()) {
+			world.breakBlock(pos, true, player);
+			return ActionResult.SUCCESS;
+		}
+
 		return !toggleSideConnection(state, getInteractDirection(state, pos, player), world, pos) ? ActionResult.FAIL : ActionResult.SUCCESS;
 	}
 
