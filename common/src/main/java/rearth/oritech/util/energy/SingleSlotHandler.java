@@ -1,4 +1,4 @@
-package rearth.oritech.util;
+package rearth.oritech.util.energy;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;

@@ -16,7 +16,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.util.HashMap;
 import java.util.List;

@@ -26,9 +26,9 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.FluidProvider;
-import rearth.oritech.util.SimpleEnergyStorage;
+import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -39,7 +39,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidProvider, EnergyApi.BlockEnergyApi.EnergyProvider, GeoBlockEntity {
+public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidProvider, EnergyApi.BlockProvider, GeoBlockEntity {
     
     private static final int MAX_SEARCH_COUNT = 100_000;
     private static final int ENERGY_USAGE = 512;   // per block pumped

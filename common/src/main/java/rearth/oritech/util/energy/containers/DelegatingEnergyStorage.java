@@ -1,6 +1,7 @@
-package rearth.oritech.util;
+package rearth.oritech.util.energy.containers;
 
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;

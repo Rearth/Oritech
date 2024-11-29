@@ -24,12 +24,14 @@ import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity implements InventoryProvider, EnergyApi.BlockEnergyApi.EnergyProvider, ExtendedScreenHandlerFactory, ScreenProvider, MachineAddonController, RedstoneAddonBlockEntity.RedstoneControllable {
+public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity implements InventoryProvider, EnergyApi.BlockProvider, ExtendedScreenHandlerFactory, ScreenProvider, MachineAddonController, RedstoneAddonBlockEntity.RedstoneControllable {
     
     public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, this::markDirty);
     

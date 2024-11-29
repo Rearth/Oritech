@@ -1,6 +1,7 @@
-package rearth.oritech.util;
+package rearth.oritech.util.energy.containers;
 
 import net.minecraft.item.ItemStack;
+import rearth.oritech.util.energy.EnergyApi;
 
 public class SimpleEnergyItemStorage extends SimpleEnergyStorage {
     

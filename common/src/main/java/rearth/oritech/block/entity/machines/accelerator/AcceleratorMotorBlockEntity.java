@@ -7,10 +7,10 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.EnergyApi;
-import rearth.oritech.util.SimpleEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 
-public class AcceleratorMotorBlockEntity extends BlockEntity implements EnergyApi.BlockEnergyApi.EnergyProvider {
+public class AcceleratorMotorBlockEntity extends BlockEntity implements EnergyApi.BlockProvider {
     
     private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(5_000_000, 5_000_000, 5_000_000, this::markDirty);
     

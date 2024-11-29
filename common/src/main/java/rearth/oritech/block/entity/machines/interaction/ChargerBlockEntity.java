@@ -37,10 +37,12 @@ import rearth.oritech.init.ComponentContent;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.util.List;
 
-public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidProvider, EnergyApi.BlockEnergyApi.EnergyProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
+public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidProvider, EnergyApi.BlockProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
     
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.charger.energyCapacity(), Oritech.CONFIG.charger.maxEnergyInsertion(), Oritech.CONFIG.charger.maxEnergyExtraction(), this::markDirty);
     

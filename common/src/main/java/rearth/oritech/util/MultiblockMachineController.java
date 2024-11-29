@@ -22,6 +22,7 @@ import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.block.entity.machines.MachineCoreEntity;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.util.ArrayList;
 import java.util.List;

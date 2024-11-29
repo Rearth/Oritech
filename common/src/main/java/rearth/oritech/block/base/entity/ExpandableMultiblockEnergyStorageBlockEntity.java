@@ -6,7 +6,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
 

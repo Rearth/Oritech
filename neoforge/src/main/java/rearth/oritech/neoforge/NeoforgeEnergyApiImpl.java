@@ -5,7 +5,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentType;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -15,25 +14,26 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.ComponentContent;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.BlockEnergyApi;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.ItemEnergyApi;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class NeoforgeEnergyApiImpl implements EnergyApi.BlockEnergyApi, EnergyApi.ItemEnergyApi {
+public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     private final List<Supplier<BlockEntityType<?>>> registeredBlockEntities = new ArrayList<>();
-    private final List<Supplier<Item>> registeredItems = new ArrayList<>();
+    private final List<Supplier<net.minecraft.item.Item>> registeredItems = new ArrayList<>();
     
-    // todo null checks before all those casts?
     @Override
     public void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier) {
         registeredBlockEntities.add(typeSupplier);
     }
     
     @Override
-    public void registerForItem(Supplier<Item> itemSupplier) {
+    public void registerForItem(Supplier<net.minecraft.item.Item> itemSupplier) {
         registeredItems.add(itemSupplier);
     }
     
@@ -44,11 +44,11 @@ public class NeoforgeEnergyApiImpl implements EnergyApi.BlockEnergyApi, EnergyAp
     
     public void registerEvent(RegisterCapabilitiesEvent event) {
         for (var supplied : registeredBlockEntities) {
-            event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, supplied.get(), (entity, direction) -> new ContainerStorageWrapper(((EnergyApi.BlockEnergyApi.EnergyProvider) entity).getStorage(direction)));
+            event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, supplied.get(), (entity, direction) -> ContainerStorageWrapper.of(((EnergyApi.BlockProvider) entity).getStorage(direction)));
         }
         
         for (var supplied : registeredItems) {
-            event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ignored) -> new ContainerStorageWrapper(((EnergyApi.ItemEnergyApi.EnergyProvider) stack.getItem()).getStorage(stack)), supplied.get());
+            event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ignored) -> ContainerStorageWrapper.of(((EnergyApi.ItemProvider) stack.getItem()).getStorage(stack)), supplied.get());
         }
     }
     
@@ -115,6 +115,11 @@ public class NeoforgeEnergyApiImpl implements EnergyApi.BlockEnergyApi, EnergyAp
     public static class ContainerStorageWrapper implements IEnergyStorage {
         
         public final EnergyApi.EnergyContainer container;
+        
+        public static ContainerStorageWrapper of(EnergyApi.EnergyContainer container) {
+            if (container == null) return null;
+            return new ContainerStorageWrapper(container);
+        }
         
         public ContainerStorageWrapper(EnergyApi.EnergyContainer container) {
             this.container = container;

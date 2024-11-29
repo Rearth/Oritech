@@ -1,4 +1,6 @@
-package rearth.oritech.util;
+package rearth.oritech.util.energy.containers;
+
+import rearth.oritech.util.energy.EnergyApi;
 
 public class DynamicEnergyStorage extends EnergyApi.EnergyContainer {
     

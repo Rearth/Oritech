@@ -15,7 +15,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.PassiveGeneratorBlockEntity;
 import rearth.oritech.block.blocks.machines.generators.BigSolarPanelBlock;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
 import software.bernie.geckolib.animatable.GeoBlockEntity;

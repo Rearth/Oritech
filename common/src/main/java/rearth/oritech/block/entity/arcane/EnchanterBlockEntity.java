@@ -34,6 +34,8 @@ import rearth.oritech.client.ui.EnchanterScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -47,7 +49,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class EnchanterBlockEntity extends BlockEntity
-  implements InventoryProvider, EnergyApi.BlockEnergyApi.EnergyProvider, GeoBlockEntity, ScreenProvider, BlockEntityTicker<EnchanterBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+  implements InventoryProvider, EnergyApi.BlockProvider, GeoBlockEntity, ScreenProvider, BlockEntityTicker<EnchanterBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
     
     public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     public static final RawAnimation UNPOWERED = RawAnimation.begin().thenPlayAndHold("unpowered");

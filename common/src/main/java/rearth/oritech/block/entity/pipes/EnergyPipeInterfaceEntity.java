@@ -11,15 +11,15 @@ import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.EnergyApi;
-import rearth.oritech.util.SimpleEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implements EnergyApi.BlockEnergyApi.EnergyProvider {
+public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implements EnergyApi.BlockProvider {
     
     private final SimpleEnergyStorage energyStorage;
     private final boolean isSuperConductor;

@@ -77,11 +77,11 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:11.0.3"
 
     // compat mods for testing
-    // Tech Reborn
-    modImplementation "curse.maven:techreborn-233564:5608205"
-    modImplementation "curse.maven:reborncore-237903:5608204"
-    // Energized Power
-    modImplementation "curse.maven:energized-power-782147:5650292"
+//    // Tech Reborn
+//    modImplementation "curse.maven:techreborn-233564:5608205"
+//    modImplementation "curse.maven:reborncore-237903:5608204"
+//    // Energized Power
+//    modImplementation "curse.maven:energized-power-782147:5650292"
 
 }
 

@@ -12,6 +12,8 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.RedstoneTorchBlock;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
@@ -355,6 +357,30 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         for (var label : handler.screenData.getExtraExtensionLabels()) {
             container.child(Components.label(label.getLeft()).tooltip(label.getRight()).margins(Insets.of(3)));
+        }
+        
+        if (handler.showRedstoneAddon()) {
+            // separator
+            container.child(Components.box(Sizing.fixed(73), Sizing.fixed(1))
+                              .color(new Color(0.8f, 0.8f, 0.8f))
+                              .margins(Insets.of(2)));
+            
+            // current input state
+            var hasRedstone = handler.screenData.receivedRedstoneSignal() > 0;
+            var statusContainer = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+            
+            statusContainer.child(Components.block(Blocks.REDSTONE_TORCH.getDefaultState().with(RedstoneTorchBlock.LIT, hasRedstone))
+                                    .sizing(Sizing.fixed(20)).margins(Insets.of(-6, -4, -8, -4)));
+            statusContainer.child(Components.label(Text.translatable("text.oritech.redstone_power", handler.screenData.receivedRedstoneSignal()))
+                              .margins(Insets.of(3, 1, 1, 1)));
+            
+            container.child(statusContainer);
+            
+            // current input state
+            if (!handler.screenData.currentRedstoneEffect().isEmpty())
+                container.child(Components.label(Text.translatable(handler.screenData.currentRedstoneEffect()))
+                                  .tooltip(Text.translatable(handler.screenData.currentRedstoneEffect() + ".tooltip"))
+                                  .margins(Insets.of(3, 3, 1, 1)));
         }
         
     }

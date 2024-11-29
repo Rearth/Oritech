@@ -25,6 +25,8 @@ import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -37,7 +39,7 @@ import java.util.List;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
-public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<DeepDrillEntity>, EnergyApi.BlockEnergyApi.EnergyProvider, GeoBlockEntity, InventoryProvider, MultiblockMachineController {
+public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<DeepDrillEntity>, EnergyApi.BlockProvider, GeoBlockEntity, InventoryProvider, MultiblockMachineController {
     
     // work data
     private boolean initialized;

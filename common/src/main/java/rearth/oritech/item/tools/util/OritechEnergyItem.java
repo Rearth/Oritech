@@ -10,10 +10,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.random.Random;
-import rearth.oritech.util.EnergyApi;
-import rearth.oritech.util.SimpleEnergyItemStorage;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.SimpleEnergyItemStorage;
 
-public interface OritechEnergyItem extends EnergyApi.ItemEnergyApi.EnergyProvider, FabricItem {
+public interface OritechEnergyItem extends EnergyApi.ItemProvider, FabricItem {
     
     default long getEnergyCapacity(ItemStack stack) {return 10_000;}
     

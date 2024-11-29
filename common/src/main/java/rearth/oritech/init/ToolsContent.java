@@ -21,7 +21,7 @@ import rearth.oritech.item.tools.harvesting.*;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.ArchitecturyRegistryContainer;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.lang.reflect.Field;
 

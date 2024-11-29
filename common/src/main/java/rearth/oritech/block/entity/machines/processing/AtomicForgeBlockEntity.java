@@ -11,7 +11,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.ArrayList;

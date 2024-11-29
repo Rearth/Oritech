@@ -13,8 +13,8 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.DynamicEnergyStorage;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -25,7 +25,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import static rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity.getOutputPosition;
 
-public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEntityTicker<ParticleCollectorBlockEntity>, EnergyApi.BlockEnergyApi.EnergyProvider, GeoBlockEntity {
+public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEntityTicker<ParticleCollectorBlockEntity>, EnergyApi.BlockProvider, GeoBlockEntity {
     
     // TODO recipes, wiki
     

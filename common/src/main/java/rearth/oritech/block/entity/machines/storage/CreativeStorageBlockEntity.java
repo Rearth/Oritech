@@ -11,7 +11,6 @@ import java.util.List;
 
 public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEntity {
 
-
     public CreativeStorageBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.CREATIVE_STORAGE_ENTITY, pos, state);
     }

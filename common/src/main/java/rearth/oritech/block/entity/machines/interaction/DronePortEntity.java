@@ -38,6 +38,8 @@ import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -53,7 +55,7 @@ import java.util.Objects;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
-public class DronePortEntity extends BlockEntity implements InventoryProvider, EnergyApi.BlockEnergyApi.EnergyProvider, GeoBlockEntity, BlockEntityTicker<DronePortEntity>, MultiblockMachineController, ExtendedScreenHandlerFactory, ScreenProvider {
+public class DronePortEntity extends BlockEntity implements InventoryProvider, EnergyApi.BlockProvider, GeoBlockEntity, BlockEntityTicker<DronePortEntity>, MultiblockMachineController, ExtendedScreenHandlerFactory, ScreenProvider {
     
     public record DroneTransferData(List<ItemStack> transferredStacks, long arrivesAt) {
     }

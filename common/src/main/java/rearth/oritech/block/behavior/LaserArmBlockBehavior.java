@@ -13,8 +13,8 @@ import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.DynamicEnergyStorage;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 
 public class LaserArmBlockBehavior {
     static private LaserArmBlockBehavior noop;
@@ -31,7 +31,7 @@ public class LaserArmBlockBehavior {
         // has an energy storage, try to transfer power to it
         var storageCandidate = EnergyApi.BLOCK.find(world, blockPos, blockState, blockEntity, null);
         // if the storage is not exposed (e.g. catalyst / deep drill / atomic forge), get it directly
-        if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockEnergyApi.EnergyProvider provider) storageCandidate = provider.getStorage(null);
+        if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockProvider provider) storageCandidate = provider.getStorage(null);
         if (storageCandidate != null)
             return transferPowerBehavior.fireAtBlock(world, laserEntity, block, blockPos, blockState, blockEntity);
         
@@ -65,7 +65,7 @@ public class LaserArmBlockBehavior {
             public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
                 var storageCandidate = EnergyApi.BLOCK.find(world, blockPos, blockState, blockEntity, null);
                 
-                if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockEnergyApi.EnergyProvider energyProvider)
+                if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockProvider energyProvider)
                     storageCandidate = energyProvider.getStorage(null);
                 
                 var insertAmount = storageCandidate.getCapacity() - storageCandidate.getAmount();

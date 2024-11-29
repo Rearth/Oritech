@@ -14,9 +14,9 @@ import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
-import rearth.oritech.util.EnergyApi;
-import rearth.oritech.util.SimpleEnergyItemStorage;
-import rearth.oritech.util.SingleSlotHandler;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.SimpleEnergyItemStorage;
+import rearth.oritech.util.energy.SingleSlotHandler;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;

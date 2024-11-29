@@ -100,8 +100,6 @@ tasks.remapJar {
     atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 }
 
-
-
 publishMods {
     file = remapJar.archiveFile
     changelog = file("../CHANGELOG.md").getText()

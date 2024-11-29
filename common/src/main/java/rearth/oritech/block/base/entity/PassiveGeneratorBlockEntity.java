@@ -10,12 +10,12 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import rearth.oritech.util.EnergyApi;
-import rearth.oritech.util.SimpleEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 
 import java.util.Set;
 
-public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements EnergyApi.BlockEnergyApi.EnergyProvider, BlockEntityTicker<PassiveGeneratorBlockEntity> {
+public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements EnergyApi.BlockProvider, BlockEntityTicker<PassiveGeneratorBlockEntity> {
     
     protected final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(200_000, 0, 5_000, this::markDirty);
     

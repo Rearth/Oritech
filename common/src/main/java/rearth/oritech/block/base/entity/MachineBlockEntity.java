@@ -32,6 +32,8 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -44,7 +46,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public abstract class MachineBlockEntity extends BlockEntity
-  implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyApi.BlockEnergyApi.EnergyProvider, ScreenProvider, InventoryProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
+  implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, InventoryProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
     
     // animations
     public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
@@ -85,9 +87,9 @@ public abstract class MachineBlockEntity extends BlockEntity
             currentRecipe = OritechRecipe.DUMMY;     // reset recipe when invalid or no input is given
         
         if (recipeCandidate.isPresent() && canOutputRecipe(recipeCandidate.get().value()) && canProceed(recipeCandidate.get().value())) {
-
+            
             if (currentRecipe != recipeCandidate.get().value()) resetProgress();
-
+            
             // this is separate so that progress is not reset when out of energy
             if (hasEnoughEnergy()) {
                 var activeRecipe = recipeCandidate.get().value();
@@ -159,7 +161,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     protected void sendNetworkEntry() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineSyncPacket(getPos(), energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, progress, currentRecipe, inventoryInputMode, lastWorkedAt));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineSyncPacket(getPos(), energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, progress, currentRecipe, inventoryInputMode, lastWorkedAt, disabledViaRedstone));
         networkDirty = false;
     }
     
@@ -173,6 +175,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         this.setCurrentRecipe(message.activeRecipe());
         this.setInventoryInputMode(message.inputMode());
         this.lastWorkedAt = message.lastWorkedAt();
+        this.disabledViaRedstone = message.disabledViaRedstone();
     }
     
     public List<ItemStack> getCraftingResults(OritechRecipe activeRecipe) {

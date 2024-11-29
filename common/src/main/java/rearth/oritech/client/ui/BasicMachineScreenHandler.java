@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.ScreenProvider;
 
@@ -65,7 +65,7 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         inventory.onOpen(playerInventory.player);
         this.playerInventory = playerInventory;
         
-        if (blockEntity instanceof EnergyApi.BlockEnergyApi.EnergyProvider energyProvider) {
+        if (blockEntity instanceof EnergyApi.BlockProvider energyProvider) {
             energyStorage = energyProvider.getStorage(null);
         } else {
             energyStorage = null;
@@ -194,4 +194,9 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     public @NotNull BlockPos getBlockPos() {
         return blockPos;
     }
+    
+    public boolean showRedstoneAddon() {
+        return screenData.hasRedstoneControlAvailable();
+    }
+    
 }

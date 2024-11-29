@@ -9,28 +9,28 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentType;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.BlockEnergyApi;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.ItemEnergyApi;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.function.Supplier;
 
-public class FabricEnergyApiImpl implements EnergyApi.BlockEnergyApi, EnergyApi.ItemEnergyApi {
+public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
-    // todo null checks before all those casts?
     @Override
     public void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier) {
-        EnergyStorage.SIDED.registerForBlockEntity((entity, direction) -> new ContainerStorageWrapper(((EnergyApi.BlockEnergyApi.EnergyProvider) entity).getStorage(direction)), typeSupplier.get());
+        EnergyStorage.SIDED.registerForBlockEntity((entity, direction) -> ContainerStorageWrapper.of(((EnergyApi.BlockProvider) entity).getStorage(direction)), typeSupplier.get());
     }
     
     @Override
-    public void registerForItem(Supplier<Item> itemSupplier) {
-        EnergyStorage.ITEM.registerForItems((stack, context) -> new ContainerStorageWrapper(((EnergyApi.ItemEnergyApi.EnergyProvider) stack.getItem()).getStorage(stack), context, stack), itemSupplier.get());
+    public void registerForItem(Supplier<net.minecraft.item.Item> itemSupplier) {
+        EnergyStorage.ITEM.registerForItems((stack, context) -> ContainerStorageWrapper.of(((EnergyApi.ItemProvider) stack.getItem()).getStorage(stack), context, stack), itemSupplier.get());
     }
     
     @Override
@@ -116,13 +116,23 @@ public class FabricEnergyApiImpl implements EnergyApi.BlockEnergyApi, EnergyApi.
         @Nullable
         public final ItemStack stack;
         
+        public static ContainerStorageWrapper of(@Nullable EnergyApi.EnergyContainer container) {
+            if (container == null) return null;
+            return new ContainerStorageWrapper(container);
+        }
+        
+        public static ContainerStorageWrapper of(@Nullable EnergyApi.EnergyContainer container, @Nullable ContainerItemContext context, @Nullable ItemStack stack) {
+            if (container == null) return null;
+            return new ContainerStorageWrapper(container, context, stack);
+        }
+        
         public ContainerStorageWrapper(EnergyApi.EnergyContainer container) {
             this.container = container;
             this.context = null;
             this.stack = null;
         }
         
-        public ContainerStorageWrapper(EnergyApi.EnergyContainer container, ContainerItemContext context, @Nullable ItemStack stack) {
+        public ContainerStorageWrapper(EnergyApi.EnergyContainer container, @Nullable ContainerItemContext context, @Nullable ItemStack stack) {
             this.container = container;
             this.context = context;
             this.stack = stack;

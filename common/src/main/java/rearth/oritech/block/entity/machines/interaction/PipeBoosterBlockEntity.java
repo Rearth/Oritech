@@ -13,8 +13,8 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
-import rearth.oritech.util.DynamicEnergyStorage;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.Geometry;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -24,7 +24,7 @@ import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTicker<PipeBoosterBlockEntity>, GeoBlockEntity, EnergyApi.BlockEnergyApi.EnergyProvider {
+public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTicker<PipeBoosterBlockEntity>, GeoBlockEntity, EnergyApi.BlockProvider {
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 4000, 0, this::markDirty);

@@ -5,13 +5,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.DelegatingEnergyStorage;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;
 
-public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements EnergyApi.BlockEnergyApi.EnergyProvider {
+public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements EnergyApi.BlockProvider {
     private final DelegatingEnergyStorage delegatedStorage = new DelegatingEnergyStorage(this::getMainStorage, this::isConnected);
     
     private MachineAddonController cachedController;

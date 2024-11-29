@@ -14,6 +14,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.machines.addons.AddonBlockEntity;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
 
 import java.util.*;
 

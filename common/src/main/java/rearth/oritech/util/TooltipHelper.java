@@ -13,6 +13,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.machines.interaction.DeepDrillEntity;
 import rearth.oritech.block.entity.machines.processing.AtomicForgeBlockEntity;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -69,7 +70,7 @@ public class TooltipHelper {
             }
             
             
-            if (entity instanceof EnergyApi.BlockEnergyApi.EnergyProvider energyProvider) {
+            if (entity instanceof EnergyApi.BlockProvider energyProvider) {
                 var maxStorage = getEnergyText(energyProvider.getStorage(null).getCapacity());
                 tooltip.add(Text.translatable("tooltip.oritech.machine_capacity_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_capacity", maxStorage).formatted(Formatting.GOLD)));
                 

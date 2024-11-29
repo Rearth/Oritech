@@ -33,12 +33,15 @@ import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyApi.BlockEnergyApi.EnergyProvider, InventoryProvider, MachineAddonController, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
+public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyApi.BlockProvider, InventoryProvider, MachineAddonController, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
     
     private final List<BlockPos> connectedAddons = new ArrayList<>();
     private final List<BlockPos> openSlots = new ArrayList<>();
@@ -314,5 +317,22 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     public void setRedstonePowered(boolean isPowered) {
         this.redstonePowered = isPowered;
+    }
+    
+    @Override
+    public boolean hasRedstoneControlAvailable() {
+        return true;
+    }
+    
+    @Override
+    public int receivedRedstoneSignal() {
+        if (redstonePowered) return 15;
+        return world.getReceivedRedstonePower(pos);
+    }
+    
+    @Override
+    public String currentRedstoneEffect() {
+        if (receivedRedstoneSignal() > 0) return "tooltip.oritech.redstone_disabled_storage";
+        return "tooltip.oritech.redstone_enabled_direct";
     }
 }

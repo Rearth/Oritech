@@ -31,6 +31,8 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +44,8 @@ public class NetworkContent {
     
     // Server -> Client
     public record MachineSyncPacket(BlockPos position, long energy, long maxEnergy, long maxInsert, int progress,
-                                    OritechRecipe activeRecipe, InventoryInputMode inputMode, long lastWorkedAt) {
+                                    OritechRecipe activeRecipe, InventoryInputMode inputMode, long lastWorkedAt,
+                                    boolean disabledViaRedstone) {
     }
     
     // Client -> Server (e.g. from UI interactions
@@ -90,10 +93,12 @@ public class NetworkContent {
     // for use with addon providers to sync energy state
     public record GenericEnergySyncPacket(BlockPos position, long currentEnergy, long maxEnergy) {}
     
+    public record GenericRedstoneSyncPacket(BlockPos position, boolean isPowered) {}
+    
     public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {
     }   // this goes both ways
     
-    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize, int yieldAddons, int hunterAddons, int hunterTargetMode, boolean cropAddon, int targetEntityId) {
+    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize, int yieldAddons, int hunterAddons, int hunterTargetMode, boolean cropAddon, int targetEntityId, boolean redstonePowered) {
     }
     public record DeepDrillSyncPacket(BlockPos position, long lastWorkTime) {
     }
@@ -193,6 +198,7 @@ public class NetworkContent {
                 laserArmBlock.hasCropFilterAddon = message.cropAddon;
                 laserArmBlock.setLivingTargetFromNetwork(message.targetEntityId);
                 laserArmBlock.hunterTargetMode = LaserArmBlockEntity.HunterTargetMode.fromValue(message.hunterTargetMode);
+                laserArmBlock.setRedstonePowered(message.redstonePowered);
             }
             
         }));
@@ -221,7 +227,7 @@ public class NetworkContent {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
-            if (entity instanceof EnergyApi.BlockEnergyApi.EnergyProvider energyProvider && energyProvider.getStorage(null) instanceof DynamicEnergyStorage storage) {
+            if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getStorage(null) instanceof DynamicEnergyStorage storage) {
                 storage.capacity = message.maxEnergy;
                 storage.amount = message.currentEnergy;
             }

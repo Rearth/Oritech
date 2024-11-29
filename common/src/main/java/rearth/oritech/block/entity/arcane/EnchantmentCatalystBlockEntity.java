@@ -31,6 +31,8 @@ import rearth.oritech.client.ui.CatalystScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -42,7 +44,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.List;
 
 public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
-  implements InventoryProvider, EnergyApi.BlockEnergyApi.EnergyProvider, ScreenProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+  implements InventoryProvider, EnergyApi.BlockProvider, ScreenProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
     
     public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     public static final RawAnimation STABILIZED = RawAnimation.begin().thenLoop("stabilized");

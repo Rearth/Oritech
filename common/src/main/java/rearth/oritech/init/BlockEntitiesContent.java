@@ -27,7 +27,7 @@ import rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.util.ArchitecturyRegistryContainer;
-import rearth.oritech.util.EnergyApi;
+import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventoryProvider;
 

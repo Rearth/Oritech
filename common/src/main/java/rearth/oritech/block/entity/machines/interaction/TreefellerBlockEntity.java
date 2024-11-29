@@ -2,7 +2,6 @@ package rearth.oritech.block.entity.machines.interaction;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -35,6 +34,8 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -45,7 +46,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
 
-public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTicker<TreefellerBlockEntity>, GeoBlockEntity, EnergyApi.BlockEnergyApi.EnergyProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
+public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTicker<TreefellerBlockEntity>, GeoBlockEntity, EnergyApi.BlockProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
     
     private static final int LOG_COST = 100;
     private static final int LEAF_COST = 10;
@@ -129,7 +130,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     private ActionResult breakTreeBlock(BlockState candidateState, BlockPos candidate) {
         if (!candidateState.isIn(TagContent.CUTTER_LOGS_MINEABLE) && !candidateState.isIn(TagContent.CUTTER_LEAVES_MINEABLE)) return ActionResult.PASS;
         
-        var dropped = Block.getDroppedStacks(candidateState, (ServerWorld) world, candidate, null);
+        var dropped = net.minecraft.block.Block.getDroppedStacks(candidateState, (ServerWorld) world, candidate, null);
         if (dropped.stream().anyMatch((itemStack) -> !(itemStack.isEmpty() || canInsert(itemStack)))) return ActionResult.FAIL;
 
         world.addBlockBreakParticles(candidate, candidateState);

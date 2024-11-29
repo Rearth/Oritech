@@ -12,10 +12,13 @@ import net.minecraft.util.math.Direction;
 import rearth.oritech.block.blocks.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
+import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 
 import java.util.Objects;
 
-public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyApi.BlockEnergyApi.EnergyProvider, FluidProvider {
+public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyApi.BlockProvider, FluidProvider {
     
     private BlockPos controllerPos = BlockPos.ORIGIN;
     private MultiblockMachineController controllerEntity;

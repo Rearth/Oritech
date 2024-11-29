@@ -3,6 +3,7 @@ package rearth.oritech.client.ui;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.world.World;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.MachineAddonController;
 
 import static rearth.oritech.block.base.entity.UpgradableMachineBlockEntity.AddonUiData;
@@ -28,4 +29,9 @@ public class UpgradableMachineScreenHandler extends BasicMachineScreenHandler {
         this.quality = coreQuality;
     }
     
+    @Override
+    public boolean showRedstoneAddon() {
+        return super.showRedstoneAddon() ||
+            addonUiData.positions().stream().anyMatch(addonPos -> this.worldAccess.getBlockState(addonPos).getBlock().equals(BlockContent.MACHINE_REDSTONE_ADDON));
+    }
 }
