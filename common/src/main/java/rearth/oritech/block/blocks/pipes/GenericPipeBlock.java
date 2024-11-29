@@ -145,7 +145,7 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
 		var world = (World) worldAccess;
 
 		// transform to interface when machine is placed as neighbor
-		if (apiValidationFunction().apply(world, neighborPos, direction.getOpposite())) {
+		if (hasMachineInDirection(direction, world, pos, apiValidationFunction())) {
 			var connectionBlock = getConnectionBlock();
 			return ((GenericPipeBlock) connectionBlock.getBlock()).addConnectionStates(connectionBlock, world, pos, direction);
 		}
