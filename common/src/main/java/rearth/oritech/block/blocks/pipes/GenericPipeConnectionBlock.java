@@ -43,7 +43,8 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         var worldImp = (World) world;
-        //var interfaceState = addConnectionStates(state, worldImp, pos, false);
+        if (worldImp.isClient) return state;
+
         if (!hasNeighboringMachine(state, worldImp, pos, false)) {
             var normalState = getNormalBlock();
             return ((GenericPipeBlock) normalState.getBlock()).addConnectionStates(normalState, worldImp, pos, false);

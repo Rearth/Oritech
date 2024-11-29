@@ -143,6 +143,7 @@ public abstract class GenericPipeBlock extends Block implements Wrench.Wrenchabl
 	@Override
 	public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess worldAccess, BlockPos pos, BlockPos neighborPos) {
 		var world = (World) worldAccess;
+		if (world.isClient) return state;
 
 		// transform to interface when machine is placed as neighbor
 		if (hasMachineInDirection(direction, world, pos, apiValidationFunction())) {
