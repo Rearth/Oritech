@@ -2,7 +2,7 @@ package rearth.oritech.client.renderers;
 
 import net.minecraft.util.Pair;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.machines.generators.BigSolarPanelEntity;
+import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
 import rearth.oritech.util.Geometry;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animation.AnimationState;

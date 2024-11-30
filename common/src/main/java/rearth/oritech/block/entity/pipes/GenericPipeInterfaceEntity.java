@@ -16,8 +16,8 @@ import net.minecraft.world.PersistentState;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.machines.interaction.PipeBoosterBlockEntity;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
+import rearth.oritech.block.entity.interaction.PipeBoosterBlockEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;

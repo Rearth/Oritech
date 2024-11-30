@@ -13,8 +13,8 @@ import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunctionType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
-import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
-import rearth.oritech.block.entity.machines.storage.SmallStorageBlockEntity;
+import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
+import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
 import rearth.oritech.init.LootContent;
 
 import java.util.List;

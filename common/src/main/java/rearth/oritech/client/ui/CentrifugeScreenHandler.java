@@ -9,7 +9,7 @@ import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
+import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.util.MachineAddonController;
 
 public class CentrifugeScreenHandler extends UpgradableMachineScreenHandler {

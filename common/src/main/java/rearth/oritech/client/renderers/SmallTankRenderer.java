@@ -10,7 +10,7 @@ import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Direction;
 import org.joml.Matrix4f;
-import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
+import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
 
 public class SmallTankRenderer implements BlockEntityRenderer<SmallFluidTankEntity> {
     

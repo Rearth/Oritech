@@ -11,8 +11,8 @@ import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
-import rearth.oritech.block.entity.machines.interaction.DeepDrillEntity;
-import rearth.oritech.block.entity.machines.processing.AtomicForgeBlockEntity;
+import rearth.oritech.block.entity.interaction.DeepDrillEntity;
+import rearth.oritech.block.entity.processing.AtomicForgeBlockEntity;
 import rearth.oritech.util.energy.EnergyApi;
 
 import java.text.NumberFormat;

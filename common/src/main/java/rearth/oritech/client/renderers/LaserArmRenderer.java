@@ -11,7 +11,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.util.Geometry;
 import software.bernie.geckolib.animatable.GeoAnimatable;

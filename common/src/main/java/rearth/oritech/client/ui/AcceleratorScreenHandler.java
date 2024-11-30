@@ -3,7 +3,7 @@ package rearth.oritech.client.ui;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketByteBuf;
-import rearth.oritech.block.entity.machines.accelerator.AcceleratorControllerBlockEntity;
+import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 
 import java.util.Objects;
 

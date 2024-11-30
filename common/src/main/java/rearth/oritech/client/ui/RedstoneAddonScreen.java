@@ -11,7 +11,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
+import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package rearth.oritech.client.renderers;
 
-import rearth.oritech.block.entity.machines.generators.BigSolarPanelEntity;
+import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
 

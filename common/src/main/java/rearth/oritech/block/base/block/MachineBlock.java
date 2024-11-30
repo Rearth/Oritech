@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.block.entity.machines.processing.PulverizerBlockEntity;
+import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;

@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.block.entity.machines.addons.RedstoneAddonBlockEntity;
+import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 
 public class RedstoneAddonScreenHandler extends ScreenHandler {

@@ -12,28 +12,20 @@ import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.blocks.MachineCoreBlock;
+import rearth.oritech.block.blocks.accelerator.*;
+import rearth.oritech.block.blocks.addons.InventoryProxyAddonBlock;
+import rearth.oritech.block.blocks.addons.MachineAddonBlock;
+import rearth.oritech.block.blocks.addons.MachineAddonBlock.AddonSettings;
+import rearth.oritech.block.blocks.addons.RedstoneAddonBlock;
+import rearth.oritech.block.blocks.addons.SteamBoilerAddonBlock;
 import rearth.oritech.block.blocks.arcane.*;
 import rearth.oritech.block.blocks.decorative.*;
-import rearth.oritech.block.blocks.machines.accelerator.*;
-import rearth.oritech.block.blocks.machines.addons.InventoryProxyAddonBlock;
-import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock;
-import rearth.oritech.block.blocks.machines.addons.MachineAddonBlock.AddonSettings;
-import rearth.oritech.block.blocks.machines.addons.RedstoneAddonBlock;
-import rearth.oritech.block.blocks.machines.addons.SteamBoilerAddonBlock;
-import rearth.oritech.block.blocks.machines.generators.*;
-import rearth.oritech.block.blocks.machines.interaction.*;
-import rearth.oritech.block.blocks.machines.processing.*;
-import rearth.oritech.block.blocks.machines.storage.*;
-import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
-import rearth.oritech.block.blocks.pipes.energy.EnergyPipeConnectionBlock;
-import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
-import rearth.oritech.block.blocks.pipes.energy.SuperConductorConnectionBlock;
-import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
-import rearth.oritech.block.blocks.pipes.fluid.FluidPipeConnectionBlock;
-import rearth.oritech.block.blocks.pipes.item.ItemFilterBlock;
-import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
-import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
+import rearth.oritech.block.blocks.generators.*;
+import rearth.oritech.block.blocks.interaction.*;
+import rearth.oritech.block.blocks.pipes.*;
+import rearth.oritech.block.blocks.processing.*;
+import rearth.oritech.block.blocks.reactor.*;
+import rearth.oritech.block.blocks.storage.*;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.util.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.item.OritechGeoItem;
@@ -194,6 +186,24 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block CAPACITOR_ADDON_EXTENDER = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withExtender(true).withNeedsSupport(false).withAddedCapacity(2_500_000).withAddedInsert(500));
     public static final Block STEAM_BOILER_ADDON = new SteamBoilerAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.STEAM_BOILER_ADDON_SHAPE));
     public static final Block MACHINE_REDSTONE_ADDON = new RedstoneAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_REDSTONE_ADDON_SHAPE));
+    
+    //region reactor
+    public static final Block REACTOR_CONTROLLER = new ReactorControllerBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block REACTOR_WALL = new ReactorWallBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block REACTOR_ROD = new ReactorRodBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block REACTOR_DOUBLE_ROD = new ReactorRodBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block REACTOR_QUAD_ROD = new ReactorRodBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block REACTOR_VENT = new ReactorHeatVentBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block REACTOR_REFLECTOR = new ReactorReflectorBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block REACTOR_HEAT_PIPE = new ReactorHeatPipeBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    
+    // cooling cell, early game re-fillable component
+    
+    // lategame, second stage components:
+    // plasma conduit, advanced heat transfer system
+    // entropy dampener, reduce degradation rate of nearby components
+    // quantum stabilizer, massively increase heat capacity of reactor
+    //endregion
     
     //region metals
     @NoAutoDrop

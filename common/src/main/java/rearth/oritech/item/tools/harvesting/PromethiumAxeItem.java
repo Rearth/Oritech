@@ -28,7 +28,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.machines.interaction.TreefellerBlockEntity;
+import rearth.oritech.block.entity.interaction.TreefellerBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
 import software.bernie.geckolib.animatable.GeoItem;

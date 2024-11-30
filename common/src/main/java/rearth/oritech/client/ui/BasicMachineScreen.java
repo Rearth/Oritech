@@ -26,7 +26,7 @@ import org.joml.Matrix4f;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
-import rearth.oritech.block.entity.machines.generators.BasicGeneratorEntity;
+import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
 import rearth.oritech.client.renderers.LaserArmModel;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.ScreenProvider;

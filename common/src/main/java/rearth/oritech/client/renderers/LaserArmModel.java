@@ -4,7 +4,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2f;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.util.Geometry;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animation.AnimationState;

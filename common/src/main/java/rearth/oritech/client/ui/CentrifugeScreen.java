@@ -11,7 +11,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.machines.processing.CentrifugeBlockEntity;
+import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.util.ScreenProvider;
 
 public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHandler> {

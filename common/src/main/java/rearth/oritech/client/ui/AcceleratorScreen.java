@@ -15,8 +15,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.machines.accelerator.AcceleratorControllerBlockEntity;
-import rearth.oritech.block.entity.machines.accelerator.AcceleratorParticleLogic;
+import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
+import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
 
 public class AcceleratorScreen extends BasicMachineScreen<AcceleratorScreenHandler> {
     

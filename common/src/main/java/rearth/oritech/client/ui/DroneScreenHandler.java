@@ -6,7 +6,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.slot.Slot;
-import rearth.oritech.block.entity.machines.interaction.DronePortEntity;
+import rearth.oritech.block.entity.interaction.DronePortEntity;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 
 import java.util.Objects;

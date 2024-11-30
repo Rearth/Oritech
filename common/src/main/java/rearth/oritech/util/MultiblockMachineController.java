@@ -19,8 +19,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.block.base.block.MultiblockMachine;
-import rearth.oritech.block.blocks.MachineCoreBlock;
-import rearth.oritech.block.entity.machines.MachineCoreEntity;
+import rearth.oritech.block.blocks.processing.MachineCoreBlock;
+import rearth.oritech.block.entity.processing.MachineCoreEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.util.energy.EnergyApi;
 

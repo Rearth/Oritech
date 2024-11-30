@@ -8,7 +8,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import rearth.oritech.block.entity.machines.accelerator.BlackHoleBlockEntity;
+import rearth.oritech.block.entity.accelerator.BlackHoleBlockEntity;
 import rearth.oritech.init.BlockContent;
 
 public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEntity> {

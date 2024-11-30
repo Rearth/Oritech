@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.machines.interaction.DronePortEntity;
+import rearth.oritech.block.entity.interaction.DronePortEntity;
 
 public class DroneScreen extends BasicMachineScreen<DroneScreenHandler> {
     

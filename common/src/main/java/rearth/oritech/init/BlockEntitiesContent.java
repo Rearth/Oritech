@@ -8,28 +8,28 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import rearth.oritech.block.entity.accelerator.*;
+import rearth.oritech.block.entity.addons.*;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.decorative.TechDoorBlockEntity;
-import rearth.oritech.block.entity.machines.MachineCoreEntity;
-import rearth.oritech.block.entity.machines.accelerator.*;
-import rearth.oritech.block.entity.machines.addons.*;
-import rearth.oritech.block.entity.machines.generators.*;
-import rearth.oritech.block.entity.machines.interaction.*;
-import rearth.oritech.block.entity.machines.processing.*;
-import rearth.oritech.block.entity.machines.storage.CreativeStorageBlockEntity;
-import rearth.oritech.block.entity.machines.storage.LargeStorageBlockEntity;
-import rearth.oritech.block.entity.machines.storage.SmallFluidTankEntity;
-import rearth.oritech.block.entity.machines.storage.SmallStorageBlockEntity;
+import rearth.oritech.block.entity.generators.*;
+import rearth.oritech.block.entity.interaction.*;
 import rearth.oritech.block.entity.pipes.EnergyPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
+import rearth.oritech.block.entity.processing.*;
+import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
+import rearth.oritech.block.entity.storage.CreativeStorageBlockEntity;
+import rearth.oritech.block.entity.storage.LargeStorageBlockEntity;
+import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
+import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
 import rearth.oritech.util.ArchitecturyRegistryContainer;
-import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventoryProvider;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -146,6 +146,8 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     public static final BlockEntityType<EnchanterBlockEntity> ENCHANTER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(EnchanterBlockEntity::new, BlockContent.ENCHANTER_BLOCK).build();
     
     public static final BlockEntityType<SpawnerControllerBlockEntity> SPAWNER_CONTROLLER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(SpawnerControllerBlockEntity::new, BlockContent.SPAWNER_CONTROLLER_BLOCK).build();
+    
+    public static final BlockEntityType<ReactorControllerBlockEntity> REACTOR_CONTROLLER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(ReactorControllerBlockEntity::new, BlockContent.REACTOR_CONTROLLER).build();
     
     @AssignSidedInventory
     public static final BlockEntityType<AcceleratorControllerBlockEntity> ACCELERATOR_CONTROLLER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(AcceleratorControllerBlockEntity::new, BlockContent.ACCELERATOR_CONTROLLER).build();

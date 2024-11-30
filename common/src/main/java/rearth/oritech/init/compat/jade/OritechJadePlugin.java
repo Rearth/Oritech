@@ -1,7 +1,7 @@
 package rearth.oritech.init.compat.jade;
 
 import rearth.oritech.Oritech;
-import rearth.oritech.block.blocks.MachineCoreBlock;
+import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import snownee.jade.api.IWailaClientRegistration;
 import snownee.jade.api.IWailaCommonRegistration;
 import snownee.jade.api.IWailaPlugin;

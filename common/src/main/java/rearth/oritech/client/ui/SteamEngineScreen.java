@@ -6,7 +6,7 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.Insets;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
-import rearth.oritech.block.entity.machines.generators.SteamEngineEntity;
+import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.util.ScreenProvider;
 
 public class SteamEngineScreen extends UpgradableMachineScreen<SteamEngineScreenHandler> {

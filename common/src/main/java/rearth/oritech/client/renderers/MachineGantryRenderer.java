@@ -15,7 +15,7 @@ import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import rearth.oritech.block.base.block.FrameInteractionBlock;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
-import rearth.oritech.block.entity.machines.interaction.DestroyerBlockEntity;
+import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.init.BlockContent;
 
 public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteractionBlockEntity> {

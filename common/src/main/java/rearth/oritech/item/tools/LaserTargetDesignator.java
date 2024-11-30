@@ -8,9 +8,9 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.blocks.MachineCoreBlock;
-import rearth.oritech.block.entity.machines.interaction.DronePortEntity;
-import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.blocks.processing.MachineCoreBlock;
+import rearth.oritech.block.entity.interaction.DronePortEntity;
+import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ComponentContent;
 

@@ -11,8 +11,8 @@ import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.World;
-import rearth.oritech.block.blocks.machines.interaction.LaserArmBlock;
-import rearth.oritech.block.entity.machines.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.blocks.interaction.LaserArmBlock;
+import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.SingleSlotHandler;
 
