@@ -581,6 +581,7 @@
   "text.oritech.reactor.heat": "Isı: %s K",
   "text.oritech.reactor.collected_heat": "Sindirilen Isı: %s K/t",
   "text.oritech.reactor.removed_heat": "Dağıtılmış Isı: %s K/t",
+  "text.oritech.reactor.absorbed_heat": "Absorbed Heat: %s K/t",
   "text.oritech.accelerator.ui.waiting.0": "Bekliyor.",
   "text.oritech.accelerator.ui.waiting.1": "Bekliyor..",
   "text.oritech.accelerator.ui.waiting.2": "Bekliyor...",
