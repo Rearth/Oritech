@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -76,6 +77,11 @@ public class TooltipHelper {
                 
                 if (energyProvider instanceof AtomicForgeBlockEntity || energyProvider instanceof DeepDrillEntity)
                     tooltip.add(Text.translatable("tooltip.oritech.needs_laser_power").formatted(Formatting.BOLD));
+                
+                var id = Registries.BLOCK.getId(block);
+                if (I18n.hasTranslation("tooltip.oritech." + id.getPath() + ".extra")) {
+                    tooltip.add(Text.translatable("tooltip.oritech." + id.getPath() + ".extra").formatted(Formatting.GRAY));
+                }
             }
         } else {
             tooltip.add(Text.translatable("tooltip.oritech.item_extra_info").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));

@@ -16,6 +16,7 @@ import rearth.oritech.block.entity.generators.FuelGeneratorEntity;
 import rearth.oritech.block.entity.generators.LavaGeneratorEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.*;
+import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -45,6 +46,10 @@ public class OritechEMIPlugin implements EmiPlugin {
         registerParticleAccelerator(registry, manager, RecipeContent.PARTICLE_COLLISION);
         
         registry.addWorkstation(VanillaEmiRecipeCategories.SMELTING, EmiStack.of(BlockContent.POWERED_FURNACE_BLOCK));
+        
+        registry.addRecipeHandler(ModScreens.ASSEMBLER_SCREEN, new EmiTransferHandler(RecipeContent.ASSEMBLER.getIdentifier()));
+        registry.addRecipeHandler(ModScreens.FOUNDRY_SCREEN, new EmiTransferHandler(RecipeContent.FOUNDRY.getIdentifier()));
+        // registry.addRecipeHandler(ModScreens.ATOMIC_FORGE_SCREEN, new EmiTransferHandler<>(RecipeContent.ATOMIC_FORGE.getIdentifier()));
         
     }
     

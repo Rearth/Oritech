@@ -50,17 +50,13 @@ Currently in very early access, numerous bugs and issues are to be expected.
 
 If you want to contribute, suggest ideas or just see what's planned, make sure to check out the GitHub discussions for this project (https://github.com/Rearth/Oritech/discussions).
 
-Includes REI and EMI compatibility.
+Includes JEI, REI and EMI compatibility. Works best with EMI.
 
-[//]: # (Extra mod compatibilities &#40;allowing metals and other components to be processed in Oritech machines, and vice-versa&#41; for the following mode are included:)
-
-[//]: # (- Alloy Forgery)
-
-[//]: # (- Tech Reborn)
-
-[//]: # (- Energized Power)
-
-[//]: # (- Mythic Metals)
+Extra mod compatibilities (allowing metals and other components to be processed in Oritech machines, and vice-versa) for the following mode are included:
+- Alloy Forgery
+- Tech Reborn
+- Energized Power
+- Mythic Metals
 
 The following translations are available:
 - English
@@ -71,6 +67,7 @@ The following translations are available:
 - Spanish (by Seyronh)
 - Turkish (by RuyaSavascisi)
 - French (by kikipunk)
+- German (by Wolkensteinchen)
 - Polish (by plhappylemonpl & Przemol)
 
 ## Built With
@@ -139,9 +136,10 @@ In detail, these are the following items that are from the above-mentioned sourc
 * glisco, the creator of owo-lib, for creating this awesome library and supporting in its usage
 * unilock, for providing most of the work on the EMI integration
 * The creators and maintainers of Geckolib for creating the great animation engine, and helping out in their discord
-* [LyFl0w's texture maker](https://github.com/LyFl0w/TextureMaker), which has been used for a lot of the other mod textures
+* [LyFl0w's texture maker](https://github.com/LyFl0w/TextureMaker), which has been used for item textures. Around 10 textures made with it are still in use.
 * Ycar, for creating all tiers of the machine core textures
-* BBoldt and BLOKBUSTR, for fixing a series of issues with the textures, and generally improving and redesigning almost all the metal component textures
+* BBoldt and BLOKBUSTR, for providing most of the metal item variant textures
 * jshipley, for a lot of contributions with new features, block, mechanics and bugfixes
 * CrazyMiner34, for improvements to item rendering in 3rd person & the wrench texture
 * NovaKatt, for creating most of the metal / compacted block textures
+* Armen, for making the pipes configurable with the wrench and some more improvements

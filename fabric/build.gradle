@@ -67,14 +67,14 @@ dependencies {
     // athena (CTM)
     modRuntimeOnly "earth.terrarium.athena:athena-fabric-1.21:4.0.0"
 
-    // EMI
-    modRuntimeOnly "dev.emi:emi-fabric:1.1.12+1.21"
-
-    // REI
-    // modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:16.0.754"
-
-    // JEI
-    // modRuntimeOnly "mezz.jei:jei-1.21.1-fabric:19.21.0.245"
+    // recipe viewer runtime
+    switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
+        case "emi": modRuntimeOnly "dev.emi:emi-fabric:${emi_version}"; break
+        case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:16.0.754"; break
+        case "jei": modRuntimeOnly "mezz.jei:jei-1.21.1-fabric:19.21.0.245"
+        case "disabled": break
+        default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, JEI, or disabled.")
+    }
 
     // mod menu
     modImplementation "com.terraformersmc:modmenu:11.0.3"
@@ -125,6 +125,7 @@ publishMods {
         requires("geckolib")
         requires("athena-ctm")
         requires("fabric-api")
+        requires("architectury-api")
 
         announcementTitle = "Fabric Version on Modrinth"
     }
@@ -139,6 +140,7 @@ publishMods {
         requires("geckolib")
         requires("athena")
         requires("fabric-api")
+        requires("architectury-api")
 
         javaVersions.add(JavaVersion.VERSION_21)
         clientRequired = true

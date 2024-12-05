@@ -24,7 +24,7 @@ dependencies {
     modImplementation "software.bernie.geckolib:geckolib-fabric-1.21.1:4.6.6"
 
     // EMI
-    modCompileOnly "dev.emi:emi-xplat-intermediary:1.1.12+1.21:api"
+    modCompileOnly "dev.emi:emi-xplat-intermediary:${emi_version}:api"
 
     // REI
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:16.0.754"

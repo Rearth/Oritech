@@ -207,7 +207,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         // if liquid is water, consider as infinite
         // if liquid, start flood fill to find all liquid blocks. Add all found blocks to queue so that it can be soaked up in reverse
         // search all neighbors per tick
-        // if more than 10000 blocks are found, consider as infinite and stop search
+        // if more than N blocks are found, consider the search finished
         // mark startup as completed
         
         if (toolheadPosition == null) {

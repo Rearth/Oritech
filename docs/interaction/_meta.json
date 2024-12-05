@@ -1,12 +1,12 @@
 {
+  "machine_frames.mdx": "Machine Frames",
   "block_destroyer.mdx": "Block Destroyer",
   "block_placer.mdx": "Block Placer",
-  "deepdrill.mdx": "Bedrock extractor",
-  "enderic_laser.mdx": "Enderic Laser",
   "fertilizer.mdx": "Fertilizer",
-  "machine_frames.mdx": "Machine Frames",
+  "enderic_laser.mdx": "Enderic Laser",
+  "deepdrill.mdx": "Bedrock extractor",
   "particle_accelerator.mdx": "Particle Accelerator",
   "pump.mdx": "Pump",
-  "redstone.mdx": "Redstone",
-  "tree_cutter.mdx": "Tree Cutter"
+  "tree_cutter.mdx": "Tree Cutter",
+  "redstone.mdx": "Redstone"
 }

@@ -37,7 +37,7 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     protected final BlockPos blockPos;
     
     @NotNull
-    protected final ScreenProvider screenData;
+    public final ScreenProvider screenData;
     
     @Nullable
     protected final SingleVariantStorage<FluidVariant> steamStorage;
@@ -48,7 +48,7 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     protected final FluidProvider fluidProvider;
     
     protected BlockState machineBlock;
-    protected BlockEntity blockEntity;
+    public BlockEntity blockEntity;
     protected List<Integer> armorSlots;
     
     public BasicMachineScreenHandler(int syncId, PlayerInventory inventory, ModScreens.BasicData setupData) {

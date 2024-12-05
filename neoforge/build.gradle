@@ -66,15 +66,16 @@ dependencies {
     // jade
     modImplementation "curse.maven:jade-324717:5846105"
 
-    // REI
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"
-    // modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"
 
-    // EMI
-    // modRuntimeOnly "dev.emi:emi-neoforge:1.1.12+1.21"
-
-    // JEI
-    modRuntimeOnly "mezz.jei:jei-1.21.1-neoforge:19.21.0.245"
+    // recipe viewer runtime
+    switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
+        case "emi": modRuntimeOnly "dev.emi:emi-neoforge:${emi_version}"; break
+        case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"; break
+        case "jei": modRuntimeOnly "mezz.jei:jei-1.21.1-neoforge:19.21.0.245"
+        case "disabled": break
+        default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, JEI, or disabled.")
+    }
 
     // compat mods for ingame testing
     modRuntimeOnly "curse.maven:energized-power-782147:5797585"
@@ -119,6 +120,7 @@ publishMods {
         requires("geckolib")
         requires("athena-ctm")
         requires("forgified-fabric-api")
+        requires("architectury-api")
 
         announcementTitle = "Neoforge Version on Modrinth"
     }
@@ -133,6 +135,7 @@ publishMods {
         requires("geckolib")
         requires("athena")
         requires("forgified-fabric-api")
+        requires("architectury-api")
 
         javaVersions.add(JavaVersion.VERSION_21)
         clientRequired = true
