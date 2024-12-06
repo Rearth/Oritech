@@ -580,6 +580,7 @@
   "text.oritech.reactor.heat_to_reactor": "Reaktöre giden Isı: %s K/t",
   "text.oritech.reactor.heat": "Isı: %s K",
   "text.oritech.reactor.fuel": "Fuel: %s/%s",
+  "text.oritech.reactor.absorbant": "Coolant: %s/%s",
   "text.oritech.reactor.collected_heat": "Sindirilen Isı: %s K/t",
   "text.oritech.reactor.removed_heat": "Dağıtılmış Isı: %s K/t",
   "text.oritech.reactor.absorbed_heat": "Absorbed Heat: %s K/t",
