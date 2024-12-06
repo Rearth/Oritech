@@ -580,6 +580,7 @@
   "text.oritech.reactor.heat_to_reactor": "Heat to Reactor: %s K/t",
   "text.oritech.reactor.heat": "Heat: %s K",
   "text.oritech.reactor.fuel": "Fuel: %s/%s",
+  "text.oritech.reactor.absorbant": "Coolant: %s/%s",
   "text.oritech.reactor.collected_heat": "Ingested Heat: %s K/t",
   "text.oritech.reactor.removed_heat": "Dispersed Heat: %s K/t",
   "text.oritech.reactor.absorbed_heat": "Absorbed Heat: %s K/t",
