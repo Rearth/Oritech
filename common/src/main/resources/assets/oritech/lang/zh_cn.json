@@ -579,6 +579,7 @@
   "text.oritech.reactor.generated_energy": "产能：%s RF/t",
   "text.oritech.reactor.heat_to_reactor": "至反应炉的热量：%s K/t",
   "text.oritech.reactor.heat": "热量：%s K",
+  "text.oritech.reactor.fuel": "Fuel: %s/%s",
   "text.oritech.reactor.collected_heat": "耗热：%s K/t",
   "text.oritech.reactor.removed_heat": "散热：%s K/t",
   "text.oritech.reactor.absorbed_heat": "Absorbed Heat: %s K/t",
