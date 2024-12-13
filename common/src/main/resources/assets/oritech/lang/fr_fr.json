@@ -94,7 +94,7 @@
   "tooltip.oritech.addon_efficiency_desc": "Efficacité énergétique ",
   "tooltip.oritech.addon_yield_desc": "Double la quantité de sous-produits dans la forge à fragmentation. Augmente le rendement de la destruction des blocs dans le Destructeur de Blocs et le Laser Enderique",
   "tooltip.oritech.addon_fluid_desc": "Permet le traitement des liquides. Applicable à la centrifugeuse",
-  "tooltip.oritech.addon_acceptor_desc": "Agit comme un proxy d'énergie",
+  "tooltip.oritech.addon_acceptor_desc": "Allows energy to be inserted to the addon instead of the machine itself",
   "tooltip.oritech.addon_crop_desc": "Applicable au Destructeur de Blocs et au Laser Enderique. Ignore les cultures ou animaux non cultivés",
   "tooltip.oritech.addon_proxy_desc": "Permet l'accès à des emplacements d'inventaire spécifiques",
   "tooltip.oritech.addon_proxy_select": "Sélectionnez l'emplacement cible du proxy",
