@@ -94,7 +94,7 @@
   "tooltip.oritech.addon_efficiency_desc": "Eficiência Energética ",
   "tooltip.oritech.addon_yield_desc": "Dobra a quantidade de subprodutos na Fragment Forge. Aumenta o rendimento de quebra de blocos no Block Destroyer e Enderic Laser",
   "tooltip.oritech.addon_fluid_desc": "Permite processamento de fluidos. Aplicável à centrífuga",
-  "tooltip.oritech.addon_acceptor_desc": "Age como um proxy de energia",
+  "tooltip.oritech.addon_acceptor_desc": "Allows energy to be inserted to the addon instead of the machine itself",
   "tooltip.oritech.addon_crop_desc": "Aplicável ao destruidor de blocos. Ignora plantações não cultivadas",
   "tooltip.oritech.addon_proxy_desc": "Permite acesso a slots de inventário específicos",
   "tooltip.oritech.addon_proxy_select": "Selecionar slot de proxy alvo",
