@@ -94,7 +94,7 @@
   "tooltip.oritech.addon_efficiency_desc": "Енергоефективність",
   "tooltip.oritech.addon_yield_desc": "Подвоює кількість побічних продуктів у кузні фрагментів.Збільшує вихід руйнування блоків у руйнівника блоків та ендеричний лазер",
   "tooltip.oritech.addon_fluid_desc": "Дозволяє обробляти рідини. Застосовується для центрифуги",
-  "tooltip.oritech.addon_acceptor_desc": "Діє як проксі-енергія",
+  "tooltip.oritech.addon_acceptor_desc": "Allows energy to be inserted to the addon instead of the machine itself",
   "tooltip.oritech.addon_crop_desc": "Застосовується до руйнівника блоків та ендеричного лазера. Пропускає невирощені культури або тварин",
   "tooltip.oritech.addon_proxy_desc": "Дозволяє отримати доступ до певних слотів інвентарю",
   "tooltip.oritech.addon_proxy_select": "Виберіть цільовий слот проксі-сервера",
