@@ -118,6 +118,7 @@
   "tooltip.oritech.exo_helmet": "Gece görüşü sağlar",
   "tooltip.oritech.black_hole": "Ne yaptığınızı bilmiyorsanız BUNU YERLEŞTİRMEYİN.",
   "tooltip.oritech.weed_killer": "Geniş bir yarıçap içindeki tüm çimen ve bitkileri temizler",
+  "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Yaşayabilir bir varlığı şununla ele geçirerek elde edilir: ",
