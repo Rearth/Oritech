@@ -118,6 +118,7 @@
   "tooltip.oritech.exo_helmet": "Дает ночное зрение.",
   "tooltip.oritech.black_hole": "НЕ МЕНЯЙТЕ ЭТО, если не знаете, что вы делаете.",
   "tooltip.oritech.weed_killer": "Удаляет все травы и растения в широком радиусе",
+  "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Получено путем захвата жизнеспособной сущности с ",
