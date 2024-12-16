@@ -93,7 +93,7 @@
   "tooltip.oritech.addon_speed_desc": "Скорость работы ",
   "tooltip.oritech.addon_efficiency_desc": "Энергоэффективность",
   "tooltip.oritech.addon_yield_desc": "Удваивает количество побочного продукта во Фрагментной Кузне. Увеличивает выработку блока в Разрушителе Блоков и Эндеррическом Лазере",
-  "tooltip.oritech.addon_fluid_desc": "Позволяет перерабатывать жидкость. Применяется для центрифуги",
+  "tooltip.oritech.addon_fluid_desc": "Allows fluid processing. Applicable to centrifuge and drone port",
   "tooltip.oritech.addon_acceptor_desc": "Allows energy to be inserted to the addon instead of the machine itself",
   "tooltip.oritech.addon_crop_desc": "Применяется для Блокировки Разрушителя и Эндеррического Лазера (Enderic Laser). Пропускает невыращенные культуры или животных",
   "tooltip.oritech.addon_proxy_desc": "Разрешить доступ к определенным слотам инвентаря",
