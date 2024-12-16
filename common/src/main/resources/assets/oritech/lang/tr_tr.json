@@ -93,7 +93,7 @@
   "tooltip.oritech.addon_speed_desc": "Çalışma Hızı ",
   "tooltip.oritech.addon_efficiency_desc": "Enerji Verimliliği ",
   "tooltip.oritech.addon_yield_desc": "Parça Dövücü'da yan ürün miktarını iki katına çıkarır. Blok Yok Edici ve Enderik Lazer'de blok kırma verimini artırır",
-  "tooltip.oritech.addon_fluid_desc": "Sıvı işlemeye izin verir. Santrifüje uygulanabilir",
+  "tooltip.oritech.addon_fluid_desc": "Allows fluid processing. Applicable to centrifuge and drone port",
   "tooltip.oritech.addon_acceptor_desc": "Makinenin kendisi yerine eklentiye enerji verilmesine izin verir",
   "tooltip.oritech.addon_crop_desc": "Blok Yok Edici ve Enderik Lazere uygulanabilir. Yetiştirilmemiş mahsulleri veya hayvanları atlar",
   "tooltip.oritech.addon_proxy_desc": "Belirli envanter yuvalarına erişim sağlar",
