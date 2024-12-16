@@ -118,6 +118,7 @@
   "tooltip.oritech.exo_helmet": "给予夜视效果",
   "tooltip.oritech.black_hole": "除非你清楚自己在做什么，否则请不要放置它！",
   "tooltip.oritech.weed_killer": "在较大范围内移除所有草和植物",
+  "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
   "tooltip.oritech.intelligence_item": [
     {
       "text": "以捕获一个可行的实体来获取，需使用 ",
