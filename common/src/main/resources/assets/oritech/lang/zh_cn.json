@@ -93,7 +93,7 @@
   "tooltip.oritech.addon_speed_desc": "处理速度 ",
   "tooltip.oritech.addon_efficiency_desc": "能量效率 ",
   "tooltip.oritech.addon_yield_desc": "加倍粉碎工厂的副产品数量。提高方块破坏器和末影激光的方块破坏产出。",
-  "tooltip.oritech.addon_fluid_desc": "允许流体处理。可应用于离心机",
+  "tooltip.oritech.addon_fluid_desc": "Allows fluid processing. Applicable to centrifuge and drone port",
   "tooltip.oritech.addon_acceptor_desc": "允许将能量输入插件而不是机器本身",
   "tooltip.oritech.addon_crop_desc": "适用于方块破坏器和末影激光器。跳过未成熟的作物",
   "tooltip.oritech.addon_proxy_desc": "允许访问指定的物品栏",
