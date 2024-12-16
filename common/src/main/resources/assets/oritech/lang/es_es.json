@@ -118,6 +118,7 @@
   "tooltip.oritech.exo_helmet": "Otorga visión nocturna",
   "tooltip.oritech.black_hole": "NO COLOQUES ESTO a menos que sepas lo que estás haciendo.",
   "tooltip.oritech.weed_killer": "Elimina toda la hierba y plantas en un radio amplio",
+  "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Obtenido al capturar una entidad viable con el ",
