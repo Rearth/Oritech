@@ -198,7 +198,7 @@
   "tooltip.oritech.steam_production": "Tik başına üretilen buhar damlacıklarının miktarı. Depo dolduğunda herhangi bir fazlalık kaybolacaktır.",
   "title.oritech.steam_consumption": "🛞 %s su/t",
   "tooltip.oritech.steam_consumption": "Tik başına depolama ünitelerindeki toplam buhar tüketimi (damlacıklar) (zincirlenmiş jeneratörler dahil)",
-  "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Şarj Edilmiş\n\nMaksimum Kullanım: %s RF/t",
+  "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Charged\n\nMaximum Usage: %s RF/t\nMaximum Transfer: %s RF/t",
   "title.oritech.machine.no_addons": "Bağlı eklenti yok",
   "button.oritech.machine.addons": "Eklentiler",
   "tooltip.oritech.pipe_booster": "Increases the extraction speed of a fluid/item pipe behind it",
