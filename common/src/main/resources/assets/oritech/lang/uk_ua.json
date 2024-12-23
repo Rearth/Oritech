@@ -198,7 +198,7 @@
   "tooltip.oritech.steam_production": "Кількість крапель пари, що виробляється за один тик. Надлишок буде втрачено, коли сховище заповниться.",
   "title.oritech.steam_consumption": "🛞 %s su/t",
   "tooltip.oritech.steam_consumption": "Загальне споживання пари в одиницях зберігання (краплі) за тик (включаючи ланцюгові генератори)",
-  "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Заряджено\n\nМаксимальне використання: %s RF/t",
+  "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Charged\n\nMaximum Usage: %s RF/t\nMaximum Transfer: %s RF/t",
   "title.oritech.machine.no_addons": "Не підключено жодного аддона",
   "button.oritech.machine.addons": "Аддони",
   "tooltip.oritech.pipe_booster": "Increases the extraction speed of a fluid/item pipe behind it",
