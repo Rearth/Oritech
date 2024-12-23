@@ -198,7 +198,7 @@
   "tooltip.oritech.steam_production": "Quantità di goccioline di vapore prodotte per tick. Qualsiasi eccesso verrà perso quando lo stoccaggio è pieno.",
   "title.oritech.steam_consumption": "🛞 %s su/t",
   "tooltip.oritech.steam_consumption": "Consumo totale di vapore nelle unità di stoccaggio (gocciole) per tick (inclusi i generatori a catena)",
-  "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Carica\n\nUtilizzo Massimo: %s RF/t",
+  "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Charged\n\nMaximum Usage: %s RF/t\nMaximum Transfer: %s RF/t",
   "title.oritech.machine.no_addons": "Nessuna estensione connessa",
   "button.oritech.machine.addons": "Estensioni",
   "tooltip.oritech.pipe_booster": "Increases the extraction speed of a fluid/item pipe behind it",
