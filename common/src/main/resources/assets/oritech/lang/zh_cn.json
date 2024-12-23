@@ -198,7 +198,7 @@
   "tooltip.oritech.steam_production": "每刻蒸汽液滴产量。当存储已满时，任何溢出将会丢失。",
   "title.oritech.steam_consumption": "🛞 %s 蒸汽单位/刻",
   "tooltip.oritech.steam_consumption": "总蒸汽消耗量每刻以存储单元（液滴）计 （包括连锁的发电机）",
-  "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% 已充能\n\n最大功率：%s RF/刻",
+  "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Charged\n\nMaximum Usage: %s RF/t\nMaximum Transfer: %s RF/t",
   "title.oritech.machine.no_addons": "未连接插件",
   "button.oritech.machine.addons": "插件",
   "tooltip.oritech.pipe_booster": "增加其后的流体/物流管道提取速度。",
