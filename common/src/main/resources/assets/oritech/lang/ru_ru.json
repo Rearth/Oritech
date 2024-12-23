@@ -198,7 +198,7 @@
   "tooltip.oritech.steam_production": "Количество паровых капель, производимых за тик. Любой избыток будет потерян при заполнении хранилища.",
   "title.oritech.steam_consumption": "🛞 %s su/t",
   "tooltip.oritech.steam_consumption": "Общее потребление пара в накопительных единицах (каплях) на такт (включая цепи-генераторы)",
-  "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Заряжено\n\nмаксимальное использование: %s RF/t",
+  "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Charged\n\nMaximum Usage: %s RF/t\nMaximum Transfer: %s RF/t",
   "title.oritech.machine.no_addons": "Дополнения не подключены",
   "button.oritech.machine.addons": "Дополнения",
   "tooltip.oritech.pipe_booster": "Увеличивает скорость извлечения жидкости/вещи за трубой",
