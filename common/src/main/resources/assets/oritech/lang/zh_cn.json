@@ -989,6 +989,7 @@
   "tag.item.c.storage_blocks.silicon": "硅块",
   "tag.item.c.storage_blocks.steel": "钢块",
   "tag.item.c.wires": "线缆",
+  "tag.item.c.plates.plastic": "Plastic Plates",
   "tag.item.oritech.biomass": "生物质",
   "tag.item.oritech.plating": "护板"
 }
