@@ -989,6 +989,7 @@
   "tag.item.c.storage_blocks.silicon": "Silicon Block",
   "tag.item.c.storage_blocks.steel": "Steel Block",
   "tag.item.c.wires": "Wires",
+  "tag.item.c.plates.plastic": "Plastic Plates",
   "tag.item.oritech.biomass": "Biomass",
   "tag.item.oritech.plating": "Plating"
 }
