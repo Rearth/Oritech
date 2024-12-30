@@ -245,7 +245,7 @@
   "tooltip.oritech.machine_efficiency": "能量效率",
   "title.oritech.machine_energy_production": "↗ %d RF/刻",
   "tooltip.oritech.steam_energy_production": "总产量（包括连锁的发电机）",
-  "title.oritech.steam_production": "↗ %s RF/刻",
+  "title.oritech.steam_production": "🛞 %s 蒸汽单位/刻",
   "tooltip.oritech.steam_production": "每刻蒸汽液滴产量。当存储已满时，任何溢出将会丢失。",
   "title.oritech.steam_consumption": "🛞 %s 蒸汽单位/刻",
   "tooltip.oritech.steam_consumption": "总蒸汽消耗量每刻以存储单元（液滴）计 （包括连锁的发电机）",
