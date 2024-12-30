@@ -161,7 +161,7 @@
   "tooltip.oritech.reactor_absorber_port.2": "the reactor heat absorbers.",
   "tooltip.oritech.reactor_energy_port": "Outputs the energy of the reactor.",
   "tooltip.oritech.reactor_energy_port.0": "",
-  "tooltip.oritech.reactor_energy_port.1": "Max Rate: 10 000 RF/t.",
+  "tooltip.oritech.reactor_energy_port.1": "Max Rate: 25 000 RF/t.",
   "tooltip.oritech.reactor_redstone_port": "Allows the reactor to be controlled via redstone, and can be read with a comparator.",
   "tooltip.oritech.reactor_redstone_port.0": "",
   "tooltip.oritech.reactor_redstone_port.1": "A redstone signal to this block will disable the INSERTION of new fuel. Already consumed fuel",
