@@ -161,7 +161,7 @@
   "tooltip.oritech.reactor_absorber_port.2": "reaktör ısı emicileri.",
   "tooltip.oritech.reactor_energy_port": "Reaktörün enerjisini çıkarır.",
   "tooltip.oritech.reactor_energy_port.0": "",
-  "tooltip.oritech.reactor_energy_port.1": "Maksimum Oran: 10 000 RF/t.",
+  "tooltip.oritech.reactor_energy_port.1": "Max Rate: 25 000 RF/t.",
   "tooltip.oritech.reactor_redstone_port": "Reaktörün redstone ile kontrol edilmesini sağlar ve bir karşılaştırıcı ile okunabilir.",
   "tooltip.oritech.reactor_redstone_port.0": "",
   "tooltip.oritech.reactor_redstone_port.1": "Bu bloğa gönderilen bir redstone sinyali yeni yakıt GİRİŞİNİ devre dışı bırakacaktır. Reaktör",
