@@ -245,7 +245,7 @@
   "tooltip.oritech.machine_efficiency": "Energy Efficiency",
   "title.oritech.machine_energy_production": "↗ %d RF/t ",
   "tooltip.oritech.steam_energy_production": "Total production (includes chained generators)",
-  "title.oritech.steam_production": "↗ %s RF/t",
+  "title.oritech.steam_production": "🛞 %s su/t",
   "tooltip.oritech.steam_production": "Amount of steam droplets produced per tick. Any excess will be lost when the storage is full.",
   "title.oritech.steam_consumption": "🛞 %s su/t",
   "tooltip.oritech.steam_consumption": "Total steam consumption in storage units (droplets) per tick (includes chained generators)",
