@@ -245,7 +245,7 @@
   "tooltip.oritech.machine_efficiency": "Efficacité énergétique",
   "title.oritech.machine_energy_production": "↗ %d RF/t ",
   "tooltip.oritech.steam_energy_production": "Production totale (comprend les générateurs en chaînes)",
-  "title.oritech.steam_production": "↗ %s RF/t",
+  "title.oritech.steam_production": "🚞 %s su/t",
   "tooltip.oritech.steam_production": "Quantité de gouttelettes de vapeur produites par tick. Tout excédent sera perdu lorsque le stockage est plein.",
   "title.oritech.steam_consumption": "🚞 %s su/t",
   "tooltip.oritech.steam_consumption": "Consommation totale de vapeur en unités de stockage (gouttelettes) par tick (comprend les générateurs en chaînes)",
