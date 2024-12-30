@@ -245,7 +245,7 @@
   "tooltip.oritech.machine_efficiency": "Enerji Verimliliği",
   "title.oritech.machine_energy_production": "↗ %d RF/t ",
   "tooltip.oritech.steam_energy_production": "Toplam üretim (zincirlenmiş jeneratörler dahil)",
-  "title.oritech.steam_production": "↗ %s RF/t",
+  "title.oritech.steam_production": "🛞 %s su/t",
   "tooltip.oritech.steam_production": "Tik başına üretilen buhar damlacıklarının miktarı. Depo dolduğunda herhangi bir fazlalık kaybolacaktır.",
   "title.oritech.steam_consumption": "🛞 %s su/t",
   "tooltip.oritech.steam_consumption": "Tik başına depolama ünitelerindeki toplam buhar tüketimi (damlacıklar) (zincirlenmiş jeneratörler dahil)",
