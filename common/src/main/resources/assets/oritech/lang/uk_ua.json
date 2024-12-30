@@ -245,7 +245,7 @@
   "tooltip.oritech.machine_efficiency": "Енергоефективність",
   "title.oritech.machine_energy_production": "↗ %d RF/t ",
   "tooltip.oritech.steam_energy_production": "Загальне виробництво (включаючи ланцюгові генератори)",
-  "title.oritech.steam_production": "↗ %s RF/t",
+  "title.oritech.steam_production": "🛞 %s su/t",
   "tooltip.oritech.steam_production": "Кількість крапель пари, що виробляється за один тик. Надлишок буде втрачено, коли сховище заповниться.",
   "title.oritech.steam_consumption": "🛞 %s su/t",
   "tooltip.oritech.steam_consumption": "Загальне споживання пари в одиницях зберігання (краплі) за тик (включаючи ланцюгові генератори)",
