@@ -656,7 +656,7 @@
   "message.oritech.machine.missing_core": "Machine is not assembled. Please add missing core blocks",
   "message.oritech.machine_frame.missing_frame": "Missing frame. Add an empty rectangular frame behind the machine using machine frame blocks",
   "message.oritech.enchanter.insert_item": "Insert Item",
-  "message.oritech.drone.invalid_distance": "Target must be at least 50 blocks away.\n(current distance: %d)",
+  "message.oritech.drone.invalid_distance": "Target must be at least 50 blocks away.",
   "message.oritech.drone.target_set": "Target port set.\nDrone will deliver whenever the inventory is not empty.",
   "message.oritech.drone.target_invalid": "Target is not a valid drone port.\nEnsure that the target port is loaded and active.",
   "message.oritech.pump.starting": "Starting",
