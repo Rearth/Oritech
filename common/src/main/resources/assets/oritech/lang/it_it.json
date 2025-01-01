@@ -656,7 +656,7 @@
   "message.oritech.machine.missing_core": "La macchina non è assemblata. Si prega di aggiungere blocchi nucleo mancanti",
   "message.oritech.machine_frame.missing_frame": "Telaio mancante. Aggiungere un telaio rettangolare vuoto dietro la macchina utilizzando blocchi di telaio macchina",
   "message.oritech.enchanter.insert_item": "Inserisci Oggetto",
-  "message.oritech.drone.invalid_distance": "Il bersaglio deve essere distante almeno 50 blocchi.\n(distanza corrente: %d)",
+  "message.oritech.drone.invalid_distance": "Target must be at least 50 blocks away.",
   "message.oritech.drone.target_set": "Porta di destinazione impostata. Il drone consegnerà ogni volta che l'inventario non è vuoto.",
   "message.oritech.drone.target_invalid": "L'obiettivo non è una porta drone valida.\nAssicurati che la porta di destinazione sia caricata e attiva.",
   "message.oritech.pump.starting": "In Avvio",
