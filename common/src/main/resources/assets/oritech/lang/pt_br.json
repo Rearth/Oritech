@@ -656,7 +656,7 @@
   "message.oritech.machine.missing_core": "A máquina não está montada. Adicione os blocos de núcleo que estão faltando",
   "message.oritech.machine_frame.missing_frame": "Estrutura ausente. Adicione uma estrutura retangular vazia atrás da máquina usando blocos de estrutura de máquina",
   "message.oritech.enchanter.insert_item": "Inserir Item",
-  "message.oritech.drone.invalid_distance": "O alvo deve estar a pelo menos 50 blocos de distância.\n(distância atual: %d)",
+  "message.oritech.drone.invalid_distance": "Target must be at least 50 blocks away.",
   "message.oritech.drone.target_set": "Porto de alvo definido.\nO drone irá entregar sempre que o inventário não estiver vazio.",
   "message.oritech.drone.target_invalid": "O alvo não é um porto de drone válido.\nCertifique-se de que o porto de destino está carregada e ativa.",
   "message.oritech.pump.starting": "Iniciando",
