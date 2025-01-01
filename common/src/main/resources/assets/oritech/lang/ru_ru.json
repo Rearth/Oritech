@@ -656,7 +656,7 @@
   "message.oritech.machine.missing_core": "Машина не собрана. Пожалуйста, добавьте недостающие основные блоки",
   "message.oritech.machine_frame.missing_frame": "Отсутствующая рама. Добавьте пустую прямоугольную рамку за машиной с помощью блоков машинной рамки",
   "message.oritech.enchanter.insert_item": "Вставка элемента",
-  "message.oritech.drone.invalid_distance": "Цель должна находиться на расстоянии не менее 50 кварталов.\n(текущее расстояние: %d)",
+  "message.oritech.drone.invalid_distance": "Target must be at least 50 blocks away.",
   "message.oritech.drone.target_set": "Установлен порт цели.\nДрон будет доставлять грузы, когда инвентарь не пуст.",
   "message.oritech.drone.target_invalid": "Целевой порт не является действительным портом дрона.\nУбедитесь, что порт цели загружен и активен.",
   "message.oritech.pump.starting": "Запуск",
