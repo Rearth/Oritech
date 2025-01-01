@@ -656,7 +656,7 @@
   "message.oritech.machine.missing_core": "Machine non assemblée. Veuillez ajouter les blocs de noyau manquants",
   "message.oritech.machine_frame.missing_frame": "Cadre manquant. Ajoutez un cadre rectangulaire vide derrière la machine en utilisant des blocs de cadre de machine",
   "message.oritech.enchanter.insert_item": "Insérer l'objet",
-  "message.oritech.drone.invalid_distance": "La cible doit être à au moins 50 blocs.\n(distance actuelle : %d)",
+  "message.oritech.drone.invalid_distance": "Target must be at least 50 blocks away.",
   "message.oritech.drone.target_set": "Station cible défini.\nLe drone livrera chaque fois que l'inventaire ne sera pas vide.",
   "message.oritech.drone.target_invalid": "La cible n'est pas une station de drone valide.\nAssurez-vous que la station cible est chargé et actif.",
   "message.oritech.pump.starting": "Démarrage",
