@@ -656,7 +656,7 @@
   "message.oritech.machine.missing_core": "Makine birleştirilmedi. Lütfen eksik çekirdek bloklarını ekleyin",
   "message.oritech.machine_frame.missing_frame": "Eksik şasi. Makine şasi bloklarını kullanarak makinenin arkasına boş bir dikdörtgen şasi ekleyin",
   "message.oritech.enchanter.insert_item": "Eşya Yerleştir",
-  "message.oritech.drone.invalid_distance": "Hedef en az 50 blok ötede olmalıdır.\n(mevcut mesafe: %d)",
+  "message.oritech.drone.invalid_distance": "Target must be at least 50 blocks away.",
   "message.oritech.drone.target_set": "Hedef liman ayarlandı.\nDrone, envanter boş olmadığında teslimat yapacaktır.",
   "message.oritech.drone.target_invalid": "Hedef geçerli bir drone limanı değil.\nHedef limanın dolu ve etkin olduğundan emin olun.",
   "message.oritech.pump.starting": "Başlıyor",
