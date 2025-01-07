@@ -425,6 +425,7 @@
   "block.oritech.machine_core_7": "Núcleo de máquina definitivo",
   "block.oritech.machine_speed_addon": "Complemento de velocidad de máquina",
   "block.oritech.machine_processing_addon": "Auxiliary Processing Chamber Addon",
+  "block.oritech.machine_ultimate_addon": "Synergy Matrix Addon",
   "block.oritech.machine_fluid_addon": "Complemento de fluidos de máquina",
   "block.oritech.machine_yield_addon": "Complemento de rendimiento de máquina",
   "block.oritech.steam_boiler_addon": "Complemento de caldera de vapor",
