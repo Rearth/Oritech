@@ -46,7 +46,7 @@ import java.util.*;
 @SuppressWarnings("UnstableApiUsage")
 public class PlayerModifierTestEntity extends BlockEntity implements BlockEntityTicker<PlayerModifierTestEntity>, MultiblockMachineController, GeoBlockEntity, ExtendedScreenHandlerFactory {
     
-    public static final Map<Identifier, PlayerAugment> allAugments = new HashMap<>();
+    public static final Map<Identifier, PlayerAugment> allAugments = loadAugments();
     public final Set<Identifier> researchedAugments = new HashSet<>();
     
     // multiblock
@@ -77,16 +77,18 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         }
     }
     
-    private void loadAugments() {
+    private static HashMap<Identifier, PlayerAugment> loadAugments() {
+        
+        var augments = new HashMap<Identifier, PlayerAugment>();
         
         var hpBoost = new PlayerStatEnhancingAugment(Oritech.id("hpboost"), EntityAttributes.GENERIC_MAX_HEALTH, 6, EntityAttributeModifier.Operation.ADD_VALUE);
         var hpBoostMore = new PlayerStatEnhancingAugment(Oritech.id("hpboostmore"), EntityAttributes.GENERIC_MAX_HEALTH, 4, EntityAttributeModifier.Operation.ADD_VALUE);
-        var speedBoost = new PlayerStatEnhancingAugment(Oritech.id("speedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5f, EntityAttributeModifier.Operation.ADD_VALUE);
-        var dwarf = new PlayerStatEnhancingAugment(Oritech.id("dwarf"), EntityAttributes.GENERIC_SCALE, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        var speedBoost = new PlayerStatEnhancingAugment(Oritech.id("speedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5f, EntityAttributeModifier.Operation.ADD_VALUE, true);
+        var dwarf = new PlayerStatEnhancingAugment(Oritech.id("dwarf"), EntityAttributes.GENERIC_SCALE, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
         
         var energyCounter = new PlayerCountingAugment(Oritech.id("rf"));
         var otherCounter = new PlayerCountingAugment(Oritech.id("other"));
-        var flight = new PlayerCountingAugment(Oritech.id("flight")) {
+        var flight = new PlayerCountingAugment(Oritech.id("flight"), true) {
             @Override
             public void onInstalled(PlayerEntity player) {
                 player.getAbilities().allowFlying = true;
@@ -98,6 +100,22 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
                 player.getAbilities().allowFlying = false;
                 player.getAbilities().flying = false;
                 player.sendAbilitiesUpdate();
+            }
+            
+            @Override
+            public void onPlayerLoad(PlayerEntity player) {
+                this.onInstalled(player);
+            }
+            
+            @Override
+            public void toggle(PlayerEntity player) {
+                player.getAbilities().allowFlying = !player.getAbilities().allowFlying;
+                player.sendAbilitiesUpdate();
+            }
+            
+            @Override
+            public boolean isEnabled(PlayerEntity player) {
+                return player.getAbilities().allowFlying;
             }
         };
         
@@ -125,13 +143,15 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         // bonus walk/flight speed. Toggleable
         // bonus swim speed. Toggleable
         
-        allAugments.put(hpBoost.id, hpBoost);
-        allAugments.put(hpBoostMore.id, hpBoostMore);
-        allAugments.put(speedBoost.id, speedBoost);
-        allAugments.put(dwarf.id, dwarf);
-        allAugments.put(energyCounter.id, energyCounter);
-        allAugments.put(otherCounter.id, otherCounter);
-        allAugments.put(flight.id, flight);
+        augments.put(hpBoost.id, hpBoost);
+        augments.put(hpBoostMore.id, hpBoostMore);
+        augments.put(speedBoost.id, speedBoost);
+        augments.put(dwarf.id, dwarf);
+        augments.put(energyCounter.id, energyCounter);
+        augments.put(otherCounter.id, otherCounter);
+        augments.put(flight.id, flight);
+        
+        return augments;
         
     }
     
@@ -195,7 +215,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         
     }
     
-    public void onPlayerConnected(PlayerEntity player) {
+    public void onPlayerLocked(PlayerEntity player) {
         
         for (var augmentId : allAugments.keySet()) {
             var augment = allAugments.get(augmentId);
@@ -206,7 +226,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     }
     
     public void onUse(PlayerEntity player) {
-        onPlayerConnected(player);
+        onPlayerLocked(player);
         
         if (player.isSneaking()) {
             System.out.println("resetting all augments!");
@@ -322,12 +342,22 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         return new PlayerModifierScreenHandler(syncId, playerInventory, this);
     }
     
+    // called when a client connect to a server
+    public static void refreshPlayerAugments(PlayerEntity player) {
+        for (var augment : allAugments.values()) {
+            if (augment.isInstalled(player))
+                augment.onPlayerLoad(player);
+        }
+    }
+    
     public static abstract class PlayerAugment {
         
         public final Identifier id;
+        public final boolean toggleable;
         
-        protected PlayerAugment(Identifier id) {
+        protected PlayerAugment(Identifier id, boolean toggleable) {
             this.id = id;
+            this.toggleable = toggleable;
         }
         
         public abstract boolean isInstalled(PlayerEntity player);
@@ -338,6 +368,12 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         
         public void onInstalled(PlayerEntity player) {}
         public void onRemoved(PlayerEntity player) {}
+        
+        public void onPlayerLoad(PlayerEntity player) {}
+        
+        public void toggle(PlayerEntity player) {}
+        
+        public boolean isEnabled (PlayerEntity player) {return true;}
         
     }
     
@@ -352,7 +388,10 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         
         
         protected PlayerCountingAugment(Identifier id) {
-            super(id);
+            this(id, false);
+        }
+        protected PlayerCountingAugment(Identifier id, boolean toggleable) {
+            super(id, toggleable);
         }
         
         @Override
@@ -380,7 +419,11 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         private final EntityAttributeModifier.Operation operation;
         
         protected PlayerStatEnhancingAugment(Identifier id, RegistryEntry<EntityAttribute> targetAttribute, float amount, EntityAttributeModifier.Operation operation) {
-            super(id);
+            this(id, targetAttribute, amount, operation, false);
+        }
+        
+        protected PlayerStatEnhancingAugment(Identifier id, RegistryEntry<EntityAttribute> targetAttribute, float amount, EntityAttributeModifier.Operation operation, boolean toggleable) {
+            super(id, toggleable);
             this.targetAttribute = targetAttribute;
             this.amount = amount;
             this.operation = operation;
@@ -407,6 +450,33 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
             if (instance == null) return;
             instance.removeModifier(id);
             this.onRemoved(player);
+        }
+        
+        @Override
+        public boolean isEnabled(PlayerEntity player) {
+            if (!this.toggleable) return true;
+            var instance = player.getAttributeInstance(targetAttribute);
+            if (instance == null) return false;
+            
+            var modifier = instance.getModifier(id);
+            if (modifier == null) return false;
+            
+            return modifier.value() == amount;
+        }
+        
+        @Override
+        public void toggle(PlayerEntity player) {
+            var instance = player.getAttributeInstance(targetAttribute);
+            if (instance == null) return;
+            
+            System.out.println("toggling: " + this.id.getPath());
+            
+            var modifier = instance.getModifier(id);
+            if (modifier == null) return;
+            
+            var isActive = modifier.value() == amount;
+            var newAmount = isActive ? 0 : amount;
+            instance.overwritePersistentModifier(new EntityAttributeModifier(id, newAmount, operation));
         }
     }
     

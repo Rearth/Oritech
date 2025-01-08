@@ -116,7 +116,7 @@ public class PlayerModifierTestBlock extends HorizontalFacingBlock implements Bl
                 var locked = lockPlayer(player, centerPos, state);
                 if (locked) {
                     var handler = (PlayerModifierTestEntity) world.getBlockEntity(pos);
-                    handler.onPlayerConnected(player);
+                    handler.onPlayerLocked(player);
                     player.openHandledScreen(handler);
                 }
             }

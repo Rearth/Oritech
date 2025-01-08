@@ -9,6 +9,7 @@ public class Helpers {
         
         if (client.player == null) return;
         
+        // ensure prometheum pick is animated correctly
         var stack = client.player.getMainHandStack();
         if (stack.getItem() instanceof PromethiumPickaxeItem pickaxeItem) {
             pickaxeItem.onHeldTick(stack, client.player, client.world);
