@@ -60,6 +60,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerTy
     public static final ExtendedScreenHandlerType<ItemFilterScreenHandler, BasicData> ITEM_FILTER_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(ItemFilterScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<InventoryProxyScreenHandler, InventoryProxyScreenHandler.InvProxyData> INVENTORY_PROXY_SCREEN = new ExtendedScreenHandlerType<>(new InventoryProxyScreenHandler.HandlerFactory(), InventoryProxyScreenHandler.InvProxyData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<ReactorScreenHandler, BasicData> REACTOR_SCREEN = new ExtendedScreenHandlerType<>(new ReactorScreenHandler.HandlerFactory(), BasicData.PACKET_CODEC);
+    public static final ExtendedScreenHandlerType<PlayerModifierScreenHandler, BasicData> MODIFIER_SCREEN = new ExtendedScreenHandlerType<>(new PlayerModifierScreenHandler.HandlerFactory(), BasicData.PACKET_CODEC);
     
     public static void assignScreens() {
         HandledScreens.register(TANK_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
@@ -89,6 +90,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerTy
         
         HandledScreens.register(INVENTORY_PROXY_SCREEN, InventoryProxyScreen::new);
         HandledScreens.register(REACTOR_SCREEN, ReactorScreen::new);
+        HandledScreens.register(MODIFIER_SCREEN, PlayerModifierScreen::new);
         HandledScreens.register(ITEM_FILTER_SCREEN, ItemFilterScreen::new);
         HandledScreens.register(DRONE_SCREEN, DroneScreen::new);
         HandledScreens.register(REDSTONE_ADDON_SCREEN, RedstoneAddonScreen::new);
