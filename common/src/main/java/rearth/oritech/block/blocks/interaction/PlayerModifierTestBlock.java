@@ -1,7 +1,6 @@
 package rearth.oritech.block.blocks.interaction;
 
 import com.mojang.serialization.MapCodec;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -116,7 +115,8 @@ public class PlayerModifierTestBlock extends HorizontalFacingBlock implements Bl
             if (ageWithoutContact > 15) {
                 var locked = lockPlayer(player, centerPos, state);
                 if (locked) {
-                    var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
+                    var handler = (PlayerModifierTestEntity) world.getBlockEntity(pos);
+                    handler.onPlayerConnected(player);
                     player.openHandledScreen(handler);
                 }
             }
@@ -148,6 +148,8 @@ public class PlayerModifierTestBlock extends HorizontalFacingBlock implements Bl
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
+        ((PlayerModifierTestEntity) world.getBlockEntity(pos)).onUse(player);
+        
         if (world.isClient)
             return ActionResult.SUCCESS;
         
@@ -175,9 +177,6 @@ public class PlayerModifierTestBlock extends HorizontalFacingBlock implements Bl
             player.sendMessage(Text.translatable("message.oritech.machine.missing_core"));
             return ActionResult.SUCCESS;
         }
-        
-        
-        modifierEntity.onUse(player, state);
         
         return ActionResult.SUCCESS;
     }

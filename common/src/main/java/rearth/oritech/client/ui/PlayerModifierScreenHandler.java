@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
+import rearth.oritech.block.entity.interaction.PlayerModifierTestEntity;
 import rearth.oritech.client.init.ModScreens;
 
 public class PlayerModifierScreenHandler extends ScreenHandler {
@@ -19,8 +20,10 @@ public class PlayerModifierScreenHandler extends ScreenHandler {
     @NotNull
     protected final BlockPos blockPos;
     
+    public final PlayerEntity player;
+    
     protected BlockState machineBlock;
-    public BlockEntity blockEntity;
+    public PlayerModifierTestEntity blockEntity;
     
     public PlayerModifierScreenHandler(int syncId, PlayerInventory inventory, ModScreens.BasicData setupData) {
         this(syncId, inventory, inventory.player.getWorld().getBlockEntity(setupData.pos()));
@@ -32,9 +35,10 @@ public class PlayerModifierScreenHandler extends ScreenHandler {
         
         this.blockPos = blockEntity.getPos();
         this.playerInventory = playerInventory;
+        this.player = playerInventory.player;
         
         this.machineBlock = blockEntity.getCachedState();
-        this.blockEntity = blockEntity;
+        this.blockEntity = (PlayerModifierTestEntity) blockEntity;
         
         buildItemSlots();
     }

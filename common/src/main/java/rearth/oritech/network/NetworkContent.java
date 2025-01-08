@@ -29,6 +29,7 @@ import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
+import rearth.oritech.client.ui.PlayerModifierScreen;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -129,6 +130,12 @@ public class NetworkContent {
     }
     
     public record PumpWorkSyncPacket(BlockPos position, String fluidType, long workedAt) {
+    }
+    
+    public record AugmentInstallTriggerPacket(BlockPos position, Identifier id, int operationId) {
+    }
+    
+    public record AugmentResearchList(BlockPos position, List<Identifier> allResearched) {
     }
     
     public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn, String fluidTypeOut,
@@ -508,6 +515,17 @@ public class NetworkContent {
             
         }));
         
+        
+        MACHINE_CHANNEL.registerClientbound(AugmentResearchList.class, ((message, access) -> {
+            
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            
+            if (entity instanceof PlayerModifierTestEntity enhancer) {
+                enhancer.researchedAugments.addAll(message.allResearched);
+            }
+            
+        }));
+        
         MACHINE_CHANNEL.registerClientbound(ReactorUIDataPacket.class, ((message, access) -> {
             
             var entity = access.player().getWorld().getBlockEntity(message.position);
@@ -605,6 +623,26 @@ public class NetworkContent {
             if (message.fluidAmount > 0)
                 stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidType)), message.fluidAmount));
             
+        });
+        
+        UI_CHANNEL.registerServerbound(AugmentInstallTriggerPacket.class, (message, access) -> {
+            var player = access.player();
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            
+            if (entity instanceof PlayerModifierTestEntity modifierEntity) {
+                var operation = PlayerModifierScreen.AugmentOperation.values()[message.operationId];
+                switch (operation) {
+                    case RESEARCH -> {
+                        modifierEntity.researchAugment(message.id);
+                    }
+                    case ADD -> {
+                        modifierEntity.installAugmentToPlayer(message.id, player);
+                    }
+                    case REMOVE -> {
+                        modifierEntity.removeAugmentFromPlayer(message.id, player);
+                    }
+                }
+            }
         });
         
     }

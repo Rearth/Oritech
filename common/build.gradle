@@ -14,7 +14,7 @@ dependencies {
     modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
 
     // fabric api (or FFAPI in neoforge)
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.102.1+1.21.1"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
 
     // owo lib (or owo-lib-neoforge)
     modImplementation "io.wispforest:owo-lib:0.12.15+1.21"
