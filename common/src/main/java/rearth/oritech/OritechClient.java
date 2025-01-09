@@ -12,6 +12,7 @@ import net.minecraft.entity.EquipmentSlot;
 import org.lwjgl.glfw.GLFW;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
@@ -50,6 +51,8 @@ public final class OritechClient {
 
         // used for area outline rendering
         WorldRenderEvents.BLOCK_OUTLINE.register(OritechClient::renderBlockOutline);
+        
+        WorldRenderEvents.AFTER_ENTITIES.register(OreFinderRenderer::doRender);
     }
 
     public static boolean renderBlockOutline(WorldRenderContext worldRenderContext, WorldRenderContext.BlockOutlineContext blockOutlineContext) {
