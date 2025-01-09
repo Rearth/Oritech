@@ -135,6 +135,9 @@ public class NetworkContent {
     public record AugmentInstallTriggerPacket(BlockPos position, Identifier id, int operationId) {
     }
     
+    public record AugmentPlayerTogglePacket(Identifier id) {
+    }
+    
     public record AugmentResearchList(BlockPos position, List<Identifier> allResearched) {
     }
     
@@ -643,6 +646,11 @@ public class NetworkContent {
                     }
                 }
             }
+        });
+        
+        UI_CHANNEL.registerServerbound(AugmentPlayerTogglePacket.class, (message, access) -> {
+            var player = access.player();
+            PlayerModifierTestEntity.toggleAugmentForPlayer(message.id, player);
         });
         
     }

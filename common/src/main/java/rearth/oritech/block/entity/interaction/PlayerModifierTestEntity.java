@@ -11,6 +11,8 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.codec.PacketCodecs;
@@ -85,10 +87,9 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         var hpBoostMore = new PlayerStatEnhancingAugment(Oritech.id("hpboostmore"), EntityAttributes.GENERIC_MAX_HEALTH, 4, EntityAttributeModifier.Operation.ADD_VALUE);
         var speedBoost = new PlayerStatEnhancingAugment(Oritech.id("speedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5f, EntityAttributeModifier.Operation.ADD_VALUE, true);
         var dwarf = new PlayerStatEnhancingAugment(Oritech.id("dwarf"), EntityAttributes.GENERIC_SCALE, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
+        var armor = new PlayerStatEnhancingAugment(Oritech.id("armor"), EntityAttributes.GENERIC_ARMOR, 0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
         
-        var energyCounter = new PlayerCountingAugment(Oritech.id("rf"));
-        var otherCounter = new PlayerCountingAugment(Oritech.id("other"));
-        var flight = new PlayerCountingAugment(Oritech.id("flight"), true) {
+        var flight = new PlayerCustomAugment(Oritech.id("flight")) {
             @Override
             public void onInstalled(PlayerEntity player) {
                 player.getAbilities().allowFlying = true;
@@ -110,12 +111,42 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
             @Override
             public void toggle(PlayerEntity player) {
                 player.getAbilities().allowFlying = !player.getAbilities().allowFlying;
+                
+                if (!player.getAbilities().allowFlying && player.getAbilities().flying)
+                    player.getAbilities().flying = false;
+                
                 player.sendAbilitiesUpdate();
             }
             
             @Override
             public boolean isEnabled(PlayerEntity player) {
                 return player.getAbilities().allowFlying;
+            }
+        };
+        var nightVision = new PlayerCustomAugment(Oritech.id("nightvision"), true) {
+            @Override
+            public void onInstalled(PlayerEntity player) {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 999999, 0, true, false, false));
+            }
+            
+            @Override
+            public void onRemoved(PlayerEntity player) {
+                player.removeStatusEffect(StatusEffects.NIGHT_VISION);
+            }
+            
+            @Override
+            public void toggle(PlayerEntity player) {
+                
+                if (player.hasStatusEffect(StatusEffects.NIGHT_VISION)) {
+                    onRemoved(player);
+                } else {
+                    onInstalled(player);
+                }
+            }
+            
+            @Override
+            public boolean isEnabled(PlayerEntity player) {
+                return player.hasStatusEffect(StatusEffects.NIGHT_VISION);
             }
         };
         
@@ -131,6 +162,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         // giant (increases scale attribute).
         // dwarf (smaller scale)
         // energy provider (multiple levels, using overcharged crystals. Doesn't actually do anything).
+        // invisibility (using player.setInvisible)
         
         // temporary portal generator (with set home point)
         
@@ -147,9 +179,9 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         augments.put(hpBoostMore.id, hpBoostMore);
         augments.put(speedBoost.id, speedBoost);
         augments.put(dwarf.id, dwarf);
-        augments.put(energyCounter.id, energyCounter);
-        augments.put(otherCounter.id, otherCounter);
+        augments.put(armor.id, armor);
         augments.put(flight.id, flight);
+        augments.put(nightVision.id, nightVision);
         
         return augments;
         
@@ -201,6 +233,24 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         var augmentInstance = allAugments.get(augment);
         augmentInstance.removeFromPlayer(player);
         this.markNetDirty();
+    }
+    
+    public static void toggleAugmentForPlayer(Identifier augment, PlayerEntity player) {
+        System.out.println("toggling augment: " + augment);
+        
+        if (!allAugments.containsKey(augment)) {
+            Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
+            return;
+        }
+        
+        var augmentInstance = allAugments.get(augment);
+        
+        if (!augmentInstance.isInstalled(player)) {
+            Oritech.LOGGER.error("Tried toggling not-installed augment id: " + augment + ". This should never happen");
+            return;
+        }
+        
+        augmentInstance.toggle(player);
     }
     
     public boolean hasPlayerAugment(Identifier augment, PlayerEntity player) {
@@ -377,7 +427,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         
     }
     
-    public static class PlayerCountingAugment extends PlayerAugment {
+    public static class PlayerCustomAugment extends PlayerAugment {
         
         private final AttachmentType<Integer> OWN_TYPE = AttachmentRegistry.<Integer>builder()
                                                                      .copyOnDeath()
@@ -387,10 +437,10 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
                                                                      .buildAndRegister(this.id);
         
         
-        protected PlayerCountingAugment(Identifier id) {
+        protected PlayerCustomAugment(Identifier id) {
             this(id, false);
         }
-        protected PlayerCountingAugment(Identifier id, boolean toggleable) {
+        protected PlayerCustomAugment(Identifier id, boolean toggleable) {
             super(id, toggleable);
         }
         
