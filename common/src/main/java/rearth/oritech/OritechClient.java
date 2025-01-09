@@ -10,6 +10,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EquipmentSlot;
 import org.lwjgl.glfw.GLFW;
+import rearth.oritech.block.entity.interaction.PlayerModifierTestEntity;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.other.OreFinderRenderer;
@@ -25,7 +26,7 @@ public final class OritechClient {
     public static AugmentSelectionScreen activeScreen = null;
     
     public static void initialize() {
-
+        
         Oritech.LOGGER.info("Oritech client initialization");
         ModScreens.assignScreens();
         
@@ -48,13 +49,18 @@ public final class OritechClient {
         
         // used for elytra jetpack cape rendering
         LivingEntityFeatureRenderEvents.ALLOW_CAPE_RENDER.register(player -> !(player.getEquippedStack(EquipmentSlot.CHEST).getItem() instanceof BaseJetpackItem));
-
+        
         // used for area outline rendering
         WorldRenderEvents.BLOCK_OUTLINE.register(OritechClient::renderBlockOutline);
         
         WorldRenderEvents.AFTER_ENTITIES.register(OreFinderRenderer::doRender);
+        
+        ClientTickEvents.START_CLIENT_TICK.register(client -> {
+            if (client.player != null)
+                PlayerModifierTestEntity.clientTickAugments(client.player);
+        });
     }
-
+    
     public static boolean renderBlockOutline(WorldRenderContext worldRenderContext, WorldRenderContext.BlockOutlineContext blockOutlineContext) {
         BlockOutlineRenderer.render(worldRenderContext.world(), worldRenderContext.camera(), worldRenderContext.tickCounter(), worldRenderContext.matrixStack(), worldRenderContext.consumers(), worldRenderContext.gameRenderer(), worldRenderContext.projectionMatrix(), worldRenderContext.lightmapTextureManager(), worldRenderContext.worldRenderer());
         return true;

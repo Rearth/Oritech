@@ -33,6 +33,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
@@ -91,6 +92,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         var hpBoostMore = new PlayerStatEnhancingAugment(Oritech.id("hpboostmore"), EntityAttributes.GENERIC_MAX_HEALTH, 4, EntityAttributeModifier.Operation.ADD_VALUE);
         var speedBoost = new PlayerStatEnhancingAugment(Oritech.id("speedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5f, EntityAttributeModifier.Operation.ADD_VALUE, true);
         var dwarf = new PlayerStatEnhancingAugment(Oritech.id("dwarf"), EntityAttributes.GENERIC_SCALE, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
+        var giant = new PlayerStatEnhancingAugment(Oritech.id("giant"), EntityAttributes.GENERIC_SCALE, 2f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
         var armor = new PlayerStatEnhancingAugment(Oritech.id("armor"), EntityAttributes.GENERIC_ARMOR, 0.5f, EntityAttributeModifier.Operation.ADD_VALUE);
         
         var flight = new PlayerCustomAugment(Oritech.id("flight")) {
@@ -186,7 +188,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         var autoFeeder = new PlayerTickingAugment(Oritech.id("autofeeder"), true) {
             
             @Override
-            public void tick(PlayerEntity player) {
+            public void serverTick(PlayerEntity player) {
                 
                 // ensure that player has at least 1 food missing
                 var playerHungerCapacity = 20 - player.getHungerManager().getFoodLevel();
@@ -239,7 +241,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         var magnet = new PlayerTickingAugment(Oritech.id("magnet"), true) {
             
             @Override
-            public void tick(PlayerEntity player) {
+            public void serverTick(PlayerEntity player) {
                 var world = player.getWorld();
                 var target = player.getEyePos();
                 
@@ -279,16 +281,17 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         
         var oreFinder = new PlayerTickingAugment(Oritech.id("orefinder"), true) {
             
-            
-            // todo move this to client
             @Override
-            public void tick(PlayerEntity player) {
+            public void serverTick(PlayerEntity player) { }
+            
+            @Override
+            public void clientTick(PlayerEntity player) {
                 var world = player.getWorld();
                 var target = BlockPos.ofFloored(player.getEyePos());
                 
-                if (world.getTime() % 5 != 0) return;
+                if (world.getTime() % 20 != 0) return;
                 
-                var range = 10;
+                var range = 16;
                 
                 var highlightPositions = new ArrayList<BlockPos>();
                 BlockPos.iterate(target.getX() - range, target.getY() - range, target.getZ() - range, target.getX() + range, target.getY() + range, target.getZ() + range)
@@ -298,8 +301,10 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
                       if (isOre) highlightPositions.add(pos.toImmutable());
                   });
                 
-                if (!highlightPositions.isEmpty())
-                    NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.PlayerOreSearchPacket(highlightPositions));
+                if (!highlightPositions.isEmpty()) {
+                    OreFinderRenderer.receivedAt = player.getWorld().getTime();
+                    OreFinderRenderer.renderedBlocks = highlightPositions;
+                }
                 
             }
             
@@ -330,9 +335,9 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         // done: creative flight
         // done: night vision
         // done: water breathing
-        // ore finder. Toggleable
-        // giant (increases scale attribute).
-        // dwarf (smaller scale)
+        // done: ore finder. Toggleable
+        // done: giant (increases scale attribute).
+        // done: dwarf (smaller scale)
         // energy provider (multiple levels, using overcharged crystals. Doesn't actually do anything).
         // invisibility (using player.setInvisible)
         
@@ -353,6 +358,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         augments.put(hpBoostMore.id, hpBoostMore);
         augments.put(speedBoost.id, speedBoost);
         augments.put(dwarf.id, dwarf);
+        augments.put(giant.id, giant);
         augments.put(armor.id, armor);
         augments.put(flight.id, flight);
         augments.put(nightVision.id, nightVision);
@@ -578,10 +584,17 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         }
     }
     
-    public static void tickAugments(PlayerEntity player) {
+    public static void serverTickAugments(PlayerEntity player) {
         for (var augment : allAugments.values()) {
             if (augment instanceof TickingAugment tickingAugment && augment.isInstalled(player) && augment.isEnabled(player))
-                tickingAugment.tick(player);
+                tickingAugment.serverTick(player);
+        }
+    }
+    
+    public static void clientTickAugments(PlayerEntity player) {
+        for (var augment : allAugments.values()) {
+            if (augment instanceof TickingAugment tickingAugment && augment.isInstalled(player) && augment.isEnabled(player))
+                tickingAugment.clientTick(player);
         }
     }
     
@@ -731,7 +744,9 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     }
     
     public interface TickingAugment {
-        void tick(PlayerEntity player);
+        void serverTick(PlayerEntity player);
+        
+        default void clientTick(PlayerEntity player) {}
     }
     
 }

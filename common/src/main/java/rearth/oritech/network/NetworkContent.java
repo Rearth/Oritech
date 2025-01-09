@@ -29,7 +29,6 @@ import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
-import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.client.ui.PlayerModifierScreen;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -113,9 +112,6 @@ public class NetworkContent {
     }
     
     public record EnchanterSelectionPacket(BlockPos position, String enchantment) {
-    }
-    
-    public record PlayerOreSearchPacket(List<BlockPos> ores) {
     }
     
     public record BlackHoleSuckPacket(BlockPos position, BlockPos from, long startedAt, long duration) {
@@ -519,13 +515,6 @@ public class NetworkContent {
             if (entity instanceof EnchanterBlockEntity enchanter) {
                 enchanter.handleEnchantmentSelection(message);
             }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(PlayerOreSearchPacket.class, ((message, access) -> {
-            
-            OreFinderRenderer.receivedAt = access.player().clientWorld.getTime();
-            OreFinderRenderer.renderedBlocks = message.ores;
             
         }));
         

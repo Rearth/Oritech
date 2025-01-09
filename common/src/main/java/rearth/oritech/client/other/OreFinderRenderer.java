@@ -1,6 +1,5 @@
 package rearth.oritech.client.other;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.LightmapTextureManager;
@@ -27,7 +26,7 @@ public class OreFinderRenderer {
         if (world == null || renderedBlocks == null) return;
         var age = world.getTime() - receivedAt;
         
-        if (age > 20) return;
+        if (age > 40) return;
         
         for (var pos : renderedBlocks) {
             var state = world.getBlockState(pos);
@@ -42,14 +41,9 @@ public class OreFinderRenderer {
             var vertexProvider = worldRenderContext.consumers().getBuffer(OVERLAY);
             var renderer = MinecraftClient.getInstance().getBlockRenderManager().getModelRenderer();
             
-            RenderSystem.disableDepthTest();
-            RenderSystem.depthMask(false);
             renderer.renderFlat(world, MinecraftClient.getInstance().getBlockRenderManager().getModel(state), state, pos, matrices, vertexProvider, false, world.random, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
-            RenderSystem.enableDepthTest();
-            RenderSystem.depthMask(true);
             
             matrices.pop();
-            ;
         }
         
     }
