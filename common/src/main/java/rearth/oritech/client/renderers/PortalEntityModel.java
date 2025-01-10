@@ -18,6 +18,6 @@ public class PortalEntityModel extends GeoModel<PortalEntity> {
     
     @Override
     public Identifier getAnimationResource(PortalEntity animatable) {
-        return null;
+        return Oritech.id("animations/entity/portal.animation.json");
     }
 }

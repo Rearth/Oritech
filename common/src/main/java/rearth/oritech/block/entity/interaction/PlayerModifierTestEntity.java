@@ -24,10 +24,15 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -755,6 +760,10 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
                 portalEntity.setYaw(-player.getYaw() + 90);
                 world.spawnEntity(portalEntity);
                 portalEntity.target = targetPos.toCenterPos();
+                
+                world.playSound(null, BlockPos.ofFloored(spawnPos), SoundEvents.AMBIENT_CAVE.value(), SoundCategory.BLOCKS, 2, 1.2f);
+                world.playSound(null, BlockPos.ofFloored(spawnPos), SoundEvents.ENTITY_WARDEN_EMERGE, SoundCategory.BLOCKS, 1f, 1.5f);
+                
             }
         }
     }

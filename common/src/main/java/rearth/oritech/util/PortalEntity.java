@@ -10,15 +10,19 @@ import net.minecraft.world.World;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class PortalEntity extends Entity implements GeoEntity {
     
-    private AnimatableInstanceCache instanceCache = GeckoLibUtil.createInstanceCache(this);
+    private final AnimatableInstanceCache instanceCache = GeckoLibUtil.createInstanceCache(this);
     
     private int age = 0;
     
     public Vec3d target;
+    protected static final RawAnimation PORTAL = RawAnimation.begin().thenPlay("create").thenLoop("idle");
+    
     
     public PortalEntity(EntityType<?> type, World world) {
         super(type, world);
@@ -68,7 +72,7 @@ public class PortalEntity extends Entity implements GeoEntity {
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-    
+        controllers.add(new AnimationController<>(this, state -> state.setAndContinue(PORTAL)));
     }
     
     @Override
