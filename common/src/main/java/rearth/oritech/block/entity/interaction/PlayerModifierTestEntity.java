@@ -376,10 +376,10 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         // energy provider (multiple levels, using overcharged crystals. Doesn't actually do anything).
         // done: invisibility (using player.setInvisible)
         
-        // temporary portal generator (with set home point)
+        // done: temporary portal generator (with set home point)
         
-        // bonus hp (multiple levels)
-        // bonus armor (multiple levels)
+        // done: bonus hp (multiple levels)
+        // done: bonus armor (multiple levels)
         // bonus armor toughness
         // bonus knockback resistance
         // bonus mining speed (multiple levels). Toggleable
@@ -762,7 +762,6 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
                 portalEntity.target = targetPos.toCenterPos();
                 
                 world.playSound(null, BlockPos.ofFloored(spawnPos), SoundEvents.AMBIENT_CAVE.value(), SoundCategory.BLOCKS, 2, 1.2f);
-                world.playSound(null, BlockPos.ofFloored(spawnPos), SoundEvents.ENTITY_WARDEN_EMERGE, SoundCategory.BLOCKS, 1f, 1.5f);
                 
             }
         }
