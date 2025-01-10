@@ -11,6 +11,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -22,13 +23,11 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -36,6 +35,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.InventoryProvider;
@@ -129,6 +129,36 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
                 return player.getAbilities().allowFlying;
             }
         };
+        
+        var cloak = new PlayerCustomAugment(Oritech.id("cloak"), true) {
+            @Override
+            public void onInstalled(PlayerEntity player) {
+                player.setInvisible(true);
+            }
+            
+            @Override
+            public void onRemoved(PlayerEntity player) {
+                player.setInvisible(false);
+            }
+            
+            @Override
+            public void onPlayerLoad(PlayerEntity player) {
+                this.onInstalled(player);
+            }
+            
+            @Override
+            public void toggle(PlayerEntity player) {
+                var isInvisible = player.isInvisible();
+                player.setInvisible(!isInvisible);
+            }
+            
+            @Override
+            public boolean isEnabled(PlayerEntity player) {
+                return player.isInvisible();
+            }
+        };
+        
+        var portal = new PlayerPortalAugment(Oritech.id("portal"), true);
         
         var nightVision = new PlayerCustomAugment(Oritech.id("nightvision"), true) {
             @Override
@@ -339,7 +369,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         // done: giant (increases scale attribute).
         // done: dwarf (smaller scale)
         // energy provider (multiple levels, using overcharged crystals. Doesn't actually do anything).
-        // invisibility (using player.setInvisible)
+        // done: invisibility (using player.setInvisible)
         
         // temporary portal generator (with set home point)
         
@@ -366,6 +396,8 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         augments.put(magnet.id, magnet);
         augments.put(waterBreathing.id, waterBreathing);
         augments.put(oreFinder.id, oreFinder);
+        augments.put(cloak.id, cloak);
+        augments.put(portal.id, portal);
         
         return augments;
         
@@ -664,6 +696,68 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         }
     }
     
+    public static class PlayerPortalAugment extends PlayerAugment {
+        
+        private final AttachmentType<BlockPos> OWN_TYPE = AttachmentRegistry.<BlockPos>builder()
+                                                           .copyOnDeath()
+                                                           .persistent(BlockPos.CODEC)
+                                                           .initializer(() -> BlockPos.ORIGIN)
+                                                           .syncWith(BlockPos.PACKET_CODEC.cast(), AttachmentSyncPredicate.targetOnly())   // todo either wait for FFAPI update or manually replace this
+                                                           .buildAndRegister(this.id);
+        
+        
+        protected PlayerPortalAugment(Identifier id) {
+            this(id, false);
+        }
+        protected PlayerPortalAugment(Identifier id, boolean toggleable) {
+            super(id, toggleable);
+        }
+        
+        public AttachmentType<BlockPos> getOwnType() {
+            return OWN_TYPE;
+        }
+        
+        @Override
+        public boolean isInstalled(PlayerEntity player) {
+            return player.hasAttached(OWN_TYPE);
+        }
+        
+        @Override
+        public void installToPlayer(PlayerEntity player) {
+            player.setAttached(OWN_TYPE, player.getBlockPos());
+            this.onInstalled(player);
+        }
+        
+        @Override
+        public void removeFromPlayer(PlayerEntity player) {
+            player.removeAttached(OWN_TYPE);
+            this.onRemoved(player);
+        }
+        
+        @Override
+        public void toggle(PlayerEntity player) {
+            var world = player.getWorld();
+            
+            var hitResult = player.raycast(6, 0, false);
+            var spawnPos = hitResult.getPos();
+            var hitDist = Math.sqrt(hitResult.squaredDistanceTo(player));
+            var spawnToPlayer = spawnPos.subtract(player.getPos()).normalize().multiply(0.3);
+            spawnPos = spawnPos.subtract(spawnToPlayer);
+            
+            System.out.println(hitDist);
+            
+            var targetPos = player.getAttached(OWN_TYPE);
+            if (targetPos == null) return;
+            
+            var portalEntity = EntitiesContent.PORTAL_ENTITY.create((ServerWorld) world, spawner -> {}, BlockPos.ofFloored(spawnPos), SpawnReason.EVENT, false, false);
+            if (portalEntity != null) {
+                portalEntity.setPosition(spawnPos);
+                portalEntity.setYaw(-player.getYaw() + 90);
+                world.spawnEntity(portalEntity);
+                portalEntity.target = targetPos.toCenterPos();
+            }
+        }
+    }
     public abstract static class PlayerTickingAugment extends PlayerCustomAugment implements TickingAugment {
         
         protected PlayerTickingAugment(Identifier id) {

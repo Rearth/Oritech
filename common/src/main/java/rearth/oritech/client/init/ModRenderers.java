@@ -1,12 +1,14 @@
 package rearth.oritech.client.init;
 
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.*;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.EntitiesContent;
 
 public class ModRenderers {
 
@@ -89,6 +91,8 @@ public class ModRenderers {
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.REACTOR_DOUBLE_ROD, RenderLayer.getTranslucent());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.REACTOR_QUAD_ROD, RenderLayer.getTranslucent());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.REACTOR_REDSTONE_PORT, RenderLayer.getTranslucent());
+        
+        EntityRendererRegistry.register(EntitiesContent.PORTAL_ENTITY, PortalEntityRenderer::new);
 
         Oritech.LOGGER.info("Registering Entities Renderers for " + Oritech.MOD_ID);
     }

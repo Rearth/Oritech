@@ -92,6 +92,7 @@ public final class Oritech {
         res.put(RegistryKeys.DATA_COMPONENT_TYPE.getValue(), ComponentContent::registerComponents);
         res.put(RegistryKeys.FEATURE.getValue(), () -> ArchitecturyRegistryContainer.register(FeatureContent.class, MOD_ID, false));
         res.put(RegistryKeys.LOOT_FUNCTION_TYPE.getValue(), () -> ArchitecturyRegistryContainer.register(LootContent.class, MOD_ID, false));
+        res.put(RegistryKeys.ENTITY_TYPE.getValue(), () -> ArchitecturyRegistryContainer.register(EntitiesContent.class, MOD_ID, false));
         res.put(RegistryKeys.ITEM.getValue(), ToolsContent::registerEventHandlers);
         res.put(RegistryKeys.SCREEN_HANDLER.getValue(), () -> ArchitecturyRegistryContainer.register(ModScreens.class, MOD_ID, false));
         res.put(RegistryKeys.RECIPE_TYPE.getValue(), () -> ArchitecturyRegistryContainer.register(RecipeContent.class, MOD_ID, false));
