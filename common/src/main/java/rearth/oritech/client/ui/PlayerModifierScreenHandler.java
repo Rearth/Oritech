@@ -15,9 +15,6 @@ import rearth.oritech.client.init.ModScreens;
 public class PlayerModifierScreenHandler extends ScreenHandler {
     
     @NotNull
-    protected final PlayerInventory playerInventory;
-    
-    @NotNull
     protected final BlockPos blockPos;
     
     public final PlayerEntity player;
@@ -34,19 +31,10 @@ public class PlayerModifierScreenHandler extends ScreenHandler {
         super(ModScreens.MODIFIER_SCREEN, syncId);
         
         this.blockPos = blockEntity.getPos();
-        this.playerInventory = playerInventory;
         this.player = playerInventory.player;
         
         this.machineBlock = blockEntity.getCachedState();
         this.blockEntity = (PlayerModifierTestEntity) blockEntity;
-        
-        buildItemSlots();
-    }
-    
-    private void buildItemSlots() {
-        
-//        SlotGenerator.begin(this::addSlot, 8, 84)
-//          .playerInventory(playerInventory);
     }
     
     @Override

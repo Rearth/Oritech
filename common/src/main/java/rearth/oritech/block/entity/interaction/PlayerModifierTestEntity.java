@@ -35,6 +35,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.other.OreFinderRenderer;
@@ -59,6 +60,7 @@ import java.util.*;
 public class PlayerModifierTestEntity extends BlockEntity implements BlockEntityTicker<PlayerModifierTestEntity>, MultiblockMachineController, GeoBlockEntity, ExtendedScreenHandlerFactory {
     
     public static final Map<Identifier, PlayerAugment> allAugments = loadAugments();
+    public static final Map<Identifier, AugmentExtraData> augmentAssets = loadAugmentAssets();
     public final Set<Identifier> researchedAugments = new HashSet<>();
     
     // multiblock
@@ -87,6 +89,34 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         if (networkDirty) {
             updateNetwork();
         }
+    }
+    
+    private static HashMap<Identifier, AugmentExtraData> loadAugmentAssets() {
+        
+        var augments = new HashMap<Identifier, AugmentExtraData>();
+        
+        addAugmentAsset(augments, "hpboost", 0, 50, List.of());
+        addAugmentAsset(augments, "speedboost", 0, 80, List.of());
+        addAugmentAsset(augments, "hpboostmore", 30, 50, List.of(Oritech.id("hpboost")));
+        addAugmentAsset(augments, "dwarf", 40, 20, List.of(Oritech.id("hpboost")));
+        addAugmentAsset(augments, "giant", 40, 60, List.of(Oritech.id("hpboost")));
+        addAugmentAsset(augments, "autofeeder", 50, 10, List.of(Oritech.id("hpboost")));
+        addAugmentAsset(augments, "armor", 30, 90, List.of());
+        addAugmentAsset(augments, "flight", 70, 30, List.of(Oritech.id("hpboostmore")));
+        addAugmentAsset(augments, "cloak", 70, 70, List.of(Oritech.id("hpboostmore")));
+        addAugmentAsset(augments, "portal", 90, 90, List.of(Oritech.id("flight")));
+        addAugmentAsset(augments, "nightvision", 90, 60, List.of());
+        addAugmentAsset(augments, "waterbreath", 120, 70, List.of());
+        addAugmentAsset(augments, "magnet", 150, 40, List.of());
+        addAugmentAsset(augments, "orefinder", 150, 70, List.of(Oritech.id("nightvision"), Oritech.id("magnet")));
+        
+        return augments;
+        
+    }
+    
+    private static void addAugmentAsset(HashMap<Identifier, AugmentExtraData> map, String idPath, int x, int y, List<Identifier> requirements) {
+        var data = new AugmentExtraData(Oritech.id(idPath), requirements, new Vector2i(x, y));
+        map.put(data.id, data);
     }
     
     private static HashMap<Identifier, PlayerAugment> loadAugments() {
@@ -850,5 +880,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         
         default void clientTick(PlayerEntity player) {}
     }
+    
+    public record AugmentExtraData(Identifier id, List<Identifier> requirements, Vector2i position) {}
     
 }
