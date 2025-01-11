@@ -96,7 +96,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         var augments = new HashMap<Identifier, AugmentExtraData>();
         
         addAugmentAsset(augments, "hpboost", 0, 50, List.of());
-        addAugmentAsset(augments, "speedboost", 0, 80, List.of());
+        addAugmentAsset(augments, "speedboost", 0, 90, List.of());
         addAugmentAsset(augments, "hpboostmore", 30, 50, List.of(Oritech.id("hpboost")));
         addAugmentAsset(augments, "dwarf", 40, 20, List.of(Oritech.id("hpboost")));
         addAugmentAsset(augments, "giant", 40, 60, List.of(Oritech.id("hpboost")));
@@ -128,7 +128,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         var speedBoost = new PlayerStatEnhancingAugment(Oritech.id("speedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5f, EntityAttributeModifier.Operation.ADD_VALUE, true);
         var dwarf = new PlayerStatEnhancingAugment(Oritech.id("dwarf"), EntityAttributes.GENERIC_SCALE, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
         var giant = new PlayerStatEnhancingAugment(Oritech.id("giant"), EntityAttributes.GENERIC_SCALE, 2f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
-        var armor = new PlayerStatEnhancingAugment(Oritech.id("armor"), EntityAttributes.GENERIC_ARMOR, 0.5f, EntityAttributeModifier.Operation.ADD_VALUE);
+        var armor = new PlayerStatEnhancingAugment(Oritech.id("armor"), EntityAttributes.GENERIC_ARMOR, 0.5f, EntityAttributeModifier.Operation.ADD_VALUE, true);
         
         var flight = new PlayerCustomAugment(Oritech.id("flight")) {
             @Override

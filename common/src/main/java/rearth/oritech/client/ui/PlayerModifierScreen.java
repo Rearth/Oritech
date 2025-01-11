@@ -3,6 +3,7 @@ package rearth.oritech.client.ui;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.component.BoxComponent;
 import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
@@ -20,15 +21,16 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.PlayerModifierTestEntity;
 import rearth.oritech.network.NetworkContent;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, PlayerModifierScreenHandler> {
     
     private static DraggableScrollContainer<FlowLayout> main;
-    private static final HashSet<Pair<Vector2i, Vector2i>> dependencyLines = new HashSet<>();
+    private static final HashMap<String, Pair<Vector2i, Vector2i>> dependencyLines = new HashMap<>();
+    private static final HashMap<Identifier, AugmentUiState> shownAugments = new HashMap<>();
     private final Set<BoxComponent> highlighters = new HashSet<>();
+    private final int backgroundAugmentFrameSize = 32;
+    private final int augmentIconSize = 24;
     
     public PlayerModifierScreen(PlayerModifierScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -69,6 +71,95 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
     }
     
     @Override
+    protected void handledScreenTick() {
+        super.handledScreenTick();
+        
+        for (var augmentId : shownAugments.keySet()) {
+            var augmentState = shownAugments.get(augmentId);
+            var uiData = PlayerModifierTestEntity.augmentAssets.get(augmentId);
+            
+            var isResearched = this.handler.blockEntity.researchedAugments.contains(augmentId);
+            var isApplied = this.handler.blockEntity.hasPlayerAugment(augmentId, this.handler.player);
+            
+            var hasRequirements = true;
+            var missingRequirements = new ArrayList<Text>();
+            missingRequirements.add(Text.translatable("oritech.text.augment." + augmentId.getPath()).formatted(Formatting.BOLD));
+            missingRequirements.add(Text.translatable("oritech.text.missing_requirements_title"));
+            for (var requirementId : uiData.requirements()) {
+                if (!this.handler.blockEntity.researchedAugments.contains(requirementId)) {
+                    hasRequirements = false;
+                    missingRequirements.add(Text.translatable("oritech.text.augment." + requirementId.getPath()).formatted(Formatting.ITALIC, Formatting.RED));
+                } else {
+                    missingRequirements.add(Text.translatable("oritech.text.augment." + requirementId.getPath()).formatted(Formatting.ITALIC, Formatting.DARK_GREEN));
+                }
+            }
+            
+            var operation = AugmentOperation.RESEARCH;
+            var tooltipTitleText = Text.translatable("oritech.text.augment." + augmentId.getPath()).formatted(Formatting.BOLD);
+            var tooltipOperation = "oritech.text.augment_op.research";
+            if (isApplied) {
+                operation = AugmentOperation.REMOVE;
+                tooltipOperation = "oritech.text.augment_op.remove";
+            } else if (isResearched) {
+                operation = AugmentOperation.ADD;
+                tooltipOperation = "oritech.text.augment_op.apply";
+            }
+            
+            var lastOp = augmentState.openOp;
+            if (operation != lastOp) {
+                System.out.println("changing state of: " + augmentId);
+                
+                var backgroundTexture = Oritech.id("textures/gui/augments/background_open.png");
+                
+                if (isApplied) {
+                    backgroundTexture = Oritech.id("textures/gui/augments/background_installed.png");
+                } else if (isResearched) {
+                    backgroundTexture = Oritech.id("textures/gui/augments/background_completed.png");
+                }
+                
+                augmentState.icon.tooltip(List.of(tooltipTitleText, Text.translatable(tooltipOperation)));
+                
+                var scrollPanel = (DraggableScrollContainer<?>) augmentState.parent.parent();
+                var scrollOffset = (int) scrollPanel.getScrollPosition();
+                
+                var oldBackground = augmentState.background;
+                var newBackground = Components.texture(backgroundTexture, 0, 0, 16, 16, 16, 16);
+                newBackground.sizing(Sizing.fixed(backgroundAugmentFrameSize), Sizing.fixed(backgroundAugmentFrameSize));
+                newBackground.positioning(Positioning.absolute(oldBackground.x() - augmentState.parent.x() - scrollOffset, oldBackground.y() - augmentState.parent.y()));
+                augmentState.parent.removeChild(oldBackground);
+                augmentState.parent.child(newBackground.zIndex(2));
+                
+                augmentState.openOp = operation;
+                
+            }
+            
+            if (!hasRequirements && augmentState.blocker == null) {
+                System.out.println("adding blocker to: " + augmentId);
+                
+                var blocker = Components.box(Sizing.fixed(augmentIconSize), Sizing.fixed(augmentIconSize));
+                blocker.color(new Color(0.3f, 0.4f, 0.4f, 0.8f));
+                blocker.fill(true);
+                blocker.positioning(Positioning.absolute(augmentState.icon.x() - augmentState.parent.x(), augmentState.icon.y() - augmentState.parent.y()));
+                blocker.zIndex(4);
+                
+                augmentState.parent.child(blocker);
+                
+                augmentState.blocker = blocker;
+                
+            } else if (hasRequirements && augmentState.blocker != null) {
+                augmentState.parent.removeChild(augmentState.blocker);
+                augmentState.blocker = null;
+            }
+            
+            // update tooltip separately always
+            if (!hasRequirements)
+                augmentState.blocker.tooltip(missingRequirements);
+            
+        }
+        
+    }
+    
+    @Override
     public void render(DrawContext vanillaContext, int mouseX, int mouseY, float delta) {
         
         for (var highlight : highlighters) {
@@ -90,86 +181,42 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
         for (var augmentId : PlayerModifierTestEntity.allAugments.keySet()) {
             var uiData = PlayerModifierTestEntity.augmentAssets.get(augmentId);
-            var isResearched = this.handler.blockEntity.researchedAugments.contains(augmentId);
-            var isApplied = this.handler.blockEntity.hasPlayerAugment(augmentId, this.handler.player);
-            
-            var hasRequirements = true;
-            var missingRequirements = new ArrayList<Text>();
-            missingRequirements.add(Text.translatable("oritech.text.augment." + augmentId.getPath()).formatted(Formatting.BOLD));
-            missingRequirements.add(Text.translatable("oritech.text.missing_requirements_title"));
-            for (var requirementId : uiData.requirements()) {
-                if (!this.handler.blockEntity.researchedAugments.contains(requirementId)) {
-                    hasRequirements = false;
-                    missingRequirements.add(Text.translatable("oritech.text.augment." + requirementId.getPath()).formatted(Formatting.ITALIC));
-                }
-            }
-            
-            var text = augmentId.getPath();
-            var operation = AugmentOperation.RESEARCH;
-            if (isApplied) {
-                text += " remove";
-                operation = AugmentOperation.REMOVE;
-            } else if (isResearched) {
-                text += " apply";
-                operation = AugmentOperation.ADD;
-            } else {
-                text += " research";
-            }
-            
-            final var finalText = text;
-            final var finalOperation = operation;
-            final var augmentOpId = augmentId;
             
             var position = new Vector2i(leftOffset + uiData.position().x * 4, (int) (uiData.position().y / 100f * maxHeight));
             
             var iconTexture = Oritech.id("textures/gui/augments/exoskeleton.png");
             var backgroundTexture = Oritech.id("textures/gui/augments/background_open.png");
             
-            if (isApplied) {
-                backgroundTexture = Oritech.id("textures/gui/augments/background_installed.png");
-            } else if (isResearched) {
-                backgroundTexture = Oritech.id("textures/gui/augments/background_completed.png");
-            }
-            
-            var iconSize = 24;
-            var backgroundSize = 32;
+            final var augmentOpId = augmentId;
             
             var icon = Components.texture(iconTexture, 0, 0, 32, 32, 32, 32);
-            icon.mouseDown().subscribe((a, b, c) -> {triggerAugmentOperation(augmentOpId, finalOperation); return true;});
-            icon.sizing(Sizing.fixed(iconSize), Sizing.fixed(iconSize));
-            icon.positioning(Positioning.absolute(position.x - iconSize / 2, position.y - iconSize / 2));
-            icon.tooltip(Text.literal(finalText));
+            icon.mouseDown().subscribe((a, b, c) -> {triggerAugmentOperation(augmentOpId, shownAugments.get(augmentOpId).openOp); return true;});
+            icon.sizing(Sizing.fixed(augmentIconSize), Sizing.fixed(augmentIconSize));
+            icon.positioning(Positioning.absolute(position.x - augmentIconSize / 2, position.y - augmentIconSize / 2));
             
             var background = Components.texture(backgroundTexture, 0, 0, 16, 16, 16, 16);
-            background.sizing(Sizing.fixed(backgroundSize), Sizing.fixed(backgroundSize));
-            background.positioning(Positioning.absolute(position.x - backgroundSize / 2, position.y - backgroundSize / 2));
+            background.sizing(Sizing.fixed(backgroundAugmentFrameSize), Sizing.fixed(backgroundAugmentFrameSize));
+            background.positioning(Positioning.absolute(position.x - backgroundAugmentFrameSize / 2, position.y - backgroundAugmentFrameSize / 2));
             
-            var highlight = Components.box(Sizing.fixed(backgroundSize + 2), Sizing.fixed(backgroundSize + 2));
+            var highlight = Components.box(Sizing.fixed(backgroundAugmentFrameSize + 2), Sizing.fixed(backgroundAugmentFrameSize + 2));
             highlight.color(new Color(0.7f, 0.7f, 0.7f, 1f));
-            highlight.positioning(Positioning.absolute(position.x - backgroundSize / 2 - 1, position.y - backgroundSize / 2 - 1));
-            
-            var blocker = Components.box(Sizing.fixed(backgroundSize), Sizing.fixed(backgroundSize));
-            blocker.color(new Color(0.3f, 0.4f, 0.4f, 0.8f));
-            blocker.zIndex(2);
-            blocker.fill(true);
-            blocker.tooltip(missingRequirements);
-            blocker.positioning(Positioning.absolute(position.x - backgroundSize / 2, position.y - backgroundSize / 2));
+            highlight.positioning(Positioning.absolute(position.x - backgroundAugmentFrameSize / 2 - 1, position.y - backgroundAugmentFrameSize / 2 - 1));
             
             for (var dependencyId : uiData.requirements()) {
                 var dependency = PlayerModifierTestEntity.augmentAssets.get(dependencyId);
                 var dependencyPos = new Vector2i(leftOffset + dependency.position().x * 4, (int) (dependency.position().y / 100f * maxHeight));
                 
-                dependencyLines.add(new Pair<>(position, dependencyPos));
+                var depId = augmentId.getPath() + "_" + dependencyId.getPath();
+                dependencyLines.put(depId, new Pair<>(position, dependencyPos));
             }
             
-            parent.child(highlight);
-            parent.child(background);
-            parent.child(icon);
-            
-            if (!hasRequirements)
-                parent.child(blocker);
+            parent.child(highlight.zIndex(1));
+            parent.child(background.zIndex(2));
+            parent.child(icon.zIndex(3));
             
             highlighters.add(highlight);
+            
+            shownAugments.put(augmentId, new AugmentUiState(highlight, background, icon, null, AugmentOperation.NEEDS_INIT, parent));
             
         }
         
@@ -181,7 +228,25 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
     }
     
     public enum AugmentOperation {
-        RESEARCH, ADD, REMOVE
+        RESEARCH, ADD, REMOVE, NEEDS_INIT
+    }
+    
+    private static final class AugmentUiState {
+        private BoxComponent highlight;
+        private TextureComponent background;
+        private TextureComponent icon;
+        private BoxComponent blocker;
+        private AugmentOperation openOp;
+        private final FlowLayout parent;
+        
+        private AugmentUiState(BoxComponent highlight, TextureComponent background, TextureComponent icon, BoxComponent blocker, AugmentOperation openOp, FlowLayout parent) {
+            this.highlight = highlight;
+            this.background = background;
+            this.icon = icon;
+            this.blocker = blocker;
+            this.openOp = openOp;
+            this.parent = parent;
+        }
     }
     
     private static void drawLine(DrawContext context, Vector2i from, Vector2i to, int color) {
@@ -255,11 +320,16 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             
             var offset = new Vector2i((int) -this.currentScrollPosition, 0).add(this.x, this.y);
             
-            for (var dependency : dependencyLines) {
+            for (var dependency : dependencyLines.values()) {
                 drawLine(context, new Vector2i(dependency.getLeft()).add(offset), new Vector2i(dependency.getRight()).add(offset), new Color(0.1f, 0.15f, 0.2f, 1f).argb());
             }
             
         }
+        
+        public double getScrollPosition() {
+            return currentScrollPosition;
+        }
+        
     }
     
 }
