@@ -29,8 +29,10 @@ import rearth.oritech.fabricgen.datagen.compat.EnergizedPowerRecipeGenerator;
 import rearth.oritech.fabricgen.datagen.compat.MythicMetalsRecipeGenerator;
 import rearth.oritech.fabricgen.datagen.compat.TechRebornRecipeGenerator;
 import rearth.oritech.init.*;
+import rearth.oritech.init.recipes.AugmentRecipe;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.util.SizedIngredient;
 import techreborn.TechReborn;
 import wraith.alloyforgery.AlloyForgery;
 
@@ -65,6 +67,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addLaserTransformations(exporter);
         addUraniumProcessing(exporter);
         addReactorBlocks(exporter);
+        addAugmentRecipes(exporter);
         
         TechRebornRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(TechReborn.MOD_ID))));
         EnergizedPowerRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(EnergizedPowerMod.MODID))));
@@ -755,6 +758,25 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addCompactingRecipe(exporter, ItemContent.PLUTONIUM_PELLET, ItemContent.SMALL_PLUTONIUM_PELLET, of(ItemContent.SMALL_PLUTONIUM_PELLET), of(ItemContent.PLUTONIUM_PELLET));
     }
     
+    private void addAugmentRecipes(RecipeExporter exporter) {
+        
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "hpboost");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.COPPER_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "speedboost");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(TagContent.NICKEL_INGOTS)), new SizedIngredient(4, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "hpboostmore");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.DIAMOND_GEMS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "dwarf");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "giant");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "autofeeder");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "armor");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "flight");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "cloak");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "portal");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "nightvision");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "waterbreath");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "magnet");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), 10, "orefinder");
+        
+    }
+    
     private void addReactorBlocks(RecipeExporter exporter) {
         
         // single rod
@@ -988,6 +1010,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
     private void addLaserRecipe(RecipeExporter exporter, Ingredient input, ItemConvertible output, String suffix) {
         var entry = new OritechRecipe(1, List.of(input), List.of(new ItemStack(output)), RecipeContent.LASER, null, null);
         exporter.accept(Oritech.id("laser/" + suffix), entry, null);
+    }
+    
+    private void addAugmentRecipe(RecipeExporter exporter, List<SizedIngredient> inputs, int time, String id) {
+        var entry = new AugmentRecipe(RecipeContent.AUGMENT, inputs, time);
+        exporter.accept(Oritech.id(id), entry, null);
     }
     
     private void addMetalProcessingChain(RecipeExporter exporter, Ingredient oreInput, Ingredient rawOre, Item rawMain, Item rawSecondary, Item clump, Item smallClump,

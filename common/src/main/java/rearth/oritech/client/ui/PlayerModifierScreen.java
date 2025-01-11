@@ -8,9 +8,13 @@ import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -19,9 +23,12 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.PlayerModifierTestEntity;
+import rearth.oritech.init.recipes.AugmentRecipe;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.SizedIngredient;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, PlayerModifierScreenHandler> {
     
@@ -97,6 +104,15 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             var operation = AugmentOperation.RESEARCH;
             var tooltipTitleText = Text.translatable("oritech.text.augment." + augmentId.getPath()).formatted(Formatting.BOLD);
             var tooltipOperation = "oritech.text.augment_op.research";
+            var tooltipDesc = Text.translatable("oritech.text.augment." + augmentId.getPath() + ".desc").formatted(Formatting.ITALIC, Formatting.GRAY);
+            
+            var extraTooltips = new ArrayList<Text>();
+            for (int i = 1; i < 8; i++) {
+                var key = "oritech.text.augment." + augmentId.getPath() + ".desc." + i;
+                if (I18n.hasTranslation(key))
+                    extraTooltips.add(Text.translatable(key));
+            }
+            
             if (isApplied) {
                 operation = AugmentOperation.REMOVE;
                 tooltipOperation = "oritech.text.augment_op.remove";
@@ -107,7 +123,13 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             
             var lastOp = augmentState.openOp;
             if (operation != lastOp) {
-                System.out.println("changing state of: " + augmentId);
+                
+                var collectedTooltip = new ArrayList<TooltipComponent>();
+                Stream.of(tooltipTitleText, Text.literal(""), Text.translatable(tooltipOperation), Text.literal(""), tooltipDesc)
+                  .map(elem -> TooltipComponent.of(elem.asOrderedText()))
+                  .forEach(collectedTooltip::add);
+                
+                extraTooltips.stream().map(elem -> TooltipComponent.of(elem.asOrderedText())).forEach(collectedTooltip::add);
                 
                 var backgroundTexture = Oritech.id("textures/gui/augments/background_open.png");
                 
@@ -115,9 +137,18 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
                     backgroundTexture = Oritech.id("textures/gui/augments/background_installed.png");
                 } else if (isResearched) {
                     backgroundTexture = Oritech.id("textures/gui/augments/background_completed.png");
+                } else {
+                    // collect requirements / cost
+                    var recipe = (AugmentRecipe) this.handler.player.getWorld().getRecipeManager().get(augmentId).get().value();
+                    var inputs = recipe.getInputs();
+                    var time = recipe.getTime();
+                    
+                    collectedTooltip.add(TooltipComponent.of(Text.translatable("oritech.text.augment_research_time: %s", time).asOrderedText()));
+                    var inputsComponent = new SizedIngredientTooltipComponent(inputs);
+                    collectedTooltip.add(inputsComponent);
                 }
                 
-                augmentState.icon.tooltip(List.of(tooltipTitleText, Text.translatable(tooltipOperation)));
+                augmentState.icon.tooltip(collectedTooltip);
                 
                 var scrollPanel = (DraggableScrollContainer<?>) augmentState.parent.parent();
                 var scrollOffset = (int) scrollPanel.getScrollPosition();
@@ -134,7 +165,6 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             }
             
             if (!hasRequirements && augmentState.blocker == null) {
-                System.out.println("adding blocker to: " + augmentId);
                 
                 var blocker = Components.box(Sizing.fixed(augmentIconSize), Sizing.fixed(augmentIconSize));
                 blocker.color(new Color(0.3f, 0.4f, 0.4f, 0.8f));
@@ -330,6 +360,53 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             return currentScrollPosition;
         }
         
+    }
+    
+    public static class SizedIngredientTooltipComponent implements TooltipComponent {
+        
+        private final List<SizedIngredient> items;
+        private final int size = 16;
+        private final int spacing = 3;
+        
+        public SizedIngredientTooltipComponent(List<SizedIngredient> items) {
+            this.items = items;
+        }
+        
+        
+        @Override
+        public int getHeight() {
+            return size + spacing + 5;
+        }
+        
+        @Override
+        public int getWidth(TextRenderer textRenderer) {
+            return (size + spacing) * items.size();
+        }
+        
+        @Override
+        public void drawItems(TextRenderer textRenderer, int x, int y, DrawContext context) {
+            context.push();
+            // context.getMatrices().translate(0, spacing, 0);
+            
+            for (int i = 0; i < items.size(); i++) {
+                var ingredient = items.get(i);
+                var stack = Arrays.stream(ingredient.ingredient().getMatchingStacks()).findFirst().get();
+                stack = new ItemStack(stack.getItem(), ingredient.count());
+                
+                var itemX = x + (size + spacing) * i;
+                var itemY = y + spacing;
+                
+                context.drawItem(stack, itemX, itemY);
+                
+                if (stack.getCount() > 1) {
+                    context.getMatrices().translate(0, 0, 200);
+                    context.drawText(textRenderer, String.valueOf(stack.getCount()), itemX + 19 - 2 - textRenderer.getWidth(String.valueOf(stack.getCount())), itemY + 6 + 3, 16777215, true);
+                }
+                
+            }
+            
+            context.pop();
+        }
     }
     
 }

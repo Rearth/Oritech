@@ -1,0 +1,18 @@
+{
+  "type": "oritech:augment",
+  "inputs": [
+    {
+      "count": 32,
+      "ingredient": {
+        "tag": "c:ingots/nickel"
+      }
+    },
+    {
+      "count": 4,
+      "ingredient": {
+        "item": "oritech:overcharged_crystal"
+      }
+    }
+  ],
+  "time": 10
+}

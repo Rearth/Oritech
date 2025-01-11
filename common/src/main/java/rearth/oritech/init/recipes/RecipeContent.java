@@ -21,4 +21,7 @@ public class RecipeContent implements ArchitecturyRecipeRegistryContainer {
     public static final OritechRecipeType COOLER = new OritechRecipeType(Oritech.id("cooler"));
     public static final OritechRecipeType REACTOR = new OritechRecipeType(Oritech.id("reactor"));
     public static final OritechRecipeType LASER = new OritechRecipeType(Oritech.id("laser"));
+    
+    public static final AugmentRecipeType AUGMENT = new AugmentRecipeType(Oritech.id("augment"));
+    
 }

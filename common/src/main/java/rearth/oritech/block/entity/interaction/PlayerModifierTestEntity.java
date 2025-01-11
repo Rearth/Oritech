@@ -71,7 +71,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     // working state
-    private boolean networkDirty = false;
+    private boolean networkDirty = true;
     
     public PlayerModifierTestEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PLAYER_MODIFIER_BLOCK_ENTITY, pos, state);
@@ -79,10 +79,6 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, PlayerModifierTestEntity blockEntity) {
-        
-        if (allAugments.isEmpty()) {
-            loadAugments(); // this is loaded on both client and server to allow the UI to read the list without having to sync it
-        }
         
         if (world.isClient) return;
         

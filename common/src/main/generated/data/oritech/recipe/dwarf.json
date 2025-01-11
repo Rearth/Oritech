@@ -1,0 +1,17 @@
+{
+  "type": "oritech:augment",
+  "inputs": [
+    {
+      "count": 32,
+      "ingredient": {
+        "tag": "c:gems/diamond"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "oritech:overcharged_crystal"
+      }
+    }
+  ],
+  "time": 10
+}
