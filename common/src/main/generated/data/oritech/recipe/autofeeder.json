@@ -1,6 +1,14 @@
 {
   "type": "oritech:augment",
-  "inputs": [
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": {
+        "tag": "c:dusts/coal"
+      }
+    }
+  ],
+  "researchCost": [
     {
       "count": 32,
       "ingredient": {

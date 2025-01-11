@@ -16,7 +16,8 @@ public class AugmentRecipeType extends EndecRecipeSerializer<AugmentRecipe> impl
     
     public static final Endec<AugmentRecipe> AUGMENT_RECIPE_ENDEC = StructEndecBuilder.of(
       MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (AugmentRecipeType) Registries.RECIPE_TYPE.get(identifier1), AugmentRecipeType::getIdentifier).fieldOf("type", AugmentRecipe::getOriType),
-      CodecUtils.toEndec(SizedIngredient.CODEC.codec()).listOf().fieldOf("inputs", AugmentRecipe::getInputs),
+      CodecUtils.toEndec(SizedIngredient.CODEC.codec()).listOf().fieldOf("researchCost", AugmentRecipe::getResearchCost),
+      CodecUtils.toEndec(SizedIngredient.CODEC.codec()).listOf().fieldOf("applyCost", AugmentRecipe::getApplyCost),
       Endec.INT.optionalFieldOf("time", AugmentRecipe::getTime, 60),
       AugmentRecipe::new
     );

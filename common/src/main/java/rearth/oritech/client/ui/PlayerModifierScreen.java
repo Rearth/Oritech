@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, PlayerModifierScreenHandler> {
     
     private static DraggableScrollContainer<FlowLayout> main;
+    private static FlowLayout root;
     private static final HashMap<String, Pair<Vector2i, Vector2i>> dependencyLines = new HashMap<>();
     private static final HashMap<Identifier, AugmentUiState> shownAugments = new HashMap<>();
     private final Set<BoxComponent> highlighters = new HashSet<>();
@@ -55,6 +56,8 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
           .horizontalAlignment(HorizontalAlignment.CENTER)
           .verticalAlignment(VerticalAlignment.CENTER);
         
+        root = rootComponent;
+        
         dependencyLines.clear();
         
         var outerContainer = Containers.horizontalFlow(Sizing.fill(60), Sizing.fill(80));
@@ -74,6 +77,24 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         outerContainer.child(innerContainer);
         
         addAvailableAugments(movedPanel);
+        
+        var startY = this.height * 0.9 - 10;
+        var startX = this.width * 0.2 + 15;
+        
+        var belowPanel = Containers.horizontalFlow(Sizing.content(2), Sizing.content(3));
+        belowPanel.surface(Surface.PANEL);
+        belowPanel.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
+        var belowPanelInner = Containers.horizontalFlow(Sizing.content(2), Sizing.content(3));
+        belowPanelInner.surface(Surface.PANEL_INSET);
+        belowPanelInner.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
+        belowPanelInner.margins(Insets.of(4));
+        var loadResearchedAugments = Components.button(Text.translatable("text.oritech.load_augments"), elem -> onLoadAugmentsClick());
+        loadResearchedAugments.tooltip(Text.translatable("text.oritech.load_augments.tooltip"));
+        loadResearchedAugments.margins(Insets.of(4));
+        
+        belowPanelInner.child(loadResearchedAugments.zIndex(-1));
+        belowPanel.child(belowPanelInner.zIndex(-1));
+        root.child(belowPanel.positioning(Positioning.absolute((int) startX, (int) startY)).zIndex(-1));
         
     }
     
@@ -140,7 +161,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
                 } else {
                     // collect requirements / cost
                     var recipe = (AugmentRecipe) this.handler.player.getWorld().getRecipeManager().get(augmentId).get().value();
-                    var inputs = recipe.getInputs();
+                    var inputs = recipe.getResearchCost();
                     var time = recipe.getTime();
                     
                     collectedTooltip.add(TooltipComponent.of(Text.translatable("oritech.text.augment_research_time: %s", time).asOrderedText()));
@@ -220,7 +241,10 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             final var augmentOpId = augmentId;
             
             var icon = Components.texture(iconTexture, 0, 0, 32, 32, 32, 32);
-            icon.mouseDown().subscribe((a, b, c) -> {triggerAugmentOperation(augmentOpId, shownAugments.get(augmentOpId).openOp); return true;});
+            icon.mouseDown().subscribe((a, b, c) -> {
+                onAugmentClick(augmentOpId, shownAugments.get(augmentOpId).openOp, false);
+                return true;
+            });
             icon.sizing(Sizing.fixed(augmentIconSize), Sizing.fixed(augmentIconSize));
             icon.positioning(Positioning.absolute(position.x - augmentIconSize / 2, position.y - augmentIconSize / 2));
             
@@ -252,9 +276,113 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
     }
     
-    private void triggerAugmentOperation(Identifier id, AugmentOperation operation) {
+    private void onAugmentClick(Identifier id, AugmentOperation operation, boolean confirmed) {
+        
+        if (!confirmed) {
+            showAugmentDialog(id, operation);
+            return;
+        }
+        
         var operationId = operation.ordinal();
         NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.AugmentInstallTriggerPacket(this.handler.blockPos, id, operationId));
+    }
+    
+    private void onLoadAugmentsClick() {
+        NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.LoadPlayerAugmentsToMachinePacket(this.handler.blockPos));
+        
+        var loadedAugmentsCount = 0;
+        for (var augmentId : PlayerModifierTestEntity.allAugments.keySet()) {
+            var augment = PlayerModifierTestEntity.allAugments.get(augmentId);
+            var isResearched = this.handler.blockEntity.researchedAugments.contains(augmentId);
+            var isInstalled = augment.isInstalled(handler.player);
+            
+            if (isInstalled && !isResearched) {
+                loadedAugmentsCount ++;
+            }
+        }
+        
+        this.handler.player.sendMessage(Text.translatable("text.oritech.loaded_augments %s", loadedAugmentsCount));
+        this.close();
+        
+    }
+    
+    private void showAugmentDialog(Identifier id, AugmentOperation operation) {
+        
+        var researchRecipe = (AugmentRecipe) this.handler.blockEntity.getWorld().getRecipeManager().get(id).get().value();
+        
+        var hasResources = true;
+        
+        var panel = Containers.verticalFlow(Sizing.fixed(250), Sizing.content(1));
+        panel.padding(Insets.of(5));
+        panel.surface(Surface.PANEL);
+        panel.horizontalAlignment(HorizontalAlignment.CENTER);
+        
+        var descriptionPanel = Containers.verticalFlow(Sizing.fill(100), Sizing.content(3));
+        descriptionPanel.surface(Surface.PANEL_INSET);
+        descriptionPanel.padding(Insets.of(3, 0, 3, 3));
+        descriptionPanel.margins(Insets.of(4));
+        
+        var overlay = Containers.overlay(panel);
+        
+        var titleLabel = Components.label(Text.translatable("oritech.text.augment." + id.getPath()).formatted(Formatting.BOLD, Formatting.BLACK));
+        titleLabel.margins(Insets.of(3, 1, 0, 0));
+        
+        descriptionPanel.child(Components.label(Text.translatable("oritech.text.augment." + id.getPath() + ".desc").formatted(Formatting.ITALIC, Formatting.GRAY)));
+        for (int i = 1; i < 8; i++) {
+            var key = "oritech.text.augment." + id.getPath() + ".desc." + i;
+            if (I18n.hasTranslation(key))
+                descriptionPanel.child(Components.label(Text.translatable(key).formatted(Formatting.ITALIC, Formatting.GRAY)));
+                
+        }
+        
+        if (!operation.equals(AugmentOperation.REMOVE)) {
+            descriptionPanel.child(Components.label(Text.translatable("oritech.text.time: %s", researchRecipe.getTime()).formatted(Formatting.GRAY)).margins(Insets.of(4, 0, 0, 0)));
+            descriptionPanel.child(Components.label(Text.translatable("oritech.text.resource_cost").formatted(Formatting.GRAY)).margins(Insets.of(4, 0, 0, 0)));
+            
+            var itemContainer = Containers.horizontalFlow(Sizing.fill(100), Sizing.content(1));
+            var shownCost = researchRecipe.getResearchCost();
+            if (operation.equals(AugmentOperation.ADD))
+                shownCost = researchRecipe.getApplyCost();
+            
+            for (var input : shownCost) {
+                var shownItem = Arrays.stream(input.ingredient().getMatchingStacks()).findFirst().get().getItem();
+                var shownStack = new ItemStack(shownItem, input.count());
+                
+                var shown = Components.item(shownStack).showOverlay(true).setTooltipFromStack(true);
+                itemContainer.child(shown.margins(Insets.of(2)));
+            }
+            descriptionPanel.child(itemContainer);
+        }
+        
+        var buttonPanel = Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(26));
+        buttonPanel.margins(Insets.of(2, 0, 4, 4));
+        buttonPanel.horizontalAlignment(HorizontalAlignment.RIGHT);
+        
+        var confirmKey = "text.oritech.begin_research";
+        if (operation.equals(AugmentOperation.ADD)) {
+            confirmKey = "text.oritech.install";
+        } else if (operation.equals(AugmentOperation.REMOVE)){
+            confirmKey = "text.oritech.remove";
+        }
+        
+        var cancelButton = Components.button(Text.translatable("text.oritech.cancel"), component -> overlay.remove());
+        var confirmButton = Components.button(Text.translatable(confirmKey), component -> {
+            onAugmentClick(id, operation, true);
+            overlay.remove();
+        });
+        
+        buttonPanel.child(cancelButton.margins(Insets.of(2)));
+        buttonPanel.child(confirmButton.margins(Insets.of(2, 2, 2, 0)));
+        
+        confirmButton.active(hasResources);
+        
+        panel.child(titleLabel);
+        panel.child(descriptionPanel);
+        panel.child(buttonPanel);
+        
+        overlay.zIndex(100);
+        root.child(overlay);
+        
     }
     
     public enum AugmentOperation {

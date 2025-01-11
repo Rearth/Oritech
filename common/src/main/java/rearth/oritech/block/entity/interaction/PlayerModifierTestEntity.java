@@ -124,7 +124,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         var speedBoost = new PlayerStatEnhancingAugment(Oritech.id("speedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5f, EntityAttributeModifier.Operation.ADD_VALUE, true);
         var dwarf = new PlayerStatEnhancingAugment(Oritech.id("dwarf"), EntityAttributes.GENERIC_SCALE, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
         var giant = new PlayerStatEnhancingAugment(Oritech.id("giant"), EntityAttributes.GENERIC_SCALE, 2f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
-        var armor = new PlayerStatEnhancingAugment(Oritech.id("armor"), EntityAttributes.GENERIC_ARMOR, 0.5f, EntityAttributeModifier.Operation.ADD_VALUE, true);
+        var armor = new PlayerStatEnhancingAugment(Oritech.id("armor"), EntityAttributes.GENERIC_ARMOR, 4f, EntityAttributeModifier.Operation.ADD_VALUE);
         
         var flight = new PlayerCustomAugment(Oritech.id("flight")) {
             @Override
@@ -512,18 +512,21 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         
     }
     
-    public void onPlayerLocked(PlayerEntity player) {
+    public void loadResearchesFromPlayer(PlayerEntity player) {
         
         for (var augmentId : allAugments.keySet()) {
             var augment = allAugments.get(augmentId);
             var isInstalled = augment.isInstalled(player);
-            System.out.println(augmentId + ": " + isInstalled);
+            var isResearched = researchedAugments.contains(augmentId);
+            
+            if (isInstalled && !isResearched) {
+                researchedAugments.add(augmentId);
+            }
         }
-        
     }
     
+    // todo remove this debug
     public void onUse(PlayerEntity player) {
-        onPlayerLocked(player);
         
         if (player.isSneaking()) {
             System.out.println("resetting all augments!");

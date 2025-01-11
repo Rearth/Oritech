@@ -135,6 +135,9 @@ public class NetworkContent {
     public record AugmentInstallTriggerPacket(BlockPos position, Identifier id, int operationId) {
     }
     
+    public record LoadPlayerAugmentsToMachinePacket(BlockPos position) {
+    }
+    
     public record AugmentPlayerTogglePacket(Identifier id) {
     }
     
@@ -645,6 +648,15 @@ public class NetworkContent {
                         modifierEntity.removeAugmentFromPlayer(message.id, player);
                     }
                 }
+            }
+        });
+        
+        UI_CHANNEL.registerServerbound(LoadPlayerAugmentsToMachinePacket.class, (message, access) -> {
+            var player = access.player();
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            
+            if (entity instanceof PlayerModifierTestEntity modifierEntity) {
+                modifierEntity.loadResearchesFromPlayer(player);
             }
         });
         

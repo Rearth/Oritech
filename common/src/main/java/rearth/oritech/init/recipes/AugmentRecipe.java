@@ -16,14 +16,16 @@ import java.util.List;
 public class AugmentRecipe implements Recipe<RecipeInput> {
     
     private final AugmentRecipeType type;
-    private final List<SizedIngredient> inputs;
+    private final List<SizedIngredient> researchCost;
+    private final List<SizedIngredient> applyCost;
     private final int time;
 
-    public static final AugmentRecipe DUMMY = new AugmentRecipe(RecipeContent.AUGMENT, List.of(new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_DUSTS))), -1);
+    public static final AugmentRecipe DUMMY = new AugmentRecipe(RecipeContent.AUGMENT, List.of(new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_DUSTS))), List.of(new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_DUSTS))), -1);
     
-    public AugmentRecipe(AugmentRecipeType type, List<SizedIngredient> inputs, int time) {
+    public AugmentRecipe(AugmentRecipeType type, List<SizedIngredient> inputs, List<SizedIngredient> applyCost, int time) {
         this.type = type;
-        this.inputs = inputs;
+        this.researchCost = inputs;
+        this.applyCost = applyCost;
         this.time = time;
     }
     
@@ -61,8 +63,12 @@ public class AugmentRecipe implements Recipe<RecipeInput> {
         return type;
     }
     
-    public List<SizedIngredient> getInputs() {
-        return inputs;
+    public List<SizedIngredient> getResearchCost() {
+        return researchCost;
+    }
+    
+    public List<SizedIngredient> getApplyCost() {
+        return applyCost;
     }
     
     public int getTime() {
@@ -73,7 +79,7 @@ public class AugmentRecipe implements Recipe<RecipeInput> {
     public String toString() {
         return "AugmentRecipe{" +
                  "type=" + type +
-                 ", inputs=" + inputs +
+                 ", inputs=" + researchCost +
                  ", time=" + time +
                  '}';
     }
