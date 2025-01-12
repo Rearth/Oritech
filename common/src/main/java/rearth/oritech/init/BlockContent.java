@@ -20,6 +20,7 @@ import rearth.oritech.block.blocks.addons.MachineAddonBlock.AddonSettings;
 import rearth.oritech.block.blocks.addons.RedstoneAddonBlock;
 import rearth.oritech.block.blocks.addons.SteamBoilerAddonBlock;
 import rearth.oritech.block.blocks.arcane.*;
+import rearth.oritech.block.blocks.augmenter.PlayerModifierTestBlock;
 import rearth.oritech.block.blocks.decorative.*;
 import rearth.oritech.block.blocks.generators.*;
 import rearth.oritech.block.blocks.interaction.*;

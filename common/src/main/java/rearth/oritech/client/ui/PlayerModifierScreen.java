@@ -22,7 +22,7 @@ import net.minecraft.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.interaction.PlayerModifierTestEntity;
+import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.init.recipes.AugmentRecipe;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.SizedIngredient;
@@ -104,7 +104,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
         for (var augmentId : shownAugments.keySet()) {
             var augmentState = shownAugments.get(augmentId);
-            var uiData = PlayerModifierTestEntity.augmentAssets.get(augmentId);
+            var uiData = PlayerAugments.augmentAssets.get(augmentId);
             
             var isResearched = this.handler.blockEntity.researchedAugments.contains(augmentId);
             var isApplied = this.handler.blockEntity.hasPlayerAugment(augmentId, this.handler.player);
@@ -230,8 +230,8 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         var maxHeight = this.height * 0.7f;
         var leftOffset = 20;
         
-        for (var augmentId : PlayerModifierTestEntity.allAugments.keySet()) {
-            var uiData = PlayerModifierTestEntity.augmentAssets.get(augmentId);
+        for (var augmentId : PlayerAugments.allAugments.keySet()) {
+            var uiData = PlayerAugments.augmentAssets.get(augmentId);
             
             var position = new Vector2i(leftOffset + uiData.position().x * 4, (int) (uiData.position().y / 100f * maxHeight));
             
@@ -257,7 +257,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             highlight.positioning(Positioning.absolute(position.x - backgroundAugmentFrameSize / 2 - 1, position.y - backgroundAugmentFrameSize / 2 - 1));
             
             for (var dependencyId : uiData.requirements()) {
-                var dependency = PlayerModifierTestEntity.augmentAssets.get(dependencyId);
+                var dependency = PlayerAugments.augmentAssets.get(dependencyId);
                 var dependencyPos = new Vector2i(leftOffset + dependency.position().x * 4, (int) (dependency.position().y / 100f * maxHeight));
                 
                 var depId = augmentId.getPath() + "_" + dependencyId.getPath();
@@ -291,8 +291,8 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.LoadPlayerAugmentsToMachinePacket(this.handler.blockPos));
         
         var loadedAugmentsCount = 0;
-        for (var augmentId : PlayerModifierTestEntity.allAugments.keySet()) {
-            var augment = PlayerModifierTestEntity.allAugments.get(augmentId);
+        for (var augmentId : PlayerAugments.allAugments.keySet()) {
+            var augment = PlayerAugments.allAugments.get(augmentId);
             var isResearched = this.handler.blockEntity.researchedAugments.contains(augmentId);
             var isInstalled = augment.isInstalled(handler.player);
             

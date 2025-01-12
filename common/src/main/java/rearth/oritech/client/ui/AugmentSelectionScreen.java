@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import rearth.oritech.OritechClient;
-import rearth.oritech.block.entity.interaction.PlayerModifierTestEntity;
+import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.network.NetworkContent;
 
 import java.util.ArrayList;
@@ -214,9 +214,9 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         
         var player = Objects.requireNonNull(this.client).player;
         
-        var augmentsToAdd = new ArrayList<PlayerModifierTestEntity.PlayerAugment>();
+        var augmentsToAdd = new ArrayList<PlayerAugments.PlayerAugment>();
         
-        for (var augment : PlayerModifierTestEntity.allAugments.values()) {
+        for (var augment : PlayerAugments.allAugments.values()) {
             var isInstalled = augment.isInstalled(player);
             var isToggleable = augment.toggleable;
             

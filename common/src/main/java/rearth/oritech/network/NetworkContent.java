@@ -22,6 +22,7 @@ import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
+import rearth.oritech.block.entity.augmenter.PlayerModifierTestEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.interaction.*;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;

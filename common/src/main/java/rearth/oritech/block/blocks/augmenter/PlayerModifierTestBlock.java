@@ -1,4 +1,4 @@
-package rearth.oritech.block.blocks.interaction;
+package rearth.oritech.block.blocks.augmenter;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
@@ -23,7 +23,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.entity.interaction.PlayerModifierTestEntity;
+import rearth.oritech.block.entity.augmenter.PlayerModifierTestEntity;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;

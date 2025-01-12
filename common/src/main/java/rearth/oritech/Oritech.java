@@ -15,7 +15,7 @@ import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
 import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
-import rearth.oritech.block.entity.interaction.PlayerModifierTestEntity;
+import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -53,10 +53,10 @@ public final class Oritech {
         ServerTickEvents.END_SERVER_TICK.register(elem -> AcceleratorParticleLogic.onTickEnd());
         
         // for player augment modifiers
-        ServerPlayConnectionEvents.JOIN.register(((handler, sender, server) -> PlayerModifierTestEntity.refreshPlayerAugments(handler.player)));
+        ServerPlayConnectionEvents.JOIN.register(((handler, sender, server) -> PlayerAugments.refreshPlayerAugments(handler.player)));
         
         // for player augment ticks
-        ServerTickEvents.START_WORLD_TICK.register(event -> event.getPlayers().forEach(PlayerModifierTestEntity::serverTickAugments));
+        ServerTickEvents.START_WORLD_TICK.register(event -> event.getPlayers().forEach(PlayerAugments::serverTickAugments));
     }
     
     public static void runAllRegistries() {

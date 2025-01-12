@@ -13,6 +13,7 @@ import rearth.oritech.block.entity.addons.*;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
+import rearth.oritech.block.entity.augmenter.PlayerModifierTestEntity;
 import rearth.oritech.block.entity.decorative.TechDoorBlockEntity;
 import rearth.oritech.block.entity.generators.*;
 import rearth.oritech.block.entity.interaction.*;
