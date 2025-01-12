@@ -1,11 +1,14 @@
 package rearth.oritech.block.entity.augmenter;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.Properties;
@@ -17,14 +20,18 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.base.block.MultiblockMachine;
+import rearth.oritech.block.blocks.augmenter.AugmenterResearchStationBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
+import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -32,11 +39,19 @@ import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-public class PlayerModifierTestEntity extends BlockEntity implements BlockEntityTicker<PlayerModifierTestEntity>, MultiblockMachineController, GeoBlockEntity, ExtendedScreenHandlerFactory {
+public class PlayerModifierTestEntity extends BlockEntity implements BlockEntityTicker<PlayerModifierTestEntity>, MultiblockMachineController, GeoBlockEntity, ExtendedScreenHandlerFactory, InventoryProvider, EnergyApi.BlockProvider {
     
     public final Set<Identifier> researchedAugments = new HashSet<>();
+    
+    // config
+    public static long maxEnergyTransfer = 50_000;
+    public static long maxEnergyStored = 5_000_000;
+    public static long energyUsageRate = 2048;
     
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
@@ -47,6 +62,17 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     
     // working state
     private boolean networkDirty = true;
+    private final List<Block> availableStations = new ArrayList<>();
+    
+    private final EnergyApi.EnergyContainer energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, 0, maxEnergyStored, this::markDirty);
+    
+    public final SimpleInventory inventory = new SimpleInventory(4) {
+        @Override
+        public void markDirty() {
+            PlayerModifierTestEntity.this.markDirty();
+        }
+    };
+    private final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     public PlayerModifierTestEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PLAYER_MODIFIER_BLOCK_ENTITY, pos, state);
@@ -169,6 +195,26 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         
     }
     
+    public void loadAvailableStations(PlayerEntity player) {
+        var facing = this.getCachedState().get(Properties.HORIZONTAL_FACING);
+        
+        var targetPositions = List.of(
+          new BlockPos(0, 0, -2),
+          new BlockPos(1, 0, 2),
+          new BlockPos(2, 0, -1)
+        );
+        
+        for (var candidatePosOffset : targetPositions) {
+            var candidatePos = new BlockPos(Geometry.offsetToWorldPosition(facing, candidatePosOffset, pos));
+            
+            var candidateState = world.getBlockState(candidatePos);
+            if (!(candidateState.getBlock() instanceof AugmenterResearchStationBlock)) continue;
+            if (!candidateState.get(MultiblockMachine.ASSEMBLED)) continue;
+            availableStations.add(candidateState.getBlock());
+        }
+        
+    }
+    
     private void markNetDirty() {
         this.networkDirty = true;
     }
@@ -178,6 +224,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         
         // collect researched augments, send them to client
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AugmentResearchList(pos, researchedAugments.stream().toList()));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.getAmount(), energyStorage.getCapacity()));
     }
     
     @Override
@@ -229,12 +276,18 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     
     @Override
     public InventoryProvider getInventoryForLink() {
-        return null;
+        return this;
     }
     
     @Override
     public EnergyApi.EnergyContainer getEnergyStorageForLink() {
-        return null;
+        return energyStorage;
+    }
+    
+    @Override
+    public void markDirty() {
+        super.markDirty();
+        this.markNetDirty();
     }
     
     @Override
@@ -270,4 +323,13 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         return new PlayerModifierScreenHandler(syncId, playerInventory, this);
     }
     
+    @Override
+    public InventoryStorage getInventory(Direction direction) {
+        return inventoryStorage;
+    }
+    
+    @Override
+    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+        return energyStorage;
+    }
 }

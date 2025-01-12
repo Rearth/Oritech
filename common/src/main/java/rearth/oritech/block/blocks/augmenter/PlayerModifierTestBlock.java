@@ -27,6 +27,7 @@ import rearth.oritech.block.entity.augmenter.PlayerModifierTestEntity;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
+import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -115,8 +116,9 @@ public class PlayerModifierTestBlock extends HorizontalFacingBlock implements Bl
             if (ageWithoutContact > 15) {
                 var locked = lockPlayer(player, centerPos, state);
                 if (locked) {
-                    var handler = (PlayerModifierTestEntity) world.getBlockEntity(pos);
-                    player.openHandledScreen(handler);
+                    var blockEntity = (PlayerModifierTestEntity) world.getBlockEntity(pos);
+                    blockEntity.loadAvailableStations(player);
+                    player.openHandledScreen(blockEntity);
                 }
             }
         }
@@ -178,6 +180,20 @@ public class PlayerModifierTestBlock extends HorizontalFacingBlock implements Bl
         }
         
         return ActionResult.SUCCESS;
+    }
+    
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        
+        if (!world.isClient() && state.get(ASSEMBLED)) {
+            
+            var entity = world.getBlockEntity(pos);
+            if (entity instanceof MultiblockMachineController machineEntity) {
+                machineEntity.onControllerBroken();
+            }
+        }
+        
+        return super.onBreak(world, pos, state, player);
     }
     
     @Nullable

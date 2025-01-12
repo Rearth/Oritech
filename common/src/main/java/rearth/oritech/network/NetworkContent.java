@@ -38,6 +38,7 @@ import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 
 import java.util.List;
 import java.util.Map;
@@ -261,6 +262,8 @@ public class NetworkContent {
             if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getStorage(null) instanceof DynamicEnergyStorage storage) {
                 storage.capacity = message.maxEnergy;
                 storage.amount = message.currentEnergy;
+            } else if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getStorage(null) instanceof SimpleEnergyStorage storage) {
+                storage.setAmount(message.currentEnergy);
             }
             
         }));

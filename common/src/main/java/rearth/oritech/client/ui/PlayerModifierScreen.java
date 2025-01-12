@@ -23,12 +23,16 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
+import rearth.oritech.block.entity.augmenter.PlayerModifierTestEntity;
 import rearth.oritech.init.recipes.AugmentRecipe;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.SizedIngredient;
 
 import java.util.*;
 import java.util.stream.Stream;
+
+import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
+import static rearth.oritech.client.ui.BasicMachineScreen.getEnergyTooltip;
 
 public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, PlayerModifierScreenHandler> {
     
@@ -39,6 +43,9 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
     private final Set<BoxComponent> highlighters = new HashSet<>();
     private final int backgroundAugmentFrameSize = 32;
     private final int augmentIconSize = 24;
+    
+    private static final float panelHeight = 0.8f;
+    private TextureComponent energyIndicator;
     
     public PlayerModifierScreen(PlayerModifierScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -60,7 +67,9 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
         dependencyLines.clear();
         
-        var outerContainer = Containers.horizontalFlow(Sizing.fill(60), Sizing.fill(80));
+        var combinedInvPanel = Containers.verticalFlow(Sizing.content(), Sizing.content());
+        
+        var outerContainer = Containers.horizontalFlow(Sizing.fill(60), Sizing.fill((int) (panelHeight * 100)));
         outerContainer.surface(Surface.PANEL);
         
         var movedPanel = Containers.horizontalFlow(Sizing.fixed(800), Sizing.fill());
@@ -73,28 +82,58 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         innerContainer.margins(Insets.of(6));
         main = innerContainer;
         
-        rootComponent.child(outerContainer);
+        rootComponent.child(outerContainer.positioning(Positioning.relative(50, 50)));
         outerContainer.child(innerContainer);
         
         addAvailableAugments(movedPanel);
         
-        var startY = this.height * 0.9 - 10;
-        var startX = this.width * 0.2 + 15;
+        var energyPanel = Containers.verticalFlow(Sizing.content(3), Sizing.content(3));
+        energyPanel.surface(Surface.PANEL);
+        energyPanel.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         
-        var belowPanel = Containers.horizontalFlow(Sizing.content(2), Sizing.content(3));
-        belowPanel.surface(Surface.PANEL);
-        belowPanel.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
-        var belowPanelInner = Containers.horizontalFlow(Sizing.content(2), Sizing.content(3));
-        belowPanelInner.surface(Surface.PANEL_INSET);
-        belowPanelInner.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
-        belowPanelInner.margins(Insets.of(4));
-        var loadResearchedAugments = Components.button(Text.translatable("text.oritech.load_augments"), elem -> onLoadAugmentsClick());
+        var loadResearchedAugments = Components.button(Text.translatable("\uD83D\uDD2C"), elem -> onLoadAugmentsClick());
         loadResearchedAugments.tooltip(Text.translatable("text.oritech.load_augments.tooltip"));
-        loadResearchedAugments.margins(Insets.of(4));
+        loadResearchedAugments.margins(Insets.of(2));
         
-        belowPanelInner.child(loadResearchedAugments.zIndex(-1));
-        belowPanel.child(belowPanelInner.zIndex(-1));
-        root.child(belowPanel.positioning(Positioning.absolute((int) startX, (int) startY)).zIndex(-1));
+        var showInventoryButton = Components.button(Text.translatable("\uD83E\uDDF0"), elem -> {
+            combinedInvPanel.positioning(Positioning.relative(50, 50));
+        });
+        showInventoryButton.tooltip(Text.translatable("text.oritech.augments.show_inv"));
+        showInventoryButton.margins(Insets.of(2));
+        
+        var energyPanelX = this.width * 0.2 - 22;
+        var energyPanelY = this.height * 0.3;
+        
+        addEnergyBar(energyPanel);
+        energyPanel.child(loadResearchedAugments.horizontalSizing(Sizing.fixed(18)));
+        energyPanel.child(showInventoryButton.horizontalSizing(Sizing.fixed(18)));
+        root.child(energyPanel.positioning(Positioning.absolute((int) energyPanelX, (int) energyPanelY)).zIndex(-1));
+        
+        // todo item slot textures
+        var inventoryPanel = Containers.grid(Sizing.content(0), Sizing.content(0), 4, 9);
+        inventoryPanel.surface(Surface.PANEL);
+        for (int i = 0; i < 4 * 9; i++) {
+            var row = i / 9;
+            var column = i % 9;
+            var slot = slotAsComponent(i);
+            slot.margins(Insets.of(2));
+            inventoryPanel.child(slot.zIndex(211), row, column);
+        }
+        
+        var machineInvPanel = Containers.horizontalFlow(Sizing.content(0), Sizing.content(0));
+        machineInvPanel.surface(Surface.PANEL);
+        machineInvPanel.margins(Insets.of(4, 4, 0, 0));
+        for (int i = 0; i < 2 * 2; i++) {
+            var slot = slotAsComponent(i + 36);
+            slot.margins(Insets.of(2));
+            machineInvPanel.child(slot.zIndex(211));
+        }
+        
+        combinedInvPanel.horizontalAlignment(HorizontalAlignment.CENTER);
+        combinedInvPanel.child(machineInvPanel.padding(Insets.of(6)));
+        combinedInvPanel.child(inventoryPanel.padding(Insets.of(6)));
+        
+        root.child(combinedInvPanel.zIndex(211).positioning(Positioning.relative(-100, 0)));
         
     }
     
@@ -208,6 +247,9 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             
         }
         
+        // update energy bar
+        updateEnergyBar();
+        
     }
     
     @Override
@@ -223,6 +265,18 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         }
         
         super.render(vanillaContext, mouseX, mouseY, delta);
+    }
+    
+    protected void updateEnergyBar() {
+        
+        var capacity = handler.blockEntity.getEnergyStorageForLink().getCapacity();
+        var amount = handler.blockEntity.getEnergyStorageForLink().getAmount();
+        
+        var fillAmount = (float) amount / capacity;
+        var tooltipText = getEnergyTooltip(amount, capacity, (int) PlayerModifierTestEntity.energyUsageRate, (int) PlayerModifierTestEntity.maxEnergyTransfer);
+        
+        energyIndicator.tooltip(tooltipText);
+        energyIndicator.visibleArea(PositionedRectangle.of(0, 96 - ((int) (96 * (fillAmount))), 24, (int) (96 * fillAmount)));
     }
     
     private void addAvailableAugments(FlowLayout parent) {
@@ -297,7 +351,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             var isInstalled = augment.isInstalled(handler.player);
             
             if (isInstalled && !isResearched) {
-                loadedAugmentsCount ++;
+                loadedAugmentsCount++;
             }
         }
         
@@ -332,7 +386,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             var key = "oritech.text.augment." + id.getPath() + ".desc." + i;
             if (I18n.hasTranslation(key))
                 descriptionPanel.child(Components.label(Text.translatable(key).formatted(Formatting.ITALIC, Formatting.GRAY)));
-                
+            
         }
         
         if (!operation.equals(AugmentOperation.REMOVE)) {
@@ -361,7 +415,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         var confirmKey = "text.oritech.begin_research";
         if (operation.equals(AugmentOperation.ADD)) {
             confirmKey = "text.oritech.install";
-        } else if (operation.equals(AugmentOperation.REMOVE)){
+        } else if (operation.equals(AugmentOperation.REMOVE)) {
             confirmKey = "text.oritech.remove";
         }
         
@@ -383,6 +437,32 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         overlay.zIndex(100);
         root.child(overlay);
         
+    }
+    
+    private void addEnergyBar(FlowLayout panel) {
+        
+        var insetSize = 1;
+        var tooltipText = Text.translatable("tooltip.oritech.energy_indicator", 10, 50);
+        
+        var width = 17;
+        var height = 80;
+        
+        var frame = Containers.horizontalFlow(Sizing.fixed(width + insetSize * 2), Sizing.fixed(height + insetSize * 2));
+        frame.surface(Surface.PANEL_INSET);
+        frame.padding(Insets.of(insetSize));
+        panel.child(frame);
+        
+        var indicator_background = Components.texture(GUI_COMPONENTS, 24, 0, 24, 96, 98, 96);
+        indicator_background.sizing(Sizing.fixed(width), Sizing.fixed(height));
+        
+        energyIndicator = Components.texture(GUI_COMPONENTS, 0, 0, 24, (96), 98, 96);
+        energyIndicator.sizing(Sizing.fixed(width), Sizing.fixed(height));
+        energyIndicator.positioning(Positioning.absolute(0, 0));
+        energyIndicator.tooltip(tooltipText);
+        
+        frame
+          .child(indicator_background)
+          .child(energyIndicator);
     }
     
     public enum AugmentOperation {
@@ -469,7 +549,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             if (inScrollBar)
                 this.scrollbaring = true;
             
-            return true;
+            return false;
         }
         
         @Override
