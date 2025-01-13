@@ -67,8 +67,6 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
         dependencyLines.clear();
         
-        var combinedInvPanel = Containers.verticalFlow(Sizing.content(), Sizing.content());
-        
         var outerContainer = Containers.horizontalFlow(Sizing.fill(60), Sizing.fill((int) (panelHeight * 100)));
         outerContainer.surface(Surface.PANEL);
         
@@ -95,45 +93,12 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         loadResearchedAugments.tooltip(Text.translatable("text.oritech.load_augments.tooltip"));
         loadResearchedAugments.margins(Insets.of(2));
         
-        var showInventoryButton = Components.button(Text.translatable("\uD83E\uDDF0"), elem -> {
-            combinedInvPanel.positioning(Positioning.relative(50, 50));
-        });
-        showInventoryButton.tooltip(Text.translatable("text.oritech.augments.show_inv"));
-        showInventoryButton.margins(Insets.of(2));
-        
         var energyPanelX = this.width * 0.2 - 22;
         var energyPanelY = this.height * 0.3;
         
         addEnergyBar(energyPanel);
         energyPanel.child(loadResearchedAugments.horizontalSizing(Sizing.fixed(18)));
-        energyPanel.child(showInventoryButton.horizontalSizing(Sizing.fixed(18)));
         root.child(energyPanel.positioning(Positioning.absolute((int) energyPanelX, (int) energyPanelY)).zIndex(-1));
-        
-        // todo item slot textures
-        var inventoryPanel = Containers.grid(Sizing.content(0), Sizing.content(0), 4, 9);
-        inventoryPanel.surface(Surface.PANEL);
-        for (int i = 0; i < 4 * 9; i++) {
-            var row = i / 9;
-            var column = i % 9;
-            var slot = slotAsComponent(i);
-            slot.margins(Insets.of(2));
-            inventoryPanel.child(slot.zIndex(211), row, column);
-        }
-        
-        var machineInvPanel = Containers.horizontalFlow(Sizing.content(0), Sizing.content(0));
-        machineInvPanel.surface(Surface.PANEL);
-        machineInvPanel.margins(Insets.of(4, 4, 0, 0));
-        for (int i = 0; i < 2 * 2; i++) {
-            var slot = slotAsComponent(i + 36);
-            slot.margins(Insets.of(2));
-            machineInvPanel.child(slot.zIndex(211));
-        }
-        
-        combinedInvPanel.horizontalAlignment(HorizontalAlignment.CENTER);
-        combinedInvPanel.child(machineInvPanel.padding(Insets.of(6)));
-        combinedInvPanel.child(inventoryPanel.padding(Insets.of(6)));
-        
-        root.child(combinedInvPanel.zIndex(211).positioning(Positioning.relative(-100, 0)));
         
     }
     

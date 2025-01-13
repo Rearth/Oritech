@@ -164,7 +164,6 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     public static final BlockEntityType<ReactorEnergyPortEntity> REACTOR_ENERGY_PORT_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(ReactorEnergyPortEntity::new, BlockContent.REACTOR_ENERGY_PORT).build();
     public static final BlockEntityType<NuclearExplosionEntity> REACTOR_EXPLOSION_ENTITY = FabricBlockEntityTypeBuilder.create(NuclearExplosionEntity::new, BlockContent.REACTOR_EXPLOSION_SMALL, BlockContent.REACTOR_EXPLOSION_MEDIUM, BlockContent.REACTOR_EXPLOSION_LARGE).build();
     
-    @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<PlayerModifierTestEntity> PLAYER_MODIFIER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(PlayerModifierTestEntity::new, BlockContent.TEST_BLOCK).build();
     public static final BlockEntityType<AugmenterResearchStationBlockEntity> AUGMENTER_RESEARCH_STATION_ENTITY = FabricBlockEntityTypeBuilder.create(AugmenterResearchStationBlockEntity::new, BlockContent.AUGMENTER_RESEARCH_STATION_BLOCK).build();

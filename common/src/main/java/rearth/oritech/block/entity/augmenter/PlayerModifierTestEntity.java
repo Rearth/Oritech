@@ -1,14 +1,12 @@
 package rearth.oritech.block.entity.augmenter;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.Properties;
@@ -44,7 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class PlayerModifierTestEntity extends BlockEntity implements BlockEntityTicker<PlayerModifierTestEntity>, MultiblockMachineController, GeoBlockEntity, ExtendedScreenHandlerFactory, InventoryProvider, EnergyApi.BlockProvider {
+public class PlayerModifierTestEntity extends BlockEntity implements BlockEntityTicker<PlayerModifierTestEntity>, MultiblockMachineController, GeoBlockEntity, ExtendedScreenHandlerFactory, EnergyApi.BlockProvider {
     
     public final Set<Identifier> researchedAugments = new HashSet<>();
     
@@ -66,13 +64,6 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     
     private final EnergyApi.EnergyContainer energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, 0, maxEnergyStored, this::markDirty);
     
-    public final SimpleInventory inventory = new SimpleInventory(4) {
-        @Override
-        public void markDirty() {
-            PlayerModifierTestEntity.this.markDirty();
-        }
-    };
-    private final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     public PlayerModifierTestEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PLAYER_MODIFIER_BLOCK_ENTITY, pos, state);
@@ -276,7 +267,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     
     @Override
     public InventoryProvider getInventoryForLink() {
-        return this;
+        return null;
     }
     
     @Override
@@ -321,11 +312,6 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         updateNetwork();
         return new PlayerModifierScreenHandler(syncId, playerInventory, this);
-    }
-    
-    @Override
-    public InventoryStorage getInventory(Direction direction) {
-        return inventoryStorage;
     }
     
     @Override
