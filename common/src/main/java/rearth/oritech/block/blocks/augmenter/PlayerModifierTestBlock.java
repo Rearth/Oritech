@@ -179,6 +179,10 @@ public class PlayerModifierTestBlock extends HorizontalFacingBlock implements Bl
             return ActionResult.SUCCESS;
         }
         
+        var blockEntity = (PlayerModifierTestEntity) world.getBlockEntity(pos);
+        blockEntity.loadAvailableStations(player);
+        player.openHandledScreen(blockEntity);
+        
         return ActionResult.SUCCESS;
     }
     

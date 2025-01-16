@@ -85,6 +85,12 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
         addAvailableAugments(movedPanel);
         
+        var researchWidth = 120;
+        var researchContainer = Containers.verticalFlow(Sizing.fixed(researchWidth), Sizing.content());
+        researchContainer.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
+        
+        addResearchPanels(researchContainer, 120);
+        
         var energyPanel = Containers.verticalFlow(Sizing.content(3), Sizing.content(3));
         energyPanel.surface(Surface.PANEL);
         energyPanel.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
@@ -93,12 +99,22 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         loadResearchedAugments.tooltip(Text.translatable("text.oritech.load_augments.tooltip"));
         loadResearchedAugments.margins(Insets.of(2));
         
+        var openInvScreen = Components.button(Text.translatable("\uD83E\uDDF0"), elem -> onOpenInvClicked());
+        openInvScreen.tooltip(Text.translatable("text.oritech.open_inv.tooltip"));
+        openInvScreen.margins(Insets.of(2));
+        
         var energyPanelX = this.width * 0.2 - 22;
         var energyPanelY = this.height * 0.3;
         
+        var researchPanelX = this.width * 0.8 - 2;
+        var researchPanelY = this.height * 0.2;
+        
         addEnergyBar(energyPanel);
         energyPanel.child(loadResearchedAugments.horizontalSizing(Sizing.fixed(18)));
+        energyPanel.child(openInvScreen.horizontalSizing(Sizing.fixed(18)));
+        
         root.child(energyPanel.positioning(Positioning.absolute((int) energyPanelX, (int) energyPanelY)).zIndex(-1));
+        root.child(researchContainer.positioning(Positioning.absolute((int) researchPanelX, (int) researchPanelY)).zIndex(-1));
         
     }
     
@@ -244,6 +260,24 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         energyIndicator.visibleArea(PositionedRectangle.of(0, 96 - ((int) (96 * (fillAmount))), 24, (int) (96 * fillAmount)));
     }
     
+    private void addResearchPanels(FlowLayout parent, int width) {
+    
+        for (var researchBlock : this.handler.blockEntity.availableStations) {
+            
+            var panel = Containers.verticalFlow(Sizing.fixed(width), Sizing.fixed((int) (width * 0.5)));
+            var title = Components.label(researchBlock.getName().formatted(Formatting.BOLD));
+            title.horizontalSizing(Sizing.fill());
+            title.horizontalTextAlignment(HorizontalAlignment.CENTER);
+            var status = Components.label(Text.translatable("idle"));
+            
+            panel.child(title);
+            panel.child(status);
+            
+            parent.child(panel.surface(Surface.PANEL).padding(Insets.of(6)).margins(Insets.of(0, 10, 0, 0)).zIndex(-1));
+        }
+        
+    }
+    
     private void addAvailableAugments(FlowLayout parent) {
         
         var maxHeight = this.height * 0.7f;
@@ -322,6 +356,12 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
         this.handler.player.sendMessage(Text.translatable("text.oritech.loaded_augments %s", loadedAugmentsCount));
         this.close();
+        
+    }
+    
+    private void onOpenInvClicked() {
+        this.close();
+        NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.OpenAugmentScreenPacket(this.handler.blockPos));
         
     }
     

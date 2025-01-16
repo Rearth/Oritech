@@ -140,10 +140,13 @@ public class NetworkContent {
     public record LoadPlayerAugmentsToMachinePacket(BlockPos position) {
     }
     
+    public record OpenAugmentScreenPacket(BlockPos position) {
+    }
+    
     public record AugmentPlayerTogglePacket(Identifier id) {
     }
     
-    public record AugmentResearchList(BlockPos position, List<Identifier> allResearched) {
+    public record AugmentDataPacket(BlockPos position, List<Identifier> allResearched, List<Identifier> activeLabs) {
     }
     
     public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn, String fluidTypeOut,
@@ -526,12 +529,16 @@ public class NetworkContent {
         }));
         
         
-        MACHINE_CHANNEL.registerClientbound(AugmentResearchList.class, ((message, access) -> {
+        MACHINE_CHANNEL.registerClientbound(AugmentDataPacket.class, ((message, access) -> {
             
             var entity = access.player().getWorld().getBlockEntity(message.position);
             
             if (entity instanceof PlayerModifierTestEntity enhancer) {
                 enhancer.researchedAugments.addAll(message.allResearched);
+                
+                enhancer.availableStations.clear();
+                message.activeLabs.stream().map(Registries.BLOCK::get).forEach(enhancer.availableStations::add);
+                
             }
             
         }));
@@ -661,6 +668,16 @@ public class NetworkContent {
             
             if (entity instanceof PlayerModifierTestEntity modifierEntity) {
                 modifierEntity.loadResearchesFromPlayer(player);
+            }
+        });
+        
+        UI_CHANNEL.registerServerbound(OpenAugmentScreenPacket.class, (message, access) -> {
+            var player = access.player();
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            
+            if (entity instanceof PlayerModifierTestEntity modifierEntity) {
+                modifierEntity.screenInvOverride = true;
+                player.openHandledScreen(modifierEntity);
             }
         });
         

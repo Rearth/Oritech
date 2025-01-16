@@ -1,13 +1,18 @@
 package rearth.oritech.block.entity.augmenter;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -21,13 +26,11 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.augmenter.AugmenterResearchStationBlock;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
-import rearth.oritech.util.Geometry;
-import rearth.oritech.util.InventoryProvider;
-import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -41,8 +44,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public class PlayerModifierTestEntity extends BlockEntity implements BlockEntityTicker<PlayerModifierTestEntity>, MultiblockMachineController, GeoBlockEntity, ExtendedScreenHandlerFactory, EnergyApi.BlockProvider {
+public class PlayerModifierTestEntity extends BlockEntity implements BlockEntityTicker<PlayerModifierTestEntity>, MultiblockMachineController, GeoBlockEntity, ExtendedScreenHandlerFactory, InventoryProvider, EnergyApi.BlockProvider, ScreenProvider {
     
     public final Set<Identifier> researchedAugments = new HashSet<>();
     
@@ -60,7 +64,11 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     
     // working state
     private boolean networkDirty = true;
-    private final List<Block> availableStations = new ArrayList<>();
+    public final List<Block> availableStations = new ArrayList<>();
+    public boolean screenInvOverride = false;
+    
+    private final SimpleInventory inventory = new SimpleInventory(5);
+    private final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     private final EnergyApi.EnergyContainer energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, 0, maxEnergyStored, this::markDirty);
     
@@ -73,6 +81,8 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     public void tick(World world, BlockPos pos, BlockState state, PlayerModifierTestEntity blockEntity) {
         
         if (world.isClient) return;
+        
+        screenInvOverride = false;
         
         if (networkDirty) {
             updateNetwork();
@@ -195,6 +205,8 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
           new BlockPos(2, 0, -1)
         );
         
+        availableStations.clear();
+        
         for (var candidatePosOffset : targetPositions) {
             var candidatePos = new BlockPos(Geometry.offsetToWorldPosition(facing, candidatePosOffset, pos));
             
@@ -214,7 +226,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         this.networkDirty = false;
         
         // collect researched augments, send them to client
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AugmentResearchList(pos, researchedAugments.stream().toList()));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AugmentDataPacket(pos, researchedAugments.stream().toList(), availableStations.stream().map(Registries.BLOCK::getId).collect(Collectors.toList())));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.getAmount(), energyStorage.getCapacity()));
     }
     
@@ -267,7 +279,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     
     @Override
     public InventoryProvider getInventoryForLink() {
-        return null;
+        return this;
     }
     
     @Override
@@ -311,11 +323,67 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         updateNetwork();
+        
+        var dist = player.squaredDistanceTo(this.pos.toBottomCenterPos());
+        if (dist > 1 || screenInvOverride)
+            return new BasicMachineScreenHandler(syncId, playerInventory, this);
+        
         return new PlayerModifierScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
     public EnergyApi.EnergyContainer getStorage(Direction direction) {
         return energyStorage;
+    }
+    
+    @Override
+    public InventoryStorage getInventory(Direction direction) {
+        return inventoryStorage;
+    }
+    
+    @Override
+    public List<GuiSlot> getGuiSlots() {
+        return List.of(
+          new GuiSlot(0, 30, 30),
+          new GuiSlot(1, 50, 30),
+          new GuiSlot(2, 70, 30),
+          new GuiSlot(3, 90, 30),
+          new GuiSlot(4, 110, 30)
+          );
+    }
+    
+    @Override
+    public float getDisplayedEnergyUsage() {
+        return 0;
+    }
+    
+    @Override
+    public float getProgress() {
+        return 0;
+    }
+    
+    @Override
+    public boolean showProgress() {
+        return false;
+    }
+    
+    @Override
+    public boolean showExpansionPanel() {
+        return false;
+    }
+    
+    @Override
+    public InventoryInputMode getInventoryInputMode() {
+        return InventoryInputMode.FILL_LEFT_TO_RIGHT;
+    }
+    
+    @Override
+    public Inventory getDisplayedInventory() {
+        return inventory;
+    }
+    
+    @Override
+    public ScreenHandlerType<?> getScreenHandlerType() {
+        return ModScreens.MODIFIED_INV_SCREEN;
     }
 }
