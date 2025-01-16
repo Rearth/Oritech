@@ -86,7 +86,7 @@
   "button.oritech.item_filter.no_nbt": "No NBT",
   "tooltip.oritech.item_filter.no_nbt": "Currently only checks the item type/id",
   "tooltip.oritech.enchanter": "Applies enchantments using energy and souls from nearby catalysts.",
-  "tooltip.oritech.catalyst": "近くの倒れたエンティティからソウルを保存します。エンチャント済みの本を用いて制約なくエンチャントすることもできます。",
+  "tooltip.oritech.catalyst": "近くの倒れたエンティティから魂を収集します。エンチャント済みの本を用いて制約なくエンチャントすることもできます。",
   "tooltip.oritech.catalyst_warning": "警告:Arcaneに気軽に触れると後悔することになるかもしれません。エンダリックレーザーで安定させてください。",
   "tooltip.oritech.spawner_cage": "Used to build a cage of the required size under the spawner controller.",
   "tooltip.oritech.spawner": "Traps the first mob that walks on it in a cage underneath.",
