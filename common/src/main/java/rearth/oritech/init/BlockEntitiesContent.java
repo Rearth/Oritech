@@ -167,7 +167,7 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<PlayerModifierTestEntity> PLAYER_MODIFIER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(PlayerModifierTestEntity::new, BlockContent.TEST_BLOCK).build();
-    public static final BlockEntityType<AugmenterResearchStationBlockEntity> AUGMENTER_RESEARCH_STATION_ENTITY = FabricBlockEntityTypeBuilder.create(AugmenterResearchStationBlockEntity::new, BlockContent.AUGMENTER_RESEARCH_STATION_BLOCK).build();
+    public static final BlockEntityType<AugmenterResearchStationBlockEntity> AUGMENTER_RESEARCH_STATION_ENTITY = FabricBlockEntityTypeBuilder.create(AugmenterResearchStationBlockEntity::new, BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK, BlockContent.AUGMENTER_RESEARCH_STATION_ADVANCED_BLOCK, BlockContent.AUGMENTER_RESEARCH_STATION_EXPERT_BLOCK).build();
     
     
     @AssignSidedInventory

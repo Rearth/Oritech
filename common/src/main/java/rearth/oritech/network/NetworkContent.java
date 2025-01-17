@@ -146,7 +146,7 @@ public class NetworkContent {
     public record AugmentPlayerTogglePacket(Identifier id) {
     }
     
-    public record AugmentDataPacket(BlockPos position, List<Identifier> allResearched, List<Identifier> activeLabs) {
+    public record AugmentDataPacket(BlockPos position, List<Identifier> allResearched, List<Identifier> researchBlocks, List<Integer> researchStates, List<Identifier> activeResearches, List<Integer> remainingTime) {
     }
     
     public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn, String fluidTypeOut,
@@ -534,11 +534,7 @@ public class NetworkContent {
             var entity = access.player().getWorld().getBlockEntity(message.position);
             
             if (entity instanceof PlayerModifierTestEntity enhancer) {
-                enhancer.researchedAugments.addAll(message.allResearched);
-                
-                enhancer.availableStations.clear();
-                message.activeLabs.stream().map(Registries.BLOCK::get).forEach(enhancer.availableStations::add);
-                
+                enhancer.handleAugmentUpdatePacket(message);
             }
             
         }));

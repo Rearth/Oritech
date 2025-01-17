@@ -170,7 +170,9 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block CREATIVE_TANK_BLOCK = new CreativeFluidTank(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).luminance(Blocks.createLightLevelFromLitBlockState(15)).hardness(-1.0F));
     
     public static final Block TEST_BLOCK = new PlayerModifierTestBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
-    public static final Block AUGMENTER_RESEARCH_STATION_BLOCK = new AugmenterResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK = new AugmenterResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block AUGMENTER_RESEARCH_STATION_ADVANCED_BLOCK = new AugmenterResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block AUGMENTER_RESEARCH_STATION_EXPERT_BLOCK = new AugmenterResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
     
     public static final Block PLACER_BLOCK = new PlacerBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block DESTROYER_BLOCK = new DestroyerBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());

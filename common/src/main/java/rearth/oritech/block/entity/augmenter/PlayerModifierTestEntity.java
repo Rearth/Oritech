@@ -40,11 +40,7 @@ import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class PlayerModifierTestEntity extends BlockEntity implements BlockEntityTicker<PlayerModifierTestEntity>, MultiblockMachineController, GeoBlockEntity, ExtendedScreenHandlerFactory, InventoryProvider, EnergyApi.BlockProvider, ScreenProvider {
     
@@ -64,7 +60,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     
     // working state
     private boolean networkDirty = true;
-    public final List<Block> availableStations = new ArrayList<>();
+    public final HashMap<Integer, ResearchState> availableStations = new HashMap<>();
     public boolean screenInvOverride = false;
     
     private final SimpleInventory inventory = new SimpleInventory(5);
@@ -101,6 +97,16 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
             Oritech.LOGGER.warn("Player tried to research already researched augment " + augment);
             return;
         }
+        
+        // find first idle station
+        for (int i = 0; i < 3; i++) {
+            var station = availableStations.getOrDefault(i, null);
+            if (station == null) continue;
+            if (!station.state.equals(ResearchState.ActiveState.IDLE)) continue;
+            // todo check station type requirements
+            
+        }
+        // update station task
         
         researchedAugments.add(augment);
         this.markNetDirty();
@@ -205,15 +211,21 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
           new BlockPos(2, 0, -1)
         );
         
-        availableStations.clear();
-        
-        for (var candidatePosOffset : targetPositions) {
+        for (int i = 0; i < targetPositions.size(); i++) {
+            var candidatePosOffset = targetPositions.get(i);
             var candidatePos = new BlockPos(Geometry.offsetToWorldPosition(facing, candidatePosOffset, pos));
             
             var candidateState = world.getBlockState(candidatePos);
-            if (!(candidateState.getBlock() instanceof AugmenterResearchStationBlock)) continue;
-            if (!candidateState.get(MultiblockMachine.ASSEMBLED)) continue;
-            availableStations.add(candidateState.getBlock());
+            if (!(candidateState.getBlock() instanceof AugmenterResearchStationBlock) || !candidateState.get(MultiblockMachine.ASSEMBLED)) {
+                availableStations.put(i, null);
+                continue;
+            }
+            
+            if (availableStations.containsKey(i) && availableStations.get(i).type.equals(candidateState.getBlock())) continue;
+            
+            var newState = new ResearchState(candidateState.getBlock(), ResearchState.ActiveState.IDLE, Identifier.of(""), -1);
+            
+            availableStations.put(i, newState);
         }
         
     }
@@ -225,9 +237,41 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     private void updateNetwork() {
         this.networkDirty = false;
         
+        var stations = new ArrayList<Identifier>();
+        var states = new ArrayList<Integer>();
+        var targets = new ArrayList<Identifier>();
+        var times = new ArrayList<Integer>();
+        
+        availableStations.values().forEach(station -> {
+            if (station == null) return;
+            stations.add(Registries.BLOCK.getId(station.type));
+            states.add(station.state.ordinal());
+            targets.add(station.selectedResearch);
+            times.add(station.remainingTime);
+        });
+        
         // collect researched augments, send them to client
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AugmentDataPacket(pos, researchedAugments.stream().toList(), availableStations.stream().map(Registries.BLOCK::getId).collect(Collectors.toList())));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AugmentDataPacket(pos, researchedAugments.stream().toList(), stations, states, targets, times));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.getAmount(), energyStorage.getCapacity()));
+    }
+    
+    public void handleAugmentUpdatePacket(NetworkContent.AugmentDataPacket packet) {
+        this.researchedAugments.clear();
+        this.researchedAugments.addAll(packet.allResearched());
+        
+        this.availableStations.clear();
+        
+        for (int i = 0; i < packet.researchBlocks().size(); i++) {
+            var station = Registries.BLOCK.get(packet.researchBlocks().get(i));
+            var state = ResearchState.ActiveState.values()[packet.researchStates().get(i)];
+            var target = packet.activeResearches().get(i);
+            var remainingTime = packet.remainingTime().get(i);
+            
+            var res = new ResearchState(station, state, target, remainingTime);
+            System.out.println("got on client: " + res);
+            availableStations.put(i, res);
+        }
+        
     }
     
     @Override
@@ -386,4 +430,35 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     public ScreenHandlerType<?> getScreenHandlerType() {
         return ModScreens.MODIFIED_INV_SCREEN;
     }
+    
+    public static class ResearchState {
+        
+        public Block type;
+        public ActiveState state;
+        public Identifier selectedResearch;
+        public int remainingTime;
+        
+        public ResearchState(Block type, ActiveState state, Identifier selectedResearch, int remainingTime) {
+            this.type = type;
+            this.state = state;
+            this.selectedResearch = selectedResearch;
+            this.remainingTime = remainingTime;
+        }
+        
+        @Override
+        public String toString() {
+            return "ResearchState{" +
+                     "type=" + type +
+                     ", state=" + state +
+                     ", selectedResearch=" + selectedResearch +
+                     ", remainingTime=" + remainingTime +
+                     '}';
+        }
+        
+        public enum ActiveState {
+            IDLE, PENDING_RESOURCES, WORKING
+        }
+        
+    }
+    
 }

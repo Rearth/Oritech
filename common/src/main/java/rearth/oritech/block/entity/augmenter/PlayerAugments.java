@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import net.minecraft.block.Block;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.SpawnReason;
@@ -15,6 +16,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -25,6 +27,7 @@ import net.minecraft.util.math.Box;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.other.OreFinderRenderer;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.EntitiesContent;
 
 import java.util.*;
@@ -306,25 +309,25 @@ public class PlayerAugments {
     
     
     static {
-        addAugmentAsset(hpBoost, 0, 50, List.of());
-        addAugmentAsset(speedBoost, 0, 90, List.of());
-        addAugmentAsset(hpBoostMore, 30, 50, List.of(Oritech.id("hpboost")));
-        addAugmentAsset(dwarf, 40, 20, List.of(Oritech.id("hpboost")));
-        addAugmentAsset(giant, 40, 60, List.of(Oritech.id("hpboost")));
-        addAugmentAsset(autoFeeder, 50, 10, List.of(Oritech.id("hpboost")));
-        addAugmentAsset(armor, 30, 90, List.of());
-        addAugmentAsset(flight, 70, 30, List.of(Oritech.id("hpboostmore")));
-        addAugmentAsset(cloak, 70, 70, List.of(Oritech.id("hpboostmore")));
-        addAugmentAsset(portal, 90, 90, List.of(Oritech.id("flight")));
-        addAugmentAsset(nightVision, 90, 60, List.of());
-        addAugmentAsset(waterBreathing, 120, 70, List.of());
-        addAugmentAsset(magnet, 150, 40, List.of());
-        addAugmentAsset(oreFinder, 150, 70, List.of(Oritech.id("nightvision"), Oritech.id("magnet")));
+        addAugmentAsset(hpBoost, 0, 50, List.of(), BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK);
+        addAugmentAsset(speedBoost, 0, 90, List.of(), BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK);
+        addAugmentAsset(hpBoostMore, 30, 50, List.of(Oritech.id("hpboost")), BlockContent.AUGMENTER_RESEARCH_STATION_ADVANCED_BLOCK);
+        addAugmentAsset(dwarf, 40, 20, List.of(Oritech.id("hpboost")), BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK);
+        addAugmentAsset(giant, 40, 60, List.of(Oritech.id("hpboost")), BlockContent.AUGMENTER_RESEARCH_STATION_ADVANCED_BLOCK);
+        addAugmentAsset(autoFeeder, 50, 10, List.of(Oritech.id("hpboost")), BlockContent.AUGMENTER_RESEARCH_STATION_ADVANCED_BLOCK);
+        addAugmentAsset(armor, 30, 90, List.of(), BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK);
+        addAugmentAsset(flight, 70, 30, List.of(Oritech.id("hpboostmore")), BlockContent.AUGMENTER_RESEARCH_STATION_EXPERT_BLOCK);
+        addAugmentAsset(cloak, 70, 70, List.of(Oritech.id("hpboostmore")), BlockContent.AUGMENTER_RESEARCH_STATION_EXPERT_BLOCK);
+        addAugmentAsset(portal, 90, 90, List.of(Oritech.id("flight")), BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK);
+        addAugmentAsset(nightVision, 90, 60, List.of(), BlockContent.AUGMENTER_RESEARCH_STATION_ADVANCED_BLOCK);
+        addAugmentAsset(waterBreathing, 120, 70, List.of(), BlockContent.AUGMENTER_RESEARCH_STATION_ADVANCED_BLOCK);
+        addAugmentAsset(magnet, 150, 40, List.of(), BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK);
+        addAugmentAsset(oreFinder, 150, 70, List.of(Oritech.id("nightvision"), Oritech.id("magnet")), BlockContent.AUGMENTER_RESEARCH_STATION_EXPERT_BLOCK);
     }
     
-    private static void addAugmentAsset(PlayerAugment augment, int x, int y, List<Identifier> requirements) {
+    private static void addAugmentAsset(PlayerAugment augment, int x, int y, List<Identifier> requirements, Block requiredStation) {
         allAugments.put(augment.id, augment);
-        augmentAssets.put(augment.id, new AugmentExtraData(augment.id, requirements, new Vector2i(x, y)));
+        augmentAssets.put(augment.id, new AugmentExtraData(augment.id, requirements, Registries.BLOCK.getId(requiredStation), new Vector2i(x, y)));
     }
     
     // called when a client connect to a server
@@ -566,5 +569,5 @@ public class PlayerAugments {
         }
     }
     
-    public record AugmentExtraData(Identifier id, List<Identifier> requirements, Vector2i position) {}
+    public record AugmentExtraData(Identifier id, List<Identifier> requirements, Identifier requiredStation, Vector2i position) {}
 }

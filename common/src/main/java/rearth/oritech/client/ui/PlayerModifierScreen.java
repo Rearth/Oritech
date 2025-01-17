@@ -15,6 +15,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -142,6 +143,20 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
                 }
             }
             
+            var hasResearchStation = false;
+            var requiredStationBlock = Registries.BLOCK.get(uiData.requiredStation());
+            
+            for (var ownStation : this.handler.blockEntity.availableStations.values()) {
+                if (ownStation == null) continue;
+                if (ownStation.type.equals(requiredStationBlock)) {
+                    hasResearchStation = true;
+                    break;
+                }
+            }
+            
+            if (!hasResearchStation)
+                missingRequirements.add(Text.translatable("oritech.text.required_station: %s", requiredStationBlock.getName()));
+            
             var operation = AugmentOperation.RESEARCH;
             var tooltipTitleText = Text.translatable("oritech.text.augment." + augmentId.getPath()).formatted(Formatting.BOLD);
             var tooltipOperation = "oritech.text.augment_op.research";
@@ -262,13 +277,14 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
     
     private void addResearchPanels(FlowLayout parent, int width) {
     
-        for (var researchBlock : this.handler.blockEntity.availableStations) {
+        for (var researchState : this.handler.blockEntity.availableStations.values()) {
+            if (researchState == null) continue;
             
             var panel = Containers.verticalFlow(Sizing.fixed(width), Sizing.fixed((int) (width * 0.5)));
-            var title = Components.label(researchBlock.getName().formatted(Formatting.BOLD));
+            var title = Components.label(researchState.type.getName().formatted(Formatting.BOLD));
             title.horizontalSizing(Sizing.fill());
             title.horizontalTextAlignment(HorizontalAlignment.CENTER);
-            var status = Components.label(Text.translatable("idle"));
+            var status = Components.label(Text.translatable(researchState.state.name()));
             
             panel.child(title);
             panel.child(status);
@@ -368,6 +384,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
     private void showAugmentDialog(Identifier id, AugmentOperation operation) {
         
         var researchRecipe = (AugmentRecipe) this.handler.blockEntity.getWorld().getRecipeManager().get(id).get().value();
+        var uiData = PlayerAugments.augmentAssets.get(id);
         
         var hasResources = true;
         
@@ -412,6 +429,11 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             }
             descriptionPanel.child(itemContainer);
         }
+        
+        // todo check if station exists and is idle
+        var requiredStationBlock = Registries.BLOCK.get(uiData.requiredStation());
+        var requiredStationLabel = Components.label(Text.translatable("oritech.text.required_station: %s", requiredStationBlock.getName()));
+        descriptionPanel.child(requiredStationLabel);
         
         var buttonPanel = Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(26));
         buttonPanel.margins(Insets.of(2, 0, 4, 4));
