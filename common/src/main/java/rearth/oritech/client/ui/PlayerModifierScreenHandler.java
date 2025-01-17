@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.augmenter.PlayerModifierTestEntity;
@@ -38,6 +39,11 @@ public class PlayerModifierScreenHandler extends ScreenHandler {
         
         if (blockEntity.getWorld().isClient)
             this.blockEntity.loadAvailableStations(this.player);    // this should yield the same result on the client, so instead of syncing them we just call it on the client again
+        
+        // add dummy slot positions to allow inv sync
+        for (int i = 0; i < 5; i++) {
+            this.addSlot(new Slot(this.blockEntity.inventory, i, -500, -500));
+        }
         
     }
     

@@ -146,7 +146,7 @@ public class NetworkContent {
     public record AugmentPlayerTogglePacket(Identifier id) {
     }
     
-    public record AugmentDataPacket(BlockPos position, List<Identifier> allResearched, List<Identifier> researchBlocks, List<Integer> researchStates, List<Identifier> activeResearches, List<Integer> remainingTime) {
+    public record AugmentDataPacket(BlockPos position, List<Identifier> allResearched, List<Identifier> researchBlocks, List<Boolean> researchStates, List<Identifier> activeResearches, List<Long> startedTimes, List<Integer> researchTimes) {
     }
     
     public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn, String fluidTypeOut,

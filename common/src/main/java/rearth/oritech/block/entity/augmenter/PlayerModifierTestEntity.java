@@ -29,6 +29,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.recipes.AugmentRecipe;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
@@ -63,7 +64,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     public final HashMap<Integer, ResearchState> availableStations = new HashMap<>();
     public boolean screenInvOverride = false;
     
-    private final SimpleInventory inventory = new SimpleInventory(5);
+    public final SimpleInventory inventory = new SimpleInventory(5);
     private final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     private final EnergyApi.EnergyContainer energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, 0, maxEnergyStored, this::markDirty);
@@ -79,6 +80,20 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         if (world.isClient) return;
         
         screenInvOverride = false;
+        
+        // update research stations
+        for (int i = 0; i < 3; i++) {
+            var station = availableStations.getOrDefault(i, null);
+            if (station == null) continue;
+            if (station.working) {
+                var isDone = world.getTime() > station.researchStartedAt + station.workTime;
+                if (!isDone) continue;
+                
+                researchedAugments.add(station.selectedResearch);
+                station.working = false;
+                this.markNetDirty();
+            }
+        }
         
         if (networkDirty) {
             updateNetwork();
@@ -98,17 +113,42 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
             return;
         }
         
-        // find first idle station
+        var recipe = (AugmentRecipe) world.getRecipeManager().get(augment).get().value();
+        
+        // remove available resources
+        for (var wantedInput : recipe.getResearchCost()) {
+            var type = wantedInput.ingredient();
+            var missingCount = wantedInput.count();
+            
+            for (var stack : this.inventory.heldStacks) {
+                if (type.test(stack)) {
+                    var takeAmount = Math.min(stack.getCount(), missingCount);
+                    missingCount -= takeAmount;
+                    stack.decrement(takeAmount);
+                    
+                    if (missingCount <= 0) break;
+                }
+            }
+        }
+        
+        // assign first idle station
         for (int i = 0; i < 3; i++) {
             var station = availableStations.getOrDefault(i, null);
             if (station == null) continue;
-            if (!station.state.equals(ResearchState.ActiveState.IDLE)) continue;
-            // todo check station type requirements
+            if (station.working) continue;
+            
+            var augmentAssets = PlayerAugments.augmentAssets.get(augment);
+            
+            if (!Registries.BLOCK.getId(station.type).equals(augmentAssets.requiredStation())) continue;
+            
+            station.selectedResearch = augment;
+            station.working = true;
+            station.researchStartedAt = world.getTime();
+            station.workTime = recipe.getTime();
+            
+            break;
             
         }
-        // update station task
-        
-        researchedAugments.add(augment);
         this.markNetDirty();
     }
     
@@ -123,6 +163,24 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         if (!researchedAugments.contains(augment)) {
             Oritech.LOGGER.warn("Player tried to install augment with id" + augment + " without researching it.");
             return;
+        }
+        
+        var recipe = (AugmentRecipe) world.getRecipeManager().get(augment).get().value();
+        
+        // remove available resources
+        for (var wantedInput : recipe.getApplyCost()) {
+            var type = wantedInput.ingredient();
+            var missingCount = wantedInput.count();
+            
+            for (var stack : this.inventory.heldStacks) {
+                if (type.test(stack)) {
+                    var takeAmount = Math.min(stack.getCount(), missingCount);
+                    missingCount -= takeAmount;
+                    stack.decrement(takeAmount);
+                    
+                    if (missingCount <= 0) break;
+                }
+            }
         }
         
         var augmentInstance = PlayerAugments.allAugments.get(augment);
@@ -197,9 +255,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
                 if (isInstalled)
                     removeAugmentFromPlayer(augmentId, player);
             }
-            
         }
-        
     }
     
     public void loadAvailableStations(PlayerEntity player) {
@@ -221,9 +277,9 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
                 continue;
             }
             
-            if (availableStations.containsKey(i) && availableStations.get(i).type.equals(candidateState.getBlock())) continue;
+            if (availableStations.containsKey(i) &&availableStations.get(i) != null && availableStations.get(i).type.equals(candidateState.getBlock())) continue;
             
-            var newState = new ResearchState(candidateState.getBlock(), ResearchState.ActiveState.IDLE, Identifier.of(""), -1);
+            var newState = new ResearchState(candidateState.getBlock(), false, Identifier.of(""), -1, -1);
             
             availableStations.put(i, newState);
         }
@@ -238,20 +294,22 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         this.networkDirty = false;
         
         var stations = new ArrayList<Identifier>();
-        var states = new ArrayList<Integer>();
+        var states = new ArrayList<Boolean>();
         var targets = new ArrayList<Identifier>();
-        var times = new ArrayList<Integer>();
+        var startTimes = new ArrayList<Long>();
+        var durations = new ArrayList<Integer>();
         
         availableStations.values().forEach(station -> {
             if (station == null) return;
             stations.add(Registries.BLOCK.getId(station.type));
-            states.add(station.state.ordinal());
+            states.add(station.working);
             targets.add(station.selectedResearch);
-            times.add(station.remainingTime);
+            startTimes.add(station.researchStartedAt);
+            durations.add(station.workTime);
         });
         
         // collect researched augments, send them to client
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AugmentDataPacket(pos, researchedAugments.stream().toList(), stations, states, targets, times));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AugmentDataPacket(pos, researchedAugments.stream().toList(), stations, states, targets, startTimes, durations));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.getAmount(), energyStorage.getCapacity()));
     }
     
@@ -263,11 +321,12 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         
         for (int i = 0; i < packet.researchBlocks().size(); i++) {
             var station = Registries.BLOCK.get(packet.researchBlocks().get(i));
-            var state = ResearchState.ActiveState.values()[packet.researchStates().get(i)];
+            var state = packet.researchStates().get(i);
             var target = packet.activeResearches().get(i);
-            var remainingTime = packet.remainingTime().get(i);
+            var researchTime = packet.researchTimes().get(i);
+            var startedTime = packet.startedTimes().get(i);
             
-            var res = new ResearchState(station, state, target, remainingTime);
+            var res = new ResearchState(station, state, target, researchTime, startedTime);
             System.out.println("got on client: " + res);
             availableStations.put(i, res);
         }
@@ -434,31 +493,29 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     public static class ResearchState {
         
         public Block type;
-        public ActiveState state;
+        public boolean working;
         public Identifier selectedResearch;
-        public int remainingTime;
+        public int workTime;
+        public long researchStartedAt;
         
-        public ResearchState(Block type, ActiveState state, Identifier selectedResearch, int remainingTime) {
+        public ResearchState(Block type, boolean working, Identifier selectedResearch, int workTime, long researchStartedAt) {
             this.type = type;
-            this.state = state;
+            this.working = working;
             this.selectedResearch = selectedResearch;
-            this.remainingTime = remainingTime;
+            this.workTime = workTime;
+            this.researchStartedAt = researchStartedAt;
         }
         
         @Override
         public String toString() {
             return "ResearchState{" +
                      "type=" + type +
-                     ", state=" + state +
+                     ", working=" + working +
                      ", selectedResearch=" + selectedResearch +
-                     ", remainingTime=" + remainingTime +
+                     ", workTime=" + workTime +
+                     ", researchStartedAt=" + researchStartedAt +
                      '}';
         }
-        
-        public enum ActiveState {
-            IDLE, PENDING_RESOURCES, WORKING
-        }
-        
     }
     
 }

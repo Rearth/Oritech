@@ -760,10 +760,10 @@ public class RecipeGenerator extends FabricRecipeProvider {
     
     private void addAugmentRecipes(RecipeExporter exporter) {
         
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 10, "hpboost");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.COPPER_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 10, "speedboost");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 100, "hpboost");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.COPPER_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 200, "speedboost");
         addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(TagContent.NICKEL_INGOTS)), new SizedIngredient(4, of(ItemContent.OVERCHARGED_CRYSTAL))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 10, "hpboostmore");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.DIAMOND_GEMS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 10, "dwarf");
+        addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.DIAMOND_GEMS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, "dwarf");
         addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 10, "giant");
         addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 10, "autofeeder");
         addAugmentRecipe(exporter, List.of(new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 10, "armor");

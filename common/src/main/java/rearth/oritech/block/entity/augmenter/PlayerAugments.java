@@ -309,20 +309,20 @@ public class PlayerAugments {
     
     
     static {
-        addAugmentAsset(hpBoost, 0, 50, List.of(), BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK);
-        addAugmentAsset(speedBoost, 0, 90, List.of(), BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK);
-        addAugmentAsset(hpBoostMore, 30, 50, List.of(Oritech.id("hpboost")), BlockContent.AUGMENTER_RESEARCH_STATION_ADVANCED_BLOCK);
-        addAugmentAsset(dwarf, 40, 20, List.of(Oritech.id("hpboost")), BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK);
-        addAugmentAsset(giant, 40, 60, List.of(Oritech.id("hpboost")), BlockContent.AUGMENTER_RESEARCH_STATION_ADVANCED_BLOCK);
-        addAugmentAsset(autoFeeder, 50, 10, List.of(Oritech.id("hpboost")), BlockContent.AUGMENTER_RESEARCH_STATION_ADVANCED_BLOCK);
-        addAugmentAsset(armor, 30, 90, List.of(), BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK);
-        addAugmentAsset(flight, 70, 30, List.of(Oritech.id("hpboostmore")), BlockContent.AUGMENTER_RESEARCH_STATION_EXPERT_BLOCK);
-        addAugmentAsset(cloak, 70, 70, List.of(Oritech.id("hpboostmore")), BlockContent.AUGMENTER_RESEARCH_STATION_EXPERT_BLOCK);
-        addAugmentAsset(portal, 90, 90, List.of(Oritech.id("flight")), BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK);
-        addAugmentAsset(nightVision, 90, 60, List.of(), BlockContent.AUGMENTER_RESEARCH_STATION_ADVANCED_BLOCK);
-        addAugmentAsset(waterBreathing, 120, 70, List.of(), BlockContent.AUGMENTER_RESEARCH_STATION_ADVANCED_BLOCK);
-        addAugmentAsset(magnet, 150, 40, List.of(), BlockContent.AUGMENTER_RESEARCH_STATION_SIMPLE_BLOCK);
-        addAugmentAsset(oreFinder, 150, 70, List.of(Oritech.id("nightvision"), Oritech.id("magnet")), BlockContent.AUGMENTER_RESEARCH_STATION_EXPERT_BLOCK);
+        addAugmentAsset(hpBoost, 0, 50, List.of(), BlockContent.SIMPLE_STATION);
+        addAugmentAsset(speedBoost, 0, 90, List.of(), BlockContent.SIMPLE_STATION);
+        addAugmentAsset(hpBoostMore, 30, 50, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION);
+        addAugmentAsset(dwarf, 40, 20, List.of(Oritech.id("hpboost")), BlockContent.SIMPLE_STATION);
+        addAugmentAsset(giant, 40, 60, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION);
+        addAugmentAsset(autoFeeder, 50, 10, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION);
+        addAugmentAsset(armor, 30, 90, List.of(), BlockContent.SIMPLE_STATION);
+        addAugmentAsset(flight, 70, 30, List.of(Oritech.id("hpboostmore")), BlockContent.EXPECT_STATION);
+        addAugmentAsset(cloak, 70, 70, List.of(Oritech.id("hpboostmore")), BlockContent.EXPECT_STATION);
+        addAugmentAsset(portal, 90, 90, List.of(Oritech.id("flight")), BlockContent.SIMPLE_STATION);
+        addAugmentAsset(nightVision, 90, 60, List.of(), BlockContent.ADV_STATION);
+        addAugmentAsset(waterBreathing, 120, 70, List.of(), BlockContent.ADV_STATION);
+        addAugmentAsset(magnet, 150, 40, List.of(), BlockContent.SIMPLE_STATION);
+        addAugmentAsset(oreFinder, 150, 70, List.of(Oritech.id("nightvision"), Oritech.id("magnet")), BlockContent.EXPECT_STATION);
     }
     
     private static void addAugmentAsset(PlayerAugment augment, int x, int y, List<Identifier> requirements, Block requiredStation) {
