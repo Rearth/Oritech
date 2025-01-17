@@ -38,10 +38,25 @@ public class PlayerAugments {
     
     private static final PlayerAugment hpBoost = new PlayerStatEnhancingAugment(Oritech.id("hpboost"), EntityAttributes.GENERIC_MAX_HEALTH, 6, EntityAttributeModifier.Operation.ADD_VALUE);
     private static final PlayerAugment hpBoostMore = new PlayerStatEnhancingAugment(Oritech.id("hpboostmore"), EntityAttributes.GENERIC_MAX_HEALTH, 4, EntityAttributeModifier.Operation.ADD_VALUE);
-    private static final PlayerAugment speedBoost = new PlayerStatEnhancingAugment(Oritech.id("speedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5f, EntityAttributeModifier.Operation.ADD_VALUE, true);
-    private static final PlayerAugment dwarf = new PlayerStatEnhancingAugment(Oritech.id("dwarf"), EntityAttributes.GENERIC_SCALE, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
+    private static final PlayerAugment hpBoostUltra = new PlayerStatEnhancingAugment(Oritech.id("hpboostultra"), EntityAttributes.GENERIC_MAX_HEALTH, 10, EntityAttributeModifier.Operation.ADD_VALUE);
+    private static final PlayerAugment hpBoostUltimate = new PlayerStatEnhancingAugment(Oritech.id("hpboostultimate"), EntityAttributes.GENERIC_MAX_HEALTH, 10, EntityAttributeModifier.Operation.ADD_VALUE);
+    private static final PlayerAugment speedBoost = new PlayerStatEnhancingAugment(Oritech.id("speedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.1f, EntityAttributeModifier.Operation.ADD_VALUE, false);
+    private static final PlayerAugment superSpeedBoost = new PlayerStatEnhancingAugment(Oritech.id("superspeedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25f, EntityAttributeModifier.Operation.ADD_VALUE, true);
+    private static final PlayerAugment stepAssist = new PlayerStatEnhancingAugment(Oritech.id("stepassist"), EntityAttributes.GENERIC_STEP_HEIGHT, 0.6f, EntityAttributeModifier.Operation.ADD_VALUE, true);
+    private static final PlayerAugment dwarf = new PlayerStatEnhancingAugment(Oritech.id("dwarf"), EntityAttributes.GENERIC_SCALE, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
     private static final PlayerAugment giant = new PlayerStatEnhancingAugment(Oritech.id("giant"), EntityAttributes.GENERIC_SCALE, 2f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
     private static final PlayerAugment armor = new PlayerStatEnhancingAugment(Oritech.id("armor"), EntityAttributes.GENERIC_ARMOR, 4f, EntityAttributeModifier.Operation.ADD_VALUE);
+    private static final PlayerAugment betterArmor = new PlayerStatEnhancingAugment(Oritech.id("betterarmor"), EntityAttributes.GENERIC_ARMOR, 4f, EntityAttributeModifier.Operation.ADD_VALUE);
+    private static final PlayerAugment ultimateArmor = new PlayerStatEnhancingAugment(Oritech.id("ultimatearmor"), EntityAttributes.GENERIC_ARMOR, 4f, EntityAttributeModifier.Operation.ADD_VALUE);
+    private static final PlayerAugment weaponReach = new PlayerStatEnhancingAugment(Oritech.id("weaponreach"), EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+    private static final PlayerAugment blockReach = new PlayerStatEnhancingAugment(Oritech.id("blockreach"), EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+    private static final PlayerAugment farBlockReach = new PlayerStatEnhancingAugment(Oritech.id("farblockreach"), EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 1f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
+    private static final PlayerAugment miningSpeed = new PlayerStatEnhancingAugment(Oritech.id("miningspeed"), EntityAttributes.PLAYER_MINING_EFFICIENCY, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+    private static final PlayerAugment superMiningSpeed = new PlayerStatEnhancingAugment(Oritech.id("fastminingspeed"), EntityAttributes.PLAYER_MINING_EFFICIENCY, 1f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
+    private static final PlayerAugment attackDamage = new PlayerStatEnhancingAugment(Oritech.id("attackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 4f, EntityAttributeModifier.Operation.ADD_VALUE, false);
+    private static final PlayerAugment superAttackDamage = new PlayerStatEnhancingAugment(Oritech.id("superattackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 6f, EntityAttributeModifier.Operation.ADD_VALUE, false);
+    private static final PlayerAugment luck = new PlayerStatEnhancingAugment(Oritech.id("luck"), EntityAttributes.GENERIC_LUCK, 100f, EntityAttributeModifier.Operation.ADD_VALUE, false);
+    private static final PlayerAugment gravity = new PlayerStatEnhancingAugment(Oritech.id("gravity"), EntityAttributes.GENERIC_GRAVITY, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
     
     private static final PlayerAugment flight = new PlayerCustomAugment(Oritech.id("flight")) {
         @Override
@@ -306,23 +321,48 @@ public class PlayerAugments {
         }
     };
     
+    // layout:
+    /*
+    0   5       30      55      80      105          130        155     180     205     230
+    10  att1    mining1 o       mining2 magnet      orevi       cloak   gravity o
+    30  speed1  o       speed2  step    nightvi     flight      portal  o       o
+    50  o       armor1  o       feeder  armor2      o           armor3  att2    hp4
+    70  hp1     o       luck    hp2     o           weaponreach hp3     water   o
+    90  o       dwarf   giant   portal  blockreach  farreach    o       o
+    
+     */
     
     
     static {
-        addAugmentAsset(hpBoost, 0, 50, List.of(), BlockContent.SIMPLE_STATION);
-        addAugmentAsset(speedBoost, 0, 90, List.of(), BlockContent.SIMPLE_STATION);
-        addAugmentAsset(hpBoostMore, 30, 50, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION);
-        addAugmentAsset(dwarf, 40, 20, List.of(Oritech.id("hpboost")), BlockContent.SIMPLE_STATION);
-        addAugmentAsset(giant, 40, 60, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION);
-        addAugmentAsset(autoFeeder, 50, 10, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION);
-        addAugmentAsset(armor, 30, 90, List.of(), BlockContent.SIMPLE_STATION);
-        addAugmentAsset(flight, 70, 30, List.of(Oritech.id("hpboostmore")), BlockContent.EXPECT_STATION);
-        addAugmentAsset(cloak, 70, 70, List.of(Oritech.id("hpboostmore")), BlockContent.EXPECT_STATION);
-        addAugmentAsset(portal, 90, 90, List.of(Oritech.id("flight")), BlockContent.SIMPLE_STATION);
-        addAugmentAsset(nightVision, 90, 60, List.of(), BlockContent.ADV_STATION);
-        addAugmentAsset(waterBreathing, 120, 70, List.of(), BlockContent.ADV_STATION);
-        addAugmentAsset(magnet, 150, 40, List.of(), BlockContent.SIMPLE_STATION);
-        addAugmentAsset(oreFinder, 150, 70, List.of(Oritech.id("nightvision"), Oritech.id("magnet")), BlockContent.EXPECT_STATION);
+        addAugmentAsset(hpBoost, 0, 70, List.of(), BlockContent.SIMPLE_STATION); //
+        addAugmentAsset(hpBoostMore, 80, 70, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION); //
+        addAugmentAsset(hpBoostUltra, 155, 70, List.of(), BlockContent.SIMPLE_STATION);  //
+        addAugmentAsset(hpBoostUltimate, 205, 50, List.of(), BlockContent.SIMPLE_STATION);  //
+        addAugmentAsset(speedBoost, 5, 30, List.of(), BlockContent.SIMPLE_STATION); //
+        addAugmentAsset(superSpeedBoost, 55, 50, List.of(), BlockContent.SIMPLE_STATION);    //
+        addAugmentAsset(stepAssist, 80, 50, List.of(), BlockContent.SIMPLE_STATION);   //
+        addAugmentAsset(dwarf, 30, 90, List.of(Oritech.id("hpboost")), BlockContent.SIMPLE_STATION);    //
+        addAugmentAsset(giant, 55, 90, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION);   //
+        addAugmentAsset(autoFeeder, 80, 90, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION);  //
+        addAugmentAsset(armor, 30, 50, List.of(), BlockContent.SIMPLE_STATION); //
+        addAugmentAsset(betterArmor, 105, 50, List.of(), BlockContent.SIMPLE_STATION);   //
+        addAugmentAsset(ultimateArmor, 155, 50, List.of(), BlockContent.SIMPLE_STATION); //
+        addAugmentAsset(flight, 130, 30, List.of(Oritech.id("hpboostmore")), BlockContent.EXPECT_STATION);   //
+        addAugmentAsset(cloak, 155, 10, List.of(Oritech.id("hpboostmore")), BlockContent.EXPECT_STATION);    //
+        addAugmentAsset(portal, 155, 30, List.of(Oritech.id("flight")), BlockContent.SIMPLE_STATION);    //
+        addAugmentAsset(nightVision, 105, 30, List.of(), BlockContent.ADV_STATION);  //
+        addAugmentAsset(weaponReach, 130, 70, List.of(), BlockContent.ADV_STATION);  //
+        addAugmentAsset(blockReach, 105, 90, List.of(), BlockContent.ADV_STATION);   //
+        addAugmentAsset(farBlockReach, 130, 90, List.of(), BlockContent.ADV_STATION);    //
+        addAugmentAsset(miningSpeed, 30, 10, List.of(), BlockContent.ADV_STATION);  //
+        addAugmentAsset(superMiningSpeed, 80, 10, List.of(), BlockContent.ADV_STATION); //
+        addAugmentAsset(attackDamage, 5, 10, List.of(), BlockContent.ADV_STATION); //
+        addAugmentAsset(superAttackDamage, 180, 50, List.of(), BlockContent.ADV_STATION);    //
+        addAugmentAsset(luck, 55, 70, List.of(), BlockContent.ADV_STATION);     //
+        addAugmentAsset(gravity, 180, 10, List.of(), BlockContent.ADV_STATION);  //
+        addAugmentAsset(waterBreathing, 180, 70, List.of(), BlockContent.ADV_STATION);  //
+        addAugmentAsset(magnet, 105, 10, List.of(), BlockContent.SIMPLE_STATION);   //
+        addAugmentAsset(oreFinder, 130, 10, List.of(Oritech.id("nightvision"), Oritech.id("magnet")), BlockContent.EXPECT_STATION); //
     }
     
     private static void addAugmentAsset(PlayerAugment augment, int x, int y, List<Identifier> requirements, Block requiredStation) {

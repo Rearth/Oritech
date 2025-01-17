@@ -74,7 +74,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         var outerContainer = Containers.horizontalFlow(Sizing.fill(60), Sizing.fill((int) (panelHeight * 100)));
         outerContainer.surface(Surface.PANEL);
         
-        var movedPanel = Containers.horizontalFlow(Sizing.fixed(800), Sizing.fill());
+        var movedPanel = Containers.horizontalFlow(Sizing.fixed(900), Sizing.fill());
         movedPanel.surface(Surface.tiled(Oritech.id("textures/block/machine_plating_block/empty.png"), 16, 16));
         movedPanel.margins(Insets.of(2));
         
@@ -142,7 +142,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             } else {
                 var remainingTicks = researchData.researchStartedAt + researchData.workTime - time;
                 var remainingSeconds = (int) (remainingTicks / 20f);
-                baseKey = Text.translatable("wait: %s", remainingSeconds);
+                baseKey = Text.translatable("text.oritech.augmenter_active", remainingSeconds);
             }
             
             panelData.text(baseKey);
@@ -183,7 +183,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             }
             
             if (!hasResearchStation) {
-                missingRequirements.add(Text.translatable("oritech.text.required_station: %s", requiredStationBlock.getName()));
+                missingRequirements.add(Text.translatable("oritech.text.required_station", requiredStationBlock.getName()));
                 hasRequirements = false;
             }
             
@@ -210,11 +210,13 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
                 tooltipOperation = "oritech.text.augment_op.pending";
             }
             
+            tooltipTitleText = Text.translatable(tooltipOperation).append(tooltipTitleText);
+            
             var lastOp = augmentState.openOp;
             if (operation != lastOp) {
                 
                 var collectedTooltip = new ArrayList<TooltipComponent>();
-                Stream.of(tooltipTitleText, Text.literal(""), Text.translatable(tooltipOperation), Text.literal(""), tooltipDesc)
+                Stream.of(tooltipTitleText, tooltipDesc)
                   .map(elem -> TooltipComponent.of(elem.asOrderedText()))
                   .forEach(collectedTooltip::add);
                 
@@ -234,7 +236,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
                     var inputs = recipe.getResearchCost();
                     var time = recipe.getTime();
                     
-                    collectedTooltip.add(TooltipComponent.of(Text.translatable("oritech.text.augment_research_time: %s", time).asOrderedText()));
+                    collectedTooltip.add(TooltipComponent.of(Text.translatable("oritech.text.augment_research_time", time).asOrderedText()));
                     var inputsComponent = new SizedIngredientTooltipComponent(inputs);
                     collectedTooltip.add(inputsComponent);
                 }
@@ -408,7 +410,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             }
         }
         
-        this.handler.player.sendMessage(Text.translatable("text.oritech.loaded_augments %s", loadedAugmentsCount));
+        this.handler.player.sendMessage(Text.translatable("text.oritech.loaded_augments", loadedAugmentsCount));
         this.close();
         
     }
@@ -450,8 +452,8 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         }
         
         if (!operation.equals(AugmentOperation.REMOVE)) {
-            descriptionPanel.child(Components.label(Text.translatable("oritech.text.time: %s", researchRecipe.getTime()).formatted(Formatting.GRAY)).margins(Insets.of(4, 0, 0, 0)));
-            descriptionPanel.child(Components.label(Text.translatable("oritech.text.resource_cost").formatted(Formatting.GRAY)).margins(Insets.of(4, 0, 0, 0)));
+            descriptionPanel.child(Components.label(Text.translatable("oritech.text.augment_research_time", researchRecipe.getTime()).formatted(Formatting.GRAY)).margins(Insets.of(4, 0, 0, 0)));
+            descriptionPanel.child(Components.label(Text.translatable("oritech.text.augment_resource_cost").formatted(Formatting.GRAY)).margins(Insets.of(4, 0, 0, 0)));
             
             var itemContainer = Containers.horizontalFlow(Sizing.fill(100), Sizing.content(1));
             var shownCost = researchRecipe.getResearchCost();
@@ -481,7 +483,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
         // todo check if station exists and is idle
         var requiredStationBlock = Registries.BLOCK.get(uiData.requiredStation());
-        var requiredStationLabel = Components.label(Text.translatable("oritech.text.required_station: %s", requiredStationBlock.getName()));
+        var requiredStationLabel = Components.label(Text.translatable("oritech.text.required_station", requiredStationBlock.getName()));
         descriptionPanel.child(requiredStationLabel);
         
         var hasRequiredStation = false;

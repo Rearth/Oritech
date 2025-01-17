@@ -10,15 +10,14 @@
   ],
   "researchCost": [
     {
-      "count": 32,
+      "count": 2,
       "ingredient": {
         "tag": "c:ingots/nickel"
       }
     },
     {
-      "count": 4,
       "ingredient": {
-        "item": "oritech:overcharged_crystal"
+        "item": "oritech:electrum_ingot"
       }
     }
   ],
