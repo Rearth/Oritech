@@ -111,11 +111,18 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         
         for (int i = 0; i < augments.size(); i++) {
             var augment = augments.get(i);
+            var augmentId = augmentIDs.get(augment);
+            var augmentData = PlayerAugments.allAugments.get(augmentId);
+            if (augmentData == null) continue;
+            var isEnabled = augmentData.isEnabled(client.player);
             var active = mousingOver == augment;
             
-            var color = new Color(160 / 255f, 180 / 255f, 180 / 255f, 0.3f).argb();
+            var color = new Color(180 / 255f, 30 / 255f, 30 / 255f, 0.3f).argb();  // red
+            if (isEnabled) {
+                color = new Color(30 / 255f, 180 / 255f, 30 / 255f, 0.3f).argb();  // green
+            }
             if (active)
-                color = new Color(160 / 255f, 180 / 255f, 220 / 255f, 0.5f).argb();
+                color = new Color(160 / 255f, 180 / 255f, 220 / 255f, 0.5f).argb(); // white
             
             var augmentRad = (i / (float) augmentCount) * 2 * Math.PI - Math.toRadians(90);
             
@@ -244,7 +251,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
             var enabled = augment.isEnabled(player);
             
             final var id = augment.id;
-            var label = Components.label(Text.literal(augment.id.getPath() + ": " + enabled));
+            var label = Components.label(Text.translatable("oritech.text.augment." + id.getPath()).append(Text.literal(": " + enabled)));
             label.positioning(Positioning.relative((int) (50 + offsetX * sideRelative), (int) (50 + offsetY)));
             
             augments.add(label);

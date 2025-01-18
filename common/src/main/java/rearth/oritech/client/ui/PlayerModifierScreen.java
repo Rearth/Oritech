@@ -196,7 +196,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             for (int i = 1; i < 8; i++) {
                 var key = "oritech.text.augment." + augmentId.getPath() + ".desc." + i;
                 if (I18n.hasTranslation(key))
-                    extraTooltips.add(Text.translatable(key));
+                    extraTooltips.add(Text.translatable(key).formatted(Formatting.ITALIC, Formatting.GRAY));
             }
             
             if (isApplied) {
@@ -234,7 +234,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
                     // collect requirements / cost
                     var recipe = (AugmentRecipe) this.handler.player.getWorld().getRecipeManager().get(augmentId).get().value();
                     var inputs = recipe.getResearchCost();
-                    var time = recipe.getTime();
+                    var time = recipe.getTime() / 20;
                     
                     collectedTooltip.add(TooltipComponent.of(Text.translatable("oritech.text.augment_research_time", time).asOrderedText()));
                     var inputsComponent = new SizedIngredientTooltipComponent(inputs);
