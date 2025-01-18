@@ -99,6 +99,7 @@ public final class Oritech {
         res.put(RegistryKeys.ITEM_GROUP.getValue(), () -> ArchitecturyRegistryContainer.register(ItemGroups.class, MOD_ID, false));
         res.put(RegistryKeys.RECIPE_SERIALIZER.getValue(), ArchitecturyRecipeRegistryContainer::finishSerializerRegister);
         res.put(RegistryKeys.LOOT_FUNCTION_TYPE.getValue(), FluidContent::registerItemsToGroups);
+        res.put(RegistryKeys.ITEM_GROUP.getValue(), PlayerAugments::init);
         
         return res;
     }

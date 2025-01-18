@@ -754,6 +754,7 @@
   "text.oritech.remove": "Remove",
   "text.oritech.noop": "",
   "text.oritech.cancel": "Cancel",
+  "text.oritech.augmenter_creative_tooltip": "In creative mode, you can research / apply augments without needing the resources to be present.",
 
   "text.oritech.redstone_power": "Level: %s",
   "text.config.oritech-config.title": "Oritech Settings",

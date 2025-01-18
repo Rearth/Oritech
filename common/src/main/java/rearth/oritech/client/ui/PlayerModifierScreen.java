@@ -89,11 +89,11 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
         addAvailableAugments(movedPanel);
         
-        var researchWidth = 120;
+        var researchWidth = 100;
         var researchContainer = Containers.verticalFlow(Sizing.fixed(researchWidth), Sizing.content());
         researchContainer.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         
-        addResearchPanels(researchContainer, 120);
+        addResearchPanels(researchContainer, researchWidth);
         
         var energyPanel = Containers.verticalFlow(Sizing.content(3), Sizing.content(3));
         energyPanel.surface(Surface.PANEL);
@@ -318,7 +318,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         for (var researchState : this.handler.blockEntity.availableStations.values()) {
             if (researchState == null) continue;
             
-            var panel = Containers.verticalFlow(Sizing.fixed(width), Sizing.fixed((int) (width * 0.5)));
+            var panel = Containers.verticalFlow(Sizing.fixed(width), Sizing.fixed((int) (width * 0.4)));
             var title = Components.label(researchState.type.getName().formatted(Formatting.BOLD));
             title.horizontalSizing(Sizing.fill());
             title.horizontalTextAlignment(HorizontalAlignment.CENTER);
@@ -426,6 +426,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         var researchRecipe = (AugmentRecipe) this.handler.blockEntity.getWorld().getRecipeManager().get(id).get().value();
         var uiData = PlayerAugments.augmentAssets.get(id);
         
+        var isCreative = this.handler.player.isCreative();
         var hasResources = true;
         
         var panel = Containers.verticalFlow(Sizing.fixed(250), Sizing.content(1));
@@ -513,6 +514,13 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             onAugmentClick(id, operation, true);
             overlay.remove();
         });
+        
+        if (!hasResources && isCreative) {
+            hasResources = true;
+            var text = Text.literal("[C] ").formatted(Formatting.DARK_PURPLE).append(Text.translatable(confirmKey));
+            confirmButton.setMessage(text);
+            confirmButton.tooltip(Text.translatable("text.oritech.augmenter_creative_tooltip"));
+        }
         
         if (operation.equals(AugmentOperation.NONE) || operation.equals(AugmentOperation.RESEARCH) && (!hasRequiredStation || !hasResources) || operation.equals(AugmentOperation.ADD) && !hasResources) {
             confirmButton.active(false);

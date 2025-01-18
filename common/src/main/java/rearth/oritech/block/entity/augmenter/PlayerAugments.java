@@ -40,7 +40,7 @@ public class PlayerAugments {
     private static final PlayerAugment hpBoostMore = new PlayerStatEnhancingAugment(Oritech.id("hpboostmore"), EntityAttributes.GENERIC_MAX_HEALTH, 4, EntityAttributeModifier.Operation.ADD_VALUE);
     private static final PlayerAugment hpBoostUltra = new PlayerStatEnhancingAugment(Oritech.id("hpboostultra"), EntityAttributes.GENERIC_MAX_HEALTH, 10, EntityAttributeModifier.Operation.ADD_VALUE);
     private static final PlayerAugment hpBoostUltimate = new PlayerStatEnhancingAugment(Oritech.id("hpboostultimate"), EntityAttributes.GENERIC_MAX_HEALTH, 10, EntityAttributeModifier.Operation.ADD_VALUE);
-    private static final PlayerAugment speedBoost = new PlayerStatEnhancingAugment(Oritech.id("speedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.1f, EntityAttributeModifier.Operation.ADD_VALUE, false);
+    private static final PlayerAugment speedBoost = new PlayerStatEnhancingAugment(Oritech.id("speedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
     private static final PlayerAugment superSpeedBoost = new PlayerStatEnhancingAugment(Oritech.id("superspeedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25f, EntityAttributeModifier.Operation.ADD_VALUE, true);
     private static final PlayerAugment stepAssist = new PlayerStatEnhancingAugment(Oritech.id("stepassist"), EntityAttributes.GENERIC_STEP_HEIGHT, 0.6f, EntityAttributeModifier.Operation.ADD_VALUE, true);
     private static final PlayerAugment dwarf = new PlayerStatEnhancingAugment(Oritech.id("dwarf"), EntityAttributes.GENERIC_SCALE, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
@@ -333,7 +333,10 @@ public class PlayerAugments {
      */
     
     
-    static {
+    public static void init() {
+        
+        Oritech.LOGGER.info("Registering oritech augment types");
+        
         addAugmentAsset(hpBoost, 0, 70, List.of(), BlockContent.SIMPLE_STATION); //
         addAugmentAsset(hpBoostMore, 80, 70, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION); //
         addAugmentAsset(hpBoostUltra, 155, 70, List.of(), BlockContent.SIMPLE_STATION);  //
@@ -430,7 +433,7 @@ public class PlayerAugments {
         private final AttachmentType<Integer> OWN_TYPE = AttachmentRegistry.<Integer>builder()
                                                                      .copyOnDeath()
                                                                      .persistent(Codec.INT)
-                                                                     .initializer(() -> 0)
+                                                                     .initializer(() -> -1)
                                                                      .syncWith(PacketCodecs.VAR_INT.cast(), AttachmentSyncPredicate.targetOnly())   // todo either wait for FFAPI update or manually replace this
                                                                      .buildAndRegister(this.id);
         
@@ -438,6 +441,7 @@ public class PlayerAugments {
         protected PlayerCustomAugment(Identifier id) {
             this(id, false);
         }
+        
         protected PlayerCustomAugment(Identifier id, boolean toggleable) {
             super(id, toggleable);
         }
