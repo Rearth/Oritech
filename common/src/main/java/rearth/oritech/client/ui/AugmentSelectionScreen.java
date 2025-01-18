@@ -57,8 +57,10 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         if (lastFocused == noOpButton) {
             noOpButton.text(Text.literal("Exit"));
         } else if (lastFocused != null && lastFocused instanceof LabelComponent lastButton) {
-            var message = lastButton.text();
-            noOpButton.text(Text.literal(""));
+            var focusedAugmentId = augmentIDs.get(lastButton);
+            if (focusedAugmentId == null) return;
+            var focusedAugment = Text.translatable("oritech.text.augment." + focusedAugmentId.getPath());
+            noOpButton.text(focusedAugment);
         }
         
     }
@@ -246,12 +248,8 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
             var offsetX = radius * Math.cos(angleRad);
             var offsetY = radius * Math.sin(angleRad);
             
-            System.out.println(augment.id.getPath() + ": " + offsetX + "|" + offsetY);
-            
-            var enabled = augment.isEnabled(player);
-            
             final var id = augment.id;
-            var label = Components.label(Text.translatable("oritech.text.augment." + id.getPath()).append(Text.literal(": " + enabled)));
+            var label = Components.label(Text.translatable("oritech.text.augment." + id.getPath()));
             label.positioning(Positioning.relative((int) (50 + offsetX * sideRelative), (int) (50 + offsetY)));
             
             augments.add(label);
@@ -270,7 +268,6 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
     }
     
     private void toggleAugment(Identifier id) {
-        System.out.println("toggling augment: " + id);
         NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.AugmentPlayerTogglePacket(id));
     }
     
