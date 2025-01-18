@@ -50,10 +50,10 @@
   "advancements.oritech.steam_engine": "Steam Dreams",
   "advancements.oritech.steam_engine.description": "Harness the power of steam! You've turned water into energy—now let's hope it doesn't turn into a hot mess!",
 
-  "oritech.text.augment.hpboost": "Reinforced Frame",
+  "oritech.text.augment.hpboost": "Steel-Infused Frame",
   "oritech.text.augment.hpboost.desc": "Integrates a durable framework, enhancing your body's resilience.",
   "oritech.text.augment.hpboost.desc.1": "Increases maximum health by 6 (3 hearts).",
-  "oritech.text.augment.hpboostmore": "Vitality Surge",
+  "oritech.text.augment.hpboostmore": "Carbon-Reinforced Lungs",
   "oritech.text.augment.hpboostmore.desc": "Channels focused energy to bolster your core life force.",
   "oritech.text.augment.hpboostmore.desc.1": "Increases maximum health by 4 (2 hearts).",
   "oritech.text.augment.hpboostultra": "Hyper-Regeneration Matrix",

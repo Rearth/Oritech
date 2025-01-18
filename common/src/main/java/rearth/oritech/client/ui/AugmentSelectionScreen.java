@@ -3,6 +3,7 @@ package rearth.oritech.client.ui;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.component.LabelComponent;
+import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
@@ -14,6 +15,7 @@ import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
+import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.network.NetworkContent;
@@ -56,7 +58,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         // update noop text
         if (lastFocused == noOpButton) {
             noOpButton.text(Text.literal("Exit"));
-        } else if (lastFocused != null && lastFocused instanceof LabelComponent lastButton) {
+        } else if (lastFocused != null && lastFocused instanceof TextureComponent lastButton) {
             var focusedAugmentId = augmentIDs.get(lastButton);
             if (focusedAugmentId == null) return;
             var focusedAugment = Text.translatable("oritech.text.augment." + focusedAugmentId.getPath());
@@ -236,7 +238,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         }
         
         var augmentCount = augmentsToAdd.size();
-        var radius = 30;
+        var radius = 32;
         
         var screenSizeX = this.width;
         var screenSizeY = this.height;
@@ -249,8 +251,10 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
             var offsetY = radius * Math.sin(angleRad);
             
             final var id = augment.id;
-            var label = Components.label(Text.translatable("oritech.text.augment." + id.getPath()));
+            var iconTexture = Oritech.id("textures/gui/augments/" + id.getPath() + ".png");
+            var label = Components.texture(iconTexture, 0, 0, 24, 24, 24, 24);
             label.positioning(Positioning.relative((int) (50 + offsetX * sideRelative), (int) (50 + offsetY)));
+            label.sizing(Sizing.fixed(36));
             
             augments.add(label);
             parent.child(label);

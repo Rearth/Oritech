@@ -344,12 +344,12 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             
             var position = new Vector2i(leftOffset + uiData.position().x * 4, (int) (uiData.position().y / 100f * maxHeight));
             
-            var iconTexture = Oritech.id("textures/gui/augments/exoskeleton.png");
+            var iconTexture = Oritech.id("textures/gui/augments/" + augmentId.getPath() + ".png");
             var backgroundTexture = Oritech.id("textures/gui/augments/background_open.png");
             
             final var augmentOpId = augmentId;
             
-            var icon = Components.texture(iconTexture, 0, 0, 32, 32, 32, 32);
+            var icon = Components.texture(iconTexture, 0, 0, 24, 24, 24, 24);
             icon.mouseDown().subscribe((a, b, c) -> {
                 onAugmentClick(augmentOpId, shownAugments.get(augmentOpId).openOp, false);
                 return true;
@@ -453,7 +453,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         }
         
         if (!operation.equals(AugmentOperation.REMOVE)) {
-            descriptionPanel.child(Components.label(Text.translatable("oritech.text.augment_research_time", researchRecipe.getTime()).formatted(Formatting.GRAY)).margins(Insets.of(4, 0, 0, 0)));
+            descriptionPanel.child(Components.label(Text.translatable("oritech.text.augment_research_time", researchRecipe.getTime() / 20).formatted(Formatting.GRAY)).margins(Insets.of(4, 0, 0, 0)));
             descriptionPanel.child(Components.label(Text.translatable("oritech.text.augment_resource_cost").formatted(Formatting.GRAY)).margins(Insets.of(4, 0, 0, 0)));
             
             var itemContainer = Containers.horizontalFlow(Sizing.fill(100), Sizing.content(1));
