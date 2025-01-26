@@ -8,9 +8,15 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -98,6 +104,47 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
         if (networkDirty) {
             updateNetwork();
         }
+    }
+    
+    // persist researched augments, inventory, energy
+    @Override
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
+        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+        nbt.putLong("rf", energyStorage.getAmount());
+        addMultiblockToNbt(nbt);
+        
+        
+        var list = new NbtList();
+        for (var augment : researchedAugments) {
+            list.add(NbtString.of(augment.getPath()));
+        }
+        
+        // also put in pending researches to avoid having to separately store them
+        for (var station : availableStations.values()) {
+            if (station == null) continue;
+            if (station.working) {
+                list.add(NbtString.of(station.selectedResearch.getPath()));
+            }
+        }
+        
+        nbt.put("researched", list);
+        
+    }
+    
+    @Override
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+        energyStorage.setAmount(nbt.getLong("rf"));
+        loadMultiblockNbtData(nbt);
+        
+        var parsedList = nbt.getList("researched", NbtElement.STRING_TYPE);
+        for (var element : parsedList) {
+            var id = Oritech.id(element.asString());
+            researchedAugments.add(id);
+        }
+        
     }
     
     public void researchAugment(Identifier augment) {
@@ -275,7 +322,8 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
                 continue;
             }
             
-            if (availableStations.containsKey(i) &&availableStations.get(i) != null && availableStations.get(i).type.equals(candidateState.getBlock())) continue;
+            if (availableStations.containsKey(i) && availableStations.get(i) != null && availableStations.get(i).type.equals(candidateState.getBlock()))
+                continue;
             
             var newState = new ResearchState(candidateState.getBlock(), false, Identifier.of(""), -1, -1);
             
@@ -449,7 +497,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
           new GuiSlot(2, 70, 30),
           new GuiSlot(3, 90, 30),
           new GuiSlot(4, 110, 30)
-          );
+        );
     }
     
     @Override
