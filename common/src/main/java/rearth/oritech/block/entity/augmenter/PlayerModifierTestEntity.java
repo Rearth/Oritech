@@ -48,8 +48,8 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     public final Set<Identifier> researchedAugments = new HashSet<>();
     
     // config
-    public static long maxEnergyTransfer = 50_000;
-    public static long maxEnergyStored = 5_000_000;
+    public static long maxEnergyTransfer = 50_000_000;
+    public static long maxEnergyStored = 5_000_000_000L;
     public static long energyUsageRate = 2048;
     
     // multiblock
@@ -101,7 +101,6 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     }
     
     public void researchAugment(Identifier augment) {
-        System.out.println("researching augment: " + augment);
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -114,6 +113,8 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
         }
         
         var recipe = (AugmentRecipe) world.getRecipeManager().get(augment).get().value();
+        
+        energyStorage.setAmount(energyStorage.getAmount() - recipe.getRfCost());
         
         // remove available resources
         for (var wantedInput : recipe.getResearchCost()) {
@@ -153,7 +154,6 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     }
     
     public void installAugmentToPlayer(Identifier augment, PlayerEntity player) {
-        System.out.println("adding augment: " + augment);
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -189,7 +189,6 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     }
     
     public void removeAugmentFromPlayer(Identifier augment, PlayerEntity player) {
-        System.out.println("removing augment: " + augment);
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -202,7 +201,6 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     }
     
     public static void toggleAugmentForPlayer(Identifier augment, PlayerEntity player) {
-        System.out.println("toggling augment: " + augment);
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -327,7 +325,6 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
             var startedTime = packet.startedTimes().get(i);
             
             var res = new ResearchState(station, state, target, researchTime, startedTime);
-            System.out.println("got on client: " + res);
             availableStations.put(i, res);
         }
         

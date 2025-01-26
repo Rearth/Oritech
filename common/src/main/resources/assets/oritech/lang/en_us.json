@@ -152,6 +152,8 @@
   "oritech.text.augment.orefinder.desc.1": "Detects nearby ores.",
   "oritech.text.augment.orefinder.desc.2": "This augment is toggleable.",
 
+  "oritech.text.energy_cost": "RF Research Cost: %s RF",
+
   "button.oritech.input_mode_fill_left_to_right": "Default",
   "button.oritech.input_mode_fill_evenly": "Fill Evenly",
   "button.oritech.input_mode_fill_matching_recipe": "Match Recipe",

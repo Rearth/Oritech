@@ -273,6 +273,12 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
     
     private void toggleAugment(Identifier id) {
         NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.AugmentPlayerTogglePacket(id));
+        
+        var instance = PlayerAugments.allAugments.get(id);
+        if (instance.autoSync) {
+            // directly toggle on client, instead of sending the toggle command to server, and then syncing to client
+            instance.toggle(this.client.player);
+        }
     }
     
     @Override

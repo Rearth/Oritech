@@ -22,6 +22,7 @@ import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
+import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.PlayerModifierTestEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.interaction.*;
@@ -148,6 +149,8 @@ public class NetworkContent {
     
     public record AugmentDataPacket(BlockPos position, List<Identifier> allResearched, List<Identifier> researchBlocks, List<Boolean> researchStates, List<Identifier> activeResearches, List<Long> startedTimes, List<Integer> researchTimes) {
     }
+    
+    public record AugmentOperationSyncPacket(Identifier id, int operation) {}
     
     public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn, String fluidTypeOut,
                                             long amountOut) {
@@ -535,6 +538,21 @@ public class NetworkContent {
             
             if (entity instanceof PlayerModifierTestEntity enhancer) {
                 enhancer.handleAugmentUpdatePacket(message);
+            }
+            
+        }));
+        
+        
+        MACHINE_CHANNEL.registerClientbound(AugmentOperationSyncPacket.class, ((message, access) -> {
+            var player = access.player();
+            
+            var augmentInstance = PlayerAugments.allAugments.get(message.id);
+            if (message.operation == PlayerModifierScreen.AugmentOperation.ADD.ordinal()) {
+                augmentInstance.installToPlayer(player);
+            } else if (message.operation == PlayerModifierScreen.AugmentOperation.REMOVE.ordinal()) {
+                augmentInstance.removeFromPlayer(player);
+            } else if (message.operation == PlayerModifierScreen.AugmentOperation.TOGGLE.ordinal()) {
+                augmentInstance.toggle(player);
             }
             
         }));

@@ -19,14 +19,16 @@ public class AugmentRecipe implements Recipe<RecipeInput> {
     private final List<SizedIngredient> researchCost;
     private final List<SizedIngredient> applyCost;
     private final int time;
+    private final long rfCost;
 
-    public static final AugmentRecipe DUMMY = new AugmentRecipe(RecipeContent.AUGMENT, List.of(new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_DUSTS))), List.of(new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_DUSTS))), -1);
+    public static final AugmentRecipe DUMMY = new AugmentRecipe(RecipeContent.AUGMENT, List.of(new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_DUSTS))), List.of(new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_DUSTS))), -1, -1);
     
-    public AugmentRecipe(AugmentRecipeType type, List<SizedIngredient> inputs, List<SizedIngredient> applyCost, int time) {
+    public AugmentRecipe(AugmentRecipeType type, List<SizedIngredient> inputs, List<SizedIngredient> applyCost, int time, long rfCost) {
         this.type = type;
         this.researchCost = inputs;
         this.applyCost = applyCost;
         this.time = time;
+        this.rfCost = rfCost;
     }
     
     @Override
@@ -69,6 +71,10 @@ public class AugmentRecipe implements Recipe<RecipeInput> {
     
     public List<SizedIngredient> getApplyCost() {
         return applyCost;
+    }
+    
+    public long getRfCost() {
+        return rfCost;
     }
     
     public int getTime() {

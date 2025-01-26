@@ -19,6 +19,7 @@ public class AugmentRecipeType extends EndecRecipeSerializer<AugmentRecipe> impl
       CodecUtils.toEndec(SizedIngredient.CODEC.codec()).listOf().fieldOf("researchCost", AugmentRecipe::getResearchCost),
       CodecUtils.toEndec(SizedIngredient.CODEC.codec()).listOf().fieldOf("applyCost", AugmentRecipe::getApplyCost),
       Endec.INT.optionalFieldOf("time", AugmentRecipe::getTime, 60),
+      Endec.LONG.optionalFieldOf("rfCost", AugmentRecipe::getRfCost, 60L),
       AugmentRecipe::new
     );
     

@@ -27,8 +27,10 @@ import net.minecraft.util.math.Box;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.other.OreFinderRenderer;
+import rearth.oritech.client.ui.PlayerModifierScreen;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.EntitiesContent;
+import rearth.oritech.network.NetworkContent;
 
 import java.util.*;
 
@@ -51,18 +53,21 @@ public class PlayerAugments {
     private static final PlayerAugment weaponReach = new PlayerStatEnhancingAugment(Oritech.id("weaponreach"), EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
     private static final PlayerAugment blockReach = new PlayerStatEnhancingAugment(Oritech.id("blockreach"), EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
     private static final PlayerAugment farBlockReach = new PlayerStatEnhancingAugment(Oritech.id("farblockreach"), EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 1f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
-    private static final PlayerAugment miningSpeed = new PlayerStatEnhancingAugment(Oritech.id("miningspeed"), EntityAttributes.PLAYER_MINING_EFFICIENCY, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, false);
-    private static final PlayerAugment superMiningSpeed = new PlayerStatEnhancingAugment(Oritech.id("fastminingspeed"), EntityAttributes.PLAYER_MINING_EFFICIENCY, 1f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
-    private static final PlayerAugment attackDamage = new PlayerStatEnhancingAugment(Oritech.id("attackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 4f, EntityAttributeModifier.Operation.ADD_VALUE, false);
-    private static final PlayerAugment superAttackDamage = new PlayerStatEnhancingAugment(Oritech.id("superattackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 6f, EntityAttributeModifier.Operation.ADD_VALUE, false);
+    private static final PlayerAugment miningSpeed = new PlayerStatEnhancingAugment(Oritech.id("miningspeed"), EntityAttributes.PLAYER_MINING_EFFICIENCY, 0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, false);
+    private static final PlayerAugment superMiningSpeed = new PlayerStatEnhancingAugment(Oritech.id("fastminingspeed"), EntityAttributes.PLAYER_MINING_EFFICIENCY, 2f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
     private static final PlayerAugment luck = new PlayerStatEnhancingAugment(Oritech.id("luck"), EntityAttributes.GENERIC_LUCK, 100f, EntityAttributeModifier.Operation.ADD_VALUE, false);
     private static final PlayerAugment gravity = new PlayerStatEnhancingAugment(Oritech.id("gravity"), EntityAttributes.GENERIC_GRAVITY, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+    private static final PlayerAugment attackDamage = new PlayerStatEnhancingAugment(Oritech.id("attackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 4f, EntityAttributeModifier.Operation.ADD_VALUE, true, false);
+    private static final PlayerAugment superAttackDamage = new PlayerStatEnhancingAugment(Oritech.id("superattackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 6f, EntityAttributeModifier.Operation.ADD_VALUE, true, false);
     
     private static final PlayerAugment flight = new PlayerCustomAugment(Oritech.id("flight")) {
         @Override
         public void onInstalled(PlayerEntity player) {
             player.getAbilities().allowFlying = true;
             player.sendAbilitiesUpdate();
+            
+            if (autoSync && !player.getWorld().isClient)
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.ADD.ordinal()));
         }
         
         @Override
@@ -107,6 +112,9 @@ public class PlayerAugments {
         @Override
         public void onPlayerLoad(PlayerEntity player) {
             this.onInstalled(player);
+            
+            if (autoSync && !player.getWorld().isClient)
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.ADD.ordinal()));
         }
         
         @Override
@@ -405,10 +413,12 @@ public class PlayerAugments {
         
         public final Identifier id;
         public final boolean toggleable;
+        public final boolean autoSync;
         
-        protected PlayerAugment(Identifier id, boolean toggleable) {
+        protected PlayerAugment(Identifier id, boolean toggleable, boolean autoSync) {
             this.id = id;
             this.toggleable = toggleable;
+            this.autoSync = autoSync;
         }
         
         public abstract boolean isInstalled(PlayerEntity player);
@@ -417,12 +427,17 @@ public class PlayerAugments {
         
         public abstract void removeFromPlayer(PlayerEntity player);
         
-        public void onInstalled(PlayerEntity player) {}
+        public void onInstalled(PlayerEntity player) { }
         public void onRemoved(PlayerEntity player) {}
         
-        public void onPlayerLoad(PlayerEntity player) {}
+        public void onPlayerLoad(PlayerEntity player) {
+            
+            if (autoSync && !player.getWorld().isClient)
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.ADD.ordinal()));
+            
+        }
         
-        public void toggle(PlayerEntity player) {}
+        public void toggle(PlayerEntity player) { }
         
         public boolean isEnabled (PlayerEntity player) {return true;}
         
@@ -443,7 +458,7 @@ public class PlayerAugments {
         }
         
         protected PlayerCustomAugment(Identifier id, boolean toggleable) {
-            super(id, toggleable);
+            super(id, toggleable, false);
         }
         
         public AttachmentType<Integer> getOwnType() {
@@ -459,12 +474,18 @@ public class PlayerAugments {
         public void installToPlayer(PlayerEntity player) {
             player.setAttached(OWN_TYPE, 0);
             this.onInstalled(player);
+            
+            if (autoSync && !player.getWorld().isClient)
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.ADD.ordinal()));
         }
         
         @Override
         public void removeFromPlayer(PlayerEntity player) {
             player.removeAttached(OWN_TYPE);
             this.onRemoved(player);
+            
+            if (autoSync && !player.getWorld().isClient)
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.REMOVE.ordinal()));
         }
     }
     
@@ -482,7 +503,7 @@ public class PlayerAugments {
             this(id, false);
         }
         protected PlayerPortalAugment(Identifier id, boolean toggleable) {
-            super(id, toggleable);
+            super(id, toggleable, false);
         }
         
         public AttachmentType<BlockPos> getOwnType() {
@@ -498,16 +519,23 @@ public class PlayerAugments {
         public void installToPlayer(PlayerEntity player) {
             player.setAttached(OWN_TYPE, player.getBlockPos());
             this.onInstalled(player);
+            
+            if (autoSync && !player.getWorld().isClient)
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.ADD.ordinal()));
         }
         
         @Override
         public void removeFromPlayer(PlayerEntity player) {
             player.removeAttached(OWN_TYPE);
             this.onRemoved(player);
+            
+            if (autoSync && !player.getWorld().isClient)
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.REMOVE.ordinal()));
         }
         
         @Override
         public void toggle(PlayerEntity player) {
+            super.toggle(player);
             var world = player.getWorld();
             
             var hitResult = player.raycast(6, 0, false);
@@ -515,8 +543,6 @@ public class PlayerAugments {
             var hitDist = Math.sqrt(hitResult.squaredDistanceTo(player));
             var spawnToPlayer = spawnPos.subtract(player.getPos()).normalize().multiply(0.3);
             spawnPos = spawnPos.subtract(spawnToPlayer);
-            
-            System.out.println(hitDist);
             
             var targetPos = player.getAttached(OWN_TYPE);
             if (targetPos == null) return;
@@ -552,11 +578,14 @@ public class PlayerAugments {
         private final EntityAttributeModifier.Operation operation;
         
         protected PlayerStatEnhancingAugment(Identifier id, RegistryEntry<EntityAttribute> targetAttribute, float amount, EntityAttributeModifier.Operation operation) {
-            this(id, targetAttribute, amount, operation, false);
+            this(id, targetAttribute, amount, operation, false, false);
         }
         
         protected PlayerStatEnhancingAugment(Identifier id, RegistryEntry<EntityAttribute> targetAttribute, float amount, EntityAttributeModifier.Operation operation, boolean toggleable) {
-            super(id, toggleable);
+            this(id, targetAttribute, amount, operation, toggleable, false);
+        }
+        protected PlayerStatEnhancingAugment(Identifier id, RegistryEntry<EntityAttribute> targetAttribute, float amount, EntityAttributeModifier.Operation operation, boolean toggleable, boolean autoSync) {
+            super(id, toggleable, autoSync);
             this.targetAttribute = targetAttribute;
             this.amount = amount;
             this.operation = operation;
@@ -575,6 +604,9 @@ public class PlayerAugments {
             if (instance == null) return;
             instance.overwritePersistentModifier(new EntityAttributeModifier(id, amount, operation));
             this.onInstalled(player);
+            
+            if (autoSync && !player.getWorld().isClient)
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.ADD.ordinal()));
         }
         
         @Override
@@ -583,6 +615,9 @@ public class PlayerAugments {
             if (instance == null) return;
             instance.removeModifier(id);
             this.onRemoved(player);
+            
+            if (autoSync && !player.getWorld().isClient)
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.REMOVE.ordinal()));
         }
         
         @Override
@@ -601,8 +636,6 @@ public class PlayerAugments {
         public void toggle(PlayerEntity player) {
             var instance = player.getAttributeInstance(targetAttribute);
             if (instance == null) return;
-            
-            System.out.println("toggling: " + this.id.getPath());
             
             var modifier = instance.getModifier(id);
             if (modifier == null) return;
