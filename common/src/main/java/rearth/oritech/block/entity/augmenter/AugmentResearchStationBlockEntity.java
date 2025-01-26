@@ -15,13 +15,13 @@ import rearth.oritech.util.energy.EnergyApi;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AugmenterResearchStationBlockEntity extends BlockEntity implements MultiblockMachineController {
+public class AugmentResearchStationBlockEntity extends BlockEntity implements MultiblockMachineController {
     
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     private float coreQuality = 1f;
     
-    public AugmenterResearchStationBlockEntity(BlockPos pos, BlockState state) {
+    public AugmentResearchStationBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.AUGMENTER_RESEARCH_STATION_ENTITY, pos, state);
     }
     

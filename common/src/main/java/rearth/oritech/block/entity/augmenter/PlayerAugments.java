@@ -27,7 +27,6 @@ import net.minecraft.util.math.Box;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.other.OreFinderRenderer;
-import rearth.oritech.client.ui.PlayerModifierScreen;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.network.NetworkContent;
@@ -53,12 +52,12 @@ public class PlayerAugments {
     private static final PlayerAugment weaponReach = new PlayerStatEnhancingAugment(Oritech.id("weaponreach"), EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
     private static final PlayerAugment blockReach = new PlayerStatEnhancingAugment(Oritech.id("blockreach"), EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
     private static final PlayerAugment farBlockReach = new PlayerStatEnhancingAugment(Oritech.id("farblockreach"), EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 1f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
-    private static final PlayerAugment miningSpeed = new PlayerStatEnhancingAugment(Oritech.id("miningspeed"), EntityAttributes.PLAYER_MINING_EFFICIENCY, 0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, false);
-    private static final PlayerAugment superMiningSpeed = new PlayerStatEnhancingAugment(Oritech.id("fastminingspeed"), EntityAttributes.PLAYER_MINING_EFFICIENCY, 2f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
+    private static final PlayerAugment miningSpeed = new PlayerStatEnhancingAugment(Oritech.id("miningspeed"), EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, 0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, false);
+    private static final PlayerAugment superMiningSpeed = new PlayerStatEnhancingAugment(Oritech.id("fastminingspeed"), EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, 2f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
     private static final PlayerAugment luck = new PlayerStatEnhancingAugment(Oritech.id("luck"), EntityAttributes.GENERIC_LUCK, 100f, EntityAttributeModifier.Operation.ADD_VALUE, false);
     private static final PlayerAugment gravity = new PlayerStatEnhancingAugment(Oritech.id("gravity"), EntityAttributes.GENERIC_GRAVITY, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
-    private static final PlayerAugment attackDamage = new PlayerStatEnhancingAugment(Oritech.id("attackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 4f, EntityAttributeModifier.Operation.ADD_VALUE, true, false);
-    private static final PlayerAugment superAttackDamage = new PlayerStatEnhancingAugment(Oritech.id("superattackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 6f, EntityAttributeModifier.Operation.ADD_VALUE, true, false);
+    private static final PlayerAugment attackDamage = new PlayerStatEnhancingAugment(Oritech.id("attackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 4f, EntityAttributeModifier.Operation.ADD_VALUE, true, true);
+    private static final PlayerAugment superAttackDamage = new PlayerStatEnhancingAugment(Oritech.id("superattackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 6f, EntityAttributeModifier.Operation.ADD_VALUE, true, true);
     
     private static final PlayerAugment flight = new PlayerCustomAugment(Oritech.id("flight")) {
         @Override
@@ -67,7 +66,7 @@ public class PlayerAugments {
             player.sendAbilitiesUpdate();
             
             if (autoSync && !player.getWorld().isClient)
-                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.ADD.ordinal()));
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, AugmentOperation.ADD.ordinal()));
         }
         
         @Override
@@ -114,7 +113,7 @@ public class PlayerAugments {
             this.onInstalled(player);
             
             if (autoSync && !player.getWorld().isClient)
-                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.ADD.ordinal()));
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, AugmentOperation.ADD.ordinal()));
         }
         
         @Override
@@ -345,35 +344,35 @@ public class PlayerAugments {
         
         Oritech.LOGGER.info("Registering oritech augment types");
         
-        addAugmentAsset(hpBoost, 0, 70, List.of(), BlockContent.SIMPLE_STATION); //
-        addAugmentAsset(hpBoostMore, 80, 70, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION); //
-        addAugmentAsset(hpBoostUltra, 155, 70, List.of(), BlockContent.SIMPLE_STATION);  //
-        addAugmentAsset(hpBoostUltimate, 205, 50, List.of(), BlockContent.SIMPLE_STATION);  //
-        addAugmentAsset(speedBoost, 5, 30, List.of(), BlockContent.SIMPLE_STATION); //
-        addAugmentAsset(superSpeedBoost, 55, 50, List.of(), BlockContent.SIMPLE_STATION);    //
-        addAugmentAsset(stepAssist, 80, 50, List.of(), BlockContent.SIMPLE_STATION);   //
-        addAugmentAsset(dwarf, 30, 90, List.of(Oritech.id("hpboost")), BlockContent.SIMPLE_STATION);    //
-        addAugmentAsset(giant, 55, 90, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION);   //
-        addAugmentAsset(autoFeeder, 80, 90, List.of(Oritech.id("hpboost")), BlockContent.ADV_STATION);  //
-        addAugmentAsset(armor, 30, 50, List.of(), BlockContent.SIMPLE_STATION); //
-        addAugmentAsset(betterArmor, 105, 50, List.of(), BlockContent.SIMPLE_STATION);   //
-        addAugmentAsset(ultimateArmor, 155, 50, List.of(), BlockContent.SIMPLE_STATION); //
-        addAugmentAsset(flight, 130, 30, List.of(Oritech.id("hpboostmore")), BlockContent.EXPECT_STATION);   //
-        addAugmentAsset(cloak, 155, 10, List.of(Oritech.id("hpboostmore")), BlockContent.EXPECT_STATION);    //
-        addAugmentAsset(portal, 155, 30, List.of(Oritech.id("flight")), BlockContent.SIMPLE_STATION);    //
-        addAugmentAsset(nightVision, 105, 30, List.of(), BlockContent.ADV_STATION);  //
-        addAugmentAsset(weaponReach, 130, 70, List.of(), BlockContent.ADV_STATION);  //
-        addAugmentAsset(blockReach, 105, 90, List.of(), BlockContent.ADV_STATION);   //
-        addAugmentAsset(farBlockReach, 130, 90, List.of(), BlockContent.ADV_STATION);    //
-        addAugmentAsset(miningSpeed, 30, 10, List.of(), BlockContent.ADV_STATION);  //
-        addAugmentAsset(superMiningSpeed, 80, 10, List.of(), BlockContent.ADV_STATION); //
-        addAugmentAsset(attackDamage, 5, 10, List.of(), BlockContent.ADV_STATION); //
-        addAugmentAsset(superAttackDamage, 180, 50, List.of(), BlockContent.ADV_STATION);    //
-        addAugmentAsset(luck, 55, 70, List.of(), BlockContent.ADV_STATION);     //
-        addAugmentAsset(gravity, 180, 10, List.of(), BlockContent.ADV_STATION);  //
-        addAugmentAsset(waterBreathing, 180, 70, List.of(), BlockContent.ADV_STATION);  //
-        addAugmentAsset(magnet, 105, 10, List.of(), BlockContent.SIMPLE_STATION);   //
-        addAugmentAsset(oreFinder, 130, 10, List.of(Oritech.id("nightvision"), Oritech.id("magnet")), BlockContent.EXPECT_STATION); //
+        addAugmentAsset(hpBoost, 0, 70, List.of(), BlockContent.SIMPLE_AUGMENT_STATION); //
+        addAugmentAsset(hpBoostMore, 80, 70, List.of(Oritech.id("hpboost")), BlockContent.ADVANCED_AUGMENT_STATION); //
+        addAugmentAsset(hpBoostUltra, 155, 70, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);  //
+        addAugmentAsset(hpBoostUltimate, 205, 50, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);  //
+        addAugmentAsset(speedBoost, 5, 30, List.of(), BlockContent.SIMPLE_AUGMENT_STATION); //
+        addAugmentAsset(superSpeedBoost, 55, 50, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);    //
+        addAugmentAsset(stepAssist, 80, 50, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);   //
+        addAugmentAsset(dwarf, 30, 90, List.of(Oritech.id("hpboost")), BlockContent.SIMPLE_AUGMENT_STATION);    //
+        addAugmentAsset(giant, 55, 90, List.of(Oritech.id("hpboost")), BlockContent.ADVANCED_AUGMENT_STATION);   //
+        addAugmentAsset(autoFeeder, 80, 90, List.of(Oritech.id("hpboost")), BlockContent.ADVANCED_AUGMENT_STATION);  //
+        addAugmentAsset(armor, 30, 50, List.of(), BlockContent.SIMPLE_AUGMENT_STATION); //
+        addAugmentAsset(betterArmor, 105, 50, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);   //
+        addAugmentAsset(ultimateArmor, 155, 50, List.of(), BlockContent.SIMPLE_AUGMENT_STATION); //
+        addAugmentAsset(flight, 130, 30, List.of(Oritech.id("hpboostmore")), BlockContent.ARCANE_AUGMENT_STATION);   //
+        addAugmentAsset(cloak, 155, 10, List.of(Oritech.id("hpboostmore")), BlockContent.ARCANE_AUGMENT_STATION);    //
+        addAugmentAsset(portal, 155, 30, List.of(Oritech.id("flight")), BlockContent.SIMPLE_AUGMENT_STATION);    //
+        addAugmentAsset(nightVision, 105, 30, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);  //
+        addAugmentAsset(weaponReach, 130, 70, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);  //
+        addAugmentAsset(blockReach, 105, 90, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);   //
+        addAugmentAsset(farBlockReach, 130, 90, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);    //
+        addAugmentAsset(miningSpeed, 30, 10, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);  //
+        addAugmentAsset(superMiningSpeed, 80, 10, List.of(), BlockContent.ADVANCED_AUGMENT_STATION); //
+        addAugmentAsset(attackDamage, 5, 10, List.of(), BlockContent.ADVANCED_AUGMENT_STATION); //
+        addAugmentAsset(superAttackDamage, 180, 50, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);    //
+        addAugmentAsset(luck, 55, 70, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);     //
+        addAugmentAsset(gravity, 180, 10, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);  //
+        addAugmentAsset(waterBreathing, 180, 70, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);  //
+        addAugmentAsset(magnet, 105, 10, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);   //
+        addAugmentAsset(oreFinder, 130, 10, List.of(Oritech.id("nightvision"), Oritech.id("magnet")), BlockContent.ARCANE_AUGMENT_STATION); //
     }
     
     private static void addAugmentAsset(PlayerAugment augment, int x, int y, List<Identifier> requirements, Block requiredStation) {
@@ -401,6 +400,10 @@ public class PlayerAugments {
             if (augment instanceof TickingAugment tickingAugment && augment.isInstalled(player) && augment.isEnabled(player))
                 tickingAugment.clientTick(player);
         }
+    }
+    
+    public enum AugmentOperation {
+        RESEARCH, ADD, REMOVE, NEEDS_INIT, TOGGLE, NONE
     }
     
     public interface TickingAugment {
@@ -433,7 +436,7 @@ public class PlayerAugments {
         public void onPlayerLoad(PlayerEntity player) {
             
             if (autoSync && !player.getWorld().isClient)
-                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.ADD.ordinal()));
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, AugmentOperation.ADD.ordinal()));
             
         }
         
@@ -476,7 +479,7 @@ public class PlayerAugments {
             this.onInstalled(player);
             
             if (autoSync && !player.getWorld().isClient)
-                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.ADD.ordinal()));
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, AugmentOperation.ADD.ordinal()));
         }
         
         @Override
@@ -485,7 +488,7 @@ public class PlayerAugments {
             this.onRemoved(player);
             
             if (autoSync && !player.getWorld().isClient)
-                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.REMOVE.ordinal()));
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, AugmentOperation.REMOVE.ordinal()));
         }
     }
     
@@ -521,7 +524,7 @@ public class PlayerAugments {
             this.onInstalled(player);
             
             if (autoSync && !player.getWorld().isClient)
-                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.ADD.ordinal()));
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, AugmentOperation.ADD.ordinal()));
         }
         
         @Override
@@ -530,7 +533,7 @@ public class PlayerAugments {
             this.onRemoved(player);
             
             if (autoSync && !player.getWorld().isClient)
-                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.REMOVE.ordinal()));
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, AugmentOperation.REMOVE.ordinal()));
         }
         
         @Override
@@ -606,7 +609,7 @@ public class PlayerAugments {
             this.onInstalled(player);
             
             if (autoSync && !player.getWorld().isClient)
-                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.ADD.ordinal()));
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, AugmentOperation.ADD.ordinal()));
         }
         
         @Override
@@ -617,7 +620,7 @@ public class PlayerAugments {
             this.onRemoved(player);
             
             if (autoSync && !player.getWorld().isClient)
-                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, PlayerModifierScreen.AugmentOperation.REMOVE.ordinal()));
+                NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, AugmentOperation.REMOVE.ordinal()));
         }
         
         @Override

@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "oritech:expect_station"
+          "name": "oritech:advanced_augment_station"
         }
       ],
       "rolls": 1.0

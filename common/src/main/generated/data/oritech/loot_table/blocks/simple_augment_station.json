@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "oritech:adv_station"
+          "name": "oritech:simple_augment_station"
         }
       ],
       "rolls": 1.0

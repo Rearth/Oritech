@@ -13,8 +13,8 @@ import rearth.oritech.block.entity.addons.*;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
-import rearth.oritech.block.entity.augmenter.AugmenterResearchStationBlockEntity;
-import rearth.oritech.block.entity.augmenter.PlayerModifierTestEntity;
+import rearth.oritech.block.entity.augmenter.AugmentResearchStationBlockEntity;
+import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.decorative.TechDoorBlockEntity;
 import rearth.oritech.block.entity.generators.*;
 import rearth.oritech.block.entity.interaction.*;
@@ -166,8 +166,8 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     
     @AssignSidedInventory
     @AssignSidedEnergy
-    public static final BlockEntityType<PlayerModifierTestEntity> PLAYER_MODIFIER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(PlayerModifierTestEntity::new, BlockContent.TEST_BLOCK).build();
-    public static final BlockEntityType<AugmenterResearchStationBlockEntity> AUGMENTER_RESEARCH_STATION_ENTITY = FabricBlockEntityTypeBuilder.create(AugmenterResearchStationBlockEntity::new, BlockContent.SIMPLE_STATION, BlockContent.ADV_STATION, BlockContent.EXPECT_STATION).build();
+    public static final BlockEntityType<AugmentApplicationEntity> PLAYER_MODIFIER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(AugmentApplicationEntity::new, BlockContent.AUGMENT_APPLICATION_BLOCK).build();
+    public static final BlockEntityType<AugmentResearchStationBlockEntity> AUGMENTER_RESEARCH_STATION_ENTITY = FabricBlockEntityTypeBuilder.create(AugmentResearchStationBlockEntity::new, BlockContent.SIMPLE_AUGMENT_STATION, BlockContent.ADVANCED_AUGMENT_STATION, BlockContent.ARCANE_AUGMENT_STATION).build();
     
     
     @AssignSidedInventory

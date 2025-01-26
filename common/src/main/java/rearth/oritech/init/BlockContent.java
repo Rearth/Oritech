@@ -20,8 +20,8 @@ import rearth.oritech.block.blocks.addons.MachineAddonBlock.AddonSettings;
 import rearth.oritech.block.blocks.addons.RedstoneAddonBlock;
 import rearth.oritech.block.blocks.addons.SteamBoilerAddonBlock;
 import rearth.oritech.block.blocks.arcane.*;
-import rearth.oritech.block.blocks.augmenter.AugmenterResearchStationBlock;
-import rearth.oritech.block.blocks.augmenter.PlayerModifierTestBlock;
+import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
+import rearth.oritech.block.blocks.augmenter.AugmentApplicationBlock;
 import rearth.oritech.block.blocks.decorative.*;
 import rearth.oritech.block.blocks.generators.*;
 import rearth.oritech.block.blocks.interaction.*;
@@ -169,10 +169,10 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @DispenserPlace
     public static final Block CREATIVE_TANK_BLOCK = new CreativeFluidTank(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).luminance(Blocks.createLightLevelFromLitBlockState(15)).hardness(-1.0F));
     
-    public static final Block TEST_BLOCK = new PlayerModifierTestBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
-    public static final Block SIMPLE_STATION = new AugmenterResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
-    public static final Block ADV_STATION = new AugmenterResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
-    public static final Block EXPECT_STATION = new AugmenterResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block AUGMENT_APPLICATION_BLOCK = new AugmentApplicationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block SIMPLE_AUGMENT_STATION = new AugmentResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block ADVANCED_AUGMENT_STATION = new AugmentResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block ARCANE_AUGMENT_STATION = new AugmentResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
     
     public static final Block PLACER_BLOCK = new PlacerBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block DESTROYER_BLOCK = new DestroyerBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());

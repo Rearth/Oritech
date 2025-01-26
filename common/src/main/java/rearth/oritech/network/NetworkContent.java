@@ -23,7 +23,7 @@ import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
-import rearth.oritech.block.entity.augmenter.PlayerModifierTestEntity;
+import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.interaction.*;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -31,7 +31,6 @@ import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
-import rearth.oritech.client.ui.PlayerModifierScreen;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -536,7 +535,7 @@ public class NetworkContent {
             
             var entity = access.player().getWorld().getBlockEntity(message.position);
             
-            if (entity instanceof PlayerModifierTestEntity enhancer) {
+            if (entity instanceof AugmentApplicationEntity enhancer) {
                 enhancer.handleAugmentUpdatePacket(message);
             }
             
@@ -547,11 +546,11 @@ public class NetworkContent {
             var player = access.player();
             
             var augmentInstance = PlayerAugments.allAugments.get(message.id);
-            if (message.operation == PlayerModifierScreen.AugmentOperation.ADD.ordinal()) {
+            if (message.operation == PlayerAugments.AugmentOperation.ADD.ordinal()) {
                 augmentInstance.installToPlayer(player);
-            } else if (message.operation == PlayerModifierScreen.AugmentOperation.REMOVE.ordinal()) {
+            } else if (message.operation == PlayerAugments.AugmentOperation.REMOVE.ordinal()) {
                 augmentInstance.removeFromPlayer(player);
-            } else if (message.operation == PlayerModifierScreen.AugmentOperation.TOGGLE.ordinal()) {
+            } else if (message.operation == PlayerAugments.AugmentOperation.TOGGLE.ordinal()) {
                 augmentInstance.toggle(player);
             }
             
@@ -660,8 +659,8 @@ public class NetworkContent {
             var player = access.player();
             var entity = access.player().getWorld().getBlockEntity(message.position);
             
-            if (entity instanceof PlayerModifierTestEntity modifierEntity) {
-                var operation = PlayerModifierScreen.AugmentOperation.values()[message.operationId];
+            if (entity instanceof AugmentApplicationEntity modifierEntity) {
+                var operation = PlayerAugments.AugmentOperation.values()[message.operationId];
                 switch (operation) {
                     case RESEARCH -> {
                         modifierEntity.researchAugment(message.id);
@@ -680,7 +679,7 @@ public class NetworkContent {
             var player = access.player();
             var entity = access.player().getWorld().getBlockEntity(message.position);
             
-            if (entity instanceof PlayerModifierTestEntity modifierEntity) {
+            if (entity instanceof AugmentApplicationEntity modifierEntity) {
                 modifierEntity.loadResearchesFromPlayer(player);
             }
         });
@@ -689,7 +688,7 @@ public class NetworkContent {
             var player = access.player();
             var entity = access.player().getWorld().getBlockEntity(message.position);
             
-            if (entity instanceof PlayerModifierTestEntity modifierEntity) {
+            if (entity instanceof AugmentApplicationEntity modifierEntity) {
                 modifierEntity.screenInvOverride = true;
                 player.openHandledScreen(modifierEntity);
             }
@@ -697,7 +696,7 @@ public class NetworkContent {
         
         UI_CHANNEL.registerServerbound(AugmentPlayerTogglePacket.class, (message, access) -> {
             var player = access.player();
-            PlayerModifierTestEntity.toggleAugmentForPlayer(message.id, player);
+            AugmentApplicationEntity.toggleAugmentForPlayer(message.id, player);
         });
         
     }

@@ -14,16 +14,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.entity.augmenter.AugmenterResearchStationBlockEntity;
+import rearth.oritech.block.entity.augmenter.AugmentResearchStationBlockEntity;
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.Objects;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
-public class AugmenterResearchStationBlock extends FacingBlock implements BlockEntityProvider {
+public class AugmentResearchStationBlock extends FacingBlock implements BlockEntityProvider {
     
-    public AugmenterResearchStationBlock(Settings settings) {
+    public AugmentResearchStationBlock(Settings settings) {
         super(settings);
         this.setDefaultState(getDefaultState().with(Properties.FACING, Direction.NORTH).with(ASSEMBLED, false));
     }
@@ -101,6 +101,6 @@ public class AugmenterResearchStationBlock extends FacingBlock implements BlockE
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new AugmenterResearchStationBlockEntity(pos, state);
+        return new AugmentResearchStationBlockEntity(pos, state);
     }
 }

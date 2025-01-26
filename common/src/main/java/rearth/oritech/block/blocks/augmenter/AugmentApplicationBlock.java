@@ -7,6 +7,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.enums.BlockFace;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.world.ServerWorld;
@@ -23,11 +24,10 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.entity.augmenter.PlayerModifierTestEntity;
+import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
-import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -35,12 +35,12 @@ import java.util.Set;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
-public class PlayerModifierTestBlock extends HorizontalFacingBlock implements BlockEntityProvider {
+public class AugmentApplicationBlock extends HorizontalFacingBlock implements BlockEntityProvider {
     
     private final VoxelShape[] HITBOXES = computeShapes();
     private final HashMap<PlayerEntity, Long> lastContact = new HashMap<>();
     
-    public PlayerModifierTestBlock(Settings settings) {
+    public AugmentApplicationBlock(Settings settings) {
         super(settings);
         setDefaultState(getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH).with(ASSEMBLED, false));
     }
@@ -116,7 +116,7 @@ public class PlayerModifierTestBlock extends HorizontalFacingBlock implements Bl
             if (ageWithoutContact > 15) {
                 var locked = lockPlayer(player, centerPos, state);
                 if (locked) {
-                    var blockEntity = (PlayerModifierTestEntity) world.getBlockEntity(pos);
+                    var blockEntity = (AugmentApplicationEntity) world.getBlockEntity(pos);
                     blockEntity.loadAvailableStations(player);
                     player.openHandledScreen(blockEntity);
                 }
@@ -149,13 +149,13 @@ public class PlayerModifierTestBlock extends HorizontalFacingBlock implements Bl
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
-        ((PlayerModifierTestEntity) world.getBlockEntity(pos)).onUse(player);
+        ((AugmentApplicationEntity) world.getBlockEntity(pos)).onUse(player);
         
         if (world.isClient)
             return ActionResult.SUCCESS;
         
         var entity = world.getBlockEntity(pos);
-        if (!(entity instanceof PlayerModifierTestEntity modifierEntity)) {
+        if (!(entity instanceof AugmentApplicationEntity modifierEntity)) {
             return ActionResult.SUCCESS;
         }
         
@@ -179,7 +179,7 @@ public class PlayerModifierTestBlock extends HorizontalFacingBlock implements Bl
             return ActionResult.SUCCESS;
         }
         
-        var blockEntity = (PlayerModifierTestEntity) world.getBlockEntity(pos);
+        var blockEntity = (AugmentApplicationEntity) world.getBlockEntity(pos);
         blockEntity.loadAvailableStations(player);
         player.openHandledScreen(blockEntity);
         
@@ -189,11 +189,19 @@ public class PlayerModifierTestBlock extends HorizontalFacingBlock implements Bl
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         
-        if (!world.isClient() && state.get(ASSEMBLED)) {
+        if (!world.isClient()) {
             
             var entity = world.getBlockEntity(pos);
-            if (entity instanceof MultiblockMachineController machineEntity) {
-                machineEntity.onControllerBroken();
+            
+            if (entity instanceof AugmentApplicationEntity storageBlock) {
+                storageBlock.onControllerBroken();
+                var stacks = storageBlock.inventory.heldStacks;
+                for (var heldStack : stacks) {
+                    if (!heldStack.isEmpty()) {
+                        var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
+                        world.spawnEntity(itemEntity);
+                    }
+                }
             }
         }
         
@@ -203,7 +211,7 @@ public class PlayerModifierTestBlock extends HorizontalFacingBlock implements Bl
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new PlayerModifierTestEntity(pos, state);
+        return new AugmentApplicationEntity(pos, state);
     }
     
     @Nullable

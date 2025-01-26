@@ -10,7 +10,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.block.entity.augmenter.PlayerModifierTestEntity;
+import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.client.init.ModScreens;
 
 public class PlayerModifierScreenHandler extends ScreenHandler {
@@ -21,7 +21,7 @@ public class PlayerModifierScreenHandler extends ScreenHandler {
     public final PlayerEntity player;
     
     protected BlockState machineBlock;
-    public PlayerModifierTestEntity blockEntity;
+    public AugmentApplicationEntity blockEntity;
     
     public PlayerModifierScreenHandler(int syncId, PlayerInventory inventory, ModScreens.BasicData setupData) {
         this(syncId, inventory, inventory.player.getWorld().getBlockEntity(setupData.pos()));
@@ -35,7 +35,7 @@ public class PlayerModifierScreenHandler extends ScreenHandler {
         this.player = playerInventory.player;
         
         this.machineBlock = blockEntity.getCachedState();
-        this.blockEntity = (PlayerModifierTestEntity) blockEntity;
+        this.blockEntity = (AugmentApplicationEntity) blockEntity;
         
         if (blockEntity.getWorld().isClient)
             this.blockEntity.loadAvailableStations(this.player);    // this should yield the same result on the client, so instead of syncing them we just call it on the client again

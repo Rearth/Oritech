@@ -644,6 +644,14 @@
   "block.oritech.reactor_absorber_port": "Reactor Coolant Absorber Port",
   "block.oritech.reactor_energy_port": "Reactor Energy Port",
   "block.oritech.reactor_redstone_port": "Reactor Redstone Port",
+  "block.oritech.simple_augment_station": "Cybernetic Research Station",
+  "block.oritech.advanced_augment_station": "Quantum Research Station",
+  "block.oritech.arcane_augment_station":  [
+    {
+      "text": "Arcane Research Station",
+      "color": "#cc66ff"
+    }
+  ],
   "item.oritech.banana": "Banana",
   "item.oritech.weed_killer": "Weed Killer",
   "item.oritech.target_designator": "Target Designator",

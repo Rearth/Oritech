@@ -24,7 +24,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.MultiblockMachine;
-import rearth.oritech.block.blocks.augmenter.AugmenterResearchStationBlock;
+import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
@@ -43,7 +43,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
 
-public class PlayerModifierTestEntity extends BlockEntity implements BlockEntityTicker<PlayerModifierTestEntity>, MultiblockMachineController, GeoBlockEntity, ExtendedScreenHandlerFactory, InventoryProvider, EnergyApi.BlockProvider, ScreenProvider {
+public class AugmentApplicationEntity extends BlockEntity implements BlockEntityTicker<AugmentApplicationEntity>, MultiblockMachineController, GeoBlockEntity, ExtendedScreenHandlerFactory, InventoryProvider, EnergyApi.BlockProvider, ScreenProvider {
     
     public final Set<Identifier> researchedAugments = new HashSet<>();
     
@@ -70,12 +70,12 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
     private final EnergyApi.EnergyContainer energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, 0, maxEnergyStored, this::markDirty);
     
     
-    public PlayerModifierTestEntity(BlockPos pos, BlockState state) {
+    public AugmentApplicationEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PLAYER_MODIFIER_BLOCK_ENTITY, pos, state);
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, PlayerModifierTestEntity blockEntity) {
+    public void tick(World world, BlockPos pos, BlockState state, AugmentApplicationEntity blockEntity) {
         
         if (world.isClient) return;
         
@@ -270,7 +270,7 @@ public class PlayerModifierTestEntity extends BlockEntity implements BlockEntity
             var candidatePos = new BlockPos(Geometry.offsetToWorldPosition(facing, candidatePosOffset, pos));
             
             var candidateState = world.getBlockState(candidatePos);
-            if (!(candidateState.getBlock() instanceof AugmenterResearchStationBlock) || !candidateState.get(MultiblockMachine.ASSEMBLED)) {
+            if (!(candidateState.getBlock() instanceof AugmentResearchStationBlock) || !candidateState.get(MultiblockMachine.ASSEMBLED)) {
                 availableStations.put(i, null);
                 continue;
             }

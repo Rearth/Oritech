@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "oritech:test_block"
+          "name": "oritech:augment_application_block"
         }
       ],
       "rolls": 1.0
