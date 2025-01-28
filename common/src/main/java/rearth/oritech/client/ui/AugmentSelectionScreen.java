@@ -238,7 +238,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         }
         
         var augmentCount = augmentsToAdd.size();
-        var radius = 32;
+        var radius = 30;
         
         var screenSizeX = this.width;
         var screenSizeY = this.height;
@@ -254,7 +254,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
             var iconTexture = Oritech.id("textures/gui/augments/" + id.getPath() + ".png");
             var label = Components.texture(iconTexture, 0, 0, 24, 24, 24, 24);
             label.positioning(Positioning.relative((int) (50 + offsetX * sideRelative), (int) (50 + offsetY)));
-            label.sizing(Sizing.fixed(36));
+            label.sizing(Sizing.fixed(screenSizeY / 10));
             
             augments.add(label);
             parent.child(label);
