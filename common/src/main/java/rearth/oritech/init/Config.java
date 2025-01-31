@@ -88,7 +88,7 @@ public class Config {
     
     @SectionHeader("particleAccelerator")
     public int maxGateDist = 10;
-    public int bendFactor = 3;
+    public float bendFactor = 2.5f;
     public int accelerationRFCost = 10;
     public int endPortalRequiredSpeed = 10000;
     public int netherPortalRequiredSpeed = 5000;

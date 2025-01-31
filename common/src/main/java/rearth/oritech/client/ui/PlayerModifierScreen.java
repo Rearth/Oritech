@@ -326,7 +326,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             var status = Components.label(Text.literal(""));
             
             panel.child(title);
-            panel.child(status);
+            panel.child(status.margins(Insets.of(4, 2, 0, 0)));
             
             researchLabels.add(status);
             
