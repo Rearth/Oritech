@@ -169,6 +169,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @DispenserPlace
     public static final Block CREATIVE_TANK_BLOCK = new CreativeFluidTank(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).luminance(Blocks.createLightLevelFromLitBlockState(15)).hardness(-1.0F));
     
+    @UseGeoBlockItem(scale = 0.7f)
     public static final Block AUGMENT_APPLICATION_BLOCK = new AugmentApplicationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
     public static final Block SIMPLE_AUGMENT_STATION = new AugmentResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
     public static final Block ADVANCED_AUGMENT_STATION = new AugmentResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
@@ -196,6 +197,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block ACCELERATOR_SENSOR = new AcceleratorSensorBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block BLACK_HOLE_BLOCK = new BlackHoleBlock(AbstractBlock.Settings.copy(Blocks.END_PORTAL).luminance(item -> 12).nonOpaque());
     
+    @UseGeoBlockItem(scale = 0.7f)
     public static final Block PARTICLE_COLLECTOR_BLOCK = new ParticleCollectorBlock(AbstractBlock.Settings.copy(Blocks.GLASS).nonOpaque());
     
     @UseGeoBlockItem(scale = 0.7f)

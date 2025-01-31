@@ -34,6 +34,7 @@ public final class Oritech {
     public static final OritechConfig CONFIG = OritechConfig.createAndLoad();
 
     public static final Multimap<Identifier, Runnable> EVENT_MAP = initEventMap();
+    public static Boolean DATAGEN = false;
     
     public static Identifier id(String path) {
         return Identifier.of(MOD_ID, path);
@@ -42,7 +43,8 @@ public final class Oritech {
     public static void initialize() {
         
         LOGGER.info("Begin Oritech initialization");
-        NetworkContent.registerChannels();
+        if (!DATAGEN)
+            NetworkContent.registerChannels();  // this seems to break datagen for some reason as it claims its using client code?
         ParticleContent.registerParticles();
         FeatureContent.initialize();
 

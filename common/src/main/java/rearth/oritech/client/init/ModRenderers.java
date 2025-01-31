@@ -24,7 +24,7 @@ public class ModRenderers {
         BlockEntityRendererFactories.register(BlockEntitiesContent.ATOMIC_FORGE_ENTITY, ctx -> new MachineRenderer<>("models/atomic_forge_block"));
         BlockEntityRendererFactories.register(BlockEntitiesContent.POWERED_FURNACE_ENTITY, ctx -> new MachineRenderer<>("models/powered_furnace_block"));
         
-        BlockEntityRendererFactories.register(BlockEntitiesContent.PLAYER_MODIFIER_BLOCK_ENTITY, ctx -> new MachineRenderer<>("models/test_block"));
+        BlockEntityRendererFactories.register(BlockEntitiesContent.PLAYER_MODIFIER_BLOCK_ENTITY, ctx -> new MachineRenderer<>("models/augment_application_block"));
         
         // generators
         BlockEntityRendererFactories.register(BlockEntitiesContent.BIO_GENERATOR_ENTITY, ctx -> new MachineRenderer<>("models/bio_generator_block"));

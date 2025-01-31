@@ -69,8 +69,6 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
             
             result[facing.ordinal()] = VoxelShapes.union(
               Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0, 0, 1, 2/16f, 1), facing, BlockFace.FLOOR),
-              Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 3/16f, 0, 2/16f, 1, 14/16f), facing, BlockFace.FLOOR),
-              Geometry.rotateVoxelShape(VoxelShapes.cuboid(14/16f, 3/16f, 0, 1f, 1, 14/16f), facing, BlockFace.FLOOR),
               Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 3/16f, 14/16f, 1f, 1f, 1f), facing, BlockFace.FLOOR)
             );
         }

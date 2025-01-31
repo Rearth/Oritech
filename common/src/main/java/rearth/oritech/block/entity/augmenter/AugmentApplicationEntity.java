@@ -30,6 +30,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.MultiblockMachine;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
@@ -44,7 +45,6 @@ import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
@@ -74,6 +74,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     private final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     private final EnergyApi.EnergyContainer energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, 0, maxEnergyStored, this::markDirty);
+    private AnimationController<AugmentApplicationEntity> animationController;
     
     
     public AugmentApplicationEntity(BlockPos pos, BlockState state) {
@@ -443,13 +444,35 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     
     @Override
     public void playSetupAnimation() {
-    
+        animationController.setAnimation(MachineBlockEntity.SETUP);
+        animationController.forceAnimationReset();
     }
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "machine", 5, state -> PlayState.CONTINUE)
-                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+        animationController = getController();
+        controllers.add(animationController.setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+    }
+    
+    private AnimationController<AugmentApplicationEntity> getController() {
+        return new AnimationController<>(this, "machine", 5, state -> {
+            return state.setAndContinue(MachineBlockEntity.IDLE);
+            
+            /*
+            if (state.isCurrentAnimation(MachineBlockEntity.SETUP)) {
+                if (state.getController().hasAnimationFinished()) {
+                    return state.setAndContinue(MachineBlockEntity.IDLE);
+                } else {
+                    return state.setAndContinue(MachineBlockEntity.SETUP);
+                }
+            }
+            
+            if (this.getCachedState().get(MultiblockMachine.ASSEMBLED)) {
+                return state.setAndContinue(MachineBlockEntity.IDLE);
+            } else {
+                return state.setAndContinue(MachineBlockEntity.PACKAGED);
+            }*/
+        });
     }
     
     @Override

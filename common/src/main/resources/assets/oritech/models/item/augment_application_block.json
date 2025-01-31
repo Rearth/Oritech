@@ -7,7 +7,7 @@
   "display": {
     "thirdperson_righthand": {
       "translation": [
-        -2,
+        -1,
         0,
         0
       ],
@@ -19,7 +19,7 @@
     },
     "thirdperson_lefthand": {
       "translation": [
-        2,
+        1,
         0,
         0
       ],
@@ -45,7 +45,7 @@
     },
     "ground": {
       "translation": [
-        -4,
+        0,
         0,
         0
       ],
@@ -62,14 +62,14 @@
         0
       ],
       "translation": [
-        0,
         -1,
+        -3,
         0
       ],
       "scale": [
-        0.8,
-        0.8,
-        0.8
+        0.36,
+        0.36,
+        0.36
       ]
     },
     "head": {

@@ -103,6 +103,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.CENTRIFUGE_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.ATOMIC_FORGE_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.POWERED_FURNACE_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.registerStateWithModelReference(BlockContent.AUGMENT_APPLICATION_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.LASER_ARM_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.BIO_GENERATOR_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.FUEL_GENERATOR_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
