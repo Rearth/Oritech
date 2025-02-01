@@ -9,7 +9,10 @@ import net.minecraft.block.enums.BlockFace;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
@@ -30,10 +33,12 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
+import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 public class AugmentApplicationBlock extends HorizontalFacingBlock implements BlockEntityProvider {
     
@@ -219,5 +224,11 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
         };
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        super.appendTooltip(stack, context, tooltip, options);
+        addMachineTooltip(tooltip, this, this);
     }
 }

@@ -97,7 +97,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
                 
                 researchedAugments.add(station.selectedResearch);
                 station.working = false;
-                this.markNetDirty();
+                this.markDirty();
             }
         }
         
@@ -197,7 +197,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
             break;
             
         }
-        this.markNetDirty();
+        this.markDirty();
     }
     
     public void installAugmentToPlayer(Identifier augment, PlayerEntity player) {

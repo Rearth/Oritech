@@ -4,7 +4,10 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -17,9 +20,11 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.augmenter.AugmentResearchStationBlockEntity;
 import rearth.oritech.util.MultiblockMachineController;
 
+import java.util.List;
 import java.util.Objects;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
+import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 public class AugmentResearchStationBlock extends FacingBlock implements BlockEntityProvider {
     
@@ -102,5 +107,11 @@ public class AugmentResearchStationBlock extends FacingBlock implements BlockEnt
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new AugmentResearchStationBlockEntity(pos, state);
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        super.appendTooltip(stack, context, tooltip, options);
+        addMachineTooltip(tooltip, this, this);
     }
 }

@@ -59,6 +59,8 @@ public final class OritechClient {
             if (client.player != null)
                 PlayerAugments.clientTickAugments(client.player);
         });
+        
+        Oritech.LOGGER.info("Oritech client initialization done");
     }
     
     public static boolean renderBlockOutline(WorldRenderContext worldRenderContext, WorldRenderContext.BlockOutlineContext blockOutlineContext) {

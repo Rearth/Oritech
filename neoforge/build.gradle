@@ -79,7 +79,7 @@ dependencies {
 
     // compat mods for ingame testing
     modRuntimeOnly "curse.maven:energized-power-782147:5797585"
-    modRuntimeOnly "curse.maven:mekanism-268560:5680395"
+    // modRuntimeOnly "curse.maven:mekanism-268560:5680395"
 }
 
 processResources {

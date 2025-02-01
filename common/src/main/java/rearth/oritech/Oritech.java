@@ -59,6 +59,7 @@ public final class Oritech {
         
         // for player augment ticks
         ServerTickEvents.START_WORLD_TICK.register(event -> event.getPlayers().forEach(PlayerAugments::serverTickAugments));
+        LOGGER.info("Oritech initialization complete");
     }
     
     public static void runAllRegistries() {
@@ -71,12 +72,12 @@ public final class Oritech {
         
         for (var type : EVENT_MAP.keySet()) {
             if (type.equals(RegistryKeys.FLUID.getValue()) || type.equals(RegistryKeys.ITEM_GROUP.getValue())) continue;
-            LOGGER.debug("Registering type");
             EVENT_MAP.get(type).forEach(Runnable::run);
         }
         
         LOGGER.debug("Registering item groups");
         EVENT_MAP.get(RegistryKeys.ITEM_GROUP.getValue()).forEach(Runnable::run);
+        LOGGER.info("Oritech registrations complete");
     }
     
     public static Multimap<Identifier, Runnable> initEventMap() {
