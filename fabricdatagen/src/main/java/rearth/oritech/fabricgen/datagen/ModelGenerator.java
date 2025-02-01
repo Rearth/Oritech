@@ -46,6 +46,9 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.SUPERCONDUCTOR_DUCT_BLOCK);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.ITEM_PIPE_DUCT_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.ITEM_FILTER_BLOCK);
+        blockStateModelGenerator.registerSimpleState(BlockContent.SIMPLE_AUGMENT_STATION);
+        blockStateModelGenerator.registerSimpleState(BlockContent.ADVANCED_AUGMENT_STATION);
+        blockStateModelGenerator.registerSimpleState(BlockContent.ARCANE_AUGMENT_STATION);
         
         blockStateModelGenerator.registerSimpleState(BlockContent.SMALL_STORAGE_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.LARGE_STORAGE_BLOCK);

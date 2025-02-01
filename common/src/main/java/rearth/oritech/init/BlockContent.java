@@ -170,10 +170,10 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block CREATIVE_TANK_BLOCK = new CreativeFluidTank(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).luminance(Blocks.createLightLevelFromLitBlockState(15)).hardness(-1.0F));
     
     @UseGeoBlockItem(scale = 0.7f)
-    public static final Block AUGMENT_APPLICATION_BLOCK = new AugmentApplicationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
-    public static final Block SIMPLE_AUGMENT_STATION = new AugmentResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
-    public static final Block ADVANCED_AUGMENT_STATION = new AugmentResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
-    public static final Block ARCANE_AUGMENT_STATION = new AugmentResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    public static final Block AUGMENT_APPLICATION_BLOCK = new AugmentApplicationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block SIMPLE_AUGMENT_STATION = new AugmentResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block ADVANCED_AUGMENT_STATION = new AugmentResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block ARCANE_AUGMENT_STATION = new AugmentResearchStationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     
     public static final Block PLACER_BLOCK = new PlacerBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block DESTROYER_BLOCK = new DestroyerBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());

@@ -41,7 +41,7 @@
 			}
 		},
 		"packaged": {
-			"loop": true,
+			"loop": false,
 			"bones": {
 				"addonBlockoutC": {
 					"rotation": {

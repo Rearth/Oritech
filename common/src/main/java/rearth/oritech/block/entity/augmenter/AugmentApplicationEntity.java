@@ -455,10 +455,8 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     }
     
     private AnimationController<AugmentApplicationEntity> getController() {
-        return new AnimationController<>(this, "machine", 5, state -> {
-            return state.setAndContinue(MachineBlockEntity.IDLE);
+        return new AnimationController<>(this, "machine", 0, state -> {
             
-            /*
             if (state.isCurrentAnimation(MachineBlockEntity.SETUP)) {
                 if (state.getController().hasAnimationFinished()) {
                     return state.setAndContinue(MachineBlockEntity.IDLE);
@@ -471,7 +469,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
                 return state.setAndContinue(MachineBlockEntity.IDLE);
             } else {
                 return state.setAndContinue(MachineBlockEntity.PACKAGED);
-            }*/
+            }
         });
     }
     

@@ -2,6 +2,8 @@ package rearth.oritech.block.entity.augmenter;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -23,6 +25,18 @@ public class AugmentResearchStationBlockEntity extends BlockEntity implements Mu
     
     public AugmentResearchStationBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.AUGMENTER_RESEARCH_STATION_ENTITY, pos, state);
+    }
+    
+    @Override
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
+        addMultiblockToNbt(nbt);
+    }
+    
+    @Override
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+        loadMultiblockNbtData(nbt);
     }
     
     @Override
