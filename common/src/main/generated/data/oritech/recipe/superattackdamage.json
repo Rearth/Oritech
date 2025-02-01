@@ -2,25 +2,38 @@
   "type": "oritech:augment",
   "applyCost": [
     {
-      "count": 4,
+      "count": 32,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "item": "oritech:enderic_compound"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:gold_block"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 64,
       "ingredient": {
-        "tag": "c:ingots/iron"
+        "item": "oritech:enderic_compound"
       }
     },
     {
+      "count": 64,
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "item": "oritech:fluxite"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:blaze_rod"
       }
     }
   ],
-  "rfCost": 10000000,
-  "time": 30
+  "rfCost": 500000000,
+  "time": 2800
 }

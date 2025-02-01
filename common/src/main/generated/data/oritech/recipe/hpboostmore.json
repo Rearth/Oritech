@@ -2,25 +2,38 @@
   "type": "oritech:augment",
   "applyCost": [
     {
+      "count": 8,
+      "ingredient": {
+        "item": "oritech:carbon_fibre_strands"
+      }
+    },
+    {
       "count": 4,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "item": "oritech:duratium_ingot"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 32,
       "ingredient": {
-        "tag": "c:ingots/nickel"
+        "item": "oritech:carbon_fibre_strands"
       }
     },
     {
+      "count": 16,
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "item": "oritech:biosteel_ingot"
+      }
+    },
+    {
+      "count": 4,
+      "ingredient": {
+        "item": "minecraft:diamond"
       }
     }
   ],
-  "rfCost": 10000000,
-  "time": 30
+  "rfCost": 50000000,
+  "time": 800
 }

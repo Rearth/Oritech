@@ -2,25 +2,37 @@
   "type": "oritech:augment",
   "applyCost": [
     {
-      "count": 4,
+      "count": 64,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "item": "oritech:duratium_dust"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:redstone_block"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 64,
       "ingredient": {
-        "tag": "c:ingots/iron"
+        "item": "oritech:energite_ingot"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:duratium_ingot"
       }
     },
     {
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "item": "minecraft:nether_star"
       }
     }
   ],
-  "rfCost": 10000000,
-  "time": 30
+  "rfCost": 200000000,
+  "time": 1600
 }

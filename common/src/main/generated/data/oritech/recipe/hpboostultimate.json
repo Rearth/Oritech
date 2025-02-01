@@ -2,25 +2,49 @@
   "type": "oritech:augment",
   "applyCost": [
     {
-      "count": 4,
+      "count": 32,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "item": "oritech:adamant_ingot"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "oritech:overcharged_crystal"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:fluxite"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 64,
       "ingredient": {
-        "tag": "c:ingots/iron"
+        "item": "oritech:adamant_ingot"
       }
     },
     {
+      "count": 8,
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "item": "minecraft:nether_star"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:uranium_pellet"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:fluxite_block"
       }
     }
   ],
-  "rfCost": 10000000,
-  "time": 30
+  "rfCost": 500000000,
+  "time": 2400
 }

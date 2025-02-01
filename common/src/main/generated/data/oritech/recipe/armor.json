@@ -4,23 +4,36 @@
     {
       "count": 4,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "item": "oritech:duratium_ingot"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "tag": "c:ingots/iron"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 64,
       "ingredient": {
-        "tag": "c:ingots/iron"
+        "tag": "c:ingots/steel"
       }
     },
     {
+      "count": 8,
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "item": "oritech:duratium_ingot"
+      }
+    },
+    {
+      "count": 16,
+      "ingredient": {
+        "item": "minecraft:diamond"
       }
     }
   ],
-  "rfCost": 10000000,
-  "time": 30
+  "rfCost": 80000000,
+  "time": 800
 }

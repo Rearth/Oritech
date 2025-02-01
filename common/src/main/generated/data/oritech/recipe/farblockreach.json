@@ -2,25 +2,38 @@
   "type": "oritech:augment",
   "applyCost": [
     {
-      "count": 4,
+      "count": 32,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "item": "oritech:enderic_lens"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:obsidian"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 64,
       "ingredient": {
-        "tag": "c:ingots/iron"
+        "item": "oritech:enderic_lens"
       }
     },
     {
+      "count": 48,
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "item": "minecraft:ender_pearl"
+      }
+    },
+    {
+      "count": 16,
+      "ingredient": {
+        "item": "minecraft:diamond_block"
       }
     }
   ],
-  "rfCost": 10000000,
-  "time": 30
+  "rfCost": 200000000,
+  "time": 800
 }

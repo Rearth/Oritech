@@ -69,7 +69,13 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     public final HashMap<Integer, ResearchState> availableStations = new HashMap<>();
     public boolean screenInvOverride = false;
     
-    public final SimpleInventory inventory = new SimpleInventory(5);
+    public final SimpleInventory inventory = new SimpleInventory(5) {
+        @Override
+        public void markDirty() {
+            super.markDirty();
+            AugmentApplicationEntity.this.markDirty();
+        }
+    };
     private final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     private final EnergyApi.EnergyContainer energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, 0, maxEnergyStored, this::markDirty);

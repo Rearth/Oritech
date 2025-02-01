@@ -2,25 +2,44 @@
   "type": "oritech:augment",
   "applyCost": [
     {
-      "count": 4,
+      "count": 32,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "tag": "oritech:biomass"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:item_pipe"
+      }
+    },
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "minecraft:hopper"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 64,
       "ingredient": {
-        "tag": "c:ingots/iron"
+        "item": "oritech:processing_unit"
       }
     },
     {
+      "count": 48,
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "tag": "oritech:biomass"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:golden_carrot"
       }
     }
   ],
-  "rfCost": 10000000,
-  "time": 30
+  "rfCost": 30000000,
+  "time": 500
 }

@@ -318,7 +318,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerGeneratorRecipe(exporter, BlockContent.ITEM_FILTER_BLOCK.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.fromTag(TagContent.WIRES), Ingredient.ofItems(ItemContent.PROCESSING_UNIT), Ingredient.fromTag(TagContent.WIRES), "itemfilter");
         // fluid pipe
         offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.FLUID_PIPE.asItem(), 6), Ingredient.fromTag(TagContent.SILICON), Ingredient.ofItems(Items.COPPER_INGOT), "fluidpipe");
-
+        
         // framed energy pipe
         offerFramedCableRecipe(exporter, new ItemStack(BlockContent.FRAMED_ENERGY_PIPE, 8), Ingredient.ofItems(BlockContent.ENERGY_PIPE), "energy");
         offerCableFromFrameRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE, 1), Ingredient.ofItems(BlockContent.FRAMED_ENERGY_PIPE), "energy");
@@ -331,7 +331,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // framed item pipe
         offerFramedCableRecipe(exporter, new ItemStack(BlockContent.FRAMED_ITEM_PIPE, 8), Ingredient.ofItems(BlockContent.ITEM_PIPE), "item");
         offerCableFromFrameRecipe(exporter, new ItemStack(BlockContent.ITEM_PIPE, 1), Ingredient.ofItems(BlockContent.FRAMED_ITEM_PIPE), "item");
-
+        
         // energy pipe duct
         offerCableDuctRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE_DUCT_BLOCK, 4), Ingredient.ofItems(BlockContent.ENERGY_PIPE), "energy");
         offerCableFromDuctRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE, 1), Ingredient.ofItems(BlockContent.ENERGY_PIPE_DUCT_BLOCK), "energy");
@@ -344,7 +344,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // item pipe duct
         offerCableDuctRecipe(exporter, new ItemStack(BlockContent.ITEM_PIPE_DUCT_BLOCK, 4), Ingredient.ofItems(BlockContent.ITEM_PIPE), "item");
         offerCableFromDuctRecipe(exporter, new ItemStack(BlockContent.ITEM_PIPE, 1), Ingredient.ofItems(BlockContent.ITEM_PIPE_DUCT_BLOCK), "item");
-
+        
         // deep drill
         offerAtomicForgeRecipe(exporter, BlockContent.DEEP_DRILL_BLOCK.asItem(), Ingredient.fromTag(TagContent.MACHINE_PLATING), Ingredient.ofItems(ItemContent.MOTOR), Ingredient.ofItems(ItemContent.HEISENBERG_COMPENSATOR), Ingredient.ofItems(ItemContent.OVERCHARGED_CRYSTAL), Ingredient.ofItems(ItemContent.DURATIUM_INGOT), "deepdrill");
         // drone port
@@ -490,13 +490,13 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerMotorRecipe(exporter, ItemContent.OVERCHARGED_CRYSTAL, Ingredient.ofItems(Items.AMETHYST_BLOCK), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), Ingredient.ofItems(BlockContent.SUPERCONDUCTOR.asItem()), "overchargedcrystal");
         addAssemblerRecipe(exporter, Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.fromTag(TagContent.WIRES), Ingredient.ofItems(ItemContent.DUBIOS_CONTAINER), Ingredient.ofItems(ItemContent.ENERGITE_INGOT), BlockContent.SUPERCONDUCTOR.asItem(), 3, 2f, "superconductor");
         addAtomicForgeRecipe(exporter, Ingredient.ofItems(ItemContent.OVERCHARGED_CRYSTAL), Ingredient.ofItems(ItemContent.HEISENBERG_COMPENSATOR), ItemContent.PROMETHEUM_INGOT, 240, "prometheum");
-    
+        
         // ice in cooler
         addCoolerRecipe(exporter, FluidStack.create(Fluids.WATER, FluidConstants.BUCKET), Items.ICE, 3, 1f, "ice");
         
         // snow from steam in cooler
         addCoolerRecipe(exporter, FluidStack.create(FluidContent.STILL_STEAM.get(), FluidConstants.BUCKET), Items.SNOW_BLOCK, 3, 1f, "snow");
-    
+        
     }
     
     private void addCompactingRecipes(RecipeExporter exporter) {
@@ -759,36 +759,308 @@ public class RecipeGenerator extends FabricRecipeProvider {
     }
     
     private void addAugmentRecipes(RecipeExporter exporter) {
+
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(TagContent.MACHINE_PLATING)),
+            new SizedIngredient(32, of(TagContent.COAL_DUSTS)),
+            new SizedIngredient(8, of(ItemContent.BIOSTEEL_INGOT))),
+          List.of(
+            new SizedIngredient(8, of(TagContent.STEEL_INGOTS)),
+            new SizedIngredient(16, of(ConventionalItemTags.IRON_INGOTS))),
+          400, 10_000_000, "hpboost");
         
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_0000, "hpboost");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.COPPER_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 200, 200_000, "speedboost");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(TagContent.NICKEL_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "hpboostmore");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.DIAMOND_GEMS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 50_000_000, "dwarf");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "giant");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "autofeeder");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "armor");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "flight");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "cloak");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "portal");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "nightvision");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "waterbreath");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "magnet");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "orefinder");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "hpboostultra");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "hpboostultimate");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "superspeedboost");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "stepassist");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "betterarmor");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "ultimatearmor");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "weaponreach");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "blockreach");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "farblockreach");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "miningspeed");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "fastminingspeed");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "attackdamage");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "superattackdamage");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "luck");
-        addAugmentRecipe(exporter, List.of(new SizedIngredient(2, of(ConventionalItemTags.IRON_INGOTS)), new SizedIngredient(1, of(ItemContent.ELECTRUM_INGOT))), List.of(new SizedIngredient(4, of(TagContent.COAL_DUSTS))), 30, 10_000_000, "gravity");
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(32, of(ItemContent.CARBON_FIBRE_STRANDS)),
+            new SizedIngredient(16, of(ItemContent.BIOSTEEL_INGOT)),
+            new SizedIngredient(4, of(Items.DIAMOND))),
+          List.of(
+            new SizedIngredient(8, of(ItemContent.CARBON_FIBRE_STRANDS)),
+            new SizedIngredient(4, of(ItemContent.DURATIUM_INGOT))),
+          800, 50_000_000, "hpboostmore");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.ENERGITE_INGOT)),
+            new SizedIngredient(32, of(ItemContent.DURATIUM_INGOT)),
+            new SizedIngredient(1, of(Items.NETHER_STAR))),
+          List.of(
+            new SizedIngredient(64, of(ItemContent.DURATIUM_DUST)),
+            new SizedIngredient(64, of(Items.REDSTONE_BLOCK))),
+          1600, 200_000_000, "hpboostultra");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.ADAMANT_INGOT)),
+            new SizedIngredient(8, of(Items.NETHER_STAR)),
+            new SizedIngredient(64, of(ItemContent.URANIUM_PELLET)),
+            new SizedIngredient(64, of(BlockContent.FLUXITE_BLOCK))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.ADAMANT_INGOT)),
+            new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL)),
+            new SizedIngredient(64, of(ItemContent.FLUXITE))),
+          2400, 500_000_000, "hpboostultimate");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(32, of(ItemContent.MOTOR)),
+            new SizedIngredient(64, of(ItemContent.BIOSTEEL_INGOT)),
+            new SizedIngredient(32, of(Items.REDSTONE))),
+          List.of(
+            new SizedIngredient(16, of(ItemContent.MOTOR)),
+            new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS))),
+          600, 30_000_000, "speedboost");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.ENERGITE_INGOT)),
+            new SizedIngredient(32, of(ItemContent.MAGNETIC_COIL)),
+            new SizedIngredient(16, of(ItemContent.FLUX_GATE))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.MAGNETIC_COIL)),
+            new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL)),
+            new SizedIngredient(64, of(TagContent.ELECTRUM_DUSTS))),
+          1800, 350_000_000, "superspeedboost");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(32, of(ItemContent.MOTOR)),
+            new SizedIngredient(64, of(TagContent.STEEL_INGOTS)),
+            new SizedIngredient(16, of(Items.IRON_BLOCK))),
+          List.of(
+            new SizedIngredient(16, of(ItemContent.MOTOR)),
+            new SizedIngredient(64, of(ConventionalItemTags.IRON_INGOTS))),
+          800, 75_000_000, "stepassist");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.SILICON_WAFER)),
+            new SizedIngredient(32, of(ItemContent.PROCESSING_UNIT)),
+            new SizedIngredient(16, of(Items.GOLD_BLOCK))),
+          List.of(
+            new SizedIngredient(32, of(TagContent.SILICON)),
+            new SizedIngredient(32, of(Items.REDSTONE_BLOCK))),
+          400, 50_000_000, "dwarf");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.RAW_BIOPOLYMER)),
+            new SizedIngredient(32, of(ItemContent.SMALL_PLUTONIUM_PELLET)),
+            new SizedIngredient(64, of(TagContent.BIOMASS))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.RAW_BIOPOLYMER)),
+            new SizedIngredient(64, of(ConventionalItemTags.IRON_INGOTS))),
+          1600, 300_000_000, "giant");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(TagContent.STEEL_INGOTS)),
+            new SizedIngredient(8, of(ItemContent.DURATIUM_INGOT)),
+            new SizedIngredient(16, of(Items.DIAMOND))),
+          List.of(
+            new SizedIngredient(4, of(ItemContent.DURATIUM_INGOT)),
+            new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS))),
+          800, 80_000_000, "armor");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.ENERGITE_INGOT)),
+            new SizedIngredient(32, of(ItemContent.MAGNETIC_COIL)),
+            new SizedIngredient(32, of(Items.DIAMOND))),
+          List.of(
+            new SizedIngredient(16, of(ItemContent.MAGNETIC_COIL)),
+            new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL)),
+            new SizedIngredient(8, of(ItemContent.DURATIUM_INGOT))),
+          1600, 280_000_000, "betterarmor");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.FLUXITE)),
+            new SizedIngredient(32, of(ItemContent.HEISENBERG_COMPENSATOR)),
+            new SizedIngredient(64, of(ItemContent.PLUTONIUM_PELLET)),
+            new SizedIngredient(8, of(Items.NETHER_STAR))),
+          List.of(
+            new SizedIngredient(32, of(BlockContent.FLUXITE_BLOCK)),
+            new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL)),
+            new SizedIngredient(16, of(Items.OBSIDIAN))),
+          2400, 500_000_000, "ultimatearmor");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.MAGNETIC_COIL)),
+            new SizedIngredient(48, of(TagContent.ELECTRUM_INGOTS)),
+            new SizedIngredient(32, of(Items.REDSTONE_BLOCK))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.MAGNETIC_COIL)),
+            new SizedIngredient(64, of(Items.IRON_BLOCK))),
+          1600, 150_000_000, "weaponreach");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.MOTOR)),
+            new SizedIngredient(48, of(TagContent.STEEL_INGOTS)),
+            new SizedIngredient(32, of(Items.COPPER_BLOCK))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.MOTOR)),
+            new SizedIngredient(64, of(Items.COPPER_INGOT))),
+          900, 100_000_000, "blockreach");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.ENDERIC_LENS)),
+            new SizedIngredient(48, of(Items.ENDER_PEARL)),
+            new SizedIngredient(16, of(Items.DIAMOND_BLOCK))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.ENDERIC_LENS)),
+            new SizedIngredient(64, of(Items.OBSIDIAN))),
+          800, 200_000_000, "farblockreach");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(48, of(ItemContent.MAGNETIC_COIL)),
+            new SizedIngredient(64, of(Items.QUARTZ_BLOCK)),
+            new SizedIngredient(32, of(ItemContent.BASIC_BATTERY))),
+          List.of(
+            new SizedIngredient(16, of(Items.QUARTZ_BLOCK)),
+            new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS))),
+          1200, 100_000_000, "miningspeed");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.ENERGITE_INGOT)),
+            new SizedIngredient(48, of(ItemContent.FLUX_GATE)),
+            new SizedIngredient(64, of(ItemContent.DURATIUM_INGOT))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.ENERGITE_INGOT)),
+            new SizedIngredient(64, of(Items.REDSTONE_BLOCK))),
+          2400, 450_000_000, "fastminingspeed");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(TagContent.STEEL_INGOTS)),
+            new SizedIngredient(48, of(Items.DIAMOND)),
+            new SizedIngredient(32, of(ItemContent.FLUXITE))),
+          List.of(
+            new SizedIngredient(16, of(TagContent.STEEL_INGOTS)),
+            new SizedIngredient(4, of(ItemContent.DURATIUM_INGOT))),
+          1600, 150_000_000, "attackdamage");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.ENDERIC_COMPOUND)),
+            new SizedIngredient(64, of(ItemContent.FLUXITE)),
+            new SizedIngredient(64, of(Items.BLAZE_ROD))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.ENDERIC_COMPOUND)),
+            new SizedIngredient(64, of(Items.GOLD_BLOCK))),
+          2800, 500_000_000, "superattackdamage");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(TagContent.ELECTRUM_INGOTS)),
+            new SizedIngredient(48, of(Items.LAPIS_BLOCK)),
+            new SizedIngredient(32, of(Items.GOLD_BLOCK))),
+          List.of(
+            new SizedIngredient(32, of(Items.LAPIS_BLOCK)),
+            new SizedIngredient(64, of(Items.REDSTONE_BLOCK))),
+          1800, 200_000_000, "luck");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.MAGNETIC_COIL)),
+            new SizedIngredient(48, of(ItemContent.FLUXITE)),
+            new SizedIngredient(8, of(Items.PHANTOM_MEMBRANE))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.MAGNETIC_COIL)),
+            new SizedIngredient(16, of(Items.IRON_BLOCK))),
+          2200, 400_000_000, "gravity");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.FLUX_GATE)),
+            new SizedIngredient(32, of(Items.WIND_CHARGE)),
+            new SizedIngredient(16, of(ItemContent.PROMETHEUM_INGOT)),
+            new SizedIngredient(64, of(ItemContent.PLUTONIUM_PELLET))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.FLUX_GATE)),
+            new SizedIngredient(8, of(ItemContent.PLUTONIUM_PELLET))),
+          3600, 500_000_000, "flight");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(Items.ENDER_EYE)),
+            new SizedIngredient(48, of(ItemContent.ENDERIC_LENS)),
+            new SizedIngredient(8, of(Items.DIAMOND))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.ENDERIC_LENS)),
+            new SizedIngredient(64, of(Items.GLOWSTONE))),
+          3200, 100_000_000, "cloak");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(Items.ENDER_PEARL)),
+            new SizedIngredient(48, of(Items.OBSIDIAN)),
+            new SizedIngredient(1, of(ItemContent.UNHOLY_INTELLIGENCE)),
+            new SizedIngredient(32, of(ItemContent.ADAMANT_INGOT))),
+          List.of(
+            new SizedIngredient(64, of(Items.ENDER_PEARL)),
+            new SizedIngredient(32, of(Items.CRYING_OBSIDIAN))),
+          3000, 250_000_000, "portal");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(Items.GOLD_BLOCK)),
+            new SizedIngredient(48, of(ItemContent.ENDERIC_LENS)),
+            new SizedIngredient(64, of(Items.GLOWSTONE))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.ENDERIC_LENS)),
+            new SizedIngredient(8, of(Items.GLOWSTONE)),
+            new SizedIngredient(8, of(Items.REDSTONE_LAMP))),
+          2400, 50_000_000, "nightvision");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(Items.PRISMARINE_CRYSTALS)),
+            new SizedIngredient(48, of(ItemContent.BIOSTEEL_INGOT)),
+            new SizedIngredient(1, of(Items.HEART_OF_THE_SEA))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.BIOSTEEL_INGOT)),
+            new SizedIngredient(1, of(Items.CONDUIT))),
+          800, 50_000_000, "waterbreath");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.PROCESSING_UNIT)),
+            new SizedIngredient(48, of(TagContent.BIOMASS)),
+            new SizedIngredient(64, of(Items.GOLDEN_CARROT))),
+          List.of(
+            new SizedIngredient(32, of(TagContent.BIOMASS)),
+            new SizedIngredient(64, of(BlockContent.ITEM_PIPE)),
+            new SizedIngredient(8, of(Items.HOPPER))),
+          500, 30_000_000, "autofeeder");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.MAGNETIC_COIL)),
+            new SizedIngredient(48, of(ItemContent.ENERGITE_INGOT)),
+            new SizedIngredient(2, of(Items.LODESTONE))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.MAGNETIC_COIL)),
+            new SizedIngredient(64, of(ConventionalItemTags.COPPER_INGOTS))),
+          2400, 400_000_000, "magnet");
+        
+        addAugmentRecipe(exporter,
+          List.of(
+            new SizedIngredient(64, of(ItemContent.ENDERIC_LENS)),
+            new SizedIngredient(48, of(Items.AMETHYST_BLOCK)),
+            new SizedIngredient(48, of(ItemContent.OVERCHARGED_CRYSTAL)),
+            new SizedIngredient(8, of(ItemContent.PROMETHEUM_INGOT)),
+            new SizedIngredient(32, of(Items.SCULK_SENSOR))),
+          List.of(
+            new SizedIngredient(32, of(ItemContent.ENDERIC_LENS)),
+            new SizedIngredient(64, of(Items.REDSTONE_TORCH))),
+          3200, 200_000_000, "orefinder");
         
     }
     
@@ -803,7 +1075,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         // reactor plating: steel and machine plating in crafting table / assembler
         offerMachinePlatingRecipe(exporter, BlockContent.REACTOR_WALL.asItem(), of(TagContent.MACHINE_PLATING), of(TagContent.STEEL_INGOTS), of(TagContent.NICKEL_INGOTS), 4, "reactorplatingcrafting");
-        addAssemblerRecipe(exporter, of(TagContent.MACHINE_PLATING), of(TagContent.MACHINE_PLATING),of(TagContent.STEEL_INGOTS), of(TagContent.NICKEL_INGOTS), BlockContent.REACTOR_WALL.asItem(), 3, 1, "reactorplatingalt");
+        addAssemblerRecipe(exporter, of(TagContent.MACHINE_PLATING), of(TagContent.MACHINE_PLATING), of(TagContent.STEEL_INGOTS), of(TagContent.NICKEL_INGOTS), BlockContent.REACTOR_WALL.asItem(), 3, 1, "reactorplatingalt");
         
         // neutron reflectors: expensive, needs duratium core, adamant frame and reactor walls
         offerMachinePlatingRecipe(exporter, BlockContent.REACTOR_REFLECTOR.asItem(), of(BlockContent.REACTOR_WALL), of(ItemContent.ADAMANT_INGOT), of(ItemContent.DURATIUM_INGOT), 1, "reflector");
@@ -1088,22 +1360,22 @@ public class RecipeGenerator extends FabricRecipeProvider {
         var item = output.getItem();
         createInsulatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, "crafting/" + suffix);
     }
-
+    
     public void offerFramedCableRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, String suffix) {
         var item = output.getItem();
         createFramedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, "crafting/frame_" + suffix);
     }
-
+    
     public void offerCableFromFrameRecipe(RecipeExporter exporter, ItemStack output, Ingredient frame, String suffix) {
         var item = output.getItem();
         ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item, output.getCount()).input(frame).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, "crafting/unframe_" + suffix);
     }
-
+    
     public void offerCableDuctRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, String suffix) {
         var item = output.getItem();
         createCableDuctRecipe(RecipeCategory.MISC, item, output.getCount(), input).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, "crafting/duct_" + suffix);
     }
-
+    
     public void offerCableFromDuctRecipe(RecipeExporter exporter, ItemStack output, Ingredient duct, String suffix) {
         var item = output.getItem();
         ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item, output.getCount()).input(duct).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, "crafting/unduct_" + suffix);
@@ -1116,11 +1388,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
     public CraftingRecipeJsonBuilder createInsulatedCableRecipe(RecipeCategory category, Item output, int count, Ingredient input, Ingredient insulation) {
         return ShapedRecipeJsonBuilder.create(category, output, count).input('c', input).input('i', insulation).pattern("iii").pattern("ccc").pattern("iii");
     }
-
+    
     public CraftingRecipeJsonBuilder createFramedCableRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
         return ShapedRecipeJsonBuilder.create(category, output, count).input('c', input).input('p', Ingredient.fromTag(TagContent.MACHINE_PLATING)).pattern("ccc").pattern("cpc").pattern("ccc");
     }
-
+    
     public CraftingRecipeJsonBuilder createCableDuctRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
         return ShapedRecipeJsonBuilder.create(category, output, count).input('c', input).input('p', Ingredient.fromTag(TagContent.MACHINE_PLATING)).input('s', Ingredient.ofItems(Blocks.STONE)).pattern("csc").pattern("sps").pattern("csc");
     }

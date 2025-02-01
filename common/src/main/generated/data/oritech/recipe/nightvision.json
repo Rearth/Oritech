@@ -2,25 +2,44 @@
   "type": "oritech:augment",
   "applyCost": [
     {
-      "count": 4,
+      "count": 32,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "item": "oritech:enderic_lens"
+      }
+    },
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "minecraft:glowstone"
+      }
+    },
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "minecraft:redstone_lamp"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 64,
       "ingredient": {
-        "tag": "c:ingots/iron"
+        "item": "minecraft:gold_block"
       }
     },
     {
+      "count": 48,
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "item": "oritech:enderic_lens"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:glowstone"
       }
     }
   ],
-  "rfCost": 10000000,
-  "time": 30
+  "rfCost": 50000000,
+  "time": 2400
 }

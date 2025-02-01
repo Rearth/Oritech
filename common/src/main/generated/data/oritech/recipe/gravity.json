@@ -2,25 +2,38 @@
   "type": "oritech:augment",
   "applyCost": [
     {
-      "count": 4,
+      "count": 32,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "item": "oritech:magnetic_coil"
+      }
+    },
+    {
+      "count": 16,
+      "ingredient": {
+        "item": "minecraft:iron_block"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 64,
       "ingredient": {
-        "tag": "c:ingots/iron"
+        "item": "oritech:magnetic_coil"
       }
     },
     {
+      "count": 48,
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "item": "oritech:fluxite"
+      }
+    },
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "minecraft:phantom_membrane"
       }
     }
   ],
-  "rfCost": 10000000,
-  "time": 30
+  "rfCost": 400000000,
+  "time": 2200
 }

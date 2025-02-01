@@ -2,25 +2,38 @@
   "type": "oritech:augment",
   "applyCost": [
     {
-      "count": 4,
+      "count": 32,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "item": "oritech:motor"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:copper_ingot"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 64,
       "ingredient": {
-        "tag": "c:ingots/iron"
+        "item": "oritech:motor"
       }
     },
     {
+      "count": 48,
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "tag": "c:ingots/steel"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "minecraft:copper_block"
       }
     }
   ],
-  "rfCost": 10000000,
-  "time": 30
+  "rfCost": 100000000,
+  "time": 900
 }

@@ -2,25 +2,43 @@
   "type": "oritech:augment",
   "applyCost": [
     {
-      "count": 4,
+      "count": 64,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "item": "minecraft:ender_pearl"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "minecraft:crying_obsidian"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 64,
       "ingredient": {
-        "tag": "c:ingots/iron"
+        "item": "minecraft:ender_pearl"
+      }
+    },
+    {
+      "count": 48,
+      "ingredient": {
+        "item": "minecraft:obsidian"
       }
     },
     {
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "item": "oritech:unholy_intelligence"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:adamant_ingot"
       }
     }
   ],
-  "rfCost": 10000000,
-  "time": 30
+  "rfCost": 250000000,
+  "time": 3000
 }

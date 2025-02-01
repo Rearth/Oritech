@@ -2,25 +2,38 @@
   "type": "oritech:augment",
   "applyCost": [
     {
-      "count": 4,
+      "count": 16,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "item": "oritech:motor"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "tag": "c:ingots/iron"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 32,
       "ingredient": {
-        "tag": "c:ingots/copper"
+        "item": "oritech:motor"
       }
     },
     {
+      "count": 64,
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "item": "oritech:biosteel_ingot"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "minecraft:redstone"
       }
     }
   ],
-  "rfCost": 200000,
-  "time": 200
+  "rfCost": 30000000,
+  "time": 600
 }

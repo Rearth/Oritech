@@ -2,25 +2,50 @@
   "type": "oritech:augment",
   "applyCost": [
     {
-      "count": 4,
+      "count": 32,
       "ingredient": {
-        "tag": "c:dusts/coal"
+        "item": "oritech:enderic_lens"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:redstone_torch"
       }
     }
   ],
   "researchCost": [
     {
-      "count": 2,
+      "count": 64,
       "ingredient": {
-        "tag": "c:ingots/iron"
+        "item": "oritech:enderic_lens"
       }
     },
     {
+      "count": 48,
       "ingredient": {
-        "item": "oritech:electrum_ingot"
+        "item": "minecraft:amethyst_block"
+      }
+    },
+    {
+      "count": 48,
+      "ingredient": {
+        "item": "oritech:overcharged_crystal"
+      }
+    },
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "oritech:prometheum_ingot"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "minecraft:sculk_sensor"
       }
     }
   ],
-  "rfCost": 10000000,
-  "time": 30
+  "rfCost": 200000000,
+  "time": 3200
 }
