@@ -337,7 +337,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
     
     private void addAvailableAugments(FlowLayout parent) {
         
-        var maxHeight = this.height * 0.7f;
+        var maxHeight = this.height * 0.75f;
         var leftOffset = 20;
         
         for (var augmentId : PlayerAugments.allAugments.keySet()) {
