@@ -308,7 +308,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         var amount = handler.blockEntity.getEnergyStorageForLink().getAmount();
         
         var fillAmount = (float) amount / capacity;
-        var tooltipText = getEnergyTooltip(amount, capacity, (int) AugmentApplicationEntity.energyUsageRate, (int) AugmentApplicationEntity.maxEnergyTransfer);
+        var tooltipText = getEnergyTooltip(amount, capacity, 0, (int) AugmentApplicationEntity.maxEnergyTransfer);
         
         energyIndicator.tooltip(tooltipText);
         energyIndicator.visibleArea(PositionedRectangle.of(0, 96 - ((int) (96 * (fillAmount))), 24, (int) (96 * fillAmount)));

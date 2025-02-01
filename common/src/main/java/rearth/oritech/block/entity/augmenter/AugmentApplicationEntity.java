@@ -55,8 +55,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     
     // config
     public static long maxEnergyTransfer = 50_000_000;
-    public static long maxEnergyStored = 5_000_000_000L;
-    public static long energyUsageRate = 2048;
+    public static long maxEnergyStored = 500_000_000L;
     
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
