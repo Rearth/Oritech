@@ -2,7 +2,6 @@ package rearth.oritech.block.entity.augmenter;
 
 import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
 import net.minecraft.block.Block;
@@ -15,7 +14,6 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
@@ -118,6 +116,7 @@ public class PlayerAugments {
         
         @Override
         public void toggle(PlayerEntity player) {
+            super.toggle(player);
             var isInvisible = player.isInvisible();
             player.setInvisible(!isInvisible);
         }
@@ -194,8 +193,6 @@ public class PlayerAugments {
             var playerHungerCapacity = 20 - player.getHungerManager().getFoodLevel();
             if (playerHungerCapacity < 2) return;
             
-            System.out.println(playerHungerCapacity);
-            
             var storedFood = player.getAttached(getOwnType());
             if (storedFood == null) return;
             
@@ -204,7 +201,6 @@ public class PlayerAugments {
                 var usedFood = Math.min(playerHungerCapacity, storedFood);
                 player.getHungerManager().add(usedFood, 1f);
                 player.setAttached(getOwnType(), storedFood - usedFood);
-                System.out.println("fed amount: " + usedFood);
             } else {
                 var foodCandidate = player.getInventory().main.stream().filter(item -> item.contains(DataComponentTypes.FOOD)).findFirst();
                 if (foodCandidate.isPresent()) {
@@ -212,7 +208,6 @@ public class PlayerAugments {
                     var gainedFood = Objects.requireNonNull(foodSourceStack.get(DataComponentTypes.FOOD)).nutrition();
                     foodSourceStack.decrement(1);
                     player.setAttached(getOwnType(), gainedFood);
-                    System.out.println("consumed food: " + gainedFood);
                 }
             }
             
@@ -220,6 +215,7 @@ public class PlayerAugments {
         
         @Override
         public void toggle(PlayerEntity player) {
+            super.toggle(player);
             var value = player.getAttached(getOwnType());
             if (value == null) return;
             
@@ -261,6 +257,7 @@ public class PlayerAugments {
         
         @Override
         public void toggle(PlayerEntity player) {
+            super.toggle(player);
             var value = player.getAttached(getOwnType());
             if (value == null) return;
             
@@ -310,6 +307,7 @@ public class PlayerAugments {
         
         @Override
         public void toggle(PlayerEntity player) {
+            super.toggle(player);
             var value = player.getAttached(getOwnType());
             if (value == null) return;
             
@@ -341,8 +339,6 @@ public class PlayerAugments {
     
     
     public static void init() {
-        
-        Oritech.LOGGER.info("Registering oritech augment types");
         
         addAugmentAsset(hpBoost, 5, 70, List.of(), BlockContent.SIMPLE_AUGMENT_STATION); //
         addAugmentAsset(hpBoostMore, 80, 70, List.of(armor.id), BlockContent.ADVANCED_AUGMENT_STATION); //
@@ -435,8 +431,11 @@ public class PlayerAugments {
         
         public void onPlayerLoad(PlayerEntity player) {
             
-            if (autoSync && !player.getWorld().isClient)
+            if (autoSync && !player.getWorld().isClient) {
                 NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, AugmentOperation.ADD.ordinal()));
+                if (toggleable && !isEnabled(player))   // send disabled status to client aswell
+                    NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, AugmentOperation.TOGGLE.ordinal()));
+            }
             
         }
         
@@ -452,7 +451,7 @@ public class PlayerAugments {
                                                                      .copyOnDeath()
                                                                      .persistent(Codec.INT)
                                                                      .initializer(() -> -1)
-                                                                     .syncWith(PacketCodecs.VAR_INT.cast(), AttachmentSyncPredicate.targetOnly())   // todo either wait for FFAPI update or manually replace this
+                                                                     // .syncWith(PacketCodecs.VAR_INT.cast(), AttachmentSyncPredicate.targetOnly())   // because FFAPI isnt updated yet this cannot be used
                                                                      .buildAndRegister(this.id);
         
         
@@ -461,7 +460,11 @@ public class PlayerAugments {
         }
         
         protected PlayerCustomAugment(Identifier id, boolean toggleable) {
-            super(id, toggleable, false);
+            this(id, toggleable, true);
+        }
+        
+        protected PlayerCustomAugment(Identifier id, boolean toggleable, boolean autoSync) {
+            super(id, toggleable, autoSync);
         }
         
         public AttachmentType<Integer> getOwnType() {
@@ -498,15 +501,12 @@ public class PlayerAugments {
                                                            .copyOnDeath()
                                                            .persistent(BlockPos.CODEC)
                                                            .initializer(() -> BlockPos.ORIGIN)
-                                                           .syncWith(BlockPos.PACKET_CODEC.cast(), AttachmentSyncPredicate.targetOnly())   // todo either wait for FFAPI update or manually replace this
+                                                           // .syncWith(BlockPos.PACKET_CODEC.cast(), AttachmentSyncPredicate.targetOnly())   // todo either wait for FFAPI update or manually replace this
                                                            .buildAndRegister(this.id);
         
         
-        protected PlayerPortalAugment(Identifier id) {
-            this(id, false);
-        }
         protected PlayerPortalAugment(Identifier id, boolean toggleable) {
-            super(id, toggleable, false);
+            super(id, toggleable, true);
         }
         
         public AttachmentType<BlockPos> getOwnType() {
@@ -540,6 +540,7 @@ public class PlayerAugments {
         public void toggle(PlayerEntity player) {
             super.toggle(player);
             var world = player.getWorld();
+            if (world.isClient) return;
             
             var hitResult = player.raycast(6, 0, false);
             var spawnPos = hitResult.getPos();
