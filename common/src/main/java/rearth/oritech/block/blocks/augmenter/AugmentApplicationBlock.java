@@ -18,6 +18,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -27,6 +28,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.OritechClient;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.network.NetworkContent;
@@ -229,6 +231,9 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
     @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         super.appendTooltip(stack, context, tooltip, options);
+        var hotkey = OritechClient.AUGMENT_SELECTOR.boundKey.getLocalizedText();
+        tooltip.add(Text.translatable("tooltip.oritech.augmenter.1").formatted(Formatting.GRAY));
+        tooltip.add(Text.translatable("tooltip.oritech.augmenter.2", hotkey.getLiteralString()).formatted(Formatting.GRAY));
         addMachineTooltip(tooltip, this, this);
     }
 }

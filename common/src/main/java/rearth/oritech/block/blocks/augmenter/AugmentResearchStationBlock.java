@@ -12,6 +12,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -112,6 +113,7 @@ public class AugmentResearchStationBlock extends FacingBlock implements BlockEnt
     @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         super.appendTooltip(stack, context, tooltip, options);
+        tooltip.add(Text.translatable("tooltip.oritech.augment_research_station").formatted(Formatting.GRAY));
         addMachineTooltip(tooltip, this, this);
     }
 }

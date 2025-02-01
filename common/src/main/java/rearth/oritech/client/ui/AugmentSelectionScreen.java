@@ -49,6 +49,10 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         this.root = rootComponent;
         
         addAugments(rootComponent);
+        
+        // add tooltip in bot left
+        var label = Components.label(Text.translatable("oritech.text.augment_toggle"));
+        rootComponent.child(label.positioning(Positioning.relative(2, 90)));
     }
     
     @Override
@@ -254,7 +258,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
             var iconTexture = Oritech.id("textures/gui/augments/" + id.getPath() + ".png");
             var label = Components.texture(iconTexture, 0, 0, 24, 24, 24, 24);
             label.positioning(Positioning.relative((int) (50 + offsetX * sideRelative), (int) (50 + offsetY)));
-            label.sizing(Sizing.fixed(screenSizeY / 10));
+            label.sizing(Sizing.fixed(screenSizeY / 12));
             
             augments.add(label);
             parent.child(label);

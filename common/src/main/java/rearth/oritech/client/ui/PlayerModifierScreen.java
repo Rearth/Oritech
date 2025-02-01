@@ -131,7 +131,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         for (int i = 0; i < researchLabels.size(); i++) {
             var panelData = researchLabels.get(i);
             var researchData = this.handler.blockEntity.availableStations.get(i);
-            if (researchData == null) return;
+            if (researchData == null) break;
             
             var baseKey = Text.literal("");
             var time = this.handler.blockEntity.getWorld().getTime();
