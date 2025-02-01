@@ -1,0 +1,21 @@
+---
+title: 生物生成
+icon: oritech:spawner_controller_block
+---
+
+<center>
+<ModAsset location="oritech:area/mob_spawner" width={512} />
+</center>
+
+生物可以通过将刷挂器控制器与下方的刷怪器笼结合来生成。
+生成实体的大小决定了所需的笼子尺寸。
+生成的生物类型由第一个走过控制器上方的生物决定，并且只能通过更换控制器来更改。
+控制器收集灵魂并使用它们来生成设定的生物，灵魂成本取决于生物的血量（HP）。
+只有在附近有可用的空旷表面时，生物才会生成。
+
+当设置了一个生物类型（或在无效时右键点击），控制器会高亮显示下方所需生成笼的尺寸。
+你也可以右键点击控制器以获取当前操作状态的信息。
+
+<Callout variant="info">
+    控制器不会生成任何带有 "oritech:spawner_blacklist" 标签的生物类型。
+</Callout>

@@ -1,0 +1,26 @@
+---
+title: 能量
+icon: oritech:energy_pipe
+---
+
+Oritech 使用 **RF** 为其所有机器供电，在 Fabric 上使用 Reborn Energy API 或在 NeoForge 上使用 FE。
+
+这确保了与 Fabric 和 NeoForge 上所有使用能量的模组的兼容性。
+
+只有一种电缆等级可用，能够传输最高 **10k RF/刻**。如果这还不够，还有超导体，能够传输 **4M RF/刻**。
+
+发电机将始终输出能量，而其他所有机器可以从所有方向接受能量但不会再次输出。
+电缆如果无法输出能量时，本身在每个机器连接点可以存储最多 **10k RF**。
+
+为了缓冲和存储能量，您可以使用能量存储方块。它们有两种尺寸，并且可以使用附加组件进行大规模扩展。
+能量存储方块通过 🟢 *绿色端口* 从所有方向接受能量，只能通过单个 🔴 *红色端口* 输出。红石信号会禁用所有能量输出。
+
+<center>
+<ModAsset location="oritech:small_storage_block" width={256} />
+</center>
+
+能量也可以通过末影激光无线传输。详见 [末影激光](../interaction/enderic_laser)。
+
+<center>
+<ModAsset location="oritech:area/enderic_laser_energy" width={512} />
+</center>

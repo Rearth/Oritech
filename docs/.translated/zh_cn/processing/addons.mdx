@@ -1,0 +1,32 @@
+---
+title: 插件
+icon: oritech:machine_extender
+---
+
+要想在Oritech中升级机器，您需要用到各类插件。
+
+插件是依附在机器上或是与扩展组件相连的方块。插件能提高机器的处理速度和能效，亦或是提供其它功能。
+
+扩展组件/插件只能安装在机器的特定位置（下文统称为“插槽”）。您可以在机器GUI中的“插件”选项卡中查看插槽位置和已安装插件，或直接在机器上寻找如图的插槽标记：
+
+<center>
+<ModAsset location="oritech:textures/book/addon_marker.png" width={300} />
+</center>
+
+安装插件后，对机器点击鼠标右键即可激活插件。当一个插件的粉红色部分变为蓝色时，这意味着其已被激活。
+
+您可以通过安装扩展组件来增加插槽数量，这些扩展组件可以与插件相连并使其能作用于机器。
+
+扩展组件可安装的层数上限取决于机器等级。机器等级为I时无法安装任何插件。
+
+机器核心品质从不直接统计激活的插件数量。相反，它统计插件连接到机器所需的扩展器数量。如果此数量大于核心品质，则插件将不会连接。请参阅下图的演示：
+
+<center>
+<ModAsset location="oritech:textures/book/extenders.png" width={700} />
+</center>
+
+正如之前所说，只会统计机器和插件之间的扩展器数量。这意味着您可以为插件提供多个分支，而所有插件都将正常工作：
+
+<center>
+<ModAsset location="oritech:textures/book/addon_branching.png" width={700} />
+</center>
