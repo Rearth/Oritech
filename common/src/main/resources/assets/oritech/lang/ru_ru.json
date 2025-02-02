@@ -211,7 +211,7 @@
   "tooltip.oritech.addon_proxy_desc": "Разрешить доступ к определенным слотам инвентаря",
   "tooltip.oritech.addon_proxy_select": "Выбрать место для прокси",
   "tooltip.oritech.addon_quarry_desc": "Применяется для блокирования разрушителя и лазера эндерика. Увеличивает размер рабочей зоны",
-  "tooltip.oritech.addon_hunter_desc": "Применяется для эндерического лазера. Цели живых сущностей",
+  "tooltip.oritech.addon_hunter_desc": "Applicable to Enderic Laser. Used to target living entities. Range increases with each addon.",
   "tooltip.oritech.addon_redstone_desc": "Позволяет изменять настройки редстоуна и компаратора",
   "tooltip.oritech.addon_capacity_desc": "Емкость:",
   "tooltip.oritech.addon_transfer_desc": "Скорость передачи энергии ",
