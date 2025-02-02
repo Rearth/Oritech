@@ -211,7 +211,7 @@
   "tooltip.oritech.addon_proxy_desc": "Permite acceso a ranuras específicas del inventario",
   "tooltip.oritech.addon_proxy_select": "Seleccionar ranura objetivo del proxy",
   "tooltip.oritech.addon_quarry_desc": "Aplicable al destructor de bloques y Láser Endérico. Aumenta el tamaño del área de trabajo",
-  "tooltip.oritech.addon_hunter_desc": "Aplicable al Láser Endérico. Apunta a entidades vivas",
+  "tooltip.oritech.addon_hunter_desc": "Applicable to Enderic Laser. Used to target living entities. Range increases with each addon.",
   "tooltip.oritech.addon_redstone_desc": "Permite configuración adicional de redstone y comparador",
   "tooltip.oritech.addon_capacity_desc": "Capacidad de Energía ",
   "tooltip.oritech.addon_transfer_desc": "Tasa de Transferencia de Energía ",
