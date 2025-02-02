@@ -211,7 +211,7 @@
   "tooltip.oritech.addon_proxy_desc": "Дозволяє отримати доступ до певних слотів інвентарю",
   "tooltip.oritech.addon_proxy_select": "Виберіть цільовий слот проксі-сервера",
   "tooltip.oritech.addon_quarry_desc": "Застосовується для блок-руйнівника та ендерик лазера. Збільшує розмір робочої зони",
-  "tooltip.oritech.addon_hunter_desc": "Застосовується до лазера ендерік. Націлений на живі істоти",
+  "tooltip.oritech.addon_hunter_desc": "Applicable to Enderic Laser. Used to target living entities. Range increases with each addon.",
   "tooltip.oritech.addon_redstone_desc": "Дозволяє подальшу конфігурацію червоного каменю та компаратора",
   "tooltip.oritech.addon_capacity_desc": "Енергетична потужність",
   "tooltip.oritech.addon_transfer_desc": "Швидкість передачі енергії ",
