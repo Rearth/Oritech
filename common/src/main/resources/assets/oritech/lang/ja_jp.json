@@ -211,7 +211,7 @@
   "tooltip.oritech.addon_proxy_desc": "指定したインベントリスロットへのアクセスを許可します。",
   "tooltip.oritech.addon_proxy_select": "対象となるスロットを選択してください。",
   "tooltip.oritech.addon_quarry_desc": "ブロックデストロイヤーとエンダリックレーザーに適用可能です。\n有効範囲のサイズが増加します。",
-  "tooltip.oritech.addon_hunter_desc": "エンダリックレーザーに適用可能です。\n生きているエンティティを対象にできます。",
+  "tooltip.oritech.addon_hunter_desc": "Applicable to Enderic Laser. Used to target living entities. Range increases with each addon.",
   "tooltip.oritech.addon_redstone_desc": "レッドストーンやコンパレータの設定をさらに可能にします。",
   "tooltip.oritech.addon_capacity_desc": "エネルギー容量 ",
   "tooltip.oritech.addon_transfer_desc": "エネルギー転送速度 ",
