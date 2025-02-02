@@ -211,7 +211,7 @@
   "tooltip.oritech.addon_proxy_desc": "Permet l'accès à des emplacements d'inventaire spécifiques",
   "tooltip.oritech.addon_proxy_select": "Sélectionnez l'emplacement cible du proxy",
   "tooltip.oritech.addon_quarry_desc": "Applicable au Destructeur de Blocs et au Laser Enderique. Augmente la taille de la zone de travail",
-  "tooltip.oritech.addon_hunter_desc": "Applicable au Laser Enderique. Cible les entités vivantes",
+  "tooltip.oritech.addon_hunter_desc": "Applicable to Enderic Laser. Used to target living entities. Range increases with each addon.",
   "tooltip.oritech.addon_redstone_desc": "Permet une configuration supplémentaire de la redstone et des comparateurs",
   "tooltip.oritech.addon_capacity_desc": "Capacité d'énergie ",
   "tooltip.oritech.addon_transfer_desc": "Taux de transfert d'énergie ",
