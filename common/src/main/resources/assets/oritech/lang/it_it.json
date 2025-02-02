@@ -211,7 +211,7 @@
   "tooltip.oritech.addon_proxy_desc": "Consente l'accesso a specifici slot dell'inventario",
   "tooltip.oritech.addon_proxy_select": "Selezionare lo slot di destinazione proxy",
   "tooltip.oritech.addon_quarry_desc": "Applicabile al Distruttore dei Blocchi e al Laser Enderico. Aumenta la dimensione dell'area di lavoro",
-  "tooltip.oritech.addon_hunter_desc": "Applicabile al Laser Enderico. Attacca le entità viventi",
+  "tooltip.oritech.addon_hunter_desc": "Applicable to Enderic Laser. Used to target living entities. Range increases with each addon.",
   "tooltip.oritech.addon_redstone_desc": "Consente ulteriori configurazioni al comparatore",
   "tooltip.oritech.addon_capacity_desc": "Capacità Energetica",
   "tooltip.oritech.addon_transfer_desc": "Tasso Di Trasmissione D'Energia",
