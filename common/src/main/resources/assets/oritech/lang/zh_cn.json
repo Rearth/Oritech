@@ -211,7 +211,7 @@
   "tooltip.oritech.addon_proxy_desc": "允许访问指定的物品栏",
   "tooltip.oritech.addon_proxy_select": "选择代理目标槽位",
   "tooltip.oritech.addon_quarry_desc": "可应用于方块破坏器和末影激光器。增加工作区域面积",
-  "tooltip.oritech.addon_hunter_desc": "适用于末影激光器。将目标设为活的实体",
+  "tooltip.oritech.addon_hunter_desc": "Applicable to Enderic Laser. Used to target living entities. Range increases with each addon.",
   "tooltip.oritech.addon_redstone_desc": "允许高阶红石和比较器配置",
   "tooltip.oritech.addon_capacity_desc": "能量容量 ",
   "tooltip.oritech.addon_transfer_desc": "能量传输速率 ",
