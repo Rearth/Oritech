@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.entity.processing.MachineCoreEntity;
+import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.interaction.DeepDrillEntity;
 import rearth.oritech.util.MultiblockMachineController;
 

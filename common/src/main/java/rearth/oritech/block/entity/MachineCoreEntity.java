@@ -1,4 +1,4 @@
-package rearth.oritech.block.entity.processing;
+package rearth.oritech.block.entity;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
@@ -67,7 +67,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
-        if (controllerEntity == null) return new SimpleEnergyStorage(100, 0, 0);
+        if (controllerEntity == null) return new SimpleEnergyStorage(100, 0, 0);    // this should never happen
         return controllerEntity.getEnergyStorageForLink();
     }
     

@@ -5,7 +5,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.processing.MachineCoreEntity;
+import rearth.oritech.block.entity.MachineCoreEntity;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.IServerDataProvider;

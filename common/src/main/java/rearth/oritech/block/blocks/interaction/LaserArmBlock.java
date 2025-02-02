@@ -28,6 +28,7 @@ import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.behavior.LaserArmEntityBehavior;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.List;
@@ -139,6 +140,10 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
             var entity = world.getBlockEntity(pos);
             if (state.get(ASSEMBLED) && entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
+            }
+            
+            if (entity instanceof MachineAddonController machineEntity) {
+                machineEntity.resetAddons();
             }
             
             if (entity instanceof LaserArmBlockEntity storageBlock) {

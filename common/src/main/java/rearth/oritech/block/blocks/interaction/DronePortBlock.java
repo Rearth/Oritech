@@ -25,6 +25,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.DronePortEntity;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.List;
@@ -101,6 +102,11 @@ public class DronePortBlock extends Block implements BlockEntityProvider {
             var entity = world.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
+            }
+            
+            
+            if (entity instanceof MachineAddonController machineEntity) {
+                machineEntity.resetAddons();
             }
             
             if (entity instanceof DronePortEntity storageBlock) {

@@ -44,7 +44,7 @@ import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.block.entity.processing.MachineCoreEntity;
+import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;

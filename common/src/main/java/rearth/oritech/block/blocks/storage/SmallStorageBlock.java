@@ -174,6 +174,19 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        
+        if (!world.isClient) {
+            var entity = world.getBlockEntity(pos);
+            if (entity instanceof MachineAddonController machineEntity) {
+                machineEntity.resetAddons();
+            }
+        }
+        
+        return super.onBreak(world, pos, state, player);
+    }
+    
+    @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         super.appendTooltip(stack, context, tooltip, options);
         

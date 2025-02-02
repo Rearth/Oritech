@@ -8,6 +8,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.accelerator.*;
 import rearth.oritech.block.entity.addons.*;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
