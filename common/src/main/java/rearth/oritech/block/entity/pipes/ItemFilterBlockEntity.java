@@ -93,7 +93,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
     }
     
     @Override
-    public InventoryStorage getInventory(Direction direction) {
+    public Storage<ItemVariant> getInventory(Direction direction) {
         return InventoryStorage.of(inventory, direction);
     }
     @Override

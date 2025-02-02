@@ -418,7 +418,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, F
     }
     
     @Override
-    public InventoryStorage getInventory(Direction direction) {
+    public Storage<ItemVariant> getInventory(Direction direction) {
         return InventoryStorage.of(inventory, direction);
     }
     

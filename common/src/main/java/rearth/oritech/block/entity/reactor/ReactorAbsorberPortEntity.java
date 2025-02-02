@@ -2,6 +2,8 @@ package rearth.oritech.block.entity.reactor;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -164,7 +166,7 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedSc
     }
     
     @Override
-    public InventoryStorage getInventory(Direction direction) {
+    public Storage<ItemVariant> getInventory(Direction direction) {
         return inventoryStorage;
     }
 }

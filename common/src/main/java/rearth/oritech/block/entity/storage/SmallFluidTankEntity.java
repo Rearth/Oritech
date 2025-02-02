@@ -256,7 +256,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     }
     
     @Override
-    public InventoryStorage getInventory(Direction direction) {
+    public Storage<ItemVariant> getInventory(Direction direction) {
         return InventoryStorage.of(inventory, direction);
     }
     

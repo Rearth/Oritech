@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.block.BlockState;
@@ -148,7 +149,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     private boolean chargeItems() {
         var heldStack = inventory.heldStacks.get(0);
         
-        var slot = ContainerItemContext.ofSingleSlot(getInventory(null).getSlot(0));
+        var slot = ContainerItemContext.ofSingleSlot(inventoryStorage.getSlot(0));
         var slotEnergyContainer = EnergyApi.ITEM.find(heldStack, slot);
         if (slotEnergyContainer != null) {
             EnergyApi.transfer(energyStorage, slotEnergyContainer, Long.MAX_VALUE, false);
@@ -221,7 +222,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     }
     
     @Override
-    public InventoryStorage getInventory(Direction direction) {
+    public Storage<ItemVariant> getInventory(Direction direction) {
         return inventoryStorage;
     }
     

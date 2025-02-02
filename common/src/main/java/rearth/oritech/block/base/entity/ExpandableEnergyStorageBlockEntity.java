@@ -3,6 +3,8 @@ package rearth.oritech.block.base.entity;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -118,7 +120,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         var heldStack = inventory.heldStacks.get(0);
         if (heldStack.isEmpty()) return;
         
-        var slot = ContainerItemContext.ofSingleSlot(getInventory(null).getSlot(0));
+        var slot = ContainerItemContext.ofSingleSlot(inventoryStorage.getSlot(0));
         var slotEnergyContainer = EnergyApi.ITEM.find(heldStack, slot);
         if (slotEnergyContainer != null) {
             EnergyApi.transfer(energyStorage, slotEnergyContainer, Long.MAX_VALUE, false);
@@ -153,7 +155,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     }
     
     @Override
-    public InventoryStorage getInventory(Direction direction) {
+    public Storage<ItemVariant> getInventory(Direction direction) {
         return inventoryStorage;
     }
     

@@ -1,7 +1,7 @@
 package rearth.oritech.block.entity;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -12,17 +12,21 @@ import net.minecraft.util.math.Direction;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.*;
-import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyApi.BlockProvider, FluidProvider {
     
     private BlockPos controllerPos = BlockPos.ORIGIN;
     private MultiblockMachineController controllerEntity;
-    private final DelegatingEnergyStorage delegatedStorage = new DelegatingEnergyStorage(this::getMainStorage, this::isEnabled);
+    private final DelegatingEnergyStorage delegatedEnergy = new DelegatingEnergyStorage(this::getMainEnergyStorage, this::isEnabled);
+    private final Map<Direction, DelegatingFluidStorage> delegatedFluid = new HashMap<>(6);
+    private final Map<Direction, DelegatingItemStorage> delegatedItem = new HashMap<>(6);
     
     public MachineCoreEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.MACHINE_CORE_ENTITY, pos, state);
@@ -61,7 +65,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         return controllerEntity;
     }
     
-    private EnergyApi.EnergyContainer getMainStorage() {
+    private EnergyApi.EnergyContainer getMainEnergyStorage() {
         
         var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
         if (!isUsed) return null;
@@ -81,6 +85,24 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         return fluidProvider.getFluidStorage(direction);
     }
     
+    private Storage<ItemVariant> getMainItemStorage(Direction direction) {
+        
+        var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
+        if (!isUsed) return null;
+        
+        var controllerEntity = getCachedController();
+        if (!(controllerEntity instanceof InventoryProvider itemProvider)) return null;
+        return itemProvider.getInventory(direction);
+    }
+    
+    private Storage<FluidVariant> getFluidStorageDelegated(Direction direction) {
+        return delegatedFluid.computeIfAbsent(direction, dir -> new DelegatingFluidStorage(() -> getMainFluidStorage(dir), this::isEnabled));
+    }
+    
+    private Storage<ItemVariant> getItemStorageDelegated(Direction direction) {
+        return delegatedItem.computeIfAbsent(direction, dir -> new DelegatingItemStorage(() -> getMainItemStorage(dir), this::isEnabled));
+    }
+    
     public boolean isEnabled() {
         return this.getCachedState().get(MachineCoreBlock.USED);
     }
@@ -90,21 +112,17 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         if (getCachedController() == null || getCachedController().getEnergyStorageForLink() == null) {
             return null;
         } else {
-            return delegatedStorage;
+            return delegatedEnergy;
         }
     }
     
     @Override
-    public InventoryStorage getInventory(Direction direction) {
-        
-        var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
-        if (!isUsed || getCachedController() == null || getCachedController().getInventoryForLink() == null) return null;
-        
-        return getCachedController().getInventoryForLink().getInventory(direction);
+    public Storage<ItemVariant> getInventory(Direction direction) {
+        return getItemStorageDelegated(direction);
     }
     
     @Override
     public Storage<FluidVariant> getFluidStorage(Direction direction) {
-        return getMainFluidStorage(direction);
+        return getFluidStorageDelegated(direction);
     }
 }
