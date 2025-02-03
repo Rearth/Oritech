@@ -168,6 +168,7 @@
   "tooltip.oritech.steam_engine": "Buharı RF ve suya dönüştürür. Birbirine zincirlenebilir",
   "tooltip.oritech.item_filter": "Bir envantere hangi eşyaların eklenebileceğini filtrelemek için kullanılır.",
   "tooltip.oritech.machine_frame": "Evet, bunun sınırlayıcı kutusunu değiştirmek için bir yapılandırma seçeneği var.",
+  "tooltip.oritech.machine_frame.1": "Max Length: %sx%s blocks.",
   "tooltip.oritech.particle_collector": "Collects the energy of tachyons emitted by particle collisions.",
   "tooltip.oritech.reactor_port_mode.0": "Çıkış Sıcaklığı",
   "tooltip.oritech.reactor_port_mode.1": "Çıkış Boş Olmayan Çubuk Sayısı",
