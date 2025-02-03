@@ -168,6 +168,7 @@
   "tooltip.oritech.steam_engine": "蒸気をRFと水に加工します。連結可能です。",
   "tooltip.oritech.item_filter": "インベントリに挿入するアイテムをフィルタリングするために使用します。",
   "tooltip.oritech.machine_frame": "もちろん、この境界線の位置を変えるオプションもあります。",
+  "tooltip.oritech.machine_frame.1": "Max Length: %sx%s blocks.",
   "tooltip.oritech.particle_collector": "粒子衝突によって放出されたタキオンのエネルギーを集めます。",
   "tooltip.oritech.reactor_port_mode.0": "温度を出力",
   "tooltip.oritech.reactor_port_mode.1": "空ではないロッドの数を出力",
