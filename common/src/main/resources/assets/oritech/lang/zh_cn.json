@@ -168,6 +168,7 @@
   "tooltip.oritech.steam_engine": "将蒸汽处理为RF和水。可以被连接在一起",
   "tooltip.oritech.item_filter": "用来过滤哪些物品能被插入一个物品栏。",
   "tooltip.oritech.machine_frame": "是的，有个选项能更改它的轮廓箱。",
+  "tooltip.oritech.machine_frame.1": "Max Length: %sx%s blocks.",
   "tooltip.oritech.particle_collector": "收集由粒子碰撞产生的速子能量。",
   "tooltip.oritech.reactor_port_mode.0": "输出温度",
   "tooltip.oritech.reactor_port_mode.1": "输出非空杆数",
