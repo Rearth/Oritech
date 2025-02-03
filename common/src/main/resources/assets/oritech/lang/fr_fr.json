@@ -168,6 +168,7 @@
   "tooltip.oritech.steam_engine": "Transforme la vapeur en RF et en eau. Peut être enchaîné",
   "tooltip.oritech.item_filter": "Utilisé pour filtrer quels objets peuvent être insérés dans un inventaire.",
   "tooltip.oritech.machine_frame": "Yes there is a config option to change the bounding box of this.",
+  "tooltip.oritech.machine_frame.1": "Max Length: %sx%s blocks.",
   "tooltip.oritech.particle_collector": "Collects the energy of tachyons emitted by particle collisions.",
   "tooltip.oritech.reactor_port_mode.0": "Output Temperature",
   "tooltip.oritech.reactor_port_mode.1": "Output Non-Empty Rod Count",
