@@ -232,7 +232,7 @@
   "tooltip.oritech.black_hole": "特に目的がないのなら、これは設置しないでください。",
   "tooltip.oritech.reactor_controller": "可変サイズの原子炉マルチブロックの制御部です。",
   "tooltip.oritech.reactor_controller.0": "原子炉用ウォールを用いて原子炉の外壁を組み立てる必要があります。",
-  "tooltip.oritech.reactor_controller.1": "内部層はY軸で同じブロックである必要があります。",
+  "tooltip.oritech.reactor_controller.1": "内部の層はY軸方向で統一されている必要があります。",
   "tooltip.oritech.reactor_controller.2": "",
   "tooltip.oritech.reactor_controller.3": "警告：もしも原子炉の冷却が不十分な場合は",
   "tooltip.oritech.reactor_controller.4": "カタストロフィが起きる可能性があります。",
