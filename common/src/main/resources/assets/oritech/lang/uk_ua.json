@@ -411,7 +411,7 @@
   "rei.process.oritech:reactor": "Reactor Fuelling",
   "rei.process.oritech:laser": "Enderic Laser Block Destruction",
   "rei.process.oritech:fuel_generator": "Спалювання палива",
-  "rei.process.oritech:particle_collision": "Спалювання палива",
+  "rei.process.oritech:particle_collision": "Зіткнення частинок",
   "rei.title.oritech.cookingtime": "%ds (%d ticks)",
   "emi.category.oritech.pulverizer": "Подрібнювач",
   "emi.category.oritech.grinder": "Фрагментування",
