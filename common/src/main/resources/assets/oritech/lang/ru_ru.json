@@ -411,7 +411,7 @@
   "rei.process.oritech:reactor": "Reactor Fuelling",
   "rei.process.oritech:laser": "Enderic Laser Block Destruction",
   "rei.process.oritech:fuel_generator": "Горящее топливо",
-  "rei.process.oritech:particle_collision": "Горящее топливо",
+  "rei.process.oritech:particle_collision": "Столкновения частиц",
   "rei.title.oritech.cookingtime": "%dсек (%d чек.)",
   "emi.category.oritech.pulverizer": "Измельчение",
   "emi.category.oritech.grinder": "Фрагменты",
