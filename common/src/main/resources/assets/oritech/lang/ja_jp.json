@@ -411,7 +411,7 @@
   "rei.process.oritech:reactor": "原子炉の稼働",
   "rei.process.oritech:laser": "エンダリックレーザーのブロック破壊",
   "rei.process.oritech:fuel_generator": "燃料燃焼",
-  "rei.process.oritech:particle_collision": "燃料燃焼",
+  "rei.process.oritech:particle_collision": "粒子衝突",
   "rei.title.oritech.cookingtime": "%d 秒（%d ティック）",
   "emi.category.oritech.pulverizer": "粉砕",
   "emi.category.oritech.grinder": "破砕",
