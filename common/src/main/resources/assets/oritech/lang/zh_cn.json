@@ -411,7 +411,7 @@
   "rei.process.oritech:reactor": "反应堆加燃料",
   "rei.process.oritech:laser": "末影激光方块破坏",
   "rei.process.oritech:fuel_generator": "燃料燃烧",
-  "rei.process.oritech:particle_collision": "燃料燃烧",
+  "rei.process.oritech:particle_collision": "粒子碰撞",
   "rei.title.oritech.cookingtime": "%d秒（%d刻）",
   "emi.category.oritech.pulverizer": "磨粉",
   "emi.category.oritech.grinder": "粉碎",
