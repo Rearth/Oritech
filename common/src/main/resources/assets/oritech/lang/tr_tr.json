@@ -411,7 +411,7 @@
   "rei.process.oritech:reactor": "Reaktör Yakıt Dolumu",
   "rei.process.oritech:laser": "Enderik Lazer Blok İmhası",
   "rei.process.oritech:fuel_generator": "Yakıt Yakımı",
-  "rei.process.oritech:particle_collision": "Yakıt Yakımı",
+  "rei.process.oritech:particle_collision": "Parçacık Çarpışması",
   "rei.title.oritech.cookingtime": "%ds (%d tik)",
   "emi.category.oritech.pulverizer": "Toz haline getirme",
   "emi.category.oritech.grinder": "Parçalama",
