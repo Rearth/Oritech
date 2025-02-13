@@ -270,7 +270,7 @@
   "tooltip.oritech.reactor_energy_port.1": "最大レート： 25 000 RF/t",
   "tooltip.oritech.reactor_redstone_port": "原子炉をレッドストーンで制御可能にし、コンパレーターで読み取ることも可能にします。",
   "tooltip.oritech.reactor_redstone_port.0": "",
-  "tooltip.oritech.reactor_redstone_port.1": "このブロックへのレッドストーン信号は\n新しい燃料の「挿入」を無効にします。",
+  "tooltip.oritech.reactor_redstone_port.1": "このブロックへのレッドストーン信号は新しい燃料の「挿入」を無効にします。",
   "tooltip.oritech.reactor_redstone_port.2": "必然的に、すでに投入された燃料ペレットは原子炉が停止する前に燃焼します。",
   "tooltip.oritech.reactor_redstone_port.3": "エネルギー、熱量、エネルギー量のいずれかをコンパレーターから読み取ることができます。",
   "tooltip.oritech.reactor_redstone_port.4": "出力モードを変更するにはブロックを右クリックです。",
