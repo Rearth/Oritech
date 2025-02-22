@@ -182,6 +182,7 @@
   "tooltip.oritech.augmenter.1": "Used for cybernetic augmentations. Can be used to install and remove augments.",
   "tooltip.oritech.augmenter.2": "Hold [%s] to configure installed augments.",
   "oritech.text.augment_toggle": "Release while hovering over an augment to toggle.",
+  "oritech.text.augment_ingredient_tip": "Accepts any:",
   "button.oritech.item_filter.whitelist": "Исключения",
   "title.oritech.item_filter.whitelist": "Исключения",
   "title.oritech.chambers": "🥣: +%s",
