@@ -435,7 +435,7 @@
   "emi.category.oritech.reactor": "反应堆加燃料",
   "emi.category.oritech.laser": "末影激光方块破坏",
   "emi.title.oritech.cookingtime": "%d秒（%d刻）",
-  "emi.title.oritech.collisionspeed": "所需碰撞能量： %sJ",
+  "emi.title.oritech.collisionspeed": "Min. collision energy: %sJ",
   "emi.title.oritech.laser_interaction": "末影激光方块破坏",
   "itemgroup.oritech.machines": "Oritech 机械",
   "itemgroup.oritech.components": "Oritech 组件",
