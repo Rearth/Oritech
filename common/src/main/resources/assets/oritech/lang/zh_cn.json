@@ -651,7 +651,7 @@
   "block.oritech.reactor_absorber_port": "反应堆冷却剂吸收器口",
   "block.oritech.reactor_energy_port": "反应堆能量端口",
   "block.oritech.reactor_redstone_port": "反应堆红石端口",
-  "block.oritech.augment_application_block": "Cybernetic Augmentation Center",
+  "block.oritech.augment_application_block": "赛博改造中心",
   "block.oritech.simple_augment_station": "Cybernetic Research Station",
   "block.oritech.advanced_augment_station": [
     {
