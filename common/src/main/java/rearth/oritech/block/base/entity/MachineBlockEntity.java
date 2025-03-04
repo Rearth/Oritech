@@ -104,9 +104,10 @@ public abstract class MachineBlockEntity extends BlockEntity
                 // increase progress
                 progress++;
                 
-                if (checkCraftingFinished(activeRecipe)) {
-                    craftItem(activeRecipe, getOutputView(), getInputView());
-                    resetProgress();
+                var realDuration = activeRecipe.getTime() * getSpeedMultiplier();
+                for (float t = progress; checkCraftingFinished(t, activeRecipe) && canProceed(recipeCandidate.get().value()); t -= realDuration) {
+                  craftItem(activeRecipe, getOutputView(), getInputView());
+                  resetProgress();
                 }
                 
                 markNetDirty();
@@ -218,7 +219,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         
     }
     
-    private boolean checkCraftingFinished(OritechRecipe activeRecipe) {
+    private boolean checkCraftingFinished(float progress, OritechRecipe activeRecipe) {
         return progress >= activeRecipe.getTime() * getSpeedMultiplier();
     }
     
