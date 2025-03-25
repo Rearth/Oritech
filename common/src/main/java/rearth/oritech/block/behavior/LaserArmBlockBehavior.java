@@ -4,12 +4,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CropBlock;
+import net.minecraft.block.NetherWartBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
+import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
@@ -27,7 +29,7 @@ public class LaserArmBlockBehavior {
      * Perform laser behavior on block
      */
     public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
-        if (laserEntity.hasCropFilterAddon && block instanceof CropBlock crop && !crop.isMature(blockState))
+        if (laserEntity.hasCropFilterAddon && DestroyerBlockEntity.isImmatureCrop(blockState))
             return false;
         
         // has an energy storage, try to transfer power to it
