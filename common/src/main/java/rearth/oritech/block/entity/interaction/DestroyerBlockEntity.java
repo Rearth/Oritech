@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.CocoaBlock;
 import net.minecraft.block.CropBlock;
 import net.minecraft.block.NetherWartBlock;
 import net.minecraft.block.entity.BlockEntity;
@@ -143,7 +144,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     public static boolean isImmatureCrop(BlockState targetState) {
         Block targetBlock = targetState.getBlock();
         return (targetBlock instanceof CropBlock cropBlock && !cropBlock.isMature(targetState))
-            || (targetBlock instanceof NetherWartBlock && targetState.get(NetherWartBlock.AGE) < NetherWartBlock.MAX_AGE);
+            || (targetBlock instanceof NetherWartBlock && targetState.get(NetherWartBlock.AGE) < NetherWartBlock.MAX_AGE)
+            || (targetBlock instanceof CocoaBlock && targetState.get(CocoaBlock.AGE) < CocoaBlock.MAX_AGE);
     }
     
     private Pair<BlockPos, BlockState> getQuarryDownwardState(BlockPos toolPosition) {
