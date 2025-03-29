@@ -20,7 +20,6 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -110,12 +109,45 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // centrifuge dirt into clay
         addCentrifugeFluidRecipe(exporter, Ingredient.fromTag(ItemTags.DIRT), Items.CLAY, Fluids.WATER, 0.25f, null, 0, 1.0f, "clay");
         // create dirt from sand + biomass
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, Items.DIRT, 2).input('s', Items.SAND).input('b', ItemContent.BIOMASS).pattern("sb").pattern("bs").criterion(hasItem(ItemContent.BIOMASS), conditionsFromItem(ItemContent.BIOMASS)).offerTo(exporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, Items.DIRT, 2).input('s', ItemTags.SAND).input('b', ItemContent.BIOMASS).pattern("sb").pattern("bs").criterion(hasItem(ItemContent.BIOMASS), conditionsFromItem(ItemContent.BIOMASS)).offerTo(exporter);
         // dripstone from dripstone block
         addPulverizerRecipe(exporter, Ingredient.ofItems(Items.DRIPSTONE_BLOCK), Items.POINTED_DRIPSTONE, 4, "dripstone");
         addGrinderRecipe(exporter, Ingredient.ofItems(Items.DRIPSTONE_BLOCK), Items.POINTED_DRIPSTONE, 4, "dripstone");
         // shroomlight from logs and 3 glowstone
         addAssemblerRecipe(exporter, Ingredient.fromTag(ItemTags.LOGS), Ingredient.ofItems(Items.GLOWSTONE), Ingredient.ofItems(Items.GLOWSTONE), Ingredient.ofItems(Items.GLOWSTONE), Items.SHROOMLIGHT, 1f, "shroomlight");
+        // recyclables
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_NETHERITE_SCRAP), Items.NETHERITE_SCRAP, "recycle_netherite_scrap");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_NETHERITE_SCRAP), Items.NETHERITE_SCRAP, "recycle_netherite_scrap");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_DIAMOND), Items.DIAMOND, "recycle_diamond");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_DIAMOND), Items.DIAMOND, "recycle_diamond");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_IRON_DUST), ItemContent.IRON_DUST, "recycle_iron_dust");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_IRON_DUST), ItemContent.IRON_DUST, "recycle_iron_dust");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_SMALL_IRON_DUST), ItemContent.SMALL_IRON_DUST, "recycle_small_iron_dust");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_SMALL_IRON_DUST), ItemContent.SMALL_IRON_DUST, "recycle_small_iron_dust");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_GOLD_DUST), ItemContent.GOLD_DUST, "recycle_gold_dust");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_GOLD_DUST), ItemContent.GOLD_DUST, "recycle_gold_dust");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_SMALL_GOLD_DUST), ItemContent.SMALL_GOLD_DUST, "recycle_small_gold_dust");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_SMALL_GOLD_DUST), ItemContent.SMALL_GOLD_DUST, "recycle_small_gold_dust");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_COPPER_DUST), ItemContent.COPPER_DUST, "recycle_copper_dust");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_COPPER_DUST), ItemContent.COPPER_DUST, "recycle_copper_dust");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_SMALL_COPPER_DUST), ItemContent.SMALL_COPPER_DUST, "recycle_small_copper_dust");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_SMALL_COPPER_DUST), ItemContent.SMALL_COPPER_DUST, "recycle_small_copper_dust");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_2_QUARTZ_DUST), ItemContent.QUARTZ_DUST, 2, "recycle_2_quartz_dust");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_2_QUARTZ_DUST), ItemContent.QUARTZ_DUST, 2, "recycle_2_quartz_dust");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_4_QUARTZ_DUST), ItemContent.QUARTZ_DUST, 4, "recycle_4_quartz_dust");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_4_QUARTZ_DUST), ItemContent.QUARTZ_DUST, 4, "recycle_4_quartz_dust");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_REDSTONE_DUST), Items.REDSTONE, "recycle_redstone_dust");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_REDSTONE_DUST), Items.REDSTONE, "recycle_redstone_dust");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_GRAVEL), Items.GRAVEL, "recycle_gravel");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_GRAVEL), Items.GRAVEL, "recycle_gravel");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_SAND), Items.SAND, "recycle_sand");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_SAND), Items.SAND, "recycle_sand");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_RED_SAND), Items.RED_SAND, "recycle_red_sand");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_RED_SAND), Items.RED_SAND, "recycle_red_sand");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_STRING), Items.STRING, 3, "recycle_string");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_STRING), Items.STRING, 4, "recycle_string");
+        addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_BIOMASS), ItemContent.BIOMASS, "recycle_biomass");
+        addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.RECYCLES_TO_BIOMASS), ItemContent.BIOMASS, "recycle_biomass");
     }
     
     private void addDyes(RecipeExporter exporter) {

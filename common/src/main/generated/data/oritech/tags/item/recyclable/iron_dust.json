@@ -1,0 +1,21 @@
+{
+  "values": [
+    "minecraft:bucket",
+    "minecraft:cauldron",
+    "minecraft:compass",
+    "minecraft:hopper",
+    "minecraft:iron_axe",
+    "minecraft:iron_boots",
+    "minecraft:iron_chestplate",
+    "minecraft:iron_door",
+    "minecraft:iron_hoe",
+    "minecraft:iron_horse_armor",
+    "minecraft:iron_leggings",
+    "minecraft:iron_pickaxe",
+    "minecraft:iron_shovel",
+    "minecraft:iron_sword",
+    "minecraft:iron_trapdoor",
+    "minecraft:minecart",
+    "minecraft:shears"
+  ]
+}

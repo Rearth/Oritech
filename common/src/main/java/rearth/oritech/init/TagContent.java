@@ -99,4 +99,22 @@ public class TagContent {
     public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_LOW = TagKey.of(RegistryKeys.BLOCK, Oritech.id("unstable_container/low"));
     public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_MEDIUM = TagKey.of(RegistryKeys.BLOCK, Oritech.id("unstable_container/medium"));
     public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_HIGH = TagKey.of(RegistryKeys.BLOCK, Oritech.id("unstable_container/high"));
+
+    // recyclables
+    public static final TagKey<Item> RECYCLES_TO_NETHERITE_SCRAP = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/netherite_scrap"));
+    public static final TagKey<Item> RECYCLES_TO_DIAMOND = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/diamond"));
+    public static final TagKey<Item> RECYCLES_TO_IRON_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/iron_dust"));
+    public static final TagKey<Item> RECYCLES_TO_SMALL_IRON_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/small_iron_dust"));
+    public static final TagKey<Item> RECYCLES_TO_GOLD_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/gold_dust"));
+    public static final TagKey<Item> RECYCLES_TO_SMALL_GOLD_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/small_gold_dust"));
+    public static final TagKey<Item> RECYCLES_TO_COPPER_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/copper_dust"));
+    public static final TagKey<Item> RECYCLES_TO_SMALL_COPPER_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/small_copper_dust"));
+    public static final TagKey<Item> RECYCLES_TO_2_QUARTZ_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/quartz_dust_2"));
+    public static final TagKey<Item> RECYCLES_TO_4_QUARTZ_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/quartz_dust_4"));
+    public static final TagKey<Item> RECYCLES_TO_REDSTONE_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/redstone_dust"));
+    public static final TagKey<Item> RECYCLES_TO_GRAVEL = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/gravel"));
+    public static final TagKey<Item> RECYCLES_TO_SAND = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/sand"));
+    public static final TagKey<Item> RECYCLES_TO_RED_SAND = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/red_sand"));
+    public static final TagKey<Item> RECYCLES_TO_STRING = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/string"));
+    public static final TagKey<Item> RECYCLES_TO_BIOMASS = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/biomass"));
 }

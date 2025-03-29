@@ -1,0 +1,13 @@
+{
+  "values": [
+    {
+      "id": "#minecraft:wool_carpets",
+      "required": false
+    },
+    {
+      "id": "#minecraft:banners",
+      "required": false
+    },
+    "minecraft:painting"
+  ]
+}

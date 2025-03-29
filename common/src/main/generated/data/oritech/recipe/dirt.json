@@ -6,7 +6,7 @@
       "item": "oritech:biomass"
     },
     "s": {
-      "item": "minecraft:sand"
+      "tag": "minecraft:sand"
     }
   },
   "pattern": [
