@@ -1,6 +1,9 @@
 package rearth.oritech.block.entity.addons;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -18,11 +21,12 @@ import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.InventoryProxyScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ImplementedInventory;
+import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;
 
-public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements ImplementedInventory, ExtendedScreenHandlerFactory {
+public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements ImplementedInventory, InventoryProvider, ExtendedScreenHandlerFactory {
     
     private MachineAddonController cachedController;
     private int targetSlot = 0;
@@ -43,6 +47,11 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
         
         cachedController = (MachineAddonController) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
         return cachedController;
+    }
+
+    @Override
+    public Storage<ItemVariant> getInventory(Direction direction) {
+        return InventoryStorage.of(this, direction);
     }
     
     @Override
