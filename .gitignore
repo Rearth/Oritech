@@ -26,7 +26,8 @@ bin/
 .classpath
 .project
 */.cache
-common/src/main/generated/.cache/
+common/src/generated/.cache/
+neoforge/src/generated/.cache/
 
 # macos
 
@@ -47,3 +48,6 @@ replay_*.log
 # krita
 *.kra
 *.png~
+
+# architectury
+.architectury-transformer/

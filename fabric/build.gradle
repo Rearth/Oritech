@@ -102,6 +102,9 @@ processResources {
     filesMatching('fabric.mod.json') {
         expand version: project.version
     }
+
+    // include the fabric compat recipes that were excluded from the common:main sourceSet
+    from(project(":common").sourceSets.fabric.resources)
 }
 
 shadowJar {

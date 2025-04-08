@@ -100,6 +100,8 @@ processResources {
     filesMatching('META-INF/neoforge.mods.toml') {
         expand version: project.version
     }
+
+    from('src/generated')
 }
 
 shadowJar {
