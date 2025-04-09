@@ -9,6 +9,7 @@ import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
@@ -17,6 +18,7 @@ import rearth.oritech.fabricgen.datagen.RecipeGenerator;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
+import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 import reborncore.common.crafting.RebornRecipe;
 import reborncore.common.crafting.SizedIngredient;
 import reborncore.common.fluid.FluidValue;
@@ -66,10 +68,10 @@ public class TechRebornRecipeGenerator {
     }
     
     public static void addTechRebornAlloys(RecipeExporter exporter) {
-        RecipeGenerator.addAlloyRecipe(exporter, Ingredient.ofItems(Items.IRON_INGOT), Ingredient.fromTag(TagContent.NICKEL_INGOTS), TRContent.Ingots.INVAR.asItem(), 2, "compat/techreborn/invar");
-        RecipeGenerator.addAlloyRecipe(exporter, Ingredient.ofItems(Items.GOLD_INGOT), Ingredient.fromTag(TRContent.Ingots.SILVER.asTag()), TRContent.Ingots.ELECTRUM.asItem(), 2, "compat/techreborn/electrum");
-        RecipeGenerator.addAlloyRecipe(exporter, Ingredient.ofItems(Items.COPPER_INGOT), Ingredient.fromTag(TRContent.Ingots.TIN.asTag()), TRContent.Ingots.BRONZE.asItem(), 2, "compat/techreborn/bronze");
-        RecipeGenerator.addAlloyRecipe(exporter, Ingredient.ofItems(Items.COPPER_INGOT), Ingredient.fromTag(TRContent.Ingots.ZINC.asTag()), TRContent.Ingots.BRASS.asItem(), 2, "compat/techreborn/brass");
+        RecipeGeneratorUtil.addAlloyRecipe(exporter, Ingredient.ofItems(Items.IRON_INGOT), Ingredient.fromTag(TagContent.NICKEL_INGOTS), TRContent.Ingots.INVAR.asItem(), 2, "compat/techreborn/invar");
+        RecipeGeneratorUtil.addAlloyRecipe(exporter, Ingredient.ofItems(Items.GOLD_INGOT), Ingredient.fromTag(TRContent.Ingots.SILVER.asTag()), TRContent.Ingots.ELECTRUM.asItem(), 2, "compat/techreborn/electrum");
+        RecipeGeneratorUtil.addAlloyRecipe(exporter, Ingredient.ofItems(Items.COPPER_INGOT), Ingredient.fromTag(TRContent.Ingots.TIN.asTag()), TRContent.Ingots.BRONZE.asItem(), 2, "compat/techreborn/bronze");
+        RecipeGeneratorUtil.addAlloyRecipe(exporter, Ingredient.ofItems(Items.COPPER_INGOT), Ingredient.fromTag(TRContent.Ingots.ZINC.asTag()), TRContent.Ingots.BRASS.asItem(), 2, "compat/techreborn/brass");
     }
     
     public static void addOritechGrinderRecipes(RecipeExporter exporter) {
@@ -90,48 +92,48 @@ public class TechRebornRecipeGenerator {
     }
     
     public static void addTechRebornPulverizerRecipes(RecipeExporter exporter) {
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.ALUMINUM.asTag()), TRContent.Ingots.ALUMINUM.getDust().asItem(), "compat/techreborn/aluminum");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.BAUXITE.asTag()), TRContent.Dusts.BAUXITE.asItem(), "compat/techreborn/bauxite");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.BRASS.asTag()), TRContent.Ingots.BRASS.getDust().asItem(), "compat/techreborn/brass");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.BRONZE.asTag()), TRContent.Ingots.BRONZE.getDust().asItem(), "compat/techreborn/bronze");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.CHROME.asTag()), TRContent.Ingots.CHROME.getDust().asItem(), "compat/techreborn/chrome");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.CINNABAR.asTag()), TRContent.Dusts.CINNABAR.asItem(), "compat/techreborn/cinnabar");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.ELECTRUM.asTag()), TRContent.Ingots.ELECTRUM.getDust().asItem(), "compat/techreborn/electrum");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.GALENA.asTag()), TRContent.Dusts.GALENA.asItem(), "compat/techreborn/galena");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.INVAR.asTag()), TRContent.Ingots.INVAR.getDust().asItem(), "compat/techreborn/invar");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.LEAD.asTag()), TRContent.RawMetals.LEAD.asItem(), 2, "compat/techreborn/lead_ore");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.PYRITE.asTag()), TRContent.Dusts.PYRITE.asItem(), "compat/techreborn/pyrite_ore");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SILVER.asTag()), TRContent.RawMetals.SILVER.asItem(), 2, "compat/techreborn/silver_ore");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.TIN.asTag()), TRContent.RawMetals.TIN.asItem(), 2, "compat/techreborn/tin_ore");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.TITANIUM.asTag()), TRContent.Ingots.TITANIUM.getDust().asItem(), "compat/techreborn/titanium");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Gems.PERIDOT.asTag()), TRContent.Gems.PERIDOT.getDust().asItem(), "compat/techreborn/peridot");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.PERIDOT.asTag()), TRContent.Gems.PERIDOT.getDust().asItem(), "compat/techreborn/peridot_ore");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Gems.RED_GARNET.asTag()), TRContent.Gems.RED_GARNET.getDust().asItem(), "compat/techreborn/red_garnet");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Gems.RUBY.asTag()), TRContent.Gems.RUBY.getDust().asItem(), "compat/techreborn/ruby");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.RUBY.asTag()), TRContent.Gems.RUBY.getDust().asItem(), 2, "compat/techreborn/ruby_ore");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Gems.SAPPHIRE.asTag()), TRContent.Gems.SAPPHIRE.getDust().asItem(), "compat/techreborn/sapphire");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SAPPHIRE.asTag()), TRContent.Gems.SAPPHIRE.getDust().asItem(), 2, "compat/techreborn/sapphire_ore");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Gems.YELLOW_GARNET.asTag()), TRContent.Gems.YELLOW_GARNET.getDust().asItem(), "compat/techreborn/yellow_garnet");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SODALITE.asTag()), TRContent.Dusts.SODALITE.asItem(), "compat/techreborn/sodalite");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SPHALERITE.asTag()), TRContent.Dusts.SPHALERITE.asItem(), "compat/techreborn/sphalerite");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.ALUMINUM.asTag()), TRContent.Ingots.ALUMINUM.getDust().asItem(), "compat/techreborn/aluminum");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.BAUXITE.asTag()), TRContent.Dusts.BAUXITE.asItem(), "compat/techreborn/bauxite");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.BRASS.asTag()), TRContent.Ingots.BRASS.getDust().asItem(), "compat/techreborn/brass");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.BRONZE.asTag()), TRContent.Ingots.BRONZE.getDust().asItem(), "compat/techreborn/bronze");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.CHROME.asTag()), TRContent.Ingots.CHROME.getDust().asItem(), "compat/techreborn/chrome");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.CINNABAR.asTag()), TRContent.Dusts.CINNABAR.asItem(), "compat/techreborn/cinnabar");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.ELECTRUM.asTag()), TRContent.Ingots.ELECTRUM.getDust().asItem(), "compat/techreborn/electrum");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.GALENA.asTag()), TRContent.Dusts.GALENA.asItem(), "compat/techreborn/galena");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.INVAR.asTag()), TRContent.Ingots.INVAR.getDust().asItem(), "compat/techreborn/invar");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.LEAD.asTag()), TRContent.RawMetals.LEAD.asItem(), 2, "compat/techreborn/lead_ore");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.PYRITE.asTag()), TRContent.Dusts.PYRITE.asItem(), "compat/techreborn/pyrite_ore");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SILVER.asTag()), TRContent.RawMetals.SILVER.asItem(), 2, "compat/techreborn/silver_ore");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.TIN.asTag()), TRContent.RawMetals.TIN.asItem(), 2, "compat/techreborn/tin_ore");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ingots.TITANIUM.asTag()), TRContent.Ingots.TITANIUM.getDust().asItem(), "compat/techreborn/titanium");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Gems.PERIDOT.asTag()), TRContent.Gems.PERIDOT.getDust().asItem(), "compat/techreborn/peridot");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.PERIDOT.asTag()), TRContent.Gems.PERIDOT.getDust().asItem(), "compat/techreborn/peridot_ore");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Gems.RED_GARNET.asTag()), TRContent.Gems.RED_GARNET.getDust().asItem(), "compat/techreborn/red_garnet");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Gems.RUBY.asTag()), TRContent.Gems.RUBY.getDust().asItem(), "compat/techreborn/ruby");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.RUBY.asTag()), TRContent.Gems.RUBY.getDust().asItem(), 2, "compat/techreborn/ruby_ore");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Gems.SAPPHIRE.asTag()), TRContent.Gems.SAPPHIRE.getDust().asItem(), "compat/techreborn/sapphire");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SAPPHIRE.asTag()), TRContent.Gems.SAPPHIRE.getDust().asItem(), 2, "compat/techreborn/sapphire_ore");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Gems.YELLOW_GARNET.asTag()), TRContent.Gems.YELLOW_GARNET.getDust().asItem(), "compat/techreborn/yellow_garnet");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SODALITE.asTag()), TRContent.Dusts.SODALITE.asItem(), "compat/techreborn/sodalite");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SPHALERITE.asTag()), TRContent.Dusts.SPHALERITE.asItem(), "compat/techreborn/sphalerite");
     }
     
     public static void addTechRebornFragmentRecipes(RecipeExporter exporter) {
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SODALITE.asTag()), List.of(new ItemStack(TRContent.Dusts.SODALITE.asItem(), 12), new ItemStack(TRContent.Dusts.ALUMINUM.asItem(), 3)), "compat/techreborn/sodalite_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SPHALERITE.asTag()), List.of(new ItemStack(TRContent.Dusts.SPHALERITE.asItem(), 6), new ItemStack(TRContent.Dusts.ZINC.asItem()), new ItemStack(TRContent.SmallDusts.YELLOW_GARNET.asItem())), "compat/techreborn/sphalerite_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.PERIDOT.asTag()), List.of(new ItemStack(TRContent.Gems.PERIDOT.asItem()), new ItemStack(TRContent.SmallDusts.PERIDOT.asItem(), 6), new ItemStack(TRContent.SmallDusts.EMERALD.asItem(), 2)), "compat/techreborn/peridot_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.RUBY.asTag()), List.of(new ItemStack(TRContent.Gems.RUBY.asItem()), new ItemStack(TRContent.SmallDusts.RUBY.asItem(), 6), new ItemStack(TRContent.SmallDusts.RED_GARNET.asItem(), 2)), "compat/techreborn/ruby_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SAPPHIRE.asTag()), List.of(new ItemStack(TRContent.Gems.SAPPHIRE.asItem()), new ItemStack(TRContent.SmallDusts.SAPPHIRE.asItem(), 6), new ItemStack(TRContent.SmallDusts.PERIDOT.asItem(), 2)), "compat/techreborn/sapphire_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.BAUXITE.asTag()), List.of(new ItemStack(TRContent.Dusts.BAUXITE.asItem(), 4), new ItemStack(TRContent.Dusts.ALUMINUM.asItem())), "compat/techreborn/bauxite_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.CINNABAR.asTag()), List.of(new ItemStack(TRContent.Dusts.CINNABAR.asItem(), 5), new ItemStack(TRContent.SmallDusts.REDSTONE.asItem(), 2), new ItemStack(TRContent.SmallDusts.GLOWSTONE)), "compat/techreborn/cinnabar_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.GALENA.asTag()), List.of(new ItemStack(TRContent.Dusts.GALENA.asItem(), 2), new ItemStack(TRContent.Dusts.SULFUR.asItem())), "compat/techreborn/galena_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.IRIDIUM.asTag()), List.of(new ItemStack(TRContent.RawMetals.IRIDIUM.asItem()), new ItemStack(TRContent.SmallDusts.PLATINUM.asItem(), 2)), "compat/techreborn/iridium_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.LEAD.asTag()), List.of(new ItemStack(TRContent.RawMetals.LEAD.asItem(), 2), new ItemStack(TRContent.SmallDusts.GALENA.asItem(), 2)), "compat/techreborn/lead_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.PYRITE.asTag()), List.of(new ItemStack(TRContent.Dusts.PYRITE.asItem(), 5), new ItemStack(TRContent.Dusts.SULFUR.asItem(), 2)), "compat/techreborn/pyrite_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SHELDONITE.asTag()), List.of(new ItemStack(TRContent.Dusts.PLATINUM.asItem(), 2), new ItemStack(TRContent.Dusts.NICKEL.asItem()), new ItemStack(TRContent.Nuggets.IRIDIUM.asItem(), 2)), "compat/techreborn/sheldonite_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SILVER.asTag()), List.of(new ItemStack(TRContent.RawMetals.SILVER.asItem(), 2), new ItemStack(TRContent.SmallDusts.GALENA.asItem(), 2)), "compat/techreborn/silver_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.TIN.asTag()), List.of(new ItemStack(TRContent.RawMetals.TIN.asItem(), 2), new ItemStack(Items.IRON_NUGGET, 3), new ItemStack(TRContent.Nuggets.ZINC.asItem(), 3)), "compat/techreborn/tin_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.TUNGSTEN.asTag()), List.of(new ItemStack(TRContent.RawMetals.TUNGSTEN.asItem(), 2), new ItemStack(Items.IRON_NUGGET, 7), new ItemStack(TRContent.SmallDusts.MANGANESE.asItem(), 3)), "compat/techreborn/tungsten_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SODALITE.asTag()), List.of(new ItemStack(TRContent.Dusts.SODALITE.asItem(), 12), new ItemStack(TRContent.Dusts.ALUMINUM.asItem(), 3)), "compat/techreborn/sodalite_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SPHALERITE.asTag()), List.of(new ItemStack(TRContent.Dusts.SPHALERITE.asItem(), 6), new ItemStack(TRContent.Dusts.ZINC.asItem()), new ItemStack(TRContent.SmallDusts.YELLOW_GARNET.asItem())), "compat/techreborn/sphalerite_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.PERIDOT.asTag()), List.of(new ItemStack(TRContent.Gems.PERIDOT.asItem()), new ItemStack(TRContent.SmallDusts.PERIDOT.asItem(), 6), new ItemStack(TRContent.SmallDusts.EMERALD.asItem(), 2)), "compat/techreborn/peridot_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.RUBY.asTag()), List.of(new ItemStack(TRContent.Gems.RUBY.asItem()), new ItemStack(TRContent.SmallDusts.RUBY.asItem(), 6), new ItemStack(TRContent.SmallDusts.RED_GARNET.asItem(), 2)), "compat/techreborn/ruby_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SAPPHIRE.asTag()), List.of(new ItemStack(TRContent.Gems.SAPPHIRE.asItem()), new ItemStack(TRContent.SmallDusts.SAPPHIRE.asItem(), 6), new ItemStack(TRContent.SmallDusts.PERIDOT.asItem(), 2)), "compat/techreborn/sapphire_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.BAUXITE.asTag()), List.of(new ItemStack(TRContent.Dusts.BAUXITE.asItem(), 4), new ItemStack(TRContent.Dusts.ALUMINUM.asItem())), "compat/techreborn/bauxite_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.CINNABAR.asTag()), List.of(new ItemStack(TRContent.Dusts.CINNABAR.asItem(), 5), new ItemStack(TRContent.SmallDusts.REDSTONE.asItem(), 2), new ItemStack(TRContent.SmallDusts.GLOWSTONE)), "compat/techreborn/cinnabar_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.GALENA.asTag()), List.of(new ItemStack(TRContent.Dusts.GALENA.asItem(), 2), new ItemStack(TRContent.Dusts.SULFUR.asItem())), "compat/techreborn/galena_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.IRIDIUM.asTag()), List.of(new ItemStack(TRContent.RawMetals.IRIDIUM.asItem()), new ItemStack(TRContent.SmallDusts.PLATINUM.asItem(), 2)), "compat/techreborn/iridium_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.LEAD.asTag()), List.of(new ItemStack(TRContent.RawMetals.LEAD.asItem(), 2), new ItemStack(TRContent.SmallDusts.GALENA.asItem(), 2)), "compat/techreborn/lead_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.PYRITE.asTag()), List.of(new ItemStack(TRContent.Dusts.PYRITE.asItem(), 5), new ItemStack(TRContent.Dusts.SULFUR.asItem(), 2)), "compat/techreborn/pyrite_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SHELDONITE.asTag()), List.of(new ItemStack(TRContent.Dusts.PLATINUM.asItem(), 2), new ItemStack(TRContent.Dusts.NICKEL.asItem()), new ItemStack(TRContent.Nuggets.IRIDIUM.asItem(), 2)), "compat/techreborn/sheldonite_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.SILVER.asTag()), List.of(new ItemStack(TRContent.RawMetals.SILVER.asItem(), 2), new ItemStack(TRContent.SmallDusts.GALENA.asItem(), 2)), "compat/techreborn/silver_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.TIN.asTag()), List.of(new ItemStack(TRContent.RawMetals.TIN.asItem(), 2), new ItemStack(Items.IRON_NUGGET, 3), new ItemStack(TRContent.Nuggets.ZINC.asItem(), 3)), "compat/techreborn/tin_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TRContent.Ores.TUNGSTEN.asTag()), List.of(new ItemStack(TRContent.RawMetals.TUNGSTEN.asItem(), 2), new ItemStack(Items.IRON_NUGGET, 7), new ItemStack(TRContent.SmallDusts.MANGANESE.asItem(), 3)), "compat/techreborn/tungsten_ore");
     }
     
     public static void addTechRebornFuels(RecipeExporter exporter) {
@@ -147,7 +149,7 @@ public class TechRebornRecipeGenerator {
     
     public static void addDistillation(RecipeExporter exporter) {
         exporter.accept(Oritech.id("compat/techreborn/distillation/oil"), new RebornRecipe.Default(ModRecipes.DISTILLATION_TOWER, List.of(cellIngredient(Fluids.EMPTY, 16), cellIngredient(FluidContent.STILL_OIL.get(), 16)), List.of(cellStack(ModFluids.DIESEL, 16), cellStack(ModFluids.SULFURIC_ACID, 15), cellStack(ModFluids.GLYCERYL, 1)), 20, 400), null);
-        RecipeGenerator.addCentrifugeFluidRecipe(exporter, Ingredient.ofItems(ItemContent.FLUXITE), null, ModFluids.OIL.getFluid(), 1f, FluidContent.STILL_FUEL.get(), 1f, 1f, "compat/techreborn/fuel");
+        RecipeGeneratorUtil.addCentrifugeFluidRecipe(exporter, Ingredient.ofItems(ItemContent.FLUXITE), (Item)null, ModFluids.OIL.getFluid(), 1f, FluidContent.STILL_FUEL.get(), 1f, 1f, "compat/techreborn/fuel");
     }
     
     private static ItemStack cellStack(ModFluids fluid, int count) {

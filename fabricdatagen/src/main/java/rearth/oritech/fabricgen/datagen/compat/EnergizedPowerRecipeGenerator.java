@@ -11,13 +11,13 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.fabricgen.datagen.RecipeGenerator;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
+import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 
 import java.util.List;
 
@@ -46,15 +46,15 @@ public class EnergizedPowerRecipeGenerator {
     }
 
     public static void addEPPulverizerRecipes(RecipeExporter exporter) {
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ores/tin"))), ModItems.RAW_TIN, 2, "compat/energizedpower/tin_ore");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/tin"))), ModItems.TIN_DUST, 2, "compat/energizedpower/raw_tin");
-        RecipeGenerator.addPulverizerRecipe(exporter, Ingredient.fromTag(TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ingots/tin"))), ModItems.TIN_DUST, "compat/energizedpower/tin_ingot");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.TIN_ORES), ModItems.RAW_TIN, 2, "compat/energizedpower/tin_ore");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.TIN_RAW_MATERIALS), ModItems.TIN_DUST, 2, "compat/energizedpower/raw_tin");
+        RecipeGeneratorUtil.addPulverizerRecipe(exporter, Ingredient.fromTag(TagContent.TIN_INGOTS), ModItems.TIN_DUST, "compat/energizedpower/tin_ingot");
     }
 
     public static void addEPFragmentRecipes(RecipeExporter exporter) {
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ores/tin"))), List.of(new ItemStack(ModItems.TIN_DUST, 4)), "compat/energizedpower/tin_ore");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/tin"))), List.of(new ItemStack(ModItems.TIN_DUST, 2)), "compat/energizedpower/raw_tin");
-        RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ingots/tin"))), List.of(new ItemStack(ModItems.RAW_TIN, 1)), "compat/energizedpower/tin_ingot");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.TIN_ORES), List.of(new ItemStack(ModItems.TIN_DUST, 4)), "compat/energizedpower/tin_ore");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.TIN_RAW_MATERIALS), List.of(new ItemStack(ModItems.TIN_DUST, 2)), "compat/energizedpower/raw_tin");
+        RecipeGeneratorUtil.addGrinderRecipe(exporter, Ingredient.fromTag(TagContent.TIN_INGOTS), List.of(new ItemStack(ModItems.RAW_TIN, 1)), "compat/energizedpower/tin_ingot");
     }
 
     public static void addOritechAssemblerRecipes(RecipeExporter exporter) {

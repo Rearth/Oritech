@@ -6,7 +6,7 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "oritech:platinum_clump"
+      "tag": "c:clumps/platinum"
     }
   ],
   "results": [

@@ -6,7 +6,7 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "tag": "minecraft:gold_ores"
+      "tag": "c:ores/gold"
     }
   ],
   "results": [

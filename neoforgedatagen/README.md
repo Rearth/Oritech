@@ -6,6 +6,8 @@
 
 The main Oritech build must be run at least once before generating Neoforge data, as the datagen uses the Oritech .jar file.
 
-From the _neoforgedatagen_ folder, run `../gradlew runData` to generate new datafiles under the _neoforge/src/generated_ folder.
+From the main Oritech folder, run `./gradlew runDatagenNeoforge` to generate new datafiles under the _neoforge/src/generated_ folder.
+
+You can also run `../gradlew runData` or `../gradlew clean` from the _neoforgedatagen_ folder. It will do the same thing.
 
 The resulting .json files can be added to git.

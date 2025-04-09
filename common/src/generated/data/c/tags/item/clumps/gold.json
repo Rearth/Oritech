@@ -1,0 +1,9 @@
+{
+  "values": [
+    "oritech:gold_clump",
+    {
+      "id": "create:crushed_raw_gold",
+      "required": false
+    }
+  ]
+}

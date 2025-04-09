@@ -71,26 +71,30 @@ repositories {
     maven { url = "https://mvn.devos.one/snapshots" } // Registrate
 }
 
+// Load properties from main Oritech gradle.properties
+ext.rootProperties = new Properties()
+ext.rootProperties.load(file("../gradle.properties").newReader())
+
 dependencies {
     // Oritech
-    implementation "rearth.oritech:oritech-neoforge:0.14.6"
+    implementation "rearth.oritech:oritech-neoforge:${rootProperties['mod_version']}"
 
     // Oritech dependencies
     // architectury
-    implementation "dev.architectury:architectury-neoforge:$architectury_api_version"
+    implementation "dev.architectury:architectury-neoforge:${rootProperties['architectury_api_version']}"
     // forgified fabric api
     runtimeOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.107.0+2.0.23+1.21.1"
     // owo lib
     runtimeOnly "io.wispforest:owo-lib-neoforge:0.12.15-beta.9+1.21"
     // geckolib
-    runtimeOnly "software.bernie.geckolib:geckolib-neoforge-1.21.1:4.6.6"
+    runtimeOnly "software.bernie.geckolib:geckolib-neoforge-${rootProperties['minecraft_version']}:4.6.6"
     // athena (CTM)
     runtimeOnly "earth.terrarium.athena:athena-neoforge-1.21:4.0.0"
 
     // Create
-    implementation("com.simibubi.create:create-1.21.1:6.0.4-55") { transitive = false }
+    implementation("com.simibubi.create:create-${rootProperties['minecraft_version']}:$create_version") { transitive = false }
 
     // Create dependencies
-    implementation "com.tterrag.registrate:Registrate:MC1.21-1.3.0+62"
+    implementation "com.tterrag.registrate:Registrate:$registrate_version"
 
 }

@@ -6,7 +6,7 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "tag": "minecraft:iron_ores"
+      "tag": "c:ores/iron"
     }
   ],
   "results": [

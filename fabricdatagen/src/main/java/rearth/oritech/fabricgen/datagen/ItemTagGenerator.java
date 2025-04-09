@@ -33,6 +33,21 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.RAW_URANIUM)
           .add(ItemContent.RAW_PLATINUM);
         
+        // clumps - added for Create and Mekanism compat support
+        // Adding Create "crushed" ores as clumps, because they essentially are
+        getOrCreateTagBuilder(TagContent.CLUMPS)
+          .add(ItemContent.COPPER_CLUMP).addOptional(Identifier.of("create", "crushed_raw_copper"))
+          .add(ItemContent.IRON_CLUMP).addOptional(Identifier.of("create", "crushed_raw_iron"))
+          .add(ItemContent.GOLD_CLUMP).addOptional(Identifier.of("create", "crushed_raw_gold"))
+          .add(ItemContent.NICKEL_CLUMP)
+          .add(ItemContent.PLATINUM_CLUMP);
+        
+        getOrCreateTagBuilder(getClumpTag("copper")).add(ItemContent.COPPER_CLUMP).addOptional(Identifier.of("create", "crushed_raw_copper"));
+        getOrCreateTagBuilder(getClumpTag("iron")).add(ItemContent.IRON_CLUMP).addOptional(Identifier.of("create", "crushed_raw_iron"));
+        getOrCreateTagBuilder(getClumpTag("gold")).add(ItemContent.GOLD_CLUMP).addOptional(Identifier.of("create", "crushed_raw_gold"));
+        getOrCreateTagBuilder(getClumpTag("nickel")).add(ItemContent.NICKEL_CLUMP);
+        getOrCreateTagBuilder(getClumpTag("platinum")).add(ItemContent.PLATINUM_CLUMP);
+        
         // dusts
         getOrCreateTagBuilder(ConventionalItemTags.DUSTS)
           .add(ItemContent.NICKEL_DUST)
@@ -335,6 +350,10 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
     
     public static TagKey<Item> getIngotTag(String path) {
         return TagKey.of(RegistryKeys.ITEM, Identifier.of(TagUtil.C_TAG_NAMESPACE, "ingots/" + path));
+    }
+
+    public static TagKey<Item> getClumpTag(String path) {
+        return TagKey.of(RegistryKeys.ITEM, Identifier.of(TagUtil.C_TAG_NAMESPACE, "clumps/" + path));
     }
     
     public static TagKey<Item> getDustTag(String path) {

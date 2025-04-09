@@ -6,7 +6,7 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "minecraft:raw_gold"
+      "tag": "c:raw_materials/gold"
     }
   ],
   "results": [
