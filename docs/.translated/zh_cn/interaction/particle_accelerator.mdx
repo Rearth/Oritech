@@ -1,6 +1,7 @@
 ---
 title: 粒子加速器
 icon: oritech:area/accelerator_ring_area
+related_items: [oritech:accelerator_ring, oritech:accelerator_motor, oritech:accelerator_controller, oritech:accelerator_sensor]
 ---
 
 你大概猜到了，粒子加速器用于加速粒子。当不同物品的粒子发生碰撞时，可以生成新的物品。
@@ -16,7 +17,7 @@ icon: oritech:area/accelerator_ring_area
 
 最大距离通过以下公式计算：
 
-> clamp(sqrt(速度), 2, 10)
+> clamp(sqrt(速度) / 2, 2, 10)
 
 _译者注：sqrt意为开平方根，clamp用于限制最小值和最大值。即该公式的意思是：计算速度的平方根，如果其小于2，则返回2；如果其大于10，则返回10；否则返回它本身。_
 
@@ -58,9 +59,9 @@ _译者注：sqrt意为开平方根，clamp用于限制最小值和最大值。�
 被粒子击中的实体会根据粒子的速度受到伤害。当粒子离开引导路径时，它还会伤害路径上的实体
 并摧毁方块，直到动量耗尽。当两个来自不同控制器的粒子碰撞时，它们可以生成新的物品。
 
-通过加速电机时，粒子的速度会增加1 m/s，要求电机必须通电。
-功率需求随速度增加。每次电机加速粒子时，它会消耗与粒子当前速度相同的RF能量。
-粒子电机和传感器都可以用作直线导轨。
+通过加速马达时，粒子的速度会增加1 m/s，要求马达必须通电。
+功率需求随速度增加。每次马达加速粒子时，它会消耗与粒子当前速度相同的RF能量。
+粒子马达和传感器都可以用作直线导轨。
 
 ---
 
