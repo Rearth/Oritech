@@ -125,4 +125,8 @@ dependencies {
 
     // Immersive Engineering
     implementation "curse.maven:immersive-engineering-231951:${immersive_engineering_version_id}"
+
+    // Industrial Foregoing
+    implementation "curse.maven:industrial-foregoing-266515:${industrial_foregoing_version_id}"
+    implementation "curse.maven:titanium-287342:${titanium_version_id}"
 }

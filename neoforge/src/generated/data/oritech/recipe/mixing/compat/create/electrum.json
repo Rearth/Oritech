@@ -9,7 +9,7 @@
   "heat_requirement": "heated",
   "ingredients": [
     {
-      "item": "minecraft:redstone"
+      "tag": "c:dusts/redstone"
     },
     {
       "tag": "c:ingots/gold"

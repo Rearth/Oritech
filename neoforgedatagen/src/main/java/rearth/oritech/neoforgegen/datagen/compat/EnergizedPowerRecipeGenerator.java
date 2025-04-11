@@ -1,10 +1,10 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
 import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.OreTransform;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.datagen.OreTransform;
 import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 
 import me.jddev0.ep.item.EPItems;
@@ -60,19 +60,19 @@ public class EnergizedPowerRecipeGenerator {
         offerEPAlloyFurnaceRecipe(exporter, new IngredientWithCount[]{
                 new IngredientWithCount(of(ItemContent.COPPER_GEM.asItem()), 1),
                 new IngredientWithCount(of(ItemContent.COPPER_GEM.asItem()), 1)},
-            new ItemStack(Items.COPPER_INGOT, 2), 800, "copper_gems");
+            new ItemStack(Items.COPPER_INGOT, 3), 800, "copper_gems");
         offerEPAlloyFurnaceRecipe(exporter, new IngredientWithCount[]{
                 new IngredientWithCount(of(ItemContent.IRON_GEM.asItem()), 1),
                 new IngredientWithCount(of(ItemContent.IRON_GEM.asItem()), 1)},
-            new ItemStack(Items.IRON_INGOT, 2), 800, "iron_gems");
+            new ItemStack(Items.IRON_INGOT, 3), 800, "iron_gems");
         offerEPAlloyFurnaceRecipe(exporter, new IngredientWithCount[]{
                 new IngredientWithCount(of(ItemContent.NICKEL_GEM.asItem()), 1),
                 new IngredientWithCount(of(ItemContent.NICKEL_GEM.asItem()), 1)},
-            new ItemStack(ItemContent.NICKEL_INGOT, 2), 800, "nickel_gems");
+            new ItemStack(ItemContent.NICKEL_INGOT, 3), 800, "nickel_gems");
         offerEPAlloyFurnaceRecipe(exporter, new IngredientWithCount[]{
                 new IngredientWithCount(of(ItemContent.PLATINUM_GEM.asItem()), 1),
                 new IngredientWithCount(of(ItemContent.PLATINUM_GEM.asItem()), 1)},
-            new ItemStack(ItemContent.PLATINUM_INGOT, 2), 800, "platinum_gems");
+            new ItemStack(ItemContent.PLATINUM_INGOT, 3), 800, "platinum_gems");
         offerEPAlloyFurnaceRecipe(exporter, new IngredientWithCount[]{
                 new IngredientWithCount(of(Tags.Items.INGOTS_IRON), 1),
                 new IngredientWithCount(of(TagContent.COAL_DUSTS), 1)},

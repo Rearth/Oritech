@@ -1,8 +1,6 @@
 package rearth.oritech.fabricgen.datagen.compat;
 
-import dev.architectury.fluid.FluidStack;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
@@ -14,6 +12,7 @@ import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
 import rearth.oritech.fabricgen.datagen.RecipeGenerator;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
@@ -32,6 +31,7 @@ import techreborn.recipe.recipes.IndustrialGrinderRecipe;
 import java.util.List;
 
 public class TechRebornRecipeGenerator {
+    private static final String PATH = "compat/techreborn/";
     
     public static void generateRecipes(RecipeExporter exporter) {
         addCraftRecipes(exporter);
@@ -140,11 +140,11 @@ public class TechRebornRecipeGenerator {
         RecipeGeneratorUtil.addBioGenRecipe(exporter, Ingredient.ofItems(TRContent.Parts.PLANTBALL.item), 25, "compat/techreborn/plantball");
         RecipeGeneratorUtil.addBioGenRecipe(exporter, Ingredient.ofItems(TRContent.Parts.COMPRESSED_PLANTBALL.item), 140, "compat/techreborn/compressedplantball");
         
-        RecipeGeneratorUtil.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.OIL.getFluid(), FluidConstants.BUCKET / 10), 8, "compat/techreborn/oil");
-        RecipeGeneratorUtil.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.NITROFUEL.getFluid(), FluidConstants.BUCKET / 10), 24, "compat/techreborn/nitrofuel");
-        RecipeGeneratorUtil.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.NITROCOAL_FUEL.getFluid(), FluidConstants.BUCKET / 10), 48, "compat/techreborn/nitrocoalfuel");
-        RecipeGeneratorUtil.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.DIESEL.getFluid(), FluidConstants.BUCKET / 10), 128, "compat/techreborn/diesel");
-        RecipeGeneratorUtil.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.NITROCOAL_FUEL.getFluid(), FluidConstants.BUCKET / 10), 400, "compat/techreborn/nitrodiesel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(ModFluids.OIL.getFluid(), 0.1f).timeInSeconds(3).export(exporter, PATH + "oil");
+        FuelGeneratorRecipeBuilder.build().fluidInput(ModFluids.NITROFUEL.getFluid(), 0.1f).timeInSeconds(10).export(exporter, PATH + "nitrofuel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(ModFluids.NITROCOAL_FUEL.getFluid(), 0.1f).timeInSeconds(12).export(exporter, PATH + "nitrocoalfuel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(ModFluids.DIESEL.getFluid(), 0.1f).timeInSeconds(14).export(exporter, PATH + "diesel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(ModFluids.NITRO_DIESEL.getFluid(), 0.1f).timeInSeconds(16).export(exporter, PATH + "nitrodiesel");
     }
     
     public static void addDistillation(RecipeExporter exporter) {

@@ -9,7 +9,7 @@
   "heat_requirement": "heated",
   "ingredients": [
     {
-      "item": "minecraft:diamond"
+      "tag": "c:gems/diamond"
     },
     {
       "tag": "c:ingots/nickel"

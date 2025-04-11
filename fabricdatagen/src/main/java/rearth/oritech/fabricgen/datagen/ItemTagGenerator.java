@@ -357,7 +357,8 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(getStorageBlockTag("raw_platinum"))
           .add(BlockContent.RAW_PLATINUM_BLOCK.asItem());
         
-        
+        getOrCreateTagBuilder(TagKey.of(RegistryKeys.ITEM, Identifier.of("industrialforegoing", "bioreactor")))
+          .addTag(TagContent.BIOFUEL);
     }
     
     public static TagKey<Item> getStorageBlockTag(String path) {

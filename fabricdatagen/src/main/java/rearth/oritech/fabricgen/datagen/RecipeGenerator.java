@@ -29,6 +29,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import nourl.mythicmetals.MythicMetals;
+import rearth.oritech.api.recipe.OreTransform;
+import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
 import rearth.oritech.fabricgen.datagen.compat.AlloyForgeryRecipeGenerator;
 import rearth.oritech.fabricgen.datagen.compat.EnergizedPowerRecipeGenerator;
 import rearth.oritech.fabricgen.datagen.compat.MythicMetalsRecipeGenerator;
@@ -39,7 +41,6 @@ import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.util.SizedIngredient;
-import rearth.oritech.util.datagen.OreTransform;
 import techreborn.TechReborn;
 import wraith.alloyforgery.AlloyForgery;
 
@@ -171,8 +172,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // lava
         addLavaGen(exporter, FluidStack.create(Fluids.LAVA, 8100), 12, "lava");
         // fuel
-        addFuelGenRecipe(exporter, FluidStack.create(FluidContent.STILL_OIL.get(), 8100), 3, "crude");
-        addFuelGenRecipe(exporter, FluidStack.create(FluidContent.STILL_FUEL.get(), 8100), 12, "fuel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_OIL.get(), 1f).timeInSeconds(3).export(exporter, "crude");
+        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_FUEL.get(), 1f).timeInSeconds(12).export(exporter, "fuel");
         //steam
         addSteamEngineGen(exporter, FluidStack.create(FluidContent.STILL_STEAM.get(), 32), 1, "steameng");
     }

@@ -8,18 +8,18 @@
   "type": "create:splashing",
   "ingredients": [
     {
-      "item": "oritech:nickel_clump"
+      "tag": "c:clumps/copper"
     }
   ],
   "results": [
     {
       "count": 9,
-      "id": "oritech:nickel_nugget"
+      "id": "create:copper_nugget"
     },
     {
       "chance": 0.5,
       "count": 2,
-      "id": "oritech:small_platinum_dust"
+      "id": "oritech:small_gold_dust"
     }
   ]
 }

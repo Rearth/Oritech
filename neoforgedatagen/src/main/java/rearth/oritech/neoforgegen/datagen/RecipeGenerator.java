@@ -6,6 +6,7 @@ import rearth.oritech.neoforgegen.datagen.compat.AlloySmelterRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.CreateRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.EnergizedPowerRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.ImmersiveEngineeringRecipeGenerator;
+import rearth.oritech.neoforgegen.datagen.compat.IndustrialForegoingRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.MekanismRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.MekanismGeneratorsRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.PowahRecipeGenerator;
@@ -45,6 +46,7 @@ public class RecipeGenerator extends RecipeProvider implements IConditionBuilder
         CreateRecipeGenerator.generateRecipes(packOutput, registries, exporter.withConditions(this.modLoaded("create")));
         EnergizedPowerRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("energizedpower")));
         ImmersiveEngineeringRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("immersiveengineering")));
+        IndustrialForegoingRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("industrialforegoing")));
         MekanismRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("mekanism")));
         MekanismGeneratorsRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("mekanismgenerators")));
         PowahRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("powah")));

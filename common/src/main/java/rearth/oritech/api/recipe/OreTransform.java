@@ -1,4 +1,4 @@
-package rearth.oritech.util.datagen;
+package rearth.oritech.api.recipe;
 
 import org.jetbrains.annotations.Nullable;
 

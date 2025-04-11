@@ -8,7 +8,7 @@
   "type": "create:splashing",
   "ingredients": [
     {
-      "item": "minecraft:redstone"
+      "tag": "c:dusts/redstone"
     }
   ],
   "results": [

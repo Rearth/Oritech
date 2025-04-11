@@ -12,7 +12,7 @@
       "item": "oritech:adamant_ingot"
     },
     {
-      "item": "minecraft:netherite_ingot"
+      "tag": "c:ingots/netherite"
     }
   ],
   "results": [

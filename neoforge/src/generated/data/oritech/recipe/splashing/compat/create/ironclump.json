@@ -8,17 +8,18 @@
   "type": "create:splashing",
   "ingredients": [
     {
-      "item": "create:crushed_raw_platinum"
+      "tag": "c:clumps/iron"
     }
   ],
   "results": [
     {
       "count": 9,
-      "id": "oritech:platinum_nugget"
+      "id": "minecraft:iron_nugget"
     },
     {
-      "chance": 0.25,
-      "id": "oritech:fluxite"
+      "chance": 0.5,
+      "count": 2,
+      "id": "oritech:small_nickel_dust"
     }
   ]
 }

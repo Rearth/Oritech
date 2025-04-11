@@ -1,9 +1,10 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
 import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
+import rearth.oritech.api.recipe.OreTransform;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.datagen.OreTransform;
 import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 
 import blusunrize.immersiveengineering.api.EnumMetals;
@@ -36,6 +37,7 @@ import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
 import static rearth.oritech.util.datagen.RecipeGeneratorUtil.cItemTag;
 
 public class ImmersiveEngineeringRecipeGenerator {
+    private static final String PATH = "compat/immersiveengineering/";
     public static void generateRecipes(RecipeOutput exporter) {
         addAlloying(exporter);
         addIEAlloying(exporter);
@@ -61,6 +63,18 @@ public class ImmersiveEngineeringRecipeGenerator {
         exporter.accept(Oritech.id("compat/immersiveengineering/arcalloying/electrum"), new ArcFurnaceRecipe(new TagOutputList(List.of(new TagOutput(ItemContent.ELECTRUM_INGOT))), TagOutput.EMPTY, List.of(), time, base_energy, new IngredientWithSize(of(Tags.Items.INGOTS_GOLD)), List.of(new IngredientWithSize(of(Tags.Items.DUSTS_REDSTONE)))), null);
         exporter.accept(Oritech.id("compat/immersiveengineering/alloying/energite"), new AlloyRecipe(new TagOutput(ItemContent.ENERGITE_INGOT), new IngredientWithSize(of(TagContent.NICKEL_INGOTS)), new IngredientWithSize(of(ItemContent.FLUXITE)), 200), null);
         exporter.accept(Oritech.id("compat/immersiveengineering/arcalloying/energite"), new ArcFurnaceRecipe(new TagOutputList(List.of(new TagOutput(ItemContent.ENERGITE_INGOT))), TagOutput.EMPTY, List.of(), time, base_energy, new IngredientWithSize(of(TagContent.NICKEL_INGOTS)), List.of(new IngredientWithSize(of(ItemContent.FLUXITE)))), null);
+
+        exporter.accept(Oritech.id("compat/immersiveengineering/alloying/coppergem"), new AlloyRecipe(new TagOutput(Items.COPPER_INGOT, 3), new IngredientWithSize(of(ItemContent.COPPER_GEM)), new IngredientWithSize(of(ItemContent.COPPER_GEM)), 200), null);
+        exporter.accept(Oritech.id("compat/immersiveengineering/arcalloying/coppergem"), new ArcFurnaceRecipe(new TagOutputList(List.of(new TagOutput(Items.COPPER_INGOT, 4))), TagOutput.EMPTY, List.of(), time, base_energy, new IngredientWithSize(of(ItemContent.COPPER_GEM)), List.of(new IngredientWithSize(of(ItemContent.COPPER_GEM)))), null);
+        exporter.accept(Oritech.id("compat/immersiveengineering/alloying/irongem"), new AlloyRecipe(new TagOutput(Items.IRON_INGOT, 3), new IngredientWithSize(of(ItemContent.IRON_GEM)), new IngredientWithSize(of(ItemContent.IRON_GEM)), 200), null);
+        exporter.accept(Oritech.id("compat/immersiveengineering/arcalloying/irongem"), new ArcFurnaceRecipe(new TagOutputList(List.of(new TagOutput(Items.IRON_INGOT, 4))), TagOutput.EMPTY, List.of(), time, base_energy, new IngredientWithSize(of(ItemContent.IRON_GEM)), List.of(new IngredientWithSize(of(ItemContent.IRON_GEM)))), null);
+        exporter.accept(Oritech.id("compat/immersiveengineering/alloying/goldgem"), new AlloyRecipe(new TagOutput(Items.GOLD_INGOT, 3), new IngredientWithSize(of(ItemContent.GOLD_GEM)), new IngredientWithSize(of(ItemContent.GOLD_GEM)), 200), null);
+        exporter.accept(Oritech.id("compat/immersiveengineering/arcalloying/goldgem"), new ArcFurnaceRecipe(new TagOutputList(List.of(new TagOutput(Items.GOLD_INGOT, 4))), TagOutput.EMPTY, List.of(), time, base_energy, new IngredientWithSize(of(ItemContent.GOLD_GEM)), List.of(new IngredientWithSize(of(ItemContent.GOLD_GEM)))), null);
+        exporter.accept(Oritech.id("compat/immersiveengineering/alloying/nickelgem"), new AlloyRecipe(new TagOutput(ItemContent.NICKEL_INGOT, 3), new IngredientWithSize(of(ItemContent.NICKEL_GEM)), new IngredientWithSize(of(ItemContent.NICKEL_GEM)), 200), null);
+        exporter.accept(Oritech.id("compat/immersiveengineering/arcalloying/nickelgem"), new ArcFurnaceRecipe(new TagOutputList(List.of(new TagOutput(ItemContent.NICKEL_INGOT, 4))), TagOutput.EMPTY, List.of(), time, base_energy, new IngredientWithSize(of(ItemContent.NICKEL_GEM)), List.of(new IngredientWithSize(of(ItemContent.NICKEL_GEM)))), null);
+        exporter.accept(Oritech.id("compat/immersiveengineering/alloying/platinumgem"), new AlloyRecipe(new TagOutput(ItemContent.PLATINUM_INGOT, 3), new IngredientWithSize(of(ItemContent.PLATINUM_GEM)), new IngredientWithSize(of(ItemContent.PLATINUM_GEM)), 200), null);
+        exporter.accept(Oritech.id("compat/immersiveengineering/arcalloying/platinumgem"), new ArcFurnaceRecipe(new TagOutputList(List.of(new TagOutput(ItemContent.PLATINUM_INGOT, 4))), TagOutput.EMPTY, List.of(), time, base_energy, new IngredientWithSize(of(ItemContent.PLATINUM_GEM)), List.of(new IngredientWithSize(of(ItemContent.PLATINUM_GEM)))), null);
+        
     }
 
     private static void addCentrifuging(RecipeOutput exporter) {
@@ -68,8 +82,8 @@ public class ImmersiveEngineeringRecipeGenerator {
     }
 
     private static void addGeneratorFuels(RecipeOutput exporter) {
-        RecipeGeneratorUtil.addFuelGenRecipe(exporter, FluidStack.create(IEFluids.BIODIESEL.still().get(), 100), 8, "compat/immersiveengineering/biodiesel");
-        RecipeGeneratorUtil.addFuelGenRecipe(exporter, FluidStack.create(IEFluids.HIGH_POWER_BIODIESEL.still().get(), 100), 24, "compat/immersiveengineering/highpowerbiodiesel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(IEFluids.BIODIESEL.still().get(), 0.1f).timeInSeconds(3).export(exporter, PATH + "biodiesel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(IEFluids.HIGH_POWER_BIODIESEL.still().get(), 0.1f).timeInSeconds(12).export(exporter, PATH + "highpowerbiodiesel");
     }
 
     private static void addMetalProcessing(RecipeOutput exporter) {

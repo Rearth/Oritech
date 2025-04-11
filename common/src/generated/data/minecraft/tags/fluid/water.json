@@ -1,0 +1,22 @@
+{
+  "values": [
+    "oritech:flowing_biofuel",
+    "oritech:still_biofuel",
+    "oritech:flowing_fuel",
+    "oritech:still_fuel",
+    "oritech:flowing_molten_adamant",
+    "oritech:still_molten_adamant",
+    "oritech:flowing_molten_biosteel",
+    "oritech:still_molten_biosteel",
+    "oritech:flowing_molten_duratium",
+    "oritech:still_molten_duratium",
+    "oritech:flowing_molten_energite",
+    "oritech:still_molten_energite",
+    "oritech:flowing_molten_fluxite",
+    "oritech:still_molten_fluxite",
+    "oritech:flowing_oil",
+    "oritech:still_oil",
+    "oritech:flowing_steam",
+    "oritech:still_steam"
+  ]
+}

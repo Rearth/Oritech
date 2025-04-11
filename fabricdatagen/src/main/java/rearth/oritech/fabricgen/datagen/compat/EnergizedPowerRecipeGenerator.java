@@ -11,10 +11,10 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.ItemTags;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.OreTransform;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.datagen.OreTransform;
 import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 
 import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
@@ -53,19 +53,19 @@ public class EnergizedPowerRecipeGenerator {
         offerEPAlloyFurnaceRecipe(exporter, new AlloyFurnaceRecipe.IngredientWithCount[]{
                 new AlloyFurnaceRecipe.IngredientWithCount(of(ItemContent.COPPER_GEM.asItem()), 1),
                 new AlloyFurnaceRecipe.IngredientWithCount(of(ItemContent.COPPER_GEM.asItem()), 1)},
-            new ItemStack(Items.COPPER_INGOT, 2), 800, "copper_gems");
+            new ItemStack(Items.COPPER_INGOT, 3), 800, "copper_gems");
         offerEPAlloyFurnaceRecipe(exporter, new AlloyFurnaceRecipe.IngredientWithCount[]{
                 new AlloyFurnaceRecipe.IngredientWithCount(of(ItemContent.IRON_GEM.asItem()), 1),
                 new AlloyFurnaceRecipe.IngredientWithCount(of(ItemContent.IRON_GEM.asItem()), 1)},
-            new ItemStack(Items.IRON_INGOT, 2), 800, "iron_gems");
+            new ItemStack(Items.IRON_INGOT, 3), 800, "iron_gems");
         offerEPAlloyFurnaceRecipe(exporter, new AlloyFurnaceRecipe.IngredientWithCount[]{
                 new AlloyFurnaceRecipe.IngredientWithCount(of(ItemContent.NICKEL_GEM.asItem()), 1),
                 new AlloyFurnaceRecipe.IngredientWithCount(of(ItemContent.NICKEL_GEM.asItem()), 1)},
-            new ItemStack(ItemContent.NICKEL_INGOT, 2), 800, "nickel_gems");
+            new ItemStack(ItemContent.NICKEL_INGOT, 3), 800, "nickel_gems");
         offerEPAlloyFurnaceRecipe(exporter, new AlloyFurnaceRecipe.IngredientWithCount[]{
                 new AlloyFurnaceRecipe.IngredientWithCount(of(ItemContent.PLATINUM_GEM.asItem()), 1),
                 new AlloyFurnaceRecipe.IngredientWithCount(of(ItemContent.PLATINUM_GEM.asItem()), 1)},
-            new ItemStack(ItemContent.PLATINUM_INGOT, 2), 800, "platinum_gems");
+            new ItemStack(ItemContent.PLATINUM_INGOT, 3), 800, "platinum_gems");
         offerEPAlloyFurnaceRecipe(exporter, new AlloyFurnaceRecipe.IngredientWithCount[]{
                 new AlloyFurnaceRecipe.IngredientWithCount(of(ConventionalItemTags.IRON_INGOTS), 1),
                 new AlloyFurnaceRecipe.IngredientWithCount(of(TagContent.COAL_DUSTS), 1)},

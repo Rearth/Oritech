@@ -1,11 +1,14 @@
 package rearth.oritech.util.datagen;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.OreTransform;
+import rearth.oritech.init.recipes.AugmentRecipe;
+import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.util.SizedIngredient;
 
 import dev.architectury.fluid.FluidStack;
+
 import net.fabricmc.fabric.api.tag.convention.v2.TagUtil;
 import net.minecraft.block.Block;
 import net.minecraft.data.server.recipe.RecipeExporter;
@@ -20,11 +23,11 @@ import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
-import rearth.oritech.Oritech;
-import rearth.oritech.init.recipes.AugmentRecipe;
-import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.SizedIngredient;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jetbrains.annotations.Nullable;
 
 public class RecipeGeneratorUtil {
     public static int DEFAULT_SPEED = 200;
@@ -141,11 +144,6 @@ public class RecipeGeneratorUtil {
             RecipeProvider.offerSmelting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 200, Oritech.MOD_ID);
             RecipeProvider.offerBlasting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 100, Oritech.MOD_ID);
         }
-    }
-
-    public static void addFuelGenRecipe(RecipeExporter exporter, FluidStack input, int timeInSeconds, String suffix) {
-        var entry = new OritechRecipe(timeInSeconds * 20, List.of(), List.of(), RecipeContent.FUEL_GENERATOR, input, null);
-        exporter.accept(Oritech.id("fuelgen/" + suffix), entry, null);
     }
 
     public static void addGrinderRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, String suffix) {
