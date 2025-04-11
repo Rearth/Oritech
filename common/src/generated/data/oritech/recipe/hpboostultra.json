@@ -10,7 +10,7 @@
     {
       "count": 64,
       "ingredient": {
-        "item": "minecraft:redstone_block"
+        "tag": "c:storage_blocks/redstone"
       }
     }
   ],

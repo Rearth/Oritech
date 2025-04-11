@@ -10,7 +10,7 @@
     {
       "count": 32,
       "ingredient": {
-        "item": "minecraft:redstone_block"
+        "tag": "c:storage_blocks/redstone"
       }
     }
   ],
@@ -34,7 +34,7 @@
     {
       "count": 16,
       "ingredient": {
-        "item": "minecraft:gold_block"
+        "tag": "c:storage_blocks/gold"
       }
     }
   ],

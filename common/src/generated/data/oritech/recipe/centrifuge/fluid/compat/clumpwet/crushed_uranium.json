@@ -1,0 +1,28 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:clumps/uranium"
+      ]
+    }
+  ],
+  "type": "oritech:centrifuge_fluid",
+  "fluidInputAmount": 81000,
+  "fluidInputVariant": "minecraft:water",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:clumps/uranium"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "oritech:uranium_dust"
+    }
+  ],
+  "time": 100
+}

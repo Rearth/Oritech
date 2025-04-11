@@ -1,5 +1,7 @@
 package rearth.oritech.util.datagen;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.item.Item;
 import net.minecraft.recipe.Ingredient;
 
@@ -8,14 +10,16 @@ public record OreTransform(
     // wherever possible, use ConventionalItemTags for ingredients
     Ingredient ore,
     Ingredient rawOreIngredient, Item rawOreItem, Item rawOreByproduct,
-    Ingredient clumpIngredient, Item clumpItem,
-    Ingredient smallClumpIngredient, Item smallClumpItem, Item smallClumpByproduct,
-    Ingredient dustIngredient, Item dustItem,
-    Ingredient smallDustIngredient, Item smallDustItem, Item smallDustByproduct,
-    Ingredient gemIngredient, Item gemItem,
-    Ingredient gemCatalyst,
+    @Nullable Ingredient clumpIngredient, @Nullable Item clumpItem,
+    @Nullable Ingredient smallClumpIngredient, @Nullable Item smallClumpItem, Item smallClumpByproduct,
+    @Nullable Ingredient dustIngredient, @Nullable Item dustItem,
+    @Nullable Ingredient smallDustIngredient, @Nullable Item smallDustItem, @Nullable Item smallDustByproduct,
+    @Nullable Ingredient gemIngredient, @Nullable Item gemItem,
+    @Nullable Ingredient gemCatalyst,
     Ingredient nuggetIngredient, Item nuggetItem,
     Ingredient ingotIngredient, Item ingotItem,
     float timeMultiplier, 
     String name,
-    int byproductAmount) {}
+    int byproductAmount,
+    // for compat use. no need to add vanilla processing for other mods' ores
+    boolean addVanillaProcessing) {}

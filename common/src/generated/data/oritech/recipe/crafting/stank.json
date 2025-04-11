@@ -6,7 +6,7 @@
       "tag": "c:glass_blocks"
     },
     "p": {
-      "item": "minecraft:copper_ingot"
+      "tag": "c:ingots/copper"
     },
     "s": {
       "item": "oritech:fluid_pipe"

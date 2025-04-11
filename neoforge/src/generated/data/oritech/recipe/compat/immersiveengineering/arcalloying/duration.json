@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "immersiveengineering"
+    }
+  ],
+  "type": "immersiveengineering:arc_furnace",
+  "additives": [
+    {
+      "tag": "c:ingots/netherite"
+    }
+  ],
+  "energy": 256000,
+  "input": {
+    "tag": "c:ingots/platinum"
+  },
+  "results": [
+    {
+      "item": "oritech:duratium_ingot"
+    }
+  ],
+  "time": 250
+}

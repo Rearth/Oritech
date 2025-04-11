@@ -6,7 +6,7 @@
       "tag": "oritech:plating"
     },
     "c": {
-      "item": "minecraft:copper_ingot"
+      "tag": "c:ingots/copper"
     },
     "f": {
       "item": "oritech:fluid_pipe"

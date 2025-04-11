@@ -4,13 +4,13 @@
     {
       "count": 32,
       "ingredient": {
-        "item": "minecraft:lapis_block"
+        "tag": "c:storage_blocks/lapis"
       }
     },
     {
       "count": 64,
       "ingredient": {
-        "item": "minecraft:redstone_block"
+        "tag": "c:storage_blocks/redstone"
       }
     }
   ],
@@ -26,13 +26,13 @@
     {
       "count": 48,
       "ingredient": {
-        "item": "minecraft:lapis_block"
+        "tag": "c:storage_blocks/lapis"
       }
     },
     {
       "count": 32,
       "ingredient": {
-        "item": "minecraft:gold_block"
+        "tag": "c:storage_blocks/gold"
       }
     }
   ],

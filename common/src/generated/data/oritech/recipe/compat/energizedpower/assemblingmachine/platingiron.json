@@ -21,12 +21,12 @@
     },
     {
       "input": {
-        "item": "minecraft:iron_ingot"
+        "tag": "c:ingots/iron"
       }
     },
     {
       "input": {
-        "item": "oritech:plastic_sheet"
+        "tag": "c:plates/plastic"
       }
     }
   ],

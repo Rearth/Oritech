@@ -4,9 +4,8 @@ import rearth.oritech.Oritech;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.datagen.RecipeGeneratorUtil;
+import rearth.oritech.util.datagen.OreTransform;
 
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.processing.recipe.HeatCondition;
@@ -38,6 +37,7 @@ public class CreateRecipeGenerator {
         addAlloying(exporter);
         addBlasting(exporter);
         addCentrifuging(exporter);
+        addMetalProcessing(exporter);
         addPulverizing(exporter);
 
         CreateCrushingRecipeGen.registerAll(packOutput, registries, exporter);
@@ -49,6 +49,7 @@ public class CreateRecipeGenerator {
         RecipeGeneratorUtil.addAlloyRecipe(exporter, Ingredient.of(Tags.Items.INGOTS_COPPER), Ingredient.of(AllItems.ZINC_INGOT.asItem()), AllItems.BRASS_INGOT.asItem(), 2, "compat/create/brass");
     }
 
+    // Create lets you blast other crushed ores, so add that for Oritech ores
     private static void addBlasting(RecipeOutput exporter) {
         offerBlasting(exporter, AllItems.CRUSHED_NICKEL.asItem(), ItemContent.NICKEL_INGOT, 1f, 100, "crushed_nickel_to_nickel_ingot");
         offerBlasting(exporter, AllItems.CRUSHED_PLATINUM.asItem(), ItemContent.PLATINUM_INGOT, 1f, 100, "crushed_platinum_to_platinum_ingot");
@@ -61,21 +62,24 @@ public class CreateRecipeGenerator {
     }
 
     private static void addCentrifuging(RecipeOutput exporter) {
-        // Centrifuge crushed ores
-        RecipeGeneratorUtil.addCentrifugeRecipe(exporter, Ingredient.of(AllItems.CRUSHED_COPPER.asItem()), List.of(new ItemStack(ItemContent.COPPER_GEM), new ItemStack(ItemContent.SMALL_GOLD_DUST, 3)), 0.5f, "compat/create/crushed_copper");
-        RecipeGeneratorUtil.addCentrifugeRecipe(exporter, Ingredient.of(AllItems.CRUSHED_IRON.asItem()), List.of(new ItemStack(ItemContent.GOLD_GEM), new ItemStack(ItemContent.SMALL_COPPER_DUST, 3)), 0.5f, "compat/create/crushed_iron");
-        RecipeGeneratorUtil.addCentrifugeRecipe(exporter, Ingredient.of(AllItems.CRUSHED_GOLD.asItem()), List.of(new ItemStack(ItemContent.IRON_GEM), new ItemStack(ItemContent.SMALL_NICKEL_DUST, 3)), 0.5f, "compat/create/crushed_gold");
-        RecipeGeneratorUtil.addCentrifugeRecipe(exporter, Ingredient.of(AllItems.CRUSHED_NICKEL.asItem()), List.of(new ItemStack(ItemContent.NICKEL_GEM), new ItemStack(ItemContent.SMALL_PLATINUM_DUST, 2)), 0.5f, "compat/create/crushed_nickel");
-        RecipeGeneratorUtil.addCentrifugeRecipe(exporter, Ingredient.of(AllItems.CRUSHED_PLATINUM.asItem()), List.of(new ItemStack(ItemContent.PLATINUM_GEM), new ItemStack(ItemContent.FLUXITE)), 0.5f, "compat/create/crushed_platinum");
-        RecipeGeneratorUtil.addCentrifugeRecipe(exporter, Ingredient.of(AllItems.CRUSHED_URANIUM.asItem()), List.of(new ItemStack(ItemContent.URANIUM_DUST, 2), new ItemStack(ItemContent.SMALL_PLUTONIUM_DUST)), 0.5f, "compat/create/crushed_uranium");
+        RecipeGeneratorUtil.addCentrifugeFluidRecipe(exporter, Ingredient.of(AllItems.WHEAT_FLOUR.asItem()), AllItems.DOUGH.asItem(), Fluids.WATER, 1, null, 0, 1f, "compat/create/dough");
+    }
 
-        // Fluid centrifuge crushed ores
-        RecipeGeneratorUtil.addCentrifugeFluidRecipe(exporter, Ingredient.of(AllItems.CRUSHED_COPPER.asItem()), ItemContent.COPPER_GEM, 2, Fluids.WATER, 1, null, 0, 0.5f, "compat/create/crushed_copper");
-        RecipeGeneratorUtil.addCentrifugeFluidRecipe(exporter, Ingredient.of(AllItems.CRUSHED_IRON.asItem()), ItemContent.IRON_GEM, 2, Fluids.WATER, 1, null, 0, 0.5f, "compat/create/crushed_iron");
-        RecipeGeneratorUtil.addCentrifugeFluidRecipe(exporter, Ingredient.of(AllItems.CRUSHED_GOLD.asItem()), ItemContent.GOLD_GEM, 2, Fluids.WATER, 1, null, 0, 0.5f, "compat/create/crushed_gold");
-        RecipeGeneratorUtil.addCentrifugeFluidRecipe(exporter, Ingredient.of(AllItems.CRUSHED_NICKEL.asItem()), ItemContent.NICKEL_GEM, 2, Fluids.WATER, 1, null, 0, 0.5f, "compat/create/crushed_nickel");
-        RecipeGeneratorUtil.addCentrifugeFluidRecipe(exporter, Ingredient.of(AllItems.CRUSHED_PLATINUM.asItem()), ItemContent.PLATINUM_GEM, 2, Fluids.WATER, 1, null, 0, 0.5f, "compat/create/crushed_platinum");
-        RecipeGeneratorUtil.addCentrifugeFluidRecipe(exporter, Ingredient.of(AllItems.CRUSHED_URANIUM.asItem()), ItemContent.URANIUM_DUST, 3, Fluids.WATER, 1, null, 0, 0.5f, "compat/create/crushed_uranium");
+    private static void addMetalProcessing(RecipeOutput exporter) {
+        var zinc = new OreTransform(
+            Ingredient.of(TagContent.ZINC_ORES),
+            Ingredient.of(TagContent.ZINC_RAW_MATERIALS), AllItems.RAW_ZINC.asItem(), Items.GUNPOWDER,
+            Ingredient.of(TagContent.ZINC_CLUMPS), AllItems.CRUSHED_ZINC.asItem(),
+            null, null, null,
+            null, null,
+            null, null, null,
+            null, null,
+            null,
+            Ingredient.of(TagContent.ZINC_NUGGETS), AllItems.ZINC_NUGGET.asItem(),
+            Ingredient.of(TagContent.ZINC_INGOTS), AllItems.ZINC_INGOT.asItem(),
+            1f, "zinc", 0, false);
+
+            RecipeGeneratorUtil.addMetalProcessingChain(exporter, zinc);
     }
 
     private static void addPulverizing(RecipeOutput exporter) {

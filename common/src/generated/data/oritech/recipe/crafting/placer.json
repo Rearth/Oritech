@@ -9,7 +9,7 @@
       "item": "oritech:machine_frame_block"
     },
     "f": {
-      "item": "minecraft:copper_ingot"
+      "tag": "c:ingots/copper"
     },
     "m": {
       "item": "oritech:processing_unit"

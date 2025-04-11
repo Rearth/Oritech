@@ -3,10 +3,10 @@
   "category": "misc",
   "key": {
     "b": {
-      "item": "minecraft:chest"
+      "tag": "c:chests/wooden"
     },
     "c": {
-      "item": "minecraft:redstone_block"
+      "tag": "c:storage_blocks/redstone"
     },
     "f": {
       "tag": "c:ingots/steel"

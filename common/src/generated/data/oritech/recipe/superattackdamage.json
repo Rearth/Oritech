@@ -10,7 +10,7 @@
     {
       "count": 64,
       "ingredient": {
-        "item": "minecraft:gold_block"
+        "tag": "c:storage_blocks/gold"
       }
     }
   ],
@@ -35,7 +35,7 @@
     {
       "count": 64,
       "ingredient": {
-        "item": "minecraft:blaze_rod"
+        "tag": "c:rods/blaze"
       }
     }
   ],

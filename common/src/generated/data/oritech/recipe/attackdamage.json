@@ -26,7 +26,7 @@
     {
       "count": 48,
       "ingredient": {
-        "item": "minecraft:diamond"
+        "tag": "c:gems/diamond"
       }
     },
     {

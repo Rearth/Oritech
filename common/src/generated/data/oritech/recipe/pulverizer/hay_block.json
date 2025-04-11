@@ -6,7 +6,7 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "minecraft:hay_block"
+      "tag": "c:storage_blocks/wheat"
     }
   ],
   "results": [

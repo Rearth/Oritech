@@ -9,13 +9,13 @@
       "item": "minecraft:honeycomb"
     },
     {
-      "item": "oritech:biomass"
+      "tag": "c:fuels/bio"
     },
     {
-      "item": "oritech:biomass"
+      "tag": "c:fuels/bio"
     },
     {
-      "item": "oritech:biomass"
+      "tag": "c:fuels/bio"
     }
   ],
   "results": [

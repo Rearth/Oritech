@@ -9,7 +9,7 @@
       "item": "minecraft:netherite_scrap"
     },
     {
-      "item": "minecraft:gold_ingot"
+      "tag": "c:ingots/gold"
     }
   ],
   "results": [

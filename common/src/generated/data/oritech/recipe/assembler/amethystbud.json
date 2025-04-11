@@ -6,10 +6,10 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "minecraft:amethyst_shard"
+      "tag": "c:gems/amethyst"
     },
     {
-      "item": "minecraft:amethyst_shard"
+      "tag": "c:gems/amethyst"
     },
     {
       "item": "oritech:enderic_compound"

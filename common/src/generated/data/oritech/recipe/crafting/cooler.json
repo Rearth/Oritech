@@ -9,7 +9,7 @@
       "item": "oritech:motor"
     },
     "f": {
-      "item": "minecraft:iron_ingot"
+      "tag": "c:ingots/iron"
     },
     "s": {
       "item": "minecraft:ice"

@@ -9,7 +9,7 @@
       "item": "oritech:adamant_ingot"
     },
     "f": {
-      "item": "minecraft:copper_ingot"
+      "tag": "c:ingots/copper"
     },
     "m": {
       "item": "minecraft:crafter"

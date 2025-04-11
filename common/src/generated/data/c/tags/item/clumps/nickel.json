@@ -1,5 +1,9 @@
 {
   "values": [
-    "oritech:nickel_clump"
+    "oritech:nickel_clump",
+    {
+      "id": "create:crushed_raw_nickel",
+      "required": false
+    }
   ]
 }

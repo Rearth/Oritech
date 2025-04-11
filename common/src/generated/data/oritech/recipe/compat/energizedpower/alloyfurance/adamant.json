@@ -16,7 +16,7 @@
     },
     {
       "input": {
-        "item": "minecraft:diamond"
+        "tag": "c:gems/diamond"
       }
     }
   ],

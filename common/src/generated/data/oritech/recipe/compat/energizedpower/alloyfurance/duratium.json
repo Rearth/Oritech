@@ -16,7 +16,7 @@
     },
     {
       "input": {
-        "item": "minecraft:netherite_ingot"
+        "tag": "c:ingots/netherite"
       }
     }
   ],

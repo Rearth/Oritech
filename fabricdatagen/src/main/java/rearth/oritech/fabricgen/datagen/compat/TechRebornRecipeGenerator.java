@@ -137,14 +137,14 @@ public class TechRebornRecipeGenerator {
     }
     
     public static void addTechRebornFuels(RecipeExporter exporter) {
-        RecipeGenerator.addBioGenRecipe(exporter, Ingredient.ofItems(TRContent.Parts.PLANTBALL.item), 25, "compat/techreborn/plantball");
-        RecipeGenerator.addBioGenRecipe(exporter, Ingredient.ofItems(TRContent.Parts.COMPRESSED_PLANTBALL.item), 140, "compat/techreborn/compressedplantball");
+        RecipeGeneratorUtil.addBioGenRecipe(exporter, Ingredient.ofItems(TRContent.Parts.PLANTBALL.item), 25, "compat/techreborn/plantball");
+        RecipeGeneratorUtil.addBioGenRecipe(exporter, Ingredient.ofItems(TRContent.Parts.COMPRESSED_PLANTBALL.item), 140, "compat/techreborn/compressedplantball");
         
-        RecipeGenerator.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.OIL.getFluid(), FluidConstants.BUCKET / 10), 8, "compat/techreborn/oil");
-        RecipeGenerator.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.NITROFUEL.getFluid(), FluidConstants.BUCKET / 10), 24, "compat/techreborn/nitrofuel");
-        RecipeGenerator.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.NITROCOAL_FUEL.getFluid(), FluidConstants.BUCKET / 10), 48, "compat/techreborn/nitrocoalfuel");
-        RecipeGenerator.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.DIESEL.getFluid(), FluidConstants.BUCKET / 10), 128, "compat/techreborn/diesel");
-        RecipeGenerator.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.NITROCOAL_FUEL.getFluid(), FluidConstants.BUCKET / 10), 400, "compat/techreborn/nitrodiesel");
+        RecipeGeneratorUtil.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.OIL.getFluid(), FluidConstants.BUCKET / 10), 8, "compat/techreborn/oil");
+        RecipeGeneratorUtil.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.NITROFUEL.getFluid(), FluidConstants.BUCKET / 10), 24, "compat/techreborn/nitrofuel");
+        RecipeGeneratorUtil.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.NITROCOAL_FUEL.getFluid(), FluidConstants.BUCKET / 10), 48, "compat/techreborn/nitrocoalfuel");
+        RecipeGeneratorUtil.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.DIESEL.getFluid(), FluidConstants.BUCKET / 10), 128, "compat/techreborn/diesel");
+        RecipeGeneratorUtil.addFuelGenRecipe(exporter, FluidStack.create(ModFluids.NITROCOAL_FUEL.getFluid(), FluidConstants.BUCKET / 10), 400, "compat/techreborn/nitrodiesel");
     }
     
     public static void addDistillation(RecipeExporter exporter) {

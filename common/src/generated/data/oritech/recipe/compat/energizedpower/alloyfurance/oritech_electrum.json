@@ -11,12 +11,12 @@
   "inputs": [
     {
       "input": {
-        "item": "minecraft:gold_ingot"
+        "tag": "c:ingots/gold"
       }
     },
     {
       "input": {
-        "item": "minecraft:redstone"
+        "tag": "c:dusts/redstone"
       }
     }
   ],

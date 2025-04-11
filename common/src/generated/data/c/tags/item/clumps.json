@@ -16,6 +16,14 @@
       "required": false
     },
     "oritech:nickel_clump",
-    "oritech:platinum_clump"
+    {
+      "id": "create:crushed_raw_nickel",
+      "required": false
+    },
+    "oritech:platinum_clump",
+    {
+      "id": "create:crushed_raw_platinum",
+      "required": false
+    }
   ]
 }

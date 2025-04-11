@@ -15,7 +15,7 @@
       "tag": "c:ingots/electrum"
     },
     {
-      "item": "minecraft:redstone"
+      "tag": "c:dusts/redstone"
     }
   ],
   "results": [

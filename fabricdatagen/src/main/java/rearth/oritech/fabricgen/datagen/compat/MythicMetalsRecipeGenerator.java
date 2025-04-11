@@ -6,7 +6,6 @@ import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
 import nourl.mythicmetals.item.ItemSet;
 import nourl.mythicmetals.item.MythicItems;
 import nourl.mythicmetals.misc.RegistryHelper;

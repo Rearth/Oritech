@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "energizedpower"
+    }
+  ],
+  "type": "energizedpower:assembling_machine",
+  "inputs": [
+    {
+      "input": {
+        "item": "oritech:processing_unit"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:fluxite"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:fluxite"
+      }
+    },
+    {
+      "input": {
+        "tag": "c:ingots/platinum"
+      }
+    }
+  ],
+  "output": {
+    "item": "oritech:flux_gate"
+  }
+}

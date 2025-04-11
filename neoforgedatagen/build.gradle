@@ -27,12 +27,6 @@ neoForge {
 }
 
 repositories {
-    // maven {
-    //     url "https://modmaven.dev/"
-    //     content {
-    //         includeGroup "dev.technici4n"
-    //     }
-    // }
     // For Oritech
     flatDir { dirs '../neoforge/build/libs' }
     maven {
@@ -59,16 +53,30 @@ repositories {
         name = 'FTB Mods'
         url "https://maven.nanite.dev/releases"
     }
+    maven { // for Mekanism
+        url "https://modmaven.dev/"
+        content {
+            includeGroup "mekanism"
+        }
+    }
     maven {
         name = 'Modrinth'
         url 'https://api.modrinth.com/maven/'
     }
-        maven { url = "https://www.cursemaven.com" }
+    maven { 
+        name = 'Curseforge'
+        url = "https://www.cursemaven.com"
+    }
 
     // create:
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
     maven { url = "https://maven.createmod.net" }   // create + ponder + flywheel?
     maven { url = "https://mvn.devos.one/snapshots" } // Registrate
+
+    maven {
+        name = 'Shedaniel'
+        url = 'https://maven.shedaniel.me'
+    } // for cloth config
 }
 
 // Load properties from main Oritech gradle.properties
@@ -97,4 +105,24 @@ dependencies {
     // Create dependencies
     implementation "com.tterrag.registrate:Registrate:$registrate_version"
 
+    // Mekanism
+    implementation "mekanism:Mekanism:${mekanism_version}"
+    implementation "mekanism:Mekanism:${mekanism_version}:generators" // Mekanism: Generators
+    
+    // Powah!
+    implementation "curse.maven:powah-rearchitected-633483:${powah_version_id}"
+    runtimeOnly "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
+    runtimeOnly "curse.maven:guideme-1173950:${guideme_version_id}"
+
+    // Energized Power
+    implementation "curse.maven:energized-power-782147:${energized_power_version_id}"
+
+    // Alloy Smelter
+    implementation "maven.modrinth:alloy-smelter:${alloy_smelter_version_id}"
+
+    // Productive Metalworks
+    implementation "curse.maven:productive-metalworks-1184570:${productive_metalworks_version_id}"
+
+    // Immersive Engineering
+    implementation "curse.maven:immersive-engineering-231951:${immersive_engineering_version_id}"
 }

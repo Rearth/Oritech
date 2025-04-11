@@ -1,16 +1,31 @@
 package rearth.oritech.neoforgegen.datagen;
 
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
+import rearth.oritech.neoforgegen.datagen.compat.AlloySmelterRecipeGenerator;
+import rearth.oritech.neoforgegen.datagen.compat.CreateRecipeGenerator;
+import rearth.oritech.neoforgegen.datagen.compat.EnergizedPowerRecipeGenerator;
+import rearth.oritech.neoforgegen.datagen.compat.ImmersiveEngineeringRecipeGenerator;
+import rearth.oritech.neoforgegen.datagen.compat.MekanismRecipeGenerator;
+import rearth.oritech.neoforgegen.datagen.compat.MekanismGeneratorsRecipeGenerator;
+import rearth.oritech.neoforgegen.datagen.compat.PowahRecipeGenerator;
+import rearth.oritech.neoforgegen.datagen.compat.ProductiveMetalworksRecipeGenerator;
+import rearth.oritech.util.datagen.RecipeGeneratorUtil;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.*;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import net.neoforged.neoforge.common.conditions.WithConditions;
 
-import rearth.oritech.neoforgegen.datagen.compat.CreateRecipeGenerator;
-import rearth.oritech.init.ItemContent;
-
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
 
 public class RecipeGenerator extends RecipeProvider implements IConditionBuilder {
     PackOutput packOutput;
@@ -24,7 +39,20 @@ public class RecipeGenerator extends RecipeProvider implements IConditionBuilder
     }
 
     @Override
-    protected void buildRecipes(RecipeOutput recipeOutput) {
-        CreateRecipeGenerator.generateRecipes(packOutput, registries, recipeOutput.withConditions(this.modLoaded("create")));
+    protected void buildRecipes(RecipeOutput exporter) {
+        // Not working yet. See https://github.com/TheFogIOF/AlloySmelter/issues/6
+        // AlloySmelterRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("alloy_smelter")));
+        CreateRecipeGenerator.generateRecipes(packOutput, registries, exporter.withConditions(this.modLoaded("create")));
+        EnergizedPowerRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("energizedpower")));
+        ImmersiveEngineeringRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("immersiveengineering")));
+        MekanismRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("mekanism")));
+        MekanismGeneratorsRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("mekanismgenerators")));
+        PowahRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("powah")));
+        ProductiveMetalworksRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("productivemetalworks")));
+
+        // Uranium clumps don't exist in Oritech, but Oritech should still be able to do something with them if they're added by another mod (like Create).
+        // Also added in Fabric datagen with Fabric load conditions, but the Fabric versions should be excluded from the Neoforge build
+        RecipeGeneratorUtil.addCentrifugeRecipe(exporter.withConditions(this.not(this.tagEmpty(TagContent.URANIUM_CLUMPS))), of(TagContent.URANIUM_CLUMPS), List.of(new ItemStack(ItemContent.URANIUM_DUST, 2), new ItemStack(ItemContent.SMALL_PLUTONIUM_DUST)), 0.5f, "compat/clump/crushed_uranium");
+        RecipeGeneratorUtil.addCentrifugeFluidRecipe(exporter.withConditions(this.not(this.tagEmpty(TagContent.URANIUM_CLUMPS))), of(TagContent.URANIUM_CLUMPS), ItemContent.URANIUM_DUST, 3, Fluids.WATER, 1, null, 0, 0.5f, "compat/clumpwet/crushed_uranium");
     }
 }

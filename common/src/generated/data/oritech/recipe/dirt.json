@@ -3,10 +3,10 @@
   "category": "misc",
   "key": {
     "b": {
-      "item": "oritech:biomass"
+      "tag": "c:fuels/bio"
     },
     "s": {
-      "item": "minecraft:sand"
+      "tag": "minecraft:sand"
     }
   },
   "pattern": [

@@ -16,7 +16,7 @@
     },
     {
       "count": 1,
-      "item": "minecraft:diamond"
+      "tag": "c:gems/diamond"
     }
   ],
   "min_forge_tier": 1,

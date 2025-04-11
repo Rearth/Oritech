@@ -12,7 +12,7 @@
       "item": "oritech:fluxite"
     },
     "m": {
-      "item": "minecraft:obsidian"
+      "tag": "c:obsidians/normal"
     },
     "s": {
       "item": "oritech:adamant_ingot"

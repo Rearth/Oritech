@@ -6,13 +6,13 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "oritech:biomass"
+      "tag": "c:fuels/bio"
     },
     {
-      "item": "oritech:biomass"
+      "tag": "c:fuels/bio"
     },
     {
-      "item": "oritech:biomass"
+      "tag": "c:fuels/bio"
     },
     {
       "tag": "minecraft:planks"

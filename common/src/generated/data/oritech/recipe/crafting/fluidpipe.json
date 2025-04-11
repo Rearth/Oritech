@@ -6,7 +6,7 @@
       "tag": "c:silicon"
     },
     "i": {
-      "item": "minecraft:copper_ingot"
+      "tag": "c:ingots/copper"
     }
   },
   "pattern": [

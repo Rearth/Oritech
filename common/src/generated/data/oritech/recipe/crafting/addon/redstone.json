@@ -9,7 +9,7 @@
       "item": "minecraft:comparator"
     },
     "f": {
-      "item": "minecraft:redstone"
+      "tag": "c:dusts/redstone"
     },
     "s": {
       "item": "minecraft:repeater"

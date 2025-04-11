@@ -20,6 +20,10 @@
       "id": "#c:crops",
       "required": false
     },
+    {
+      "id": "#farmersdelight:wild_crops",
+      "required": false
+    },
     "oritech:wither_crop_block",
     "oritech:banana",
     "minecraft:wheat",

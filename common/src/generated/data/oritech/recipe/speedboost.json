@@ -32,7 +32,7 @@
     {
       "count": 32,
       "ingredient": {
-        "item": "minecraft:redstone"
+        "tag": "c:dusts/redstone"
       }
     }
   ],

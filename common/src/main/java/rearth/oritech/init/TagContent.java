@@ -55,18 +55,31 @@ public class TagContent {
     
     public static final TagKey<Item> URANIUM_RAW_MATERIALS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/uranium"));
     public static final TagKey<Item> URANIUM_ORES = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ores/uranium"));
+    public static final TagKey<Item> URANIUM_CLUMPS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "clumps/uranium"));
     public static final TagKey<Block> URANIUM_ORE_BLOCKS = TagKey.of(RegistryKeys.BLOCK, Identifier.of("c", "ores/uranium"));
 
     // compat ores
     public static final TagKey<Item> TIN_RAW_MATERIALS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/tin"));
     public static final TagKey<Item> TIN_ORES = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ores/tin"));
+    public static final TagKey<Item> TIN_DUSTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dusts/tin"));
     public static final TagKey<Item> TIN_INGOTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ingots/tin"));
+    public static final TagKey<Item> TIN_NUGGETS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "nuggets/tin"));
+    public static final TagKey<Item> TIN_CLUMPS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "clumps/tin"));
+    public static final TagKey<Item> ZINC_RAW_MATERIALS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/zinc"));
+    public static final TagKey<Item> ZINC_ORES = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ores/zinc"));
+    public static final TagKey<Item> ZINC_INGOTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ingots/zinc"));
+    public static final TagKey<Item> ZINC_NUGGETS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "nuggets/zinc"));
+    public static final TagKey<Item> ZINC_CLUMPS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "clumps/zinc"));
+    public static final TagKey<Item> BRONZE_INGOTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ingots/bronze"));
+    // also need osmium, silver, lead, quicksilver, bauxite
     
     // plastic
     public static final TagKey<Item> PLASTIC_PLATES = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "plates/plastic"));
     
     // biomass
     public static final TagKey<Item> BIOMASS = TagKey.of(RegistryKeys.ITEM, Oritech.id("biomass"));
+    public static final TagKey<Item> BIOFUEL = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "fuels/bio"));
+    public static final TagKey<Item> BIOFUEL_BLOCK = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "fuels/block/bio"));
     
     // plating
     public static final TagKey<Item> MACHINE_PLATING = TagKey.of(RegistryKeys.ITEM, Oritech.id("plating"));

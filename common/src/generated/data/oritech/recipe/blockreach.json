@@ -10,7 +10,7 @@
     {
       "count": 64,
       "ingredient": {
-        "item": "minecraft:copper_ingot"
+        "tag": "c:ingots/copper"
       }
     }
   ],
@@ -32,7 +32,7 @@
     {
       "count": 32,
       "ingredient": {
-        "item": "minecraft:copper_block"
+        "tag": "c:storage_blocks/copper"
       }
     }
   ],

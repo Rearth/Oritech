@@ -1,0 +1,19 @@
+{
+  "type": "oritech:centrifuge_fluid",
+  "fluidInputAmount": 20250,
+  "fluidInputVariant": "minecraft:water",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:fuels/block/bio"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:raw_biopolymer"
+    }
+  ],
+  "time": 200
+}

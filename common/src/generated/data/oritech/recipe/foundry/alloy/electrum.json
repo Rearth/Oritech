@@ -6,10 +6,10 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "minecraft:gold_ingot"
+      "tag": "c:ingots/gold"
     },
     {
-      "item": "minecraft:redstone"
+      "tag": "c:dusts/redstone"
     }
   ],
   "results": [

@@ -15,7 +15,7 @@
       "item": "minecraft:paper"
     },
     {
-      "item": "minecraft:leather"
+      "tag": "c:leathers"
     }
   ],
   "results": [

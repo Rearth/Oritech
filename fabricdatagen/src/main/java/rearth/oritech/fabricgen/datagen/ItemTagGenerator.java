@@ -39,14 +39,17 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.COPPER_CLUMP).addOptional(Identifier.of("create", "crushed_raw_copper"))
           .add(ItemContent.IRON_CLUMP).addOptional(Identifier.of("create", "crushed_raw_iron"))
           .add(ItemContent.GOLD_CLUMP).addOptional(Identifier.of("create", "crushed_raw_gold"))
-          .add(ItemContent.NICKEL_CLUMP)
-          .add(ItemContent.PLATINUM_CLUMP);
+          .add(ItemContent.NICKEL_CLUMP).addOptional(Identifier.of("create", "crushed_raw_nickel"))
+          .add(ItemContent.PLATINUM_CLUMP).addOptional(Identifier.of("create", "crushed_raw_platinum"));
         
         getOrCreateTagBuilder(getClumpTag("copper")).add(ItemContent.COPPER_CLUMP).addOptional(Identifier.of("create", "crushed_raw_copper"));
         getOrCreateTagBuilder(getClumpTag("iron")).add(ItemContent.IRON_CLUMP).addOptional(Identifier.of("create", "crushed_raw_iron"));
         getOrCreateTagBuilder(getClumpTag("gold")).add(ItemContent.GOLD_CLUMP).addOptional(Identifier.of("create", "crushed_raw_gold"));
-        getOrCreateTagBuilder(getClumpTag("nickel")).add(ItemContent.NICKEL_CLUMP);
-        getOrCreateTagBuilder(getClumpTag("platinum")).add(ItemContent.PLATINUM_CLUMP);
+        getOrCreateTagBuilder(getClumpTag("nickel")).add(ItemContent.NICKEL_CLUMP).addOptional(Identifier.of("create", "crushed_raw_nickel"));
+        getOrCreateTagBuilder(getClumpTag("platinum")).add(ItemContent.PLATINUM_CLUMP).addOptional(Identifier.of("create", "crushed_raw_platinum"));
+        // for compat
+        getOrCreateTagBuilder(getClumpTag("uranium")).addOptional(Identifier.of("create", "crushed_raw_uranium"));
+        getOrCreateTagBuilder(getClumpTag("osmium")).addOptional(Identifier.of("create", "crushed_raw_osmium"));
         
         // dusts
         getOrCreateTagBuilder(ConventionalItemTags.DUSTS)
@@ -105,11 +108,13 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         
         getOrCreateTagBuilder(TagContent.NICKEL_ORES).add(BlockContent.NICKEL_ORE.asItem(), BlockContent.DEEPSLATE_NICKEL_ORE.asItem());
         getOrCreateTagBuilder(TagContent.PLATINUM_ORES).add(BlockContent.DEEPSLATE_PLATINUM_ORE.asItem(), BlockContent.ENDSTONE_PLATINUM_ORE.asItem());
-        getOrCreateTagBuilder(TagContent.URANIUM_ORES).add(BlockContent.DEEPSLATE_URANIUM_ORE.asItem());
+        getOrCreateTagBuilder(TagContent.URANIUM_ORES).add(BlockContent.DEEPSLATE_URANIUM_ORE.asItem())
+          .addOptional(Identifier.of("immersiveengineering", "ore_uranium"))
+          .addOptional(Identifier.of("immersiveengineering", "deepslate_ore_uranium"));
         
         getOrCreateTagBuilder(TagContent.STEEL_INGOTS).add(ItemContent.STEEL_INGOT).add(ItemContent.BIOSTEEL_INGOT);
         getOrCreateTagBuilder(TagContent.QUARTZ_DUSTS).add(ItemContent.QUARTZ_DUST);
-        getOrCreateTagBuilder(TagContent.COAL_DUSTS).add(ItemContent.COAL_DUST);
+        getOrCreateTagBuilder(TagContent.COAL_DUSTS).add(ItemContent.COAL_DUST).addOptional(Identifier.of("immersiveengineering", "dust_hop_graphite"));
         
         // vanilla variants
         getOrCreateTagBuilder(TagContent.COPPER_DUSTS).add(ItemContent.COPPER_DUST);
@@ -133,6 +138,9 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(TagContent.FEEDER_BLACKLIST)
           .addOptional(Identifier.of("relics", "infinity_ham"));
         
+        getOrCreateTagBuilder(getItemTag("bananas")).add(ItemContent.BANANA);
+        getOrCreateTagBuilder(getItemTag("foods/fruit")).add(ItemContent.BANANA);
+        
         // biomass
         getOrCreateTagBuilder(TagContent.BIOMASS)
           .addOptionalTag(ItemTags.VILLAGER_PLANTABLE_SEEDS)
@@ -140,6 +148,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .addOptionalTag(ItemTags.SAPLINGS)
           .addOptionalTag(ConventionalItemTags.FOODS)
           .addOptionalTag(ConventionalItemTags.CROPS)
+          .addOptionalTag(Identifier.of("farmersdelight", "wild_crops"))
           .add(BlockContent.WITHER_CROP_BLOCK.asItem())
           .add(ItemContent.BANANA.asItem())
           .add(Items.WHEAT)
@@ -177,6 +186,11 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(Items.RED_MUSHROOM_BLOCK)
           .add(Items.NETHER_WART_BLOCK)
           .add(Items.WARPED_WART_BLOCK);
+        
+        getOrCreateTagBuilder(TagContent.BIOFUEL)
+          .add(ItemContent.BIOMASS);
+        getOrCreateTagBuilder(TagContent.BIOFUEL_BLOCK)
+          .add(BlockContent.BIOMASS_BLOCK.asItem());
         
         // dyes
         getOrCreateTagBuilder(TagContent.RAW_WHITE_DYE)
@@ -223,6 +237,8 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         
         // plastic
         getOrCreateTagBuilder(TagContent.PLASTIC_PLATES)
+          .add(ItemContent.PLASTIC_SHEET);
+        getOrCreateTagBuilder(getItemTag("plastics"))
           .add(ItemContent.PLASTIC_SHEET);
         
         // carbon fibre
@@ -345,18 +361,22 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
     }
     
     public static TagKey<Item> getStorageBlockTag(String path) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(TagUtil.C_TAG_NAMESPACE, "storage_blocks/" + path));
+        return getItemTag("storage_blocks/" + path);
     }
     
     public static TagKey<Item> getIngotTag(String path) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(TagUtil.C_TAG_NAMESPACE, "ingots/" + path));
+        return getItemTag("ingots/" + path);
     }
 
     public static TagKey<Item> getClumpTag(String path) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(TagUtil.C_TAG_NAMESPACE, "clumps/" + path));
+        return getItemTag("clumps/" + path);
     }
     
     public static TagKey<Item> getDustTag(String path) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(TagUtil.C_TAG_NAMESPACE, "dusts/" + path));
+        return getItemTag("dusts/" + path);
+    }
+
+    public static TagKey<Item> getItemTag(String path) {
+        return TagKey.of(RegistryKeys.ITEM, Identifier.of(TagUtil.C_TAG_NAMESPACE, path));
     }
 }

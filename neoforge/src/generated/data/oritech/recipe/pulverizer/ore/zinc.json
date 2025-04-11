@@ -1,0 +1,25 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "oritech:pulverizer",
+  "fluidInputAmount": 0,
+  "fluidInputVariant": "minecraft:empty",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:ores/zinc"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "create:raw_zinc"
+    }
+  ],
+  "time": 200
+}
