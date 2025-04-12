@@ -7,7 +7,6 @@ import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
@@ -18,7 +17,6 @@ import rearth.oritech.fabricgen.datagen.RecipeGenerator;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 import reborncore.common.crafting.RebornRecipe;
 import reborncore.common.crafting.SizedIngredient;
 import reborncore.common.fluid.FluidValue;
@@ -138,8 +136,8 @@ public class TechRebornRecipeGenerator {
     }
     
     public static void addTechRebornFuels(RecipeExporter exporter) {
-        RecipeGeneratorUtil.addBioGenRecipe(exporter, Ingredient.ofItems(TRContent.Parts.PLANTBALL.item), 25, "compat/techreborn/plantball");
-        RecipeGeneratorUtil.addBioGenRecipe(exporter, Ingredient.ofItems(TRContent.Parts.COMPRESSED_PLANTBALL.item), 140, "compat/techreborn/compressedplantball");
+        // RecipeGeneratorUtil.addBioGenRecipe(exporter, Ingredient.ofItems(TRContent.Parts.PLANTBALL.item), 25, "compat/techreborn/plantball");
+        // RecipeGeneratorUtil.addBioGenRecipe(exporter, Ingredient.ofItems(TRContent.Parts.COMPRESSED_PLANTBALL.item), 140, "compat/techreborn/compressedplantball");
         
         FuelGeneratorRecipeBuilder.build().fluidInput(ModFluids.OIL.getFluid(), 0.1f).timeInSeconds(3).export(exporter, PATH + "oil");
         FuelGeneratorRecipeBuilder.build().fluidInput(ModFluids.NITROFUEL.getFluid(), 0.1f).timeInSeconds(10).export(exporter, PATH + "nitrofuel");

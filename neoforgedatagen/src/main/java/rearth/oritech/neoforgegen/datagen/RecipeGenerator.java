@@ -27,7 +27,7 @@ import net.neoforged.neoforge.common.conditions.WithConditions;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 
 public class RecipeGenerator extends RecipeProvider implements IConditionBuilder {
     PackOutput packOutput;

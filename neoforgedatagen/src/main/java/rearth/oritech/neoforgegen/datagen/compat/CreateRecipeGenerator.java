@@ -35,7 +35,7 @@ import net.neoforged.neoforge.common.Tags;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 
 public class CreateRecipeGenerator {
     private static final String PATH = "compat/create/";

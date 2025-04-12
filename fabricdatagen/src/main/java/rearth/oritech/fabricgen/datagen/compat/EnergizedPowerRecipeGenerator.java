@@ -17,7 +17,7 @@ import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 
-import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 
 public class EnergizedPowerRecipeGenerator {
     private static final String PATH = "compat/energizedpower/";

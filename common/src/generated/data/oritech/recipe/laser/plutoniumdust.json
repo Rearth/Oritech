@@ -1,5 +1,5 @@
 {
-  "type": "oritech:laser",
+  "type": "oritech:deep_drill",
   "fluidInputAmount": 0,
   "fluidInputVariant": "minecraft:empty",
   "fluidOutputAmount": 0,
@@ -15,5 +15,5 @@
       "id": "oritech:plutonium_dust"
     }
   ],
-  "time": 1
+  "time": 200
 }

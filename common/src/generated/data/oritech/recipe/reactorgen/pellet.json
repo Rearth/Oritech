@@ -1,0 +1,14 @@
+{
+  "type": "oritech:bio_generator",
+  "fluidInputAmount": 0,
+  "fluidInputVariant": "minecraft:empty",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "item": "oritech:uranium_pellet"
+    }
+  ],
+  "results": [],
+  "time": 4000
+}

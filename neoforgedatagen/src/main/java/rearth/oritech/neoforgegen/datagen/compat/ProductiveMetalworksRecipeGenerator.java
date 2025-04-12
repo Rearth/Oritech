@@ -26,7 +26,7 @@ import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
 import java.util.List;
 
-import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 
 public class ProductiveMetalworksRecipeGenerator {
     public static void generateRecipes(RecipeOutput exporter) {

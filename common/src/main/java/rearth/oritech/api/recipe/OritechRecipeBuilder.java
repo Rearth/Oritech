@@ -142,6 +142,7 @@ public abstract class OritechRecipeBuilder {
     public void export(RecipeExporter exporter, String suffix) {
         var id = Oritech.id(resourcePath + "/" + suffix);
         validate(id);
+        
         exporter.accept(
             id,
             new OritechRecipe(

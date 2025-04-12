@@ -11,7 +11,7 @@ import dev.architectury.fluid.FluidStack;
 
 import net.minecraft.data.recipes.RecipeOutput;
 
-import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 
 public class IndustrialForegoingRecipeGenerator {
     private static final String PATH = "compat/industrialforegoing/";

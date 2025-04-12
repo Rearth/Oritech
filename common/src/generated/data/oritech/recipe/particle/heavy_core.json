@@ -1,5 +1,5 @@
 {
-  "type": "oritech:particle_collision",
+  "type": "oritech:bio_generator",
   "fluidInputAmount": 0,
   "fluidInputVariant": "minecraft:empty",
   "fluidOutputAmount": 0,

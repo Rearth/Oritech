@@ -16,7 +16,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 import net.neoforged.neoforge.common.Tags;
 
-import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 
 public class AlloySmelterRecipeGenerator {
     public static void generateRecipes(RecipeOutput exporter) {
