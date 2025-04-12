@@ -7,7 +7,6 @@ import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
 import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 
 import blusunrize.immersiveengineering.api.EnumMetals;
 import blusunrize.immersiveengineering.api.IETags;

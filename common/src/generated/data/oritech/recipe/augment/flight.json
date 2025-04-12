@@ -21,6 +21,7 @@
   ],
   "researchCost": [
     {
+      "count": 64,
       "ingredient": {
         "item": "oritech:flux_gate"
       }

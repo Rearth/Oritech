@@ -6,10 +6,13 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
+      "item": "oritech:platinum_gem"
+    },
+    {
       "item": "oritech:fluxite"
     },
     {
-      "item": "oritech:platinum_gem"
+      "item": "oritech:fluxite"
     }
   ],
   "results": [

@@ -7,6 +7,8 @@ public class DeepDrillRecipeBuilder extends OritechRecipeBuilder {
 
     protected DeepDrillRecipeBuilder() {
         super(RecipeContent.DEEP_DRILL, "deepdrill");
+        // Set the default time for deep drill recipes
+        this.time = 1;
     }
 
     public static OritechRecipeBuilder build() {

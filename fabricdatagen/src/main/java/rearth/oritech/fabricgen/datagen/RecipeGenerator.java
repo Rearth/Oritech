@@ -98,21 +98,21 @@ public class RecipeGenerator extends FabricRecipeProvider {
     private void addVanillaAdditions(RecipeExporter exporter) {
         
         // slimeball from honey and biomass
-        AssemblerRecipeBuilder.build().input(Items.HONEYCOMB).input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).result(Items.SLIME_BALL).export(exporter, "slime");
+        AssemblerRecipeBuilder.build().input(Items.HONEYCOMB).input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).result(Items.SLIME_BALL).timeMultiplier(0.8f).export(exporter, "slime");
         // fireball in assembler (gunpowder, blaze powder + coal) = 5 charges
-        AssemblerRecipeBuilder.build().input(Items.GUNPOWDER).input(Items.BLAZE_POWDER).input(ItemTags.COALS).input(ItemTags.COALS).result(Items.FIRE_CHARGE, 4).export(exporter, "fireball");
+        AssemblerRecipeBuilder.build().input(Items.GUNPOWDER).input(Items.BLAZE_POWDER).input(ItemTags.COALS).input(ItemTags.COALS).result(Items.FIRE_CHARGE, 4).timeMultiplier(0.8f).export(exporter, "fireball");
         // blaze rod (4 powder in assembler)
-        AssemblerRecipeBuilder.build().input(Items.BLAZE_POWDER).input(Items.BLAZE_POWDER).input(Items.BLAZE_POWDER).input(Items.BLAZE_POWDER).result(Items.BLAZE_ROD).export(exporter, "blazerod");
+        AssemblerRecipeBuilder.build().input(Items.BLAZE_POWDER).input(Items.BLAZE_POWDER).input(Items.BLAZE_POWDER).input(Items.BLAZE_POWDER).result(Items.BLAZE_ROD).timeMultiplier(0.8f).export(exporter, "blazerod");
         // enderic compound from sculk
         CentrifugeRecipeBuilder.build().input(Items.SCULK).result(ItemContent.ENDERIC_COMPOUND).timeMultiplier(4f).export(exporter, "endericsculk");
         // budding amethyst (amethyst shard x2, enderic compound, overcharged crystal)
-        AssemblerRecipeBuilder.build().input(ConventionalItemTags.AMETHYST_GEMS).input(ConventionalItemTags.AMETHYST_GEMS).input(ItemContent.ENDERIC_COMPOUND).input(ItemContent.OVERCHARGED_CRYSTAL).result(Items.BUDDING_AMETHYST).export(exporter, "amethystbud");
+        AssemblerRecipeBuilder.build().input(ConventionalItemTags.AMETHYST_GEMS).input(ConventionalItemTags.AMETHYST_GEMS).input(ItemContent.ENDERIC_COMPOUND).input(ItemContent.OVERCHARGED_CRYSTAL).result(Items.BUDDING_AMETHYST).time(160).export(exporter, "amethystbud");
         // netherite alloying (yes this is pretty OP)
         FoundryRecipeBuilder.build().input(ConventionalItemTags.GOLD_INGOTS).input(Items.NETHERITE_SCRAP).result(Items.NETHERITE_INGOT).export(exporter, "netherite");
         // books
-        AssemblerRecipeBuilder.build().input(Items.PAPER).input(Items.PAPER).input(Items.PAPER).input(ConventionalItemTags.LEATHERS).result(Items.BOOK, 2).export(exporter, "book");
+        AssemblerRecipeBuilder.build().input(Items.PAPER).input(Items.PAPER).input(Items.PAPER).input(ConventionalItemTags.LEATHERS).result(Items.BOOK, 2).timeMultiplier(0.8f).export(exporter, "book");
         // reinforced deepslate
-        AtomicForgeRecipeBuilder.build().input(ItemContent.DURATIUM_INGOT).input(Items.DEEPSLATE).result(Items.REINFORCED_DEEPSLATE).time(100).export(exporter, "reinfdeepslate");
+        AtomicForgeRecipeBuilder.build().input(Items.DEEPSLATE).input(ItemContent.DURATIUM_INGOT).input(ItemContent.DURATIUM_INGOT).result(Items.REINFORCED_DEEPSLATE).time(100).export(exporter, "reinfdeepslate");
         // cobblestone to gravel
         PulverizerRecipeBuilder.build().input(ConventionalItemTags.COBBLESTONES).result(Items.GRAVEL).addToGrinder().export(exporter, "gravel");
         // gravel to sand
@@ -128,7 +128,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // dripstone from dripstone block
         PulverizerRecipeBuilder.build().input(Items.DRIPSTONE_BLOCK).result(Items.POINTED_DRIPSTONE, 4).addToGrinder().export(exporter, "dripstone");
         // shroomlight from logs and 3 glowstone
-        AssemblerRecipeBuilder.build().input(ItemTags.LOGS).input(Items.GLOWSTONE).input(Items.GLOWSTONE).input(Items.GLOWSTONE).result(Items.SHROOMLIGHT).export(exporter, "shroomlight");
+        AssemblerRecipeBuilder.build().input(ItemTags.LOGS).input(Items.GLOWSTONE).input(Items.GLOWSTONE).input(Items.GLOWSTONE).result(Items.SHROOMLIGHT).timeMultiplier(0.8f).export(exporter, "shroomlight");
     }
     
     private void addDyes(RecipeExporter exporter) {
@@ -161,18 +161,18 @@ public class RecipeGenerator extends FabricRecipeProvider {
     private void addFuels(RecipeExporter exporter) {
         
         // bio
-        BioGeneratorRecipeBuilder.build().input(TagContent.BIOMASS).time(15).export(exporter, "rawbio");
-        BioGeneratorRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).time(200).export(exporter, "packedwheat");
-        BioGeneratorRecipeBuilder.build().input(TagContent.BIOFUEL).time(25).export(exporter, "biomass");
-        BioGeneratorRecipeBuilder.build().input(ItemContent.SOLID_BIOFUEL).time(160).export(exporter, "solidbiomass");
-        BioGeneratorRecipeBuilder.build().input(TagContent.BIOFUEL_BLOCK).time(160).export(exporter, "biomassblock");
-        BioGeneratorRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).time(300).export(exporter, "polymer");
-        BioGeneratorRecipeBuilder.build().input(ItemContent.UNHOLY_INTELLIGENCE).time(3000).export(exporter, "vex");
+        BioGeneratorRecipeBuilder.build().input(TagContent.BIOMASS).timeInSeconds(15).export(exporter, "rawbio");
+        BioGeneratorRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).timeInSeconds(200).export(exporter, "packedwheat");
+        BioGeneratorRecipeBuilder.build().input(TagContent.BIOFUEL).timeInSeconds(30).export(exporter, "biomass");
+        BioGeneratorRecipeBuilder.build().input(ItemContent.SOLID_BIOFUEL).timeInSeconds(160).export(exporter, "solidbiomass");
+        BioGeneratorRecipeBuilder.build().input(TagContent.BIOFUEL_BLOCK).timeInSeconds(270).export(exporter, "biomassblock");
+        BioGeneratorRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).timeInSeconds(300).export(exporter, "polymer");
+        BioGeneratorRecipeBuilder.build().input(ItemContent.UNHOLY_INTELLIGENCE).timeInSeconds(3000).export(exporter, "vex");
         // lava
-        LavaGeneratorRecipeBuilder.build().fluidInput(Fluids.LAVA).timeInSeconds(12).export(exporter, "lava");
+        LavaGeneratorRecipeBuilder.build().fluidInput(Fluids.LAVA, 0.1f).timeInSeconds(12).export(exporter, "lava");
         // fuel
-        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_OIL.get()).timeInSeconds(3).export(exporter, "crude");
-        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_FUEL.get()).timeInSeconds(12).export(exporter, "fuel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_OIL.get(), 0.1f).timeInSeconds(3).export(exporter, "crude");
+        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_FUEL.get(), 0.1f).timeInSeconds(12).export(exporter, "fuel");
         //steam
         SteamGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_STEAM.get()).export(exporter, "steameng");
     }
@@ -182,7 +182,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         PulverizerRecipeBuilder.build().input(TagContent.BIOMASS).result(ItemContent.BIOMASS).export(exporter, "biobasic");
         PulverizerRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).result(ItemContent.BIOMASS, 16).export(exporter, "packagedwheatbio");
         PulverizerRecipeBuilder.build().input(cItemTag("storage_blocks/wheat")).result(ItemContent.BIOMASS, 16).export(exporter, "hay_block");
-        AssemblerRecipeBuilder.build().input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).input(ItemTags.PLANKS).result(ItemContent.SOLID_BIOFUEL).export(exporter, "solidbiofuel");
+        AssemblerRecipeBuilder.build().input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).input(ItemTags.PLANKS).result(ItemContent.SOLID_BIOFUEL).timeMultiplier(0.8f).export(exporter, "solidbiofuel");
     }
     
     private void addEquipment(RecipeExporter exporter) {
@@ -448,28 +448,28 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         // fine wires
         offerCableRecipe(exporter, new ItemStack(ItemContent.INSULATED_WIRE, 4), of(TagContent.NICKEL_INGOTS), "insulatedwire");
-        AssemblerRecipeBuilder.build().input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(ConventionalItemTags.COPPER_INGOTS).result(ItemContent.INSULATED_WIRE, 12).timeMultiplier(0.5f).export(exporter, "fwire");
+        AssemblerRecipeBuilder.build().input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(ConventionalItemTags.COPPER_INGOTS).result(ItemContent.INSULATED_WIRE, 12).timeMultiplier(0.4f).export(exporter, "fwire");
         
         // magnetic coils
         offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.MAGNETIC_COIL, 2), of(TagContent.STEEL_INGOTS), of(TagContent.WIRES), "magnet");
-        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.WIRES).input(TagContent.WIRES).input(TagContent.WIRES).result(ItemContent.MAGNETIC_COIL, 2).timeMultiplier(0.5f).export(exporter, "magnet");
+        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.WIRES).input(TagContent.WIRES).input(TagContent.WIRES).result(ItemContent.MAGNETIC_COIL, 2).timeMultiplier(0.4f).export(exporter, "magnet");
         
         // motor
         offerMotorRecipe(exporter, ItemContent.MOTOR, of(TagContent.NICKEL_INGOTS), of(ItemContent.MAGNETIC_COIL), of(TagContent.STEEL_INGOTS), "motorcraft");
-        AssemblerRecipeBuilder.build().input(TagContent.NICKEL_INGOTS).input(TagContent.STEEL_INGOTS).input(ItemContent.MAGNETIC_COIL).input(ItemContent.MAGNETIC_COIL).result(ItemContent.MOTOR, 2).timeMultiplier(0.5f).export(exporter, "motor");
+        AssemblerRecipeBuilder.build().input(TagContent.NICKEL_INGOTS).input(TagContent.STEEL_INGOTS).input(ItemContent.MAGNETIC_COIL).input(ItemContent.MAGNETIC_COIL).result(ItemContent.MOTOR, 2).timeMultiplier(0.4f).export(exporter, "motor");
         
         // machine plating variants
         offerMachinePlatingRecipe(exporter, BlockContent.MACHINE_PLATING_BLOCK.asItem(), of(TagContent.STEEL_INGOTS), of(Blocks.STONE.asItem()), of(ConventionalItemTags.COPPER_INGOTS), 2, "plating");
-        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.STEEL_INGOTS).input(ConventionalItemTags.COPPER_INGOTS).input(TagContent.PLASTIC_PLATES).result(BlockContent.MACHINE_PLATING_BLOCK.asItem(), 8).export(exporter, "plating");
+        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.STEEL_INGOTS).input(ConventionalItemTags.COPPER_INGOTS).input(TagContent.PLASTIC_PLATES).result(BlockContent.MACHINE_PLATING_BLOCK.asItem(), 8).timeMultiplier(0.8f).export(exporter, "plating");
         offerMachinePlatingRecipe(exporter, BlockContent.IRON_PLATING_BLOCK.asItem(), of(TagContent.STEEL_INGOTS), of(Blocks.STONE.asItem()), of(ConventionalItemTags.IRON_INGOTS), 2, "iron");
-        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.STEEL_INGOTS).input(ConventionalItemTags.IRON_INGOTS).input(TagContent.PLASTIC_PLATES).result(BlockContent.IRON_PLATING_BLOCK.asItem(), 8).export(exporter, "platingiron");
+        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.STEEL_INGOTS).input(ConventionalItemTags.IRON_INGOTS).input(TagContent.PLASTIC_PLATES).result(BlockContent.IRON_PLATING_BLOCK.asItem(), 8).timeMultiplier(0.8f).export(exporter, "platingiron");
         offerMachinePlatingRecipe(exporter, BlockContent.NICKEL_PLATING_BLOCK.asItem(), of(TagContent.STEEL_INGOTS), of(Blocks.STONE.asItem()), of(TagContent.NICKEL_INGOTS), 2, "nickel");
-        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.STEEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(TagContent.PLASTIC_PLATES).result(BlockContent.NICKEL_PLATING_BLOCK.asItem(), 8).export(exporter, "platingnickel");
+        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.STEEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(TagContent.PLASTIC_PLATES).result(BlockContent.NICKEL_PLATING_BLOCK.asItem(), 8).timeMultiplier(0.8f).export(exporter, "platingnickel");
         
         // basic battery
         offerMotorRecipe(exporter, ItemContent.BASIC_BATTERY, of(TagContent.STEEL_INGOTS), of(TagContent.ELECTRUM_INGOTS), of(TagContent.PLASTIC_PLATES), "manualbattery");
-        AssemblerRecipeBuilder.build().input(TagContent.PLASTIC_PLATES).input(TagContent.ELECTRUM_INGOTS).input(TagContent.ELECTRUM_INGOTS).input(TagContent.STEEL_INGOTS).result(ItemContent.BASIC_BATTERY).timeMultiplier(0.5f).export(exporter, "battery");
-        AssemblerRecipeBuilder.build().input(TagContent.PLASTIC_PLATES).input(ItemContent.FLUXITE).input(ItemContent.FLUXITE).input(TagContent.STEEL_INGOTS).result(ItemContent.BASIC_BATTERY, 2).export(exporter, "batterybetter");
+        AssemblerRecipeBuilder.build().input(TagContent.PLASTIC_PLATES).input(TagContent.ELECTRUM_INGOTS).input(TagContent.ELECTRUM_INGOTS).input(TagContent.STEEL_INGOTS).result(ItemContent.BASIC_BATTERY).timeMultiplier(0.4f).export(exporter, "battery");
+        AssemblerRecipeBuilder.build().input(TagContent.PLASTIC_PLATES).input(ItemContent.FLUXITE).input(ItemContent.FLUXITE).input(TagContent.STEEL_INGOTS).result(ItemContent.BASIC_BATTERY, 2).timeMultiplier(0.8f).export(exporter, "batterybetter");
         
         // silicon
         offerManualAlloyRecipe(exporter, ItemContent.RAW_SILICON, of(TagContent.QUARTZ_DUSTS), of(ItemTags.SAND), 3, "rawsilicon");
@@ -480,21 +480,21 @@ public class RecipeGenerator extends FabricRecipeProvider {
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.SOLID_BIOFUEL).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_biomass");
         CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOFUEL_BLOCK).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_bioblock");
-        CentrifugeFluidRecipeBuilder.build().input(ItemTags.SAND).result(ItemContent.POLYMER_RESIN).fluidInput(FluidContent.STILL_OIL.get(), 0.1f).export(exporter, "polymerresin");
+        CentrifugeFluidRecipeBuilder.build().input(ItemTags.SAND).result(ItemContent.POLYMER_RESIN).fluidInput(FluidContent.STILL_OIL.get(), 0.1f).time(100).export(exporter, "polymerresin");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).result(ItemContent.PLASTIC_SHEET).fluidInput(Fluids.WATER, 0.5f).export(exporter, "plasticoil");
-        CentrifugeFluidRecipeBuilder.build().input(ItemContent.POLYMER_RESIN).result(ItemContent.PLASTIC_SHEET).fluidInput(Fluids.WATER, 0.5f).export(exporter, "plasticbio");
+        CentrifugeFluidRecipeBuilder.build().input(ItemContent.POLYMER_RESIN).result(ItemContent.PLASTIC_SHEET).fluidInput(Fluids.WATER, 0.5f).time(66).export(exporter, "plasticbio");
         
         // processing unit
-        AssemblerRecipeBuilder.build().input(TagContent.PLASTIC_PLATES).input(TagContent.CARBON_FIBRE).input(TagContent.ELECTRUM_INGOTS).input(ConventionalItemTags.REDSTONE_DUSTS).result(ItemContent.PROCESSING_UNIT).export(exporter, "processingunit");
+        AssemblerRecipeBuilder.build().input(TagContent.PLASTIC_PLATES).input(TagContent.CARBON_FIBRE).input(TagContent.ELECTRUM_INGOTS).input(ConventionalItemTags.REDSTONE_DUSTS).result(ItemContent.PROCESSING_UNIT).timeMultiplier(0.8f).export(exporter, "processingunit");
         // enderic lens
-        AssemblerRecipeBuilder.build().input(ItemContent.ADAMANT_INGOT).input(TagContent.CARBON_FIBRE).input(ItemContent.ENDERIC_COMPOUND).input(ItemContent.ENDERIC_COMPOUND).result(ItemContent.ENDERIC_LENS).timeMultiplier(1.5f).export(exporter, "enderlens");
+        AssemblerRecipeBuilder.build().input(ItemContent.ADAMANT_INGOT).input(TagContent.CARBON_FIBRE).input(ItemContent.ENDERIC_COMPOUND).input(ItemContent.ENDERIC_COMPOUND).result(ItemContent.ENDERIC_LENS).timeMultiplier(1.2f).export(exporter, "enderlens");
         // flux gate
-        AssemblerRecipeBuilder.build().input(ItemContent.PROCESSING_UNIT).input(ItemContent.FLUXITE).input(ItemContent.FLUXITE).input(TagContent.PLATINUM_INGOTS).result(ItemContent.FLUX_GATE).timeMultiplier(1.5f).export(exporter, "fluxgate");
+        AssemblerRecipeBuilder.build().input(ItemContent.PROCESSING_UNIT).input(ItemContent.FLUXITE).input(ItemContent.FLUXITE).input(TagContent.PLATINUM_INGOTS).result(ItemContent.FLUX_GATE).timeMultiplier(1.2f).export(exporter, "fluxgate");
         
         // ai processor tree
-        AtomicForgeRecipeBuilder.build().input(TagContent.SILICON).input(TagContent.CARBON_FIBRE).result(ItemContent.SILICON_WAFER).time(5).export(exporter, "wafer");
-        AtomicForgeRecipeBuilder.build().input(ItemContent.SILICON_WAFER).input(ItemContent.PROCESSING_UNIT).result(ItemContent.ADVANCED_COMPUTING_ENGINE).time(5).export(exporter, "advcomputer");
-        AtomicForgeRecipeBuilder.build().input(ItemContent.ADVANCED_COMPUTING_ENGINE).input(ItemContent.DURATIUM_INGOT).result(ItemContent.SUPER_AI_CHIP).time(50).export(exporter, "aicomputer");
+        AtomicForgeRecipeBuilder.build().input(TagContent.CARBON_FIBRE).input(TagContent.SILICON).input(TagContent.SILICON).result(ItemContent.SILICON_WAFER).time(5).export(exporter, "wafer");
+        AtomicForgeRecipeBuilder.build().input(ItemContent.PROCESSING_UNIT).input(ItemContent.SILICON_WAFER).input(ItemContent.SILICON_WAFER).result(ItemContent.ADVANCED_COMPUTING_ENGINE).time(5).export(exporter, "advcomputer");
+        AtomicForgeRecipeBuilder.build().input(ItemContent.DURATIUM_INGOT).input(ItemContent.ADVANCED_COMPUTING_ENGINE).input(ItemContent.ADVANCED_COMPUTING_ENGINE).result(ItemContent.SUPER_AI_CHIP).time(50).export(exporter, "aicomputer");
         
         // dubios container
         offerMotorRecipe(exporter, ItemContent.DUBIOS_CONTAINER, of(TagContent.PLASTIC_PLATES), of(ItemContent.ADAMANT_INGOT), of(ItemContent.ENDERIC_COMPOUND), "dubios");
@@ -504,17 +504,17 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // fuel
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(FluidContent.STILL_OIL.get()).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(FluidContent.STILL_BIOFUEL.get()).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel_from_biofuel");
-        CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOFUEL).fluidOutput(FluidContent.STILL_BIOFUEL.get(), 0.1f).export(exporter, "biofuel");
+        CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOFUEL).fluidOutput(FluidContent.STILL_BIOFUEL.get(), 0.1f).timeMultiplier(0.2f).export(exporter, "biofuel");
         
         // biosteel
         FoundryRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).input(ConventionalItemTags.IRON_INGOTS).result(ItemContent.BIOSTEEL_INGOT).export(exporter, "biosteel");
         
         // endgame components
-        AtomicForgeRecipeBuilder.build().input(ItemContent.ADAMANT_INGOT).input(ItemContent.SUPER_AI_CHIP).result(ItemContent.HEISENBERG_COMPENSATOR).time(60).export(exporter, "compensator");
-        AtomicForgeRecipeBuilder.build().input(ItemContent.ADAMANT_INGOT).input(ItemContent.UNHOLY_INTELLIGENCE).result(ItemContent.HEISENBERG_COMPENSATOR).time(60).export(exporter, "compensatoralt");
+        AtomicForgeRecipeBuilder.build().input(ItemContent.SUPER_AI_CHIP).input(ItemContent.ADAMANT_INGOT).input(ItemContent.ADAMANT_INGOT).result(ItemContent.HEISENBERG_COMPENSATOR).time(60).export(exporter, "compensator");
+        AtomicForgeRecipeBuilder.build().input(ItemContent.UNHOLY_INTELLIGENCE).input(ItemContent.ADAMANT_INGOT).input(ItemContent.ADAMANT_INGOT).result(ItemContent.HEISENBERG_COMPENSATOR).time(60).export(exporter, "compensatoralt");
         offerMotorRecipe(exporter, ItemContent.OVERCHARGED_CRYSTAL, of(Items.AMETHYST_BLOCK), of(ItemContent.ADVANCED_BATTERY), of(BlockContent.SUPERCONDUCTOR.asItem()), "overchargedcrystal");
-        AssemblerRecipeBuilder.build().input(ItemContent.FLUX_GATE).input(TagContent.WIRES).input(ItemContent.DUBIOS_CONTAINER).input(ItemContent.ENERGITE_INGOT).result(BlockContent.SUPERCONDUCTOR.asItem(), 3).timeMultiplier(2f).export(exporter, "superconductor");
-        AtomicForgeRecipeBuilder.build().input(ItemContent.OVERCHARGED_CRYSTAL).input(ItemContent.HEISENBERG_COMPENSATOR).result(ItemContent.PROMETHEUM_INGOT).time(240).export(exporter, "prometheum");
+        AssemblerRecipeBuilder.build().input(ItemContent.FLUX_GATE).input(TagContent.WIRES).input(ItemContent.DUBIOS_CONTAINER).input(ItemContent.ENERGITE_INGOT).result(BlockContent.SUPERCONDUCTOR.asItem(), 3).timeMultiplier(1.6f).export(exporter, "superconductor");
+        AtomicForgeRecipeBuilder.build().input(ItemContent.HEISENBERG_COMPENSATOR).input(ItemContent.OVERCHARGED_CRYSTAL).input(ItemContent.OVERCHARGED_CRYSTAL).result(ItemContent.PROMETHEUM_INGOT).time(240).export(exporter, "prometheum");
         
         // ice in cooler
         CoolerRecipeBuilder.build().fluidInput(Fluids.WATER).result(Items.ICE, 3).export(exporter, "ice");
@@ -713,18 +713,18 @@ public class RecipeGenerator extends FabricRecipeProvider {
         PulverizerRecipeBuilder.build().input(TagContent.URANIUM_RAW_MATERIALS).result(ItemContent.URANIUM_DUST, 2).export(exporter, "uranium");
         
         // uranium gem from raw uranium / uranium dust in atomic forge
-        AtomicForgeRecipeBuilder.build().input(TagContent.URANIUM_RAW_MATERIALS).input(TagContent.COPPER_DUSTS).result(ItemContent.URANIUM_GEM, 5).export(exporter, "urandust");
-        AtomicForgeRecipeBuilder.build().input(TagContent.URANIUM_DUSTS).input(TagContent.COPPER_DUSTS).result(ItemContent.URANIUM_GEM, 5).export(exporter, "urandustgem");
+        AtomicForgeRecipeBuilder.build().input(TagContent.COPPER_DUSTS).input(TagContent.URANIUM_RAW_MATERIALS).input(TagContent.URANIUM_RAW_MATERIALS).result(ItemContent.URANIUM_GEM).time(5).export(exporter, "urandust");
+        AtomicForgeRecipeBuilder.build().input(TagContent.COPPER_DUSTS).input(TagContent.URANIUM_DUSTS).input(TagContent.URANIUM_DUSTS).result(ItemContent.URANIUM_GEM).time(5).export(exporter, "urandustgem");
         
         // uranium pellets in assembler
-        AssemblerRecipeBuilder.build().input(ItemContent.URANIUM_GEM).input(ItemContent.URANIUM_GEM).input(TagContent.PLASTIC_PLATES).input(TagContent.NICKEL_INGOTS).result(ItemContent.URANIUM_PELLET, 2).export(exporter, "uranpelletbasic");
-        AssemblerRecipeBuilder.build().input(ItemContent.URANIUM_GEM).input(ItemContent.URANIUM_GEM).input(TagContent.PLASTIC_PLATES).input(ItemContent.ADAMANT_INGOT).result(ItemContent.URANIUM_PELLET, 3).export(exporter, "uranpelletbetter");
-        AssemblerRecipeBuilder.build().input(ItemContent.URANIUM_GEM).input(ItemContent.URANIUM_GEM).input(TagContent.PLASTIC_PLATES).input(ItemContent.DURATIUM_INGOT).result(ItemContent.URANIUM_PELLET, 4).export(exporter, "uranpelletult");
+        AssemblerRecipeBuilder.build().input(ItemContent.URANIUM_GEM).input(ItemContent.URANIUM_GEM).input(TagContent.PLASTIC_PLATES).input(TagContent.NICKEL_INGOTS).result(ItemContent.URANIUM_PELLET, 2).timeMultiplier(0.8f).export(exporter, "uranpelletbasic");
+        AssemblerRecipeBuilder.build().input(ItemContent.URANIUM_GEM).input(ItemContent.URANIUM_GEM).input(TagContent.PLASTIC_PLATES).input(ItemContent.ADAMANT_INGOT).result(ItemContent.URANIUM_PELLET, 3).timeMultiplier(0.8f).export(exporter, "uranpelletbetter");
+        AssemblerRecipeBuilder.build().input(ItemContent.URANIUM_GEM).input(ItemContent.URANIUM_GEM).input(TagContent.PLASTIC_PLATES).input(ItemContent.DURATIUM_INGOT).result(ItemContent.URANIUM_PELLET, 4).timeMultiplier(0.8f).export(exporter, "uranpelletult");
         
         // plutonium pellets in assembler
-        AssemblerRecipeBuilder.build().input(ItemContent.PLUTONIUM_DUST).input(ItemContent.PLUTONIUM_DUST).input(TagContent.PLASTIC_PLATES).input(TagContent.NICKEL_INGOTS).result(ItemContent.PLUTONIUM_PELLET, 2).export(exporter, "plutoniumpelletbasic");
-        AssemblerRecipeBuilder.build().input(ItemContent.PLUTONIUM_DUST).input(ItemContent.PLUTONIUM_DUST).input(TagContent.PLASTIC_PLATES).input(ItemContent.ADAMANT_INGOT).result(ItemContent.PLUTONIUM_PELLET, 3).export(exporter, "plutoniumpelletbetter");
-        AssemblerRecipeBuilder.build().input(ItemContent.PLUTONIUM_DUST).input(ItemContent.PLUTONIUM_DUST).input(TagContent.PLASTIC_PLATES).input(ItemContent.DURATIUM_INGOT).result(ItemContent.PLUTONIUM_PELLET, 4).export(exporter, "plutoniumpelletult");
+        AssemblerRecipeBuilder.build().input(ItemContent.PLUTONIUM_DUST).input(ItemContent.PLUTONIUM_DUST).input(TagContent.PLASTIC_PLATES).input(TagContent.NICKEL_INGOTS).result(ItemContent.PLUTONIUM_PELLET, 2).timeMultiplier(0.8f).export(exporter, "plutoniumpelletbasic");
+        AssemblerRecipeBuilder.build().input(ItemContent.PLUTONIUM_DUST).input(ItemContent.PLUTONIUM_DUST).input(TagContent.PLASTIC_PLATES).input(ItemContent.ADAMANT_INGOT).result(ItemContent.PLUTONIUM_PELLET, 3).timeMultiplier(0.8f).export(exporter, "plutoniumpelletbetter");
+        AssemblerRecipeBuilder.build().input(ItemContent.PLUTONIUM_DUST).input(ItemContent.PLUTONIUM_DUST).input(TagContent.PLASTIC_PLATES).input(ItemContent.DURATIUM_INGOT).result(ItemContent.PLUTONIUM_PELLET, 4).timeMultiplier(0.8f).export(exporter, "plutoniumpelletult");
         
         // dust compacting
         addCompactingRecipe(exporter, ItemContent.URANIUM_DUST, ItemContent.SMALL_URANIUM_DUST, of(ItemContent.SMALL_URANIUM_DUST), of(TagContent.URANIUM_DUSTS));
@@ -982,7 +982,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
             .export(exporter, "gravity");
         
         AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.FLUX_GATE)
+            .researchCost(ItemContent.FLUX_GATE, 64)
             .researchCost(Items.WIND_CHARGE, 16)
             .researchCost(ItemContent.PROMETHEUM_INGOT, 16)
             .researchCost(ItemContent.PLUTONIUM_PELLET, 32)
@@ -1087,7 +1087,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         // reactor plating: steel and machine plating in crafting table / assembler
         offerMachinePlatingRecipe(exporter, BlockContent.REACTOR_WALL.asItem(), of(TagContent.MACHINE_PLATING), of(TagContent.STEEL_INGOTS), of(TagContent.NICKEL_INGOTS), 4, "reactorplatingcrafting");
-        AssemblerRecipeBuilder.build().input(TagContent.MACHINE_PLATING).input(TagContent.MACHINE_PLATING).input(TagContent.STEEL_INGOTS).input(TagContent.NICKEL_INGOTS).result(BlockContent.REACTOR_WALL.asItem(), 3).export(exporter, "reactorplatingalt");
+        AssemblerRecipeBuilder.build().input(TagContent.MACHINE_PLATING).input(TagContent.MACHINE_PLATING).input(TagContent.STEEL_INGOTS).input(TagContent.NICKEL_INGOTS).result(BlockContent.REACTOR_WALL.asItem(), 3).timeMultiplier(0.8f).export(exporter, "reactorplatingalt");
         
         // neutron reflectors: expensive, needs duratium core, adamant frame and reactor walls
         offerMachinePlatingRecipe(exporter, BlockContent.REACTOR_REFLECTOR.asItem(), of(BlockContent.REACTOR_WALL), of(ItemContent.ADAMANT_INGOT), of(ItemContent.DURATIUM_INGOT), 1, "reflector");

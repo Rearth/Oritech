@@ -6,7 +6,7 @@ import rearth.oritech.init.recipes.RecipeContent;
 public class ReactorGeneratorRecipeBuilder extends OritechRecipeBuilder {
 
     protected ReactorGeneratorRecipeBuilder() {
-        super(RecipeContent.BIO_GENERATOR, "reactorgen");
+        super(RecipeContent.REACTOR, "reactorgen");
     }
 
     public static OritechRecipeBuilder build() {

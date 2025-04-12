@@ -3,12 +3,15 @@ package rearth.oritech.fabricgen.datagen;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.TagContent;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
@@ -22,7 +25,11 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
         
         var pickaxeBuilder = getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE);
         
-        for (var block : BlockContent.autoRegisteredDrops) {
+        // sort auto registered drops before writing to pickaxe.json to keep pickaxe.json
+        // from being changed every time datagen is run.
+        var blockDrops = new ArrayList<Block>(BlockContent.autoRegisteredDrops);
+        Collections.sort(blockDrops, (b1, b2) -> b1.toString().compareTo(b2.toString()));
+        for (var block : blockDrops) {
             pickaxeBuilder.add(block);
         }
         pickaxeBuilder.add(BlockContent.ENERGY_PIPE_CONNECTION);

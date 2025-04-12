@@ -6,10 +6,13 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
+      "item": "oritech:super_ai_chip"
+    },
+    {
       "item": "oritech:adamant_ingot"
     },
     {
-      "item": "oritech:super_ai_chip"
+      "item": "oritech:adamant_ingot"
     }
   ],
   "results": [

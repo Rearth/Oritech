@@ -1,5 +1,5 @@
 {
-  "type": "oritech:deep_drill",
+  "type": "oritech:laser",
   "fluidInputAmount": 0,
   "fluidInputVariant": "minecraft:empty",
   "fluidOutputAmount": 0,
@@ -15,5 +15,5 @@
       "id": "oritech:fluxite"
     }
   ],
-  "time": 200
+  "time": 1
 }

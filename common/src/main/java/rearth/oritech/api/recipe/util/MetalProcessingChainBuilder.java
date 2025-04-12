@@ -5,7 +5,6 @@ import net.minecraft.data.server.recipe.RecipeProvider;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.tag.TagKey;
@@ -16,10 +15,6 @@ import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
 import rearth.oritech.api.recipe.FoundryRecipeBuilder;
 import rearth.oritech.api.recipe.GrinderRecipeBuilder;
 import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
-import rearth.oritech.api.recipe.util.RecipeHelpers;
-
-// remove ASAP
-// import static rearth.oritech.util.datagen.RecipeGeneratorUtil.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -254,7 +249,7 @@ public class MetalProcessingChainBuilder {
             PulverizerRecipeBuilder.build()
                 .input(rawOreIngredient)
                 .result(dustItem)
-                .result(firstNonNullOptional(smallDustItem, nuggetItem))
+                .result(firstNonNullOptional(smallDustItem, nuggetItem), 3)
                 .timeMultiplier(timeMultiplier)
                 .export(exporter, resourcePath + "raw/" + metalName);
         }
@@ -264,7 +259,7 @@ public class MetalProcessingChainBuilder {
             GrinderRecipeBuilder.build()
                 .input(rawOreIngredient)
                 .result(firstNonNull(clumpItem, dustItem))
-                .result(firstNonNullOptional(smallClumpItem, smallDustItem, nuggetItem))
+                .result(firstNonNullOptional(smallClumpItem, smallDustItem, nuggetItem), 3)
                 .result(Optional.fromNullable(clumpByproduct), byproductAmount)
                 .timeMultiplier(timeMultiplier)
                 .export(exporter, resourcePath + "raw/" + metalName);
@@ -282,17 +277,17 @@ public class MetalProcessingChainBuilder {
                 .input(clumpIngredient)
                 .fluidInput(Fluids.WATER)
                 .result(firstNonNull(centrifugeResult, gemItem), 2)
-                .timeMultiplier(timeMultiplier)
+                .timeMultiplier(timeMultiplier * 1.5f)
                 .export(exporter, resourcePath + "clump/" + metalName);
         }
 
         // gems to dust (doubling)
         if (gemIngredient != null) {
             // atomic forge: 1 gem -> 2 ingots
-            AtomicForgeRecipeBuilder.build().input(gemCatalyst).input(gemIngredient).result(dustItem, 2).time(20).export(exporter, resourcePath + "dust/" + metalName);
+            AtomicForgeRecipeBuilder.build().input(gemIngredient).input(gemCatalyst).input(gemCatalyst).result(dustItem, 2).time(20).export(exporter, resourcePath + "dust/" + metalName);
 
             // foundry alternative: 2 gems -> 3 ingots
-            FoundryRecipeBuilder.build().input(gemIngredient).input(gemIngredient).result(ingotItem, 3).timeMultiplier(timeMultiplier).export(exporter, resourcePath + "gem/" + metalName);
+            FoundryRecipeBuilder.build().input(gemIngredient).input(gemIngredient).result(ingotItem, 3).export(exporter, resourcePath + "gem/" + metalName);
         }
 
         // ingots/nuggets to dust

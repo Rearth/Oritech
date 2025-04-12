@@ -9,7 +9,6 @@ import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.processing.recipe.HeatCondition;

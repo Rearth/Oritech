@@ -6,7 +6,9 @@ import rearth.oritech.init.recipes.RecipeContent;
 public class LaserRecipeBuilder extends OritechRecipeBuilder {
 
     protected LaserRecipeBuilder() {
-        super(RecipeContent.DEEP_DRILL, "laser");
+        super(RecipeContent.LASER, "laser");
+        // Set the default time for laser recipes
+        this.time = 1;
     }
 
     public static OritechRecipeBuilder build() {

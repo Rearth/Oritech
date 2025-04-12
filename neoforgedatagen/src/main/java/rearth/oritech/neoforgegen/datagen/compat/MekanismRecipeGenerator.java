@@ -7,7 +7,6 @@ import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.api.recipe.util.RecipeHelpers;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 
 import mekanism.api.datagen.recipe.builder.ItemStackChemicalToItemStackRecipeBuilder;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;

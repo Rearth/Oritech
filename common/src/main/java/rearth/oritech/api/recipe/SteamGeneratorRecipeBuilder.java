@@ -6,7 +6,7 @@ import rearth.oritech.init.recipes.RecipeContent;
 public class SteamGeneratorRecipeBuilder extends OritechRecipeBuilder {
 
     protected SteamGeneratorRecipeBuilder() {
-        super(RecipeContent.BIO_GENERATOR, "steamgen");
+        super(RecipeContent.STEAM_ENGINE, "steamgen");
     }
 
     public static OritechRecipeBuilder build() {

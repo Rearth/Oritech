@@ -1,7 +1,5 @@
 package rearth.oritech.api.recipe;
 
-import java.util.List;
-
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.util.Identifier;
@@ -29,15 +27,17 @@ public class FoundryRecipeBuilder extends OritechRecipeBuilder {
     @Override
     public void export(RecipeExporter exporter, String suffix) {
         super.export(exporter, suffix);
-        exporter.accept(
-            Oritech.id(resourcePath + "/inverse/" + suffix),
-            new OritechRecipe(
-                (int)(time * timeMultiplier),
-                inputs != null ? inputs.reversed() : List.of(),
-                results != null ? results : List.of(),
-                type,
-                fluidInput != null ? fluidInput : FluidStack.empty(),
-                fluidOutput != null ? fluidOutput : FluidStack.empty()),
-            null);
+        if (!inputs.get(0).equals(inputs.get(1))) {
+            exporter.accept(
+                Oritech.id(resourcePath + "/inverse/" + suffix),
+                new OritechRecipe(
+                    (int)(time * timeMultiplier),
+                    inputs.reversed(),
+                    results,
+                    type,
+                    fluidInput != null ? fluidInput : FluidStack.empty(),
+                    fluidOutput != null ? fluidOutput : FluidStack.empty()),
+                null);
+        }
     }    
 }

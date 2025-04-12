@@ -6,7 +6,7 @@ import rearth.oritech.init.recipes.RecipeContent;
 public class ParticleCollisionRecipeBuilder extends OritechRecipeBuilder {
 
     protected ParticleCollisionRecipeBuilder() {
-        super(RecipeContent.BIO_GENERATOR, "particle");
+        super(RecipeContent.PARTICLE_COLLISION, "particle");
     }
 
     public static OritechRecipeBuilder build() {

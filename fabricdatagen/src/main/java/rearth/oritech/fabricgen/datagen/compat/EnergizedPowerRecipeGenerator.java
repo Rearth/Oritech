@@ -15,7 +15,6 @@ import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 
 import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 

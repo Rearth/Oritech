@@ -6,7 +6,7 @@ import rearth.oritech.init.recipes.RecipeContent;
 public class LavaGeneratorRecipeBuilder extends OritechRecipeBuilder {
 
     protected LavaGeneratorRecipeBuilder() {
-        super(RecipeContent.BIO_GENERATOR, "lavagen");
+        super(RecipeContent.LAVA_GENERATOR, "lavagen");
     }
 
     public static OritechRecipeBuilder build() {

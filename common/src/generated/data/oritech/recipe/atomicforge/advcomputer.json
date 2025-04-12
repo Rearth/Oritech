@@ -6,10 +6,13 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
+      "item": "oritech:processing_unit"
+    },
+    {
       "item": "oritech:silicon_wafer"
     },
     {
-      "item": "oritech:processing_unit"
+      "item": "oritech:silicon_wafer"
     }
   ],
   "results": [

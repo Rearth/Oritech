@@ -6,10 +6,13 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
+      "item": "oritech:heisenberg_compensator"
+    },
+    {
       "item": "oritech:overcharged_crystal"
     },
     {
-      "item": "oritech:heisenberg_compensator"
+      "item": "oritech:overcharged_crystal"
     }
   ],
   "results": [

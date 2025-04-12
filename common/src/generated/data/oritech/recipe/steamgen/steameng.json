@@ -1,5 +1,5 @@
 {
-  "type": "oritech:bio_generator",
+  "type": "oritech:steam_engine",
   "fluidInputAmount": 81000,
   "fluidInputVariant": "oritech:still_steam",
   "fluidOutputAmount": 0,
