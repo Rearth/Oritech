@@ -7,12 +7,16 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.base.Optional;
 
 import dev.architectury.fluid.FluidStack;
 
@@ -24,11 +28,20 @@ public abstract class OritechRecipeBuilder {
     protected FluidStack fluidInput;
     protected FluidStack fluidOutput;
     protected int time = 200;
+    protected float timeMultiplier = 1f;
+    protected boolean addToGrinder;
     private final String resourcePath;
 
     protected OritechRecipeBuilder(OritechRecipeType type, String resourcePath) {
         this.type = type;
         this.resourcePath = resourcePath;
+    }
+
+    public OritechRecipeBuilder input(List<Ingredient> in) {
+        if (inputs == null)
+            inputs = new ArrayList<>();
+        inputs.addAll(in);
+        return this;
     }
 
     public OritechRecipeBuilder input(Ingredient in) {
@@ -38,7 +51,7 @@ public abstract class OritechRecipeBuilder {
         return this;
     }
 
-    public OritechRecipeBuilder input(Item in) {
+    public OritechRecipeBuilder input(ItemConvertible in) {
         return input(Ingredient.ofItems(in));
     }
 
@@ -79,12 +92,29 @@ public abstract class OritechRecipeBuilder {
         return this;
     }
 
+    public OritechRecipeBuilder result(List<ItemStack> out) {
+        if (results == null)
+            results = new ArrayList<>();
+        results.addAll(out);
+        return this;
+    }
+
     public OritechRecipeBuilder result(Item out, int count) {
 
         return result(new ItemStack(out, count));
     }
 
     public OritechRecipeBuilder result(Item out) {
+        return result(out, 1);
+    }
+
+    public OritechRecipeBuilder result(Optional<Item> out, int count) {
+        if (out.isPresent())
+            return result(out.get(), count);
+        return this;
+    }
+
+    public OritechRecipeBuilder result(Optional<Item> out) {
         return result(out, 1);
     }
 
@@ -97,14 +127,25 @@ public abstract class OritechRecipeBuilder {
         return time(time * 20);
     }
 
-    public abstract void validate() throws IllegalStateException;
+    public OritechRecipeBuilder timeMultiplier(float timeMultiplier) {
+        this.timeMultiplier = timeMultiplier;
+        return this;
+    }
+
+    public OritechRecipeBuilder addToGrinder() {
+        this.addToGrinder = true;
+        return this;
+    }
+
+    public abstract void validate(Identifier id) throws IllegalStateException;
 
     public void export(RecipeExporter exporter, String suffix) {
-        validate();
+        var id = Oritech.id(resourcePath + "/" + suffix);
+        validate(id);
         exporter.accept(
-            Oritech.id(resourcePath + "/" + suffix),
+            id,
             new OritechRecipe(
-                time,
+                (int)(time * timeMultiplier),
                 inputs != null ? inputs : List.of(),
                 results != null ? results : List.of(),
                 type,

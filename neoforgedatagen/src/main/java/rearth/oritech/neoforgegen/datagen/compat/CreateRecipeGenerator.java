@@ -1,7 +1,11 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
 import rearth.oritech.Oritech;
-import rearth.oritech.api.recipe.OreTransform;
+import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
+import rearth.oritech.api.recipe.FoundryRecipeBuilder;
+import rearth.oritech.api.recipe.GrinderRecipeBuilder;
+import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
+import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
@@ -34,6 +38,8 @@ import java.util.concurrent.CompletableFuture;
 import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
 
 public class CreateRecipeGenerator {
+    private static final String PATH = "compat/create/";
+
     public static void generateRecipes(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries, RecipeOutput exporter) { 
         addAlloying(exporter);
         addBlasting(exporter);
@@ -47,7 +53,7 @@ public class CreateRecipeGenerator {
     }
 
     private static void addAlloying(RecipeOutput exporter) {
-        RecipeGeneratorUtil.addAlloyRecipe(exporter, of(Tags.Items.INGOTS_COPPER), of(AllItems.ZINC_INGOT.asItem()), AllItems.BRASS_INGOT.asItem(), 2, "compat/create/brass");
+        FoundryRecipeBuilder.build().input(Tags.Items.INGOTS_COPPER).input(AllItems.ZINC_INGOT.asItem()).result(AllItems.BRASS_INGOT.asItem(), 2).export(exporter, "compat/create/brass");
     }
 
     // Create lets you blast other crushed ores, so add that for Oritech ores
@@ -59,33 +65,27 @@ public class CreateRecipeGenerator {
     private static void offerBlasting(RecipeOutput exporter, Item input, Item result, float xp, int cookTime, String suffix) {
         SimpleCookingRecipeBuilder.blasting(of(input), RecipeCategory.MISC, result, xp, cookTime)
             .unlockedBy(RecipeProvider.getHasName(input), RecipeProvider.has(input))
-            .save(exporter, ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "blasting/compat/create/" + suffix));
+            .save(exporter, ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "blasting/" + PATH + suffix));
     }
 
     private static void addCentrifuging(RecipeOutput exporter) {
-        RecipeGeneratorUtil.addCentrifugeFluidRecipe(exporter, of(AllItems.WHEAT_FLOUR.asItem()), AllItems.DOUGH.asItem(), Fluids.WATER, 1, null, 0, 1f, "compat/create/dough");
+        CentrifugeFluidRecipeBuilder.build().input(AllItems.WHEAT_FLOUR.asItem()).result(AllItems.DOUGH.asItem()).fluidInput(Fluids.WATER).export(exporter, PATH + "dough");
     }
 
     private static void addMetalProcessing(RecipeOutput exporter) {
-        var zinc = new OreTransform(
-            of(TagContent.ZINC_ORES),
-            of(TagContent.ZINC_RAW_MATERIALS), AllItems.RAW_ZINC.asItem(), Items.GUNPOWDER,
-            of(TagContent.ZINC_CLUMPS), AllItems.CRUSHED_ZINC.asItem(),
-            null, null, null,
-            null, null,
-            null, null, null,
-            null, null,
-            null,
-            of(TagContent.ZINC_NUGGETS), AllItems.ZINC_NUGGET.asItem(),
-            of(TagContent.ZINC_INGOTS), AllItems.ZINC_INGOT.asItem(),
-            1f, "zinc", 0, false);
-
-            RecipeGeneratorUtil.addMetalProcessingChain(exporter, zinc);
+        MetalProcessingChainBuilder.build("zinc").resourcePath(PATH)
+            .ore(TagContent.ZINC_ORES)
+            .rawOre(TagContent.ZINC_RAW_MATERIALS, AllItems.RAW_ZINC.asItem()).rawOreByproduct(Items.GUNPOWDER)
+            .ingot(TagContent.ZINC_INGOTS, AllItems.ZINC_INGOT.asItem())
+            .nugget(TagContent.ZINC_NUGGETS, AllItems.ZINC_NUGGET.asItem())
+            .clump(TagContent.ZINC_CLUMPS, AllItems.CRUSHED_ZINC.asItem()).clumpByproduct(Items.GUNPOWDER).byproductAmount(1)
+            .centrifugeResult(AllItems.ZINC_NUGGET.asItem(), 9)
+            .export(exporter);
     }
 
     private static void addPulverizing(RecipeOutput exporter) {
-        RecipeGeneratorUtil.addPulverizerRecipe(exporter, of(Tags.Items.CROPS_WHEAT), AllItems.WHEAT_FLOUR.asItem(), "compat/create/wheat_flour");
-        RecipeGeneratorUtil.addGrinderRecipe(exporter, of(Tags.Items.CROPS_WHEAT), AllItems.WHEAT_FLOUR.asItem(), "compat/create/wheat_flour");
+        PulverizerRecipeBuilder.build().input(Tags.Items.CROPS_WHEAT).result(AllItems.WHEAT_FLOUR.asItem()).export(exporter, PATH + "wheat_flour");
+        GrinderRecipeBuilder.build().input(Tags.Items.CROPS_WHEAT).result(AllItems.WHEAT_FLOUR.asItem()).export(exporter, PATH + "wheat_flour");
     }
 
     private static class CreateCrushingRecipeGen extends CrushingRecipeGen {

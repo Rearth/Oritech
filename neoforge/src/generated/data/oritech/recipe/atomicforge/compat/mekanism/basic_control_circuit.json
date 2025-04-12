@@ -12,13 +12,10 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
+      "tag": "c:dusts/redstone"
+    },
+    {
       "tag": "c:ingots/osmium"
-    },
-    {
-      "tag": "c:dusts/redstone"
-    },
-    {
-      "tag": "c:dusts/redstone"
     }
   ],
   "results": [

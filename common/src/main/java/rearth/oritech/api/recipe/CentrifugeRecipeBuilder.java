@@ -1,5 +1,6 @@
 package rearth.oritech.api.recipe;
 
+import net.minecraft.util.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class CentrifugeRecipeBuilder extends OritechRecipeBuilder {
@@ -13,10 +14,10 @@ public class CentrifugeRecipeBuilder extends OritechRecipeBuilder {
     }
 
     @Override
-    public void validate() throws IllegalStateException {
-        if ((this.inputs == null || this.inputs.isEmpty()) || (this.results == null || this.results.isEmpty()))
-            throw new IllegalStateException("inputs and results are required for recipe type " + this.type);
-        if (this.inputs.size() > 1)
-            throw new IllegalStateException("too many inputs for recipe type " + this.type);
+    public void validate(Identifier id) throws IllegalStateException {
+        if ((inputs == null || inputs.isEmpty()) || (results == null || results.isEmpty()))
+            throw new IllegalStateException("inputs and results are required for recipe " + id + " (type " + type + ")");
+        if (inputs.size() > 1)
+            throw new IllegalStateException("too many inputs for recipe " + id + " (type " + type + ")");
     }
 }

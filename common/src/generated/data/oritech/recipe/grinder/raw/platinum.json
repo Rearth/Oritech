@@ -15,7 +15,7 @@
       "id": "oritech:platinum_clump"
     },
     {
-      "count": 3,
+      "count": 1,
       "id": "oritech:small_platinum_clump"
     },
     {
@@ -23,5 +23,5 @@
       "id": "oritech:fluxite"
     }
   ],
-  "time": 210
+  "time": 300
 }

@@ -15,7 +15,7 @@
       "id": "oritech:iron_clump"
     },
     {
-      "count": 3,
+      "count": 1,
       "id": "oritech:small_iron_clump"
     },
     {
@@ -23,5 +23,5 @@
       "id": "oritech:small_nickel_clump"
     }
   ],
-  "time": 140
+  "time": 200
 }

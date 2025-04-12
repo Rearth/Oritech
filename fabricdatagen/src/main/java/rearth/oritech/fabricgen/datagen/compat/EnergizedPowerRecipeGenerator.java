@@ -11,7 +11,7 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.ItemTags;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.recipe.OreTransform;
+import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
@@ -20,6 +20,7 @@ import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
 
 public class EnergizedPowerRecipeGenerator {
+    private static final String PATH = "compat/energizedpower/";
 
     public static void generateRecipes(RecipeExporter exporter) {
         addOritechAlloys(exporter);
@@ -73,20 +74,13 @@ public class EnergizedPowerRecipeGenerator {
     }
 
     public static void addEPMetalProcessingRecipes(RecipeExporter exporter) {
-        var tin = new OreTransform(
-            of(TagContent.TIN_ORES),
-            of(TagContent.TIN_RAW_MATERIALS), ModItems.RAW_TIN, Items.RAW_COPPER,
-            null, null,
-            null, null, null,
-            of(TagContent.TIN_DUSTS), ModItems.TIN_DUST,
-            null, null, ModItems.TIN_NUGGET,
-            // Adding dust as "gemItem" to give dust as an output from the centrifuge recipes
-            null, ModItems.TIN_DUST,
-            null,
-            of(TagContent.TIN_NUGGETS), ModItems.TIN_NUGGET,
-            of(TagContent.TIN_INGOTS), ModItems.TIN_INGOT,
-            1.5f, "compat/energizedpower/tin", 2, false);
-        RecipeGeneratorUtil.addMetalProcessingChain(exporter, tin);
+        MetalProcessingChainBuilder.build("tin").resourcePath(PATH)
+            .ore(TagContent.TIN_ORES)
+            .rawOre(TagContent.TIN_RAW_MATERIALS, ModItems.RAW_TIN).rawOreByproduct(Items.RAW_GOLD)
+            .ingot(TagContent.TIN_INGOTS, ModItems.TIN_INGOT)
+            .nugget(TagContent.TIN_NUGGETS, ModItems.TIN_NUGGET)
+            .dust(ModItems.TIN_DUST).dustByproduct(ItemContent.COPPER_NUGGET)
+            .export(exporter);
     }
 
     public static void addOritechAssemblerRecipes(RecipeExporter exporter) {

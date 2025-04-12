@@ -1,7 +1,7 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
 import rearth.oritech.Oritech;
-import rearth.oritech.api.recipe.OreTransform;
+import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
@@ -27,6 +27,7 @@ import net.neoforged.neoforge.common.Tags;
 import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
 
 public class EnergizedPowerRecipeGenerator {
+    public static final String PATH = "compat/energizedpower";
 
     public static void generateRecipes(RecipeOutput exporter) {
         addOritechAlloys(exporter);
@@ -80,20 +81,12 @@ public class EnergizedPowerRecipeGenerator {
     }
 
     public static void addEPMetalProcessingRecipes(RecipeOutput exporter) {
-        var tin = new OreTransform(
-            of(TagContent.TIN_ORES),
-            of(TagContent.TIN_RAW_MATERIALS), EPItems.RAW_TIN.get(), Items.RAW_COPPER,
-            null, null,
-            null, null, null,
-            of(TagContent.TIN_DUSTS), EPItems.TIN_DUST.get(),
-            null, null, EPItems.TIN_NUGGET.get(),
-            // Adding dust as "gemItem" to give dust as an output from the centrifuge recipes
-            null, EPItems.TIN_DUST.get(),
-            null,
-            of(TagContent.TIN_NUGGETS), EPItems.TIN_NUGGET.get(),
-            of(TagContent.TIN_INGOTS), EPItems.TIN_INGOT.get(),
-            1.5f, "compat/energizedpower/tin", 2, false);
-        RecipeGeneratorUtil.addMetalProcessingChain(exporter, tin);
+        MetalProcessingChainBuilder.build("tin").resourcePath(PATH)
+            .ore(TagContent.TIN_ORES)
+            .rawOre(TagContent.TIN_RAW_MATERIALS, EPItems.RAW_TIN.get()).rawOreByproduct(Items.RAW_GOLD)
+            .ingot(TagContent.TIN_INGOTS, EPItems.TIN_INGOT.get())
+            .dust(EPItems.TIN_DUST.get()).dustByproduct(ItemContent.COPPER_NUGGET)
+            .export(exporter);
     }
 
     public static void addOritechAssemblerRecipes(RecipeOutput exporter) {

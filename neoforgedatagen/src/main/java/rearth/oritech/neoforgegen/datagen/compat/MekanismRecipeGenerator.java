@@ -1,7 +1,10 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
 import rearth.oritech.Oritech;
-import rearth.oritech.api.recipe.OreTransform;
+import rearth.oritech.api.recipe.AtomicForgeRecipeBuilder;
+import rearth.oritech.api.recipe.FoundryRecipeBuilder;
+import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
+import rearth.oritech.api.recipe.util.RecipeHelpers;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.util.datagen.RecipeGeneratorUtil;
@@ -28,6 +31,8 @@ import java.util.List;
 import static rearth.oritech.util.datagen.RecipeGeneratorUtil.of;
 
 public class MekanismRecipeGenerator {
+    private static final String PATH = "compat/mekanism/";
+
     public static void generateRecipes(RecipeOutput exporter) {
         addAlloying(exporter);
         addAtomicForging(exporter);
@@ -37,78 +42,120 @@ public class MekanismRecipeGenerator {
     }
 
     private static void addAlloying(RecipeOutput exporter) {
-        RecipeGeneratorUtil.addAlloyRecipe(exporter, of(Tags.Items.INGOTS_COPPER), of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.TIN)), MekanismItems.BRONZE_INGOT.asItem(), 2, "compat/mekanism/bronze");
-        RecipeGeneratorUtil.addAlloyRecipe(exporter, of(Tags.Items.INGOTS_COPPER), of(Tags.Items.DUSTS_REDSTONE), MekanismItems.INFUSED_ALLOY.asItem(), 1, "compat/mekanism/infused_alloy");
-        RecipeGeneratorUtil.addAlloyRecipe(exporter, of(MekanismTags.Items.ALLOYS_INFUSED), of(MekanismTags.Items.DUSTS_DIAMOND), MekanismItems.REINFORCED_ALLOY.asItem(), 1, "compat/mekanism/reinforced_alloy");
-        RecipeGeneratorUtil.addAlloyRecipe(exporter, of(MekanismTags.Items.ALLOYS_REINFORCED), of(MekanismTags.Items.DUSTS_REFINED_OBSIDIAN), MekanismItems.ATOMIC_ALLOY.asItem(), 1, "compat/mekanism/atomic_alloy");
-        RecipeGeneratorUtil.addAlloyRecipe(exporter, of(MekanismTags.Items.DUSTS_OBSIDIAN), of(MekanismTags.Items.DUSTS_DIAMOND), MekanismItems.REFINED_OBSIDIAN_DUST.asItem(), 1, "compat/mekanism/refined_obsidian_dust");
+        FoundryRecipeBuilder.build()
+            .input(Tags.Items.INGOTS_COPPER)
+            .input(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.TIN))
+            .result(MekanismItems.BRONZE_INGOT.asItem(), 2)
+            .export(exporter, PATH + "bronze");
+        FoundryRecipeBuilder.build()
+            .input(Tags.Items.INGOTS_COPPER)
+            .input(Tags.Items.DUSTS_REDSTONE)
+            .result(MekanismItems.INFUSED_ALLOY.asItem())
+            .export(exporter, PATH + "infused_alloy");
+        FoundryRecipeBuilder.build()
+            .input(MekanismTags.Items.ALLOYS_INFUSED)
+            .input(MekanismTags.Items.DUSTS_DIAMOND)
+            .result(MekanismItems.REINFORCED_ALLOY.asItem())
+            .export(exporter, PATH + "reinforced_alloy");
+        FoundryRecipeBuilder.build()
+            .input(MekanismTags.Items.ALLOYS_REINFORCED)
+            .input(MekanismTags.Items.DUSTS_REFINED_OBSIDIAN)
+            .result(MekanismItems.ATOMIC_ALLOY.asItem())
+            .export(exporter, PATH + "atomic_alloy");
+        FoundryRecipeBuilder.build()
+            .input(MekanismTags.Items.DUSTS_OBSIDIAN)
+            .input(MekanismTags.Items.DUSTS_DIAMOND)
+            .result(MekanismItems.REFINED_OBSIDIAN_DUST.asItem())
+            .export(exporter, PATH + "refined_obsidian_dust");
     }
 
     private static void addAtomicForging(RecipeOutput exporter) {
-        RecipeGeneratorUtil.addAtomicForgeRecipe(exporter, of(Tags.Items.DUSTS_REDSTONE), of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.OSMIUM)), MekanismItems.BASIC_CONTROL_CIRCUIT.asItem(), 5, "compat/mekanism/basic_control_circuit");
-        RecipeGeneratorUtil.addAtomicForgeRecipe(exporter, of(Tags.Items.DUSTS_REDSTONE), of(MekanismTags.Items.CIRCUITS_BASIC), MekanismItems.ADVANCED_CONTROL_CIRCUIT.asItem(), 5, "compat/mekanism/advanced_control_circuit");
-        RecipeGeneratorUtil.addAtomicForgeRecipe(exporter, of(MekanismTags.Items.DUSTS_DIAMOND), of(MekanismTags.Items.CIRCUITS_ADVANCED), MekanismItems.ELITE_CONTROL_CIRCUIT.asItem(), 5, "compat/mekanism/elite_control_circuit");
-        RecipeGeneratorUtil.addAtomicForgeRecipe(exporter, of(MekanismTags.Items.DUSTS_REFINED_OBSIDIAN), of(MekanismTags.Items.CIRCUITS_ELITE), MekanismItems.ULTIMATE_CONTROL_CIRCUIT.asItem(), 5, "compat/mekanism/ultimate_control_circuit");
+        AtomicForgeRecipeBuilder.build()
+            .input(Tags.Items.DUSTS_REDSTONE)
+            .input(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.OSMIUM))
+            .result(MekanismItems.BASIC_CONTROL_CIRCUIT.asItem())
+            .time(5).export(exporter, PATH + "basic_control_circuit");
+        AtomicForgeRecipeBuilder.build()
+            .input(Tags.Items.DUSTS_REDSTONE)
+            .input(MekanismTags.Items.CIRCUITS_BASIC)
+            .result(MekanismItems.ADVANCED_CONTROL_CIRCUIT.asItem())
+            .time(5).export(exporter, PATH + "advanced_control_circuit");
+        AtomicForgeRecipeBuilder.build()
+            .input(MekanismTags.Items.DUSTS_DIAMOND)
+            .input(MekanismTags.Items.CIRCUITS_ADVANCED)
+            .result(MekanismItems.ELITE_CONTROL_CIRCUIT.asItem())
+            .time(5).export(exporter, PATH + "elite_control_circuit");
+        AtomicForgeRecipeBuilder.build()
+            .input(MekanismTags.Items.DUSTS_REFINED_OBSIDIAN)
+            .input(MekanismTags.Items.CIRCUITS_ELITE)
+            .result(MekanismItems.ULTIMATE_CONTROL_CIRCUIT.asItem())
+            .time(5).export(exporter, PATH + "ultimate_control_circuit");
     }
 
     private static void addDustGrinding(RecipeOutput exporter) {
-        RecipeGeneratorUtil.addDustRecipe(exporter, of(TagContent.BRONZE_INGOTS), MekanismItems.BRONZE_DUST.asItem(), "compat/mekanism/dust/bronze");
-        RecipeGeneratorUtil.addDustRecipe(exporter, of(Items.CHARCOAL), MekanismItems.CHARCOAL_DUST.asItem(), "compat/mekanism/dust/charcoal");
-        RecipeGeneratorUtil.addDustRecipe(exporter, of(Tags.Items.GEMS_DIAMOND), MekanismItems.DIAMOND_DUST.asItem(), "compat/mekanism/dust/diamond");
-        RecipeGeneratorUtil.addDustRecipe(exporter, of(Tags.Items.GEMS_EMERALD), MekanismItems.EMERALD_DUST.asItem(), "compat/mekanism/dust/emerald");
-        RecipeGeneratorUtil.addDustRecipe(exporter, of(MekanismTags.Items.GEMS_FLUORITE), MekanismItems.FLUORITE_DUST.asItem(), "compat/mekanism/dust/fluorite");
-        RecipeGeneratorUtil.addDustRecipe(exporter, of(Tags.Items.GEMS_LAPIS), MekanismItems.LAPIS_LAZULI_DUST.asItem(), "compat/mekanism/dust/lapis");
-        RecipeGeneratorUtil.addDustRecipe(exporter, of(Tags.Items.INGOTS_NETHERITE), MekanismItems.NETHERITE_DUST.asItem(), "compat/mekanism/dust/netherite");
-        RecipeGeneratorUtil.addDustRecipe(exporter, of(MekanismTags.Items.INGOTS_REFINED_OBSIDIAN), MekanismItems.REFINED_OBSIDIAN_DUST.asItem(), "compat/mekanism/dust/refined_obsidian");
-        RecipeGeneratorUtil.addDustRecipe(exporter, of(TagContent.STEEL_INGOTS), MekanismItems.STEEL_DUST.asItem(), "compat/mekanism/dust/steel");
-        RecipeGeneratorUtil.addDustRecipe(exporter, of(Tags.Items.OBSIDIANS), MekanismItems.OBSIDIAN_DUST.asItem(), "compat/mekanism/dust/obsidian");
+        RecipeHelpers.addDustRecipe(exporter, of(TagContent.BRONZE_INGOTS), MekanismItems.BRONZE_DUST.asItem(), PATH + "dust/bronze");
+        RecipeHelpers.addDustRecipe(exporter, of(Items.CHARCOAL), MekanismItems.CHARCOAL_DUST.asItem(), "compat/mekanism/dust/charcoal");
+        RecipeHelpers.addDustRecipe(exporter, of(Tags.Items.GEMS_DIAMOND), MekanismItems.DIAMOND_DUST.asItem(), "compat/mekanism/dust/diamond");
+        RecipeHelpers.addDustRecipe(exporter, of(Tags.Items.GEMS_EMERALD), MekanismItems.EMERALD_DUST.asItem(), "compat/mekanism/dust/emerald");
+        RecipeHelpers.addDustRecipe(exporter, of(MekanismTags.Items.GEMS_FLUORITE), MekanismItems.FLUORITE_DUST.asItem(), "compat/mekanism/dust/fluorite");
+        RecipeHelpers.addDustRecipe(exporter, of(Tags.Items.GEMS_LAPIS), MekanismItems.LAPIS_LAZULI_DUST.asItem(), "compat/mekanism/dust/lapis");
+        RecipeHelpers.addDustRecipe(exporter, of(Tags.Items.INGOTS_NETHERITE), MekanismItems.NETHERITE_DUST.asItem(), "compat/mekanism/dust/netherite");
+        RecipeHelpers.addDustRecipe(exporter, of(MekanismTags.Items.INGOTS_REFINED_OBSIDIAN), MekanismItems.REFINED_OBSIDIAN_DUST.asItem(), "compat/mekanism/dust/refined_obsidian");
+        RecipeHelpers.addDustRecipe(exporter, of(TagContent.STEEL_INGOTS), MekanismItems.STEEL_DUST.asItem(), "compat/mekanism/dust/steel");
+        RecipeHelpers.addDustRecipe(exporter, of(Tags.Items.OBSIDIANS), MekanismItems.OBSIDIAN_DUST.asItem(), "compat/mekanism/dust/obsidian");
     }
     
     private static void addMetalProcessing(RecipeOutput exporter) {
-        var oreTransforms = List.of(
         // osmium
-        new OreTransform(
-            of(MekanismTags.Items.ORES.get(OreType.OSMIUM)),
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.OSMIUM)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.OSMIUM).asItem(), ItemContent.RAW_PLATINUM,
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.CLUMP, PrimaryResource.OSMIUM)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.CLUMP, PrimaryResource.OSMIUM).asItem(),
-            null, null, null,
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.OSMIUM)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.OSMIUM).asItem(),
-            null, null, MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.OSMIUM).asItem(),
-            // Adding dust as "gemItem" to give dust as an output from the centrifuge recipes
-            null, MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.OSMIUM).asItem(),
-            null,
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.OSMIUM)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.OSMIUM).asItem(),
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.OSMIUM)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.OSMIUM).asItem(),
-            1.5f, "compat/mekanism/osmium", 1, false),
+        MetalProcessingChainBuilder.build("osmium").resourcePath(PATH)
+            .ore(MekanismTags.Items.ORES.get(OreType.OSMIUM))
+            .rawOre(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.OSMIUM),
+                    MekanismItems.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.OSMIUM).asItem())
+            .rawOreByproduct(ItemContent.RAW_PLATINUM)
+            .ingot(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.OSMIUM),
+                    MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.OSMIUM).asItem())
+            .nugget(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.OSMIUM).asItem())
+            .clump(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.CLUMP, PrimaryResource.OSMIUM),
+                    MekanismItems.PROCESSED_RESOURCES.get(ResourceType.CLUMP, PrimaryResource.OSMIUM).asItem())
+            .clumpByproduct(ItemContent.SMALL_PLATINUM_CLUMP)
+            .centrifugeResult(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.OSMIUM).asItem())
+            .dust(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.OSMIUM).asItem())
+            .dustByproduct(ItemContent.SMALL_PLATINUM_DUST)
+            .byproductAmount(2)
+            .timeMultiplier(1.5f)
+            .export(exporter);
         // tin
-        new OreTransform(
-            of(MekanismTags.Items.ORES.get(OreType.TIN)),
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.TIN)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.TIN).asItem(), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.LEAD).asItem(),
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.CLUMP, PrimaryResource.TIN)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.CLUMP, PrimaryResource.TIN).asItem(),
-            null, null, null,
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.TIN)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.TIN).asItem(),
-            null, null, MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.TIN).asItem(),
-            // Adding dust as "gemItem" to give dust as an output from the centrifuge recipes
-            null, MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.TIN).asItem(),
-            null,
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.TIN)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.TIN).asItem(),
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.TIN)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.TIN).asItem(),
-            1.5f, "compat/mekanism/tin", 2, false),
+        MetalProcessingChainBuilder.build("tin").resourcePath(PATH)
+            .ore(MekanismTags.Items.ORES.get(OreType.TIN))
+            .rawOre(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.TIN),
+                    MekanismItems.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.TIN).asItem())
+            .rawOreByproduct(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.LEAD).asItem())
+            .ingot(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.TIN),
+                    MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.TIN).asItem())
+            .nugget(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.TIN).asItem())
+            .clump(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.CLUMP, PrimaryResource.TIN),
+                    MekanismItems.PROCESSED_RESOURCES.get(ResourceType.CLUMP, PrimaryResource.TIN).asItem())
+            .clumpByproduct(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.LEAD).asItem())
+            .centrifugeResult(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.TIN).asItem())
+            .dust(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.TIN).asItem())
+            .dustByproduct(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.LEAD).asItem())
+            .export(exporter);
         // lead
-        new OreTransform(
-            of(MekanismTags.Items.ORES.get(OreType.LEAD)),
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.LEAD)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.LEAD).asItem(), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.TIN).asItem(),
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.CLUMP, PrimaryResource.LEAD)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.CLUMP, PrimaryResource.LEAD).asItem(),
-            null, null, null,
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.LEAD)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.LEAD).asItem(),
-            null, null, MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.LEAD).asItem(),
-            // Adding dust as "gemItem" to give dust as an output from the centrifuge recipes
-            null, MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.LEAD).asItem(),
-            null,
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.LEAD)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.LEAD).asItem(),
-            of(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.LEAD)), MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.LEAD).asItem(),
-            1.5f, "compat/mekanism/lead", 2, false));
-        oreTransforms.forEach(ore -> RecipeGeneratorUtil.addMetalProcessingChain(exporter, ore));
+        MetalProcessingChainBuilder.build("lead").resourcePath(PATH)
+            .ore(MekanismTags.Items.ORES.get(OreType.LEAD))
+            .rawOre(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.LEAD),
+                    MekanismItems.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.LEAD).asItem())
+            .rawOreByproduct(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.RAW, PrimaryResource.TIN).asItem())
+            .ingot(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.LEAD),
+                    MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.LEAD).asItem())
+            .nugget(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.LEAD).asItem())
+            .clump(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.CLUMP, PrimaryResource.LEAD),
+                    MekanismItems.PROCESSED_RESOURCES.get(ResourceType.CLUMP, PrimaryResource.LEAD).asItem())
+            .clumpByproduct(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.TIN).asItem())
+            .centrifugeResult(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.LEAD).asItem())
+            .dust(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.LEAD).asItem())
+            .dustByproduct(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.TIN).asItem())
+            .export(exporter);
     }
 
     private static void addMekInfusing(RecipeOutput exporter) {

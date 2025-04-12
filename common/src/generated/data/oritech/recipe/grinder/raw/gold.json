@@ -15,7 +15,7 @@
       "id": "oritech:gold_clump"
     },
     {
-      "count": 3,
+      "count": 1,
       "id": "oritech:small_gold_clump"
     },
     {
@@ -23,5 +23,5 @@
       "id": "oritech:small_copper_clump"
     }
   ],
-  "time": 140
+  "time": 200
 }

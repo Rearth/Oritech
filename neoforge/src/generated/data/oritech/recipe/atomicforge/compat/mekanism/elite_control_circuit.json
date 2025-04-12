@@ -12,13 +12,10 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
+      "tag": "c:dusts/diamond"
+    },
+    {
       "tag": "c:circuits/advanced"
-    },
-    {
-      "tag": "c:dusts/diamond"
-    },
-    {
-      "tag": "c:dusts/diamond"
     }
   ],
   "results": [

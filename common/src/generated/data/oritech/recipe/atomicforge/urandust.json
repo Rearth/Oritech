@@ -6,20 +6,17 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
+      "tag": "c:raw_materials/uranium"
+    },
+    {
       "tag": "c:dusts/copper"
-    },
-    {
-      "tag": "c:raw_materials/uranium"
-    },
-    {
-      "tag": "c:raw_materials/uranium"
     }
   ],
   "results": [
     {
-      "count": 1,
+      "count": 5,
       "id": "oritech:uranium_gem"
     }
   ],
-  "time": 5
+  "time": 200
 }

@@ -12,13 +12,10 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
+      "tag": "c:dusts/refined_obsidian"
+    },
+    {
       "tag": "c:circuits/elite"
-    },
-    {
-      "tag": "c:dusts/refined_obsidian"
-    },
-    {
-      "tag": "c:dusts/refined_obsidian"
     }
   ],
   "results": [

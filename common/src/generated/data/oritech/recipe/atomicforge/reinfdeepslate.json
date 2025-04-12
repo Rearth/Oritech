@@ -6,13 +6,10 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
+      "item": "oritech:duratium_ingot"
+    },
+    {
       "item": "minecraft:deepslate"
-    },
-    {
-      "item": "oritech:duratium_ingot"
-    },
-    {
-      "item": "oritech:duratium_ingot"
     }
   ],
   "results": [

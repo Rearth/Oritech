@@ -6,13 +6,10 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
+      "item": "oritech:adamant_ingot"
+    },
+    {
       "item": "oritech:unholy_intelligence"
-    },
-    {
-      "item": "oritech:adamant_ingot"
-    },
-    {
-      "item": "oritech:adamant_ingot"
     }
   ],
   "results": [

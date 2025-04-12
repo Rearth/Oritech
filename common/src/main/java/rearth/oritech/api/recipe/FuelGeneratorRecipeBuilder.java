@@ -1,5 +1,6 @@
 package rearth.oritech.api.recipe;
 
+import net.minecraft.util.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class FuelGeneratorRecipeBuilder extends OritechRecipeBuilder {
@@ -12,8 +13,8 @@ public class FuelGeneratorRecipeBuilder extends OritechRecipeBuilder {
     }
 
     @Override
-    public void validate() throws IllegalStateException {
-        if (this.fluidInput == null || this.fluidInput.isEmpty())
-            throw new IllegalStateException("fluid input required for recipe type " + this.type);
+    public void validate(Identifier id) throws IllegalStateException {
+        if (fluidInput == null || fluidInput.isEmpty())
+            throw new IllegalStateException("fluid input required for recipe " + id + " (type " + type + ")");
     }
 }

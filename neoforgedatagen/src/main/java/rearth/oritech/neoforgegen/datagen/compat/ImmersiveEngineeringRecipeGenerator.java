@@ -1,8 +1,10 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
 import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
+import rearth.oritech.api.recipe.FoundryRecipeBuilder;
 import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
-import rearth.oritech.api.recipe.OreTransform;
+import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.util.datagen.RecipeGeneratorUtil;
@@ -38,6 +40,7 @@ import static rearth.oritech.util.datagen.RecipeGeneratorUtil.cItemTag;
 
 public class ImmersiveEngineeringRecipeGenerator {
     private static final String PATH = "compat/immersiveengineering/";
+
     public static void generateRecipes(RecipeOutput exporter) {
         addAlloying(exporter);
         addIEAlloying(exporter);
@@ -47,7 +50,7 @@ public class ImmersiveEngineeringRecipeGenerator {
     }
 
     private static void addAlloying(RecipeOutput exporter) {
-        RecipeGeneratorUtil.addAlloyRecipe(exporter, of(Tags.Items.INGOTS_COPPER), of(TagContent.NICKEL_INGOTS), IEItems.Metals.INGOTS.get(EnumMetals.CONSTANTAN).get(), 2, "compat/immersiveengineering/constantan");
+        FoundryRecipeBuilder.build().input(Tags.Items.INGOTS_COPPER).input(TagContent.NICKEL_INGOTS).result(IEItems.Metals.INGOTS.get(EnumMetals.CONSTANTAN).get(), 2).export(exporter, "compat/immersiveengineering/constantan");
     }
 
     private static void addIEAlloying(RecipeOutput exporter) {
@@ -78,7 +81,7 @@ public class ImmersiveEngineeringRecipeGenerator {
     }
 
     private static void addCentrifuging(RecipeOutput exporter) {
-        RecipeGeneratorUtil.addCentrifugeFluidRecipe(exporter, of(ItemTags.PLANKS), IEBlocks.WoodenDecoration.TREATED_WOOD.get(TreatedWoodStyles.HORIZONTAL).get().asItem(), IEFluids.CREOSOTE.still().get(), 0.125f, null, 0, 1f, "compat/immersiveengineering/treated_planks");
+        CentrifugeFluidRecipeBuilder.build().input(ItemTags.PLANKS).result(IEBlocks.WoodenDecoration.TREATED_WOOD.get(TreatedWoodStyles.HORIZONTAL).get().asItem()).fluidInput(IEFluids.CREOSOTE.still().get(), 0.125f).export(exporter, "compat/immersiveengineering/treated_planks");
     }
 
     private static void addGeneratorFuels(RecipeOutput exporter) {
@@ -87,49 +90,29 @@ public class ImmersiveEngineeringRecipeGenerator {
     }
 
     private static void addMetalProcessing(RecipeOutput exporter) {
-        var oreTransforms = List.of(
-            // bauxite/aluminum
-            new OreTransform(
-                of(cItemTag("ores/aluminum")),
-                of(IETags.getTagsFor(EnumMetals.ALUMINUM).rawOre), IEItems.Metals.INGOTS.get(EnumMetals.ALUMINUM).get(), ItemContent.QUARTZ_DUST,
-                null, null,
-                null, null, null,
-                of(IETags.getTagsFor(EnumMetals.ALUMINUM).dust), IEItems.Metals.DUSTS.get(EnumMetals.ALUMINUM).get(),
-                null, null, IEItems.Metals.NUGGETS.get(EnumMetals.ALUMINUM).get(),
-                // Adding dust as "gemItem" to give dust as an output from the centrifuge recipes
-                null, IEItems.Metals.DUSTS.get(EnumMetals.ALUMINUM).get(),
-                null,
-                of(IETags.getTagsFor(EnumMetals.ALUMINUM).nugget), IEItems.Metals.NUGGETS.get(EnumMetals.ALUMINUM).get(),
-                of(IETags.getTagsFor(EnumMetals.ALUMINUM).ingot), IEItems.Metals.INGOTS.get(EnumMetals.ALUMINUM).get(),
-                1.5f, "compat/immersiveengineering/aluminum", 2, false),
-            // silver
-            new OreTransform(
-                of(cItemTag("ores/silver")),
-                of(IETags.getTagsFor(EnumMetals.SILVER).rawOre), IEItems.Metals.INGOTS.get(EnumMetals.SILVER).get(), ItemContent.COPPER_DUST,
-                null, null,
-                null, null, null,
-                of(IETags.getTagsFor(EnumMetals.SILVER).dust), IEItems.Metals.DUSTS.get(EnumMetals.SILVER).get(),
-                null, null, IEItems.Metals.NUGGETS.get(EnumMetals.SILVER).get(),
-                // Adding dust as "gemItem" to give dust as an output from the centrifuge recipes
-                null, IEItems.Metals.DUSTS.get(EnumMetals.SILVER).get(),
-                null,
-                of(IETags.getTagsFor(EnumMetals.SILVER).nugget), IEItems.Metals.NUGGETS.get(EnumMetals.SILVER).get(),
-                of(IETags.getTagsFor(EnumMetals.SILVER).ingot), IEItems.Metals.INGOTS.get(EnumMetals.SILVER).get(),
-                1.5f, "compat/immersiveengineering/silver", 2, false),
-            // lead
-            new OreTransform(
-                of(cItemTag("ores/lead")),
-                of(IETags.getTagsFor(EnumMetals.LEAD).rawOre), IEItems.Metals.INGOTS.get(EnumMetals.LEAD).get(), ItemContent.GOLD_DUST,
-                null, null,
-                null, null, null,
-                of(IETags.getTagsFor(EnumMetals.LEAD).dust), IEItems.Metals.DUSTS.get(EnumMetals.LEAD).get(),
-                null, null, IEItems.Metals.NUGGETS.get(EnumMetals.LEAD).get(),
-                // Adding dust as "gemItem" to give dust as an output from the centrifuge recipes
-                null, IEItems.Metals.DUSTS.get(EnumMetals.LEAD).get(),
-                null,
-                of(IETags.getTagsFor(EnumMetals.LEAD).nugget), IEItems.Metals.NUGGETS.get(EnumMetals.LEAD).get(),
-                of(IETags.getTagsFor(EnumMetals.LEAD).ingot), IEItems.Metals.INGOTS.get(EnumMetals.LEAD).get(),
-                1.5f, "compat/immersiveengineering/lead", 2, false));
-        oreTransforms.forEach(ore -> RecipeGeneratorUtil.addMetalProcessingChain(exporter, ore));
+        // bauxite/aluminum
+        MetalProcessingChainBuilder.build("aluminum").resourcePath(PATH)
+            .ore(cItemTag("ores/aluminum"))
+            .rawOre(IETags.getTagsFor(EnumMetals.ALUMINUM).rawOre, IEItems.Metals.RAW_ORES.get(EnumMetals.ALUMINUM).get()).rawOreByproduct(ItemContent.QUARTZ_DUST)
+            .ingot(IETags.getTagsFor(EnumMetals.ALUMINUM).ingot, IEItems.Metals.INGOTS.get(EnumMetals.ALUMINUM).get())
+            .nugget(IETags.getTagsFor(EnumMetals.ALUMINUM).nugget, IEItems.Metals.NUGGETS.get(EnumMetals.ALUMINUM).get())
+            .dust(IEItems.Metals.DUSTS.get(EnumMetals.ALUMINUM).get()).dustByproduct(ItemContent.QUARTZ_DUST).byproductAmount(1)
+            .export(exporter);
+        // silver
+        MetalProcessingChainBuilder.build("silver").resourcePath(PATH)
+            .ore(cItemTag("ores/silver"))
+            .rawOre(IETags.getTagsFor(EnumMetals.SILVER).rawOre, IEItems.Metals.RAW_ORES.get(EnumMetals.SILVER).get()).rawOreByproduct(ItemContent.COPPER_DUST)
+            .ingot(IETags.getTagsFor(EnumMetals.SILVER).ingot, IEItems.Metals.INGOTS.get(EnumMetals.SILVER).get())
+            .nugget(IETags.getTagsFor(EnumMetals.SILVER).nugget, IEItems.Metals.NUGGETS.get(EnumMetals.SILVER).get())
+            .dust(IEItems.Metals.DUSTS.get(EnumMetals.SILVER).get()).dustByproduct(ItemContent.SMALL_COPPER_DUST)
+            .export(exporter);
+        // lead
+        MetalProcessingChainBuilder.build("lead").resourcePath(PATH)
+            .ore(cItemTag("ores/lead"))
+            .rawOre(IETags.getTagsFor(EnumMetals.LEAD).rawOre, IEItems.Metals.RAW_ORES.get(EnumMetals.LEAD).get()).rawOreByproduct(Items.RAW_GOLD)
+            .ingot(IETags.getTagsFor(EnumMetals.LEAD).ingot, IEItems.Metals.INGOTS.get(EnumMetals.LEAD).get())
+            .nugget(IETags.getTagsFor(EnumMetals.LEAD).nugget, IEItems.Metals.NUGGETS.get(EnumMetals.LEAD).get())
+            .dust(IEItems.Metals.DUSTS.get(EnumMetals.LEAD).get()).dustByproduct(ItemContent.SMALL_GOLD_DUST)
+            .export(exporter);
     }
 }

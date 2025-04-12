@@ -1,5 +1,7 @@
 package rearth.oritech.neoforgegen.datagen;
 
+import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
+import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.neoforgegen.datagen.compat.AlloySmelterRecipeGenerator;
@@ -11,7 +13,6 @@ import rearth.oritech.neoforgegen.datagen.compat.MekanismRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.MekanismGeneratorsRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.PowahRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.ProductiveMetalworksRecipeGenerator;
-import rearth.oritech.util.datagen.RecipeGeneratorUtil;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -54,7 +55,7 @@ public class RecipeGenerator extends RecipeProvider implements IConditionBuilder
 
         // Uranium clumps don't exist in Oritech, but Oritech should still be able to do something with them if they're added by another mod (like Create).
         // Also added in Fabric datagen with Fabric load conditions, but the Fabric versions should be excluded from the Neoforge build
-        RecipeGeneratorUtil.addCentrifugeRecipe(exporter.withConditions(this.not(this.tagEmpty(TagContent.URANIUM_CLUMPS))), of(TagContent.URANIUM_CLUMPS), List.of(new ItemStack(ItemContent.URANIUM_DUST, 2), new ItemStack(ItemContent.SMALL_PLUTONIUM_DUST)), 0.5f, "compat/clump/crushed_uranium");
-        RecipeGeneratorUtil.addCentrifugeFluidRecipe(exporter.withConditions(this.not(this.tagEmpty(TagContent.URANIUM_CLUMPS))), of(TagContent.URANIUM_CLUMPS), ItemContent.URANIUM_DUST, 3, Fluids.WATER, 1, null, 0, 0.5f, "compat/clumpwet/crushed_uranium");
+        CentrifugeRecipeBuilder.build().input(TagContent.URANIUM_CLUMPS).result(ItemContent.URANIUM_DUST, 2).result(ItemContent.SMALL_PLUTONIUM_DUST).timeMultiplier(0.5f).export(exporter.withConditions(this.not(this.tagEmpty(TagContent.URANIUM_CLUMPS))), "compat/clump/crushed_uranium");
+        CentrifugeRecipeBuilder.build().input(TagContent.URANIUM_CLUMPS).result(ItemContent.URANIUM_DUST, 3).fluidInput(Fluids.WATER).timeMultiplier(0.5f).export(exporter.withConditions(this.not(this.tagEmpty(TagContent.URANIUM_CLUMPS))), "compat/clumpwet/crushed_uranium");
     }
 }
