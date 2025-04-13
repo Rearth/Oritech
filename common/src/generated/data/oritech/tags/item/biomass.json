@@ -24,6 +24,14 @@
       "id": "#farmersdelight:wild_crops",
       "required": false
     },
+    {
+      "id": "enderio:plant_matter_green",
+      "required": false
+    },
+    {
+      "id": "enderio:plant_matter_brown",
+      "required": false
+    },
     "oritech:wither_crop_block",
     "oritech:banana",
     "minecraft:wheat",

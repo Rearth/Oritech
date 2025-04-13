@@ -1,0 +1,25 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "pneumaticcraft"
+    }
+  ],
+  "type": "oritech:centrifuge_fluid",
+  "fluidInputAmount": 81000,
+  "fluidInputVariant": "pneumaticcraft:yeast_culture",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "item": "pneumaticcraft:wheat_flour"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "pneumaticcraft:sourdough"
+    }
+  ],
+  "time": 200
+}

@@ -77,6 +77,13 @@ repositories {
         name = 'Shedaniel'
         url = 'https://maven.shedaniel.me'
     } // for cloth config
+
+    maven {
+        url = 'https://maven.rover656.dev/releases' // for Ender IO
+        content {
+            includeGroup "com.enderio"
+        }
+    }
 }
 
 // Load properties from main Oritech gradle.properties
@@ -129,4 +136,15 @@ dependencies {
     // Industrial Foregoing
     implementation "curse.maven:industrial-foregoing-266515:${industrial_foregoing_version_id}"
     implementation "curse.maven:titanium-287342:${titanium_version_id}"
+
+    // PneumaticCraft: Repressurized
+    implementation "curse.maven:pneumaticcraft-repressurized-281849:${pneumaticcraft_version_id}"
+
+    // Ender IO
+    implementation "com.enderio:enderio-base:${enderio_version}"
+    implementation("com.enderio:enderio-machines:${enderio_version}") { transitive = false }
+
+    // Actually Additions
+    implementation "curse.maven:actually-additions-228404:${actually_additions_version_id}"
+    runtimeOnly "curse.maven:curios-309927:${curios_version_id}"
 }

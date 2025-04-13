@@ -4,7 +4,6 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.api.recipe.FoundryRecipeBuilder;
 import rearth.oritech.api.recipe.GrinderRecipeBuilder;
-import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
 import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
@@ -44,7 +43,6 @@ public class CreateRecipeGenerator {
         addBlasting(exporter);
         addCentrifuging(exporter);
         addMetalProcessing(exporter);
-        addPulverizing(exporter);
 
         CreateCrushingRecipeGen.registerAll(packOutput, registries, exporter);
         CreateMixingRecipeGen.registerAll(packOutput, registries, exporter);
@@ -80,11 +78,6 @@ public class CreateRecipeGenerator {
             .clump(TagContent.ZINC_CLUMPS, AllItems.CRUSHED_ZINC.asItem()).clumpByproduct(Items.GUNPOWDER).byproductAmount(1)
             .centrifugeResult(AllItems.ZINC_NUGGET.asItem(), 9)
             .export(exporter);
-    }
-
-    private static void addPulverizing(RecipeOutput exporter) {
-        PulverizerRecipeBuilder.build().input(Tags.Items.CROPS_WHEAT).result(AllItems.WHEAT_FLOUR.asItem()).export(exporter, PATH + "wheat_flour");
-        GrinderRecipeBuilder.build().input(Tags.Items.CROPS_WHEAT).result(AllItems.WHEAT_FLOUR.asItem()).export(exporter, PATH + "wheat_flour");
     }
 
     private static class CreateCrushingRecipeGen extends CrushingRecipeGen {

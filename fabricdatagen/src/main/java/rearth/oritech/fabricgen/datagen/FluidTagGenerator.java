@@ -11,6 +11,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
+import rearth.oritech.Oritech;
 import rearth.oritech.init.FluidContent;
 
 public class FluidTagGenerator extends FabricTagProvider.FluidTagProvider {
@@ -25,13 +26,13 @@ public class FluidTagGenerator extends FabricTagProvider.FluidTagProvider {
         getOrCreateTagBuilder(getFluidTag("minecraft", "water"))
             .add(FluidContent.FLOWING_BIOFUEL.get()).add(FluidContent.STILL_BIOFUEL.get())
             .add(FluidContent.FLOWING_FUEL.get()).add(FluidContent.STILL_FUEL.get())
-            .add(FluidContent.FLOWING_MOLTEN_ADAMANT.get()).add(FluidContent.STILL_MOLTEN_ADAMANT.get())
-            .add(FluidContent.FLOWING_MOLTEN_BIOSTEEL.get()).add(FluidContent.STILL_MOLTEN_BIOSTEEL.get())
-            .add(FluidContent.FLOWING_MOLTEN_DURATIUM.get()).add(FluidContent.STILL_MOLTEN_DURATIUM.get())
-            .add(FluidContent.FLOWING_MOLTEN_ENERGITE.get()).add(FluidContent.STILL_MOLTEN_ENERGITE.get())
-            .add(FluidContent.FLOWING_MOLTEN_FLUXITE.get()).add(FluidContent.STILL_MOLTEN_FLUXITE.get())
             .add(FluidContent.FLOWING_OIL.get()).add(FluidContent.STILL_OIL.get())
-            .add(FluidContent.FLOWING_STEAM.get()).add(FluidContent.STILL_STEAM.get());
+            .add(FluidContent.FLOWING_STEAM.get()).add(FluidContent.STILL_STEAM.get())
+            .addOptional(Oritech.id("flowing_molten_adamant")).addOptional(Oritech.id("still_molten_adamant"))
+            .addOptional(Oritech.id("flowing_molten_biosteel")).addOptional(Oritech.id("still_molten_biosteel"))
+            .addOptional(Oritech.id("flowing_molten_duratium")).addOptional(Oritech.id("still_molten_duratium"))
+            .addOptional(Oritech.id("flowing_molten_energite")).addOptional(Oritech.id("still_molten_energite"))
+            .addOptional(Oritech.id("flowing_molten_fluxite")).addOptional(Oritech.id("still_molten_fluxite"));
 
         getOrCreateTagBuilder(getCTag("biodiesel")).add(FluidContent.STILL_BIOFUEL.get());
         getOrCreateTagBuilder(getCTag("high_power_biodiesel")).add(FluidContent.STILL_FUEL.get());

@@ -1,0 +1,20 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "actuallyadditions"
+    }
+  ],
+  "type": "oritech:centrifuge_fluid",
+  "fluidInputAmount": 81000,
+  "fluidInputVariant": "actuallyadditions:refined_canola_oil",
+  "fluidOutputAmount": 81000,
+  "fluidOutputVariant": "actuallyadditions:crystallized_oil",
+  "ingredients": [
+    {
+      "item": "actuallyadditions:crystallized_canola_seed"
+    }
+  ],
+  "results": [],
+  "time": 200
+}

@@ -40,7 +40,8 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.IRON_CLUMP).addOptional(Identifier.of("create", "crushed_raw_iron"))
           .add(ItemContent.GOLD_CLUMP).addOptional(Identifier.of("create", "crushed_raw_gold"))
           .add(ItemContent.NICKEL_CLUMP).addOptional(Identifier.of("create", "crushed_raw_nickel"))
-          .add(ItemContent.PLATINUM_CLUMP).addOptional(Identifier.of("create", "crushed_raw_platinum"));
+          .add(ItemContent.PLATINUM_CLUMP).addOptional(Identifier.of("create", "crushed_raw_platinum"))
+          .addOptional(Identifier.of("create", "crushed_raw_zinc"));
         
         getOrCreateTagBuilder(getClumpTag("copper")).add(ItemContent.COPPER_CLUMP).addOptional(Identifier.of("create", "crushed_raw_copper"));
         getOrCreateTagBuilder(getClumpTag("iron")).add(ItemContent.IRON_CLUMP).addOptional(Identifier.of("create", "crushed_raw_iron"));
@@ -149,6 +150,9 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .addOptionalTag(ConventionalItemTags.FOODS)
           .addOptionalTag(ConventionalItemTags.CROPS)
           .addOptionalTag(Identifier.of("farmersdelight", "wild_crops"))
+          .addOptionalTag(Identifier.of("createaddition", "plant_foods"))
+          .addOptional(Identifier.of("enderio", "plant_matter_green"))
+          .addOptional(Identifier.of("enderio", "plant_matter_brown"))
           .add(BlockContent.WITHER_CROP_BLOCK.asItem())
           .add(ItemContent.BANANA.asItem())
           .add(Items.WHEAT)
@@ -240,6 +244,8 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.PLASTIC_SHEET);
         getOrCreateTagBuilder(getItemTag("plastics"))
           .add(ItemContent.PLASTIC_SHEET);
+        getOrCreateTagBuilder(TagKey.of(RegistryKeys.ITEM, Identifier.of("pneumaticcraft", "plastic_sheets")))
+          .add(ItemContent.PLASTIC_SHEET);
         
         // carbon fibre
         getOrCreateTagBuilder(TagContent.CARBON_FIBRE)
@@ -290,6 +296,9 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ToolsContent.EXO_BOOTS);
         
         getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
+          .add(ItemContent.WRENCH);
+        
+        getOrCreateTagBuilder(getItemTag("tools/wrench"))
           .add(ItemContent.WRENCH);
         
         getOrCreateTagBuilder(TagContent.REACTOR_COOLANT)

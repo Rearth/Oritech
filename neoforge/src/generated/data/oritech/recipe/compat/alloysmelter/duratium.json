@@ -1,0 +1,29 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "alloy_smelter"
+    }
+  ],
+  "type": "alloy_smelter:smelting",
+  "fuelPerTick": 20,
+  "ingredients": [
+    {
+      "count": 1,
+      "ingredient": {
+        "tag": "c:ingots/platinum"
+      }
+    },
+    {
+      "count": 1,
+      "ingredient": {
+        "tag": "c:ingots/netherite"
+      }
+    }
+  ],
+  "requiredTier": 3,
+  "result": {
+    "count": 1,
+    "id": "oritech:duratium_ingot"
+  }
+}

@@ -16,6 +16,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 import net.neoforged.neoforge.common.Tags;
 
+import java.util.List;
+
 import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 
 public class AlloySmelterRecipeGenerator {
@@ -30,10 +32,11 @@ public class AlloySmelterRecipeGenerator {
         offerAlloyRecipe(exporter, of(ItemContent.COPPER_GEM), of(ItemContent.COPPER_GEM), new ItemStack(Items.COPPER_INGOT, 3), 5, 2, "coppergem");
         offerAlloyRecipe(exporter, of(ItemContent.IRON_GEM), of(ItemContent.IRON_GEM), new ItemStack(Items.COPPER_INGOT, 3), 5, 2, "irongem");
         offerAlloyRecipe(exporter, of(ItemContent.GOLD_GEM), of(ItemContent.GOLD_GEM), new ItemStack(Items.GOLD_INGOT, 3), 5, 2, "goldgem");
-        offerAlloyRecipe(exporter, of(ItemContent.NICKEL_GEM), of(ItemContent.NICKEL_GEM), new ItemStack(ItemContent.NICKEL_INGOT), 5, 2, "platinumgem");
+        offerAlloyRecipe(exporter, of(ItemContent.NICKEL_GEM), of(ItemContent.NICKEL_GEM), new ItemStack(ItemContent.NICKEL_INGOT, 3), 5, 2, "nickelgem");
+        offerAlloyRecipe(exporter, of(ItemContent.PLATINUM_GEM), of(ItemContent.PLATINUM_GEM), new ItemStack(ItemContent.PLATINUM_INGOT, 3), 5, 2, "platinumgem");
     }
 
     private static void offerAlloyRecipe(RecipeOutput exporter, Ingredient A, Ingredient B, ItemStack output, int fuelPerTick, int requiredTier, String suffix) {
-        exporter.accept(Oritech.id("compat/alloysmelter/" + suffix), new SmeltingRecipe(NonNullList.of(Material.of(A, 1), Material.of(B, 1)), output, 200, fuelPerTick, requiredTier), null);
+        exporter.accept(Oritech.id("compat/alloysmelter/" + suffix), new SmeltingRecipe(NonNullList.copyOf(List.of(Material.of(A, 1), Material.of(B, 1))), output, 200, fuelPerTick, requiredTier), null);
     }
 }

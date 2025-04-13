@@ -1,0 +1,28 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "endercore"
+    }
+  ],
+  "type": "oritech:foundry",
+  "fluidInputAmount": 0,
+  "fluidInputVariant": "minecraft:empty",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:ingots/iron"
+    },
+    {
+      "tag": "c:ender_pearls"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "enderio:pulsating_alloy_ingot"
+    }
+  ],
+  "time": 200
+}

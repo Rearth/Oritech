@@ -179,9 +179,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
     
     private void addBiomass(RecipeExporter exporter) {
         // biomass
-        PulverizerRecipeBuilder.build().input(TagContent.BIOMASS).result(ItemContent.BIOMASS).export(exporter, "biobasic");
-        PulverizerRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).result(ItemContent.BIOMASS, 16).export(exporter, "packagedwheatbio");
-        PulverizerRecipeBuilder.build().input(cItemTag("storage_blocks/wheat")).result(ItemContent.BIOMASS, 16).export(exporter, "hay_block");
+        PulverizerRecipeBuilder.build().input(TagContent.BIOMASS).result(ItemContent.BIOMASS).addToGrinder().export(exporter, "biobasic");
+        PulverizerRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).result(ItemContent.BIOMASS, 16).addToGrinder().export(exporter, "packagedwheatbio");
+        PulverizerRecipeBuilder.build().input(cItemTag("storage_blocks/wheat")).result(ItemContent.BIOMASS, 16).addToGrinder().export(exporter, "hay_block");
         AssemblerRecipeBuilder.build().input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).input(ItemTags.PLANKS).result(ItemContent.SOLID_BIOFUEL).timeMultiplier(0.8f).export(exporter, "solidbiofuel");
     }
     
@@ -1182,10 +1182,6 @@ public class RecipeGenerator extends FabricRecipeProvider {
     
     public CraftingRecipeJsonBuilder createCableRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
         return ShapedRecipeJsonBuilder.create(category, output, count).input('#', input).pattern("   ").pattern("###");
-    }
-    
-    public CraftingRecipeJsonBuilder createInsulatedCableRecipe(RecipeCategory category, Item output, int count, Ingredient input, Ingredient insulation) {
-        return ShapedRecipeJsonBuilder.create(category, output, count).input('c', input).input('i', insulation).pattern("iii").pattern("ccc").pattern("iii");
     }
     
     public CraftingRecipeJsonBuilder createFramedCableRecipe(RecipeCategory category, Item output, int count, Ingredient input) {

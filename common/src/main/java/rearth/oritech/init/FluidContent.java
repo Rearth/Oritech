@@ -5,6 +5,7 @@ import dev.architectury.core.fluid.ArchitecturyFlowingFluid;
 import dev.architectury.core.fluid.ArchitecturyFluidAttributes;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import dev.architectury.core.item.ArchitecturyBucketItem;
+import dev.architectury.platform.Platform;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import io.wispforest.owo.ui.core.Color;
@@ -89,7 +90,9 @@ public class FluidContent {
     public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(Oritech.MOD_ID, RegistryKeys.FLUID);
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Oritech.MOD_ID, RegistryKeys.BLOCK);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Oritech.MOD_ID, RegistryKeys.ITEM);
-    public static final List<ArchitecturyFluidAttributes> FLUID_ATTRIBUTES = List.of(OIL_ATTRIBUTES, FUEL_ATTRIBUTES, BIOFUEL_ATTRIBUTES, STEAM_ATTRIBUTES, MOLTEN_ADAMANT_ATTRIBUTES, MOLTEN_BIOSTEEL_ATTRIBUTES, MOLTEN_DURATIUM_ATTRIBUTES, MOLTEN_ENERGITE_ATTRIBUTES, MOLTEN_FLUXITE_ATTRIBUTES);
+    public static final List<ArchitecturyFluidAttributes> FLUID_ATTRIBUTES = Platform.isModLoaded("productivemetalworks")
+        ? List.of(OIL_ATTRIBUTES, FUEL_ATTRIBUTES, BIOFUEL_ATTRIBUTES, STEAM_ATTRIBUTES, MOLTEN_ADAMANT_ATTRIBUTES, MOLTEN_BIOSTEEL_ATTRIBUTES, MOLTEN_DURATIUM_ATTRIBUTES, MOLTEN_ENERGITE_ATTRIBUTES, MOLTEN_FLUXITE_ATTRIBUTES)
+        : List.of(OIL_ATTRIBUTES, FUEL_ATTRIBUTES, BIOFUEL_ATTRIBUTES, STEAM_ATTRIBUTES);
     
     // oil
     public static final RegistrySupplier<FlowableFluid> STILL_OIL = FLUIDS.register("still_oil", () -> new ArchitecturyFlowingFluid.Source(OIL_ATTRIBUTES));
@@ -116,34 +119,34 @@ public class FluidContent {
     public static final RegistrySupplier<Item> STILL_STEAM_BUCKET = ITEMS.register("still_steam_bucket", () -> new ArchitecturyBucketItem(STILL_STEAM, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
 
     // adamant
-    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_ADAMANT = FLUIDS.register("still_molten_adamant", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_ADAMANT_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_ADAMANT = FLUIDS.register("flowing_molten_adamant", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_ADAMANT_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_ADAMANT_BLOCK = BLOCKS.register("still_molten_adamant_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_ADAMANT, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_MOLTEN_ADAMANT_BUCKET = ITEMS.register("still_molten_adamant_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_ADAMANT, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_ADAMANT = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_adamant", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_ADAMANT_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_ADAMANT = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_adamant", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_ADAMANT_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_ADAMANT_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_adamant_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_ADAMANT, AbstractBlock.Settings.copy(Blocks.WATER))) : null;
+    public static final RegistrySupplier<Item> STILL_MOLTEN_ADAMANT_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_adamant_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_ADAMANT, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET))) : null;
 
     // biosteel
-    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_BIOSTEEL = FLUIDS.register("still_molten_biosteel", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_BIOSTEEL_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_BIOSTEEL = FLUIDS.register("flowing_molten_biosteel", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_BIOSTEEL_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_BIOSTEEL_BLOCK = BLOCKS.register("still_molten_biosteel_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_BIOSTEEL, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_MOLTEN_BIOSTEEL_BUCKET = ITEMS.register("still_molten_biosteel_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_BIOSTEEL, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_BIOSTEEL = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_biosteel", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_BIOSTEEL_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_BIOSTEEL = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_biosteel", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_BIOSTEEL_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_BIOSTEEL_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_biosteel_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_BIOSTEEL, AbstractBlock.Settings.copy(Blocks.WATER))) : null;
+    public static final RegistrySupplier<Item> STILL_MOLTEN_BIOSTEEL_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_biosteel_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_BIOSTEEL, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET))) : null;
 
     // duratium
-    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_DURATIUM = FLUIDS.register("still_molten_duratium", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_DURATIUM_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_DURATIUM = FLUIDS.register("flowing_molten_duratium", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_DURATIUM_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_DURATIUM_BLOCK = BLOCKS.register("still_molten_duratium_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_DURATIUM, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_MOLTEN_DURATIUM_BUCKET = ITEMS.register("still_molten_duratium_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_DURATIUM, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_DURATIUM = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_duratium", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_DURATIUM_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_DURATIUM = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_duratium", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_DURATIUM_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_DURATIUM_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_duratium_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_DURATIUM, AbstractBlock.Settings.copy(Blocks.WATER))) : null;
+    public static final RegistrySupplier<Item> STILL_MOLTEN_DURATIUM_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_duratium_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_DURATIUM, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET))) : null;
 
     // energite
-    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_ENERGITE = FLUIDS.register("still_molten_energite", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_ENERGITE_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_ENERGITE = FLUIDS.register("flowing_molten_energite", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_ENERGITE_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_ENERGITE_BLOCK = BLOCKS.register("still_molten_energite_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_ENERGITE, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_MOLTEN_ENERGITE_BUCKET = ITEMS.register("still_molten_energite_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_ENERGITE, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_ENERGITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_energite", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_ENERGITE_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_ENERGITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_energite", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_ENERGITE_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_ENERGITE_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_energite_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_ENERGITE, AbstractBlock.Settings.copy(Blocks.WATER))) : null;
+    public static final RegistrySupplier<Item> STILL_MOLTEN_ENERGITE_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_energite_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_ENERGITE, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET))) : null;
 
     // fluxite
-    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_FLUXITE = FLUIDS.register("still_molten_fluxite", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_FLUXITE_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_FLUXITE = FLUIDS.register("flowing_molten_fluxite", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_FLUXITE_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_FLUXITE_BLOCK = BLOCKS.register("still_molten_fluxite_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_FLUXITE, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_MOLTEN_FLUXITE_BUCKET = ITEMS.register("still_molten_fluxite_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_FLUXITE, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_FLUXITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_fluxite", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_FLUXITE_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_FLUXITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_fluxite", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_FLUXITE_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_FLUXITE_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_fluxite_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_FLUXITE, AbstractBlock.Settings.copy(Blocks.WATER))) : null;
+    public static final RegistrySupplier<Item> STILL_MOLTEN_FLUXITE_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_fluxite_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_FLUXITE, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET))) : null;
     
     public static void registerFluids() {
         FLUIDS.register();
@@ -162,11 +165,13 @@ public class FluidContent {
         ItemGroups.add(ItemContent.Groups.components, STILL_FUEL_BUCKET.get());
         ItemGroups.add(ItemContent.Groups.components, STILL_BIOFUEL_BUCKET.get());
         ItemGroups.add(ItemContent.Groups.components, STILL_STEAM_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_ADAMANT_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_BIOSTEEL_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_DURATIUM_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_ENERGITE_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_FLUXITE_BUCKET.get());
+        if (Platform.isModLoaded("productivemetalworks")) {
+            ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_ADAMANT_BUCKET.get());
+            ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_BIOSTEEL_BUCKET.get());
+            ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_DURATIUM_BUCKET.get());
+            ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_ENERGITE_BUCKET.get());
+            ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_FLUXITE_BUCKET.get());
+        }
     }
     
 }

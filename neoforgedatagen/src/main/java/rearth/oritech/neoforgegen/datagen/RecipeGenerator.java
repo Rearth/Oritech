@@ -4,15 +4,31 @@ import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
+import rearth.oritech.neoforgegen.datagen.compat.ActuallyAdditionsRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.AlloySmelterRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.CreateRecipeGenerator;
+import rearth.oritech.neoforgegen.datagen.compat.EnderIORecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.EnergizedPowerRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.ImmersiveEngineeringRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.IndustrialForegoingRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.MekanismRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.MekanismGeneratorsRecipeGenerator;
+import rearth.oritech.neoforgegen.datagen.compat.PneumaticcraftRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.PowahRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.ProductiveMetalworksRecipeGenerator;
+
+import de.ellpeck.actuallyadditions.mod.ActuallyAdditions;
+import sk.alloy_smelter.AlloySmelter;
+import com.simibubi.create.Create;
+import com.enderio.core.EnderCore;
+import me.jddev0.ep.api.EPAPI;
+import blusunrize.immersiveengineering.ImmersiveEngineering;
+import com.buuz135.industrial.utils.Reference;
+import mekanism.common.Mekanism;
+import mekanism.generators.common.MekanismGenerators;
+import me.desht.pneumaticcraft.api.lib.Names;
+import owmii.powah.Powah;
+import cy.jdkdigital.productivemetalworks.ProductiveMetalworks;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -42,16 +58,18 @@ public class RecipeGenerator extends RecipeProvider implements IConditionBuilder
 
     @Override
     protected void buildRecipes(RecipeOutput exporter) {
-        // Not working yet. See https://github.com/TheFogIOF/AlloySmelter/issues/6
-        // AlloySmelterRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("alloy_smelter")));
-        CreateRecipeGenerator.generateRecipes(packOutput, registries, exporter.withConditions(this.modLoaded("create")));
-        EnergizedPowerRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("energizedpower")));
-        ImmersiveEngineeringRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("immersiveengineering")));
-        IndustrialForegoingRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("industrialforegoing")));
-        MekanismRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("mekanism")));
-        MekanismGeneratorsRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("mekanismgenerators")));
-        PowahRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("powah")));
-        ProductiveMetalworksRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded("productivemetalworks")));
+        ActuallyAdditionsRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(ActuallyAdditions.MODID)));
+        AlloySmelterRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(AlloySmelter.MOD_ID)));
+        CreateRecipeGenerator.generateRecipes(packOutput, registries, exporter.withConditions(this.modLoaded(Create.ID)));
+        EnderIORecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(EnderCore.MOD_ID)), this);
+        EnergizedPowerRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(EPAPI.MOD_ID)));
+        ImmersiveEngineeringRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(ImmersiveEngineering.MODID)));
+        IndustrialForegoingRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(Reference.MOD_ID)));
+        MekanismRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(Mekanism.MODID)));
+        MekanismGeneratorsRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(MekanismGenerators.MODID)));
+        PneumaticcraftRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(Names.MOD_ID)));
+        PowahRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(Powah.MOD_ID)));
+        ProductiveMetalworksRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(ProductiveMetalworks.MODID)));
 
         // Uranium clumps don't exist in Oritech, but Oritech should still be able to do something with them if they're added by another mod (like Create).
         // Also added in Fabric datagen with Fabric load conditions, but the Fabric versions should be excluded from the Neoforge build

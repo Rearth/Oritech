@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "pneumaticcraft"
+    }
+  ],
+  "type": "oritech:cooler",
+  "fluidInputAmount": 81000,
+  "fluidInputVariant": "pneumaticcraft:plastic",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:plastic_sheet"
+    }
+  ],
+  "time": 200
+}
