@@ -108,7 +108,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         var producedCount = consumedCount * WATER_RATIO;
         
         // update tanks
-        steamTank.extract(currentRecipe.getFluidInput().copyWithAmount((long) consumedCount), false);
+        steamTank.extract(steamTank.getStack().copyWithAmount((long) consumedCount), false);
         waterTank.insert(FluidStack.create(Fluids.WATER, (long) producedCount), false);
         
         // produce energy

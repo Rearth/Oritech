@@ -3,7 +3,6 @@ package rearth.oritech.init.recipes;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.platform.Platform;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
@@ -14,41 +13,40 @@ import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
+import rearth.oritech.util.FluidIngredient;
+
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.util.SimpleCraftingInventory;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class OritechRecipe implements Recipe<RecipeInput> {
     
     public static final int fluidDivider = Platform.isNeoForge() ? 81 : 1;  // dirty hack because bucket amounts are 81000 in neo, and 1000 in fabric, but datagen/recipes are on fabric
     
-    private final OritechRecipeType type;
-    private final List<Ingredient> inputs;
-    private final List<ItemStack> results;
-    private final FluidStack fluidInput;
-    private final FluidStack fluidOutput;
-    private final int time;
+    protected final OritechRecipeType type;
+    protected final List<Ingredient> inputs;
+    protected final List<ItemStack> results;
+    protected final FluidIngredient fluidInput;
+    protected final FluidStack fluidOutput;
+    protected final int time;
 
-    public static final OritechRecipe DUMMY = new OritechRecipe(-1, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER, FluidStack.empty(), FluidStack.empty());
+    public static final OritechRecipe DUMMY = new OritechRecipe(-1, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER, FluidIngredient.EMPTY, FluidStack.empty());
     
-    public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, @Nullable FluidStack fluidInput, @Nullable FluidStack fluidOutput) {
+    public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, @Nullable FluidIngredient fluidInput, @Nullable FluidStack fluidOutput) {
         this.type = type;
         this.results = results;
         this.inputs = inputs;
         this.time = time;
-        if (fluidInput == null) fluidInput = FluidStack.empty();
+        if (fluidInput == null) fluidInput = FluidIngredient.EMPTY;
         this.fluidInput = fluidInput;
         if (fluidOutput == null) fluidOutput = FluidStack.empty();
         this.fluidOutput = fluidOutput;
     }
     
     public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, Fluid inVariant, long inAmount, Fluid outVariant, long outAmount) {
-        this(time, inputs, results, type, FluidStack.create(inVariant, inAmount / fluidDivider), FluidStack.create(outVariant, outAmount / fluidDivider));
+        this(time, inputs, results, type, new FluidIngredient(inVariant, inAmount / fluidDivider), FluidStack.create(outVariant, outAmount / fluidDivider));
     }
-    
     
     
     @Override
@@ -162,7 +160,7 @@ public class OritechRecipe implements Recipe<RecipeInput> {
         return type;
     }
     
-    public @Nullable FluidStack getFluidInput() {
+    public @Nullable FluidIngredient getFluidInput() {
         return fluidInput;
     }
     

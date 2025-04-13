@@ -107,7 +107,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         if (isTankEmpty) return false;
         
         var recipeFluid = recipe.getFluidInput();
-        return recipeFluid.isFluidEqual(available) && available.getAmount() >= recipe.getFluidInput().getAmount();
+        return recipeFluid.matchesFluid(available) && available.getAmount() >= recipe.getFluidInput().getAmount();
     }
     
     @Override
@@ -137,7 +137,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         var output = activeRecipe.getFluidOutput();
         
         if (input != null && input.getAmount() > 0)
-            fluidContainer.getInputContainer().extract(input, false);
+            fluidContainer.getInputContainer().extract(fluidContainer.getInStack().copyWithAmount(input.getAmount()), false);
         if (output != null && output.getAmount() > 0)
             fluidContainer.getOutputContainer().insert(output, false);
         

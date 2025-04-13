@@ -11,6 +11,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import rearth.oritech.util.FluidIngredient;
 
 public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> implements RecipeType<OritechRecipe> {
     
@@ -24,8 +25,7 @@ public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> impl
       CodecUtils.toEndec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
       MinecraftEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
       MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
-      FLUID_ENDEC.fieldOf("fluidInputVariant", elem -> elem.getFluidInput().getFluid()),
-      Endec.LONG.fieldOf("fluidInputAmount", elem -> elem.getFluidInput().getAmount()),
+      CodecUtils.toEndec(FluidIngredient.MAP_CODEC.codec()).fieldOf("fluidInputIngredient", elem -> elem.getFluidInput()),
       FLUID_ENDEC.fieldOf("fluidOutputVariant", elem -> elem.getFluidOutput().getFluid()),
       Endec.LONG.fieldOf("fluidOutputAmount", elem -> elem.getFluidOutput().getAmount()),
       OritechRecipe::new
