@@ -374,7 +374,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         
         var maxApplicableDamage = mob.getHealth();
         var inflictedDamage = Math.min(remainingMomentum, maxApplicableDamage);
-        mob.damage(world.getDamageSources().magic(), remainingMomentum);
+        mob.damage(world.getDamageSources().magic(), inflictedDamage);
         var position = mob.getBoundingBox().getCenter();
         position = new Vec3d(position.x, particle.position.y, position.z);
         ParticleContent.BIG_HIT.spawn(world, position);
