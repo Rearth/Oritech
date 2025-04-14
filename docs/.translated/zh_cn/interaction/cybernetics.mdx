@@ -4,56 +4,56 @@ icon: oritech:augment_application_block
 related_items: [oritech:augment_application_block, oritech:simple_augment_station, oritech:advanced_augment_station, oritech:arcane_augment_station]
 ---
 
-The Cybernetic Augmentation Center is a facility that allows you to install cybernetic augmentations into your body.
-These augmentations can provide you with a variety of benefits, such as increased strength, speed, and protection.
-They can also grant you new abilities, such as the ability to see in the dark or to automatically keep you fed.
+赛博改造中心是一种允许你对你的身体安装赛博植入体的设备。
+这些植入体可以给你提供多种好处，例如增强力量、速度和防护。
+它们还可以赋予你新的能力，例如夜视或自动喂食。
 
 <Callout variant="info">
-    Augmentations are permanent upgrades to the player that don't require any energy or resources to maintain.
+    植入体是对玩家的永久升级，且不需要任何能量或资源来维持。
 </Callout>
 
 <center>
 <ModAsset location="oritech:augment_application_block" width={400} />
 </center>
 
-### Research Requirements
-All augmentations must first be researched in the Cybernetic Augmentation Center:
-1. Walk into the assembled machine to open the Research & Application GUI
-2. Each augmentation has unique energy and resource costs (stored in the center's or player inventory)
-3. Access the machine inventory via right-clicking the machine or using the GUI's bottom-left button
-4. Many researches require prerequisite augmentations (as shown in the tech tree)
+### 研究需求
+所有植入体都必须先在赛博改造中心里进行研究：
+1. 走进组装好的机器以打开研究与应用GUI
+2. 每种植入体都有独特的能量和资源消耗（存储在赛博改造中心或玩家物品栏）
+3. 通过右键点击机器或使用GUI左下角的按钮来访问机器物品栏
+4. 许多研究需要完成前置研究（如科技树所示）
 
 <center>
 <ModAsset location="oritech:area/cyborg_research_ui" width={700} />
 </center>
 
-### Research Stations
-- The augmentation center has 3 multiblock research slots (which are attached similar to addon slots)
-- Each station:
-  - Requires 3 machine cores
-  - Handles one research at a time
-  - Duplicate stations can enable parallel research
+### 研究站
+- 赛博改造中心有3个多方块研究站插槽（与使用插件槽位相似）
+- 每个研究站:
+  - 需要3个机械核心
+  - 同时只能进行一项研究
+  - 重复的研究站可以实现并行研究
 
-### Application Process
-1. Researched augments become available for installation
-2. Application requires additional resources
-3. Center stores all researched blueprints (per-machine, this means they'll be lost when the machine is destroyed)
-4. Existing player augmentations can be scanned via UI import button (bottom-left)
+### 应用过程
+1. 已研究的植入体可以安装
+2. 应用植入体需要额外的资源
+3. 赛博改造中心存储所有已研究的蓝图（每个机器独立，机器被破坏后丢失）
+4. 可以通过UI左下角的导入按钮扫描玩家已有的植入体
 
 <Callout variant="info">
-    Most augmentation data, such as research/apply cost, UI positioning, research stations, and dependencies can be configured via datapacks.
-    Adding / changing the augmentations themselves is not possible (yet).
+    大多数植入体数据，例如研究/应用消耗、UI位置、研究站和依赖关系可以通过数据包配置。
+    目前无法添加/更改植入体。
 </Callout>
 
-### Augmentation Management
-- All Augmentations are installed permanently (no maintenance or energy is required)
-- Some augments can be toggled; others remain always-active
-- Augmentations can be removed at any time, but the resources used for installation are lost.
+### 植入体管理
+- 所有植入体都是永久安装的（不需要维持或能量）
+- 一些植入体可以切换开关；有些则始终激活
+- 植入体可以被随时移除，但安装所使用的资源不会返还
 
-### Toggle Controls
-1. Press+hold augmentation hotkey ([G] by default)
-2. Hover over desired augment in radial UI
-3. Release to toggle it
+### 切换控制
+1. 按住配置植入体快捷键 (默认为[G])
+2. 将鼠标悬停在径向UI中要切换的植入体上
+3. 松开按键以切换
 
 <center>
 <ModAsset location="oritech:area/cyborg_ui" width={700} />
