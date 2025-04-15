@@ -77,7 +77,9 @@ public class TagContent {
     public static final TagKey<Item> PLASTIC_PLATES = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "plates/plastic"));
     
     // biomass
+    // BIOMASS tag is for items that can be ground into biomas
     public static final TagKey<Item> BIOMASS = TagKey.of(RegistryKeys.ITEM, Oritech.id("biomass"));
+    // BIOFUEL tag is for the biomass item and other similar items (Mekanism's bio fuel, Tech Reborn's plantball, etc.)
     public static final TagKey<Item> BIOFUEL = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "fuels/bio"));
     public static final TagKey<Item> BIOFUEL_BLOCK = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "fuels/block/bio"));
     

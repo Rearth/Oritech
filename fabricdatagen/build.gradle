@@ -15,7 +15,7 @@ loom {
             inherit server
             "Data Generation"
             vmArg "-Dfabric-api.datagen"
-            vmArg "-Dfabric-api.datagen.output-dir=${project(":common").file("src/generated")}"
+            vmArg "-Dfabric-api.datagen.output-dir=${project(":common").file("src/main/generated")}"
             vmArg "-Dfabric-api.datagen.modid=oritech"
             runDir "build/datagen"
         }

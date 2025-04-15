@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:empty",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "chance": 0.4,
+              "condition": "minecraft:random_chance"
+            }
+          ],
+          "name": "oritech:enderic_compound"
+        }
+      ],
+      "name": "enderic_compound_in_world_crafting",
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 3.0,
+        "min": 1.0
+      }
+    }
+  ],
+  "random_sequence": "oritech:compat/enderio/firecrafting/sculk"
+}

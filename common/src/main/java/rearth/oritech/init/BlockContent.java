@@ -36,6 +36,7 @@ import rearth.oritech.block.blocks.pipes.item.ItemPipeDuctBlock;
 import rearth.oritech.block.blocks.processing.*;
 import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
+import rearth.oritech.init.ItemContent.Compostable;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.util.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.item.OritechGeoItem;
@@ -385,6 +386,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block DURATIUM_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.NETHERITE_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    @Compostable(1.0f)
     public static final Block BIOMASS_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).sounds(BlockSoundGroup.MOSS_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block PLASTIC_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).sounds(BlockSoundGroup.SHROOMLIGHT));
@@ -422,6 +424,10 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
         
         if (field.isAnnotationPresent(DispenserPlace.class)) {
             DispenserBlock.registerBehavior(value, new BlockPlacementDispenserBehavior());
+        }
+
+        if (field.isAnnotationPresent(Compostable.class)) {
+            ComposterBlock.registerCompostableItem(field.getAnnotation(Compostable.class).value(), value.asItem());
         }
         
         ItemGroups.add(targetGroup, value);

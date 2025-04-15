@@ -162,14 +162,14 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             
             var hasRequirements = true;
             var missingRequirements = new ArrayList<Text>();
-            missingRequirements.add(Text.translatable("oritech.text.augment." + augmentId.getPath()).formatted(Formatting.BOLD));
+            missingRequirements.add(Text.translatable(augmentKey(augmentId).formatted(Formatting.BOLD)));
             missingRequirements.add(Text.translatable("oritech.text.missing_requirements_title"));
             for (var requirementId : augmentRecipe.getRequirements()) {
                 if (!this.handler.blockEntity.researchedAugments.contains(requirementId)) {
                     hasRequirements = false;
-                    missingRequirements.add(Text.translatable("oritech.text.augment." + requirementId.getPath()).formatted(Formatting.ITALIC, Formatting.RED));
+                    missingRequirements.add(Text.translatable(augmentKey(requirementId)).formatted(Formatting.ITALIC, Formatting.RED));
                 } else {
-                    missingRequirements.add(Text.translatable("oritech.text.augment." + requirementId.getPath()).formatted(Formatting.ITALIC, Formatting.DARK_GREEN));
+                    missingRequirements.add(Text.translatable(augmentKey(requirementId)).formatted(Formatting.ITALIC, Formatting.DARK_GREEN));
                 }
             }
             
@@ -190,13 +190,13 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             }
             
             var operation = PlayerAugments.AugmentOperation.RESEARCH;
-            var tooltipTitleText = Text.translatable("oritech.text.augment." + augmentId.getPath()).formatted(Formatting.BOLD);
+            var tooltipTitleText = Text.translatable(augmentKey(augmentId)).formatted(Formatting.BOLD);
             var tooltipOperation = "oritech.text.augment_op.research";
-            var tooltipDesc = Text.translatable("oritech.text.augment." + augmentId.getPath() + ".desc").formatted(Formatting.ITALIC, Formatting.GRAY);
+            var tooltipDesc = Text.translatable(augmentKey(augmentId) + ".desc").formatted(Formatting.ITALIC, Formatting.GRAY);
             
             var extraTooltips = new ArrayList<Text>();
             for (int i = 1; i < 8; i++) {
-                var key = "oritech.text.augment." + augmentId.getPath() + ".desc." + i;
+                var key = augmentKey(augmentId) + ".desc." + i;
                 if (I18n.hasTranslation(key))
                     extraTooltips.add(Text.translatable(key).formatted(Formatting.ITALIC, Formatting.GRAY));
             }
@@ -224,14 +224,14 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
                 
                 extraTooltips.stream().map(elem -> TooltipComponent.of(elem.asOrderedText())).forEach(collectedTooltip::add);
                 
-                var backgroundTexture = Oritech.id("textures/gui/augments/background_open.png");
+                var backgroundTexture = Oritech.id("textures/gui/augment/background_open.png");
                 
                 if (isApplied) {
-                    backgroundTexture = Oritech.id("textures/gui/augments/background_installed.png");
+                    backgroundTexture = Oritech.id("textures/gui/augment/background_installed.png");
                 } else if (isResearched) {
-                    backgroundTexture = Oritech.id("textures/gui/augments/background_completed.png");
+                    backgroundTexture = Oritech.id("textures/gui/augment/background_completed.png");
                 } else if (isResearching) {
-                    backgroundTexture = Oritech.id("textures/gui/augments/background_pending.png");
+                    backgroundTexture = Oritech.id("textures/gui/augment/background_pending.png");
                 } else {
                     // collect requirements / cost
                     var inputs = augmentRecipe.getResearchCost();
@@ -345,8 +345,8 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             
             var position = new Vector2i(leftOffset + augmentRecipe.getUiX() * 4, (int) (augmentRecipe.getUiY() / 100f * maxHeight));
             
-            var iconTexture = Oritech.id("textures/gui/augments/" + augmentId.getPath() + ".png");
-            var backgroundTexture = Oritech.id("textures/gui/augments/background_open.png");
+            var iconTexture = Oritech.id("textures/gui/" + augmentId.getPath() + ".png");
+            var backgroundTexture = Oritech.id("textures/gui/augment/background_open.png");
             
             final var augmentOpId = augmentId;
             
@@ -442,12 +442,12 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
         var overlay = Containers.overlay(panel);
         
-        var titleLabel = Components.label(Text.translatable("oritech.text.augment." + id.getPath()).formatted(Formatting.BOLD, Formatting.BLACK));
+        var titleLabel = Components.label(Text.translatable(augmentKey(id)).formatted(Formatting.BOLD, Formatting.BLACK));
         titleLabel.margins(Insets.of(3, 1, 0, 0));
         
-        descriptionPanel.child(Components.label(Text.translatable("oritech.text.augment." + id.getPath() + ".desc").formatted(Formatting.ITALIC, Formatting.GRAY)));
+        descriptionPanel.child(Components.label(Text.translatable(augmentKey(id) + ".desc").formatted(Formatting.ITALIC, Formatting.GRAY)));
         for (int i = 1; i < 8; i++) {
-            var key = "oritech.text.augment." + id.getPath() + ".desc." + i;
+            var key = augmentKey(id) + ".desc." + i;
             if (I18n.hasTranslation(key))
                 descriptionPanel.child(Components.label(Text.translatable(key).formatted(Formatting.ITALIC, Formatting.GRAY)));
             
@@ -634,6 +634,10 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         context.draw();
         
         matrices.pop();
+    }
+
+    public static String augmentKey(Identifier id) {
+        return "oritech.text." + id.getPath().replace('/', '.');
     }
     
     private static class CustomFlowRootContainer extends FlowLayout {

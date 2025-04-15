@@ -1,0 +1,25 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ae2"
+    }
+  ],
+  "type": "oritech:laser",
+  "fluidInputAmount": 0,
+  "fluidInputVariant": "minecraft:empty",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "item": "ae2:quartz_cluster"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "ae2:charged_certus_quartz_crystal"
+    }
+  ],
+  "time": 1
+}

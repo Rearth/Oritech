@@ -15,7 +15,7 @@ neoForge {
     runs {
         data {
             data()
-            programArguments.addAll '--all', '--mod', 'oritech_datagen', '--output', file('../neoforge/src/generated/').getAbsolutePath()
+            programArguments.addAll '--all', '--mod', 'oritech_datagen', '--output', file('../neoforge/src/main/generated/').getAbsolutePath()
         }
     }
 
@@ -147,4 +147,7 @@ dependencies {
     // Actually Additions
     implementation "curse.maven:actually-additions-228404:${actually_additions_version_id}"
     runtimeOnly "curse.maven:curios-309927:${curios_version_id}"
+
+    // Applied Energistics 2
+    implementation "curse.maven:applied-energistics-2-223794:${applied_energistics_version_id}"
 }

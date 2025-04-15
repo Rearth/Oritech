@@ -1,5 +1,6 @@
 package rearth.oritech.api.recipe.util;
 
+import net.fabricmc.fabric.api.tag.convention.v2.TagUtil;
 import net.minecraft.data.server.recipe.CraftingRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.RecipeProvider;
@@ -41,7 +42,11 @@ public class RecipeHelpers {
         return Ingredient.fromTag(item);
     }
 
+    public static TagKey<Item> itemTag(String namespace, String path) {
+        return TagKey.of(RegistryKeys.ITEM, Identifier.of(namespace, path));
+    }
+
     public static TagKey<Item> cItemTag(String path) {
-      return TagKey.of(RegistryKeys.ITEM, Identifier.of("c", path));
+      return itemTag(TagUtil.C_TAG_NAMESPACE, path);
     }
 }

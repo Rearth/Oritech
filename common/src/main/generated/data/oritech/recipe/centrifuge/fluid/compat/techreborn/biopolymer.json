@@ -1,0 +1,27 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "techreborn"
+      ]
+    }
+  ],
+  "type": "oritech:centrifuge_fluid",
+  "fluidInputAmount": 20250,
+  "fluidInputVariant": "minecraft:water",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "item": "techreborn:compressed_plantball"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:raw_biopolymer"
+    }
+  ],
+  "time": 200
+}

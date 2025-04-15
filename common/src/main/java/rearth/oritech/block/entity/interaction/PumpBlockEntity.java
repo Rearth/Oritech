@@ -121,7 +121,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             
             var targetBlock = pendingLiquidPositions.peekLast();
             
-            if (!world.getBlockState(targetBlock).isLiquid()) {
+            if (!world.getBlockState(targetBlock).getFluidState().isStill()) {
                 pendingLiquidPositions.pollLast();
                 return;
             }

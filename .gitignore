@@ -26,8 +26,8 @@ bin/
 .classpath
 .project
 */.cache
-common/src/generated/.cache/
-neoforge/src/generated/.cache/
+common/src/main/generated/.cache/
+neoforge/src/main/generated/.cache/
 
 # macos
 

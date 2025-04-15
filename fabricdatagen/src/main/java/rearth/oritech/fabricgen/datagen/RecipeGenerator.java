@@ -877,7 +877,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
             .applyCost(BlockContent.FLUXITE_BLOCK, 32)
             .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
             .applyCost(ConventionalItemTags.NORMAL_OBSIDIANS, 16)
-            .requirement(Oritech.id("augment/betteraromr"))
+            .requirement(Oritech.id("augment/betterarmor"))
             .requiredStation(ADVANCED_AUGMENT_STATION_ID)
             .uiX(155).uiY(50).time(2400).rfCost(500_000_000)
             .export(exporter, "ultimatearmor");

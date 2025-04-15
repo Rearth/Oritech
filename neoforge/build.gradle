@@ -101,7 +101,7 @@ processResources {
         expand version: project.version
     }
 
-    from('src/generated')
+    from('src/main/generated')
 }
 
 shadowJar {

@@ -18,6 +18,9 @@ import rearth.oritech.init.ToolsContent;
 
 import java.util.concurrent.CompletableFuture;
 
+import static rearth.oritech.api.recipe.util.RecipeHelpers.itemTag;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.cItemTag;
+
 public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
     
     public ItemTagGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> completableFuture) {
@@ -139,8 +142,8 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(TagContent.FEEDER_BLACKLIST)
           .addOptional(Identifier.of("relics", "infinity_ham"));
         
-        getOrCreateTagBuilder(getItemTag("bananas")).add(ItemContent.BANANA);
-        getOrCreateTagBuilder(getItemTag("foods/fruit")).add(ItemContent.BANANA);
+        getOrCreateTagBuilder(cItemTag("bananas")).add(ItemContent.BANANA);
+        getOrCreateTagBuilder(cItemTag("foods/fruit")).add(ItemContent.BANANA);
         
         // biomass
         getOrCreateTagBuilder(TagContent.BIOMASS)
@@ -192,7 +195,8 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(Items.WARPED_WART_BLOCK);
         
         getOrCreateTagBuilder(TagContent.BIOFUEL)
-          .add(ItemContent.BIOMASS);
+          .add(ItemContent.BIOMASS)
+          .addOptional(Identifier.of("techreborn", "plantball"));
         getOrCreateTagBuilder(TagContent.BIOFUEL_BLOCK)
           .add(BlockContent.BIOMASS_BLOCK.asItem());
         
@@ -242,7 +246,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         // plastic
         getOrCreateTagBuilder(TagContent.PLASTIC_PLATES)
           .add(ItemContent.PLASTIC_SHEET);
-        getOrCreateTagBuilder(getItemTag("plastics"))
+        getOrCreateTagBuilder(cItemTag("plastics"))
           .add(ItemContent.PLASTIC_SHEET);
         getOrCreateTagBuilder(TagKey.of(RegistryKeys.ITEM, Identifier.of("pneumaticcraft", "plastic_sheets")))
           .add(ItemContent.PLASTIC_SHEET);
@@ -298,7 +302,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
           .add(ItemContent.WRENCH);
         
-        getOrCreateTagBuilder(getItemTag("tools/wrench"))
+        getOrCreateTagBuilder(cItemTag("tools/wrench"))
           .add(ItemContent.WRENCH);
         
         getOrCreateTagBuilder(TagContent.REACTOR_COOLANT)
@@ -371,22 +375,18 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
     }
     
     public static TagKey<Item> getStorageBlockTag(String path) {
-        return getItemTag("storage_blocks/" + path);
+        return cItemTag("storage_blocks/" + path);
     }
     
     public static TagKey<Item> getIngotTag(String path) {
-        return getItemTag("ingots/" + path);
+        return cItemTag("ingots/" + path);
     }
 
     public static TagKey<Item> getClumpTag(String path) {
-        return getItemTag("clumps/" + path);
+        return cItemTag("clumps/" + path);
     }
     
     public static TagKey<Item> getDustTag(String path) {
-        return getItemTag("dusts/" + path);
-    }
-
-    public static TagKey<Item> getItemTag(String path) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(TagUtil.C_TAG_NAMESPACE, path));
+        return cItemTag("dusts/" + path);
     }
 }
