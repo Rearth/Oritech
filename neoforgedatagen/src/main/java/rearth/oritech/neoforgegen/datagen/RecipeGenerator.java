@@ -31,7 +31,6 @@ import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.neoforgegen.datagen.compat.ActuallyAdditionsRecipeGenerator;
-import rearth.oritech.neoforgegen.datagen.compat.AlloySmelterRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.AppliedEnergistics2RecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.CreateRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.EnderIORecipeGenerator;
@@ -43,7 +42,6 @@ import rearth.oritech.neoforgegen.datagen.compat.MekanismGeneratorsRecipeGenerat
 import rearth.oritech.neoforgegen.datagen.compat.PneumaticcraftRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.PowahRecipeGenerator;
 import rearth.oritech.neoforgegen.datagen.compat.ProductiveMetalworksRecipeGenerator;
-import sk.alloy_smelter.AlloySmelter;
 
 public class RecipeGenerator extends RecipeProvider implements IConditionBuilder {
     PackOutput packOutput;
@@ -59,7 +57,6 @@ public class RecipeGenerator extends RecipeProvider implements IConditionBuilder
     @Override
     protected void buildRecipes(RecipeOutput exporter) {
         ActuallyAdditionsRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(ActuallyAdditions.MODID)));
-        AlloySmelterRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(AlloySmelter.MOD_ID)));
         AppliedEnergistics2RecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(AEConstants.MOD_ID)));
         CreateRecipeGenerator.generateRecipes(packOutput, registries, exporter.withConditions(this.modLoaded(Create.ID)));
         EnderIORecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(EnderCore.MOD_ID)), this);

@@ -124,9 +124,6 @@ dependencies {
     // Energized Power
     implementation "curse.maven:energized-power-782147:${energized_power_version_id}"
 
-    // Alloy Smelter
-    implementation "maven.modrinth:alloy-smelter:${alloy_smelter_version_id}"
-
     // Productive Metalworks
     implementation "curse.maven:productive-metalworks-1184570:${productive_metalworks_version_id}"
 
