@@ -52,7 +52,7 @@ sourceSets {
         // make compat recipes available to fabric build
         resources {
             srcDir "src/main/generated"
-            include { "src/main/generated/**/compat" }
+            include "**/compat/**"
         }
         output.resourcesDir = "data"
     }
