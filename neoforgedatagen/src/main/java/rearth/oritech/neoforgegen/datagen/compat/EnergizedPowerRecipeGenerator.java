@@ -1,10 +1,6 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
-import rearth.oritech.Oritech;
-import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.TagContent;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 
 import me.jddev0.ep.item.EPItems;
 import me.jddev0.ep.recipe.AlloyFurnaceRecipe;
@@ -12,7 +8,7 @@ import me.jddev0.ep.recipe.AssemblingMachineRecipe;
 import me.jddev0.ep.recipe.FiltrationPlantRecipe;
 import me.jddev0.ep.recipe.IngredientWithCount;
 import me.jddev0.ep.recipe.OutputItemStackWithPercentages;
-
+import me.jddev0.ep.registry.tags.CommonItemTags;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -20,10 +16,12 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-
 import net.neoforged.neoforge.common.Tags;
-
-import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 
 public class EnergizedPowerRecipeGenerator {
     public static final String PATH = "compat/energizedpower";
@@ -81,9 +79,9 @@ public class EnergizedPowerRecipeGenerator {
 
     public static void addEPMetalProcessingRecipes(RecipeOutput exporter) {
         MetalProcessingChainBuilder.build("tin").resourcePath(PATH)
-            .ore(TagContent.TIN_ORES)
-            .rawOre(TagContent.TIN_RAW_MATERIALS, EPItems.RAW_TIN.get()).rawOreByproduct(Items.RAW_GOLD)
-            .ingot(TagContent.TIN_INGOTS, EPItems.TIN_INGOT.get())
+            .ore(CommonItemTags.ORES_TIN)
+            .rawOre(CommonItemTags.RAW_MATERIALS_TIN, EPItems.RAW_TIN.get()).rawOreByproduct(Items.RAW_GOLD)
+            .ingot(CommonItemTags.INGOTS_TIN, EPItems.TIN_INGOT.get())
             .dust(EPItems.TIN_DUST.get()).dustByproduct(ItemContent.COPPER_NUGGET)
             .export(exporter);
     }
@@ -92,9 +90,9 @@ public class EnergizedPowerRecipeGenerator {
         offerEPAssemblingMachineRecipe(exporter,
             new IngredientWithCount[]{
                 new IngredientWithCount(of(Items.HONEYCOMB), 1),
-                new IngredientWithCount(of(TagContent.BIOFUEL), 1),
-                new IngredientWithCount(of(TagContent.BIOFUEL), 1),
-                new IngredientWithCount(of(TagContent.BIOFUEL), 1)}, 
+                new IngredientWithCount(of(TagContent.BIOMASS), 1),
+                new IngredientWithCount(of(TagContent.BIOMASS), 1),
+                new IngredientWithCount(of(TagContent.BIOMASS), 1)}, 
             new ItemStack(Items.SLIME_BALL), "slime");
         offerEPAssemblingMachineRecipe(exporter,
             new IngredientWithCount[]{
@@ -126,9 +124,9 @@ public class EnergizedPowerRecipeGenerator {
             new ItemStack(Items.BOOK, 2), "book");
         offerEPAssemblingMachineRecipe(exporter,
             new IngredientWithCount[]{
-                new IngredientWithCount(of(TagContent.BIOFUEL), 1),
-                new IngredientWithCount(of(TagContent.BIOFUEL), 1),
-                new IngredientWithCount(of(TagContent.BIOFUEL), 1),
+                new IngredientWithCount(of(TagContent.BIOMASS), 1),
+                new IngredientWithCount(of(TagContent.BIOMASS), 1),
+                new IngredientWithCount(of(TagContent.BIOMASS), 1),
                 new IngredientWithCount(of(ItemTags.PLANKS), 1)},
             new ItemStack(ItemContent.SOLID_BIOFUEL), "solidbiofuel");
         offerEPAssemblingMachineRecipe(exporter,

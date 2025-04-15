@@ -1,32 +1,29 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
-import rearth.oritech.Oritech;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.FluidContent;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.TagContent;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
+
+import java.util.List;
 
 import cy.jdkdigital.productivemetalworks.datagen.recipe.BlockCastingRecipeBuilder;
 import cy.jdkdigital.productivemetalworks.datagen.recipe.FluidAlloyingRecipeBuilder;
 import cy.jdkdigital.productivemetalworks.datagen.recipe.ItemCastingRecipeBuilder;
 import cy.jdkdigital.productivemetalworks.datagen.recipe.ItemMeltingRecipeBuilder;
 import cy.jdkdigital.productivemetalworks.registry.MetalworksRegistrator;
-
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
-
-import java.util.List;
-
-import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
+import rearth.oritech.Oritech;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.FluidContent;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 
 public class ProductiveMetalworksRecipeGenerator {
     public static void generateRecipes(RecipeOutput exporter) {
@@ -87,8 +84,8 @@ public class ProductiveMetalworksRecipeGenerator {
         ItemMeltingRecipeBuilder.of(of(BlockContent.FLUXITE_BLOCK.asItem()), new FluidStack(FluidContent.STILL_MOLTEN_FLUXITE.get(), 900)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/fluxite"));
 
         // biomass
-        ItemMeltingRecipeBuilder.of(of(TagContent.BIOFUEL), new FluidStack(FluidContent.STILL_BIOFUEL.get(), 100)).save(exporter, Oritech.id("compat/productivemetalworks/melting/glob/bio"));
-        ItemMeltingRecipeBuilder.of(of(TagContent.BIOFUEL_BLOCK), new FluidStack(FluidContent.STILL_BIOFUEL.get(), 900)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/bio"));
+        ItemMeltingRecipeBuilder.of(of(TagContent.BIOMASS), new FluidStack(FluidContent.STILL_BIOFUEL.get(), 100)).save(exporter, Oritech.id("compat/productivemetalworks/melting/glob/bio"));
+        ItemMeltingRecipeBuilder.of(of(TagContent.BIOMASS_BLOCK), new FluidStack(FluidContent.STILL_BIOFUEL.get(), 900)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/bio"));
     }
 
     private static void addFluidAlloyingRecipes(RecipeOutput exporter) {

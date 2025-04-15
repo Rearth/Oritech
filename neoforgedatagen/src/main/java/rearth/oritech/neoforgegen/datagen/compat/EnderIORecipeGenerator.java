@@ -1,18 +1,13 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
-import rearth.oritech.Oritech;
-import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
-import rearth.oritech.api.recipe.FoundryRecipeBuilder;
-import rearth.oritech.neoforgegen.datagen.loot.FireCraftingLootProvider;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.createInsulatedCableRecipe;
 
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.TagContent;
+import java.util.List;
+import java.util.Optional;
 
 import com.enderio.base.common.init.EIOItems;
 import com.enderio.base.common.recipe.FireCraftingRecipe;
 import com.enderio.machines.common.blocks.alloy.AlloySmeltingRecipe;
-
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
@@ -22,14 +17,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.Level;
-
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
-
-import java.util.List;
-import java.util.Optional;
-
-import static rearth.oritech.api.recipe.util.RecipeHelpers.createInsulatedCableRecipe;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
+import rearth.oritech.api.recipe.FoundryRecipeBuilder;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
+import rearth.oritech.neoforgegen.datagen.loot.FireCraftingLootProvider;
 
 public class EnderIORecipeGenerator {
     private static final String PATH = "compat/enderio/";

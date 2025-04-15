@@ -23,11 +23,5 @@
   "output": {
     "item": "oritech:steel_ingot"
   },
-  "secondaryOutput": {
-    "output": {
-      "item": "minecraft:iron_ingot"
-    },
-    "percentages": []
-  },
   "ticks": 500
 }

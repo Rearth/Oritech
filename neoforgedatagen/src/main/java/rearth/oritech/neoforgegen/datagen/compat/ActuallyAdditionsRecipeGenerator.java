@@ -1,21 +1,18 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
+import de.ellpeck.actuallyadditions.mod.crafting.LiquidFuelRecipe;
+import de.ellpeck.actuallyadditions.mod.crafting.PressingRecipe;
+import de.ellpeck.actuallyadditions.mod.fluids.InitFluids;
+import de.ellpeck.actuallyadditions.mod.items.ActuallyItems;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.neoforged.neoforge.fluids.FluidStack;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.TagContent;
-
-import de.ellpeck.actuallyadditions.mod.crafting.LiquidFuelRecipe;
-import de.ellpeck.actuallyadditions.mod.crafting.PressingRecipe;
-import de.ellpeck.actuallyadditions.mod.fluids.InitFluids;
-import de.ellpeck.actuallyadditions.mod.items.ActuallyItems;
-
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
-
-import net.neoforged.neoforge.fluids.FluidStack;
 
 public class ActuallyAdditionsRecipeGenerator {
     private static final String PATH = "compat/actuallyadditions/";
@@ -48,7 +45,7 @@ public class ActuallyAdditionsRecipeGenerator {
         exporter.accept(Oritech.id(PATH + "fuel/fuel"), new LiquidFuelRecipe(new FluidStack(FluidContent.STILL_FUEL.get(), 50), 400, 48_000), null);
 
         // turn biomass into fluid biofuel
-        exporter.accept(Oritech.id(PATH + "pressing/biomass"), new PressingRecipe(Ingredient.of(TagContent.BIOFUEL), new FluidStack(FluidContent.STILL_BIOFUEL.get(), 80)), null);
+        exporter.accept(Oritech.id(PATH + "pressing/biomass"), new PressingRecipe(Ingredient.of(TagContent.BIOMASS), new FluidStack(FluidContent.STILL_BIOFUEL.get(), 80)), null);
 
     }
 }

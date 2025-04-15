@@ -1,5 +1,7 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
+import static rearth.oritech.init.TagContent.cItemTag;
+
 import appeng.core.definitions.AEBlocks;
 import appeng.core.definitions.AEItems;
 import appeng.recipes.handlers.ChargerRecipe;
@@ -11,8 +13,6 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.LaserRecipeBuilder;
 import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
 import rearth.oritech.init.ItemContent;
-
-import static rearth.oritech.api.recipe.util.RecipeHelpers.cItemTag;
 
 public class AppliedEnergistics2RecipeGenerator {
     private static final String PATH = "compat/ae2/";

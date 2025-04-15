@@ -23,11 +23,5 @@
   "output": {
     "item": "oritech:duratium_ingot"
   },
-  "secondaryOutput": {
-    "output": {
-      "item": "minecraft:iron_ingot"
-    },
-    "percentages": []
-  },
   "ticks": 1000
 }

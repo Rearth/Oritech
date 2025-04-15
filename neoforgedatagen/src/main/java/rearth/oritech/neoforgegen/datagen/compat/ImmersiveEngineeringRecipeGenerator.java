@@ -1,12 +1,9 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
-import rearth.oritech.Oritech;
-import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
-import rearth.oritech.api.recipe.FoundryRecipeBuilder;
-import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
-import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.TagContent;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
+import static rearth.oritech.init.TagContent.cItemTag;
+
+import java.util.List;
 
 import blusunrize.immersiveengineering.api.EnumMetals;
 import blusunrize.immersiveengineering.api.IETags;
@@ -19,9 +16,7 @@ import blusunrize.immersiveengineering.common.blocks.wooden.TreatedWoodStyles;
 import blusunrize.immersiveengineering.common.register.IEBlocks;
 import blusunrize.immersiveengineering.common.register.IEFluids;
 import blusunrize.immersiveengineering.common.register.IEItems;
-
 import dev.architectury.fluid.FluidStack;
-
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -29,13 +24,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-
 import net.neoforged.neoforge.common.Tags;
-
-import java.util.List;
-
-import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
-import static rearth.oritech.api.recipe.util.RecipeHelpers.cItemTag;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
+import rearth.oritech.api.recipe.FoundryRecipeBuilder;
+import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
+import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 
 public class ImmersiveEngineeringRecipeGenerator {
     private static final String PATH = "compat/immersiveengineering/";

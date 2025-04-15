@@ -3,7 +3,8 @@ package rearth.oritech.fabricgen.datagen;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import me.jddev0.ep.EnergizedPowerMod;
+import me.jddev0.ep.api.EPAPI;
+import net.emilsg.clutter.Clutter;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
@@ -47,6 +48,7 @@ import rearth.oritech.api.recipe.ReactorGeneratorRecipeBuilder;
 import rearth.oritech.api.recipe.SteamGeneratorRecipeBuilder;
 import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.fabricgen.datagen.compat.AlloyForgeryRecipeGenerator;
+import rearth.oritech.fabricgen.datagen.compat.ClutterRecipeGenerator;
 import rearth.oritech.fabricgen.datagen.compat.EnergizedPowerRecipeGenerator;
 import rearth.oritech.fabricgen.datagen.compat.MythicMetalsRecipeGenerator;
 import rearth.oritech.fabricgen.datagen.compat.TechRebornRecipeGenerator;
@@ -59,6 +61,7 @@ import techreborn.TechReborn;
 import wraith.alloyforgery.AlloyForgery;
 
 import static rearth.oritech.api.recipe.util.RecipeHelpers.*;
+import static rearth.oritech.init.TagContent.cItemTag;
 
 public class RecipeGenerator extends FabricRecipeProvider {
     
@@ -89,16 +92,17 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addReactorBlocks(exporter);
         addAugmentRecipes(exporter);
         
-        TechRebornRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(TechReborn.MOD_ID))));
-        EnergizedPowerRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(EnergizedPowerMod.MODID))));
         AlloyForgeryRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(AlloyForgery.MOD_ID))));
+        ClutterRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(Clutter.MOD_ID))));
+        EnergizedPowerRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(EPAPI.MOD_ID))));
         MythicMetalsRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(MythicMetals.MOD_ID))));
+        TechRebornRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(TechReborn.MOD_ID))));
     }
     
     private void addVanillaAdditions(RecipeExporter exporter) {
         
         // slimeball from honey and biomass
-        AssemblerRecipeBuilder.build().input(Items.HONEYCOMB).input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).result(Items.SLIME_BALL).timeMultiplier(0.8f).export(exporter, "slime");
+        AssemblerRecipeBuilder.build().input(Items.HONEYCOMB).input(TagContent.BIOMASS).input(TagContent.BIOMASS).input(TagContent.BIOMASS).result(Items.SLIME_BALL).timeMultiplier(0.8f).export(exporter, "slime");
         // fireball in assembler (gunpowder, blaze powder + coal) = 5 charges
         AssemblerRecipeBuilder.build().input(Items.GUNPOWDER).input(Items.BLAZE_POWDER).input(ItemTags.COALS).input(ItemTags.COALS).result(Items.FIRE_CHARGE, 4).timeMultiplier(0.8f).export(exporter, "fireball");
         // blaze rod (4 powder in assembler)
@@ -124,11 +128,28 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // centrifuge dirt into clay
         CentrifugeFluidRecipeBuilder.build().input(ItemTags.DIRT).result(Items.CLAY).fluidInput(Fluids.WATER, 0.25f).export(exporter, "clay");
         // create dirt from sand + biomass
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, Items.DIRT, 2).input('s', ItemTags.SAND).input('b', TagContent.BIOFUEL).pattern("sb").pattern("bs").criterion("has_biomass", conditionsFromTag(TagContent.BIOFUEL)).offerTo(exporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, Items.DIRT, 2).input('s', ItemTags.SAND).input('b', TagContent.BIOMASS).pattern("sb").pattern("bs").criterion("has_biomass", conditionsFromTag(TagContent.BIOMASS)).offerTo(exporter);
         // dripstone from dripstone block
         PulverizerRecipeBuilder.build().input(Items.DRIPSTONE_BLOCK).result(Items.POINTED_DRIPSTONE, 4).addToGrinder().export(exporter, "dripstone");
         // shroomlight from logs and 3 glowstone
         AssemblerRecipeBuilder.build().input(ItemTags.LOGS).input(Items.GLOWSTONE).input(Items.GLOWSTONE).input(Items.GLOWSTONE).result(Items.SHROOMLIGHT).timeMultiplier(0.8f).export(exporter, "shroomlight");
+        // recyclables
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_NETHERITE_SCRAP).result(Items.NETHERITE_SCRAP).addToGrinder().export(exporter, "recycle/netherite_scrap");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_DIAMOND).result(Items.DIAMOND).addToGrinder().export(exporter, "recycle/diamond");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_IRON_DUST).result(ItemContent.IRON_DUST).addToGrinder().export(exporter, "recycle/iron_dust");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_SMALL_IRON_DUST).result(ItemContent.SMALL_IRON_DUST).export(exporter, "recycle/small_iron_dust");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_GOLD_DUST).result(ItemContent.GOLD_DUST).export(exporter, "recycle/gold_dust");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_SMALL_GOLD_DUST).result(ItemContent.SMALL_GOLD_DUST).export(exporter, "recycle/small_gold_dust");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_COPPER_DUST).result(ItemContent.COPPER_DUST).export(exporter, "recycle/copper_dust");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_SMALL_COPPER_DUST).result(ItemContent.SMALL_COPPER_DUST).export(exporter, "recycle/small_copper_dust");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_2_QUARTZ_DUST).result(ItemContent.QUARTZ_DUST, 2).export(exporter, "recycle/2_quartz_dust");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_4_QUARTZ_DUST).result(ItemContent.QUARTZ_DUST, 4).export(exporter, "recycle/4_quartz_dust");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_REDSTONE_DUST).result(Items.REDSTONE).export(exporter, "recycle/redstone_dust");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_GRAVEL).result(Items.GRAVEL).export(exporter, "recycle/gravel");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_SAND).result(Items.SAND).export(exporter, "recycle/sand");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_RED_SAND).result(Items.RED_SAND).export(exporter, "recycle/red_sand");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_STRING).result(Items.STRING, 3).export(exporter, "recycle/string");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_BIOMASS).result(ItemContent.BIOMASS).export(exporter, "recycle/biomass");
     }
     
     private void addDyes(RecipeExporter exporter) {
@@ -161,11 +182,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
     private void addFuels(RecipeExporter exporter) {
         
         // bio
-        BioGeneratorRecipeBuilder.build().input(TagContent.BIOMASS).timeInSeconds(15).export(exporter, "rawbio");
+        BioGeneratorRecipeBuilder.build().input(TagContent.BIOMATTER).timeInSeconds(15).export(exporter, "rawbio");
         BioGeneratorRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).timeInSeconds(200).export(exporter, "packedwheat");
-        BioGeneratorRecipeBuilder.build().input(TagContent.BIOFUEL).timeInSeconds(30).export(exporter, "biomass");
+        BioGeneratorRecipeBuilder.build().input(TagContent.BIOMASS).timeInSeconds(30).export(exporter, "biomass");
         BioGeneratorRecipeBuilder.build().input(ItemContent.SOLID_BIOFUEL).timeInSeconds(160).export(exporter, "solidbiomass");
-        BioGeneratorRecipeBuilder.build().input(TagContent.BIOFUEL_BLOCK).timeInSeconds(270).export(exporter, "biomassblock");
+        BioGeneratorRecipeBuilder.build().input(TagContent.BIOMASS_BLOCK).timeInSeconds(270).export(exporter, "biomassblock");
         BioGeneratorRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).timeInSeconds(300).export(exporter, "polymer");
         BioGeneratorRecipeBuilder.build().input(ItemContent.UNHOLY_INTELLIGENCE).timeInSeconds(3000).export(exporter, "vex");
         // lava
@@ -179,10 +200,10 @@ public class RecipeGenerator extends FabricRecipeProvider {
     
     private void addBiomass(RecipeExporter exporter) {
         // biomass
-        PulverizerRecipeBuilder.build().input(TagContent.BIOMASS).result(ItemContent.BIOMASS).addToGrinder().export(exporter, "biobasic");
+        PulverizerRecipeBuilder.build().input(TagContent.BIOMATTER).result(ItemContent.BIOMASS).addToGrinder().export(exporter, "biobasic");
         PulverizerRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).result(ItemContent.BIOMASS, 16).addToGrinder().export(exporter, "packagedwheatbio");
         PulverizerRecipeBuilder.build().input(cItemTag("storage_blocks/wheat")).result(ItemContent.BIOMASS, 16).addToGrinder().export(exporter, "hay_block");
-        AssemblerRecipeBuilder.build().input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).input(TagContent.BIOFUEL).input(ItemTags.PLANKS).result(ItemContent.SOLID_BIOFUEL).timeMultiplier(0.8f).export(exporter, "solidbiofuel");
+        AssemblerRecipeBuilder.build().input(TagContent.BIOMASS).input(TagContent.BIOMASS).input(TagContent.BIOMASS).input(ItemTags.PLANKS).result(ItemContent.SOLID_BIOFUEL).timeMultiplier(0.8f).export(exporter, "solidbiofuel");
     }
     
     private void addEquipment(RecipeExporter exporter) {
@@ -479,7 +500,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offer2x2CompactingRecipe(exporter, RecipeCategory.MISC, ItemContent.PACKED_WHEAT, Items.WHEAT);
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.SOLID_BIOFUEL).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_biomass");
-        CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOFUEL_BLOCK).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_bioblock");
+        CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOMASS_BLOCK).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_bioblock");
         CentrifugeFluidRecipeBuilder.build().input(ItemTags.SAND).result(ItemContent.POLYMER_RESIN).fluidInput(FluidContent.STILL_OIL.get(), 0.1f).time(100).export(exporter, "polymerresin");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).result(ItemContent.PLASTIC_SHEET).fluidInput(Fluids.WATER, 0.5f).export(exporter, "plasticoil");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.POLYMER_RESIN).result(ItemContent.PLASTIC_SHEET).fluidInput(Fluids.WATER, 0.5f).time(66).export(exporter, "plasticbio");
@@ -504,7 +525,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // fuel
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(FluidContent.STILL_OIL.get()).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(FluidContent.STILL_BIOFUEL.get()).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel_from_biofuel");
-        CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOFUEL).fluidOutput(FluidContent.STILL_BIOFUEL.get(), 0.1f).timeMultiplier(0.2f).export(exporter, "biofuel");
+        CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOMASS).fluidOutput(FluidContent.STILL_BIOFUEL.get(), 0.1f).timeMultiplier(0.2f).export(exporter, "biofuel");
         
         // biosteel
         FoundryRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).input(ConventionalItemTags.IRON_INGOTS).result(ItemContent.BIOSTEEL_INGOT).export(exporter, "biosteel");
@@ -554,7 +575,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         // iron chain
         MetalProcessingChainBuilder.build("iron")
-            .ore(TagContent.IRON_ORES)
+            .ore(ItemTags.IRON_ORES)
             .rawOre(ConventionalItemTags.IRON_RAW_MATERIALS, Items.RAW_IRON)
             .rawOreByproduct(ItemContent.RAW_NICKEL)
             .ingot(ConventionalItemTags.IRON_INGOTS, Items.IRON_INGOT).nugget(ConventionalItemTags.IRON_NUGGETS, Items.IRON_NUGGET)
@@ -565,7 +586,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
             .export(exporter);
         // copper chain
         MetalProcessingChainBuilder.build("copper")
-            .ore(TagContent.COPPER_ORES)
+            .ore(ItemTags.COPPER_ORES)
             .rawOre(ConventionalItemTags.COPPER_RAW_MATERIALS, Items.RAW_COPPER).rawOreByproduct(Items.RAW_GOLD)
             .ingot(ConventionalItemTags.COPPER_INGOTS, Items.COPPER_INGOT).nugget(TagContent.COPPER_NUGGETS, ItemContent.COPPER_NUGGET)
             .clump(TagContent.COPPER_CLUMPS, ItemContent.COPPER_CLUMP).smallClump(ItemContent.SMALL_COPPER_CLUMP).clumpByproduct(ItemContent.SMALL_GOLD_CLUMP)
@@ -575,7 +596,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
             .export(exporter);
         // gold chain
         MetalProcessingChainBuilder.build("gold")
-            .ore(TagContent.GOLD_ORES)
+            .ore(ItemTags.GOLD_ORES)
             .rawOre(ConventionalItemTags.GOLD_RAW_MATERIALS, Items.RAW_GOLD).rawOreByproduct(Items.RAW_COPPER)
             .ingot(ConventionalItemTags.GOLD_INGOTS, Items.GOLD_INGOT).nugget(ConventionalItemTags.GOLD_NUGGETS, Items.GOLD_NUGGET)
             .clump(TagContent.GOLD_CLUMPS, ItemContent.GOLD_CLUMP).smallClump(ItemContent.SMALL_GOLD_CLUMP).clumpByproduct(ItemContent.SMALL_COPPER_CLUMP)
@@ -838,7 +859,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         AugmentRecipeBuilder.build()
             .researchCost(ItemContent.RAW_BIOPOLYMER, 64)
             .researchCost(ItemContent.SMALL_URANIUM_DUST, 32)
-            .researchCost(TagContent.BIOMASS, 64)
+            .researchCost(TagContent.BIOMATTER, 64)
             .applyCost(ItemContent.RAW_BIOPOLYMER, 32)
             .applyCost(ConventionalItemTags.IRON_INGOTS, 64)
             .requirement(Oritech.id("augment/dwarf"))
@@ -1039,9 +1060,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         AugmentRecipeBuilder.build()
             .researchCost(ItemContent.PROCESSING_UNIT, 64)
-            .researchCost(TagContent.BIOMASS, 48)
+            .researchCost(TagContent.BIOMATTER, 48)
             .researchCost(Items.GOLDEN_CARROT, 64)
-            .applyCost(TagContent.BIOMASS, 32)
+            .applyCost(TagContent.BIOMATTER, 32)
             .applyCost(BlockContent.ITEM_PIPE, 64)
             .applyCost(Items.HOPPER, 8)
             .requirement(Oritech.id("augment/armor"))

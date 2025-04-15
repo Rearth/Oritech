@@ -6,7 +6,7 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "tag": "oritech:biomass"
+      "tag": "oritech:biomatter"
     }
   ],
   "results": [],

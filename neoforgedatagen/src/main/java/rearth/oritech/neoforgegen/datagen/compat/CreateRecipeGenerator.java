@@ -1,20 +1,16 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
-import rearth.oritech.Oritech;
-import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
-import rearth.oritech.api.recipe.FoundryRecipeBuilder;
-import rearth.oritech.api.recipe.GrinderRecipeBuilder;
-import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
-import rearth.oritech.init.FluidContent;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.TagContent;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
+import static rearth.oritech.init.TagContent.cItemTag;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.processing.recipe.HeatCondition;
 import com.simibubi.create.foundation.data.recipe.CrushingRecipeGen;
 import com.simibubi.create.foundation.data.recipe.MixingRecipeGen;
 import com.simibubi.create.foundation.data.recipe.WashingRecipeGen;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -27,13 +23,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluids;
-
 import net.neoforged.neoforge.common.Tags;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
+import rearth.oritech.api.recipe.FoundryRecipeBuilder;
+import rearth.oritech.api.recipe.GrinderRecipeBuilder;
+import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
+import rearth.oritech.init.FluidContent;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 
 public class CreateRecipeGenerator {
     private static final String PATH = "compat/create/";
@@ -71,11 +69,11 @@ public class CreateRecipeGenerator {
 
     private static void addMetalProcessing(RecipeOutput exporter) {
         MetalProcessingChainBuilder.build("zinc").resourcePath(PATH)
-            .ore(TagContent.ZINC_ORES)
-            .rawOre(TagContent.ZINC_RAW_MATERIALS, AllItems.RAW_ZINC.asItem()).rawOreByproduct(Items.GUNPOWDER)
-            .ingot(TagContent.ZINC_INGOTS, AllItems.ZINC_INGOT.asItem())
-            .nugget(TagContent.ZINC_NUGGETS, AllItems.ZINC_NUGGET.asItem())
-            .clump(TagContent.ZINC_CLUMPS, AllItems.CRUSHED_ZINC.asItem()).clumpByproduct(Items.GUNPOWDER).byproductAmount(1)
+            .ore(cItemTag("ores/zinc"))
+            .rawOre(cItemTag("raw_materials/zinc"), AllItems.RAW_ZINC.asItem()).rawOreByproduct(Items.GUNPOWDER)
+            .ingot(cItemTag("ingots/zinc"), AllItems.ZINC_INGOT.asItem())
+            .nugget(cItemTag("nuggets/zinc"), AllItems.ZINC_NUGGET.asItem())
+            .clump(cItemTag("clumps/zinc"), AllItems.CRUSHED_ZINC.asItem()).clumpByproduct(Items.GUNPOWDER).byproductAmount(1)
             .centrifugeResult(AllItems.ZINC_NUGGET.asItem(), 9)
             .export(exporter);
     }

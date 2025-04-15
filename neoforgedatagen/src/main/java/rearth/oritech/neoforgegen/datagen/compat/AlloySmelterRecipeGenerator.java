@@ -1,11 +1,8 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
-import rearth.oritech.Oritech;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.TagContent;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 
-import sk.alloy_smelter.recipe.SmeltingRecipe;
-import sk.alloy_smelter.recipe.SmeltingRecipe.Material;
+import java.util.List;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -13,12 +10,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-
 import net.neoforged.neoforge.common.Tags;
-
-import java.util.List;
-
-import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
+import rearth.oritech.Oritech;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
+import sk.alloy_smelter.recipe.SmeltingRecipe;
+import sk.alloy_smelter.recipe.SmeltingRecipe.Material;
 
 public class AlloySmelterRecipeGenerator {
     public static void generateRecipes(RecipeOutput exporter) {

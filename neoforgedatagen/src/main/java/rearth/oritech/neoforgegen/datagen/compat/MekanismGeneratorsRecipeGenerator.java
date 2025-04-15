@@ -1,12 +1,10 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
-import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
-
+import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
 import mekanism.generators.common.registries.GeneratorsFluids;
-
-import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
 import net.minecraft.data.recipes.RecipeOutput;
+import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
 
 public class MekanismGeneratorsRecipeGenerator {
     private static String PATH = "compat/mekanism/";

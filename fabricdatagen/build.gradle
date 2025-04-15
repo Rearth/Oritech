@@ -96,6 +96,9 @@ dependencies {
     modRuntimeOnly "org.ladysnake.cardinal-components-api:cardinal-components-base:${cardinal_components_version}"
     modRuntimeOnly "org.ladysnake.cardinal-components-api:cardinal-components-entity:${cardinal_components_version}"
     modRuntimeOnly "maven.modrinth:additionalentityattributes:${additional_entity_attributes_version}"
+    // Clutter
+    modImplementation "curse.maven:clutter-826060:${clutter_version_id}"
+    modRuntimeOnly "com.terraformersmc.terraform-api:terraform-wood-api-v1:${project.terraform_wood_api_version}"
 }
 
 processResources {

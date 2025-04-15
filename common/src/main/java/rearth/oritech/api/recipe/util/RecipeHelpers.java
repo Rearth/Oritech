@@ -41,12 +41,4 @@ public class RecipeHelpers {
     public static Ingredient of(TagKey<Item> item) {
         return Ingredient.fromTag(item);
     }
-
-    public static TagKey<Item> itemTag(String namespace, String path) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(namespace, path));
-    }
-
-    public static TagKey<Item> cItemTag(String path) {
-      return itemTag(TagUtil.C_TAG_NAMESPACE, path);
-    }
 }

@@ -1,0 +1,12 @@
+{
+  "values": [
+    "minecraft:activator_rail",
+    "minecraft:chain",
+    "minecraft:detector_rail",
+    "minecraft:flint_and_steel",
+    "minecraft:heavy_weighted_pressure_plate",
+    "minecraft:iron_bars",
+    "minecraft:rail",
+    "minecraft:tripwire_hook"
+  ]
+}

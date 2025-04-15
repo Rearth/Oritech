@@ -23,11 +23,5 @@
   "output": {
     "item": "oritech:biosteel_ingot"
   },
-  "secondaryOutput": {
-    "output": {
-      "item": "minecraft:iron_ingot"
-    },
-    "percentages": []
-  },
   "ticks": 500
 }

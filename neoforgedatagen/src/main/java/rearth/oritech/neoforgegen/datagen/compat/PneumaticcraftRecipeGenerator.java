@@ -1,19 +1,16 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
+import me.desht.pneumaticcraft.common.registry.ModFluids;
+import me.desht.pneumaticcraft.common.registry.ModItems;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.common.Tags;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.api.recipe.CoolerRecipeBuilder;
 import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
 import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
-
-import me.desht.pneumaticcraft.common.registry.ModFluids;
-import me.desht.pneumaticcraft.common.registry.ModItems;
-
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.world.level.material.Fluids;
-
-import net.neoforged.neoforge.common.Tags;
 
 public class PneumaticcraftRecipeGenerator {
     public static final String PATH = "compat/pneumaticcraft/";

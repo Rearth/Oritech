@@ -1,12 +1,8 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
-import rearth.oritech.Oritech;
-import rearth.oritech.api.recipe.AtomicForgeRecipeBuilder;
-import rearth.oritech.api.recipe.FoundryRecipeBuilder;
-import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
-import rearth.oritech.api.recipe.util.RecipeHelpers;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.TagContent;
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
+
+import java.util.List;
 
 import mekanism.api.datagen.recipe.builder.ItemStackChemicalToItemStackRecipeBuilder;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
@@ -16,18 +12,19 @@ import mekanism.common.resource.PrimaryResource;
 import mekanism.common.resource.ResourceType;
 import mekanism.common.resource.ore.OreType;
 import mekanism.common.tags.MekanismTags;
-
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-
 import net.neoforged.neoforge.common.Tags;
-
-import java.util.List;
-
-import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.AtomicForgeRecipeBuilder;
+import rearth.oritech.api.recipe.FoundryRecipeBuilder;
+import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
+import rearth.oritech.api.recipe.util.RecipeHelpers;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 
 public class MekanismRecipeGenerator {
     private static final String PATH = "compat/mekanism/";
@@ -92,7 +89,7 @@ public class MekanismRecipeGenerator {
     }
 
     private static void addDustGrinding(RecipeOutput exporter) {
-        RecipeHelpers.addDustRecipe(exporter, of(TagContent.BRONZE_INGOTS), MekanismItems.BRONZE_DUST.asItem(), PATH + "dust/bronze");
+        RecipeHelpers.addDustRecipe(exporter, of(MekanismTags.Items.INGOTS_BRONZE), MekanismItems.BRONZE_DUST.asItem(), PATH + "dust/bronze");
         RecipeHelpers.addDustRecipe(exporter, of(Items.CHARCOAL), MekanismItems.CHARCOAL_DUST.asItem(), "compat/mekanism/dust/charcoal");
         RecipeHelpers.addDustRecipe(exporter, of(Tags.Items.GEMS_DIAMOND), MekanismItems.DIAMOND_DUST.asItem(), "compat/mekanism/dust/diamond");
         RecipeHelpers.addDustRecipe(exporter, of(Tags.Items.GEMS_EMERALD), MekanismItems.EMERALD_DUST.asItem(), "compat/mekanism/dust/emerald");

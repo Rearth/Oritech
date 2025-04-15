@@ -1,19 +1,16 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
-import rearth.oritech.Oritech;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.TagContent;
-
-import owmii.powah.block.energizing.EnergizingRecipe;
+import java.util.List;
 
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-
 import net.neoforged.neoforge.common.Tags;
-
-import java.util.List;
+import owmii.powah.block.energizing.EnergizingRecipe;
+import rearth.oritech.Oritech;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 
 public class PowahRecipeGenerator {
     public static void generateRecipes(RecipeOutput exporter)     {

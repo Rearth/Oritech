@@ -4,7 +4,7 @@
     {
       "count": 32,
       "ingredient": {
-        "tag": "oritech:biomass"
+        "tag": "oritech:biomatter"
       }
     },
     {
@@ -35,7 +35,7 @@
     {
       "count": 48,
       "ingredient": {
-        "tag": "oritech:biomass"
+        "tag": "oritech:biomatter"
       }
     },
     {
