@@ -3,6 +3,7 @@ package rearth.oritech.fabricgen.datagen;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import dev.architectury.fluid.FluidStack;
 import me.jddev0.ep.api.EPAPI;
 import net.emilsg.clutter.Clutter;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -184,7 +185,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // bio
         BioGeneratorRecipeBuilder.build().input(TagContent.BIOMATTER).timeInSeconds(15).export(exporter, "rawbio");
         BioGeneratorRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).timeInSeconds(200).export(exporter, "packedwheat");
-        BioGeneratorRecipeBuilder.build().input(TagContent.BIOMASS).timeInSeconds(30).export(exporter, "biomass");
+        BioGeneratorRecipeBuilder.build().input(TagContent.BIOMASS).timeInSeconds(25).export(exporter, "biomass");
         BioGeneratorRecipeBuilder.build().input(ItemContent.SOLID_BIOFUEL).timeInSeconds(160).export(exporter, "solidbiomass");
         BioGeneratorRecipeBuilder.build().input(TagContent.BIOMASS_BLOCK).timeInSeconds(270).export(exporter, "biomassblock");
         BioGeneratorRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).timeInSeconds(300).export(exporter, "polymer");
@@ -195,7 +196,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_OIL.get(), 0.1f).timeInSeconds(3).export(exporter, "crude");
         FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_FUEL.get(), 0.1f).timeInSeconds(12).export(exporter, "fuel");
         //steam
-        SteamGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_STEAM.get()).export(exporter, "steameng");
+        SteamGeneratorRecipeBuilder.build().fluidInput(FluidStack.create(FluidContent.STILL_STEAM.get(), 32)).time(1).export(exporter, "steameng");
     }
     
     private void addBiomass(RecipeExporter exporter) {

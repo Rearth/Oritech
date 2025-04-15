@@ -227,16 +227,16 @@ public class EnergizedPowerRecipeGenerator {
         // Items.EMPTY would be better, but exporter is rejecting that. 0% chance of dropping iron ingot should be fine.
         var secondary = new OutputItemStackWithPercentages(new ItemStack(Items.IRON_INGOT), new double[0]);
         var recipe = new AlloyFurnaceRecipe(output, secondary, inputs, ticks);
-        exporter.accept(Oritech.id("compat/energizedpower/alloyfurance/" + suffix), recipe, null);
+        exporter.accept(Oritech.id(PATH + "/alloyfurnace/" + suffix), recipe, null);
     }
 
     private static void offerEPAssemblingMachineRecipe(RecipeExporter exporter, IngredientWithCount[] inputs, ItemStack output, String suffix) {
         var recipe = new AssemblingMachineRecipe(output, inputs);
-        exporter.accept(Oritech.id("compat/energizedpower/assemblingmachine/" + suffix), recipe, null);
+        exporter.accept(Oritech.id(PATH + "/assemblingmachine/" + suffix), recipe, null);
     }
 
     private static void offerEPOreFiltrationRecipe(RecipeExporter exporter, OutputItemStackWithPercentages output, OutputItemStackWithPercentages secondaryOutput, String suffix) {
         var recipe = new FiltrationPlantRecipe(output, secondaryOutput, Registries.ITEM.getId(output.output().getItem()));
-        exporter.accept(Oritech.id("compat/energizedpower/filtrationplant/" + suffix), recipe, null);
+        exporter.accept(Oritech.id(PATH + "/filtrationplant/" + suffix), recipe, null);
     }   
 }

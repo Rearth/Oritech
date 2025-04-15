@@ -239,7 +239,7 @@ public class MetalProcessingChainBuilder {
 
         // ore block -> raw ores
         PulverizerRecipeBuilder.build().input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier).export(exporter, resourcePath + "ore/" + metalName);
-        var grinderOreRecipe = GrinderRecipeBuilder.build().input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier);
+        var grinderOreRecipe = GrinderRecipeBuilder.build().input(ore).result(rawOreItem, 2).time(140).timeMultiplier(timeMultiplier);
         if (rawOreByproduct != null)
             grinderOreRecipe.result(rawOreByproduct);
         grinderOreRecipe.export(exporter, resourcePath + "ore/" + metalName);
@@ -261,7 +261,7 @@ public class MetalProcessingChainBuilder {
                 .result(firstNonNull(clumpItem, dustItem))
                 .result(firstNonNullOptional(smallClumpItem, smallDustItem, nuggetItem), 3)
                 .result(Optional.fromNullable(clumpByproduct), byproductAmount)
-                .timeMultiplier(timeMultiplier)
+                .time(140).timeMultiplier(timeMultiplier)
                 .export(exporter, resourcePath + "raw/" + metalName);
         }
 
@@ -277,7 +277,7 @@ public class MetalProcessingChainBuilder {
                 .input(clumpIngredient)
                 .fluidInput(Fluids.WATER)
                 .result(firstNonNull(centrifugeResult, gemItem), 2)
-                .timeMultiplier(timeMultiplier * 1.5f)
+                .time(300).timeMultiplier(timeMultiplier)
                 .export(exporter, resourcePath + "clump/" + metalName);
         }
 
@@ -302,7 +302,7 @@ public class MetalProcessingChainBuilder {
         if (vanillaProcessing) {
             if (dustItem != null) {
                 RecipeProvider.offerSmelting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
-                RecipeProvider.offerBlasting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1, 100, Oritech.MOD_ID);
+                RecipeProvider.offerBlasting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
                 RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, dustItem, smallDustItem);
             }
             if (smallDustItem != null) {
@@ -311,7 +311,7 @@ public class MetalProcessingChainBuilder {
             }
             if (gemItem != null) {
                 RecipeProvider.offerSmelting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
-                RecipeProvider.offerBlasting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1, 100, Oritech.MOD_ID);
+                RecipeProvider.offerBlasting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
             }
             if (clumpItem != null && smallClumpItem != null)
                 RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, clumpItem, smallClumpItem);
