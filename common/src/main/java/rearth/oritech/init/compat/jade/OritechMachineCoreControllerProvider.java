@@ -30,7 +30,7 @@ public enum OritechMachineCoreControllerProvider implements IBlockComponentProvi
         if (accessor.getBlockEntity() instanceof MachineCoreEntity coreEntity) {
             var controllerEntity = coreEntity.getCachedController();
             if (controllerEntity != null) {
-                var controller = accessor.getLevel().getBlockState(controllerEntity.getMachinePos()).getBlock();
+                var controller = accessor.getLevel().getBlockState(controllerEntity.getPosForMultiblock()).getBlock();
                 data.putString("controller", controller.getTranslationKey());
             }
         }

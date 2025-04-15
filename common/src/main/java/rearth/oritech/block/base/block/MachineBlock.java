@@ -1,6 +1,7 @@
 package rearth.oritech.block.base.block;
 
 import com.mojang.serialization.MapCodec;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -16,6 +17,8 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -26,6 +29,8 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
+import rearth.oritech.util.StackContext;
+import rearth.oritech.util.fluid.FluidApi;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -120,6 +125,51 @@ public abstract class MachineBlock extends HorizontalFacingBlock implements Bloc
         }
         
         return ActionResult.SUCCESS;
+    }
+    
+    @Override
+    public ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        
+        var blockEntity = world.getBlockEntity(pos);
+        if (blockEntity instanceof FluidApi.BlockProvider tankEntity) {
+            var usedStack = stack;
+            if (stack.getCount() > 1) {
+                usedStack = stack.copyWithCount(1);
+            }
+            var stackRef = new StackContext(usedStack, updated -> {
+                if (stack.getCount() > 1) {
+                    stack.decrement(1);
+                    if (!player.getInventory().insertStack(updated)) {
+                        player.dropItem(updated, true);
+                    }
+                } else {
+                    player.setStackInHand(hand, updated);
+                }
+            });
+            
+            var candidate = FluidApi.ITEM.find(stackRef);
+            if (candidate != null) {
+                
+                var fluidStorage = tankEntity.getFluidStorage(null);
+                
+                if (!world.isClient) {
+                    if (candidate.getContent().getFirst().isEmpty()) { // from tank to item
+                        var moved = FluidApi.transferFirst(fluidStorage, candidate, FluidStackHooks.bucketAmount() * 8, false);
+                        if (moved == 0) {   // attempt last if first did not work
+                            moved = FluidApi.transferLast(fluidStorage, candidate, FluidStackHooks.bucketAmount() * 8, false);
+                        }
+                        Oritech.LOGGER.debug("moved to item {} {}", moved, stackRef.getValue());
+                    } else {    // from item to tank
+                        var moved = FluidApi.transferFirst(candidate, fluidStorage, FluidStackHooks.bucketAmount() * 8, false);
+                        Oritech.LOGGER.debug("moved from item {} {}", moved, stackRef.getValue());
+                    }
+                }
+                
+                return ItemActionResult.success(true);
+            }
+        }
+        
+        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
     }
     
     @Override

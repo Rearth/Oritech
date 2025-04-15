@@ -1,16 +1,16 @@
 package rearth.oritech.util.energy;
 
-import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.Item;
+import rearth.oritech.util.StackContext;
 
 import java.util.function.Supplier;
 
 public interface ItemEnergyApi {
     
-    void registerForItem(Supplier<net.minecraft.item.Item> itemSupplier);
+    void registerForItem(Supplier<Item> itemSupplier);
     
-    EnergyApi.EnergyContainer find(ItemStack stack, ContainerItemContext context);
+    EnergyApi.EnergyStorage find(StackContext stack);
     
     ComponentType<Long> getEnergyComponent();
     

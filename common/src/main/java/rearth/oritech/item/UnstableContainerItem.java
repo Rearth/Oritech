@@ -1,4 +1,4 @@
-package rearth.oritech.util.item;
+package rearth.oritech.item;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.screen.Screen;

@@ -24,7 +24,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     private final SimpleEnergyStorage energyStorage;
     private final boolean isSuperConductor;
     
-    private List<EnergyApi.EnergyContainer> cachedTargets = List.of();
+    private List<EnergyApi.EnergyStorage> cachedTargets = List.of();
     private int cacheHash;
     
     public EnergyPipeInterfaceEntity(BlockPos pos, BlockState state) {
@@ -53,7 +53,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
@@ -75,7 +75,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
         
         var targetHash = targets.hashCode();
         
-        List<EnergyApi.EnergyContainer> energyStorages;
+        List<EnergyApi.EnergyStorage> energyStorages;
         
         if (this.cacheHash == targetHash) {
             energyStorages = this.cachedTargets;

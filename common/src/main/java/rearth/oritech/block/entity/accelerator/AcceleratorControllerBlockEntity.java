@@ -2,9 +2,6 @@ package rearth.oritech.block.entity.accelerator;
 
 import io.wispforest.owo.util.VectorRandomUtils;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Portal;
@@ -15,7 +12,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -44,19 +40,21 @@ import rearth.oritech.init.SoundContent;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.InOutInventoryStorage;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity>, InventoryProvider, ExtendedScreenHandlerFactory, ScreenProvider {
+public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity>, ItemApi.BlockProvider, ExtendedScreenHandlerFactory, ScreenProvider {
     
     private AcceleratorParticleLogic.ActiveParticle particle;
     public ItemStack activeItemParticle = ItemStack.EMPTY;
     
     private AcceleratorParticleLogic particleLogic;
     
-    private final SimpleInventory inventory = new SimpleSidedInventory(2, new InventorySlotAssignment(0, 1, 1, 1));   // 0 = input, 1 = output
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::markDirty, new InventorySlotAssignment(0, 1, 1, 1));
     
     // client data
     public List<Vec3d> displayTrail;
@@ -421,7 +419,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var entity = world.getBlockEntity(motorBlock);
         if (!(entity instanceof AcceleratorMotorBlockEntity motorEntity)) return;
         
-        var storage = motorEntity.getStorage(null);
+        var storage = motorEntity.getEnergyStorage(null);
         var availableEnergy = storage.getAmount();
         
         var speed = particle.velocity;
@@ -448,8 +446,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
-        return InventoryStorage.of(inventory, direction);
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        return inventory;
     }
     
     @Override

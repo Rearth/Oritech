@@ -203,11 +203,11 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             
             // only proceed if all stacks fit
             for (var stack : dropped) {
-                if (!this.inventory.canInsert(stack)) return;
+                if (this.inventory.insert(stack, true) != stack.getCount()) return;
             }
             
             for (var stack : dropped) {
-                this.inventory.addStack(stack);
+                this.inventory.insert(stack, false);
             }
             
             targetState.getBlock().onBreak(world, targetPosition, targetState, getDestroyerPlayerEntity());

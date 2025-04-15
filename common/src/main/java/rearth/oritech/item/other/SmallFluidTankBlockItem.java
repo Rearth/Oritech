@@ -1,36 +1,72 @@
 package rearth.oritech.item.other;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
+import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.block.Block;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.Formatting;
+import rearth.oritech.Oritech;
+import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.util.fluid.containers.SimpleItemFluidStorage;
 
 import java.util.List;
 
-public class SmallFluidTankBlockItem extends BlockItem {
+public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemProvider {
+    
     public SmallFluidTankBlockItem(Block block, Settings settings) {
         super(block, settings);
     }
     
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        var data = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
+        
+        if (data.isEmpty()) {
+            tooltip.add(Text.translatable("tooltip.oritech.fluid_empty"));
+        } else {
+            var amount = data.getAmount() / (float) FluidStackHooks.bucketAmount();
+            tooltip.add(Text.translatable("tooltip.oritech.fluid_content_tank_tooltip", amount, FluidStackHooks.getName(data).getString()));
+        }
+        
         super.appendTooltip(stack, context, tooltip, type);
         
-        if (!stack.contains(DataComponentTypes.CUSTOM_DATA)) return;
-        var nbt = stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
-        if (nbt.isEmpty() || !nbt.contains("variant") || !nbt.contains("amount")) return;
+    }
+    
+    @Override
+    public Text getName(ItemStack stack) {
+        var content = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
+        if (content.isEmpty()) {
+            return super.getName(stack);
+        } else {
+            return FluidStackHooks.getName(content).copy().formatted(Formatting.ITALIC).append(Text.literal(" ")).append(super.getName(stack));
+        }
+    }
+    
+    @Override
+    public FluidApi.SingleSlotStorage getFluidStorage(ItemStack stack) {
+        return new SimpleItemFluidStorage(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), stack);
+    }
+    
+    @Override
+    public boolean isItemBarVisible(ItemStack stack) {
+        var contentEmpty = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()).isEmpty();
+        return !contentEmpty;
+    }
+    
+    @Override
+    public int getItemBarColor(ItemStack stack) {
+        return 0x07bdff;
+    }
+    
+    @Override
+    public int getItemBarStep(ItemStack stack) {
         
-        var variant = Registries.FLUID.get(Identifier.of(nbt.getCompound("variant").getString("fluid")));
-        var amount = nbt.getLong("amount") * 1000 / FluidConstants.BUCKET;
-        tooltip.add(Text.translatable("tooltip.oritech.fluid_content", amount, amount <= 0
-            ? Text.translatable("tooltip.oritech.fluid_empty")
-            : FluidVariantAttributes.getName(FluidVariant.of(variant)).getString()));
+        var capacity = Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount();
+        var fillAmount = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()).getAmount();
+        
+        return Math.round((fillAmount * 100f / capacity) * ITEM_BAR_STEPS) / 100;
     }
 }

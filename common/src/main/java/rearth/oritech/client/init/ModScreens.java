@@ -18,7 +18,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.ui.*;
-import rearth.oritech.util.ArchitecturyRegistryContainer;
+import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 import rearth.oritech.util.MachineAddonController;
 
 import java.lang.reflect.InvocationTargetException;
@@ -46,6 +46,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerTy
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> BASIC_GENERATOR_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> LAVA_GENERATOR_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> FUEL_GENERATOR_SCREEN = upgradeHandler();
+    public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> STEAM_ENGINE_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> DESTROYER_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> PLACER_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> FERTILIZER_SCREEN = upgradeHandler();
@@ -57,14 +58,13 @@ public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerTy
     public static final ExtendedScreenHandlerType<DroneScreenHandler, UpgradableData> DRONE_SCREEN = new ExtendedScreenHandlerType<>(new UpgradeFactory<>(DroneScreenHandler.class), UpgradableData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<RedstoneAddonScreenHandler, BasicData> REDSTONE_ADDON_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(RedstoneAddonScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<CentrifugeScreenHandler, UpgradableData> CENTRIFUGE_SCREEN = new ExtendedScreenHandlerType<>(new UpgradeFactory<>(CentrifugeScreenHandler.class), UpgradableData.PACKET_CODEC);
-    public static final ExtendedScreenHandlerType<SteamEngineScreenHandler, UpgradableData> STEAM_ENGINE_SCREEN = new ExtendedScreenHandlerType<>(new UpgradeFactory<>(SteamEngineScreenHandler.class), UpgradableData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<ItemFilterScreenHandler, BasicData> ITEM_FILTER_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(ItemFilterScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<InventoryProxyScreenHandler, InventoryProxyScreenHandler.InvProxyData> INVENTORY_PROXY_SCREEN = new ExtendedScreenHandlerType<>(new InventoryProxyScreenHandler.HandlerFactory(), InventoryProxyScreenHandler.InvProxyData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<ReactorScreenHandler, BasicData> REACTOR_SCREEN = new ExtendedScreenHandlerType<>(new ReactorScreenHandler.HandlerFactory(), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<PlayerModifierScreenHandler, BasicData> MODIFIER_SCREEN = new ExtendedScreenHandlerType<>(new PlayerModifierScreenHandler.HandlerFactory(), BasicData.PACKET_CODEC);
     
     public static void assignScreens() {
-        HandledScreens.register(TANK_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
+        HandledScreens.register(TANK_SCREEN, TankScreen::new);
         HandledScreens.register(TREEFELLER_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         HandledScreens.register(ATOMIC_FORGE_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         HandledScreens.register(CATALYST_SCREEN, CatalystScreen::new);

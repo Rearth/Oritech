@@ -105,7 +105,7 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(@Nullable Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(@Nullable Direction direction) {
         return energyStorage;
     }
     

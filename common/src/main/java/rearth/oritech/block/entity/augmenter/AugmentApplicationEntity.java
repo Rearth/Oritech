@@ -1,9 +1,6 @@
 package rearth.oritech.block.entity.augmenter;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -12,7 +9,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -43,6 +39,8 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.SimpleInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -51,7 +49,8 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
 
-public class AugmentApplicationEntity extends BlockEntity implements BlockEntityTicker<AugmentApplicationEntity>, MultiblockMachineController, GeoBlockEntity, ExtendedScreenHandlerFactory, InventoryProvider, EnergyApi.BlockProvider, ScreenProvider {
+public class AugmentApplicationEntity extends BlockEntity implements BlockEntityTicker<AugmentApplicationEntity>, MultiblockMachineController, GeoBlockEntity,
+                                                                       ExtendedScreenHandlerFactory, ItemApi.BlockProvider, EnergyApi.BlockProvider, ScreenProvider {
     
     public final Set<Identifier> researchedAugments = new HashSet<>();
     
@@ -71,16 +70,9 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     public final HashMap<Integer, ResearchState> availableStations = new HashMap<>();
     public boolean screenInvOverride = false;
     
-    public final SimpleInventory inventory = new SimpleInventory(5) {
-        @Override
-        public void markDirty() {
-            super.markDirty();
-            AugmentApplicationEntity.this.markDirty();
-        }
-    };
-    private final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(5, this::markDirty);
     
-    private final EnergyApi.EnergyContainer energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, maxEnergyStored, maxEnergyStored, this::markDirty);
+    private final EnergyApi.EnergyStorage energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, maxEnergyStored, maxEnergyStored, this::markDirty);
     private AnimationController<AugmentApplicationEntity> animationController;
     
     
@@ -413,12 +405,12 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     }
     
     @Override
-    public BlockPos getMachinePos() {
+    public BlockPos getPosForMultiblock() {
         return pos;
     }
     
     @Override
-    public World getMachineWorld() {
+    public World getWorldForMultiblock() {
         return world;
     }
     
@@ -438,12 +430,12 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     }
     
     @Override
-    public InventoryProvider getInventoryForLink() {
-        return this;
+    public ItemApi.InventoryStorage getInventoryForMultiblock() {
+        return inventory;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return energyStorage;
     }
     
@@ -512,13 +504,13 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
     @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
-        return inventoryStorage;
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        return inventory;
     }
     
     @Override

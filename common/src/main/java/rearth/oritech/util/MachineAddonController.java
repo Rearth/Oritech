@@ -15,6 +15,7 @@ import net.minecraft.world.World;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
 
 import java.util.*;
 
@@ -24,17 +25,17 @@ public interface MachineAddonController {
     List<BlockPos> getConnectedAddons();
     
     // a list of where addons could be placed
-    List<BlockPos> getOpenSlots();
+    List<BlockPos> getOpenAddonSlots();
     
-    BlockPos getMachinePos();
+    BlockPos getPosForAddon();
     
-    World getMachineWorld();
+    World getWorldForAddon();
     
     Direction getFacingForAddon();
     
     DynamicEnergyStorage getStorageForAddon();
     
-    SimpleInventory getInventoryForAddon();
+    ItemApi.InventoryStorage getInventoryForAddon();
     
     ScreenProvider getScreenProvider();
     
@@ -74,10 +75,10 @@ public interface MachineAddonController {
         // remove/reset all old addons that are not connected anymore
         for (var addon : getConnectedAddons()) {
             if (foundAddons.stream().noneMatch(newAddon -> newAddon.pos().equals(addon))) {
-                var state = Objects.requireNonNull(getMachineWorld()).getBlockState(addon);
+                var state = Objects.requireNonNull(getWorldForAddon()).getBlockState(addon);
                 if (state.getBlock() instanceof MachineAddonBlock) {
-                    getMachineWorld().setBlockState(addon, state.with(MachineAddonBlock.ADDON_USED, false));
-                    getMachineWorld().updateNeighborsAlways(addon, state.getBlock());
+                    getWorldForAddon().setBlockState(addon, state.with(MachineAddonBlock.ADDON_USED, false));
+                    getWorldForAddon().updateNeighborsAlways(addon, state.getBlock());
                 }
             }
         }
@@ -91,10 +92,10 @@ public interface MachineAddonController {
     default void resetAddons() {
         
         for (var addon : getConnectedAddons()) {
-            var state = Objects.requireNonNull(getMachineWorld()).getBlockState(addon);
+            var state = Objects.requireNonNull(getWorldForAddon()).getBlockState(addon);
             if (state.getBlock() instanceof MachineAddonBlock) {
-                getMachineWorld().setBlockState(addon, state.with(MachineAddonBlock.ADDON_USED, false));
-                getMachineWorld().updateNeighborsAlways(addon, state.getBlock());
+                getWorldForAddon().setBlockState(addon, state.with(MachineAddonBlock.ADDON_USED, false));
+                getWorldForAddon().updateNeighborsAlways(addon, state.getBlock());
             }
         }
         
@@ -112,11 +113,11 @@ public interface MachineAddonController {
         //   go through all slots
         //   check if slot is occupied by MachineAddonBlock, check if block is not used
         //   if valid and extender: add all neighboring positions to search set
-        var world = getMachineWorld();
-        var pos = getMachinePos();
+        var world = getWorldForAddon();
+        var pos = getPosForAddon();
         assert world != null;
         
-        var openSlots = getOpenSlots();
+        var openSlots = getOpenAddonSlots();
         openSlots.clear();
         
         var baseSlots = getAddonSlots();    // available addon slots on machine itself (includes multiblocks)
@@ -220,8 +221,8 @@ public interface MachineAddonController {
     // update state of the found addons
     default void writeAddons(List<AddonBlock> addons) {
         
-        var world = getMachineWorld();
-        var pos = getMachinePos();
+        var world = getWorldForAddon();
+        var pos = getPosForAddon();
         assert world != null;
         
         for (var addon : addons) {
@@ -281,7 +282,7 @@ public interface MachineAddonController {
     
     default AddonUiData getUiData() {
         var data = getBaseAddonData();
-        return new AddonUiData(getConnectedAddons(), getOpenSlots(), data.efficiency, data.speed, getMachinePos(), data.extraChambers);
+        return new AddonUiData(getConnectedAddons(), getOpenAddonSlots(), data.efficiency, data.speed, getPosForAddon(), data.extraChambers);
     }
     
     private static Set<BlockPos> getNeighbors(BlockPos pos) {

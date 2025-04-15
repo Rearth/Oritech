@@ -92,7 +92,7 @@ public class EnergyStorageScreen extends UpgradableMachineScreen<UpgradableMachi
         overlay.child(toggleButton.positioning(Positioning.absolute(panelXPos, 5)));
         
         if (this.handler.blockEntity instanceof UnstableContainerBlockEntity unstableContainer) {
-            var container = (DynamicEnergyStorage) unstableContainer.getEnergyStorageForLink(null);
+            var container = (DynamicEnergyStorage) unstableContainer.getEnergyStorageForMultiblock(null);
             var capacity = container.maxInsert;
             var capacityMultiplier = capacity / (UnstableContainerBlockEntity.BASE_CAPACITY * unstableContainer.qualityMultiplier);   // in percent, exponential
             var laserIcon = Components.item(new ItemStack(BlockContent.LASER_ARM_BLOCK.asItem()));

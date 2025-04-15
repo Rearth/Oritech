@@ -1,6 +1,5 @@
 package rearth.oritech.item.tools.armor;
 
-import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,10 +13,10 @@ import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
+import rearth.oritech.util.StackContext;
+import rearth.oritech.util.TooltipHelper;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.SimpleEnergyItemStorage;
-import rearth.oritech.util.energy.SingleSlotHandler;
-import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;
 
@@ -52,14 +51,15 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEner
         for (int i = 0; i < player.getInventory().size(); i++) {
             var stack = player.getInventory().getStack(i);
             if (stack.isEmpty() || stack == pack || slot == i) continue;
-
-            var stackContext = new SingleSlotHandler(stack);
-            var stackStorage = EnergyApi.ITEM.find(stack, ContainerItemContext.ofSingleSlot(stackContext));
+            
+            final int finalI = i;
+            var stackRef = new StackContext(stack, updated -> player.getInventory().setStack(finalI, updated));
+            var stackStorage = EnergyApi.ITEM.find(stackRef);
             if (stackStorage == null || stackStorage.getAmount() >= stackStorage.getCapacity()) continue;
             
             EnergyApi.transfer(packStorage, stackStorage, Long.MAX_VALUE, false);
             
-            player.getInventory().setStack(i, stackContext.getStack());
+            // player.getInventory().setStack(i, stackContext.getStack());
         }
     }
     

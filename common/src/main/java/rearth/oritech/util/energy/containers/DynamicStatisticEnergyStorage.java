@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class DynamicStatisticEnergyContainer extends DynamicEnergyStorage {
+public class DynamicStatisticEnergyStorage extends DynamicEnergyStorage {
     
     private final List<Long> inserted = new ArrayList<>();  // just for this tick
     private final List<Long> extracted = new ArrayList<>();
@@ -12,7 +12,7 @@ public class DynamicStatisticEnergyContainer extends DynamicEnergyStorage {
     private final Long[] historicExtract = new Long[20];
     private int currentInsertSources = 0;
     
-    public DynamicStatisticEnergyContainer(long capacity, long maxInsert, long maxExtract, Runnable onUpdate) {
+    public DynamicStatisticEnergyStorage(long capacity, long maxInsert, long maxExtract, Runnable onUpdate) {
         super(capacity, maxInsert, maxExtract, onUpdate);
         
         Arrays.fill(historicInsert, 0L);

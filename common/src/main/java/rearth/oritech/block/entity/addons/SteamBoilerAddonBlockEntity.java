@@ -1,19 +1,17 @@
 package rearth.oritech.block.entity.addons;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.MachineAddonController;
+import rearth.oritech.util.fluid.FluidApi;
 
 import java.util.Objects;
 
-public class SteamBoilerAddonBlockEntity extends AddonBlockEntity implements FluidProvider {
+public class SteamBoilerAddonBlockEntity extends AddonBlockEntity implements FluidApi.BlockProvider {
     
     private UpgradableGeneratorBlockEntity cachedController;
     
@@ -36,8 +34,8 @@ public class SteamBoilerAddonBlockEntity extends AddonBlockEntity implements Flu
     }
     
     @Override
-    public Storage<FluidVariant> getFluidStorage(Direction direction) {
+    public FluidApi.FluidStorage getFluidStorage(Direction direction) {
         if (!isConnected()) return null;
-        return cachedController.exposedStorage;
+        return cachedController.boilerStorage;
     }
 }

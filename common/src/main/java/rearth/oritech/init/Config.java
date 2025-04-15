@@ -1,8 +1,8 @@
 package rearth.oritech.init;
 
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import io.wispforest.owo.config.Option;
 import io.wispforest.owo.config.annotation.*;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 
 // thank gpt for being able to translate the language keys for all this. It would be horror to type these all out
 @io.wispforest.owo.config.annotation.Config(name = "oritech-config", wrapperName = "OritechConfig")
@@ -47,13 +47,13 @@ public class Config {
     @Nest
     public BasicEnergyMachineData charger = new BasicEnergyMachineData(500_000, 10_000, 5_000, 0);
     @Nest
-    public JetpackData basicJetpack = new JetpackData(100_000, 4 * FluidConstants.BUCKET, 128, (int) (10 * (FluidConstants.BUCKET / 1000)), 1024, 0.4f);
+    public JetpackData basicJetpack = new JetpackData(100_000, 4 * FluidStackHooks.bucketAmount(), 128, (int) (10 * (FluidStackHooks.bucketAmount() / 1000)), 1024, 0.4f);
     @Nest
-    public JetpackData exoJetpack = new JetpackData(5_000_000, 32 * FluidConstants.BUCKET, 256, (int) (15 * (FluidConstants.BUCKET / 1000)), 10_000, 1.5f);
+    public JetpackData exoJetpack = new JetpackData(5_000_000, 32 * FluidStackHooks.bucketAmount(), 256, (int) (15 * (FluidStackHooks.bucketAmount() / 1000)), 10_000, 1.5f);
     @Nest
-    public JetpackData elytraJetpack = new JetpackData(100_000, 4 * FluidConstants.BUCKET, 128, (int) (10 * (FluidConstants.BUCKET / 1000)), 1024, 0.6f);
+    public JetpackData elytraJetpack = new JetpackData(100_000, 4 * FluidStackHooks.bucketAmount(), 128, (int) (10 * (FluidStackHooks.bucketAmount() / 1000)), 1024, 0.6f);
     @Nest
-    public JetpackData exoElytraJetpack = new JetpackData(5_000_000, 32 * FluidConstants.BUCKET, 256, (int) (15 * (FluidConstants.BUCKET / 1000)), 10_000, 1.4f);
+    public JetpackData exoElytraJetpack = new JetpackData(5_000_000, 32 * FluidStackHooks.bucketAmount(), 256, (int) (15 * (FluidStackHooks.bucketAmount() / 1000)), 10_000, 1.4f);
     @Nest
     public ToolData exoChestplate = new ToolData(5_000_000, 10_000, 10_000);
     @Nest

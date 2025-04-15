@@ -15,20 +15,57 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
+import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.ui.InventoryProxyScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.ImplementedInventory;
 import rearth.oritech.util.MachineAddonController;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.DelegatingInventoryStorage;
 
 import java.util.Objects;
 
-public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements ImplementedInventory, ExtendedScreenHandlerFactory {
+public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements ItemApi.BlockProvider, ExtendedScreenHandlerFactory {
     
     private MachineAddonController cachedController;
     private int targetSlot = 0;
     
+    private final DelegatingInventoryStorage inventory = new DelegatingInventoryStorage(this::getTargetItemStorage, this::isConnected) {
+        
+        @Override
+        public int insert(ItemStack inserted, boolean simulate) {
+            return insertToSlot(inserted, targetSlot, simulate);
+        }
+        
+        @Override
+        public int extract(ItemStack extracted, boolean simulate) {
+            return extractFromSlot(extracted, targetSlot, simulate);
+        }
+        
+        @Override
+        public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
+            if (slot != targetSlot) return 0;
+            return super.insertToSlot(inserted, slot, simulate);
+        }
+        
+        @Override
+        public int extractFromSlot(ItemStack extracted, int slot, boolean simulate) {
+            if (slot != targetSlot) return 0;
+            return super.extractFromSlot(extracted, slot, simulate);
+        }
+    };
+    
     public InventoryProxyAddonBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.INVENTORY_PROXY_ADDON_ENTITY, pos, state);
+    }
+    
+    private ItemApi.InventoryStorage getTargetItemStorage() {
+        
+        var isUsed = this.getCachedState().get(MachineAddonBlock.ADDON_USED);
+        if (!isUsed) return null;
+        
+        var controllerEntity = getCachedController();
+        if (!(controllerEntity instanceof ItemApi.BlockProvider itemProvider)) return null;
+        return itemProvider.getInventoryStorage(null);
     }
     
     private boolean isConnected() {
@@ -43,24 +80,6 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
         
         cachedController = (MachineAddonController) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
         return cachedController;
-    }
-    
-    @Override
-    public DefaultedList<ItemStack> getItems() {
-        if (!isConnected())
-            return DefaultedList.of();
-        
-        return getCachedController().getInventoryForAddon().heldStacks;
-    }
-    
-    @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction side) {
-        return slot == targetSlot;
-    }
-    
-    @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction side) {
-        return slot == targetSlot;
     }
     
     @Override
@@ -93,5 +112,10 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         targetSlot = nbt.getInt("target_slot");
+    }
+    
+    @Override
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        return inventory;
     }
 }

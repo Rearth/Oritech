@@ -304,8 +304,8 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
     
     protected void updateEnergyBar() {
         
-        var capacity = handler.blockEntity.getEnergyStorageForLink(null).getCapacity();
-        var amount = handler.blockEntity.getEnergyStorageForLink(null).getAmount();
+        var capacity = handler.blockEntity.getEnergyStorageForMultiblock(null).getCapacity();
+        var amount = handler.blockEntity.getEnergyStorageForMultiblock(null).getAmount();
         
         var fillAmount = (float) amount / capacity;
         var tooltipText = getEnergyTooltip(amount, capacity, 0, (int) AugmentApplicationEntity.maxEnergyTransfer);
@@ -475,7 +475,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
                 descriptionPanel.child(Components.label(Text.translatable("oritech.text.augment_research_time", researchRecipe.getTime() / 20).formatted(Formatting.WHITE)).margins(Insets.of(4, 0, 0, 0)));
                 descriptionPanel.child(Components.label(Text.translatable("oritech.text.energy_cost", parsedCost).formatted(Formatting.WHITE)).margins(Insets.of(4, 0, 0, 0)));
                 
-                if (this.handler.blockEntity.getEnergyStorageForLink(null).getAmount() < rfCost)
+                if (this.handler.blockEntity.getEnergyStorageForMultiblock(null).getAmount() < rfCost)
                     hasEnergy = false;
                 
             }

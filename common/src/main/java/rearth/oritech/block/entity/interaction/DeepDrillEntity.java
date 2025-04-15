@@ -1,15 +1,10 @@
 package rearth.oritech.block.entity.interaction;
 
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
@@ -25,9 +20,14 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.*;
-import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
+import rearth.oritech.util.Geometry;
+import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.SimpleCraftingInventory;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.SimpleInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -40,7 +40,7 @@ import java.util.List;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
-public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<DeepDrillEntity>, EnergyApi.BlockProvider, GeoBlockEntity, InventoryProvider, MultiblockMachineController {
+public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<DeepDrillEntity>, EnergyApi.BlockProvider, GeoBlockEntity, ItemApi.BlockProvider, MultiblockMachineController {
     
     // work data
     private boolean initialized;
@@ -56,14 +56,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     // storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.deepDrillConfig.energyCapacity(), 0, 0, this::markDirty);
     
-    public final SimpleInventory inventory = new SimpleInventory(1) {
-        @Override
-        public void markDirty() {
-            DeepDrillEntity.this.markDirty();
-        }
-    };
-    
-    protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(1, this::markDirty);
     
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
@@ -168,11 +161,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
             return;
         
         var output = recipeCandidate.get().value().getResults().get(0);
-        if (!inventory.canInsert(output)) return;
-        try (var tx = Transaction.openOuter()) {
-            inventoryStorage.insert(ItemVariant.of(output), output.getCount(), tx);
-            tx.commit();
-        }
+        inventory.insert(output, false);
     }
     
     @Override
@@ -192,13 +181,13 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
     @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
-        return inventoryStorage;
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        return inventory;
     }
     
     @Override
@@ -240,12 +229,12 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     }
     
     @Override
-    public BlockPos getMachinePos() {
+    public BlockPos getPosForMultiblock() {
         return pos;
     }
     
     @Override
-    public World getMachineWorld() {
+    public World getWorldForMultiblock() {
         return world;
     }
     
@@ -265,12 +254,12 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     }
     
     @Override
-    public InventoryProvider getInventoryForLink() {
-        return this;
+    public ItemApi.InventoryStorage getInventoryForMultiblock() {
+        return inventory;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return null;
     }
     

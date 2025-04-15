@@ -7,10 +7,11 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.item.ItemApi;
 
 import java.util.ArrayList;
 
@@ -57,13 +58,23 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     }
     
     @Override
-    public InventoryProvider getInventoryForLink() {
-        return this;
+    public ItemApi.InventoryStorage getInventoryForMultiblock() {
+        return inventory;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return energyStorage;
+    }
+    
+    @Override
+    public BlockPos getPosForMultiblock() {
+        return pos;
+    }
+    
+    @Override
+    public World getWorldForMultiblock() {
+        return world;
     }
     
     @Override

@@ -65,7 +65,7 @@ public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     

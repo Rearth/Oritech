@@ -3,8 +3,6 @@ package rearth.oritech.init.world;
 import io.wispforest.owo.serialization.CodecUtils;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -18,7 +16,7 @@ import rearth.oritech.init.world.features.resourcenode.ResourceNodeFeature;
 import rearth.oritech.init.world.features.resourcenode.ResourceNodeFeatureConfig;
 import rearth.oritech.init.world.features.uranium.UraniumPatchFeature;
 import rearth.oritech.init.world.features.uranium.UraniumPatchFeatureConfig;
-import rearth.oritech.util.ArchitecturyRegistryContainer;
+import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
 public class FeatureContent implements ArchitecturyRegistryContainer<Feature<?>> {
     

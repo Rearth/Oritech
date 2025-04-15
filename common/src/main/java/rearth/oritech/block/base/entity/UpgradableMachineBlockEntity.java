@@ -20,6 +20,7 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,8 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
             
             // craft N extra items if we have extra chambers
             for (int i = 0; i < chamberCount; i++) {
-                if (!canOutputRecipe(activeRecipe) || !canProceed(activeRecipe)) break;
+                var newRecipe = getRecipe();
+                if (newRecipe.isEmpty() || !newRecipe.get().value().equals(currentRecipe) || !canOutputRecipe(activeRecipe) || !canProceed(activeRecipe)) break;
                 super.craftItem(activeRecipe, outputInventory, inputInventory);
             }
         }
@@ -75,7 +77,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     }
     
     @Override
-    public List<BlockPos> getOpenSlots() {
+    public List<BlockPos> getOpenAddonSlots() {
         return openSlots;
     }
     
@@ -96,12 +98,12 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     
     
     @Override
-    public BlockPos getMachinePos() {
+    public BlockPos getPosForAddon() {
         return getPos();
     }
     
     @Override
-    public World getMachineWorld() {
+    public World getWorldForAddon() {
         return getWorld();
     }
     
@@ -124,7 +126,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     }
     
     @Override
-    public SimpleInventory getInventoryForAddon() {
+    public ItemApi.InventoryStorage getInventoryForAddon() {
         return inventory;
     }
     

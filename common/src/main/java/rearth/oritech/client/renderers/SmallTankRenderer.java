@@ -1,30 +1,31 @@
 package rearth.oritech.client.renderers;
 
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import io.wispforest.owo.ui.core.Color;
-import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.util.math.Direction;
 import org.joml.Matrix4f;
-import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
+import rearth.oritech.block.entity.storage.SmallTankEntity;
 
-public class SmallTankRenderer implements BlockEntityRenderer<SmallFluidTankEntity> {
+public class SmallTankRenderer implements BlockEntityRenderer<SmallTankEntity> {
     
     @Override
-    public void render(SmallFluidTankEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(SmallTankEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         
-        var storage = entity.getForDirectFluidAccess();
-        if (storage.amount == 0 || storage.variant.isBlank()) return;
+        var storage = entity.fluidStorage;
+        if (storage.getAmount() <= 0 || storage.getFluid().equals(Fluids.EMPTY)) return;
         
-        var fluid = storage.variant;
-        var fill = storage.amount / (float) storage.getCapacity();
+        var fluid = storage.getFluid();
+        var fill = storage.getAmount() / (float) storage.getCapacity();
         
-        var sprite = FluidVariantRendering.getSprite(fluid);
-        var spriteColor = FluidVariantRendering.getColor(fluid);
+        var sprite = FluidStackHooks.getStillTexture(fluid);
+        var spriteColor = FluidStackHooks.getColor(fluid);
         var consumer = vertexConsumers.getBuffer(RenderLayer.getTranslucent());
         
         var parsedColor = Color.ofArgb(spriteColor);

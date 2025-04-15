@@ -1,9 +1,6 @@
 package rearth.oritech.block.base.entity;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -26,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
@@ -35,19 +33,20 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.InOutInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 public abstract class MachineBlockEntity extends BlockEntity
-  implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, InventoryProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
+  implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
     
     // animations
     public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
@@ -56,7 +55,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     public static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    public final SimpleMachineInventory inventory = new SimpleMachineInventory(getInventorySize());
+    
     // crafting / processing
     public int progress;
     protected int energyPerTick;
@@ -64,9 +63,12 @@ public abstract class MachineBlockEntity extends BlockEntity
     protected InventoryInputMode inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
     protected boolean disabledViaRedstone = false;
     public long lastWorkedAt;
+    
     // network state
     protected boolean networkDirty = true;
+    
     //own storage
+    public final FilteringInventory inventory = new FilteringInventory(getInventorySize(), this::markDirty, getSlotAssignments());
     public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
     
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
@@ -83,15 +85,14 @@ public abstract class MachineBlockEntity extends BlockEntity
         
         if (world.isClient || !isActive(state) || disabledViaRedstone) return;
         
-        if (inventory.needsBalancing)
-            inventory.balance();
-        
+        // if a recipe is found, this means the input items are all available
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty())
             currentRecipe = OritechRecipe.DUMMY;     // reset recipe when invalid or no input is given
         
         if (recipeCandidate.isPresent() && canOutputRecipe(recipeCandidate.get().value()) && canProceed(recipeCandidate.get().value())) {
             
+            // reset when recipe was switched while running
             if (currentRecipe != recipeCandidate.get().value()) resetProgress();
             
             // this is separate so that progress is not reset when out of energy
@@ -100,7 +101,6 @@ public abstract class MachineBlockEntity extends BlockEntity
                 currentRecipe = activeRecipe;
                 lastWorkedAt = world.getTime();
                 
-                // check energy
                 useEnergy();
                 
                 // increase progress
@@ -125,15 +125,8 @@ public abstract class MachineBlockEntity extends BlockEntity
         }
     }
     
-    // returns true if input items match
+    // used to do additional checks, if the recipe match is not enough
     protected boolean canProceed(OritechRecipe value) {
-        
-        var inputInv = getInputInventory();
-        for (int i = 0; i < value.getInputs().size(); i++) {
-            var input = value.getInputs().get(i);
-            if (!input.test(inputInv.getStackInSlot(i))) return false;
-        }
-        
         return true;
     }
     
@@ -160,7 +153,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         // a few ticks old (e.g. for rendering), as this does not matter as much.
         // Currently not perfect for multiplayer, as it doesn't track individual players. So all players that match the entity handle will receive the packets while
         // the screen is open
-        if (isActivelyViewed()) updateFrequency = 1;
+        if (isActivelyViewed()) updateFrequency = 2;
         
         if (Objects.requireNonNull(this.world).getTime() % updateFrequency != 0) return;
         
@@ -213,9 +206,21 @@ public abstract class MachineBlockEntity extends BlockEntity
             }
         }
         
-        // remove inputs
-        for (int i = 0; i < inputs.size(); i++) {
-            Inventories.splitStack(inputInventory, i, 1);
+        // remove inputs. Each input is 1 ingredient.
+        var startOffset = 0;    // used so when multiple matching stacks are available, they're drained somewhat evenly
+        for (var removedIng : inputs) {
+            // try to find current ingredient
+            for (int i = 0; i < inputInventory.size(); i++) {
+                var inputStack = inputInventory.get((i + startOffset) % inputInventory.size());
+                if (removedIng.test(inputStack)) {
+                    inputStack.decrement(1);
+                    startOffset++;
+                    break;
+                }
+            }
+            
+            Oritech.LOGGER.warn("Unable to remove ingredient from inventory: {}. This should never happen.", removedIng);
+            
         }
         
     }
@@ -266,20 +271,20 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     protected abstract OritechRecipeType getOwnRecipeType();
     
-    public abstract InventorySlotAssignment getSlots();
+    public abstract InventorySlotAssignment getSlotAssignments();
     
     protected List<ItemStack> getInputView() {
-        var slots = getSlots();
+        var slots = getSlotAssignments();
         return this.inventory.heldStacks.subList(slots.inputStart(), slots.inputStart() + slots.inputCount());
     }
     
     protected List<ItemStack> getOutputView() {
-        var slots = getSlots();
+        var slots = getSlotAssignments();
         return this.inventory.heldStacks.subList(slots.outputStart(), slots.outputStart() + slots.outputCount());
     }
     
     protected RecipeInput getInputInventory() {
-        return new SimpleCraftingInventory(getInputView().toArray(ItemStack[]::new));
+        return new SimpleCraftingInventory(getInputView().stream().map(ItemStack::copy).toArray(ItemStack[]::new));
     }
     
     protected Inventory getOutputInventory() {
@@ -397,7 +402,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
@@ -458,11 +463,6 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     public abstract int getInventorySize();
     
-    @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
-        return InventoryStorage.of(inventory, direction);
-    }
-    
     public boolean isActive(BlockState state) {
         return true;
     }
@@ -499,6 +499,11 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     @Override
     public Inventory getDisplayedInventory() {
+        return inventory;
+    }
+    
+    @Override
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
         return inventory;
     }
     
@@ -542,137 +547,56 @@ public abstract class MachineBlockEntity extends BlockEntity
         this.disabledViaRedstone = isPowered;
     }
     
-    // this entire class feels like a super dirty hack, and makes me hate the transaction API
-    public class SimpleMachineInventory extends SimpleSidedInventory {
+    public class FilteringInventory extends InOutInventoryStorage {
         
-        public boolean needsBalancing = false;
-        
-        public SimpleMachineInventory(int size) {
-            super(size, getSlots());
+        public FilteringInventory(int size, Runnable onUpdate, InventorySlotAssignment slotAssignment) {
+            super(size, onUpdate, slotAssignment);
         }
         
         @Override
-        public void markDirty() {
-            super.markDirty();
-            MachineBlockEntity.this.markDirty();
+        public int insert(ItemStack toInsert, boolean simulate) {
             
-            if (world == null || world.isClient || inventoryInputMode != InventoryInputMode.FILL_EVENLY) return;
-            needsBalancing = true;
-        }
-        
-        // balances only into empty slots
-        public void balance() {
-            
-            super.markDirty();
-            MachineBlockEntity.this.markDirty();
-            this.needsBalancing = false;
-            
-            // find the bigger stack(s), split the slots
-            
-            var inputInv = getInputView();
-            
-            var emptySlotsCount = 0;
-            var maxCount = 0;
-            var minCount = 64;
-            var maxCountMatching = 0;
-            
-            for (var stack : inputInv) {
-                if (stack.isEmpty()) {
-                    emptySlotsCount++;
-                    minCount = 0;
-                    continue;
-                }
+            if (inventoryInputMode.equals(InventoryInputMode.FILL_EVENLY)) {
+                var remaining = toInsert.getCount();
+                var slotCountTarget = toInsert.getCount() / getSlotAssignments().inputCount();
+                slotCountTarget = Math.clamp(slotCountTarget, 1, remaining);
                 
-                if (stack.getCount() > maxCount)
-                    maxCount = stack.getCount();
-                
-                if (stack.getCount() < minCount)
-                    minCount = stack.getCount();
-            }
-            
-            for (var stack : inputInv) {
-                if (stack.getCount() == maxCount) maxCountMatching++;
-            }
-            
-            if (maxCount <= 1) return;
-            
-            var slotsPerSplitStack = emptySlotsCount / maxCountMatching + 1;
-            if (slotsPerSplitStack <= 1) {
-                
-                // try to balance within stacks
-                for (int i = 0; i < inputInv.size(); i++) {
-                    var stack = inputInv.get(i);
-                    if (stack.getCount() <= 1) continue;
-                    for (int j = 0; j < inputInv.size(); j++) {
-                        if (j == i) continue;
-                        var otherStack = inputInv.get(j);
-                        if (!otherStack.getItem().equals(stack.getItem())) continue;
-                        // same item, try to exchange if needed (if difference > 2)
-                        var diff = stack.getCount() - otherStack.getCount();
-                        if (diff < 2) continue;
-                        
-                        var moved = diff / 2;
-                        stack.decrement(moved);
-                        otherStack.increment(moved);
+                // start at slot with fewest items
+                var lowestSlot = 0;
+                var lowestSlotCount = Integer.MAX_VALUE;
+                for (int i = getSlotAssignments().inputStart(); i < getSlotAssignments().inputStart() + getSlotAssignments().inputCount(); i++) {
+                    var content = this.getStack(i);
+                    if (!content.isEmpty() && !content.getItem().equals(toInsert.getItem())) continue;    // skip slots containing other items
+                    if (content.getCount() < lowestSlotCount) {
+                        lowestSlotCount = content.getCount();
+                        lowestSlot = i;
                     }
                 }
                 
-                return;
-            }
-            
-            var finalOrder = new ArrayList<ItemStack>();
-            
-            for (var stack : inputInv) {
-                if (stack.getCount() != maxCount) {
-                    if (!stack.isEmpty())
-                        finalOrder.add(stack.copy());
-                    continue;
+                for (var slot = 0; slot < size() && remaining > 0; slot++) {
+                    remaining -= customSlotInsert(toInsert.copyWithCount(slotCountTarget), (slot + lowestSlot) % size(), simulate);
                 }
                 
-                // split stack in N parts
-                var parts = Math.min(slotsPerSplitStack, stack.getCount());
-                var partSize = maxCount / parts;
-                
-                for (int partIndex = 0; partIndex < parts; partIndex++) {
-                    finalOrder.add(stack.copyWithCount(partSize));
-                }
-                
+                return toInsert.getCount() - remaining;
             }
             
-            var finalCount = finalOrder.stream().mapToInt(ItemStack::getCount).sum();
-            var initialCount = inputInv.stream().mapToInt(ItemStack::getCount).sum();
-            System.out.println(initialCount + " " + finalCount);
-            System.out.println(finalOrder);
-            if (finalCount != initialCount || finalOrder.size() > inputInv.size()) return;
             
-            for (int i = 0; i < finalOrder.size(); i++) {
-                var targetStack = finalOrder.get(i);
-                inputInv.set(i, targetStack);
-            }
-            
+            return super.insert(toInsert, simulate);
         }
         
         @Override
-        public boolean canInsert(int slot, ItemStack stack, @Nullable Direction side) {
-            // Check that this is an insert slot, and is being inserted on an accepted side.
-            if (!super.canInsert(slot, stack, side))
-                return false;
+        public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
             
-            var mode = inventoryInputMode;
-            var config = getSlots();
+            if (inventoryInputMode.equals(InventoryInputMode.FILL_EVENLY)) {
+                return insert(addedStack, simulate);
+            }
             
-            var inv = getInputView();
-            
-            // fill equally
-            // check all slots, find the one with the lowest (or empty) type
-            return switch (mode) {
-                case FILL_EVENLY -> {
-                    var target = findLowestMatchingSlot(stack, inv, true);
-                    yield target >= 0 && config.inputToRealSlot(target) == slot;
-                }
-                case FILL_LEFT_TO_RIGHT -> // fill left to right
-                  true;
-            };
+            return customSlotInsert(addedStack, slot, simulate);
+        }
+        
+        private int customSlotInsert(ItemStack toInsert, int slot, boolean simulate) {
+            return super.insertToSlot(toInsert, slot, simulate);
         }
     }
+    
 }

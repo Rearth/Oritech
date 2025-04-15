@@ -1,18 +1,12 @@
 package rearth.oritech.block.base.entity;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
-import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.registry.Registries;
@@ -22,35 +16,23 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.StackContext;
+import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
 
 import java.util.List;
 import java.util.Optional;
 
-public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGeneratorBlockEntity implements FluidProvider {
+public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGeneratorBlockEntity implements FluidApi.BlockProvider {
     
-    public final SingleVariantStorage<FluidVariant> inputTank = new SingleVariantStorage<>() {
+    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty) {
         @Override
-        protected FluidVariant getBlankVariant() {
-            return FluidVariant.blank();
-        }
-        
-        @Override
-        protected long getCapacity(FluidVariant variant) {
-            return (4 * FluidConstants.BUCKET);
-        }
-        
-        @Override
-        public boolean supportsExtraction() {
-            return false;
-        }
-        
-        @Override
-        protected void onFinalCommit() {
-            super.onFinalCommit();
-            FluidMultiblockGeneratorBlockEntity.this.markDirty();
+        public long insert(FluidStack toInsert, boolean simulate) {
+            if (toInsert.getFluid().equals(Fluids.WATER)) return 0L;    // to avoid mixups with players inserting water for boiler into main storage
+            return super.insert(toInsert, simulate);
         }
     };
     
@@ -61,54 +43,43 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     @Override
     public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
         
-        if (bucketInputAllowed() && !world.isClient && isActive(state) && !inventory.getStack(0).isEmpty()) {
+        if (bucketInputAllowed() && !world.isClient && isActive(state)) {
             processBuckets();
         }
-        
-        resetEmptyFluidTank(inputTank);
         
         super.tick(world, pos, state, blockEntity);
     }
     
-    public static void resetEmptyFluidTank(SingleVariantStorage<FluidVariant> tank) {
-        if (!tank.isResourceBlank() && tank.amount <= 0) {
-            tank.variant = FluidVariant.blank();
-        }
-    }
-    
     private void processBuckets() {
+        
         var inStack = inventory.getStack(0);
-        var emptyBucket = ItemVariant.of(Items.BUCKET, inStack.getComponentChanges()).toStack();
-        if (inStack.getItem() instanceof BucketItem bucketItem && outputCanAcceptBucket(emptyBucket)) {
-            
-            var bucketFluid = bucketItem.arch$getFluid();
-            if (bucketFluid == Fluids.EMPTY) return;
-            
-            try (var tx = Transaction.openOuter()) {
-                var inserted = inputTank.insert(FluidVariant.of(bucketFluid), FluidConstants.BUCKET, tx);
-                if (inserted != FluidConstants.BUCKET) return;
-                
-                inStack.decrement(1);
-                if (inventory.getStack(1).isEmpty()) {
-                    inventory.heldStacks.set(1, emptyBucket);
-                } else {
-                    inventory.getStack(1).increment(1);
-                }
-                inventory.heldStacks.set(0, inStack);
-                tx.commit();
+        var canFill = this.fluidStorage.getAmount() < this.fluidStorage.getCapacity();
+        
+        if (!canFill || inStack.isEmpty() || inStack.getCount() > 1) return;
+        
+        var stackRef = new StackContext(inStack, updated -> inventory.setStack(0, updated));
+        var candidate = FluidApi.ITEM.find(stackRef);
+        if (candidate == null || !candidate.supportsExtraction()) return;
+        
+        var moved = FluidApi.transferFirst(candidate, fluidStorage, fluidStorage.getCapacity(), false);
+        
+        if (moved == 0) {
+            // move stack
+            var outStack = inventory.getStack(1);
+            if (outStack.isEmpty()) {
+                inventory.setStack(1, stackRef.getValue());
+                inventory.setStack(0, ItemStack.EMPTY);
+            } else if (outStack.getItem().equals(stackRef.getValue().getItem()) && outStack.getCount() < outStack.getMaxCount()) {
+                outStack.increment(1);
+                inventory.setStack(0, ItemStack.EMPTY);
             }
         }
-    }
-    
-    private boolean outputCanAcceptBucket(ItemStack bucket) {
-        var slot = inventory.getStack(1);
-        return (slot.isEmpty() || (slot.isStackable() && ItemStack.areItemsAndComponentsEqual(slot, bucket) && slot.getCount() < slot.getMaxCount()));
     }
     
     @Override
     protected void tryConsumeInput() {
         
-        if (isProducingSteam && (waterStorage.amount == 0 || steamStorage.amount == steamStorage.getCapacity())) return;
+        if (isProducingSteam && (boilerStorage.getInStack().getAmount() == 0 || boilerStorage.getOutStack().getAmount() >= boilerStorage.getCapacity())) return;
         
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty())
@@ -132,27 +103,28 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
         // remove inputs
         // correct amount and variant is already validated in getRecipe, so we can directly remove it
         var fluidStack = activeRecipe.getFluidInput();
-        inputTank.amount -= fluidStack.getAmount();
-        
-        markNetDirty();
-        markDirty();
+        fluidStorage.extract(fluidStack, false);
     }
     
     // gets all recipe of target type, and only checks for matching liquids
     @Override
     protected Optional<RecipeEntry<OritechRecipe>> getRecipe() {
-        return getRecipe(inputTank);
+        return getRecipe(fluidStorage);
     }
     
-    protected Optional<RecipeEntry<OritechRecipe>> getRecipe(SingleVariantStorage<FluidVariant> checkedTank) {
+    protected Optional<RecipeEntry<OritechRecipe>> getRecipe(SimpleFluidStorage checkedTank) {
+        return getRecipe(checkedTank, world, getOwnRecipeType());
+    }
+    
+    public static Optional<RecipeEntry<OritechRecipe>> getRecipe(FluidApi.SingleSlotStorage checkedTank, World world, OritechRecipeType ownType) {
         
-        if (checkedTank.isResourceBlank() || checkedTank.amount <= 0) return Optional.empty();
+        if (checkedTank.getStack().isEmpty()) return Optional.empty();
         
-        var availableRecipes = world.getRecipeManager().listAllOfType(getOwnRecipeType());
+        var availableRecipes = world.getRecipeManager().listAllOfType(ownType);
         for (var recipeEntry : availableRecipes) {
             var recipe = recipeEntry.value();
             var recipeFluid = recipe.getFluidInput();
-            if (recipeFluid.getFluid().equals(checkedTank.variant.getFluid()) && checkedTank.amount >= recipeFluid.getAmount())
+            if (recipeFluid.isFluidEqual(checkedTank.getStack()) && checkedTank.getStack().getAmount() >= recipeFluid.getAmount())
                 return Optional.of(recipeEntry);
         }
         
@@ -162,21 +134,22 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        SingleVariantStorage.writeNbt(inputTank, FluidVariant.CODEC, nbt, registryLookup);
+        fluidStorage.writeNbt(nbt, "");
         Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
     }
     
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        SingleVariantStorage.readNbt(inputTank, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
+        fluidStorage.readNbt(nbt, "");
         Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
     }
     
     @Override
     protected void sendNetworkEntry() {
         super.sendNetworkEntry();
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SingleVariantFluidSyncPacket(pos, Registries.FLUID.getId(inputTank.variant.getFluid()).toString(), inputTank.amount));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(
+          new NetworkContent.SingleVariantFluidSyncPacketAPI(pos, Registries.FLUID.getId(fluidStorage.getFluid()).toString(), fluidStorage.getAmount()));
     }
     
     @Override
@@ -190,7 +163,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
-    public InventorySlotAssignment getSlots() {
+    public InventorySlotAssignment getSlotAssignments() {
         return new InventorySlotAssignment(0, 1, 1, 1);
     }
     
@@ -204,12 +177,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
-    public Storage<FluidVariant> getFluidStorage(Direction direction) {
-        return inputTank;
-    }
-    
-    @Override
-    public @Nullable SingleVariantStorage<FluidVariant> getForDirectFluidAccess() {
-        return inputTank;
+    public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
+        return fluidStorage;
     }
 }

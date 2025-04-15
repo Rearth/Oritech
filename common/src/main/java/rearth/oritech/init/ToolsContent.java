@@ -20,7 +20,8 @@ import rearth.oritech.item.tools.armor.*;
 import rearth.oritech.item.tools.harvesting.*;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
-import rearth.oritech.util.ArchitecturyRegistryContainer;
+import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 import rearth.oritech.util.energy.EnergyApi;
 
 import java.lang.reflect.Field;
@@ -79,6 +80,10 @@ public class ToolsContent implements ArchitecturyRegistryContainer<Item> {
             ItemGroups.add(targetGroup, variantStack);
             
             EnergyApi.ITEM.registerForItem(() -> value);
+        }
+        
+        if (FluidApi.ITEM != null && value instanceof FluidApi.ItemProvider) {
+            FluidApi.ITEM.registerForItem(() -> value);
         }
         
     }

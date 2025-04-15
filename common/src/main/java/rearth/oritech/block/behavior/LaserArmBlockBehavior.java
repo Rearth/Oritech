@@ -34,7 +34,7 @@ public class LaserArmBlockBehavior {
         var storageCandidate = EnergyApi.BLOCK.find(world, blockPos, blockState, blockEntity, null);
         // if the storage is not exposed (e.g. catalyst / deep drill / atomic forge), get it directly
         if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockProvider provider)
-            storageCandidate = provider.getStorage(null);
+            storageCandidate = provider.getEnergyStorage(null);
         if (storageCandidate != null)
             return transferPowerBehavior.fireAtBlock(world, laserEntity, block, blockPos, blockState, blockEntity);
         
@@ -69,7 +69,7 @@ public class LaserArmBlockBehavior {
                 var storageCandidate = EnergyApi.BLOCK.find(world, blockPos, blockState, blockEntity, null);
                 
                 if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockProvider energyProvider)
-                    storageCandidate = energyProvider.getStorage(null);
+                    storageCandidate = energyProvider.getEnergyStorage(null);
                 
                 if (blockEntity instanceof UnstableContainerBlockEntity unstableContainerBlockEntity)
                     storageCandidate = unstableContainerBlockEntity.laserInputStorage;

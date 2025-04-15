@@ -84,10 +84,10 @@ dependencies {
 
     // compat mods for testing
 //    // Tech Reborn
-//    modImplementation "curse.maven:techreborn-233564:5608205"
-//    modImplementation "curse.maven:reborncore-237903:5608204"
+    modImplementation "curse.maven:techreborn-233564:5608205"
+    modImplementation "curse.maven:reborncore-237903:5608204"
 //    // Energized Power
-//    modImplementation "curse.maven:energized-power-782147:5650292"
+    modImplementation "curse.maven:energized-power-782147:5650292"
 
     // create
     // modImplementation "net.createmod.ponder:Ponder-Fabric-${minecraft_version}:1.0.45"

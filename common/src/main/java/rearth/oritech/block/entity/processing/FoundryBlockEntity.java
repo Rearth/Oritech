@@ -36,7 +36,7 @@ public class FoundryBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public InventorySlotAssignment getSlots() {
+    public InventorySlotAssignment getSlotAssignments() {
         return new InventorySlotAssignment(0, 2, 2, 1);
     }
     

@@ -1,15 +1,8 @@
 package rearth.oritech.block.entity.pipes;
 
-import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -23,16 +16,17 @@ import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.item.ItemApi;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     
     private static final int TRANSFER_AMOUNT = Oritech.CONFIG.itemPipeTransferAmount();
     private static final int TRANSFER_PERIOD = Oritech.CONFIG.itemPipeIntervalDuration();
     
-    private final HashMap<BlockPos, BlockApiCache<Storage<ItemVariant>, Direction>> lookupCache = new HashMap<>();
-    private List<Pair<Storage<ItemVariant>, BlockPos>> filteredTargetItemStorages;
+    private List<Pair<ItemApi.InventoryStorage, BlockPos>> filteredTargetItemStorages;
     
     // item path cache (invalidated on network update)
     private final HashMap<BlockPos, Pair<ArrayList<BlockPos>, Integer>> cachedTransferPaths = new HashMap<>();
@@ -49,6 +43,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
     }
     
+    @SuppressWarnings("DataFlowIssue")
     @Override
     public void tick(World world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
         var block = (ExtractablePipeConnectionBlock) state.getBlock();
@@ -66,37 +61,33 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
         var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
         var stackToMove = ItemStack.EMPTY;
-        Storage<ItemVariant> moveFromInventory = null;
+        ItemApi.InventoryStorage moveFromInventory = null;
         BlockPos takenFrom = null;
         var moveCapacity = isBoostAvailable() ? 64 : TRANSFER_AMOUNT;
         
-        try (var mainTx = Transaction.openOuter()) {
-            for (var sourcePos : sources) {
-                
-                var blockedTimer = blockedUntil.getOrDefault(sourcePos, 0L);
-                if (world.getTime() < blockedTimer) continue;
-                
-                if (blockedTimer > 0)   // if timer has expired but was set
-                    blockedUntil.remove(sourcePos);
-                
-                var offset = pos.subtract(sourcePos);
-                var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
-                if (!block.isSideExtractable(state, direction.getOpposite())) continue;
-                var inventory = findFromCache(world, sourcePos, direction);
-                if (inventory == null || !inventory.supportsExtraction()) continue;
-                
-                var firstStack = getFromStorage(inventory, moveCapacity, mainTx);
-                
-                if (!firstStack.isEmpty()) {
-                    stackToMove = firstStack;
-                    moveFromInventory = inventory;
-                    takenFrom = sourcePos;
-                    break;
-                }
-                
+        for (var sourcePos : sources) {
+            
+            var blockedTimer = blockedUntil.getOrDefault(sourcePos, 0L);
+            if (world.getTime() < blockedTimer) continue;
+            
+            if (blockedTimer > 0)   // if timer has expired but was set
+                blockedUntil.remove(sourcePos);
+            
+            var offset = pos.subtract(sourcePos);
+            var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
+            if (!block.isSideExtractable(state, direction.getOpposite())) continue;
+            var inventory = ItemApi.BLOCK.find(world, sourcePos, direction);
+            if (inventory == null || !inventory.supportsExtraction()) continue;
+            
+            var firstStack = getFirstStack(inventory, moveCapacity);
+            
+            if (!firstStack.isEmpty()) {
+                stackToMove = firstStack;
+                moveFromInventory = inventory;
+                takenFrom = sourcePos;
+                break;
             }
             
-            mainTx.abort();
         }
         
         if (stackToMove.isEmpty()) return;
@@ -120,8 +111,8 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                                                var extracting = itemBlock.isSideExtractable(pipeState, direction.getOpposite());
                                                return !extracting;
                                            })
-                                           .map(target -> new Pair<>(findFromCache(world, target.getLeft(), target.getRight()), target.getLeft()))
-                                           .filter(obj -> Objects.nonNull(obj.getLeft()) && obj.getLeft().supportsInsertion()) //&& obj.getRight().getManhattanDistance(pos) > 1)
+                                           .map(target -> new Pair<>(ItemApi.BLOCK.find(world, target.getLeft(), target.getRight()), target.getLeft()))
+                                           .filter(obj -> Objects.nonNull(obj.getLeft()) && obj.getLeft().supportsInsertion())
                                            .sorted(Comparator.comparingInt(a -> a.getRight().getManhattanDistance(pos)))
                                            .toList();
             
@@ -129,40 +120,30 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             cachedTransferPaths.clear();
         }
         
-        var moveCount = stackToMove.getCount();
-        var moved = 0L;
+        var toMove = stackToMove.getCount();
+        var moved = 0;
         
-        try (var tx = Transaction.openOuter()) {
-            for (var targetStorage : filteredTargetItemStorages) {
-                if (targetStorage.getLeft().equals(moveFromInventory)) continue;    // skip when targeting same machine
-                
-                var wasEmptyStorage = !targetStorage.getLeft().nonEmptyIterator().hasNext();
-                
-                var inserted = targetStorage.getLeft().insert(ItemVariant.of(stackToMove), moveCount, tx);
-                moveCount -= (int) inserted;
-                moved += inserted;
-                
-                if (inserted > 0) {
-                    onItemMoved(this.pos, takenFrom, targetStorage.getRight(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.pos, 0), new HashSet<>()), world, stackToMove.getItem(), (int) inserted, wasEmptyStorage);
-                }
-                
-                if (moveCount <= 0) break;  // target has been found for all items
+        for (var storagePair : filteredTargetItemStorages) {
+            if (storagePair.getLeft().equals(moveFromInventory)) continue;    // skip when targeting same machine
+            
+            var targetStorage = storagePair.getLeft();
+            var wasEmptyStorage = IntStream.range(0, targetStorage.getSlotCount()).allMatch(slot -> targetStorage.getStackInSlot(slot).isEmpty());
+            
+            
+            var inserted = targetStorage.insert(stackToMove, false);
+            toMove -= inserted;
+            moved += inserted;
+            
+            if (inserted > 0) {
+                onItemMoved(this.pos, takenFrom, storagePair.getRight(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.pos, 0), new HashSet<>()), world, stackToMove.getItem(), inserted, wasEmptyStorage);
             }
             
-            if (moved <= 0) { // no idea how this could ever be negative, but there was this crash: https://github.com/Rearth/Oritech/issues/277
-                tx.abort();
-                return;
-            }
-            
-            var extracted = moveFromInventory.extract(ItemVariant.of(stackToMove), moved, tx);
-            
-            if (extracted != moved) {
-                Oritech.LOGGER.warn("Invalid state while transferring inventory. Caused at position " + pos);
-                tx.abort();
-            } else {
-                tx.commit();
-            }
-            
+            if (toMove <= 0) break;  // target has been found for all items
+        }
+        var extracted = moveFromInventory.extract(stackToMove.copyWithCount(moved), false);
+        
+        if (extracted != moved) {
+            Oritech.LOGGER.warn("Invalid state while transferring inventory. Caused at position {}", pos);
         }
         
         if (moveCapacity > TRANSFER_AMOUNT) onBoostUsed();
@@ -310,23 +291,18 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             world.markDirty(pos);
     }
     
-    private Storage<ItemVariant> findFromCache(World world, BlockPos pos, Direction direction) {
-        var cacheRes = lookupCache.computeIfAbsent(pos, elem -> BlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world, pos));
-        return cacheRes.find(direction);
-    }
-    
-    private static ItemStack getFromStorage(Storage<ItemVariant> inventory, int maxTransferAmount, Transaction mainTx) {
-        for (Iterator<StorageView<ItemVariant>> it = inventory.nonEmptyIterator(); it.hasNext(); ) {
-            var stack = it.next();
-            var type = stack.getResource();
-            var extractedAmount = inventory.extract(type, maxTransferAmount, mainTx);
-            if (extractedAmount > 0) {
-                return type.toStack((int) extractedAmount);
-            }
+    private static ItemStack getFirstStack(ItemApi.InventoryStorage inventory, int maxTransferAmount) {
+        
+        for (int i = 0; i < inventory.getSlotCount(); i++) {
+            var slotStack = inventory.getStackInSlot(i);
+            if (slotStack.isEmpty()) continue;
+            var extracted = inventory.extractFromSlot(slotStack.copyWithCount(maxTransferAmount), i, true);
+            if (extracted > 0) return slotStack.copyWithCount(extracted);
         }
         
         return ItemStack.EMPTY;
     }
     
-    public record RenderStackData(ItemStack rendered, List<BlockPos> path, Long startedAt, int pathLength) {}
+    public record RenderStackData(ItemStack rendered, List<BlockPos> path, Long startedAt, int pathLength) {
+    }
 }

@@ -14,7 +14,7 @@ import rearth.oritech.Oritech;
 import java.util.function.Supplier;
 
 // this can't be an auto container because as always, neoforge is annoying
-// because of stupid neoforge we have to register components separatelly there, because $REASONS
+// because of stupid neoforge we have to register components separately there, because $REASONS
 // when adding/changing this, make sure to update the components in the neo entry class aswell
 @SuppressWarnings("unchecked")
 public class ComponentContent {

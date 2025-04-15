@@ -5,7 +5,7 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import rearth.oritech.util.ArchitecturyRegistryContainer;
+import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 import rearth.oritech.util.PortalEntity;
 
 public class EntitiesContent implements ArchitecturyRegistryContainer<EntityType<?>> {

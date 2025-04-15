@@ -25,7 +25,7 @@ public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements 
         return isUsed && getCachedController() != null;
     }
     
-    private EnergyApi.EnergyContainer getMainStorage() {
+    private EnergyApi.EnergyStorage getMainStorage() {
         
         var isUsed = this.getCachedState().get(MachineAddonBlock.ADDON_USED);
         if (!isUsed) return null;
@@ -44,7 +44,7 @@ public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements 
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return delegatedStorage;
     }
 }

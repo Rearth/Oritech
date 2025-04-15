@@ -1,4 +1,4 @@
-package rearth.oritech.util;
+package rearth.oritech.util.registry;
 
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;

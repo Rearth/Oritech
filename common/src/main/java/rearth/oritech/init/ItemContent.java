@@ -14,8 +14,8 @@ import rearth.oritech.item.other.MobCaptureItem;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 import rearth.oritech.item.tools.WeedKiller;
 import rearth.oritech.item.tools.Wrench;
-import rearth.oritech.util.ArchitecturyRegistryContainer;
-import rearth.oritech.util.item.UnstableContainerItem;
+import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
+import rearth.oritech.item.UnstableContainerItem;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

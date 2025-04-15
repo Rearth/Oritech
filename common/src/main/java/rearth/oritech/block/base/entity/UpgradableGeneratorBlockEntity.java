@@ -1,12 +1,10 @@
 package rearth.oritech.block.base.entity;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
+import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
@@ -19,12 +17,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.fluid.containers.SimpleInOutFluidStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +33,15 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     public int currentMaxBurnTime; // needed only for progress display
     private List<ItemStack> pendingOutputs = new ArrayList<>(); // used if a recipe produces a byproduct at the end
     
+    // this is used just for steam
     public boolean isProducingSteam = false;
-    public final SingleVariantStorage<FluidVariant> waterStorage = createBasicTank(FluidVariant.of(Fluids.WATER));
-    public final SingleVariantStorage<FluidVariant> steamStorage = createBasicTank(FluidVariant.of(FluidContent.STILL_STEAM.get()));
-    public final Storage<FluidVariant> waterWrapper = FilteringStorage.insertOnlyOf(waterStorage);
-    public final Storage<FluidVariant> steamWrapper = FilteringStorage.extractOnlyOf(steamStorage);
-    public final Storage<FluidVariant> exposedStorage = new CombinedStorage<>(List.of(steamWrapper, waterWrapper));
+    public final SimpleInOutFluidStorage boilerStorage = new SimpleInOutFluidStorage(8 * FluidStackHooks.bucketAmount(), this::markDirty) {
+        @Override
+        public long insert(FluidStack toInsert, boolean simulate) {
+            if (!boilerAcceptsInput(toInsert.getFluid())) return 0L;
+            return super.insert(toInsert, simulate);
+        }
+    };
     
     // speed multiplier increases output rate and reduces burn time by same percentage
     // efficiency multiplier only increases burn time
@@ -85,7 +86,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     
     protected void tryConsumeInput() {
         
-        if (isProducingSteam && (waterStorage.amount == 0 || steamStorage.amount == steamStorage.getCapacity())) return;
+        if (isProducingSteam && (boilerStorage.getInStack().getAmount() == 0 || boilerStorage.getOutStack().getAmount() >= boilerStorage.getCapacity())) return;
         
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty())
@@ -120,7 +121,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     protected void produceResultItems() {
         if (!pendingOutputs.isEmpty()) {
             for (var stack : pendingOutputs) {
-                this.inventory.addStack(stack);
+                this.inventory.insert(stack, false);
             }
         }
         
@@ -168,11 +169,9 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             // yes this will void excess steam. Generators will only stop producing when the RF storage is full, not the steam storage
             // this is by design and supposed to be one of the negatives of steam production
             produced *= Oritech.CONFIG.generators.steamEngineData.rfToSteamRatio();
-            produced = Math.min(waterStorage.amount, produced);
-            steamStorage.amount += produced;
-            steamStorage.amount = Math.min(steamStorage.amount, steamStorage.getCapacity());
-            waterStorage.amount -= produced;
             
+            var extracted = boilerStorage.getInputContainer().extract(FluidStack.create(Fluids.WATER.getStill(), (long) produced), false);
+            boilerStorage.getOutputContainer().insert(FluidStack.create(FluidContent.STILL_STEAM.get(), extracted), false);
         } else {
             energyStorage.amount += produced;
         }
@@ -188,8 +187,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         nbt.putInt("storedBurn", currentMaxBurnTime);
-        nbt.putLong("waterStored", waterStorage.amount);
-        nbt.putLong("steamStored", steamStorage.amount);
+        boilerStorage.writeNbt(nbt, "");
         nbt.putBoolean("steamAddon", isProducingSteam);
         
         var resList = new NbtList();
@@ -204,8 +202,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         currentMaxBurnTime = nbt.getInt("storedBurn");
-        steamStorage.amount = nbt.getLong("steamStored");
-        waterStorage.amount = nbt.getLong("waterStored");
+        boilerStorage.readNbt(nbt, "");
         isProducingSteam = nbt.getBoolean("steamAddon");
         
         var storedResults = nbt.getList("pendingResults", NbtElement.COMPOUND_TYPE);
@@ -222,7 +219,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorUISyncPacket(getPos(), currentMaxBurnTime, isProducingSteam));
         
         if (isProducingSteam)
-            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorSteamSyncPacket(pos, steamStorage.amount, waterStorage.amount));
+            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorSteamSyncPacket(pos, boilerStorage.getInStack().getAmount(), boilerStorage.getOutStack().getAmount()));
     }
     
     protected abstract Set<Pair<BlockPos, Direction>> getOutputTargets(BlockPos pos, World world);
@@ -242,6 +239,10 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         if (moved > 0)
             this.markDirty();
         
+    }
+    
+    public boolean boilerAcceptsInput(Fluid fluid ){
+        return fluid.equals(Fluids.WATER);
     }
     
     @Override
@@ -280,39 +281,5 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         var recipeTicks = currentMaxBurnTime;
         var animationTicks = 60f;    // 3s, length which all animations are defined as
         return animationTicks / recipeTicks * Oritech.CONFIG.generators.animationSpeedMultiplier();
-    }
-    
-    public SingleVariantStorage<FluidVariant> getSteamStorage() {
-        return steamStorage;
-    }
-    
-    public SingleVariantStorage<FluidVariant> getWaterStorage() {
-        return waterStorage;
-    }
-    
-    private SingleVariantStorage<FluidVariant> createBasicTank(FluidVariant fluidType) {
-        return new SingleVariantStorage<>() {
-            
-            @Override
-            protected FluidVariant getBlankVariant() {
-                return fluidType;
-            }
-            
-            @Override
-            protected boolean canInsert(FluidVariant variant) {
-                return variant.equals(fluidType);
-            }
-            
-            @Override
-            protected long getCapacity(FluidVariant variant) {
-                return CentrifugeBlockEntity.CAPACITY;
-            }
-            
-            @Override
-            protected void onFinalCommit() {
-                super.onFinalCommit();
-                UpgradableGeneratorBlockEntity.this.markDirty();
-            }
-        };
     }
 }

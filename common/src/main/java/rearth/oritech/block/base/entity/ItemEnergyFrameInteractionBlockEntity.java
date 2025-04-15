@@ -1,9 +1,6 @@
 package rearth.oritech.block.base.entity;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,24 +22,24 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.*;
-import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.MachineAddonController;
+import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.SimpleInventoryStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity implements InventoryProvider, EnergyApi.BlockProvider, ExtendedScreenHandlerFactory, ScreenProvider, MachineAddonController, RedstoneAddonBlockEntity.RedstoneControllable {
+public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity implements ItemApi.BlockProvider, EnergyApi.BlockProvider, ExtendedScreenHandlerFactory, ScreenProvider, MachineAddonController, RedstoneAddonBlockEntity.RedstoneControllable {
     
     public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, this::markDirty);
     
-    public final SimpleInventory inventory = new SimpleInventory(getInventorySize()) {
-        @Override
-        public void markDirty() {
-            ItemEnergyFrameInteractionBlockEntity.this.markDirty();
-        }
-    };
+    
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(getInventorySize(), this::markDirty);
     
     private final List<BlockPos> connectedAddons = new ArrayList<>();
     private final List<BlockPos> openSlots = new ArrayList<>();
@@ -94,23 +91,23 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
-        return InventoryStorage.of(inventory, direction);
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        return inventory;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
     
     @Override
-    public BlockPos getMachinePos() {
+    public BlockPos getPosForAddon() {
         return getPos();
     }
     
     @Override
-    public World getMachineWorld() {
+    public World getWorldForAddon() {
         return getWorld();
     }
     
@@ -204,7 +201,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public SimpleInventory getInventoryForAddon() {
+    public ItemApi.InventoryStorage getInventoryForAddon() {
         return inventory;
     }
     
@@ -228,7 +225,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public List<BlockPos> getOpenSlots() {
+    public List<BlockPos> getOpenAddonSlots() {
         return openSlots;
     }
     

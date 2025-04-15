@@ -1,7 +1,6 @@
 package rearth.oritech.block.blocks.storage;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -9,28 +8,29 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
+import rearth.oritech.Oritech;
+import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.ComparatorOutputProvider;
+import rearth.oritech.util.StackContext;
+import rearth.oritech.util.fluid.FluidApi;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(LIT, false));
     }
-
+    
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(LIT);
@@ -55,7 +55,7 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new SmallFluidTankEntity(pos, state, false);
+        return new SmallTankEntity(pos, state, false);
     }
     
     @Override
@@ -79,17 +79,57 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
         
         return ActionResult.SUCCESS;
     }
-
+    
+    @Override
+    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        
+        var blockEntity = world.getBlockEntity(pos);
+        if (blockEntity instanceof SmallTankEntity tankEntity) {
+            var usedStack = stack;
+            if (stack.getCount() > 1) {
+                usedStack = stack.copyWithCount(1);
+            }
+            var stackRef = new StackContext(usedStack, updated -> {
+                if (stack.getCount() > 1) {
+                    stack.decrement(1);
+                    if (!player.getInventory().insertStack(updated)) {
+                        player.dropItem(updated, true);
+                    }
+                } else {
+                    player.setStackInHand(hand, updated);
+                }
+            });
+            
+            var candidate = FluidApi.ITEM.find(stackRef);
+            if (candidate != null) {
+                
+                if (!world.isClient) {
+                    if (candidate.getContent().getFirst().isEmpty()) { // from tank to item
+                        var moved = FluidApi.transferFirst(tankEntity.fluidStorage, candidate, tankEntity.fluidStorage.getCapacity(), false);
+                        Oritech.LOGGER.debug("moved to item {} {}", moved, stackRef.getValue());
+                    } else {    // from item to tank
+                        var moved = FluidApi.transferFirst(candidate, tankEntity.fluidStorage, tankEntity.fluidStorage.getCapacity(), false);
+                        Oritech.LOGGER.debug("moved from item {} {}", moved, stackRef.getValue());
+                    }
+                }
+                
+                return ItemActionResult.success(true);
+            }
+        }
+        
+        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+    }
+    
     protected List<ItemStack> getDroppedStacks(BlockState state, LootContextParameterSet.Builder builder) {
         var droppedStacks = super.getDroppedStacks(state, builder);
-
-        var blockEntity = (BlockEntity)builder.getOptional(LootContextParameters.BLOCK_ENTITY);
-        if (blockEntity instanceof SmallFluidTankEntity tankEntity)
+        
+        var blockEntity = builder.getOptional(LootContextParameters.BLOCK_ENTITY);
+        if (blockEntity instanceof SmallTankEntity tankEntity)
             droppedStacks.addAll(tankEntity.inventory.getHeldStacks());
-
+        
         return droppedStacks;
     }
-
+    
     @Override
     public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         return getStackWithData(world, pos);
@@ -97,15 +137,12 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     
     @NotNull
     private static ItemStack getStackWithData(WorldView world, BlockPos pos) {
-        var tankEntity = (SmallFluidTankEntity) world.getBlockEntity(pos);
+        var tankEntity = (SmallTankEntity) world.getBlockEntity(pos);
         var stack = getBasePickStack(tankEntity.isCreative);
         
-        if (tankEntity.getForDirectFluidAccess().amount > 0) {
-            var nbt = new NbtCompound();
-            tankEntity.writeNbt(nbt, world.getRegistryManager());
-            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
-            var fluidName = FluidVariantAttributes.getName(tankEntity.getForDirectFluidAccess().variant);
-            stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable(tankEntity.isCreative ? "block.oritech.creative_tank_block" : "block.oritech.small_tank_block")));
+        if (tankEntity.fluidStorage.getAmount() > 0) {
+            var fluidStack = tankEntity.fluidStorage.getStack();
+            stack.set(FluidApi.ITEM.getFluidComponent(), fluidStack);
         }
         
         return stack;
@@ -119,12 +156,10 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
         
-        if (!itemStack.contains(DataComponentTypes.CUSTOM_DATA)) return;
-        
-        var tankEntity = (SmallFluidTankEntity) world.getBlockEntity(pos);
-        var nbt = itemStack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
-        if (nbt != null)
-            tankEntity.readNbt(nbt, world.getRegistryManager());
+        if (itemStack.contains(FluidApi.ITEM.getFluidComponent())) {
+            var tankEntity = (SmallTankEntity) world.getBlockEntity(pos);
+            tankEntity.fluidStorage.setStack(itemStack.get(FluidApi.ITEM.getFluidComponent()));
+        }
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})

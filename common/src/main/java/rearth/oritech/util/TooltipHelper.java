@@ -74,7 +74,7 @@ public class TooltipHelper {
             
             
             if (entity instanceof EnergyApi.BlockProvider energyProvider) {
-                var maxStorage = getEnergyText(energyProvider.getStorage(null).getCapacity());
+                var maxStorage = getEnergyText(energyProvider.getEnergyStorage(null).getCapacity());
                 tooltip.add(Text.translatable("tooltip.oritech.machine_capacity_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_capacity", maxStorage).formatted(Formatting.GOLD)));
                 
                 if (energyProvider instanceof AtomicForgeBlockEntity || energyProvider instanceof DeepDrillEntity)

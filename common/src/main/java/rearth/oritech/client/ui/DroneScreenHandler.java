@@ -1,7 +1,5 @@
 package rearth.oritech.client.ui;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -11,11 +9,12 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.DronePortEntity;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 import rearth.oritech.util.MachineAddonController;
+import rearth.oritech.util.fluid.FluidApi;
 
 public class DroneScreenHandler extends UpgradableMachineScreenHandler {
     
     private final SimpleInventory cardInventory;
-    private final SingleVariantStorage<FluidVariant> fluidTank;
+    private final FluidApi.SingleSlotStorage fluidTank;
     
     public DroneScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity, MachineAddonController.AddonUiData addonUiData, float coreQuality) {
         super(syncId, playerInventory, blockEntity, addonUiData, coreQuality);

@@ -1,17 +1,9 @@
 package rearth.oritech.block.entity.pipes;
 
-import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import com.google.common.collect.Streams;
+import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.block.BlockState;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -20,100 +12,62 @@ import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeConnectionBlock;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.FluidProvider;
+import rearth.oritech.util.fluid.FluidApi;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity implements FluidProvider {
+public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     
-    public static final int MAX_TRANSFER_RATE = (int) (FluidConstants.BUCKET * Oritech.CONFIG.fluidPipeExtractAmountBuckets());
+    public static final int MAX_TRANSFER_RATE = (int) (FluidStackHooks.bucketAmount() * Oritech.CONFIG.fluidPipeExtractAmountBuckets());
     private static final int TRANSFER_PERIOD = Oritech.CONFIG.fluidPipeExtractIntervalDuration();
     
-    private List<Storage<FluidVariant>> filteredFluidTargetsCached;
-    
-    private final HashMap<BlockPos, BlockApiCache<Storage<FluidVariant>, Direction>> lookupCache = new HashMap<>();
-    
-    private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
-        @Override
-        protected FluidVariant getBlankVariant() {
-            return FluidVariant.blank();
-        }
-        
-        @Override
-        protected long getCapacity(FluidVariant variant) {
-            return (long) (MAX_TRANSFER_RATE * Oritech.CONFIG.fluidPipeInternalStorageBuckets() * (isBoostAvailable() ? 10 : 1));
-        }
-        
-        @Override
-        protected void onFinalCommit() {
-            super.onFinalCommit();
-            FluidPipeInterfaceEntity.this.markDirty();
-        }
-    };
+    private List<FluidApi.FluidStorage> filteredFluidTargetsCached;
     
     public FluidPipeInterfaceEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.FLUID_PIPE_ENTITY, pos, state);
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
-    }
-    
-    @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
-    }
-    
-    @Override
     public void tick(World world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
-        if (world.isClient) return;
+        var block = (ExtractablePipeConnectionBlock) state.getBlock();
+        if (world.isClient || !block.isExtractable(state)) return;
         
         // boosted pipe works every tick, otherwise only every N tick
-        var block = (ExtractablePipeConnectionBlock) state.getBlock();
-        if (world.getTime() % TRANSFER_PERIOD != 0 && !isBoostAvailable() || !block.isExtractable(state))
+        if (world.getTime() % TRANSFER_PERIOD != 0 && !isBoostAvailable())
             return;
         
         var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
         
-        // try to fill internal storage from inputs (if extract true)
+        // try to get fluid to transfer
         // one transaction for each side
-        if (block.isExtractable(state) && fluidStorage.amount < fluidStorage.getCapacity()) {
+        var stackToMove = FluidStack.empty();
+        FluidApi.FluidStorage takenFrom = null;
+        var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
+        
+        for (var sourcePos : sources) {
+            var offset = pos.subtract(sourcePos);
+            var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
+            if (!block.isSideExtractable(state, direction.getOpposite())) continue;
+            var sourceContainer = FluidApi.BLOCK.find(world, sourcePos, direction);
+            if (sourceContainer == null || !sourceContainer.supportsExtraction()) continue;
             
-            var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
+            var contents = sourceContainer.getContent();
+            var extractionCandidate = Streams.stream(contents)
+                                        .filter(candidate -> !candidate.isEmpty())
+                                        .filter(candidate -> sourceContainer.extract(candidate, true) > 0)
+                                        .findFirst();
             
-            for (var sourcePos : sources) {
-                var offset = pos.subtract(sourcePos);
-                var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
-                if (!block.isSideExtractable(state, direction.getOpposite())) continue;
-                var sourceContainer = findFromCache(world, sourcePos, direction);
-                if (sourceContainer == null || !sourceContainer.supportsExtraction()) continue;
-                
-                var availableInsert = fluidStorage.getCapacity() - fluidStorage.amount;
-                var ownVariant = fluidStorage.variant;
-                
-                for (Iterator<StorageView<FluidVariant>> it = sourceContainer.nonEmptyIterator(); it.hasNext(); ) {
-                    var fluid = it.next();
-                    if (!ownVariant.isBlank() && !fluid.getResource().equals(ownVariant)) continue;
-                    var targetVariant = fluid.getResource();
-                    try (var tx = Transaction.openOuter()) {
-                        var extracted = sourceContainer.extract(targetVariant, availableInsert, tx);
-                        if (extracted == 0) continue;
-                        var inserted = fluidStorage.insert(targetVariant, extracted, tx);
-                        if (inserted != extracted) {
-                            // this should never happen
-                            tx.abort();
-                            Oritech.LOGGER.warn("Something weird has happened with fluid pipes. Working with transaction APIs is just annoying. Caused at: " + pos);
-                            continue;
-                        } else {
-                            tx.commit();
-                        }
-                        break;
-                    }
-                }
+            if (extractionCandidate.isPresent()) {
+                var extractionTest = extractionCandidate.get().copyWithAmount(MAX_TRANSFER_RATE);
+                var movedAmount = sourceContainer.extract(extractionTest, true);
+                stackToMove = extractionTest;
+                stackToMove.setAmount(movedAmount);
+                takenFrom = sourceContainer;
+                break;
             }
         }
         
@@ -121,13 +75,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity imp
         // gather all connection targets supporting insertion
         // shuffle em
         // insert until no more fluid to output is available
-        if (fluidStorage.amount <= 0) return;
-        
-        if (fluidStorage.variant == FluidVariant.blank()) {
-            System.err.println("this should never happen! Maybe it's updating old data?");
-            fluidStorage.amount = 0;
-            return;
-        }
+        if (stackToMove.isEmpty() || takenFrom == null) return;
         
         var targets = findNetworkTargets(pos, data);
         
@@ -149,7 +97,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity imp
                                                var extracting = fluidBlock.isSideExtractable(pipeState, target.getRight().getOpposite());
                                                return !extracting;
                                            })
-                                           .map(target -> findFromCache(world, target.getLeft(), target.getRight()))
+                                           .map(target -> FluidApi.BLOCK.find(world, target.getLeft(), target.getRight()))
                                            .filter(obj -> Objects.nonNull(obj) && obj.supportsInsertion())
                                            .collect(Collectors.toList());
             
@@ -158,46 +106,23 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity imp
         
         Collections.shuffle(filteredFluidTargetsCached);
         
-        var availableFluid = fluidStorage.getAmount();
-        var ownType = fluidStorage.variant;
-        var moved = 0L;
+        var availableFluid = stackToMove.getAmount();
         
-        try (var tx = Transaction.openOuter()) {
-            for (var targetStorage : filteredFluidTargetsCached) {
-                var transferred = targetStorage.insert(ownType, availableFluid, tx);
-                
-                if(transferred < 0) { // no idea how this could ever be negative, but there was this crash: https://github.com/Rearth/Oritech/issues/277
-                    tx.abort();
-                    continue;
-                }
-                
-                moved += fluidStorage.extract(ownType, transferred, tx);
-                availableFluid -= transferred;
-                
-                if (availableFluid <= 0) break;
-            }
+        for (var targetStorage : filteredFluidTargetsCached) {
+            var transferred = targetStorage.insert(stackToMove, false);
+            stackToMove.shrink(transferred);
+            targetStorage.update();
             
-            tx.commit();
+            if (stackToMove.getAmount() <= 0) break;
         }
         
-        if (moved > 0)
+        var moved = availableFluid - stackToMove.getAmount();
+        if (moved > 0) {
+            stackToMove.setAmount(moved);
+            takenFrom.extract(stackToMove, false);
             onBoostUsed();
+            takenFrom.update();
+        }
         
-    }
-    
-    @Override
-    public void markDirty() {
-        if (this.world != null)
-            world.markDirty(pos);
-    }
-    
-    private Storage<FluidVariant> findFromCache(World world, BlockPos pos, Direction direction) {
-        var cacheRes = lookupCache.computeIfAbsent(pos, elem -> BlockApiCache.create(FluidStorage.SIDED, (ServerWorld) world, pos));
-        return cacheRes.find(direction);
-    }
-    
-    @Override
-    public Storage<FluidVariant> getFluidStorage(Direction direction) {
-        return fluidStorage;
     }
 }

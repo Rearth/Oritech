@@ -1,5 +1,6 @@
 package rearth.oritech.init.compat.rei.Screens;
 
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import io.wispforest.owo.compat.rei.ReiUIAdapter;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.container.Containers;
@@ -14,9 +15,6 @@ import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -55,7 +53,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             var screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(new BlockPos(0, 0, 0), finalBlockState);
             this.isGenerator = screenProvider instanceof UpgradableGeneratorBlockEntity;
             this.slots = screenProvider.getGuiSlots();
-            this.slotOffsets = screenProvider.getSlots();
+            this.slotOffsets = screenProvider.getSlotAssignments();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -133,11 +131,11 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             var fluid = display.entry.value().getFluidInput().getFluid();
             var amount = display.entry.value().getFluidInput().getAmount();
             
-            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(FluidVariant.of(fluid), 81000, new ScreenProvider.BarConfiguration(4, 5, 16, 50)));
+            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(display.entry.value().getFluidInput(), new ScreenProvider.BarConfiguration(4, 5, 16, 50)));
             
             
             var text = amount > 0
-                ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(FluidVariant.of(fluid)).getString())
+                ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(display.entry.value().getFluidInput()).getString())
                 : Text.translatable("tooltip.oritech.fluid_empty");
 
             var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
@@ -151,10 +149,10 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             var fluid = display.entry.value().getFluidOutput().getFluid();
             var amount = display.entry.value().getFluidOutput().getAmount();
             
-            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(FluidVariant.of(fluid), 81000, new ScreenProvider.BarConfiguration(123, 5, 16, 50)));
+            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(display.entry.value().getFluidOutput(), new ScreenProvider.BarConfiguration(123, 5, 16, 50)));
             
             var text = amount > 0
-                ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(FluidVariant.of(fluid)).getString())
+                ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(display.entry.value().getFluidOutput()).getString())
                 : Text.translatable("tooltip.oritech.fluid_empty");
             var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
             foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));

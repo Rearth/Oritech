@@ -2,8 +2,6 @@ package rearth.oritech.block.entity.reactor;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,13 +23,17 @@ import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.*;
+import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.InOutInventoryStorage;
 
 import java.util.List;
 
-public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ScreenProvider, InventoryProvider {
+public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ScreenProvider, ItemApi.BlockProvider {
     
-    private final SimpleSidedInventory inventory = new SimpleSidedInventory(1, new InventorySlotAssignment(0, 1, 1, 0));
+    private final InOutInventoryStorage inventory = new InOutInventoryStorage(1, this::markDirty, new InventorySlotAssignment(0, 1, 1, 0));
     private final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     public int availableFuel;
@@ -166,7 +168,7 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedSc
     }
     
     @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
-        return inventoryStorage;
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        return inventory;
     }
 }

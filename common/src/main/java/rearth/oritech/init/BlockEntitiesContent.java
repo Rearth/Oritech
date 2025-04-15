@@ -2,8 +2,6 @@ package rearth.oritech.init;
 
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -26,10 +24,10 @@ import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.block.entity.reactor.*;
 import rearth.oritech.block.entity.storage.*;
-import rearth.oritech.util.ArchitecturyRegistryContainer;
-import rearth.oritech.util.FluidProvider;
-import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -181,6 +179,7 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     @AssignSidedEnergy
     public static final BlockEntityType<ParticleCollectorBlockEntity> PARTICLE_COLLECTOR_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(ParticleCollectorBlockEntity::new, BlockContent.PARTICLE_COLLECTOR_BLOCK).build();
     
+    @AssignSidedInventory
     public static final BlockEntityType<InventoryProxyAddonBlockEntity> INVENTORY_PROXY_ADDON_ENTITY = FabricBlockEntityTypeBuilder.create(InventoryProxyAddonBlockEntity::new, BlockContent.MACHINE_INVENTORY_PROXY_ADDON).build();
     
     @AssignSidedInventory
@@ -195,13 +194,12 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     
     @AssignSidedInventory
     @AssignSidedFluid
-    public static final BlockEntityType<SmallFluidTankEntity> SMALL_TANK_ENTITY = FabricBlockEntityTypeBuilder.create((pos, state) -> new SmallFluidTankEntity(pos, state, false), BlockContent.SMALL_TANK_BLOCK).build();
+    public static final BlockEntityType<SmallTankEntity> SMALL_TANK_ENTITY = FabricBlockEntityTypeBuilder.create((pos, state) -> new SmallTankEntity(pos, state, false), BlockContent.SMALL_TANK_BLOCK).build();
     
     @AssignSidedInventory
     @AssignSidedFluid
-    public static final BlockEntityType<SmallFluidTankEntity> CREATIVE_TANK_ENTITY = FabricBlockEntityTypeBuilder.create((pos, state) -> new SmallFluidTankEntity(pos, state, true), BlockContent.CREATIVE_TANK_BLOCK).build();
+    public static final BlockEntityType<SmallTankEntity> CREATIVE_TANK_ENTITY = FabricBlockEntityTypeBuilder.create((pos, state) -> new SmallTankEntity(pos, state, true), BlockContent.CREATIVE_TANK_BLOCK).build();
     
-    @AssignSidedFluid
     public static final BlockEntityType<FluidPipeInterfaceEntity> FLUID_PIPE_ENTITY = FabricBlockEntityTypeBuilder.create(FluidPipeInterfaceEntity::new, BlockContent.FLUID_PIPE_CONNECTION, BlockContent.FRAMED_FLUID_PIPE_CONNECTION).build();
     @AssignSidedEnergy
     public static final BlockEntityType<EnergyPipeInterfaceEntity> ENERGY_PIPE_ENTITY = FabricBlockEntityTypeBuilder.create(EnergyPipeInterfaceEntity::new, BlockContent.ENERGY_PIPE_CONNECTION, BlockContent.SUPERCONDUCTOR_CONNECTION, BlockContent.FRAMED_ENERGY_PIPE_CONNECTION, BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION).build();
@@ -261,10 +259,10 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
             EnergyApi.BLOCK.registerBlockEntity(() -> value);
         
         if (field.isAnnotationPresent(AssignSidedFluid.class))
-            FluidStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((FluidProvider) blockEntity).getFluidStorage(direction), value);
+            FluidApi.BLOCK.registerBlockEntity(() -> value);
         
         if (field.isAnnotationPresent(AssignSidedInventory.class))
-            ItemStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((InventoryProvider) blockEntity).getInventory(direction), value);
+            ItemApi.BLOCK.registerBlockEntity(() -> value);
         
     }
     

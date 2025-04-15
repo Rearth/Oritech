@@ -1,12 +1,10 @@
 package rearth.oritech.neoforge;
 
 import dev.technici4n.grandpower.api.ILongEnergyStorage;
-import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -14,9 +12,11 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.ComponentContent;
+import rearth.oritech.util.StackContext;
 import rearth.oritech.util.energy.BlockEnergyApi;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.ItemEnergyApi;
+import rearth.oritech.util.energy.containers.SimpleEnergyItemStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,24 +44,24 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     public void registerEvent(RegisterCapabilitiesEvent event) {
         for (var supplied : registeredBlockEntities) {
-            event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, supplied.get(), (entity, direction) -> ContainerStorageWrapper.of(((EnergyApi.BlockProvider) entity).getStorage(direction)));
+            event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, supplied.get(), (entity, direction) -> ContainerStorageWrapper.of(((EnergyApi.BlockProvider) entity).getEnergyStorage(direction)));
         }
         
         for (var supplied : registeredItems) {
-            event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ignored) -> ContainerStorageWrapper.of(((EnergyApi.ItemProvider) stack.getItem()).getStorage(stack)), supplied.get());
+            event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, ignored) -> ContainerStorageWrapper.of(((EnergyApi.ItemProvider) stack.getItem()).getEnergyStorage(stack)), supplied.get());
         }
     }
     
     @Override
-    public EnergyApi.EnergyContainer find(ItemStack stack, ContainerItemContext context) {
-        var candidate = stack.getCapability(ILongEnergyStorage.ITEM);
+    public EnergyApi.EnergyStorage find(StackContext stack) {
+        var candidate = stack.getValue().getCapability(ILongEnergyStorage.ITEM);
         if (candidate == null) return null;
-        if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
+        if (candidate instanceof ContainerStorageWrapper wrapper && wrapper.container instanceof SimpleEnergyItemStorage itemStorage) return itemStorage.withCallback(ignored -> stack.sync());
         return new NeoforgeStorageWrapper(candidate);
     }
     
     @Override
-    public EnergyApi.EnergyContainer find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         var candidate = world.getCapability(ILongEnergyStorage.BLOCK, pos, state, entity, direction);
         if (candidate == null) return null;
         if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
@@ -69,12 +69,12 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     }
     
     @Override
-    public EnergyApi.EnergyContainer find(World world, BlockPos pos, @Nullable Direction direction) {
+    public EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
     }
     
     // this is used to interact with energy storages from other mods
-    public static class NeoforgeStorageWrapper extends EnergyApi.EnergyContainer {
+    public static class NeoforgeStorageWrapper extends EnergyApi.EnergyStorage {
         
         public final ILongEnergyStorage storage;
         
@@ -114,14 +114,14 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     // this is used by other mods to interact with the oritech energy containers (machines/items)
     public static class ContainerStorageWrapper implements ILongEnergyStorage {
         
-        public final EnergyApi.EnergyContainer container;
+        public final EnergyApi.EnergyStorage container;
         
-        public static ContainerStorageWrapper of(EnergyApi.EnergyContainer container) {
+        public static ContainerStorageWrapper of(EnergyApi.EnergyStorage container) {
             if (container == null) return null;
             return new ContainerStorageWrapper(container);
         }
         
-        public ContainerStorageWrapper(EnergyApi.EnergyContainer container) {
+        public ContainerStorageWrapper(EnergyApi.EnergyStorage container) {
             this.container = container;
         }
         

@@ -42,7 +42,7 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(@Nullable Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(@Nullable Direction direction) {
         return energyStorage;
     }
     

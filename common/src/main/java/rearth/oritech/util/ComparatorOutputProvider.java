@@ -1,8 +1,7 @@
 package rearth.oritech.util;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.item.ItemStack;
+import rearth.oritech.util.fluid.FluidApi;
 
 public interface ComparatorOutputProvider {
 
@@ -10,8 +9,8 @@ public interface ComparatorOutputProvider {
 		return (int) ((stack.getCount() / (float) stack.getMaxCount()) * 15);
 	}
 
-	static int getFluidStorageComparatorOutput(SingleVariantStorage<FluidVariant> storage) {
-		return (int) ((storage.getAmount() / (float) storage.getCapacity()) * 15);
+	static int getFluidStorageComparatorOutput(FluidApi.SingleSlotStorage storage) {
+		return (int) ((storage.getStack().getAmount() / (float) storage.getCapacity()) * 15);
 	}
 
 	int getComparatorOutput();

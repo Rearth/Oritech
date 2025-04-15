@@ -16,8 +16,8 @@ import rearth.oritech.block.base.entity.PassiveGeneratorBlockEntity;
 import rearth.oritech.block.blocks.generators.BigSolarPanelBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.item.ItemApi;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -119,12 +119,12 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     }
     
     @Override
-    public InventoryProvider getInventoryForLink() {
+    public ItemApi.InventoryStorage getInventoryForMultiblock() {
         return null;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return null;
     }
     
@@ -196,12 +196,12 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     }
     
     @Override
-    public BlockPos getMachinePos() {
+    public BlockPos getPosForMultiblock() {
         return getPos();
     }
     
     @Override
-    public World getMachineWorld() {
+    public World getWorldForMultiblock() {
         return getWorld();
     }
     

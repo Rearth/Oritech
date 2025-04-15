@@ -6,17 +6,17 @@ import rearth.oritech.util.energy.EnergyApi;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-public class DelegatingEnergyStorage extends EnergyApi.EnergyContainer {
+public class DelegatingEnergyStorage extends EnergyApi.EnergyStorage {
     
-    protected final Supplier<EnergyApi.EnergyContainer> backingStorage;
+    protected final Supplier<EnergyApi.EnergyStorage> backingStorage;
     protected final BooleanSupplier validPredicate;
     
-    public DelegatingEnergyStorage(Supplier<EnergyApi.EnergyContainer> backingStorage, @Nullable BooleanSupplier validPredicate) {
+    public DelegatingEnergyStorage(Supplier<EnergyApi.EnergyStorage> backingStorage, @Nullable BooleanSupplier validPredicate) {
         this.backingStorage = backingStorage;
         this.validPredicate = validPredicate == null ? () -> true : validPredicate;
     }
     
-    public DelegatingEnergyStorage(EnergyApi.EnergyContainer backingStorage, @Nullable BooleanSupplier validPredicate) {
+    public DelegatingEnergyStorage(EnergyApi.EnergyStorage backingStorage, @Nullable BooleanSupplier validPredicate) {
         this(() -> backingStorage, validPredicate);
     }
     

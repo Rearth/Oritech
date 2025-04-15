@@ -33,7 +33,7 @@ public class EmiTransferHandler<S extends BasicMachineScreenHandler> implements 
         
         var res = new ArrayList<Slot>();
         
-        for (int i = handler.getMachineInvStartSlot(ItemStack.EMPTY); i < handler.getMachineInvStartSlot(ItemStack.EMPTY) + machine.getSlots().inputCount(); i++) {
+        for (int i = handler.getMachineInvStartSlot(ItemStack.EMPTY); i < handler.getMachineInvStartSlot(ItemStack.EMPTY) + machine.getSlotAssignments().inputCount(); i++) {
             res.add(handler.slots.get(i));
         }
         

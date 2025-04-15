@@ -158,7 +158,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public InventorySlotAssignment getSlots() {
+    public InventorySlotAssignment getSlotAssignments() {
         return new InventorySlotAssignment(0, 1, 1, 1);
     }
     

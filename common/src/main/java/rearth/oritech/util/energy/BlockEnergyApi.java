@@ -14,8 +14,8 @@ public interface BlockEnergyApi {
     
     void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier);
     
-    EnergyApi.EnergyContainer find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction);
+    EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction);
     
-    EnergyApi.EnergyContainer find(World world, BlockPos pos, @Nullable Direction direction);
+    EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable Direction direction);
     
 }

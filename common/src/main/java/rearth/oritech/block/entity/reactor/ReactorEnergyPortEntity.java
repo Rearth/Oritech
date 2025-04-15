@@ -18,7 +18,7 @@ public class ReactorEnergyPortEntity extends BlockEntity implements EnergyApi.Bl
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return dummyStorage;
     }
 }

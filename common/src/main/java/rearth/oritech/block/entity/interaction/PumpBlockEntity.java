@@ -1,15 +1,13 @@
 package rearth.oritech.block.entity.interaction;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
@@ -27,8 +25,9 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -39,7 +38,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidProvider, EnergyApi.BlockProvider, GeoBlockEntity {
+public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity {
     
     private static final int MAX_SEARCH_COUNT = 100_000;
     private static final int ENERGY_USAGE = 512;   // per block pumped
@@ -49,26 +48,10 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     private final AnimationController<PumpBlockEntity> animationController = getAnimationController();
     
     // client only
-    public FluidVariant lastPumpedVariant;
+    public Fluid lastPumpedVariant;
     public long lastPumpTime;
     
-    private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
-        @Override
-        protected FluidVariant getBlankVariant() {
-            return FluidVariant.blank();
-        }
-        
-        @Override
-        protected long getCapacity(FluidVariant variant) {
-            return (16 * FluidConstants.BUCKET);
-        }
-        
-        @Override
-        protected void onFinalCommit() {
-            super.onFinalCommit();
-            PumpBlockEntity.this.markDirty();
-        }
-    };
+    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
     
     private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(1000, 0, 20_000);
     private boolean initialized = false;
@@ -85,7 +68,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
+        fluidStorage.writeNbt(nbt, "");
         nbt.putBoolean("initialized", initialized);
         nbt.putLong("energy", energyStorage.getAmount());
         
@@ -97,7 +80,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         initialized = nbt.getBoolean("initialized");
-        SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
+        fluidStorage.readNbt(nbt, "");
         energyStorage.setAmount(nbt.getLong("energy"));
         pendingLiquidPositions = Arrays.stream(nbt.getLongArray("pendingTargets")).mapToObj(BlockPos::fromLong).collect(Collectors.toCollection(ArrayDeque::new));
     }
@@ -136,7 +119,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             useEnergy();
             this.markDirty();
             setLastPumpTime(world.getTime());
-            updateNetwork(fluidStorage.variant);
+            updateNetwork();
         }
         
     }
@@ -170,8 +153,8 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         
         var targetPos = pos.toCenterPos();
         var targetType = ParticleTypes.BUBBLE_COLUMN_UP;
-        if (lastPumpedVariant.getFluid().equals(Fluids.LAVA)) targetType = ParticleTypes.LAVA;
-        if (lastPumpedVariant.getFluid().equals(FluidContent.STILL_OIL)) targetType = ParticleTypes.FALLING_OBSIDIAN_TEAR;
+        if (lastPumpedVariant.equals(Fluids.LAVA)) targetType = ParticleTypes.LAVA;
+        if (lastPumpedVariant.equals(FluidContent.STILL_OIL)) targetType = ParticleTypes.FALLING_OBSIDIAN_TEAR;
         
         world.addParticle(targetType, targetPos.getX(), targetPos.getY(), targetPos.getZ(), 0, 0.3, 0);
     }
@@ -185,14 +168,11 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     }
     
     private boolean tankIsFull() {
-        return fluidStorage.amount > fluidStorage.getCapacity() - FluidConstants.BUCKET;
+        return fluidStorage.getAmount() > fluidStorage.getCapacity() - FluidStackHooks.bucketAmount();
     }
     
     private void addLiquidToTank(FluidState targetState) {
-        try (var tx = Transaction.openOuter()) {
-            fluidStorage.insert(FluidVariant.of(targetState.getFluid()), FluidConstants.BUCKET, tx);
-            tx.commit();
-        }
+        fluidStorage.insert(FluidStack.create(targetState.getFluid(), FluidStackHooks.bucketAmount()), false);
     }
     
     private void drainSourceBlock(BlockPos targetBlock) {
@@ -247,7 +227,10 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         var stateBelow = world.getBlockState(posBelow);
         var blockBelow = stateBelow.getBlock();
         
-        return !(blockBelow.equals(Blocks.AIR) || blockBelow.equals(BlockContent.PUMP_TRUNK_BLOCK));
+        var isAirOrTrunk = stateBelow.isReplaceable() || blockBelow.equals(BlockContent.PUMP_TRUNK_BLOCK);
+        var isStillFluid = stateBelow.getFluidState().isStill();
+        
+        return isStillFluid || !isAirOrTrunk;
     }
     
     private void startLiquidSearch(BlockPos start) {
@@ -269,12 +252,12 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     }
     
     @Override
-    public Storage<FluidVariant> getFluidStorage(Direction direction) {
+    public FluidApi.FluidStorage getFluidStorage(Direction direction) {
         return fluidStorage;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
@@ -283,8 +266,8 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         controllers.add(animationController);
     }
     
-    private void updateNetwork(FluidVariant variant) {
-        var fluid = Registries.FLUID.getId(variant.getFluid()).toString();
+    private void updateNetwork() {
+        var fluid = Registries.FLUID.getId(fluidStorage.getFluid()).toString();
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.PumpWorkSyncPacket(pos, fluid, world.getTime()));
     }
     
@@ -304,7 +287,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         });
     }
     
-    public void setLastPumpedVariant(FluidVariant lastPumpedVariant) {
+    public void setLastPumpedVariant(Fluid lastPumpedVariant) {
         this.lastPumpedVariant = lastPumpedVariant;
     }
     

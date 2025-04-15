@@ -558,7 +558,7 @@ public class ReactorControllerBlockEntity extends BlockEntity implements BlockEn
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     

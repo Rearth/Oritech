@@ -14,9 +14,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.util.StackContext;
 import rearth.oritech.util.energy.BlockEnergyApi;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.ItemEnergyApi;
+import rearth.oritech.util.energy.containers.SimpleEnergyItemStorage;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.function.Supplier;
@@ -25,47 +27,53 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     @Override
     public void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier) {
-        EnergyStorage.SIDED.registerForBlockEntity((entity, direction) -> ContainerStorageWrapper.of(((EnergyApi.BlockProvider) entity).getStorage(direction)), typeSupplier.get());
+        team.reborn.energy.api.EnergyStorage.SIDED.registerForBlockEntity((entity, direction) ->
+                                                     ContainerStorageWrapper.of(((EnergyApi.BlockProvider) entity).getEnergyStorage(direction)), typeSupplier.get());
     }
     
     @Override
     public void registerForItem(Supplier<net.minecraft.item.Item> itemSupplier) {
-        EnergyStorage.ITEM.registerForItems((stack, context) -> ContainerStorageWrapper.of(((EnergyApi.ItemProvider) stack.getItem()).getStorage(stack), context, stack), itemSupplier.get());
+        team.reborn.energy.api.EnergyStorage.ITEM.registerForItems((stack, context) ->
+                                              ContainerStorageWrapper.of(((EnergyApi.ItemProvider) stack.getItem()).getEnergyStorage(stack), context, stack), itemSupplier.get());
     }
     
     @Override
     public ComponentType<Long> getEnergyComponent() {
-        return EnergyStorage.ENERGY_COMPONENT;
+        return team.reborn.energy.api.EnergyStorage.ENERGY_COMPONENT;
     }
     
     @Override
-    public EnergyApi.EnergyContainer find(ItemStack stack, ContainerItemContext context) {
-        var candidate = EnergyStorage.ITEM.find(stack, context);
+    public EnergyApi.EnergyStorage find(StackContext stack) {
+        var context = ContainerItemContext.ofSingleSlot(new ItemStackStorage(stack));
+        var candidate = team.reborn.energy.api.EnergyStorage.ITEM.find(stack.getValue(), context);
+        if (candidate == null) return null;
+        if (candidate instanceof ContainerStorageWrapper wrapper && wrapper.container instanceof SimpleEnergyItemStorage itemStorage)
+            return itemStorage.withCallback(ignored -> stack.sync());
+        return new FabricStorageWrapper(candidate, stack);
+    }
+    
+    @Override
+    public EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+        var candidate = team.reborn.energy.api.EnergyStorage.SIDED.find(world, pos, state, entity, direction);
         if (candidate == null) return null;
         if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
-        return new FabricStorageWrapper(candidate);
+        return new FabricStorageWrapper(candidate, null);
     }
     
     @Override
-    public EnergyApi.EnergyContainer find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
-        var candidate = EnergyStorage.SIDED.find(world, pos, state, entity, direction);
-        if (candidate == null) return null;
-        if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
-        return new FabricStorageWrapper(candidate);
-    }
-    
-    @Override
-    public EnergyApi.EnergyContainer find(World world, BlockPos pos, @Nullable Direction direction) {
+    public EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
     }
     
     // this is used to interact with energy storages from other mods
-    public static class FabricStorageWrapper extends EnergyApi.EnergyContainer {
+    public static class FabricStorageWrapper extends EnergyApi.EnergyStorage {
         
         public final EnergyStorage storage;
+        public final @Nullable StackContext context;
         
-        public FabricStorageWrapper(EnergyStorage storage) {
+        public FabricStorageWrapper(EnergyStorage storage, @Nullable StackContext context) {
             this.storage = storage;
+            this.context = context;
         }
         
         @Override
@@ -104,35 +112,37 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
         
         @Override
         public void update() {
+            if (context != null)
+                context.sync();
         }
     }
     
     // this is used by other mods to interact with the oritech energy containers (machines/items)
     public static class ContainerStorageWrapper extends SnapshotParticipant<Long> implements EnergyStorage {
         
-        public final EnergyApi.EnergyContainer container;
+        public final EnergyApi.EnergyStorage container;
         @Nullable
         public final ContainerItemContext context;
         @Nullable
         public final ItemStack stack;
         
-        public static ContainerStorageWrapper of(@Nullable EnergyApi.EnergyContainer container) {
+        public static ContainerStorageWrapper of(@Nullable EnergyApi.EnergyStorage container) {
             if (container == null) return null;
             return new ContainerStorageWrapper(container);
         }
         
-        public static ContainerStorageWrapper of(@Nullable EnergyApi.EnergyContainer container, @Nullable ContainerItemContext context, @Nullable ItemStack stack) {
+        public static ContainerStorageWrapper of(@Nullable EnergyApi.EnergyStorage container, @Nullable ContainerItemContext context, @Nullable ItemStack stack) {
             if (container == null) return null;
             return new ContainerStorageWrapper(container, context, stack);
         }
         
-        public ContainerStorageWrapper(EnergyApi.EnergyContainer container) {
+        public ContainerStorageWrapper(EnergyApi.EnergyStorage container) {
             this.container = container;
             this.context = null;
             this.stack = null;
         }
         
-        public ContainerStorageWrapper(EnergyApi.EnergyContainer container, @Nullable ContainerItemContext context, @Nullable ItemStack stack) {
+        public ContainerStorageWrapper(EnergyApi.EnergyStorage container, @Nullable ContainerItemContext context, @Nullable ItemStack stack) {
             this.container = container;
             this.context = context;
             this.stack = stack;
@@ -149,11 +159,19 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
             transaction.addCloseCallback((transactionContext, result) -> {
                 if (result.wasCommitted()) {
                     container.update();
-                    if (this.context != null)
-                        updateStackToContext();
                 }
             });
-            return container.insert(maxAmount, false);
+            
+            var inserted = container.insert(maxAmount, false);
+            
+            // no idea what this does, but it does seem to fix it
+            if (context != null) {
+                stack.set(EnergyApi.ITEM.getEnergyComponent(), container.getAmount());
+                context.exchange(ItemVariant.of(stack), 1, transaction);
+            }
+            
+            
+            return inserted;
         }
         
         @Override
@@ -167,8 +185,6 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
             transaction.addCloseCallback((context, result) -> {
                 if (result.wasCommitted()) {
                     container.update();
-                    if (this.context != null)
-                        updateStackToContext();
                 }
             });
             return container.extract(maxAmount, false);
@@ -192,22 +208,6 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
         @Override
         protected void readSnapshot(Long snapshot) {
             container.setAmount(snapshot);
-        }
-        
-        // this is required for non-oritech machines trying to interact with oritech energy items
-        // inspired by https://github.com/Sinytra/ConnectorExtras/blob/master/energy-bridge/src/main/java/dev/su5ed/sinytra/connectorextras/energybridge/ForgeEnergyStorageHandler.java#L54
-        private void updateStackToContext() {
-            if (stack == null || context == null) return;
-            var thread = new Thread(() -> { // needs to be a separate thread because on main a transaction is in process of closing
-                try (var t = Transaction.openOuter()) {
-                    //Update the item components
-                    context.extract(context.getItemVariant(), 1, t);
-                    context.insert(ItemVariant.of(stack), 1, t);
-                    t.commit();
-                } catch (Exception ignored) {
-                }  // these exceptions sometimes happen during world load
-            });
-            thread.start();
         }
     }
     

@@ -38,7 +38,7 @@ public interface OritechEnergyItem extends EnergyApi.ItemProvider, FabricItem {
             amount = amount / (random.nextInt(unbreakingLevel) + 1);
         }
         
-        var storage = getStorage(stack);
+        var storage = getEnergyStorage(stack);
         if (storage instanceof SimpleEnergyItemStorage itemStorage) {
             var extracted = itemStorage.extractIgnoringLimit(amount, false);
             if (extracted > 0) {
@@ -64,11 +64,11 @@ public interface OritechEnergyItem extends EnergyApi.ItemProvider, FabricItem {
     }
     
     default long getStoredEnergy(ItemStack stack) {
-        return getStorage(stack).getAmount();
+        return getEnergyStorage(stack).getAmount();
     }
     
     @Override
-    default EnergyApi.EnergyContainer getStorage(ItemStack stack) {
+    default EnergyApi.EnergyStorage getEnergyStorage(ItemStack stack) {
         return new SimpleEnergyItemStorage(getEnergyMaxInput(stack), getEnergyMaxOutput(stack), getEnergyCapacity(stack), stack);
     }
 }

@@ -1,9 +1,6 @@
 package rearth.oritech.block.entity.interaction;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -12,7 +9,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
@@ -35,9 +31,14 @@ import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.*;
-import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
+import rearth.oritech.util.Geometry;
+import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.SimpleInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -48,7 +49,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
 
-public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTicker<TreefellerBlockEntity>, GeoBlockEntity, EnergyApi.BlockProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
+public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTicker<TreefellerBlockEntity>, GeoBlockEntity, EnergyApi.BlockProvider, ItemApi.BlockProvider, ScreenProvider, ExtendedScreenHandlerFactory {
     
     private static final int LOG_COST = 100;
     private static final int LEAF_COST = 10;
@@ -61,19 +62,13 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 4000, 0, this::markDirty);
     
-    public final SimpleInventory inventory = new SimpleInventory(6) {
-        @Override
-        public void markDirty() {
-            TreefellerBlockEntity.this.markDirty();
-        }
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(6, this::markDirty) {
         
         @Override
-        public boolean canInsert(ItemStack stack) {
+        public boolean supportsInsertion() {
             return false;
         }
     };
-    
-    protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     public TreefellerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.TREEFELLER_BLOCK_ENTITY, pos, state);
@@ -140,7 +135,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
             world.playSound(null, candidate, candidateState.getSoundGroup().getBreakSound(), SoundCategory.BLOCKS, 0.5f, 1f);
         world.setBlockState(candidate, Blocks.AIR.getDefaultState());
         
-        dropped.forEach(inventory::addStack);
+        dropped.forEach(stack -> inventory.insert(stack, false));
         return ActionResult.SUCCESS;
     }
 
@@ -259,13 +254,13 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
     @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
-        return inventoryStorage;
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        return inventory;
     }
     
     @Override

@@ -14,12 +14,15 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.base.block.MachineBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.interaction.DeepDrillEntity;
 import rearth.oritech.util.MultiblockMachineController;
@@ -113,6 +116,22 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
         
         return ActionResult.SUCCESS;
         
+    }
+    
+    @Override
+    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        
+        if (!state.get(USED)) super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+        
+        if (!world.isClient) {
+            var controllerPos = getControllerPos(world, pos);
+            var controllerBlock = world.getBlockState(controllerPos);
+            if (controllerBlock.getBlock() instanceof MachineBlock machineBlock) {
+                return machineBlock.onUseWithItem(stack, state, world, pos, player, hand, hit);
+            }
+        }
+        
+        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
     }
     
     @Nullable

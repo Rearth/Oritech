@@ -2,10 +2,7 @@ package rearth.oritech;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import dev.architectury.event.EventResult;
-import dev.architectury.event.events.common.EntityEvent;
 import dev.architectury.event.events.common.PlayerEvent;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -28,9 +25,9 @@ import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.ArchitecturyBlockRegistryContainer;
-import rearth.oritech.util.ArchitecturyRecipeRegistryContainer;
-import rearth.oritech.util.ArchitecturyRegistryContainer;
+import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
+import rearth.oritech.util.registry.ArchitecturyRecipeRegistryContainer;
+import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
 public final class Oritech {
     

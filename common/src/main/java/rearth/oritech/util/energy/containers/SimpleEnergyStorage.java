@@ -2,7 +2,7 @@ package rearth.oritech.util.energy.containers;
 
 import rearth.oritech.util.energy.EnergyApi;
 
-public class SimpleEnergyStorage extends EnergyApi.EnergyContainer {
+public class SimpleEnergyStorage extends EnergyApi.EnergyStorage {
     private final long maxInsert;
     private final long maxExtract;
     private final long capacity;

@@ -49,7 +49,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
             var screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(new BlockPos(0, 0, 0), machineState);
             this.isGenerator = screenProvider instanceof UpgradableGeneratorBlockEntity;
             this.slots = screenProvider.getGuiSlots();
-            this.slotOffsets = screenProvider.getSlots();
+            this.slotOffsets = screenProvider.getSlotAssignments();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             throw new RuntimeException(e);

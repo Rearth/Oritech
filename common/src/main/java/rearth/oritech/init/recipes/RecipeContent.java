@@ -1,7 +1,7 @@
 package rearth.oritech.init.recipes;
 
 import rearth.oritech.Oritech;
-import rearth.oritech.util.ArchitecturyRecipeRegistryContainer;
+import rearth.oritech.util.registry.ArchitecturyRecipeRegistryContainer;
 
 public class RecipeContent implements ArchitecturyRecipeRegistryContainer {
 

@@ -1,6 +1,5 @@
 package rearth.oritech.block.behavior;
 
-import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -13,8 +12,8 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.World;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
+import rearth.oritech.util.StackContext;
 import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.energy.SingleSlotHandler;
 
 public class LaserArmEntityBehavior {
     static private LaserArmEntityBehavior transferPowerBehavior;
@@ -46,10 +45,10 @@ public class LaserArmEntityBehavior {
                 if (!(entity instanceof PlayerEntity player))
                     return false;
                 
-                var chestItem = player.getEquippedStack(EquipmentSlot.CHEST);
-                var candidate = EnergyApi.ITEM.find(chestItem, ContainerItemContext.ofSingleSlot(new SingleSlotHandler(chestItem)));
+                var stackRef = new StackContext(player.getEquippedStack(EquipmentSlot.CHEST), updated -> player.getInventory().armor.set(EquipmentSlot.CHEST.getEntitySlotId(), updated));
+                var candidate = EnergyApi.ITEM.find(stackRef);
                 if (candidate != null) {
-                    var amount = EnergyApi.transfer(laserEntity.getEnergyStorageForLink(null), candidate, laserEntity.energyRequiredToFire(), false);
+                    var amount = EnergyApi.transfer(laserEntity.getEnergyStorageForMultiblock(null), candidate, laserEntity.energyRequiredToFire(), false);
                     return amount > 0;
                 }
                 
