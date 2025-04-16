@@ -38,9 +38,9 @@ public class FluidTagGenerator extends FabricTagProvider.FluidTagProvider {
         getOrCreateTagBuilder(getCTag("high_power_biodiesel")).add(FluidContent.STILL_FUEL.get());
 
         getOrCreateTagBuilder(ConventionalFluidTags.GASEOUS)
-            .add(FluidContent.FLOWING_STEAM.get());
+            .add(FluidContent.FLOWING_STEAM.get()).add(FluidContent.STILL_STEAM.get());
         getOrCreateTagBuilder(getCTag("steam"))
-            .add(FluidContent.FLOWING_STEAM.get());
+            .add(FluidContent.FLOWING_STEAM.get()).add(FluidContent.STILL_STEAM.get());
         
     }
 
