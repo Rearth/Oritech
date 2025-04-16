@@ -206,7 +206,7 @@
   "tooltip.oritech.item_filter.blacklist": "不允许列表中的物品通过",
   "tooltip.oritech.item_filter.nbt": "当前仅检查列出物品的自定义NBT数据",
   "tooltip.oritech.item_filter.no_nbt": "当前只检查物品的类型或id",
-  "tooltip.oritech.item_filter.no_component": "Currently ignores all item data components, such as enchantments, energy, etc.",
+  "tooltip.oritech.item_filter.no_component": "当前忽略所有数据组件，如附魔，能量等。",
   "tooltip.oritech.item_filter.component": "Currently checks the listed items for all data component values",
   "tooltip.oritech.enchanter": "使用能量和附近催化器的灵魂添加附魔",
   "tooltip.oritech.catalyst": "分离附近死亡实体的灵魂。可以用来从附魔书应用（无限制）附魔。",
