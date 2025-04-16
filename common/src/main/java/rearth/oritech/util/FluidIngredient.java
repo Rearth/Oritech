@@ -69,6 +69,14 @@ public class FluidIngredient implements Predicate<FluidStack> {
         return matchesFluid(fluidStack.getFluid());
     }
 
+    public FluidStack getFirstFluidStack() {
+        return FluidStack.create((Fluid)fluidTag.map(
+            tag -> Registries.FLUID.stream().filter(fluid -> fluid.isIn(tag)).findFirst().get(),
+            id -> Registries.FLUID.getEntry(id).get().value()
+        ), amount);
+
+    }
+
     public boolean isEmpty() {
         return this == EMPTY;
     }

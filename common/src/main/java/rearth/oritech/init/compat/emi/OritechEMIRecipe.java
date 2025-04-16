@@ -41,7 +41,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         recipe.getResults().forEach(stack -> this.outputs.add(EmiStack.of(stack)));
         
         if (recipe.getFluidInput() != null)
-            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluid(), Math.max(recipe.getFluidInput().getAmount() / fluidDivider, 1)));
+            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFirstFluidStack().getFluid(), Math.max(recipe.getFluidInput().getAmount() / fluidDivider, 1)));
         if (recipe.getFluidOutput() != null)
             this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), Math.max(recipe.getFluidInput().getAmount() / fluidDivider, 1)));
         
@@ -72,7 +72,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         recipe.getResults().forEach(stack -> this.outputs.add(EmiStack.of(stack)));
         
         if (recipe.getFluidInput() != null)
-            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluid(), recipe.getFluidInput().getAmount() / fluidDivider));
+            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFirstFluidStack().getFluid(), recipe.getFluidInput().getAmount() / fluidDivider));
         if (recipe.getFluidOutput() != null)
             this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), recipe.getFluidInput().getAmount() / fluidDivider));
             

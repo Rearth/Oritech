@@ -19,6 +19,7 @@ import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
@@ -34,6 +35,7 @@ import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.AugmentRecipe;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.util.FluidIngredient;
 import rearth.oritech.util.SizedIngredient;
 import techreborn.TechReborn;
 import wraith.alloyforgery.AlloyForgery;
@@ -165,12 +167,12 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.RAW_BIOPOLYMER), 300, "polymer");
         addBioGenRecipe(exporter, Ingredient.ofItems(ItemContent.UNHOLY_INTELLIGENCE), 3000, "vex");
         // lava
-        addLavaGen(exporter, FluidStack.create(Fluids.LAVA, 8100), 12, "lava");
+        addLavaGen(exporter, new FluidIngredient(Fluids.LAVA, 8100), 12, "lava");
         // fuel
-        addFuelGenRecipe(exporter, FluidStack.create(FluidContent.STILL_OIL.get(), 8100), 3, "crude");
-        addFuelGenRecipe(exporter, FluidStack.create(FluidContent.STILL_FUEL.get(), 8100), 12, "fuel");
+        addFuelGenRecipe(exporter, new FluidIngredient(TagKey.of(RegistryKeys.FLUID, Identifier.of("c", "oils")), 8100), 3, "crude");
+        addFuelGenRecipe(exporter, new FluidIngredient(FluidContent.STILL_FUEL.get(), 8100), 12, "fuel");
         //steam
-        addSteamEngineGen(exporter, FluidStack.create(FluidContent.STILL_STEAM.get(), 32), 1, "steameng");
+        addSteamEngineGen(exporter, new FluidIngredient(FluidContent.STILL_STEAM.get(), 32), 1, "steameng");
     }
     
     private void addBiomass(RecipeExporter exporter) {
@@ -1245,10 +1247,10 @@ public class RecipeGenerator extends FabricRecipeProvider {
     public static void addCentrifugeFluidRecipe(RecipeExporter exporter, Ingredient input, Item result, Fluid in, float bucketsIn, Fluid out, float bucketsOut, float timeMultiplier, String suffix) {
         var defaultSpeed = 200;
         var speed = (int) (defaultSpeed * timeMultiplier);
-        var inputStack = in != null ? FluidStack.create(in, (long) (bucketsIn * 81000)) : null;
+        var inputIngredient = in != null ? new FluidIngredient(in, (long) (bucketsIn * 81000)) : null;
         var outputStack = out != null ? FluidStack.create(out, (long) (bucketsOut * 81000)) : null;
         List<ItemStack> outputItem = result != null ? List.of(new ItemStack(result)) : List.of();
-        var entry = new OritechRecipe(speed, List.of(input), outputItem, RecipeContent.CENTRIFUGE_FLUID, inputStack, outputStack);
+        var entry = new OritechRecipe(speed, List.of(input), outputItem, RecipeContent.CENTRIFUGE_FLUID, inputIngredient, outputStack);
         exporter.accept(Oritech.id("centrifuge/fluid/" + suffix), entry, null);
     }
     
@@ -1277,7 +1279,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
     public static void addCoolerRecipe(RecipeExporter exporter, FluidStack input, Item result, int count, float speedMultiplier, String suffix) {
         var coolerDefaultSpeed = (int) (200 * speedMultiplier);
         
-        var entry = new OritechRecipe(coolerDefaultSpeed, List.of(), List.of(new ItemStack(result, count)), RecipeContent.COOLER, input, null);
+        var entry = new OritechRecipe(coolerDefaultSpeed, List.of(), List.of(new ItemStack(result, count)), RecipeContent.COOLER, new FluidIngredient(input), null);
         exporter.accept(Oritech.id("cooler/" + suffix), entry, null);
     }
     
@@ -1297,17 +1299,17 @@ public class RecipeGenerator extends FabricRecipeProvider {
         exporter.accept(Oritech.id("biogen/" + suffix), entry, null);
     }
     
-    public static void addFuelGenRecipe(RecipeExporter exporter, FluidStack input, int timeInSeconds, String suffix) {
+    public static void addFuelGenRecipe(RecipeExporter exporter, FluidIngredient input, int timeInSeconds, String suffix) {
         var entry = new OritechRecipe(timeInSeconds * 20, List.of(), List.of(), RecipeContent.FUEL_GENERATOR, input, null);
         exporter.accept(Oritech.id("fuelgen/" + suffix), entry, null);
     }
     
-    private void addLavaGen(RecipeExporter exporter, FluidStack input, int timeInSeconds, String suffix) {
+    private void addLavaGen(RecipeExporter exporter, FluidIngredient input, int timeInSeconds, String suffix) {
         var entry = new OritechRecipe(timeInSeconds * 20, List.of(), List.of(), RecipeContent.LAVA_GENERATOR, input, null);
         exporter.accept(Oritech.id("lavagen/" + suffix), entry, null);
     }
     
-    private void addSteamEngineGen(RecipeExporter exporter, FluidStack input, int timeInTicks, String suffix) {
+    private void addSteamEngineGen(RecipeExporter exporter, FluidIngredient input, int timeInTicks, String suffix) {
         var entry = new OritechRecipe(timeInTicks, List.of(), List.of(), RecipeContent.STEAM_ENGINE, input, null);
         exporter.accept(Oritech.id("steamgen/" + suffix), entry, null);
     }
@@ -1341,7 +1343,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         // clump processing into gems
         var centrifugeClumpDry = new OritechRecipe((int) (200 * timeMultiplier), List.of(Ingredient.ofItems(clump)), List.of(new ItemStack(gem, 1), new ItemStack(smallSecondaryDust, byproductAmount)), RecipeContent.CENTRIFUGE, null, null);
-        var centrifugeClumpWet = new OritechRecipe((int) (300 * timeMultiplier), List.of(Ingredient.ofItems(clump)), List.of(new ItemStack(gem, 2)), RecipeContent.CENTRIFUGE_FLUID, FluidStack.create(Fluids.WATER, 81000), null);
+        var centrifugeClumpWet = new OritechRecipe((int) (300 * timeMultiplier), List.of(Ingredient.ofItems(clump)), List.of(new ItemStack(gem, 2)), RecipeContent.CENTRIFUGE_FLUID, new FluidIngredient(Fluids.WATER, 81000), null);
         // gems can either be directly smelted for 1:1 results, atomic forge for 1:2, and foundry for 1:1.5
         
         // gems to dust (doubling)

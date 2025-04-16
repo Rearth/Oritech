@@ -43,6 +43,10 @@ public class OritechRecipe implements Recipe<RecipeInput> {
         if (fluidOutput == null) fluidOutput = FluidStack.empty();
         this.fluidOutput = fluidOutput;
     }
+
+    public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, @Nullable FluidIngredient fluidInput, Fluid outVariant, long outAmount) {
+        this(time, inputs, results, type, fluidInput, FluidStack.create(outVariant, outAmount / fluidDivider));
+    }
     
     public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, Fluid inVariant, long inAmount, Fluid outVariant, long outAmount) {
         this(time, inputs, results, type, new FluidIngredient(inVariant, inAmount / fluidDivider), FluidStack.create(outVariant, outAmount / fluidDivider));

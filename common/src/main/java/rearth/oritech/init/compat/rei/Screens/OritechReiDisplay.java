@@ -128,14 +128,14 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         
         // fluids
         if (display.entry.value().getFluidInput() != null && display.entry.value().getFluidInput().getAmount() > 0) {
-            var fluid = display.entry.value().getFluidInput().getFluid();
+            var fluid = display.entry.value().getFluidInput().getFirstFluidStack();
             var amount = display.entry.value().getFluidInput().getAmount();
             
-            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(display.entry.value().getFluidInput(), new ScreenProvider.BarConfiguration(4, 5, 16, 50)));
+            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluid, new ScreenProvider.BarConfiguration(4, 5, 16, 50)));
             
             
             var text = amount > 0
-                ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(display.entry.value().getFluidInput()).getString())
+                ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidStackHooks.bucketAmount(), fluid.getName().getString())
                 : Text.translatable("tooltip.oritech.fluid_empty");
 
             var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
