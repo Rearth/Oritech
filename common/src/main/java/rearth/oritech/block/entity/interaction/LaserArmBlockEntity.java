@@ -248,29 +248,11 @@ public class LaserArmBlockEntity extends BlockEntity implements
     }
     
     public PlayerEntity getLaserPlayerEntity() {
+        if (!(world instanceof ServerWorld))
+            return null;
+
         if (laserPlayerEntity == null) {
-            laserPlayerEntity = new PlayerEntity(world, pos, 0, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME)) {
-                @Override
-                public boolean isSpectator() {
-                    return false;
-                }
-                
-                @Override
-                public boolean isCreative() {
-                    return false;
-                }
-                
-                @Override
-                public boolean canTakeDamage() {
-                    return false;
-                }
-                
-                @Override
-                public boolean giveItemStack(ItemStack itemStack) {
-                    LaserArmBlockEntity.this.inventory.insert(itemStack, false);
-                    return true;
-                }
-            };
+            laserPlayerEntity = FakeMachinePlayer.create((ServerWorld)world, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME), inventory);
         }
         
         if (hunterAddons > 0 && yieldAddons > 0) {
