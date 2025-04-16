@@ -134,5 +134,8 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
         
         getOrCreateTagBuilder(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH)
           .add(BlockContent.BLACK_HOLE_BLOCK);
+
+        getOrCreateTagBuilder(TagContent.MACHINE_FRAME_SUPPORT)
+          .add(BlockContent.METAL_BEAM_BLOCK);
     }
 }

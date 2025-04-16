@@ -54,6 +54,9 @@ public class TagContent {
     // plating
     public static final TagKey<Item> MACHINE_PLATING = TagKey.of(RegistryKeys.ITEM, Oritech.id("plating"));
 
+    // frame support
+    public static final TagKey<Block> MACHINE_FRAME_SUPPORT = TagKey.of(RegistryKeys.BLOCK, Oritech.id("frame_support"));
+
     // silicon
     public static final TagKey<Item> SILICON = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "silicon"));
 
