@@ -82,7 +82,7 @@ public class LaserArmBlockBehavior {
                 
                 if (storageCandidate instanceof DynamicEnergyStorage dynamicStorage) {
                     var inserted = dynamicStorage.insertIgnoringLimit(transferCapacity, true);
-                    if (inserted == transferCapacity) {
+                    if (inserted > 0 && inserted <= transferCapacity) {
                         dynamicStorage.insertIgnoringLimit(transferCapacity, false);
                         dynamicStorage.update();
                         return true;
@@ -90,7 +90,7 @@ public class LaserArmBlockBehavior {
                     return false;
                 } else {
                     var inserted = storageCandidate.insert(transferCapacity, true);
-                    if (inserted == transferCapacity) {
+                    if (inserted > 0 && inserted <= transferCapacity) {
                         storageCandidate.insert(transferCapacity, false);
                         storageCandidate.update();
                         return true;
