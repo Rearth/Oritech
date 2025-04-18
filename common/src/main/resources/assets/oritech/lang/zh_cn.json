@@ -1001,7 +1001,6 @@
   "text.config.oritech-config.category.laserArmConfig": "激光臂设置",
   "text.config.oritech-config.option.laserArmConfig.energyCapacity": "能量容量",
   "text.config.oritech-config.option.laserArmConfig.maxEnergyInsertion": "最大能量输入",
-  "text.config.oritech-config.option.laserArmConfig.minEnergyExtraction": "Min Energy Extraction",
   "text.config.oritech-config.option.laserArmConfig.energyPerTick": "每刻能量",
   "text.config.oritech-config.option.laserArmConfig.blockBreakEnergyBase": "方块破坏能量基数",
   "text.config.oritech-config.option.laserArmConfig.damageTickBase": "每刻基础伤害",

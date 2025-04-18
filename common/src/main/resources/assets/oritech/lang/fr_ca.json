@@ -635,7 +635,6 @@
   "text.config.oritech-config.category.laserArmConfig": "Configuration du bras laser",
   "text.config.oritech-config.option.laserArmConfig.energyCapacity": "Capacité d'énergie",
   "text.config.oritech-config.option.laserArmConfig.maxEnergyInsertion": "Insertion maximale d'énergie",
-  "text.config.oritech-config.option.laserArmConfig.minEnergyExtraction": "Min Energy Extraction",
   "text.config.oritech-config.option.laserArmConfig.energyPerTick": "Énergie par tick",
   "text.config.oritech-config.option.laserArmConfig.blockBreakEnergyBase": "Énergie de base pour casser les blocs",
   "text.config.oritech-config.option.laserArmConfig.damageTickBase": "Dégâts par tick de base",

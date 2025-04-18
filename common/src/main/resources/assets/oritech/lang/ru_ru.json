@@ -1001,7 +1001,6 @@
   "text.config.oritech-config.category.laserArmConfig": "Конфигурация лазерной руки",
   "text.config.oritech-config.option.laserArmConfig.energyCapacity": "Емкость энергии",
   "text.config.oritech-config.option.laserArmConfig.maxEnergyInsertion": "Максимальное количество вводимой энергии",
-  "text.config.oritech-config.option.laserArmConfig.minEnergyExtraction": "Min Energy Extraction",
   "text.config.oritech-config.option.laserArmConfig.energyPerTick": "Энергия на тик",
   "text.config.oritech-config.option.laserArmConfig.blockBreakEnergyBase": "Блокировать Базу Энергии Разрыва",
   "text.config.oritech-config.option.laserArmConfig.damageTickBase": "Базовый урон за тик",

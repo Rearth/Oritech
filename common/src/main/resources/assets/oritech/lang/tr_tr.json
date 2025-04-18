@@ -1001,7 +1001,6 @@
   "text.config.oritech-config.category.laserArmConfig": "Lazer Kol Yapılandırması",
   "text.config.oritech-config.option.laserArmConfig.energyCapacity": "Enerji Kapasitesi",
   "text.config.oritech-config.option.laserArmConfig.maxEnergyInsertion": "Maks Enerji Yerleştirme",
-  "text.config.oritech-config.option.laserArmConfig.minEnergyExtraction": "Min Energy Extraction",
   "text.config.oritech-config.option.laserArmConfig.energyPerTick": "Tik Başına Enerji",
   "text.config.oritech-config.option.laserArmConfig.blockBreakEnergyBase": "Blok Kırıcı Enerji Tabanı",
   "text.config.oritech-config.option.laserArmConfig.damageTickBase": "Tik Başına Hasar Bazı",

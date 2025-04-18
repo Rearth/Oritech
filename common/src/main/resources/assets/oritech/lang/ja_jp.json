@@ -1001,7 +1001,6 @@
   "text.config.oritech-config.category.laserArmConfig": "レーザーアーム設定",
   "text.config.oritech-config.option.laserArmConfig.energyCapacity": "エネルギー容量",
   "text.config.oritech-config.option.laserArmConfig.maxEnergyInsertion": "最大エネルギー入力量",
-  "text.config.oritech-config.option.laserArmConfig.minEnergyExtraction": "Min Energy Extraction",
   "text.config.oritech-config.option.laserArmConfig.energyPerTick": "ティックあたりのエネルギー",
   "text.config.oritech-config.option.laserArmConfig.blockBreakEnergyBase": "ブロック破壊エネルギーのベース",
   "text.config.oritech-config.option.laserArmConfig.damageTickBase": "基本ティックあたりのダメージ",
