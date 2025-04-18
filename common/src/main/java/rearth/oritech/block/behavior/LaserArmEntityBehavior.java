@@ -10,6 +10,7 @@ import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.util.StackContext;
@@ -18,6 +19,8 @@ import rearth.oritech.util.energy.EnergyApi;
 public class LaserArmEntityBehavior {
     static private LaserArmEntityBehavior transferPowerBehavior;
     static private LaserArmEntityBehavior chargeEntityBehavior;
+
+    private static final long minEnergyExtraction = Oritech.CONFIG.laserArmConfig.minEnergyExtraction();
     
     // possible improvement - the target designator could be used to set up scoreboard teams,
     // and the laser could respect the attackable TargetPredicate to avoid attacking "friendly" mobs or to attack players
@@ -49,7 +52,7 @@ public class LaserArmEntityBehavior {
                 var candidate = EnergyApi.ITEM.find(stackRef);
                 if (candidate != null) {
                     var amount = EnergyApi.transfer(laserEntity.getEnergyStorageForMultiblock(null), candidate, laserEntity.energyRequiredToFire(), false);
-                    return amount > 0;
+                    return amount > minEnergyExtraction;
                 }
                 
                 return false;
