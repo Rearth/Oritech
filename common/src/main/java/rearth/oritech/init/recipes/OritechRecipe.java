@@ -79,12 +79,15 @@ public class OritechRecipe implements Recipe<RecipeInput> {
         
         // Input does not need to be in the correct slots / split into different slots.
         // We just check if we can remove all ingredients from the inventory, and fail is any input is not able to be removed.
+
+        // make a fresh copy for every search, as every recipe this attempts to match mutates the inventory
+        var inventoryStackCopy = simpleInventory.heldStacks.stream().map(ItemStack::copy).toArray(ItemStack[]::new);
         
         for (var ingredient : getInputs()) {
             
             var found = false;
             
-            for (var heldStack : simpleInventory.heldStacks) {
+            for (var heldStack : inventoryStackCopy) {
                 if (ingredient.test(heldStack)) {
                     heldStack.decrement(1);
                     found = true;
