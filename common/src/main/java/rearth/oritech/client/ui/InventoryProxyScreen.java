@@ -44,7 +44,7 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
         rootComponent.child(spacer);
         
         for (var slot : Objects.requireNonNull(handler.controllerScreen).getGuiSlots()) {
-            var button = Components.button(Text.literal(""), elem -> {
+            var button = Components.button(Text.literal(" "), elem -> {
                 setActiveSlot(slot.index());
             });
             button.renderer(ORITECH_BUTTON);
