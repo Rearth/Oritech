@@ -1001,6 +1001,7 @@
   "text.config.oritech-config.category.laserArmConfig": "Konfiguracja Ramienia Lasera",
   "text.config.oritech-config.option.laserArmConfig.energyCapacity": "Pojemność Energetyczna",
   "text.config.oritech-config.option.laserArmConfig.maxEnergyInsertion": "Maksymalne Wstawianie Energii",
+  "text.config.oritech-config.option.laserArmConfig.minEnergyExtraction": "Min Energy Extraction",
   "text.config.oritech-config.option.laserArmConfig.energyPerTick": "Energia Na Tick",
   "text.config.oritech-config.option.laserArmConfig.blockBreakEnergyBase": "Podstawa Energii Łamania Bloków",
   "text.config.oritech-config.option.laserArmConfig.damageTickBase": "Podstawa Uszkodzeń Na Tick",

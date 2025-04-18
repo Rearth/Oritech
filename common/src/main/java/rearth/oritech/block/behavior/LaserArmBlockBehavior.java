@@ -9,6 +9,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
@@ -22,6 +23,8 @@ public class LaserArmBlockBehavior {
     static private LaserArmBlockBehavior noop;
     static private LaserArmBlockBehavior transferPowerBehavior;
     static private LaserArmBlockBehavior energizeBuddingBehavior;
+
+    private static final long minEnergyExtraction = Oritech.CONFIG.laserArmConfig.minEnergyExtraction();
     
     /**
      * Perform laser behavior on block
@@ -78,11 +81,12 @@ public class LaserArmBlockBehavior {
                 if (insertAmount <= 0)
                     return false;
                 
+                // transferCapacity ignores the input storage's transfer rate limits
                 var transferCapacity = Math.min(insertAmount, laserEntity.energyRequiredToFire());
                 
                 if (storageCandidate instanceof DynamicEnergyStorage dynamicStorage) {
                     var inserted = dynamicStorage.insertIgnoringLimit(transferCapacity, true);
-                    if (inserted == transferCapacity) {
+                    if (inserted >= minEnergyExtraction && inserted <= transferCapacity) {
                         dynamicStorage.insertIgnoringLimit(transferCapacity, false);
                         dynamicStorage.update();
                         return true;
@@ -90,7 +94,7 @@ public class LaserArmBlockBehavior {
                     return false;
                 } else {
                     var inserted = storageCandidate.insert(transferCapacity, true);
-                    if (inserted == transferCapacity) {
+                    if (inserted >= minEnergyExtraction && inserted <= transferCapacity) {
                         storageCandidate.insert(transferCapacity, false);
                         storageCandidate.update();
                         return true;
