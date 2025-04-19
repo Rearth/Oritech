@@ -19,6 +19,7 @@ import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
@@ -85,6 +86,7 @@ public class CreateRecipeGenerator {
 
         public List<GeneratedRecipe> all = List.of(
             create(Oritech.id("compat/create/quartz"), b -> b.require(Items.QUARTZ).output(ItemContent.QUARTZ_DUST)),
+            create(Oritech.id("compat/create/coal"), b -> b.require(ItemTags.COALS).output(ItemContent.COAL_DUST)),
             create(Oritech.id("compat/create/copperingot"), b -> b.require(Tags.Items.INGOTS_COPPER).output(ItemContent.COPPER_DUST)),
             create(Oritech.id("compat/create/ironingot"), b -> b.require(Tags.Items.INGOTS_IRON).output(ItemContent.IRON_DUST)),
             create(Oritech.id("compat/create/goldingot"), b -> b.require(Tags.Items.INGOTS_GOLD).output(ItemContent.GOLD_DUST)),
