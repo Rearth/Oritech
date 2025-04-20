@@ -15,66 +15,68 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class PortalEntity extends Entity implements GeoEntity {
-    
+
     private final AnimatableInstanceCache instanceCache = GeckoLibUtil.createInstanceCache(this);
-    
+
     private int age = 0;
-    
+
     public Vec3d target;
     protected static final RawAnimation PORTAL = RawAnimation.begin().thenPlay("create").thenLoop("idle");
-    
-    
+
+
     public PortalEntity(EntityType<?> type, World world) {
         super(type, world);
-        
+
     }
-    
+
     @Override
     public boolean isCollidable() {
         return true;
     }
-    
+
     @Override
     public void onPlayerCollision(PlayerEntity player) {
+        if (getWorld().isClient) return;
+
         if (target != null) {
             player.teleport(target.x, target.y, target.z, true);
         }
-        
+
         this.remove(RemovalReason.DISCARDED);
     }
-    
+
     @Override
     public void tick() {
         var world = this.getWorld();
         if (world.isClient) return;
-        
+
         age++;
-        
+
         if (age > 100) {
             this.remove(RemovalReason.DISCARDED);
         }
     }
-    
+
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
-    
+
     }
-    
+
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
-    
+
     }
-    
+
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
-    
+
     }
-    
+
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, state -> state.setAndContinue(PORTAL)));
     }
-    
+
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return instanceCache;
