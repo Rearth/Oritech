@@ -166,7 +166,7 @@
   "tooltip.oritech.item_extra_info": "按住Ctrl查看更多信息",
   "tooltip.oritech.addon_desc": "插件槽位： ",
   "tooltip.oritech.core_desc": "多方块结构。需要机器核心： ",
-  "tooltip.oritech.oracle_missing": "Oracle Index 模组未安装。游戏内帮助不可用。",
+  "tooltip.oritech.oracle_missing": "未安装Oracle Index 模组。游戏内帮助不可用。",
   "tooltip.oritech.oracle_available": "在Oracle Index中打开其帮助页。",
   "tooltip.oritech.unstable_container.1": "用于装载并转换一个危险的方块。手持该物品右键目标方块，",
   "tooltip.oritech.unstable_container.2": "它就会捕捉该方块，并将其作为大型多方块能量存储的核心。",
