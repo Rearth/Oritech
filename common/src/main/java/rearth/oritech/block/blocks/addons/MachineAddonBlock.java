@@ -236,13 +236,13 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
         if (showExtra) {
             
             if (addonSettings.speedMultiplier() != 1) {
-                var displayedNumber = (int) ((1 - addonSettings.speedMultiplier()) * 100);
+                var displayedNumber = Math.round((1 - addonSettings.speedMultiplier()) * 100);
                 tooltip.add(Text.translatable("tooltip.oritech.addon_speed_desc").formatted(Formatting.DARK_GRAY)
                               .append(TooltipHelper.getFormattedValueChangeTooltip(displayedNumber)));
             }
             
             if (addonSettings.efficiencyMultiplier() != 1) {
-                var displayedNumber = (int) ((1 - addonSettings.efficiencyMultiplier()) * 100);
+                var displayedNumber = Math.round((1 - addonSettings.efficiencyMultiplier()) * 100);
                 tooltip.add(Text.translatable("tooltip.oritech.addon_efficiency_desc").formatted(Formatting.DARK_GRAY)
                               .append(TooltipHelper.getFormattedValueChangeTooltip(displayedNumber)));
             }
