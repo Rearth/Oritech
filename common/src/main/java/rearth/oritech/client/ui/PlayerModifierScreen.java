@@ -323,7 +323,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             var title = Components.label(researchState.type.getName().formatted(Formatting.BOLD));
             title.horizontalSizing(Sizing.fill());
             title.horizontalTextAlignment(HorizontalAlignment.CENTER);
-            var status = Components.label(Text.literal(""));
+            var status = Components.label(Text.literal(" "));
             
             panel.child(title);
             panel.child(status.margins(Insets.of(4, 2, 0, 0)));

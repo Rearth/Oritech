@@ -1269,9 +1269,6 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         var entry = new OritechRecipe(foundryDefaultSpeed, List.of(A, B), List.of(new ItemStack(result, count)), RecipeContent.FOUNDRY, null, null);
         exporter.accept(Oritech.id("foundry/alloy/" + suffix), entry, null);
-        
-        var entryInverse = new OritechRecipe(foundryDefaultSpeed, List.of(B, A), List.of(new ItemStack(result, count)), RecipeContent.FOUNDRY, null, null);
-        exporter.accept(Oritech.id("foundry/alloy/inverse/" + suffix), entryInverse, null);
     }
     
     public static void addCoolerRecipe(RecipeExporter exporter, FluidStack input, Item result, int count, float speedMultiplier, String suffix) {

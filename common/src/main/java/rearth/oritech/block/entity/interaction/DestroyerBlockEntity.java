@@ -4,7 +4,9 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.CocoaBlock;
 import net.minecraft.block.CropBlock;
+import net.minecraft.block.NetherWartBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.UnbreakableComponent;
@@ -110,7 +112,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
         
         // skip not grown crops
-        if (hasCropFilterAddon && targetState.getBlock() instanceof CropBlock cropBlock && !cropBlock.isMature(targetState)) {
+        if (hasCropFilterAddon && isImmatureCrop(targetState)) {
             return false;
         }
         
@@ -137,6 +139,13 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
     private boolean hasQuarryTarget(BlockPos toolPosition) {
         return getQuarryDownwardState(toolPosition) != null;
+    }
+
+    public static boolean isImmatureCrop(BlockState targetState) {
+        Block targetBlock = targetState.getBlock();
+        return (targetBlock instanceof CropBlock cropBlock && !cropBlock.isMature(targetState))
+            || (targetBlock instanceof NetherWartBlock && targetState.get(NetherWartBlock.AGE) < NetherWartBlock.MAX_AGE)
+            || (targetBlock instanceof CocoaBlock && targetState.get(CocoaBlock.AGE) < CocoaBlock.MAX_AGE);
     }
     
     private Pair<BlockPos, BlockState> getQuarryDownwardState(BlockPos toolPosition) {
@@ -182,7 +191,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         if (targetHardness < 0) return;    // skip undestroyable blocks, such as bedrock
         
         // skip not grown crops
-        if (range == 1 && hasCropFilterAddon && targetState.getBlock() instanceof CropBlock cropBlock && !cropBlock.isMature(targetState)) {
+        if (range == 1 && hasCropFilterAddon && isImmatureCrop(targetState)) {
             return;
         }
         

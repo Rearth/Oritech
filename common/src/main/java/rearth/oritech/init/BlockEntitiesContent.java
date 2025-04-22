@@ -258,10 +258,10 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
         if (EnergyApi.BLOCK != null && field.isAnnotationPresent(AssignSidedEnergy.class))
             EnergyApi.BLOCK.registerBlockEntity(() -> value);
         
-        if (field.isAnnotationPresent(AssignSidedFluid.class))
+        if (FluidApi.BLOCK != null && field.isAnnotationPresent(AssignSidedFluid.class))
             FluidApi.BLOCK.registerBlockEntity(() -> value);
         
-        if (field.isAnnotationPresent(AssignSidedInventory.class))
+        if (ItemApi.BLOCK != null && field.isAnnotationPresent(AssignSidedInventory.class))
             ItemApi.BLOCK.registerBlockEntity(() -> value);
         
     }

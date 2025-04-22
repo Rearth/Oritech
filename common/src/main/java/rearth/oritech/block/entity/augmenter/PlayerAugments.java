@@ -28,6 +28,9 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.GlobalPos;
+import net.minecraft.world.World;
+
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.other.OreFinderRenderer;
@@ -531,9 +534,8 @@ public class PlayerAugments {
 
     @SuppressWarnings("UnstableApiUsage")
     public static class PlayerPortalAugment extends PlayerAugment {
-
-        private AttachmentType<BlockPos> OWN_TYPE;
-
+        
+        private AttachmentType<GlobalPos> OWN_TYPE;
         protected PlayerPortalAugment(Identifier id, boolean toggleable) {
             super(id, toggleable, true);
         }
@@ -559,7 +561,12 @@ public class PlayerAugments {
 
         @Override
         public void installToPlayer(PlayerEntity player) {
-            player.setAttached(OWN_TYPE, player.getBlockPos());
+            player.setAttached(OWN_TYPE, GlobalPos.create(
+                    player.getWorld().getRegistryKey(),
+                    player.getBlockPos()
+                )
+            );
+
             this.onInstalled(player);
 
             if (autoSync && !player.getWorld().isClient)
@@ -596,8 +603,7 @@ public class PlayerAugments {
                 portalEntity.setPosition(spawnPos);
                 portalEntity.setYaw(-player.getYaw() + 90);
                 world.spawnEntity(portalEntity);
-                portalEntity.target = targetPos.toCenterPos();
-
+                portalEntity.target = targetPos;
                 world.playSound(null, BlockPos.ofFloored(spawnPos), SoundEvents.AMBIENT_CAVE.value(), SoundCategory.BLOCKS, 2, 1.2f);
 
             }

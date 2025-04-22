@@ -41,6 +41,7 @@ import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -219,7 +220,6 @@ public abstract class MachineBlockEntity extends BlockEntity
                 }
             }
             
-            Oritech.LOGGER.warn("Unable to remove ingredient from inventory: {}. This should never happen.", removedIng);
             
         }
         
@@ -284,7 +284,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     protected RecipeInput getInputInventory() {
-        return new SimpleCraftingInventory(getInputView().stream().map(ItemStack::copy).toArray(ItemStack[]::new));
+        return new SimpleCraftingInventory(getInputView().toArray(ItemStack[]::new));
     }
     
     protected Inventory getOutputInventory() {

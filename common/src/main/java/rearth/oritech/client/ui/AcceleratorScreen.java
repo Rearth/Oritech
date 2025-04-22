@@ -91,7 +91,7 @@ public class AcceleratorScreen extends BasicMachineScreen<AcceleratorScreenHandl
                 text = text.formatted(Formatting.BOLD, Formatting.BLACK);
                 titleLabel.horizontalTextAlignment(HorizontalAlignment.LEFT).text(text);
                 speedLabel.text(Text.translatable("text.oritech.accelerator.ui.waiting").formatted(Formatting.BLACK));
-                statusLabel.text(Text.literal(""));
+                statusLabel.text(Text.literal(" "));
             }
             case ERROR -> {
                 titleLabel.text(Text.translatable("text.oritech.accelerator.ui.error").formatted(Formatting.BLACK, Formatting.BOLD));
