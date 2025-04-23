@@ -24,9 +24,9 @@ import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.block.entity.reactor.*;
 import rearth.oritech.block.entity.storage.*;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
 import java.lang.annotation.ElementType;
@@ -258,10 +258,10 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
         if (EnergyApi.BLOCK != null && field.isAnnotationPresent(AssignSidedEnergy.class))
             EnergyApi.BLOCK.registerBlockEntity(() -> value);
         
-        if (field.isAnnotationPresent(AssignSidedFluid.class))
+        if (FluidApi.BLOCK != null && field.isAnnotationPresent(AssignSidedFluid.class))
             FluidApi.BLOCK.registerBlockEntity(() -> value);
         
-        if (field.isAnnotationPresent(AssignSidedInventory.class))
+        if (ItemApi.BLOCK != null && field.isAnnotationPresent(AssignSidedInventory.class))
             ItemApi.BLOCK.registerBlockEntity(() -> value);
         
     }

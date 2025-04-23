@@ -18,11 +18,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.StackContext;
-import rearth.oritech.util.fluid.BlockFluidApi;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.ItemFluidApi;
-import rearth.oritech.util.fluid.containers.DelegatingFluidStorage;
-import rearth.oritech.util.fluid.containers.SimpleItemFluidStorage;
+import rearth.oritech.api.fluid.BlockFluidApi;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.ItemFluidApi;
+import rearth.oritech.api.fluid.containers.DelegatingFluidStorage;
+import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
 
 import java.util.ArrayList;
 import java.util.List;

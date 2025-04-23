@@ -39,12 +39,12 @@ import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.util.energy.containers.DynamicStatisticEnergyStorage;
-import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
+import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 
 import java.util.List;
 import java.util.Map;

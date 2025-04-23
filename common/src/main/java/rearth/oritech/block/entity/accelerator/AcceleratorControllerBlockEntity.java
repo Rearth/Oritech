@@ -40,8 +40,8 @@ import rearth.oritech.init.SoundContent;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
-import rearth.oritech.util.item.ItemApi;
-import rearth.oritech.util.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
 
 import java.util.ArrayList;
 import java.util.HashSet;

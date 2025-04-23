@@ -25,7 +25,6 @@ public class ServerPlayerEntityMixin {
             oldAttributeInstance.getModifiers().forEach(oldModifier -> {
                 var isAugment = oldModifier.id().getNamespace().equals(Oritech.MOD_ID);
                 if (!isAugment) return;
-                System.out.println(oldModifier.id());
                 
                 var newInstance = newPlayer.getAttributeInstance(oldAttributeInstance.getAttribute());
                 if (newInstance == null) return;

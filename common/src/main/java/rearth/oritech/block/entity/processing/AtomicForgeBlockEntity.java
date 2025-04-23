@@ -15,7 +15,7 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
-import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -20,8 +20,8 @@ import rearth.oritech.init.FluidContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.TooltipHelper;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleItemFluidStorage;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
 
 import java.util.List;
 

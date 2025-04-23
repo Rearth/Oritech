@@ -22,6 +22,7 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.network.NetworkContent;
@@ -58,6 +59,7 @@ public final class Oritech {
         // for player augment modifiers
         ServerPlayConnectionEvents.JOIN.register(((handler, sender, server) -> PlayerAugments.refreshPlayerAugments(handler.player)));
         PlayerEvent.PLAYER_RESPAWN.register((player, inEnd, removalReason) -> PlayerAugments.refreshPlayerAugments(player));
+        PlayerEvent.CHANGE_DIMENSION.register((player, oldLevel, newLevel) -> PlayerAugments.refreshPlayerAugments(player)); //TODO Wait FFAPI to Update Fabric syncWith support
         
         // for player augment ticks
         ServerTickEvents.START_WORLD_TICK.register(event -> event.getPlayers().forEach(PlayerAugments::serverTickAugments));
@@ -105,7 +107,7 @@ public final class Oritech {
         res.put(RegistryKeys.ITEM_GROUP.getValue(), () -> ArchitecturyRegistryContainer.register(ItemGroups.class, MOD_ID, false));
         res.put(RegistryKeys.RECIPE_SERIALIZER.getValue(), ArchitecturyRecipeRegistryContainer::finishSerializerRegister);
         res.put(RegistryKeys.LOOT_FUNCTION_TYPE.getValue(), FluidContent::registerItemsToGroups);
-        res.put(Identifier.of("neoforge", "biome_modifier_serializers"), PlayerAugments::init);   // this works just fine on fabric aswell, as they key is not really relevant there. Intentionally registered later to avoid locking issues on neoforge
+        res.put(Identifier.of("minecraft", "enchantment_provider_type"), PlayerAugments::init);   // this works just fine on fabric aswell, as they key is not really relevant there. Intentionally registered before the real attachments to avoid locking issues on neoforge
         
         return res;
     }

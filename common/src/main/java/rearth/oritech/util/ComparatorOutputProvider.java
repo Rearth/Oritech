@@ -1,7 +1,7 @@
 package rearth.oritech.util;
 
 import net.minecraft.item.ItemStack;
-import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi;
 
 public interface ComparatorOutputProvider {
 

@@ -13,7 +13,7 @@ import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.TooltipHelper;
-import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 
 import java.util.Collection;
 import java.util.List;

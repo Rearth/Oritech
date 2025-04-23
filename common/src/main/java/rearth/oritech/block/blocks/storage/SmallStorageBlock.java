@@ -32,7 +32,7 @@ import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 import rearth.oritech.util.MachineAddonController;
-import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi;
 
 import java.util.List;
 import java.util.Objects;

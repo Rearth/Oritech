@@ -10,8 +10,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.random.Random;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.energy.containers.SimpleEnergyItemStorage;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 
 public interface OritechEnergyItem extends EnergyApi.ItemProvider, FabricItem {
     

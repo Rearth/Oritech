@@ -20,8 +20,8 @@ import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.StackContext;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 
 import java.util.List;
 import java.util.Optional;

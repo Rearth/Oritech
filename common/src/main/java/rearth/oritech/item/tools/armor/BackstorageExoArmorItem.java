@@ -15,8 +15,8 @@ import rearth.oritech.Oritech;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.StackContext;
 import rearth.oritech.util.TooltipHelper;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.energy.containers.SimpleEnergyItemStorage;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 
 import java.util.List;
 

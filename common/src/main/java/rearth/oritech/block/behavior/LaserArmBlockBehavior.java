@@ -3,20 +3,20 @@ package rearth.oritech.block.behavior;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.CropBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
+import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 
 public class LaserArmBlockBehavior {
     static private LaserArmBlockBehavior noop;
@@ -27,7 +27,7 @@ public class LaserArmBlockBehavior {
      * Perform laser behavior on block
      */
     public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
-        if (laserEntity.hasCropFilterAddon && block instanceof CropBlock crop && !crop.isMature(blockState))
+        if (laserEntity.hasCropFilterAddon && DestroyerBlockEntity.isImmatureCrop(blockState))
             return false;
         
         // has an energy storage, try to transfer power to it
@@ -82,7 +82,7 @@ public class LaserArmBlockBehavior {
                 
                 if (storageCandidate instanceof DynamicEnergyStorage dynamicStorage) {
                     var inserted = dynamicStorage.insertIgnoringLimit(transferCapacity, true);
-                    if (inserted == transferCapacity) {
+                    if (inserted > 0 && inserted <= transferCapacity) {
                         dynamicStorage.insertIgnoringLimit(transferCapacity, false);
                         dynamicStorage.update();
                         return true;
@@ -90,7 +90,7 @@ public class LaserArmBlockBehavior {
                     return false;
                 } else {
                     var inserted = storageCandidate.insert(transferCapacity, true);
-                    if (inserted == transferCapacity) {
+                    if (inserted > 0 && inserted <= transferCapacity) {
                         storageCandidate.insert(transferCapacity, false);
                         storageCandidate.update();
                         return true;

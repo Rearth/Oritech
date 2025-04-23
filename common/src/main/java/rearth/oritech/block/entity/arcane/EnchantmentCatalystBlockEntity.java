@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.arcane;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.component.DataComponentTypes;
@@ -33,10 +32,10 @@ import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.ComparatorOutputProvider;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
-import rearth.oritech.util.item.ItemApi;
-import rearth.oritech.util.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;

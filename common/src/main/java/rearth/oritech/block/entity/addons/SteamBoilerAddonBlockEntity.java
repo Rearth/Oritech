@@ -7,7 +7,7 @@ import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MachineAddonController;
-import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi;
 
 import java.util.Objects;
 

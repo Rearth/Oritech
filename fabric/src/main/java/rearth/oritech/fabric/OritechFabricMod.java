@@ -2,9 +2,9 @@ package rearth.oritech.fabric;
 
 import net.fabricmc.api.ModInitializer;
 import rearth.oritech.Oritech;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.item.ItemApi;
 
 public final class OritechFabricMod implements ModInitializer {
     @Override

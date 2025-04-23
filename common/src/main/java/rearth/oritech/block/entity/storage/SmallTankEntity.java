@@ -30,14 +30,13 @@ import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
-import rearth.oritech.util.item.ItemApi;
-import rearth.oritech.util.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvider, ItemApi.BlockProvider, ComparatorOutputProvider, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<SmallTankEntity> {
     

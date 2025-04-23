@@ -27,8 +27,8 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.ItemFilterScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.item.ItemApi;
-import rearth.oritech.util.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 
 import java.util.HashMap;
 import java.util.Map;

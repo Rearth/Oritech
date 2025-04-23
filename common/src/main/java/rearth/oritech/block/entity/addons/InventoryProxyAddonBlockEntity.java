@@ -10,17 +10,15 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
-import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.ui.InventoryProxyScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MachineAddonController;
-import rearth.oritech.util.item.ItemApi;
-import rearth.oritech.util.item.containers.DelegatingInventoryStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.DelegatingInventoryStorage;
 
 import java.util.Objects;
 

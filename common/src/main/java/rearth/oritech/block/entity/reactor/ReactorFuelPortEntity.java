@@ -28,8 +28,8 @@ import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.SimpleCraftingInventory;
-import rearth.oritech.util.item.ItemApi;
-import rearth.oritech.util.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
 
 import java.util.List;
 

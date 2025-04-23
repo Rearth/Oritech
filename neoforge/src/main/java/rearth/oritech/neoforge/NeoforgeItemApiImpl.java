@@ -15,8 +15,8 @@ import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.util.item.BlockItemApi;
-import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.api.item.BlockItemApi;
+import rearth.oritech.api.item.ItemApi;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.util.StackContext;
-import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi;
 
 public class LaserArmEntityBehavior {
     static private LaserArmEntityBehavior transferPowerBehavior;

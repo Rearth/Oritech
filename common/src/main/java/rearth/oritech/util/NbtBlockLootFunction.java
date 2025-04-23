@@ -11,8 +11,8 @@ import net.minecraft.loot.function.LootFunctionType;
 import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
 import rearth.oritech.init.LootContent;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.FluidApi;
 
 import java.util.List;
 

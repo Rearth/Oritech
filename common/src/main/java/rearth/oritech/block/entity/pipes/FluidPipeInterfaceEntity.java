@@ -12,7 +12,7 @@ import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeConnectionBlock;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi;
 
 import java.util.Collections;
 import java.util.HashSet;

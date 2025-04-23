@@ -17,9 +17,9 @@ import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -21,8 +21,8 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.fluid.containers.SimpleInOutFluidStorage;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 
 import java.util.ArrayList;
 import java.util.List;

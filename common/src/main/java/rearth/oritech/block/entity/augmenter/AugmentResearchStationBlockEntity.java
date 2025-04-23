@@ -11,8 +11,8 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MultiblockMachineController;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.item.ItemApi;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -36,7 +36,7 @@ import rearth.oritech.client.renderers.LaserArmModel;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
-import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi;
 
 import java.util.Optional;
 

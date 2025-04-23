@@ -30,7 +30,7 @@ import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 import rearth.oritech.util.StackContext;
-import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi;
 
 import java.util.List;
 

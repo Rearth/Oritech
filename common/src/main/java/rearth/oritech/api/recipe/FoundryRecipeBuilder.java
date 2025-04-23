@@ -23,21 +23,4 @@ public class FoundryRecipeBuilder extends OritechRecipeBuilder {
         if ((inputs == null || inputs.size() < 2) || (results == null || results.isEmpty()))
             throw new IllegalStateException("wrong number of inputs and results for recipe " + id + " (type " + type + ")");
     }
-
-    @Override
-    public void export(RecipeExporter exporter, String suffix) {
-        super.export(exporter, suffix);
-        if (!inputs.get(0).equals(inputs.get(1))) {
-            exporter.accept(
-                Oritech.id(resourcePath + "/inverse/" + suffix),
-                new OritechRecipe(
-                    (int)(time * timeMultiplier),
-                    inputs.reversed(),
-                    results,
-                    type,
-                    fluidInput != null ? fluidInput : FluidStack.empty(),
-                    fluidOutput != null ? fluidOutput : FluidStack.empty()),
-                null);
-        }
-    }    
 }

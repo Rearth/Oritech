@@ -16,7 +16,7 @@ import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.api.item.ItemApi;
 
 import java.util.*;
 import java.util.stream.IntStream;

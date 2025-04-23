@@ -23,7 +23,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
@@ -31,10 +30,10 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.util.item.ItemApi;
-import rearth.oritech.util.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -219,7 +218,6 @@ public abstract class MachineBlockEntity extends BlockEntity
                 }
             }
             
-            Oritech.LOGGER.warn("Unable to remove ingredient from inventory: {}. This should never happen.", removedIng);
             
         }
         
@@ -284,7 +282,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     protected RecipeInput getInputInventory() {
-        return new SimpleCraftingInventory(getInputView().stream().map(ItemStack::copy).toArray(ItemStack[]::new));
+        return new SimpleCraftingInventory(getInputView().toArray(ItemStack[]::new));
     }
     
     protected Inventory getOutputInventory() {

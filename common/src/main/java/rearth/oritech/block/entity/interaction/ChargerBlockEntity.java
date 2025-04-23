@@ -31,12 +31,12 @@ import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.StackContext;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
-import rearth.oritech.util.item.ItemApi;
-import rearth.oritech.util.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
 
 import java.util.List;
 

@@ -5,7 +5,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.util.MachineAddonController;
-import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi;
 
 public class CentrifugeScreenHandler extends UpgradableMachineScreenHandler {
     
