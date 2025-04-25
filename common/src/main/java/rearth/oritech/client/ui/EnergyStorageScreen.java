@@ -8,12 +8,12 @@ import io.wispforest.owo.ui.core.*;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.TooltipHelper;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 
 import java.util.Collection;
 import java.util.List;

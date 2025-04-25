@@ -1,6 +1,6 @@
 package rearth.oritech.block.base.entity;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -12,28 +12,27 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -45,7 +44,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public abstract class MachineBlockEntity extends BlockEntity
-  implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
+  implements ExtendedMenuProvider, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
     
     // animations
     public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
@@ -379,9 +378,10 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
+    public void saveExtraData(PacketByteBuf buf) {
         sendNetworkEntry();
-        return new ModScreens.BasicData(pos);
+        buf.writeBlockPos(pos);
+        
     }
     
     protected Direction getFacing() {

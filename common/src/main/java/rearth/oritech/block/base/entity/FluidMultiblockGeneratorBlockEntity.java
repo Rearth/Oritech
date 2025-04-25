@@ -15,13 +15,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.StackContext;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 
 import java.util.List;
 import java.util.Optional;

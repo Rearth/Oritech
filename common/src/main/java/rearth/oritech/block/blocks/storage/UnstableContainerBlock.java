@@ -1,6 +1,7 @@
 package rearth.oritech.block.blocks.storage;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -11,6 +12,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.ActionResult;
@@ -83,9 +85,8 @@ public class UnstableContainerBlock extends Block implements BlockEntityProvider
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
         if (!world.isClient) {
-            var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
-            player.openHandledScreen(handler);
-            
+            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+                MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
         }
         
         return ActionResult.SUCCESS;

@@ -12,11 +12,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.StackContext;
 import rearth.oritech.util.TooltipHelper;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 
 import java.util.List;
 

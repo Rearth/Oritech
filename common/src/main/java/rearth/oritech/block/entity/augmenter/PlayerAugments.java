@@ -1,10 +1,6 @@
 package rearth.oritech.block.entity.augmenter;
 
 import com.mojang.serialization.Codec;
-import io.wispforest.owo.network.ClientAccess;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.SpawnReason;
@@ -26,6 +22,7 @@ import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.Attachment;
 import rearth.oritech.api.attachment.AttachmentApi;
+import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.init.TagContent;
@@ -285,7 +282,7 @@ public class PlayerAugments {
             BlockPos.iterate(target.getX() - range, target.getY() - range, target.getZ() - range, target.getX() + range, target.getY() + range, target.getZ() + range)
                     .forEach(pos -> {
                         var state = world.getBlockState(pos);
-                        var isOre = state.isIn(ConventionalBlockTags.ORES);
+                        var isOre = state.isIn(TagContent.CONVENTIONAL_ORES);
                         if (isOre) highlightPositions.add(pos.toImmutable());
                     });
 
@@ -330,6 +327,11 @@ public class PlayerAugments {
 
 
     public static void init() {
+        
+        if (EnergyApi.BLOCK == null) {
+            System.out.println("APIs not defined, skipping augment init (if this is not a datagen run then something is very wrong)");
+            return;
+        }
 
         addAugmentAsset(hpBoost);
         addAugmentAsset(hpBoostMore);
@@ -386,21 +388,6 @@ public class PlayerAugments {
         for (var augment : allAugments.values()) {
             if (augment instanceof TickingAugment tickingAugment && augment.isInstalled(player) && augment.isEnabled(player))
                 tickingAugment.clientTick(player);
-        }
-    }
-
-    @Environment(EnvType.CLIENT)
-    public static void handlePlayerAugmentOperation(NetworkContent.AugmentOperationSyncPacket message, ClientAccess access) {
-
-        var player = access.player();
-
-        var augmentInstance = PlayerAugments.allAugments.get(message.id());
-        if (message.operation() == PlayerAugments.AugmentOperation.ADD.ordinal()) {
-            augmentInstance.installToPlayer(player);
-        } else if (message.operation() == PlayerAugments.AugmentOperation.REMOVE.ordinal()) {
-            augmentInstance.removeFromPlayer(player);
-        } else if (message.operation() == PlayerAugments.AugmentOperation.TOGGLE.ordinal()) {
-            augmentInstance.toggle(player);
         }
     }
 

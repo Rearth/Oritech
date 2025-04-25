@@ -11,7 +11,7 @@ public class SimpleCraftingInventory extends SimpleInventory implements RecipeIn
     }
     @Override
     public ItemStack getStackInSlot(int slot) {
-        return slot >= 0 && slot < this.heldStacks.size() ? this.heldStacks.get(slot) : ItemStack.EMPTY;
+        return slot >= 0 && slot < this.getHeldStacks().size() ? this.getHeldStacks().get(slot) : ItemStack.EMPTY;
     }
     
     @Override

@@ -15,6 +15,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
@@ -28,7 +29,6 @@ import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
-import rearth.oritech.api.fluid.FluidApi;
 
 import java.util.HashSet;
 import java.util.List;

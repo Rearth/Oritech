@@ -52,7 +52,7 @@ dependencies {
     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
 
     // forgified fabric api
-    modImplementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.107.0+2.0.23+1.21.1"
+    // modImplementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.107.0+2.0.23+1.21.1"
 
     include modApi("dev.technici4n:GrandPower:3.0.2")
 
@@ -133,7 +133,6 @@ publishMods {
         requires("owo-lib")
         requires("geckolib")
         requires("athena-ctm")
-        requires("forgified-fabric-api")
         requires("architectury-api")
 
         announcementTitle = "Neoforge Version on Modrinth"
@@ -148,7 +147,6 @@ publishMods {
         requires("owo-lib")
         requires("geckolib")
         requires("athena")
-        requires("forgified-fabric-api")
         requires("architectury-api")
 
         javaVersions.add(JavaVersion.VERSION_21)

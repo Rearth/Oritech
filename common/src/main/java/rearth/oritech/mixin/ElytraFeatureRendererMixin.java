@@ -1,8 +1,6 @@
 package rearth.oritech.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.ElytraFeatureRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -13,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import rearth.oritech.item.tools.armor.JetpackElytraItem;
 import rearth.oritech.item.tools.armor.JetpackExoElytraItem;
 
-@Environment(EnvType.CLIENT)
 @Mixin(ElytraFeatureRenderer.class)
 public class ElytraFeatureRendererMixin {
     

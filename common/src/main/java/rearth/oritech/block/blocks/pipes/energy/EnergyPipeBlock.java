@@ -17,10 +17,10 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.function.TriFunction;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.api.energy.EnergyApi;
 
 import java.util.HashMap;
 import java.util.List;

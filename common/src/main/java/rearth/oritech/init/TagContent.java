@@ -6,6 +6,7 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.biome.Biome;
 import rearth.oritech.Oritech;
 
 public class TagContent {
@@ -76,6 +77,9 @@ public class TagContent {
     public static final TagKey<Item> BIOMASS = cItemTag("fuels/bio");
     public static final TagKey<Item> BIOMASS_BLOCK = cItemTag("fuels/block/bio");
 
+    // frame support
+    public static final TagKey<Block> MACHINE_FRAME_SUPPORT = TagKey.of(RegistryKeys.BLOCK, Oritech.id("frame_support"));
+
     // silicon
     public static final TagKey<Item> SILICON = cItemTag("silicon");
 
@@ -94,6 +98,11 @@ public class TagContent {
     // trees
     public static final TagKey<Block> CUTTER_LOGS_MINEABLE = oritechBlockTag("mineable/cutter_logs");
     public static final TagKey<Block> CUTTER_LEAVES_MINEABLE = oritechBlockTag("mineable/cutter_leaves");
+    
+    // c stuff
+    public static final TagKey<Block> CONVENTIONAL_ORES = TagKey.of(RegistryKeys.BLOCK, Identifier.of("c", "ores"));
+    public static final TagKey<Item> CONVENTIONAL_FERTILIZER = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "fertilizers"));
+    public static final TagKey<Biome> CONVENTIONAL_COLD = TagKey.of(RegistryKeys.BIOME, Identifier.of("c", "is_cold"));
     
     // reactor
     public static final TagKey<Block> REACTOR_WALL_BLOCKS = oritechBlockTag("reactor_wall_blocks");

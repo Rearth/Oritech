@@ -14,7 +14,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import org.apache.commons.lang3.function.TriFunction;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.item.tools.Wrench;

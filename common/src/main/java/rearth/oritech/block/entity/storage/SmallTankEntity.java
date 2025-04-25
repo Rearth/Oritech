@@ -1,7 +1,7 @@
 package rearth.oritech.block.entity.storage;
 
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -13,32 +13,32 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import rearth.oritech.block.blocks.storage.SmallFluidTank;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
 
 import java.util.List;
 import java.util.Objects;
 
-public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvider, ItemApi.BlockProvider, ComparatorOutputProvider, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<SmallTankEntity> {
+public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvider, ItemApi.BlockProvider, ComparatorOutputProvider, ScreenProvider, ExtendedMenuProvider, BlockEntityTicker<SmallTankEntity> {
     
     private boolean netDirty = false;
     private int lastComparatorOutput = 0;
@@ -217,9 +217,10 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
         }
     }
     
+    
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
-        return new ModScreens.BasicData(pos);
+    public void saveExtraData(PacketByteBuf buf) {
+        buf.writeBlockPos(pos);
     }
     
     @Override

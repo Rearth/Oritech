@@ -1,6 +1,6 @@
 package rearth.oritech.block.entity.storage;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -12,11 +12,11 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -26,6 +26,11 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
+import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
+import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.block.blocks.storage.UnstableContainerBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -35,11 +40,6 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
-import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
-import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -52,7 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class UnstableContainerBlockEntity extends BlockEntity implements ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<UnstableContainerBlockEntity>,
+public class UnstableContainerBlockEntity extends BlockEntity implements ScreenProvider, ExtendedMenuProvider, BlockEntityTicker<UnstableContainerBlockEntity>,
                                                                            GeoBlockEntity, MultiblockMachineController, EnergyApi.BlockProvider {
     
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("setup").thenPlay("idle");
@@ -400,9 +400,10 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     }
     
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity serverPlayerEntity) {
+    public void saveExtraData(PacketByteBuf buf) {
         updateNetwork();
-        return new ModScreens.UpgradableData(pos, new MachineAddonController.AddonUiData(List.of(), List.of(), 1f, 1f, pos, 0), getCoreQuality());
+        var data = new ModScreens.UpgradableData(pos, new MachineAddonController.AddonUiData(List.of(), List.of(), 1f, 1f, pos, 0), getCoreQuality());
+        ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
     }
     
     @Override

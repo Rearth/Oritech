@@ -1,6 +1,6 @@
 package rearth.oritech.block.base.entity;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -10,10 +10,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.Pair;
@@ -23,6 +23,12 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.block.blocks.storage.SmallStorageBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
@@ -30,18 +36,13 @@ import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyApi.BlockProvider, ItemApi.BlockProvider, MachineAddonController, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
+public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyApi.BlockProvider, ItemApi.BlockProvider, MachineAddonController,
+                                                                                          ScreenProvider, ExtendedMenuProvider, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
     
     private final List<BlockPos> connectedAddons = new ArrayList<>();
     private final List<BlockPos> openSlots = new ArrayList<>();
@@ -235,9 +236,10 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     public abstract long getDefaultExtractionRate();
     
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
+    public void saveExtraData(PacketByteBuf buf) {
         sendNetworkEntry();
-        return new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
+        var data = new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
+        ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
     }
     
     @Override

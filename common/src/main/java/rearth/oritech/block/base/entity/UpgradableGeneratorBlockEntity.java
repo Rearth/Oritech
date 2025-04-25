@@ -17,12 +17,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 
 import java.util.ArrayList;
 import java.util.List;

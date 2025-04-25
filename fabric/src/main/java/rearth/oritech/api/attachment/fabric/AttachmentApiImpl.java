@@ -22,9 +22,7 @@ public class AttachmentApiImpl {
                         .initializer(attachment.initializer())
                         .persistent(attachment.persistenceCodec())
                         .buildAndRegister(attachment.identifier());
-        
-        System.out.println("Registered attachment fabric impl: " + attachment.identifier());
-        
+                
         registeredTypes.put(attachment.identifier(), created);
         
     }

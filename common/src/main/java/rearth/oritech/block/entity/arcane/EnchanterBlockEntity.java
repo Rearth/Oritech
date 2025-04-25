@@ -1,8 +1,7 @@
 package rearth.oritech.block.entity.arcane;
 
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.wispforest.owo.util.VectorRandomUtils;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -13,12 +12,12 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -27,6 +26,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkStatus;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.EnchanterScreenHandler;
@@ -36,10 +39,6 @@ import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -53,7 +52,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class EnchanterBlockEntity extends BlockEntity
-  implements ItemApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity, ScreenProvider, BlockEntityTicker<EnchanterBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+  implements ItemApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity, ScreenProvider, BlockEntityTicker<EnchanterBlockEntity>, ExtendedMenuProvider {
     
     public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     public static final RawAnimation UNPOWERED = RawAnimation.begin().thenPlayAndHold("unpowered");
@@ -67,7 +66,6 @@ public class EnchanterBlockEntity extends BlockEntity
     
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::markDirty, new InventorySlotAssignment(0, 1, 1, 1));
     
-    protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     public RegistryEntry<Enchantment> selectedEnchantment;
     public int progress;
@@ -292,9 +290,9 @@ public class EnchanterBlockEntity extends BlockEntity
     }
     
     @Override
-    public ModScreens.BasicData getScreenOpeningData(ServerPlayerEntity player) {
+    public void saveExtraData(PacketByteBuf buf) {
         networkDirty = true;
-        return new ModScreens.BasicData(pos);
+        buf.writeBlockPos(pos);
     }
     
     @Override

@@ -7,13 +7,9 @@ import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
-import io.wispforest.owo.ui.util.NinePatchTexture;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -24,7 +20,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.ITEM_SLOT;
-import static rearth.oritech.client.ui.BasicMachineScreen.ORITECH_BUTTON;
 
 public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilterScreenHandler> {
     

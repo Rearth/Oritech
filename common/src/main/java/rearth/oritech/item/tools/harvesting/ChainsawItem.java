@@ -15,9 +15,11 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.TreefellerBlockEntity;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
@@ -41,6 +43,24 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
             Rule.ofAlwaysDropping(List.of(Blocks.COBWEB), 15.0F)),
             1.0F, 1);
         this.components = settings.component(DataComponentTypes.TOOL, toolComponent).getValidatedComponents();
+    }
+    
+    // this overrides the fabric specific extensions
+    public boolean allowComponentsUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
+        return false;
+    }
+    
+    public boolean allowContinuingBlockBreaking(PlayerEntity player, ItemStack oldStack, ItemStack newStack) {
+        return true;
+    }
+    
+    // this overrides the neoforge specific extensions
+    public boolean shouldCauseReequipAnimation(@NotNull ItemStack oldStack, @NotNull ItemStack newStack, boolean slotChanged) {
+        return false;
+    }
+    
+    public boolean shouldCauseBlockBreakReset(@NotNull ItemStack oldStack, @NotNull ItemStack newStack) {
+        return false;
     }
     
     @Override

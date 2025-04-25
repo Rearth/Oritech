@@ -1,13 +1,14 @@
 package rearth.oritech.block.entity.processing;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -15,7 +16,6 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
-import rearth.oritech.api.energy.EnergyApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -142,8 +142,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
-        sendNetworkEntry();
-        return new ModScreens.BasicData(pos);
+    public void saveExtraData(PacketByteBuf buf) {
+        buf.writeBlockPos(pos);
     }
 }

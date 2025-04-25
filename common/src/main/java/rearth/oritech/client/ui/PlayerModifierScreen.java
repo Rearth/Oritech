@@ -24,8 +24,8 @@ import net.minecraft.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
+import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.init.recipes.AugmentRecipe;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.SizedIngredient;
@@ -67,6 +67,11 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
           .verticalAlignment(VerticalAlignment.CENTER);
         
         root = rootComponent;
+        
+        if (handler.blockEntity == null) {
+            this.close();
+            return;
+        }
         
         dependencyLines.clear();
         shownAugments.clear();
@@ -127,6 +132,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
     @Override
     protected void handledScreenTick() {
         super.handledScreenTick();
+        if (handler.blockEntity == null) return;
         
         // update research panels
         for (int i = 0; i < researchLabels.size(); i++) {

@@ -1,14 +1,16 @@
 package rearth.oritech.client.ui;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.world.World;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
 import rearth.oritech.client.init.ModScreens;
+
+import java.util.Objects;
 
 public class ReactorScreenHandler extends ScreenHandler {
     
@@ -16,8 +18,8 @@ public class ReactorScreenHandler extends ScreenHandler {
     public final World world;
     
     // this calls the second version
-    public ReactorScreenHandler(int syncId, PlayerInventory inventory, ModScreens.BasicData setupData) {
-        this(syncId, inventory, inventory.player.getWorld().getBlockEntity(setupData.pos()));
+    public ReactorScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
     }
     
     // on server, also called from client constructor
@@ -34,12 +36,5 @@ public class ReactorScreenHandler extends ScreenHandler {
     }
     public boolean canUse(PlayerEntity player) {
         return true;
-    }
-    
-    public static class HandlerFactory implements ExtendedScreenHandlerType.ExtendedFactory<ReactorScreenHandler, ModScreens.BasicData> {
-        @Override
-        public ReactorScreenHandler create(int syncId, PlayerInventory inventory, ModScreens.BasicData data) {
-            return new ReactorScreenHandler(syncId, inventory, data);
-        }
     }
 }

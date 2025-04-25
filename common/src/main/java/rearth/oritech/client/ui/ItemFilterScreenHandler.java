@@ -6,6 +6,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,10 @@ public class ItemFilterScreenHandler extends ScreenHandler {
     protected final BlockPos blockPos;
     @NotNull
     protected final ItemFilterBlockEntity blockEntity;
+    
+    public ItemFilterScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
+    }
     
     public ItemFilterScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
         super(ModScreens.ITEM_FILTER_SCREEN, syncId);

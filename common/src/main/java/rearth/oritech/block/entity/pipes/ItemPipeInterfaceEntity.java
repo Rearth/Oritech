@@ -9,6 +9,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.time.StopWatch;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.block.blocks.pipes.AbstractPipeBlock;
 import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
@@ -16,7 +17,6 @@ import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.api.item.ItemApi;
 
 import java.util.*;
 import java.util.stream.IntStream;

@@ -1,6 +1,6 @@
 package rearth.oritech.block.base.entity;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -8,14 +8,18 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
@@ -24,16 +28,13 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity implements ItemApi.BlockProvider, EnergyApi.BlockProvider, ExtendedScreenHandlerFactory, ScreenProvider, MachineAddonController, RedstoneAddonBlockEntity.RedstoneControllable {
+public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity
+  implements ItemApi.BlockProvider, EnergyApi.BlockProvider, ExtendedMenuProvider, ScreenProvider, MachineAddonController, RedstoneAddonBlockEntity.RedstoneControllable {
     
     public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, this::markDirty);
     
@@ -55,8 +56,8 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     @Override
     protected boolean canProgress() {
         return !disabledViaRedstone &&
-          energyStorage.amount >= getMoveEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()) &&
-            energyStorage.amount >= getOperationEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed());
+                 energyStorage.amount >= getMoveEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()) &&
+                 energyStorage.amount >= getOperationEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed());
     }
     
     @Override
@@ -111,9 +112,10 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
+    public void saveExtraData(PacketByteBuf buf) {
         sendMovementNetworkPacket(getCurrentTarget());
-        return new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
+        var data = new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
+        ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
     }
     
     @Nullable

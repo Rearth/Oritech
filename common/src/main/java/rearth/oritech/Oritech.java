@@ -2,10 +2,9 @@ package rearth.oritech;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
@@ -22,7 +21,6 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
-import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.network.NetworkContent;
@@ -50,19 +48,19 @@ public final class Oritech {
         FeatureContent.initialize();
         
         // for pipe data
-        ServerLifecycleEvents.SERVER_STARTED.register(Oritech::onServerStarted);
+        LifecycleEvent.SERVER_STARTED.register(Oritech::onServerStarted);
         
         // for particle collisions
-        ServerTickEvents.END_SERVER_TICK.register(elem -> AcceleratorParticleLogic.onTickEnd());
-        ServerTickEvents.END_SERVER_TICK.register(elem -> AddonBlockEntity.completeInits());
+        TickEvent.SERVER_POST.register(elem -> AcceleratorParticleLogic.onTickEnd());
+        TickEvent.SERVER_POST.register(elem -> AddonBlockEntity.completeInits());
         
         // for player augment modifiers
-        ServerPlayConnectionEvents.JOIN.register(((handler, sender, server) -> PlayerAugments.refreshPlayerAugments(handler.player)));
+        PlayerEvent.PLAYER_JOIN.register(PlayerAugments::refreshPlayerAugments);
         PlayerEvent.PLAYER_RESPAWN.register((player, inEnd, removalReason) -> PlayerAugments.refreshPlayerAugments(player));
-        PlayerEvent.CHANGE_DIMENSION.register((player, oldLevel, newLevel) -> PlayerAugments.refreshPlayerAugments(player)); //TODO Wait FFAPI to Update Fabric syncWith support
+        PlayerEvent.CHANGE_DIMENSION.register((player, oldLevel, newLevel) -> PlayerAugments.refreshPlayerAugments(player));
         
         // for player augment ticks
-        ServerTickEvents.START_WORLD_TICK.register(event -> event.getPlayers().forEach(PlayerAugments::serverTickAugments));
+        TickEvent.SERVER_PRE.register(event -> event.getWorlds().forEach(world -> world.getPlayers().forEach(PlayerAugments::serverTickAugments)));
         LOGGER.info("Oritech initialization complete");
     }
     

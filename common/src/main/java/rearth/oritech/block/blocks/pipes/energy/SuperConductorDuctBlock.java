@@ -7,8 +7,6 @@ import rearth.oritech.block.blocks.pipes.GenericPipeDuctBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 
-import static rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock.ENERGY_PIPE_DATA;
-
 public class SuperConductorDuctBlock extends GenericPipeDuctBlock {
 	public SuperConductorDuctBlock(Settings settings) {
 		super(settings);

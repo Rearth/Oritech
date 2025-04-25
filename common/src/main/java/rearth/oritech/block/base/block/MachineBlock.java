@@ -2,7 +2,8 @@ package rearth.oritech.block.base.block;
 
 import com.mojang.serialization.MapCodec;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -13,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -27,10 +29,10 @@ import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
 import rearth.oritech.util.StackContext;
-import rearth.oritech.api.fluid.FluidApi;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -120,8 +122,8 @@ public abstract class MachineBlock extends HorizontalFacingBlock implements Bloc
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!world.isClient) {
-            var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
-            player.openHandledScreen(handler);
+            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+                MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
         }
         
         return ActionResult.SUCCESS;

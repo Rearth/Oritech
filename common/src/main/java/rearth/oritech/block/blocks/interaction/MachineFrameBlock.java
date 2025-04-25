@@ -17,6 +17,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.init.TagContent;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,18 +30,20 @@ public class MachineFrameBlock extends Block {
     public static final BooleanProperty EAST = ConnectingBlock.EAST;
     public static final BooleanProperty SOUTH = ConnectingBlock.SOUTH;      // south and west are only needed for voxel shapes
     public static final BooleanProperty WEST = ConnectingBlock.WEST;
+    public static final BooleanProperty UP = ConnectingBlock.UP;
+    public static final BooleanProperty DOWN = ConnectingBlock.DOWN;        // used to connect to pillars to make things look nice
     
     protected final VoxelShape[] boundingShapes;
     
     public MachineFrameBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(getDefaultState().with(NORTH, false).with(EAST, false).with(SOUTH, false).with(WEST, false));
+        this.setDefaultState(getDefaultState().with(NORTH, false).with(EAST, false).with(SOUTH, false).with(WEST, false).with(UP, false).with(DOWN, false));
         boundingShapes = createShapes();
     }
     
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(NORTH, EAST, SOUTH, WEST);
+        builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN);
     }
     
     @Override
@@ -66,6 +69,10 @@ public class MachineFrameBlock extends Block {
             shape = VoxelShapes.union(shape, boundingShapes[3]);
         if (state.get(WEST))
             shape = VoxelShapes.union(shape, boundingShapes[4]);
+        if (state.get(UP))
+            shape = VoxelShapes.union(shape, boundingShapes[5]);
+        if (state.get(DOWN))
+            shape = VoxelShapes.union(shape, boundingShapes[6]);
         
         return shape;
     }
@@ -89,8 +96,10 @@ public class MachineFrameBlock extends Block {
         VoxelShape east = Block.createCuboidShape(0, 5, 5, 5, 11, 11);
         VoxelShape south = Block.createCuboidShape(5, 5, 11, 11, 11, 16);
         VoxelShape west = Block.createCuboidShape(11, 5, 5, 16, 11, 11);
+        VoxelShape up = Block.createCuboidShape(5, 5, 5, 11, 16, 11);
+        VoxelShape down = Block.createCuboidShape(5, 0, 5, 11, 5, 11);
         
-        return new VoxelShape[] {inner, north, west, south, east};
+        return new VoxelShape[] {inner, north, west, south, east, up, down};
     }
     
     @Nullable
@@ -102,8 +111,10 @@ public class MachineFrameBlock extends Block {
         var eastConnected = ctx.getWorld().getBlockState(ctx.getBlockPos().east()).getBlock() == this;
         var southConnected = ctx.getWorld().getBlockState(ctx.getBlockPos().south()).getBlock() == this;
         var westConnected = ctx.getWorld().getBlockState(ctx.getBlockPos().west()).getBlock() == this;
+        var upConnected = ctx.getWorld().getBlockState(ctx.getBlockPos().up()).isIn(TagContent.MACHINE_FRAME_SUPPORT);
+        var downConnected = ctx.getWorld().getBlockState(ctx.getBlockPos().down()).isIn(TagContent.MACHINE_FRAME_SUPPORT);
         
-        return Objects.requireNonNull(baseState).with(NORTH, northConnected).with(EAST, eastConnected).with(SOUTH, southConnected).with(WEST, westConnected);
+        return Objects.requireNonNull(baseState).with(NORTH, northConnected).with(EAST, eastConnected).with(SOUTH, southConnected).with(WEST, westConnected).with(UP, upConnected).with(DOWN, downConnected);
     }
     
     @Override
@@ -113,8 +124,10 @@ public class MachineFrameBlock extends Block {
         var eastConnected = world.getBlockState(pos.east()).getBlock() == this;
         var southConnected = world.getBlockState(pos.south()).getBlock() == this;
         var westConnected = world.getBlockState(pos.west()).getBlock() == this;
+        var upConnected = world.getBlockState(pos.up()).isIn(TagContent.MACHINE_FRAME_SUPPORT);
+        var downConnected = world.getBlockState(pos.down()).isIn(TagContent.MACHINE_FRAME_SUPPORT);
         
-        return state.with(NORTH, northConnected).with(EAST, eastConnected).with(SOUTH, southConnected).with(WEST, westConnected);
+        return state.with(NORTH, northConnected).with(EAST, eastConnected).with(SOUTH, southConnected).with(WEST, westConnected).with(UP, upConnected).with(DOWN, downConnected);
         
     }
 }

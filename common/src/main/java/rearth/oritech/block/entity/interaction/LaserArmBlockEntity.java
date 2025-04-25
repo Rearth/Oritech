@@ -1,7 +1,7 @@
 package rearth.oritech.block.entity.interaction;
 
 import com.mojang.authlib.GameProfile;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -21,13 +21,13 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.property.Property;
@@ -37,6 +37,10 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
@@ -53,10 +57,6 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -69,7 +69,7 @@ import java.util.stream.Collectors;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 public class LaserArmBlockEntity extends BlockEntity implements
-  GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyApi.BlockProvider, ScreenProvider, ExtendedScreenHandlerFactory,
+  GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyApi.BlockProvider, ScreenProvider, ExtendedMenuProvider,
     MultiblockMachineController, MachineAddonController, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
     
     public static final String LASER_PLAYER_NAME = "oritech_laser";
@@ -247,29 +247,11 @@ public class LaserArmBlockEntity extends BlockEntity implements
     }
     
     public PlayerEntity getLaserPlayerEntity() {
+        if (!(world instanceof ServerWorld))
+            return null;
+        
         if (laserPlayerEntity == null) {
-            laserPlayerEntity = new PlayerEntity(world, pos, 0, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME)) {
-                @Override
-                public boolean isSpectator() {
-                    return false;
-                }
-                
-                @Override
-                public boolean isCreative() {
-                    return false;
-                }
-                
-                @Override
-                public boolean canTakeDamage() {
-                    return false;
-                }
-                
-                @Override
-                public boolean giveItemStack(ItemStack itemStack) {
-                    LaserArmBlockEntity.this.inventory.insert(itemStack, false);
-                    return true;
-                }
-            };
+            laserPlayerEntity = FakeMachinePlayer.create((ServerWorld) world, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME), inventory);
         }
         
         if (hunterAddons > 0 && yieldAddons > 0) {
@@ -910,17 +892,19 @@ public class LaserArmBlockEntity extends BlockEntity implements
         return ScreenProvider.super.getBlockFacingProperty();
     }
     
-    @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
-        updateNetwork();
-        return new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
-    }
-    
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.FullEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, energyStorage.maxExtract));
         return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+    }
+    
+    @Override
+    public void saveExtraData(PacketByteBuf buf) {
+        updateNetwork();
+        var data = new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
+        ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
+        
     }
     
     @Override

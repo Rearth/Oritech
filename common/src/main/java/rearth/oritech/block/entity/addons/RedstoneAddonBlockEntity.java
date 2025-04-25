@@ -1,26 +1,25 @@
 package rearth.oritech.block.entity.addons;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
-import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.RedstoneAddonScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 
-public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockEntityTicker<RedstoneAddonBlockEntity>, ExtendedScreenHandlerFactory, ComparatorOutputProvider {
+public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockEntityTicker<RedstoneAddonBlockEntity>, ExtendedMenuProvider, ComparatorOutputProvider {
     
     private RedstoneControllable cachedController;
     public RedstoneMode activeMode = RedstoneMode.INPUT_CONTROL;
@@ -105,11 +104,11 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     public int getComparatorOutput() {
         return currentOutput;
     }
-
+    
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
+    public void saveExtraData(PacketByteBuf buf) {
         sendDataToClient();
-        return new ModScreens.BasicData(pos);
+        buf.writeBlockPos(pos);
     }
     
     @Nullable

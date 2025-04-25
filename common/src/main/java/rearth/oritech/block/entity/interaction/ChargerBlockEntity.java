@@ -1,7 +1,7 @@
 package rearth.oritech.block.entity.interaction;
 
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -11,17 +11,23 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
@@ -31,16 +37,11 @@ import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.StackContext;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
 
 import java.util.List;
 
-public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidApi.BlockProvider, EnergyApi.BlockProvider, ItemApi.BlockProvider, ScreenProvider, ExtendedScreenHandlerFactory {
+public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidApi.BlockProvider, EnergyApi.BlockProvider, ItemApi.BlockProvider,
+                                                                 ScreenProvider, ExtendedMenuProvider {
     
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.charger.energyCapacity(), Oritech.CONFIG.charger.maxEnergyInsertion(), Oritech.CONFIG.charger.maxEnergyExtraction(), this::markDirty);
     
@@ -156,8 +157,8 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     }
     
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
-        return new ModScreens.BasicData(pos);
+    public void saveExtraData(PacketByteBuf buf) {
+        buf.writeBlockPos(pos);
     }
     
     @Nullable

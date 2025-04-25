@@ -1,6 +1,6 @@
 package rearth.oritech.block.entity.reactor;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -9,9 +9,9 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -23,8 +23,9 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
 import rearth.oritech.block.blocks.reactor.*;
-import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.ReactorScreenHandler;
 import rearth.oritech.init.BlockContent;
@@ -32,12 +33,10 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
 
 import java.util.*;
 
-public class ReactorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<ReactorControllerBlockEntity>, EnergyApi.BlockProvider, ExtendedScreenHandlerFactory {
+public class ReactorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<ReactorControllerBlockEntity>, EnergyApi.BlockProvider, ExtendedMenuProvider {
     
     public static final int MAX_SIZE = Oritech.CONFIG.maxSize();
     public static final int RF_PER_PULSE = Oritech.CONFIG.rfPerPulse();
@@ -582,13 +581,6 @@ public class ReactorControllerBlockEntity extends BlockEntity implements BlockEn
     }
     
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
-        var previewMax = new BlockPos(areaMax.getX(), areaMin.getY() + 1, areaMax.getZ());
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.ReactorUIDataPacket(pos, areaMin, areaMax, previewMax));
-        return new ModScreens.BasicData(pos);
-    }
-    
-    @Override
     public Text getDisplayName() {
         return Text.of("");
     }
@@ -597,6 +589,13 @@ public class ReactorControllerBlockEntity extends BlockEntity implements BlockEn
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         return new ReactorScreenHandler(syncId, playerInventory, this);
+    }
+    
+    @Override
+    public void saveExtraData(PacketByteBuf buf) {
+        var previewMax = new BlockPos(areaMax.getX(), areaMin.getY() + 1, areaMax.getZ());
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.ReactorUIDataPacket(pos, areaMin, areaMax, previewMax));
+        buf.writeBlockPos(pos);
     }
     
     public record ComponentStatistics(short receivedPulses, int storedHeat, short heatChanged) {

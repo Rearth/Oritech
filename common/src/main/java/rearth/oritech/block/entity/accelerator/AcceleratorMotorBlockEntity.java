@@ -6,9 +6,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.init.BlockEntitiesContent;
 
 public class AcceleratorMotorBlockEntity extends BlockEntity implements EnergyApi.BlockProvider {
     

@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction.Axis;
@@ -13,7 +12,6 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.util.FeatureContext;
 import rearth.oritech.Oritech;
-import rearth.oritech.init.TagContent;
 
 import java.util.List;
 

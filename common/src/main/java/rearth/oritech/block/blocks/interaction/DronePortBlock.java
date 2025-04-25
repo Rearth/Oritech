@@ -1,6 +1,7 @@
 package rearth.oritech.block.blocks.interaction;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -14,6 +15,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -86,8 +88,8 @@ public class DronePortBlock extends Block implements BlockEntityProvider {
 
             dronePort.initAddons();
             
-            var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
-            player.openHandledScreen(handler);
+            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+                MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
             
         }
         

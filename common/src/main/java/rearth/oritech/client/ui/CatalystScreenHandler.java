@@ -4,11 +4,18 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.PacketByteBuf;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
+
+import java.util.Objects;
 
 public class CatalystScreenHandler extends BasicMachineScreenHandler {
     
     public final EnchantmentCatalystBlockEntity catalyst;
+    
+    public CatalystScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
+    }
     
     public CatalystScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
         super(syncId, playerInventory, blockEntity);

@@ -8,6 +8,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
@@ -15,8 +17,6 @@ import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 
 public class LaserArmBlockBehavior {
     static private LaserArmBlockBehavior noop;

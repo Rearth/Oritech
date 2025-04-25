@@ -8,11 +8,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeConnectionBlock;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.api.fluid.FluidApi;
 
 import java.util.Collections;
 import java.util.HashSet;

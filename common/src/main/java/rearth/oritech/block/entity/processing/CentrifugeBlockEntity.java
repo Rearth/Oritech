@@ -17,6 +17,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.CentrifugeScreenHandler;
@@ -27,8 +29,6 @@ import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventorySlotAssignment;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 
 import java.util.List;
 import java.util.Objects;
