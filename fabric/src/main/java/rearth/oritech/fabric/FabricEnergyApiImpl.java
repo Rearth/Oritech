@@ -15,10 +15,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.util.StackContext;
-import rearth.oritech.util.energy.BlockEnergyApi;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.energy.ItemEnergyApi;
-import rearth.oritech.util.energy.containers.SimpleEnergyItemStorage;
+import rearth.oritech.api.energy.BlockEnergyApi;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.ItemEnergyApi;
+import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.function.Supplier;

@@ -8,11 +8,13 @@
     }
   ],
   "type": "oritech:fuel_generator",
-  "fluidInputAmount": 8100,
-  "fluidInputVariant": "techreborn:diesel",
+  "fluidInputIngredient": {
+    "amount": 8100,
+    "tag": "#techreborn:diesel"
+  },
   "fluidOutputAmount": 0,
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [],
   "results": [],
-  "time": 2560
+  "time": 280
 }

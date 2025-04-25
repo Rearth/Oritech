@@ -26,7 +26,7 @@
     },
     {
       "input": {
-        "item": "minecraft:leather"
+        "tag": "c:leathers"
       }
     }
   ],

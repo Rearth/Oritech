@@ -9,7 +9,7 @@
       "item": "oritech:fluid_pipe"
     },
     "f": {
-      "item": "oritech:coal_dust"
+      "tag": "c:dusts/coal"
     },
     "s": {
       "item": "oritech:adamant_ingot"

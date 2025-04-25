@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mekanism"
+    }
+  ],
+  "type": "oritech:atomic_forge",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:dusts/refined_obsidian"
+    },
+    {
+      "tag": "c:circuits/elite"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "mekanism:ultimate_control_circuit"
+    }
+  ],
+  "time": 5
+}

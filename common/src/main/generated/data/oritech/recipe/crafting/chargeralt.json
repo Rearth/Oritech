@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "b": {
-      "item": "minecraft:chest"
+      "tag": "c:chests/wooden"
     },
     "c": {
       "item": "oritech:processing_unit"

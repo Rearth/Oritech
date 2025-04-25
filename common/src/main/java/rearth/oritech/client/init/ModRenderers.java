@@ -1,16 +1,19 @@
 package rearth.oritech.client.init;
 
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.block.Block;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.*;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.EntitiesContent;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ModRenderers {
+    
+    public static Map<Block, RenderLayer> RENDER_LAYERS = new HashMap<>();  // this is used in client-specific parts to set render layers
 
     public static void registerRenderers() {
 
@@ -60,43 +63,41 @@ public class ModRenderers {
         BlockEntityRendererFactories.register(BlockEntitiesContent.TECH_DOOR_ENTITY, ctx -> new MachineRenderer<>("models/tech_door"));
         
         // cutout renders
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.MACHINE_FRAME_BLOCK, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.REACTOR_ABSORBER_PORT, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.REACTOR_CONTROLLER, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.FRAME_GANTRY_ARM, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.BLOCK_PLACER_HEAD, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.BLOCK_DESTROYER_HEAD, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.BLOCK_FERTILIZER_HEAD, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.MACHINE_FLUID_ADDON, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.CROP_FILTER_ADDON, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.LARGE_STORAGE_BLOCK, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.FERTILIZER_BLOCK, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.PLACER_BLOCK, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.URANIUM_CRYSTAL, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.DESTROYER_BLOCK, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.SMALL_TANK_BLOCK, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.CREATIVE_TANK_BLOCK, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.INDUSTRIAL_GLASS_BLOCK, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.QUARRY_BEAM_TARGET, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.QUARRY_BEAM_RING, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.WITHER_CROP_BLOCK, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.SPAWNER_CONTROLLER_BLOCK, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.ACCELERATOR_MOTOR, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.ACCELERATOR_RING, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.ACCELERATOR_CONTROLLER, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.BLACK_HOLE_BLOCK, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.BLACK_HOLE_INNER, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.BLACK_HOLE_MIDDLE, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.BLACK_HOLE_OUTER, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.COOLER_BLOCK, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.REACTOR_ROD, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.REACTOR_DOUBLE_ROD, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.REACTOR_QUAD_ROD, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.REACTOR_REDSTONE_PORT, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.TRANSPARENT_ITEM_PIPE, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION, RenderLayer.getTranslucent());
-        
-        EntityRendererRegistry.register(EntitiesContent.PORTAL_ENTITY, PortalEntityRenderer::new);
+        RENDER_LAYERS.put(BlockContent.MACHINE_FRAME_BLOCK, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.REACTOR_ABSORBER_PORT, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.REACTOR_CONTROLLER, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.FRAME_GANTRY_ARM, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.BLOCK_PLACER_HEAD, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.BLOCK_DESTROYER_HEAD, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.BLOCK_FERTILIZER_HEAD, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.MACHINE_FLUID_ADDON, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.CROP_FILTER_ADDON, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.LARGE_STORAGE_BLOCK, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.FERTILIZER_BLOCK, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.PLACER_BLOCK, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.URANIUM_CRYSTAL, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.DESTROYER_BLOCK, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.SMALL_TANK_BLOCK, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.CREATIVE_TANK_BLOCK, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.INDUSTRIAL_GLASS_BLOCK, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.QUARRY_BEAM_TARGET, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.QUARRY_BEAM_RING, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.WITHER_CROP_BLOCK, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.SPAWNER_CONTROLLER_BLOCK, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.ACCELERATOR_MOTOR, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.ACCELERATOR_RING, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.ACCELERATOR_CONTROLLER, RenderLayer.getCutout());
+        RENDER_LAYERS.put(BlockContent.BLACK_HOLE_BLOCK, RenderLayer.getTranslucent());
+        RENDER_LAYERS.put(BlockContent.BLACK_HOLE_INNER, RenderLayer.getTranslucent());
+        RENDER_LAYERS.put(BlockContent.BLACK_HOLE_MIDDLE, RenderLayer.getTranslucent());
+        RENDER_LAYERS.put(BlockContent.BLACK_HOLE_OUTER, RenderLayer.getTranslucent());
+        RENDER_LAYERS.put(BlockContent.COOLER_BLOCK, RenderLayer.getTranslucent());
+        RENDER_LAYERS.put(BlockContent.REACTOR_ROD, RenderLayer.getTranslucent());
+        RENDER_LAYERS.put(BlockContent.REACTOR_DOUBLE_ROD, RenderLayer.getTranslucent());
+        RENDER_LAYERS.put(BlockContent.REACTOR_QUAD_ROD, RenderLayer.getTranslucent());
+        RENDER_LAYERS.put(BlockContent.REACTOR_REDSTONE_PORT, RenderLayer.getTranslucent());
+        RENDER_LAYERS.put(BlockContent.TRANSPARENT_ITEM_PIPE, RenderLayer.getTranslucent());
+        RENDER_LAYERS.put(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION, RenderLayer.getTranslucent());
 
         Oritech.LOGGER.info("Registering Entities Renderers for " + Oritech.MOD_ID);
     }

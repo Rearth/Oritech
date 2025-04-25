@@ -1,5 +1,10 @@
 package rearth.oritech.init.compat.emi;
 
+import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+
 import dev.architectury.platform.Platform;
 import dev.emi.emi.api.recipe.BasicEmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -18,11 +23,6 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-
-import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
-
 public class OritechEMIRecipe extends BasicEmiRecipe {
     
     private final Boolean isGenerator;
@@ -32,17 +32,16 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
     
     public OritechEMIRecipe(RecipeEntry<OritechRecipe> entry, EmiRecipeCategory category, Class<? extends MachineBlockEntity> screenProviderSource, BlockState machineState) {
         super(category, entry.id(), 150, 66);
-        
-        
+
         var fluidDivider = Platform.isNeoForge() ? 81 : 1;  // no idea why this is needed
         
         recipe = entry.value();
         recipe.getInputs().forEach(ingredient -> this.inputs.add(EmiIngredient.of(ingredient)));
         recipe.getResults().forEach(stack -> this.outputs.add(EmiStack.of(stack)));
         
-        if (recipe.getFluidInput() != null)
+        if (recipe.getFluidInput() != null && recipe.getFluidInput().getAmount() > 0)
             this.inputs.add(EmiStack.of(recipe.getFluidInput().getFirstFluidStack().getFluid(), Math.max(recipe.getFluidInput().getAmount() / fluidDivider, 1)));
-        if (recipe.getFluidOutput() != null)
+        if (recipe.getFluidOutput() != null && recipe.getFluidInput().getAmount() > 0)
             this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), Math.max(recipe.getFluidInput().getAmount() / fluidDivider, 1)));
         
         try {
@@ -64,17 +63,14 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         this.slots = slots;
         this.slotOffsets = slotOffsets;
         
-        
-        var fluidDivider = Platform.isNeoForge() ? 81 : 1;  // no idea why this is needed
-        
         recipe = entry.value();
         recipe.getInputs().forEach(ingredient -> this.inputs.add(EmiIngredient.of(ingredient)));
         recipe.getResults().forEach(stack -> this.outputs.add(EmiStack.of(stack)));
         
-        if (recipe.getFluidInput() != null)
-            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFirstFluidStack().getFluid(), recipe.getFluidInput().getAmount() / fluidDivider));
-        if (recipe.getFluidOutput() != null)
-            this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), recipe.getFluidInput().getAmount() / fluidDivider));
+        if (recipe.getFluidInput() != null && recipe.getFluidInput().getAmount() > 0)
+            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFirstFluidStack().getFluid(), recipe.getFluidInput().getAmount()));
+        if (recipe.getFluidOutput() != null && recipe.getFluidOutput().getAmount() > 0)
+            this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), recipe.getFluidOutput().getAmount()));
             
     }
     

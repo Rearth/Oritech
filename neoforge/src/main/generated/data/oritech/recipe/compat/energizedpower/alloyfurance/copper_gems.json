@@ -1,0 +1,26 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "energizedpower"
+    }
+  ],
+  "type": "energizedpower:alloy_furnace",
+  "inputs": [
+    {
+      "input": {
+        "item": "oritech:copper_gem"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:copper_gem"
+      }
+    }
+  ],
+  "output": {
+    "count": 3,
+    "item": "minecraft:copper_ingot"
+  },
+  "ticks": 800
+}

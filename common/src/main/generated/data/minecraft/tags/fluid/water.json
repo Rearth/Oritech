@@ -1,0 +1,52 @@
+{
+  "values": [
+    "oritech:flowing_biofuel",
+    "oritech:still_biofuel",
+    "oritech:flowing_fuel",
+    "oritech:still_fuel",
+    "oritech:flowing_oil",
+    "oritech:still_oil",
+    "oritech:flowing_steam",
+    "oritech:still_steam",
+    {
+      "id": "oritech:flowing_molten_adamant",
+      "required": false
+    },
+    {
+      "id": "oritech:still_molten_adamant",
+      "required": false
+    },
+    {
+      "id": "oritech:flowing_molten_biosteel",
+      "required": false
+    },
+    {
+      "id": "oritech:still_molten_biosteel",
+      "required": false
+    },
+    {
+      "id": "oritech:flowing_molten_duratium",
+      "required": false
+    },
+    {
+      "id": "oritech:still_molten_duratium",
+      "required": false
+    },
+    {
+      "id": "oritech:flowing_molten_energite",
+      "required": false
+    },
+    {
+      "id": "oritech:still_molten_energite",
+      "required": false
+    },
+    {
+      "id": "oritech:flowing_molten_fluxite",
+      "required": false
+    },
+    {
+      "id": "oritech:still_molten_fluxite",
+      "required": false
+    }
+  ]
+}

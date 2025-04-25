@@ -4,8 +4,8 @@ import net.minecraft.loot.function.LootFunctionType;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 import rearth.oritech.util.NbtBlockLootFunction;
+import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
 public class LootContent implements ArchitecturyRegistryContainer<LootFunctionType<?>> {
     

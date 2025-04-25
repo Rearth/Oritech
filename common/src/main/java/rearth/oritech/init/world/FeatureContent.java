@@ -1,8 +1,7 @@
 package rearth.oritech.init.world;
 
+import dev.architectury.registry.level.biome.BiomeModifications;
 import io.wispforest.owo.serialization.CodecUtils;
-import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
-import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -26,52 +25,61 @@ public class FeatureContent implements ArchitecturyRegistryContainer<Feature<?>>
     
     public static void initialize() {
         
-        BiomeModifications.addFeature(
-          BiomeSelectors.foundInOverworld(),
-          GenerationStep.Feature.LAKES,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("oil_spring")));
+        BiomeModifications.addProperties((context, mutable) -> {
+            if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
+                mutable.getGenerationProperties().addFeature(GenerationStep.Feature.LAKES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("oil_spring")));
+            }
+        });
         
-        BiomeModifications.addFeature(
-          BiomeSelectors.tag(BiomeTags.VILLAGE_DESERT_HAS_STRUCTURE),
-          GenerationStep.Feature.LAKES,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("oil_spring_desert")));
+        BiomeModifications.addProperties((context, mutable) -> {
+            if (context.hasTag(BiomeTags.VILLAGE_DESERT_HAS_STRUCTURE)) {
+                mutable.getGenerationProperties().addFeature(GenerationStep.Feature.LAKES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("oil_spring_desert")));
+            }
+        });
         
-        BiomeModifications.addFeature(
-          BiomeSelectors.foundInOverworld(),
-          GenerationStep.Feature.TOP_LAYER_MODIFICATION,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("resource_node_common")));
+        BiomeModifications.addProperties((context, mutable) -> {
+            if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
+                mutable.getGenerationProperties().addFeature(GenerationStep.Feature.TOP_LAYER_MODIFICATION, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("resource_node_common")));
+            }
+        });
         
-        BiomeModifications.addFeature(
-          BiomeSelectors.foundInOverworld(),
-          GenerationStep.Feature.UNDERGROUND_DECORATION,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("resource_node_rare")));
+        BiomeModifications.addProperties((context, mutable) -> {
+            if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
+                mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_DECORATION, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("resource_node_rare")));
+            }
+        });
         
-        BiomeModifications.addFeature(
-          BiomeSelectors.foundInOverworld(),
-          GenerationStep.Feature.UNDERGROUND_DECORATION,
-          RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("resource_node_other")));
+        BiomeModifications.addProperties((context, mutable) -> {
+            if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
+                mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_DECORATION, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("resource_node_other")));
+            }
+        });
         
         // ores
         if (Oritech.CONFIG.generateOres()) {
-            BiomeModifications.addFeature(
-              BiomeSelectors.foundInOverworld(),
-              GenerationStep.Feature.UNDERGROUND_ORES,
-              RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_nickel")));
+            BiomeModifications.addProperties((context, mutable) -> {
+                if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
+                    mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_ORES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_nickel")));
+                }
+            });
             
-            BiomeModifications.addFeature(
-              BiomeSelectors.foundInOverworld(),
-              GenerationStep.Feature.UNDERGROUND_ORES,
-              RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("uranium_patch")));
+            BiomeModifications.addProperties((context, mutable) -> {
+                if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
+                    mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_ORES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("uranium_patch")));
+                }
+            });
             
-            BiomeModifications.addFeature(
-              BiomeSelectors.foundInOverworld(),
-              GenerationStep.Feature.UNDERGROUND_ORES,
-              RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_platinum")));
+            BiomeModifications.addProperties((context, mutable) -> {
+                if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
+                    mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_ORES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_platinum")));
+                }
+            });
             
-            BiomeModifications.addFeature(
-              BiomeSelectors.foundInTheEnd(),
-              GenerationStep.Feature.UNDERGROUND_ORES,
-              RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_platinum_end")));
+            BiomeModifications.addProperties((context, mutable) -> {
+                if (context.hasTag(BiomeTags.IS_END)) {
+                    mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_ORES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_platinum_end")));
+                }
+            });
         }
     }
     

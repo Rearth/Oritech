@@ -1,0 +1,18 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "industrialforegoing"
+    }
+  ],
+  "type": "oritech:fuel_generator",
+  "fluidInputIngredient": {
+    "amount": 100,
+    "tag": "#industrialforegoing:biofuel"
+  },
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [],
+  "results": [],
+  "time": 60
+}

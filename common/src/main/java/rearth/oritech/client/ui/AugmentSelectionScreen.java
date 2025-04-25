@@ -65,7 +65,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         } else if (lastFocused != null && lastFocused instanceof TextureComponent lastButton) {
             var focusedAugmentId = augmentIDs.get(lastButton);
             if (focusedAugmentId == null) return;
-            var focusedAugment = Text.translatable("oritech.text.augment." + focusedAugmentId.getPath());
+            var focusedAugment = Text.translatable(PlayerModifierScreen.augmentKey(focusedAugmentId));
             noOpButton.text(focusedAugment);
         }
         

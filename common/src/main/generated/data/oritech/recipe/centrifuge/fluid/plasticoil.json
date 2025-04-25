@@ -1,7 +1,9 @@
 {
   "type": "oritech:centrifuge_fluid",
-  "fluidInputAmount": 40500,
-  "fluidInputVariant": "minecraft:water",
+  "fluidInputIngredient": {
+    "amount": 40500,
+    "tag": "#minecraft:water"
+  },
   "fluidOutputAmount": 0,
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [

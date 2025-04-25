@@ -4,11 +4,14 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
+
+import java.util.Objects;
 
 public class RedstoneAddonScreenHandler extends ScreenHandler {
     
@@ -16,6 +19,10 @@ public class RedstoneAddonScreenHandler extends ScreenHandler {
     protected final BlockPos blockPos;
     @NotNull
     protected final RedstoneAddonBlockEntity blockEntity;
+    
+    public RedstoneAddonScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
+    }
     
     public RedstoneAddonScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
         super(ModScreens.REDSTONE_ADDON_SCREEN, syncId);

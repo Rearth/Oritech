@@ -115,7 +115,7 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
         buttonContainer.child(title.positioning(Positioning.relative(50, 5)));
         
         for (var slot : slots) {
-            var button = Components.button(Text.literal(""), elem -> {
+            var button = Components.button(Text.literal(" "), elem -> {
                 setActiveSlot(slot.index());
             });
             buttons.add(button);

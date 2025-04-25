@@ -9,8 +9,8 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import rearth.oritech.Oritech;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleItemFluidStorage;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
 
 import java.util.List;
 

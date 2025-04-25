@@ -1,0 +1,21 @@
+{
+  "type": "oritech:pulverizer",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:ender_pearls"
+    }
+  ],
+  "results": [
+    {
+      "count": 8,
+      "id": "oritech:enderic_compound"
+    }
+  ],
+  "time": 200
+}

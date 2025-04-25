@@ -1,6 +1,5 @@
 package rearth.oritech.item.tools.armor;
 
-import net.fabricmc.fabric.api.entity.event.v1.FabricElytraItem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.entity.Entity;
@@ -15,6 +14,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
@@ -33,12 +33,17 @@ import java.util.function.Consumer;
 // this item can store both energy and fluids
 // applicable fluids will be consumed first, and then energy
 // the fluid bar is rendered in a different color if a fluid is available
-public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpackItem, FabricElytraItem {
+public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
     public JetpackElytraItem(RegistryEntry<ArmorMaterial> material, Type type, Item.Settings settings) {
         super(material, type, settings);
+    }
+    
+    @Override
+    public boolean requireTakeoff() {
+        return false;
     }
     
     @Override
@@ -50,11 +55,23 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
         }
     }
     
-    @Override
     public boolean useCustomElytra(LivingEntity entity, ItemStack chestStack, boolean tickElytra) {
-        if (tickElytra)
-            doVanillaElytraTick(entity, chestStack);
+        if (!tickElytra) return true;
         
+        int nextRoll = entity.getFallFlyingTicks() + 1;
+        if (!entity.getWorld().isClient && nextRoll % 10 == 0) {
+            entity.emitGameEvent(GameEvent.ELYTRA_GLIDE);
+        }
+        
+        return true;
+    }
+    
+    // this overrides the IItemExtension methods in neoforge
+    public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
+        return useCustomElytra(entity, entity.getEquippedStack(EquipmentSlot.CHEST), true);
+    }
+    
+    public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
         return true;
     }
     

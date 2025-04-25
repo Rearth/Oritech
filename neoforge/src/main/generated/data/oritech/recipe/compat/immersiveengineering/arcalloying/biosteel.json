@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "immersiveengineering"
+    }
+  ],
+  "type": "immersiveengineering:arc_furnace",
+  "additives": [
+    {
+      "item": "oritech:raw_biopolymer"
+    }
+  ],
+  "energy": 51200,
+  "input": {
+    "tag": "c:ingots/iron"
+  },
+  "results": [
+    {
+      "item": "oritech:biosteel_ingot"
+    }
+  ],
+  "time": 100
+}

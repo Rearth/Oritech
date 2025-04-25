@@ -1,0 +1,15 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "actuallyadditions"
+    }
+  ],
+  "type": "actuallyadditions:liquid_fuel",
+  "burn_time": 9600,
+  "fuel": {
+    "amount": 50,
+    "id": "oritech:still_biofuel"
+  },
+  "total_energy": 120
+}

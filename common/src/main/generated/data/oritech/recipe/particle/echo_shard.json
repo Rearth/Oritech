@@ -1,15 +1,17 @@
 {
   "type": "oritech:particle_collision",
-  "fluidInputAmount": 0,
-  "fluidInputVariant": "minecraft:empty",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
   "fluidOutputAmount": 0,
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "minecraft:ender_pearl"
+      "tag": "c:ender_pearls"
     },
     {
-      "item": "minecraft:amethyst_shard"
+      "tag": "c:gems/amethyst"
     }
   ],
   "results": [

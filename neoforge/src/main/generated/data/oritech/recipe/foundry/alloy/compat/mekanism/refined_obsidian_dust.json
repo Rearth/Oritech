@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mekanism"
+    }
+  ],
+  "type": "oritech:foundry",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:dusts/obsidian"
+    },
+    {
+      "tag": "c:dusts/diamond"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "mekanism:dust_refined_obsidian"
+    }
+  ],
+  "time": 200
+}

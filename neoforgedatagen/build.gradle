@@ -1,0 +1,150 @@
+plugins {
+    // Apply the plugin. You can find the latest version at https://projects.neoforged.net/neoforged/ModDevGradle
+    id 'net.neoforged.moddev' version '2.0.80'
+}
+
+neoForge {
+    // We currently only support NeoForge versions later than 21.0.x
+    // See https://projects.neoforged.net/neoforged/neoforge for the latest updates
+    version = "21.1.145"
+    
+    // Validate AT files and raise errors when they have invalid targets
+    // This option is false by default, but turning it on is recommended
+    validateAccessTransformers = true
+
+    runs {
+        data {
+            data()
+            programArguments.addAll '--all', '--mod', 'oritech_datagen', '--output', file('../neoforge/src/main/generated/').getAbsolutePath()
+        }
+    }
+
+    mods {
+        'oritech' {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+repositories {
+    // For Oritech
+    flatDir { dirs '../neoforge/build/libs' }
+    maven {
+        name = 'Architectury'
+        url "https://maven.architectury.dev/"
+    }
+    maven {
+        name = 'Owo'
+        url 'https://maven.wispforest.io/releases/'
+    }
+    maven {
+        name = 'GeckoLib'
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+    }
+    maven { // FFAPI
+        name = "Sinytra"
+        url "https://maven.su5ed.dev/releases"
+    }
+    maven { // for athena/CSL
+        name = 'teamresourceful'
+        url "https://maven.teamresourceful.com/repository/maven-public/"
+    }
+    maven { // for Create dependencies
+        name = 'FTB Mods'
+        url "https://maven.nanite.dev/releases"
+    }
+    maven { // for Mekanism
+        url "https://modmaven.dev/"
+        content {
+            includeGroup "mekanism"
+        }
+    }
+    maven {
+        name = 'Modrinth'
+        url 'https://api.modrinth.com/maven/'
+    }
+    maven { 
+        name = 'Curseforge'
+        url = "https://www.cursemaven.com"
+    }
+
+    // create:
+    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
+    maven { url = "https://maven.createmod.net" }   // create + ponder + flywheel?
+    maven { url = "https://mvn.devos.one/snapshots" } // Registrate
+
+    maven {
+        name = 'Shedaniel'
+        url = 'https://maven.shedaniel.me'
+    } // for cloth config
+
+    maven {
+        url = 'https://maven.rover656.dev/releases' // for Ender IO
+        content {
+            includeGroup "com.enderio"
+        }
+    }
+}
+
+// Load properties from main Oritech gradle.properties
+ext.rootProperties = new Properties()
+ext.rootProperties.load(file("../gradle.properties").newReader())
+
+dependencies {
+    // Oritech
+    implementation "rearth.oritech:oritech-neoforge:${rootProperties['mod_version']}"
+
+    // Oritech dependencies
+    // architectury
+    implementation "dev.architectury:architectury-neoforge:${rootProperties['architectury_api_version']}"
+    // forgified fabric api
+    runtimeOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.107.0+2.0.23+1.21.1"
+    // owo lib
+    runtimeOnly "io.wispforest:owo-lib-neoforge:0.12.15-beta.9+1.21"
+    // geckolib
+    runtimeOnly "software.bernie.geckolib:geckolib-neoforge-${rootProperties['minecraft_version']}:4.6.6"
+    // athena (CTM)
+    runtimeOnly "earth.terrarium.athena:athena-neoforge-1.21:4.0.0"
+
+    // Create
+    implementation("com.simibubi.create:create-${rootProperties['minecraft_version']}:$create_version") { transitive = false }
+
+    // Create dependencies
+    implementation "com.tterrag.registrate:Registrate:$registrate_version"
+
+    // Mekanism
+    implementation "mekanism:Mekanism:${mekanism_version}"
+    implementation "mekanism:Mekanism:${mekanism_version}:generators" // Mekanism: Generators
+    
+    // Powah!
+    implementation "curse.maven:powah-rearchitected-633483:${powah_version_id}"
+    runtimeOnly "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
+    runtimeOnly "curse.maven:guideme-1173950:${guideme_version_id}"
+
+    // Energized Power
+    implementation "curse.maven:energized-power-782147:${energized_power_version_id}"
+
+    // Productive Metalworks
+    implementation "curse.maven:productive-metalworks-1184570:${productive_metalworks_version_id}"
+
+    // Immersive Engineering
+    implementation "curse.maven:immersive-engineering-231951:${immersive_engineering_version_id}"
+
+    // Industrial Foregoing
+    implementation "curse.maven:industrial-foregoing-266515:${industrial_foregoing_version_id}"
+    implementation "curse.maven:titanium-287342:${titanium_version_id}"
+
+    // PneumaticCraft: Repressurized
+    implementation "curse.maven:pneumaticcraft-repressurized-281849:${pneumaticcraft_version_id}"
+
+    // Ender IO
+    implementation "com.enderio:enderio-base:${enderio_version}"
+    implementation("com.enderio:enderio-machines:${enderio_version}") { transitive = false }
+
+    // Actually Additions
+    implementation "curse.maven:actually-additions-228404:${actually_additions_version_id}"
+    runtimeOnly "curse.maven:curios-309927:${curios_version_id}"
+
+    // Applied Energistics 2
+    implementation "curse.maven:applied-energistics-2-223794:${applied_energistics_version_id}"
+}

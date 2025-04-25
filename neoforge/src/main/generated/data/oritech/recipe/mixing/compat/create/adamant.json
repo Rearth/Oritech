@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    {
+      "tag": "c:gems/diamond"
+    },
+    {
+      "tag": "c:ingots/nickel"
+    }
+  ],
+  "results": [
+    {
+      "id": "oritech:adamant_ingot"
+    }
+  ]
+}

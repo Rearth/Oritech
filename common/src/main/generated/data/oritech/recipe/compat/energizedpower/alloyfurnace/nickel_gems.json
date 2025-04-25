@@ -1,0 +1,28 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "energizedpower"
+      ]
+    }
+  ],
+  "type": "energizedpower:alloy_furnace",
+  "inputs": [
+    {
+      "input": {
+        "item": "oritech:nickel_gem"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:nickel_gem"
+      }
+    }
+  ],
+  "output": {
+    "count": 3,
+    "item": "oritech:nickel_ingot"
+  },
+  "ticks": 800
+}

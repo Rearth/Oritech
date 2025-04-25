@@ -8,8 +8,10 @@
     }
   ],
   "type": "oritech:foundry",
-  "fluidInputAmount": 0,
-  "fluidInputVariant": "minecraft:empty",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
   "fluidOutputAmount": 0,
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
@@ -22,7 +24,7 @@
   ],
   "results": [
     {
-      "count": 1,
+      "count": 2,
       "id": "mythicmetals:bronze_ingot"
     }
   ],

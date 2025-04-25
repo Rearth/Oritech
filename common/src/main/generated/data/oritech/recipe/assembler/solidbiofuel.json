@@ -1,18 +1,20 @@
 {
   "type": "oritech:assembler",
-  "fluidInputAmount": 0,
-  "fluidInputVariant": "minecraft:empty",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
   "fluidOutputAmount": 0,
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "oritech:biomass"
+      "tag": "c:fuels/bio"
     },
     {
-      "item": "oritech:biomass"
+      "tag": "c:fuels/bio"
     },
     {
-      "item": "oritech:biomass"
+      "tag": "c:fuels/bio"
     },
     {
       "tag": "minecraft:planks"

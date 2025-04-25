@@ -1,7 +1,9 @@
 {
   "type": "oritech:cooler",
-  "fluidInputAmount": 81000,
-  "fluidInputVariant": "minecraft:water",
+  "fluidInputIngredient": {
+    "amount": 81000,
+    "tag": "#minecraft:water"
+  },
   "fluidOutputAmount": 0,
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [],

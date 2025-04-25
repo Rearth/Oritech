@@ -1,7 +1,9 @@
 {
   "type": "oritech:centrifuge_fluid",
-  "fluidInputAmount": 81000,
-  "fluidInputVariant": "oritech:still_oil",
+  "fluidInputIngredient": {
+    "amount": 81000,
+    "tag": "#oritech:still_oil"
+  },
   "fluidOutputAmount": 81000,
   "fluidOutputVariant": "oritech:still_fuel",
   "ingredients": [

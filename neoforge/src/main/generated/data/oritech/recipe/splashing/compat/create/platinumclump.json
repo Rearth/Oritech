@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:splashing",
+  "ingredients": [
+    {
+      "tag": "c:clumps/platinum"
+    }
+  ],
+  "results": [
+    {
+      "count": 9,
+      "id": "oritech:platinum_nugget"
+    },
+    {
+      "chance": 0.25,
+      "id": "oritech:fluxite"
+    }
+  ]
+}

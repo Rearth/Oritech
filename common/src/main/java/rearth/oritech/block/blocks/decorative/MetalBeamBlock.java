@@ -16,6 +16,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.TagContent;
 
 public class MetalBeamBlock extends Block {
     
@@ -58,8 +59,11 @@ public class MetalBeamBlock extends Block {
     }
     
     private BlockState getTargetState(WorldAccess world, BlockPos pos) {
-        var beamBelow = world.getBlockState(pos.down()).getBlock().equals(BlockContent.METAL_BEAM_BLOCK);
-        var beamAbove = world.getBlockState(pos.up()).getBlock().equals(BlockContent.METAL_BEAM_BLOCK);
+        var isFrameSupport = world.getBlockState(pos).isIn(TagContent.MACHINE_FRAME_SUPPORT);
+        var blockBelow = world.getBlockState(pos.down()).getBlock();
+        var beamBelow = blockBelow.equals(BlockContent.METAL_BEAM_BLOCK) || (isFrameSupport && blockBelow.equals(BlockContent.MACHINE_FRAME_BLOCK));
+        var blockAbove = world.getBlockState(pos.up()).getBlock();
+        var beamAbove = blockAbove.equals(BlockContent.METAL_BEAM_BLOCK) || (isFrameSupport && blockAbove.equals(BlockContent.MACHINE_FRAME_BLOCK));
         
         var state = getDefaultState();
         

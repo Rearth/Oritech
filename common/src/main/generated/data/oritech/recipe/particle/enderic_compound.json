@@ -1,12 +1,14 @@
 {
   "type": "oritech:particle_collision",
-  "fluidInputAmount": 0,
-  "fluidInputVariant": "minecraft:empty",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
   "fluidOutputAmount": 0,
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "minecraft:redstone"
+      "tag": "c:dusts/redstone"
     },
     {
       "item": "minecraft:rotten_flesh"

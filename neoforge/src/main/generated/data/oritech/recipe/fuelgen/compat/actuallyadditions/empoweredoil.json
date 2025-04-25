@@ -1,0 +1,18 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "actuallyadditions"
+    }
+  ],
+  "type": "oritech:fuel_generator",
+  "fluidInputIngredient": {
+    "amount": 100,
+    "tag": "#actuallyadditions:empowered_oil"
+  },
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [],
+  "results": [],
+  "time": 240
+}

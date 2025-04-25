@@ -1,0 +1,9 @@
+{
+  "values": [
+    "oritech:platinum_clump",
+    {
+      "id": "create:crushed_raw_platinum",
+      "required": false
+    }
+  ]
+}

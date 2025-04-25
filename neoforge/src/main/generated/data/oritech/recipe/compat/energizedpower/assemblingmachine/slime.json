@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "energizedpower"
+    }
+  ],
+  "type": "energizedpower:assembling_machine",
+  "inputs": [
+    {
+      "input": {
+        "item": "minecraft:honeycomb"
+      }
+    },
+    {
+      "input": {
+        "tag": "c:fuels/bio"
+      }
+    },
+    {
+      "input": {
+        "tag": "c:fuels/bio"
+      }
+    },
+    {
+      "input": {
+        "tag": "c:fuels/bio"
+      }
+    }
+  ],
+  "output": {
+    "item": "minecraft:slime_ball"
+  }
+}

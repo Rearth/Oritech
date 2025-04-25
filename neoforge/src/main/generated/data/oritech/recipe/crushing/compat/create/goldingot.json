@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:crushing",
+  "ingredients": [
+    {
+      "tag": "c:ingots/gold"
+    }
+  ],
+  "results": [
+    {
+      "id": "oritech:gold_dust"
+    }
+  ]
+}

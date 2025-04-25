@@ -1,0 +1,45 @@
+{
+  "type": "oritech:augment",
+  "applyCost": [
+    {
+      "count": 8,
+      "ingredient": {
+        "tag": "c:carbon_fibre"
+      }
+    },
+    {
+      "count": 4,
+      "ingredient": {
+        "item": "oritech:duratium_ingot"
+      }
+    }
+  ],
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:augment/armor"
+  ],
+  "researchCost": [
+    {
+      "count": 32,
+      "ingredient": {
+        "tag": "c:carbon_fibre"
+      }
+    },
+    {
+      "count": 16,
+      "ingredient": {
+        "item": "oritech:biosteel_ingot"
+      }
+    },
+    {
+      "count": 4,
+      "ingredient": {
+        "tag": "c:gems/diamond"
+      }
+    }
+  ],
+  "rfCost": 50000000,
+  "time": 800,
+  "uiX": 80,
+  "uiY": 70
+}

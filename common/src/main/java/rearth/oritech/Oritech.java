@@ -2,10 +2,9 @@ package rearth.oritech;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
@@ -49,18 +48,19 @@ public final class Oritech {
         FeatureContent.initialize();
         
         // for pipe data
-        ServerLifecycleEvents.SERVER_STARTED.register(Oritech::onServerStarted);
+        LifecycleEvent.SERVER_STARTED.register(Oritech::onServerStarted);
         
         // for particle collisions
-        ServerTickEvents.END_SERVER_TICK.register(elem -> AcceleratorParticleLogic.onTickEnd());
-        ServerTickEvents.END_SERVER_TICK.register(elem -> AddonBlockEntity.completeInits());
+        TickEvent.SERVER_POST.register(elem -> AcceleratorParticleLogic.onTickEnd());
+        TickEvent.SERVER_POST.register(elem -> AddonBlockEntity.completeInits());
         
         // for player augment modifiers
-        ServerPlayConnectionEvents.JOIN.register(((handler, sender, server) -> PlayerAugments.refreshPlayerAugments(handler.player)));
+        PlayerEvent.PLAYER_JOIN.register(PlayerAugments::refreshPlayerAugments);
         PlayerEvent.PLAYER_RESPAWN.register((player, inEnd, removalReason) -> PlayerAugments.refreshPlayerAugments(player));
+        PlayerEvent.CHANGE_DIMENSION.register((player, oldLevel, newLevel) -> PlayerAugments.refreshPlayerAugments(player));
         
         // for player augment ticks
-        ServerTickEvents.START_WORLD_TICK.register(event -> event.getPlayers().forEach(PlayerAugments::serverTickAugments));
+        TickEvent.SERVER_PRE.register(event -> event.getWorlds().forEach(world -> world.getPlayers().forEach(PlayerAugments::serverTickAugments)));
         LOGGER.info("Oritech initialization complete");
     }
     
@@ -105,7 +105,7 @@ public final class Oritech {
         res.put(RegistryKeys.ITEM_GROUP.getValue(), () -> ArchitecturyRegistryContainer.register(ItemGroups.class, MOD_ID, false));
         res.put(RegistryKeys.RECIPE_SERIALIZER.getValue(), ArchitecturyRecipeRegistryContainer::finishSerializerRegister);
         res.put(RegistryKeys.LOOT_FUNCTION_TYPE.getValue(), FluidContent::registerItemsToGroups);
-        res.put(Identifier.of("neoforge", "biome_modifier_serializers"), PlayerAugments::init);   // this works just fine on fabric aswell, as they key is not really relevant there. Intentionally registered later to avoid locking issues on neoforge
+        res.put(Identifier.of("minecraft", "enchantment_provider_type"), PlayerAugments::init);   // this works just fine on fabric aswell, as they key is not really relevant there. Intentionally registered before the real attachments to avoid locking issues on neoforge
         
         return res;
     }

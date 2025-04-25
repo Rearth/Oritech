@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:clumps/uranium"
+      }
+    }
+  ],
+  "type": "oritech:centrifuge",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:clumps/uranium"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "oritech:uranium_dust"
+    },
+    {
+      "count": 1,
+      "id": "oritech:small_plutonium_dust"
+    }
+  ],
+  "time": 100
+}

@@ -1,7 +1,9 @@
 {
   "type": "oritech:centrifuge_fluid",
-  "fluidInputAmount": 8100,
-  "fluidInputVariant": "oritech:still_oil",
+  "fluidInputIngredient": {
+    "amount": 8100,
+    "tag": "#oritech:still_oil"
+  },
   "fluidOutputAmount": 0,
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [

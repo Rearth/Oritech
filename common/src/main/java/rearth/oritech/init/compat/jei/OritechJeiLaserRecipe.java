@@ -9,7 +9,6 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -21,8 +20,6 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-
-import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 
 public class OritechJeiLaserRecipe implements IRecipeCategory<OritechRecipe> {
     

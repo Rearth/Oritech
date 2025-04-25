@@ -6,7 +6,7 @@
       "item": "minecraft:brewing_stand"
     },
     "c": {
-      "item": "minecraft:redstone_block"
+      "tag": "c:storage_blocks/redstone"
     },
     "f": {
       "tag": "c:ingots/electrum"

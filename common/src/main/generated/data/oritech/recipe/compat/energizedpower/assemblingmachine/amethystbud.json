@@ -11,12 +11,12 @@
   "inputs": [
     {
       "input": {
-        "item": "minecraft:amethyst_shard"
+        "tag": "c:gems/amethyst"
       }
     },
     {
       "input": {
-        "item": "minecraft:amethyst_shard"
+        "tag": "c:gems/amethyst"
       }
     },
     {

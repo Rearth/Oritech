@@ -6,7 +6,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.TntEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
@@ -211,7 +210,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
             var targetBlock = targetState.getBlock();
             var targetHardness = targetBlock.getBlastResistance();
             
-            if (targetBlock instanceof NuclearExplosionBlock || targetState.isAir() && !targetState.isLiquid()) continue;
+            if (targetBlock instanceof NuclearExplosionBlock || targetState.isAir() && !targetState.getFluidState().isStill()) continue;
             
             // skip too hard blocks (except for the first few)
             if (targetHardness > power && hardBusters-- < 0) continue;

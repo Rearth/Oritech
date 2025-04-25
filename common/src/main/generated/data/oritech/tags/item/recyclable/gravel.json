@@ -1,0 +1,33 @@
+{
+  "values": [
+    "minecraft:stone_axe",
+    "minecraft:stone_button",
+    "minecraft:stone_hoe",
+    "minecraft:stone_pickaxe",
+    "minecraft:stone_pressure_plate",
+    "minecraft:stone_shovel",
+    "minecraft:stone_sword",
+    "minecraft:furnace",
+    "minecraft:smoker",
+    "minecraft:blast_furnace",
+    "minecraft:dispenser",
+    "minecraft:dropper",
+    "minecraft:observer",
+    "minecraft:chiseled_stone_bricks",
+    "minecraft:cobblestone_stairs",
+    "minecraft:cobblestone_wall",
+    "minecraft:cracked_stone_bricks",
+    "minecraft:mossy_cobblestone_slab",
+    "minecraft:mossy_cobblestone_stairs",
+    "minecraft:mossy_cobblestone_wall",
+    "minecraft:mossy_stone_bricks",
+    "minecraft:mossy_stone_brick_stairs",
+    "minecraft:mossy_stone_brick_wall",
+    "minecraft:smooth_stone",
+    "minecraft:stone",
+    "minecraft:stone_stairs",
+    "minecraft:stone_bricks",
+    "minecraft:stone_brick_stairs",
+    "minecraft:stone_brick_wall"
+  ]
+}

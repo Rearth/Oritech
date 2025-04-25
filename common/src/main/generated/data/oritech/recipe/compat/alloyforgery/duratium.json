@@ -16,7 +16,7 @@
     },
     {
       "count": 1,
-      "item": "minecraft:netherite_ingot"
+      "tag": "c:ingots/netherite"
     }
   ],
   "min_forge_tier": 1,

@@ -17,6 +17,11 @@ wiki {
     }
 }
 
+task runDatagenNeoforge(type: GradleBuild) {
+    buildFile = 'neoforgedatagen/build.gradle'
+    tasks = ['runData']
+}
+
 architectury {
     minecraft = project.minecraft_version
 }

@@ -1,0 +1,26 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "energizedpower"
+    }
+  ],
+  "type": "energizedpower:filtration_plant",
+  "icon": "energizedpower:stone_pebble",
+  "output": {
+    "output": {
+      "item": "energizedpower:stone_pebble"
+    },
+    "percentages": [
+      0.33
+    ]
+  },
+  "secondaryOutput": {
+    "output": {
+      "item": "oritech:raw_nickel"
+    },
+    "percentages": [
+      0.05
+    ]
+  }
+}

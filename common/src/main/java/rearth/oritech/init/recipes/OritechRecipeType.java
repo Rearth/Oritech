@@ -27,7 +27,7 @@ public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> impl
       MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
       CodecUtils.toEndec(FluidIngredient.MAP_CODEC.codec()).fieldOf("fluidInputIngredient", elem -> elem.getFluidInput()),
       FLUID_ENDEC.fieldOf("fluidOutputVariant", elem -> elem.getFluidOutput().getFluid()),
-      Endec.LONG.fieldOf("fluidOutputAmount", elem -> elem.getFluidOutput().getAmount()),
+      Endec.LONG.fieldOf("fluidOutputAmount", elem -> elem.getFluidOutput().getAmount() * OritechRecipe.fluidDivider),
       OritechRecipe::new
     );
     

@@ -1,6 +1,5 @@
 package rearth.oritech.item.tools.util;
 
-import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
@@ -10,10 +9,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.random.Random;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.energy.containers.SimpleEnergyItemStorage;
+import org.jetbrains.annotations.NotNull;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 
-public interface OritechEnergyItem extends EnergyApi.ItemProvider, FabricItem {
+public interface OritechEnergyItem extends EnergyApi.ItemProvider {
     
     default long getEnergyCapacity(ItemStack stack) {return 10_000;}
     
@@ -23,11 +23,6 @@ public interface OritechEnergyItem extends EnergyApi.ItemProvider, FabricItem {
     
     default long getEnergyMaxOutput(ItemStack stack) {
         return 0;
-    }
-    
-    @Override
-    default boolean allowComponentsUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
-        return false;
     }
     
     default boolean tryUseEnergy(ItemStack stack, long amount, PlayerEntity player){

@@ -3,10 +3,10 @@
   "category": "misc",
   "key": {
     "b": {
-      "item": "minecraft:furnace"
+      "tag": "c:player_workstations/furnaces"
     },
     "c": {
-      "item": "minecraft:copper_ingot"
+      "tag": "c:ingots/copper"
     },
     "f": {
       "tag": "c:ingots/nickel"

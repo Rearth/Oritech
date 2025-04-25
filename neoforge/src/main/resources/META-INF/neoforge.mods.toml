@@ -41,12 +41,6 @@ ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies.oritech]]
-modId = "fabric_api"
-type = "required"
-ordering = "AFTER"
-side = "BOTH"
-
-[[dependencies.oritech]]
 modId = "owo"
 type = "required"
 ordering = "AFTER"

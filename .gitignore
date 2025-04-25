@@ -27,6 +27,7 @@ bin/
 .project
 */.cache
 common/src/main/generated/.cache/
+neoforge/src/main/generated/.cache/
 
 # macos
 
@@ -47,3 +48,6 @@ replay_*.log
 # krita
 *.kra
 *.png~
+
+# architectury
+.architectury-transformer/

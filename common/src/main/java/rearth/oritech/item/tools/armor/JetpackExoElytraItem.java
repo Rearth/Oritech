@@ -1,8 +1,8 @@
 package rearth.oritech.item.tools.armor;
 
-import net.fabricmc.fabric.api.entity.event.v1.FabricElytraItem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Item;
@@ -13,11 +13,12 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 import rearth.oritech.Oritech;
 
 import java.util.List;
 
-public class JetpackExoElytraItem extends BackstorageExoArmorItem implements BaseJetpackItem, FabricElytraItem {
+public class JetpackExoElytraItem extends BackstorageExoArmorItem implements BaseJetpackItem {
     public JetpackExoElytraItem(RegistryEntry<ArmorMaterial> material, Type type, Item.Settings settings) {
         super(material, type, settings);
     }
@@ -33,10 +34,27 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     }
     
     @Override
+    public boolean requireTakeoff() {
+        return false;
+    }
+    
     public boolean useCustomElytra(LivingEntity entity, ItemStack chestStack, boolean tickElytra) {
-        if (tickElytra)
-            doVanillaElytraTick(entity, chestStack);
+        if (!tickElytra) return true;
         
+        int nextRoll = entity.getFallFlyingTicks() + 1;
+        if (!entity.getWorld().isClient && nextRoll % 10 == 0) {
+            entity.emitGameEvent(GameEvent.ELYTRA_GLIDE);
+        }
+        
+        return true;
+    }
+    
+    // this overrides the IItemExtension methods in neoforge
+    public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
+        return useCustomElytra(entity, entity.getEquippedStack(EquipmentSlot.CHEST), true);
+    }
+    
+    public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
         return true;
     }
     

@@ -1,0 +1,18 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "endercore"
+    }
+  ],
+  "type": "enderio:fire_crafting",
+  "base_blocks": [
+    "minecraft:sculk"
+  ],
+  "block_after_burning": "minecraft:air",
+  "dimensions": [
+    "minecraft:overworld"
+  ],
+  "loot_table": "oritech:compat/enderio/firecrafting/sculk",
+  "max_item_drops": 2
+}

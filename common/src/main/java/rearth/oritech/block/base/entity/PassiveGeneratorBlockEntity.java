@@ -10,8 +10,8 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
 
 import java.util.Set;
 

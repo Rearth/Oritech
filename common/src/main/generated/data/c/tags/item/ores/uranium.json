@@ -1,5 +1,13 @@
 {
   "values": [
-    "oritech:deepslate_uranium_ore"
+    "oritech:deepslate_uranium_ore",
+    {
+      "id": "immersiveengineering:ore_uranium",
+      "required": false
+    },
+    {
+      "id": "immersiveengineering:deepslate_ore_uranium",
+      "required": false
+    }
   ]
 }

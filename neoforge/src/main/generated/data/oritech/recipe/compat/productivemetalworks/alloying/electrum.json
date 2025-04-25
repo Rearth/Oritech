@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "productivemetalworks"
+    }
+  ],
+  "type": "productivemetalworks:fluid_alloying",
+  "fluids": [
+    {
+      "amount": 1,
+      "fluid": "productivemetalworks:molten_redstone"
+    },
+    {
+      "amount": 1,
+      "fluid": "productivemetalworks:molten_nickel"
+    }
+  ],
+  "result": {
+    "amount": 1,
+    "id": "productivemetalworks:molten_electrum"
+  },
+  "speed": 10
+}

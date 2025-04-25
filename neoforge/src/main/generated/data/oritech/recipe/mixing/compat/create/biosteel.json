@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    {
+      "item": "oritech:raw_biopolymer"
+    },
+    {
+      "tag": "c:ingots/iron"
+    }
+  ],
+  "results": [
+    {
+      "id": "oritech:biosteel_ingot"
+    }
+  ]
+}

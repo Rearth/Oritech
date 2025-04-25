@@ -11,7 +11,7 @@
   "inputs": [
     {
       "input": {
-        "item": "oritech:plastic_sheet"
+        "tag": "c:plates/plastic"
       }
     },
     {

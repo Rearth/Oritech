@@ -1,0 +1,21 @@
+{
+  "type": "oritech:pulverizer",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "item": "oritech:packed_wheat"
+    }
+  ],
+  "results": [
+    {
+      "count": 16,
+      "id": "oritech:biomass"
+    }
+  ],
+  "time": 200
+}

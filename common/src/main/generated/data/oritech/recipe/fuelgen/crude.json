@@ -1,8 +1,8 @@
 {
   "type": "oritech:fuel_generator",
   "fluidInputIngredient": {
-    "tag": "#c:oils",
-    "amount": 8100
+    "amount": 8100,
+    "tag": "#oritech:still_oil"
   },
   "fluidOutputAmount": 0,
   "fluidOutputVariant": "minecraft:empty",

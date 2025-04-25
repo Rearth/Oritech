@@ -1,0 +1,20 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "productivemetalworks"
+    }
+  ],
+  "type": "productivemetalworks:item_melting",
+  "ingredient": {
+    "item": "oritech:small_copper_clump"
+  },
+  "maximum_temperature": 0,
+  "minimum_temperature": 1000,
+  "result": [
+    {
+      "amount": 10,
+      "id": "productivemetalworks:molten_copper"
+    }
+  ]
+}

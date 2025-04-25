@@ -18,6 +18,8 @@ import rearth.oritech.init.ToolsContent;
 
 import java.util.concurrent.CompletableFuture;
 
+import static rearth.oritech.init.TagContent.cItemTag;
+
 public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
     
     public ItemTagGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> completableFuture) {
@@ -32,6 +34,25 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.RAW_NICKEL)
           .add(ItemContent.RAW_URANIUM)
           .add(ItemContent.RAW_PLATINUM);
+        
+        // clumps - added for Create and Mekanism compat support
+        // Adding Create "crushed" ores as clumps, because they essentially are
+        getOrCreateTagBuilder(TagContent.CLUMPS)
+          .add(ItemContent.COPPER_CLUMP).addOptional(Identifier.of("create", "crushed_raw_copper"))
+          .add(ItemContent.IRON_CLUMP).addOptional(Identifier.of("create", "crushed_raw_iron"))
+          .add(ItemContent.GOLD_CLUMP).addOptional(Identifier.of("create", "crushed_raw_gold"))
+          .add(ItemContent.NICKEL_CLUMP).addOptional(Identifier.of("create", "crushed_raw_nickel"))
+          .add(ItemContent.PLATINUM_CLUMP).addOptional(Identifier.of("create", "crushed_raw_platinum"))
+          .addOptional(Identifier.of("create", "crushed_raw_zinc"));
+        
+        getOrCreateTagBuilder(getClumpTag("copper")).add(ItemContent.COPPER_CLUMP).addOptional(Identifier.of("create", "crushed_raw_copper"));
+        getOrCreateTagBuilder(getClumpTag("iron")).add(ItemContent.IRON_CLUMP).addOptional(Identifier.of("create", "crushed_raw_iron"));
+        getOrCreateTagBuilder(getClumpTag("gold")).add(ItemContent.GOLD_CLUMP).addOptional(Identifier.of("create", "crushed_raw_gold"));
+        getOrCreateTagBuilder(getClumpTag("nickel")).add(ItemContent.NICKEL_CLUMP).addOptional(Identifier.of("create", "crushed_raw_nickel"));
+        getOrCreateTagBuilder(getClumpTag("platinum")).add(ItemContent.PLATINUM_CLUMP).addOptional(Identifier.of("create", "crushed_raw_platinum"));
+        // for compat
+        getOrCreateTagBuilder(getClumpTag("uranium")).addOptional(Identifier.of("create", "crushed_raw_uranium"));
+        getOrCreateTagBuilder(getClumpTag("osmium")).addOptional(Identifier.of("create", "crushed_raw_osmium"));
         
         // dusts
         getOrCreateTagBuilder(ConventionalItemTags.DUSTS)
@@ -90,11 +111,13 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         
         getOrCreateTagBuilder(TagContent.NICKEL_ORES).add(BlockContent.NICKEL_ORE.asItem(), BlockContent.DEEPSLATE_NICKEL_ORE.asItem());
         getOrCreateTagBuilder(TagContent.PLATINUM_ORES).add(BlockContent.DEEPSLATE_PLATINUM_ORE.asItem(), BlockContent.ENDSTONE_PLATINUM_ORE.asItem());
-        getOrCreateTagBuilder(TagContent.URANIUM_ORES).add(BlockContent.DEEPSLATE_URANIUM_ORE.asItem());
+        getOrCreateTagBuilder(TagContent.URANIUM_ORES).add(BlockContent.DEEPSLATE_URANIUM_ORE.asItem())
+          .addOptional(Identifier.of("immersiveengineering", "ore_uranium"))
+          .addOptional(Identifier.of("immersiveengineering", "deepslate_ore_uranium"));
         
         getOrCreateTagBuilder(TagContent.STEEL_INGOTS).add(ItemContent.STEEL_INGOT).add(ItemContent.BIOSTEEL_INGOT);
         getOrCreateTagBuilder(TagContent.QUARTZ_DUSTS).add(ItemContent.QUARTZ_DUST);
-        getOrCreateTagBuilder(TagContent.COAL_DUSTS).add(ItemContent.COAL_DUST);
+        getOrCreateTagBuilder(TagContent.COAL_DUSTS).add(ItemContent.COAL_DUST).addOptional(Identifier.of("immersiveengineering", "dust_hop_graphite"));
         
         // vanilla variants
         getOrCreateTagBuilder(TagContent.COPPER_DUSTS).add(ItemContent.COPPER_DUST);
@@ -118,13 +141,20 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(TagContent.FEEDER_BLACKLIST)
           .addOptional(Identifier.of("relics", "infinity_ham"));
         
+        getOrCreateTagBuilder(cItemTag("bananas")).add(ItemContent.BANANA);
+        getOrCreateTagBuilder(cItemTag("foods/fruit")).add(ItemContent.BANANA);
+        
         // biomass
-        getOrCreateTagBuilder(TagContent.BIOMASS)
+        getOrCreateTagBuilder(TagContent.BIOMATTER)
           .addOptionalTag(ItemTags.VILLAGER_PLANTABLE_SEEDS)
           .addOptionalTag(TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "seeds")))
           .addOptionalTag(ItemTags.SAPLINGS)
           .addOptionalTag(ConventionalItemTags.FOODS)
           .addOptionalTag(ConventionalItemTags.CROPS)
+          .addOptionalTag(Identifier.of("farmersdelight", "wild_crops"))
+          .addOptionalTag(Identifier.of("createaddition", "plant_foods"))
+          .addOptional(Identifier.of("enderio", "plant_matter_green"))
+          .addOptional(Identifier.of("enderio", "plant_matter_brown"))
           .add(BlockContent.WITHER_CROP_BLOCK.asItem())
           .add(ItemContent.BANANA.asItem())
           .add(Items.WHEAT)
@@ -162,6 +192,12 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(Items.RED_MUSHROOM_BLOCK)
           .add(Items.NETHER_WART_BLOCK)
           .add(Items.WARPED_WART_BLOCK);
+        
+        getOrCreateTagBuilder(TagContent.BIOMASS)
+          .add(ItemContent.BIOMASS)
+          .addOptional(Identifier.of("techreborn", "plantball"));
+        getOrCreateTagBuilder(TagContent.BIOMASS_BLOCK)
+          .add(BlockContent.BIOMASS_BLOCK.asItem());
         
         // dyes
         getOrCreateTagBuilder(TagContent.RAW_WHITE_DYE)
@@ -208,6 +244,10 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         
         // plastic
         getOrCreateTagBuilder(TagContent.PLASTIC_PLATES)
+          .add(ItemContent.PLASTIC_SHEET);
+        getOrCreateTagBuilder(cItemTag("plastics"))
+          .add(ItemContent.PLASTIC_SHEET);
+        getOrCreateTagBuilder(TagKey.of(RegistryKeys.ITEM, Identifier.of("pneumaticcraft", "plastic_sheets")))
           .add(ItemContent.PLASTIC_SHEET);
         
         // carbon fibre
@@ -259,6 +299,9 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ToolsContent.EXO_BOOTS);
         
         getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
+          .add(ItemContent.WRENCH);
+        
+        getOrCreateTagBuilder(cItemTag("tools/wrench"))
           .add(ItemContent.WRENCH);
         
         getOrCreateTagBuilder(TagContent.REACTOR_COOLANT)
@@ -326,18 +369,161 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(getStorageBlockTag("raw_platinum"))
           .add(BlockContent.RAW_PLATINUM_BLOCK.asItem());
         
-        
+        getOrCreateTagBuilder(TagKey.of(RegistryKeys.ITEM, Identifier.of("industrialforegoing", "bioreactor")))
+          .addTag(TagContent.BIOMASS);
+
+        // recycling
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_NETHERITE_SCRAP)
+          .add(Items.NETHERITE_AXE)
+          .add(Items.NETHERITE_BOOTS)
+          .add(Items.NETHERITE_CHESTPLATE)
+          .add(Items.NETHERITE_HELMET)
+          .add(Items.NETHERITE_LEGGINGS)
+          .add(Items.NETHERITE_PICKAXE)
+          .add(Items.NETHERITE_SHOVEL)
+          .add(Items.NETHERITE_SWORD);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_DIAMOND)
+          .add(Items.DIAMOND_AXE)
+          .add(Items.DIAMOND_BOOTS)
+          .add(Items.DIAMOND_CHESTPLATE)
+          .add(Items.DIAMOND_HELMET)
+          .add(Items.DIAMOND_HOE)
+          .add(Items.DIAMOND_HORSE_ARMOR)
+          .add(Items.DIAMOND_LEGGINGS)
+          .add(Items.DIAMOND_PICKAXE)
+          .add(Items.DIAMOND_SHOVEL)
+          .add(Items.DIAMOND_SWORD);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_IRON_DUST)
+          .add(Items.BUCKET)  
+          .add(Items.CAULDRON)
+          .add(Items.COMPASS)
+          .add(Items.HOPPER)
+          .add(Items.IRON_AXE)
+          .add(Items.IRON_BOOTS)
+          .add(Items.IRON_CHESTPLATE)
+          .add(Items.IRON_DOOR)
+          .add(Items.IRON_HOE)
+          .add(Items.IRON_HORSE_ARMOR)
+          .add(Items.IRON_LEGGINGS)
+          .add(Items.IRON_PICKAXE)
+          .add(Items.IRON_SHOVEL)
+          .add(Items.IRON_SWORD)
+          .add(Items.IRON_TRAPDOOR)
+          .add(Items.MINECART)
+          .add(Items.SHEARS);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_SMALL_IRON_DUST)
+          .add(Items.ACTIVATOR_RAIL)  
+          .add(Items.CHAIN)
+          .add(Items.DETECTOR_RAIL)
+          .add(Items.FLINT_AND_STEEL)
+          .add(Items.HEAVY_WEIGHTED_PRESSURE_PLATE)
+          .add(Items.IRON_BARS)
+          .add(Items.RAIL)
+          .add(Items.TRIPWIRE_HOOK);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_GOLD_DUST)
+          .add(Items.BELL)
+          .add(Items.CLOCK)
+          .add(Items.GOLDEN_AXE)
+          .add(Items.GOLDEN_BOOTS)
+          .add(Items.GOLDEN_CHESTPLATE)
+          .add(Items.GOLDEN_HELMET)
+          .add(Items.GOLDEN_HOE)
+          .add(Items.GOLDEN_HORSE_ARMOR)
+          .add(Items.GOLDEN_LEGGINGS)
+          .add(Items.GOLDEN_PICKAXE)
+          .add(Items.GOLDEN_SHOVEL)
+          .add(Items.GOLDEN_SWORD);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_SMALL_GOLD_DUST)
+          .add(Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
+          .add(Items.POWERED_RAIL);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_COPPER_DUST)
+          .add(Items.CHISELED_COPPER).add(Items.EXPOSED_CHISELED_COPPER).add(Items.WEATHERED_CHISELED_COPPER).add(Items.OXIDIZED_CHISELED_COPPER)
+          .add(Items.WAXED_CHISELED_COPPER).add(Items.WAXED_EXPOSED_CHISELED_COPPER).add(Items.WAXED_WEATHERED_CHISELED_COPPER).add(Items.WAXED_OXIDIZED_CHISELED_COPPER)
+          .add(Items.COPPER_GRATE).add(Items.EXPOSED_COPPER_GRATE).add(Items.WEATHERED_COPPER_GRATE).add(Items.OXIDIZED_COPPER_GRATE)
+          .add(Items.WAXED_COPPER_GRATE).add(Items.WAXED_EXPOSED_COPPER_GRATE).add(Items.WAXED_WEATHERED_COPPER_GRATE).add(Items.WAXED_OXIDIZED_COPPER_GRATE)
+          .add(Items.CUT_COPPER).add(Items.EXPOSED_CUT_COPPER).add(Items.WEATHERED_CUT_COPPER).add(Items.OXIDIZED_CUT_COPPER)
+          .add(Items.WAXED_CUT_COPPER).add(Items.WAXED_EXPOSED_CUT_COPPER).add(Items.WAXED_WEATHERED_CUT_COPPER).add(Items.WAXED_OXIDIZED_CUT_COPPER)
+          .add(Items.CUT_COPPER_SLAB).add(Items.EXPOSED_CUT_COPPER_SLAB).add(Items.WEATHERED_CUT_COPPER_SLAB).add(Items.OXIDIZED_CUT_COPPER_SLAB)
+          .add(Items.WAXED_CUT_COPPER_SLAB).add(Items.WAXED_EXPOSED_CUT_COPPER_SLAB).add(Items.WAXED_WEATHERED_CUT_COPPER_SLAB).add(Items.WAXED_OXIDIZED_CUT_COPPER_SLAB)
+          .add(Items.CUT_COPPER_STAIRS).add(Items.EXPOSED_CUT_COPPER_STAIRS).add(Items.WEATHERED_CUT_COPPER_STAIRS).add(Items.OXIDIZED_CUT_COPPER_STAIRS)
+          .add(Items.WAXED_CUT_COPPER_STAIRS).add(Items.WAXED_EXPOSED_CUT_COPPER_STAIRS).add(Items.WAXED_WEATHERED_CUT_COPPER_STAIRS).add(Items.WAXED_OXIDIZED_CUT_COPPER_STAIRS)
+          .add(Items.COPPER_DOOR).add(Items.EXPOSED_COPPER_DOOR).add(Items.WEATHERED_COPPER_DOOR).add(Items.OXIDIZED_COPPER_DOOR)
+          .add(Items.WAXED_COPPER_DOOR).add(Items.WAXED_EXPOSED_COPPER_DOOR).add(Items.WAXED_WEATHERED_COPPER_DOOR).add(Items.WAXED_OXIDIZED_COPPER_DOOR)
+          .add(Items.COPPER_TRAPDOOR).add(Items.EXPOSED_COPPER_TRAPDOOR).add(Items.WEATHERED_COPPER_TRAPDOOR).add(Items.OXIDIZED_COPPER_TRAPDOOR)
+          .add(Items.WAXED_COPPER_TRAPDOOR).add(Items.WAXED_EXPOSED_COPPER_TRAPDOOR).add(Items.WAXED_WEATHERED_COPPER_TRAPDOOR).add(Items.WAXED_OXIDIZED_COPPER_TRAPDOOR)
+          .add(Items.COPPER_BULB).add(Items.EXPOSED_COPPER_BULB).add(Items.WEATHERED_COPPER_BULB).add(Items.OXIDIZED_COPPER_BULB)
+          .add(Items.WAXED_COPPER_BULB).add(Items.WAXED_EXPOSED_COPPER_BULB).add(Items.WAXED_WEATHERED_COPPER_BULB).add(Items.WAXED_OXIDIZED_COPPER_BULB);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_SMALL_COPPER_DUST)
+          .add(Items.LIGHTNING_ROD);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_2_QUARTZ_DUST)
+          .add(Items.QUARTZ_SLAB).add(Items.SMOOTH_QUARTZ_SLAB);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_4_QUARTZ_DUST)
+          .add(Items.QUARTZ_BLOCK).add(Items.CHISELED_QUARTZ_BLOCK).add(Items.SMOOTH_QUARTZ)
+          .add(Items.QUARTZ_BRICKS)
+          .add(Items.QUARTZ_PILLAR)
+          .add(Items.QUARTZ_STAIRS).add(Items.SMOOTH_QUARTZ_STAIRS);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_REDSTONE_DUST)
+          .add(Items.REPEATER)
+          .add(Items.COMPARATOR)
+          .add(Items.REDSTONE_TORCH)
+          .add(Items.TARGET);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_GRAVEL)
+          .add(Items.STONE_AXE)
+          .add(Items.STONE_BUTTON)
+          .add(Items.STONE_HOE)
+          .add(Items.STONE_PICKAXE)
+          .add(Items.STONE_PRESSURE_PLATE)
+          .add(Items.STONE_SHOVEL)
+          .add(Items.STONE_SWORD)
+          .add(Items.FURNACE)
+          .add(Items.SMOKER)
+          .add(Items.BLAST_FURNACE)
+          .add(Items.DISPENSER)
+          .add(Items.DROPPER)
+          .add(Items.OBSERVER)
+          .add(Items.CHISELED_STONE_BRICKS)
+          .add(Items.COBBLESTONE_STAIRS).add(Items.COBBLESTONE_WALL)
+          .add(Items.CRACKED_STONE_BRICKS)
+          .add(Items.MOSSY_COBBLESTONE_SLAB).add(Items.MOSSY_COBBLESTONE_STAIRS).add(Items.MOSSY_COBBLESTONE_WALL)
+          .add(Items.MOSSY_STONE_BRICKS).add(Items.MOSSY_STONE_BRICK_STAIRS).add(Items.MOSSY_STONE_BRICK_WALL)
+          .add(Items.SMOOTH_STONE)
+          .add(Items.STONE).add(Items.STONE_STAIRS)
+          .add(Items.STONE_BRICKS).add(Items.STONE_BRICK_STAIRS).add(Items.STONE_BRICK_WALL);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_SAND)
+          .add(Items.SANDSTONE_STAIRS).add(Items.SANDSTONE_WALL)
+          .add(Items.SMOOTH_SANDSTONE_STAIRS);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_RED_SAND)
+          .add(Items.RED_SANDSTONE_STAIRS).add(Items.RED_SANDSTONE_WALL)
+          .add(Items.SMOOTH_RED_SANDSTONE_STAIRS);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_STRING)
+          .addOptionalTag(ItemTags.WOOL_CARPETS)
+          .addOptionalTag(ItemTags.BANNERS)
+          .add(Items.PAINTING);
+        getOrCreateTagBuilder(TagContent.RECYCLES_TO_BIOMASS)
+          .add(Items.SADDLE)
+          .add(Items.LEATHER)
+          .add(Items.LEATHER_BOOTS)
+          .add(Items.LEATHER_CHESTPLATE)
+          .add(Items.LEATHER_HELMET)
+          .add(Items.LEATHER_HORSE_ARMOR)
+          .add(Items.LEATHER_LEGGINGS)
+          .add(Items.RABBIT_FOOT)
+          .add(Items.RABBIT_HIDE);
     }
     
     public static TagKey<Item> getStorageBlockTag(String path) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(TagUtil.C_TAG_NAMESPACE, "storage_blocks/" + path));
+        return cItemTag("storage_blocks/" + path);
     }
     
     public static TagKey<Item> getIngotTag(String path) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(TagUtil.C_TAG_NAMESPACE, "ingots/" + path));
+        return cItemTag("ingots/" + path);
+    }
+
+    public static TagKey<Item> getClumpTag(String path) {
+        return cItemTag("clumps/" + path);
     }
     
     public static TagKey<Item> getDustTag(String path) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(TagUtil.C_TAG_NAMESPACE, "dusts/" + path));
+        return cItemTag("dusts/" + path);
     }
 }

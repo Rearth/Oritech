@@ -1,0 +1,16 @@
+{
+  "values": [
+    {
+      "id": "clutter:small_onyx_bud",
+      "required": false
+    },
+    {
+      "id": "clutter:medium_onyx_bud",
+      "required": false
+    },
+    {
+      "id": "clutter:large_onyx_bud",
+      "required": false
+    }
+  ]
+}

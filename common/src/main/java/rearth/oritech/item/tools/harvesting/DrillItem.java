@@ -12,8 +12,10 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 
@@ -26,6 +28,24 @@ public class DrillItem extends MiningToolItem implements OritechEnergyItem {
     
     public DrillItem(ToolMaterial toolMaterial, TagKey<Block> effectiveBlocks, Item.Settings settings) {
         super(toolMaterial, effectiveBlocks, settings);
+    }
+    
+    // this overrides the fabric specific extensions
+    public boolean allowComponentsUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
+        return false;
+    }
+    
+    public boolean allowContinuingBlockBreaking(PlayerEntity player, ItemStack oldStack, ItemStack newStack) {
+        return true;
+    }
+    
+    // this overrides the neoforge specific extensions
+    public boolean shouldCauseReequipAnimation(@NotNull ItemStack oldStack, @NotNull ItemStack newStack, boolean slotChanged) {
+        return false;
+    }
+    
+    public boolean shouldCauseBlockBreakReset(@NotNull ItemStack oldStack, @NotNull ItemStack newStack) {
+        return false;
     }
     
     @Override

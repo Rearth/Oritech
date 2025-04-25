@@ -8,7 +8,6 @@ import io.wispforest.owo.ui.container.OverlayContainer;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;

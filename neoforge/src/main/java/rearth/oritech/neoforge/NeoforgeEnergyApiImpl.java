@@ -13,10 +13,10 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.StackContext;
-import rearth.oritech.util.energy.BlockEnergyApi;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.energy.ItemEnergyApi;
-import rearth.oritech.util.energy.containers.SimpleEnergyItemStorage;
+import rearth.oritech.api.energy.BlockEnergyApi;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.ItemEnergyApi;
+import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 
 import java.util.ArrayList;
 import java.util.List;

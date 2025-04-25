@@ -9,10 +9,10 @@
       "item": "minecraft:glass_bottle"
     },
     "m": {
-      "item": "minecraft:rotten_flesh"
+      "tag": "c:foods/food_poisoning"
     },
     "s": {
-      "item": "minecraft:rotten_flesh"
+      "tag": "c:foods/food_poisoning"
     }
   },
   "pattern": [

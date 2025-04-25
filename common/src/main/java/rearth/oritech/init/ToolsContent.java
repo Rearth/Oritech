@@ -1,10 +1,10 @@
 package rearth.oritech.init;
 
+import dev.architectury.event.EventResult;
+import dev.architectury.event.events.common.BlockEvent;
+import dev.architectury.event.events.common.EntityEvent;
+import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.registry.registries.RegistrySupplier;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.UnbreakableComponent;
 import net.minecraft.entity.EquipmentSlot;
@@ -16,13 +16,12 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.item.tools.armor.*;
 import rearth.oritech.item.tools.harvesting.*;
-import rearth.oritech.item.tools.util.ArmorEventHandler;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
-import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
-import rearth.oritech.util.energy.EnergyApi;
 
 import java.lang.reflect.Field;
 
@@ -90,35 +89,24 @@ public class ToolsContent implements ArchitecturyRegistryContainer<Item> {
     
     public static void registerEventHandlers() {
         
-        PlayerBlockBreakEvents.BEFORE.register(PromethiumPickaxeItem::preMine);
+        BlockEvent.BREAK.register(PromethiumPickaxeItem::preMine);
+        // PlayerBlockBreakEvents.BEFORE.register(PromethiumPickaxeItem::preMine);
         
-        ServerTickEvents.START_WORLD_TICK.register(PromethiumAxeItem::onTick);
+        TickEvent.SERVER_LEVEL_PRE.register(PromethiumAxeItem::onTick);
         
-        ServerEntityEvents.EQUIPMENT_CHANGE.register((livingEntity, equipmentSlot, previousStack, currentStack) -> {
-            if (livingEntity instanceof PlayerEntity playerEntity && equipmentSlot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
-                if (previousStack.getItem() instanceof ArmorEventHandler armorItem) {
-                    armorItem.onUnequipped(playerEntity, previousStack);
-                }
-                if (currentStack.getItem() instanceof ArmorEventHandler armorItem) {
-                    armorItem.onEquipped(playerEntity, currentStack);
-                }
-                
-            }
-        });
-        
-        ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+        EntityEvent.LIVING_HURT.register((entity, source, amount) -> {
             
             if (source.getTypeRegistryEntry().matchesKey(DamageTypes.FALL) && entity instanceof PlayerEntity player) {
                 var boots = player.getEquippedStack(EquipmentSlot.FEET);
                 
-                if (boots == null) return true;
-                if (!(boots.getItem() instanceof ExoArmorItem)) return true;
+                if (boots == null) return EventResult.pass();
+                if (!(boots.getItem() instanceof ExoArmorItem)) return EventResult.pass();
                 
                 player.getWorld().playSound(null, player.getBlockPos(), SoundContent.SHORT_SERVO, SoundCategory.PLAYERS, 0.2f, 1.0f);
                 
-                return false;
+                return EventResult.interruptFalse();
             }
-            return true;
+            return EventResult.pass();
         });
         
     }

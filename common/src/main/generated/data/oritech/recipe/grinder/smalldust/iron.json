@@ -1,0 +1,21 @@
+{
+  "type": "oritech:grinder",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:nuggets/iron"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:small_iron_dust"
+    }
+  ],
+  "time": 140
+}

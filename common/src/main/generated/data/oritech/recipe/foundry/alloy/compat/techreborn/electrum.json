@@ -8,13 +8,15 @@
     }
   ],
   "type": "oritech:foundry",
-  "fluidInputAmount": 0,
-  "fluidInputVariant": "minecraft:empty",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
   "fluidOutputAmount": 0,
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "minecraft:gold_ingot"
+      "tag": "c:ingots/gold"
     },
     {
       "tag": "c:ingots/silver"

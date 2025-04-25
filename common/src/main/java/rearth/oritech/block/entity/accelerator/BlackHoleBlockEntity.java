@@ -50,7 +50,7 @@ public class BlackHoleBlockEntity extends BlockEntity implements BlockEntityTick
 
         for (var candidate : BlockPos.iterateOutwards(pos, pullRange, pullRange, pullRange)) {
             var candidateState = world.getBlockState(candidate);
-            if (candidate.equals(pos) || candidateState.isAir() || candidateState.isLiquid() || candidateState.getBlock().equals(Blocks.MOVING_PISTON) || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK)) continue;
+            if (candidate.equals(pos) || candidateState.isAir() || candidateState.getFluidState().isStill() || candidateState.getBlock().equals(Blocks.MOVING_PISTON) || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK)) continue;
             
             currentlyPullingFrom = candidate;
             currentlyPulling = candidateState;
@@ -145,7 +145,7 @@ public class BlackHoleBlockEntity extends BlockEntity implements BlockEntityTick
     
     private static boolean canPassThrough(BlockState state, BlockPos blockPos) {
         // When targetting entities, don't let grass, vines, small mushrooms, pressure plates, etc. get in the way of the laser
-        return state.isAir() || state.isLiquid() || state.isIn(TagContent.LASER_PASSTHROUGH) || state.getBlock() instanceof AcceleratorPassthroughBlock;
+        return state.isAir() || state.getFluidState().isStill() || state.isIn(TagContent.LASER_PASSTHROUGH) || state.getBlock() instanceof AcceleratorPassthroughBlock;
     }
     
     public void onClientPullEvent(NetworkContent.BlackHoleSuckPacket packet) {

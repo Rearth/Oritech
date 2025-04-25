@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mekanism"
+    }
+  ],
+  "type": "oritech:foundry",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:ingots/copper"
+    },
+    {
+      "tag": "c:ingots/tin"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "mekanism:ingot_bronze"
+    }
+  ],
+  "time": 200
+}

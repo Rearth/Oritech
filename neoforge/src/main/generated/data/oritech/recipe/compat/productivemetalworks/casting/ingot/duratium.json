@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "productivemetalworks"
+    }
+  ],
+  "type": "productivemetalworks:item_casting",
+  "cast": {
+    "item": "productivemetalworks:ingot_cast"
+  },
+  "consume_cast": false,
+  "fluid": {
+    "amount": 90,
+    "fluid": "oritech:still_molten_duratium"
+  },
+  "result": {
+    "count": 1,
+    "id": "oritech:duratium_ingot"
+  }
+}

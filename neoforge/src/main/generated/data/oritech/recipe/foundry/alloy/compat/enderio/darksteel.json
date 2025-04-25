@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "endercore"
+    }
+  ],
+  "type": "oritech:foundry",
+  "fluidInputIngredient": {
+    "amount": 0,
+    "tag": "#minecraft:empty"
+  },
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:ingots/steel"
+    },
+    {
+      "tag": "c:obsidians/normal"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "enderio:dark_steel_ingot"
+    }
+  ],
+  "time": 200
+}

@@ -1,6 +1,5 @@
 package rearth.oritech.init.compat.jei;
 
-import dev.emi.emi.api.widget.Bounds;
 import io.wispforest.owo.mixin.ui.access.BaseOwoHandledScreenAccessor;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.container.FlowLayout;
@@ -15,7 +14,6 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;

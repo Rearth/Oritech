@@ -1,6 +1,7 @@
 package rearth.oritech.block.blocks.interaction;
 
 import com.mojang.serialization.MapCodec;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -12,6 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -66,7 +68,7 @@ public class ChargerBlock extends HorizontalFacingBlock implements BlockEntityPr
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
         if (!world.isClient && world.getBlockEntity(pos) instanceof ChargerBlockEntity machine) {
-            player.openHandledScreen(machine);
+            MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, machine);
         }
         
         return ActionResult.SUCCESS;

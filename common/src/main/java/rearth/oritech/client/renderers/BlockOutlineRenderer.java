@@ -17,7 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShapes;
-import org.joml.Matrix4f;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
@@ -34,7 +33,7 @@ import rearth.oritech.util.MultiblockMachineController;
 import java.util.ArrayList;
 
 public class BlockOutlineRenderer {
-    public static void render(ClientWorld world, Camera camera, RenderTickCounter counter, MatrixStack matrixStack, VertexConsumerProvider consumer, GameRenderer gameRenderer, Matrix4f matrix, LightmapTextureManager lightTexture, WorldRenderer worldRenderer) {
+    public static void render(ClientWorld world, Camera camera, MatrixStack matrixStack, VertexConsumerProvider consumer) {
         if (world == null) return;
         
         var client = MinecraftClient.getInstance();

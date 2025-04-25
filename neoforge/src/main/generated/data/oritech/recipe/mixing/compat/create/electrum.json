@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    {
+      "tag": "c:dusts/redstone"
+    },
+    {
+      "tag": "c:ingots/gold"
+    }
+  ],
+  "results": [
+    {
+      "id": "oritech:electrum_ingot"
+    }
+  ]
+}

@@ -9,21 +9,21 @@
   ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_c_ingots_platinum": {
+    "has_c_ingots_netherite": {
       "conditions": {
         "items": [
           {
-            "items": "#c:ingots/platinum"
+            "items": "#c:ingots/netherite"
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_netherite_ingot": {
+    "has_c_ingots_platinum": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:netherite_ingot"
+            "items": "#c:ingots/platinum"
           }
         ]
       },
@@ -40,7 +40,7 @@
     [
       "has_the_recipe",
       "has_c_ingots_platinum",
-      "has_netherite_ingot"
+      "has_c_ingots_netherite"
     ]
   ],
   "rewards": {

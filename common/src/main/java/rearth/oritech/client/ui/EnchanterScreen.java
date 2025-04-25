@@ -87,7 +87,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         
         var statistics = handler.enchanter.statistics;
         if (statistics.equals(EnchanterBlockEntity.EnchanterStatistics.EMPTY)) {
-            statisticsLabel.text(Text.literal(""));
+            statisticsLabel.text(Text.literal(" "));
         } else {
             statisticsLabel.text(Text.translatable("title.oritech.enchanter.catalysts", statistics.availableCatalysts(), statistics.requiredCatalysts()).formatted(Formatting.DARK_GRAY));
         }
