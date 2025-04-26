@@ -7,7 +7,7 @@
   ],
   "type": "oritech:cooler",
   "fluidInput": {
-    "amount": 12,
+    "amount": 1000,
     "fluid": "pneumaticcraft:plastic"
   },
   "fluidOutput": {

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_jetpack_exo_elytra": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:jetpack_exo_elytra"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/exoboostedelytra"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_jetpack_exo_elytra"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/exoboostedelytra"
+    ]
+  }
+}

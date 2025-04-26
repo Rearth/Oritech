@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "oritech:framed_fluid_pipe"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:fluid_pipe"
+  }
+}

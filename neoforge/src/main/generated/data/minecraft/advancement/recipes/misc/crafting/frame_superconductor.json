@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_framed_superconductor": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:framed_superconductor"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/frame_superconductor"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_framed_superconductor"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/frame_superconductor"
+    ]
+  }
+}

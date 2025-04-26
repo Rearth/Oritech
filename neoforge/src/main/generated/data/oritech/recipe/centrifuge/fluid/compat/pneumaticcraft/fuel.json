@@ -7,11 +7,11 @@
   ],
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 12,
+    "amount": 1000,
     "fluid": "pneumaticcraft:oil"
   },
   "fluidOutput": {
-    "amount": 12,
+    "amount": 1000,
     "fluid": "oritech:still_fuel"
   },
   "ingredients": [

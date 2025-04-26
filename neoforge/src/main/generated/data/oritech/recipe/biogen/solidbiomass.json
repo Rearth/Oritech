@@ -1,0 +1,18 @@
+{
+  "type": "oritech:bio_generator",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "oritech:solid_biofuel"
+    }
+  ],
+  "results": [],
+  "time": 3200
+}

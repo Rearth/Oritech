@@ -1,0 +1,26 @@
+{
+  "type": "oritech:foundry",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "oritech:gold_gem"
+    },
+    {
+      "item": "oritech:gold_gem"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "minecraft:gold_ingot"
+    }
+  ],
+  "time": 200
+}

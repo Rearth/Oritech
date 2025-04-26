@@ -1,0 +1,32 @@
+{
+  "type": "oritech:assembler",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "oritech:processing_unit"
+    },
+    {
+      "item": "oritech:fluxite"
+    },
+    {
+      "item": "oritech:fluxite"
+    },
+    {
+      "tag": "c:ingots/platinum"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:flux_gate"
+    }
+  ],
+  "time": 240
+}

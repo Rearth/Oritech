@@ -1,0 +1,23 @@
+{
+  "type": "oritech:centrifuge",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "tag": "c:dusts/coal"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:carbon_fibre_strands"
+    }
+  ],
+  "time": 100
+}

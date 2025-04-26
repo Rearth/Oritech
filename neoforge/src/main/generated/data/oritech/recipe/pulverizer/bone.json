@@ -1,0 +1,23 @@
+{
+  "type": "oritech:pulverizer",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:bone"
+    }
+  ],
+  "results": [
+    {
+      "count": 6,
+      "id": "minecraft:bone_meal"
+    }
+  ],
+  "time": 200
+}

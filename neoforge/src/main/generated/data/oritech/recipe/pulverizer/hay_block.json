@@ -1,0 +1,23 @@
+{
+  "type": "oritech:pulverizer",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "tag": "c:storage_blocks/wheat"
+    }
+  ],
+  "results": [
+    {
+      "count": 16,
+      "id": "oritech:biomass"
+    }
+  ],
+  "time": 200
+}

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "tag": "c:player_workstations/furnaces"
+    },
+    "c": {
+      "tag": "c:ingots/copper"
+    },
+    "f": {
+      "tag": "c:ingots/nickel"
+    },
+    "s": {
+      "item": "oritech:magnetic_coil"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:basic_generator_block"
+  }
+}

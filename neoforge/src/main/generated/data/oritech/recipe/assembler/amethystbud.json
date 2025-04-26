@@ -1,0 +1,32 @@
+{
+  "type": "oritech:assembler",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "tag": "c:gems/amethyst"
+    },
+    {
+      "tag": "c:gems/amethyst"
+    },
+    {
+      "item": "oritech:enderic_compound"
+    },
+    {
+      "item": "oritech:overcharged_crystal"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:budding_amethyst"
+    }
+  ],
+  "time": 160
+}

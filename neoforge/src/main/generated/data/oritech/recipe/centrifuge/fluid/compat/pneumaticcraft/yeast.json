@@ -7,11 +7,11 @@
   ],
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 12,
+    "amount": 1000,
     "fluid": "minecraft:water"
   },
   "fluidOutput": {
-    "amount": 3,
+    "amount": 250,
     "fluid": "pneumaticcraft:yeast_culture"
   },
   "ingredients": [

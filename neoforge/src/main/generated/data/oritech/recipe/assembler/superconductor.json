@@ -1,0 +1,32 @@
+{
+  "type": "oritech:assembler",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "oritech:flux_gate"
+    },
+    {
+      "tag": "c:wires"
+    },
+    {
+      "item": "oritech:dubios_container"
+    },
+    {
+      "item": "oritech:energite_ingot"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "oritech:superconductor"
+    }
+  ],
+  "time": 320
+}

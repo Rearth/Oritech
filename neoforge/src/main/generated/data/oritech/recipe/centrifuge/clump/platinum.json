@@ -1,0 +1,27 @@
+{
+  "type": "oritech:centrifuge",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "tag": "c:clumps/platinum"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:platinum_gem"
+    },
+    {
+      "count": 1,
+      "id": "oritech:fluxite"
+    }
+  ],
+  "time": 300
+}

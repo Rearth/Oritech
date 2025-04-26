@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.fabricmc.fabric.api.tag.convention.v2.TagUtil;
-import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
@@ -18,7 +17,7 @@ import rearth.oritech.init.ToolsContent;
 
 import java.util.concurrent.CompletableFuture;
 
-import static rearth.oritech.init.TagContent.cItemTag;
+import static rearth.oritech.util.TagUtils.*;
 
 public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
     
@@ -509,21 +508,5 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(Items.LEATHER_LEGGINGS)
           .add(Items.RABBIT_FOOT)
           .add(Items.RABBIT_HIDE);
-    }
-    
-    public static TagKey<Item> getStorageBlockTag(String path) {
-        return cItemTag("storage_blocks/" + path);
-    }
-    
-    public static TagKey<Item> getIngotTag(String path) {
-        return cItemTag("ingots/" + path);
-    }
-
-    public static TagKey<Item> getClumpTag(String path) {
-        return cItemTag("clumps/" + path);
-    }
-    
-    public static TagKey<Item> getDustTag(String path) {
-        return cItemTag("dusts/" + path);
     }
 }

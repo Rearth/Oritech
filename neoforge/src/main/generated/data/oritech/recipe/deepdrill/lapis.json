@@ -1,0 +1,23 @@
+{
+  "type": "oritech:deep_drill",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "oritech:resource_node_lapis"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:lapis_lazuli"
+    }
+  ],
+  "time": 1
+}

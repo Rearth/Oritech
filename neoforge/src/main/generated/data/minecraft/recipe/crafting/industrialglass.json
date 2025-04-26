@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "a": {
+      "tag": "c:ingots/steel"
+    },
+    "c": {
+      "tag": "oritech:plating"
+    },
+    "e": {
+      "tag": "c:glass_blocks"
+    }
+  },
+  "pattern": [
+    "eae",
+    "aca",
+    "eae"
+  ],
+  "result": {
+    "count": 4,
+    "id": "oritech:industrial_glass_block"
+  }
+}

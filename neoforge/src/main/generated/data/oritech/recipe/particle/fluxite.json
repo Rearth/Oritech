@@ -1,0 +1,26 @@
+{
+  "type": "oritech:particle_collision",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "tag": "c:dusts/electrum"
+    },
+    {
+      "tag": "c:dusts/redstone"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:fluxite"
+    }
+  ],
+  "time": 1000
+}

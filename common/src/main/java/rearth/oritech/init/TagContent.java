@@ -9,6 +9,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
 import rearth.oritech.Oritech;
 
+import static rearth.oritech.util.TagUtils.*;
+
 public class TagContent {
     
     // only add tags for common stuff, such as dusts and nuggets. Gems are oritech-only
@@ -148,24 +150,4 @@ public class TagContent {
     public static final TagKey<Item> RECYCLES_TO_RED_SAND = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/red_sand"));
     public static final TagKey<Item> RECYCLES_TO_STRING = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/string"));
     public static final TagKey<Item> RECYCLES_TO_BIOMASS = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/biomass"));
-
-    public static TagKey<Item> itemTag(String namespace, String path) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(namespace, path));
-    }
-
-    public static TagKey<Item> cItemTag(String path) {
-        return itemTag("c", path);
-    }
-
-    public static TagKey<Block> cBlockTag(String path) {
-        return TagKey.of(RegistryKeys.BLOCK, Identifier.of("c", path));
-    }
-
-    private static TagKey<Item> oritechItemTag(String path) {
-        return TagKey.of(RegistryKeys.ITEM, Oritech.id(path));
-    }
-
-    private static TagKey<Block> oritechBlockTag(String path) {
-        return TagKey.of(RegistryKeys.BLOCK, Oritech.id(path));
-    }
 }

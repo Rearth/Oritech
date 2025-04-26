@@ -1,0 +1,32 @@
+{
+  "type": "oritech:assembler",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:honeycomb"
+    },
+    {
+      "tag": "c:fuels/bio"
+    },
+    {
+      "tag": "c:fuels/bio"
+    },
+    {
+      "tag": "c:fuels/bio"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:slime_ball"
+    }
+  ],
+  "time": 160
+}

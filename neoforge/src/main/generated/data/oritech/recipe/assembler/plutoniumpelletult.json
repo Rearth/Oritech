@@ -1,0 +1,32 @@
+{
+  "type": "oritech:assembler",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "oritech:plutonium_dust"
+    },
+    {
+      "item": "oritech:plutonium_dust"
+    },
+    {
+      "tag": "c:plates/plastic"
+    },
+    {
+      "item": "oritech:duratium_ingot"
+    }
+  ],
+  "results": [
+    {
+      "count": 4,
+      "id": "oritech:plutonium_pellet"
+    }
+  ],
+  "time": 160
+}

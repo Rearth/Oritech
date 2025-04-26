@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_reactor_fuel_port": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:reactor_fuel_port"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/fuelport"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_reactor_fuel_port"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/fuelport"
+    ]
+  }
+}

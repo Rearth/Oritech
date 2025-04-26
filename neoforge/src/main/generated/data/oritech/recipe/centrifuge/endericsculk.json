@@ -1,0 +1,23 @@
+{
+  "type": "oritech:centrifuge",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:sculk"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:enderic_compound"
+    }
+  ],
+  "time": 800
+}

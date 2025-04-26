@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "oritech:big_solar_panel_block"
+    },
+    "p": {
+      "item": "oritech:superconductor"
+    },
+    "s": {
+      "item": "oritech:heisenberg_compensator"
+    }
+  },
+  "pattern": [
+    "ppp",
+    "scs",
+    "ppp"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:particle_collector_block"
+  }
+}

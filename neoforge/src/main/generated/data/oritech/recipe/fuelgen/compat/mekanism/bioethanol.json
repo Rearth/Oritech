@@ -7,7 +7,7 @@
   ],
   "type": "oritech:fuel_generator",
   "fluidInput": {
-    "amount": 1,
+    "amount": 100,
     "fluid": "mekanismgenerators:bioethanol"
   },
   "fluidOutput": {

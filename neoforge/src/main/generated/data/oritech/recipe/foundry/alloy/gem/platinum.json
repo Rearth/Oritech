@@ -1,0 +1,26 @@
+{
+  "type": "oritech:foundry",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "oritech:platinum_gem"
+    },
+    {
+      "item": "oritech:platinum_gem"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "oritech:platinum_ingot"
+    }
+  ],
+  "time": 200
+}

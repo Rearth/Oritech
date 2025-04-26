@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "minecraft:brewing_stand"
+    },
+    "c": {
+      "tag": "c:storage_blocks/redstone"
+    },
+    "f": {
+      "tag": "c:ingots/electrum"
+    },
+    "s": {
+      "tag": "oritech:plating"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:simple_augment_station"
+  }
+}

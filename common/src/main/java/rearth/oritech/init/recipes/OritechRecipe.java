@@ -22,8 +22,6 @@ import java.util.List;
 
 public class OritechRecipe implements Recipe<RecipeInput> {
     
-    public static final int fluidDivider = Platform.isNeoForge() ? 81 : 1;  // dirty hack because bucket amounts are 81000 in neo, and 1000 in fabric, but datagen/recipes are on fabric
-    
     protected final OritechRecipeType type;
     protected final List<Ingredient> inputs;
     protected final List<ItemStack> results;
@@ -39,11 +37,11 @@ public class OritechRecipe implements Recipe<RecipeInput> {
         this.inputs = inputs;
         this.time = time;
         if (fluidInput == null) fluidInput = FluidIngredient.EMPTY;
-        this.fluidInput = fluidInput.withAmount(fluidInput.amount() / fluidDivider);
+        this.fluidInput = fluidInput.withAmount(fluidInput.amount());
         if (fluidOutput == null) fluidOutput = FluidStack.empty();
         this.fluidOutput = fluidOutput;
         if (!fluidOutput.isEmpty())
-            this.fluidOutput.setAmount(this.fluidOutput.getAmount() / fluidDivider);
+            this.fluidOutput.setAmount(this.fluidOutput.getAmount());
     }
 
     public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, @Nullable FluidIngredient fluidInput, Fluid outVariant, long outAmount) {

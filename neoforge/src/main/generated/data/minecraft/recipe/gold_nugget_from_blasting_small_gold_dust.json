@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 25,
+  "experience": 0.5,
+  "group": "oritech",
+  "ingredient": {
+    "item": "oritech:small_gold_dust"
+  },
+  "result": {
+    "count": 1,
+    "id": "minecraft:gold_nugget"
+  }
+}

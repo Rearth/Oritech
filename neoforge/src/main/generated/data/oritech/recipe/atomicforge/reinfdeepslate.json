@@ -1,0 +1,29 @@
+{
+  "type": "oritech:atomic_forge",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:deepslate"
+    },
+    {
+      "item": "oritech:duratium_ingot"
+    },
+    {
+      "item": "oritech:duratium_ingot"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:reinforced_deepslate"
+    }
+  ],
+  "time": 100
+}

@@ -7,7 +7,7 @@
   ],
   "type": "oritech:fuel_generator",
   "fluidInput": {
-    "amount": 12,
+    "amount": 1000,
     "fluid": "pneumaticcraft:diesel"
   },
   "fluidOutput": {

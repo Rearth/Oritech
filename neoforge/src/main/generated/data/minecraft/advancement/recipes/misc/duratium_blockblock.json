@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_duratium_ingot": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:duratium_ingot"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:duratium_blockblock"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_duratium_ingot"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:duratium_blockblock"
+    ]
+  }
+}

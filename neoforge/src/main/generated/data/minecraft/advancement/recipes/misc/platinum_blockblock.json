@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_platinum_ingot": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:platinum_ingot"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:platinum_blockblock"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_platinum_ingot"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:platinum_blockblock"
+    ]
+  }
+}

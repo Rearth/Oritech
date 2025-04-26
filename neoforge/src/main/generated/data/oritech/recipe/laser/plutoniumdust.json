@@ -1,0 +1,23 @@
+{
+  "type": "oritech:laser",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "oritech:uranium_crystal"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:plutonium_dust"
+    }
+  ],
+  "time": 1
+}

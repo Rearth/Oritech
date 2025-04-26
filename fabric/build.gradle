@@ -103,7 +103,7 @@ processResources {
         expand version: project.version
     }
 
-    // include the fabric compat recipes that were excluded from the common:main sourceSet
+    // include the fabric recipes that were excluded from the common:main sourceSet
     from(project(":common").sourceSets.fabric.resources)
 }
 

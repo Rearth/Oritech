@@ -1,0 +1,32 @@
+{
+  "type": "oritech:assembler",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "tag": "c:ingots/nickel"
+    },
+    {
+      "tag": "c:ingots/steel"
+    },
+    {
+      "item": "oritech:magnetic_coil"
+    },
+    {
+      "item": "oritech:magnetic_coil"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "oritech:motor"
+    }
+  ],
+  "time": 80
+}

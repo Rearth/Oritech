@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/wrench"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_wrench": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:wrench"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_wrench"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/wrench"
+    ]
+  }
+}

@@ -7,11 +7,11 @@
   ],
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 12,
+    "amount": 1000,
     "fluid": "actuallyadditions:crystallized_oil"
   },
   "fluidOutput": {
-    "amount": 12,
+    "amount": 1000,
     "fluid": "actuallyadditions:empowered_oil"
   },
   "ingredients": [

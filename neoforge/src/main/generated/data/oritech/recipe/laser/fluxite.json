@@ -1,0 +1,23 @@
+{
+  "type": "oritech:laser",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:amethyst_cluster"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:fluxite"
+    }
+  ],
+  "time": 1
+}

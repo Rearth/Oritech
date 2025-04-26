@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "a": {
+      "item": "oritech:heisenberg_compensator"
+    },
+    "c": {
+      "item": "minecraft:tnt"
+    },
+    "e": {
+      "item": "oritech:plutonium_pellet"
+    }
+  },
+  "pattern": [
+    "eae",
+    "aca",
+    "eae"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:nuke"
+  }
+}

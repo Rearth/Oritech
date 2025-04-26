@@ -1,7 +1,7 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
 import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
-import static rearth.oritech.init.TagContent.cItemTag;
+import static rearth.oritech.util.TagUtils.cItemTag;
 
 import java.util.List;
 

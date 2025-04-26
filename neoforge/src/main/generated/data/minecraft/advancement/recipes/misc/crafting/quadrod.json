@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_reactor_quad_rod": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:reactor_quad_rod"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/quadrod"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_reactor_quad_rod"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/quadrod"
+    ]
+  }
+}

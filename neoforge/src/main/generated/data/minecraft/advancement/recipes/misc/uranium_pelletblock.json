@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_small_uranium_pellet": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:small_uranium_pellet"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:uranium_pelletblock"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_small_uranium_pellet"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:uranium_pelletblock"
+    ]
+  }
+}

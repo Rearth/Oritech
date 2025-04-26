@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "minecraft:cauldron"
+    },
+    "c": {
+      "item": "oritech:motor"
+    },
+    "f": {
+      "tag": "c:ingots/iron"
+    },
+    "s": {
+      "item": "minecraft:ice"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:cooler_block"
+  }
+}

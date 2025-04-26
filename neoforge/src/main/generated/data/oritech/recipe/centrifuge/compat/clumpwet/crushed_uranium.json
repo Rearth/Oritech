@@ -10,7 +10,7 @@
   ],
   "type": "oritech:centrifuge",
   "fluidInput": {
-    "amount": 12,
+    "amount": 1000,
     "fluid": "minecraft:water"
   },
   "fluidOutput": {

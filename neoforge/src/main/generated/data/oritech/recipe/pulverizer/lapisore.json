@@ -1,0 +1,23 @@
+{
+  "type": "oritech:pulverizer",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "tag": "minecraft:lapis_ores"
+    }
+  ],
+  "results": [
+    {
+      "count": 6,
+      "id": "minecraft:lapis_lazuli"
+    }
+  ],
+  "time": 200
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:storage_blocks/duratium"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "oritech:duratium_ingot"
+  }
+}

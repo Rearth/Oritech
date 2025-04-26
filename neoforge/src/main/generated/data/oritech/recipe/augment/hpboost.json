@@ -1,0 +1,43 @@
+{
+  "type": "oritech:augment",
+  "applyCost": [
+    {
+      "count": 8,
+      "ingredient": {
+        "tag": "c:ingots/steel"
+      }
+    },
+    {
+      "count": 16,
+      "ingredient": {
+        "tag": "c:ingots/iron"
+      }
+    }
+  ],
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "tag": "oritech:plating"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "tag": "c:dusts/coal"
+      }
+    },
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "oritech:biosteel_ingot"
+      }
+    }
+  ],
+  "rfCost": 10000000,
+  "time": 400,
+  "uiX": 5,
+  "uiY": 70
+}
