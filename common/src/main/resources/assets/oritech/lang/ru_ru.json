@@ -1152,6 +1152,7 @@
   "text.config.oritech-config.section.particleAccelerator": "Ускоритель частиц",
   "text.config.oritech-config.option.bendFactor": "Коэффициент требований к кривой частиц",
   "text.config.oritech-config.option.accelerationRFCost": "Базовая стоимость ускорения частиц",
+  "text.config.oritech-config.option.acceleratorMotorRFCapacity": "Accelerator Motor RF Capacity",
   "text.config.oritech-config.option.maxGateDist": "Максимальное расстояние врат частиц",
   "text.config.oritech-config.option.endPortalRequiredSpeed": "Минимальная энергия портала Энда",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "Минимальная энергия Портала Незера",
