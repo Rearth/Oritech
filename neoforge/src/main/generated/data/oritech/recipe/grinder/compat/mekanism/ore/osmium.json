@@ -6,12 +6,14 @@
     }
   ],
   "type": "oritech:grinder",
-  "fluidInputIngredient": {
+  "fluidInput": {
     "amount": 0,
-    "tag": "#minecraft:empty"
+    "fluid": "minecraft:empty"
   },
-  "fluidOutputAmount": 0,
-  "fluidOutputVariant": "minecraft:empty",
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
   "ingredients": [
     {
       "tag": "c:ores/osmium"

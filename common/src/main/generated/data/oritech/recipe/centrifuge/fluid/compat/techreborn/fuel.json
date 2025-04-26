@@ -8,12 +8,14 @@
     }
   ],
   "type": "oritech:centrifuge_fluid",
-  "fluidInputIngredient": {
+  "fluidInput": {
     "amount": 81000,
-    "tag": "#techreborn:oil"
+    "fluid": "techreborn:oil"
   },
-  "fluidOutputAmount": 81000,
-  "fluidOutputVariant": "oritech:still_fuel",
+  "fluidOutput": {
+    "amount": 81000,
+    "fluid": "oritech:still_fuel"
+  },
   "ingredients": [
     {
       "item": "oritech:fluxite"

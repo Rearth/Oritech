@@ -104,7 +104,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         var speed = getSteamProcessingSpeed(steamTank);
         var workerCount = slaves.size() + 1;
         
-        var consumedCount = currentRecipe.getFluidInput().getAmount() * speed * workerCount;
+        var consumedCount = currentRecipe.getFluidInput().amount() * speed * workerCount;
         var producedCount = consumedCount * WATER_RATIO;
         
         // update tanks

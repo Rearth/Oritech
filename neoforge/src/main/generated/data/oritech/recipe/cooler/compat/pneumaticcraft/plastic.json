@@ -6,12 +6,14 @@
     }
   ],
   "type": "oritech:cooler",
-  "fluidInputIngredient": {
+  "fluidInput": {
     "amount": 1000,
-    "tag": "#pneumaticcraft:plastic"
+    "fluid": "pneumaticcraft:plastic"
   },
-  "fluidOutputAmount": 0,
-  "fluidOutputVariant": "minecraft:empty",
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
   "ingredients": [],
   "results": [
     {

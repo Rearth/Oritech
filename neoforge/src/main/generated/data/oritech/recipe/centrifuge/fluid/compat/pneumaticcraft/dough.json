@@ -6,12 +6,14 @@
     }
   ],
   "type": "oritech:centrifuge_fluid",
-  "fluidInputIngredient": {
+  "fluidInput": {
     "amount": 1000,
-    "tag": "#pneumaticcraft:yeast_culture"
+    "fluid": "pneumaticcraft:yeast_culture"
   },
-  "fluidOutputAmount": 0,
-  "fluidOutputVariant": "minecraft:empty",
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
   "ingredients": [
     {
       "item": "pneumaticcraft:wheat_flour"

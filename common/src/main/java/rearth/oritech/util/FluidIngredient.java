@@ -1,6 +1,8 @@
 package rearth.oritech.util;
 
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -11,45 +13,69 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 // Inspired by Immersive Engineering https://github.com/BluSunrize/ImmersiveEngineering/blob/1.21.1/src/api/java/blusunrize/immersiveengineering/api/crafting/FluidTagInput.java
-public class FluidIngredient implements Predicate<FluidStack> {
+public record FluidIngredient(Either<TagKey<Fluid>, Identifier> fluidContent, long amount) implements Predicate<FluidStack> {
     public static final MapCodec<FluidIngredient> MAP_CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
         Codec.mapEither(
             TagKey.codec(RegistryKeys.FLUID).fieldOf("tag"),
             Identifier.CODEC.fieldOf("fluid")
-        ).forGetter(t -> t.fluidTag),
+        ).forGetter(t -> t.fluidContent),
         Codec.LONG.fieldOf("amount").forGetter(t -> t.amount)
     ).apply(inst, FluidIngredient::new));
 
-    protected final Either<TagKey<Fluid>, Identifier> fluidTag;
-    protected final long amount;
+    public static final FluidIngredient EMPTY = new FluidIngredient();
 
-    public static final FluidIngredient EMPTY = new FluidIngredient(Identifier.of("empty"), 0);
-
-    public FluidIngredient(Either<TagKey<Fluid>, Identifier> fluidTag, long amount) {
-        this.fluidTag = fluidTag;
+    public FluidIngredient(Either<TagKey<Fluid>, Identifier> fluidContent, long amount) {
+        this.fluidContent = fluidContent;
         this.amount = amount;
     }
 
-    public FluidIngredient(TagKey<Fluid> fluidTag, long amount) {
-        this(Either.left(fluidTag), amount);
+    public FluidIngredient() {
+        this(Either.right(Registries.FLUID.getId(Fluids.EMPTY)), 0L);
     }
 
-    public FluidIngredient(Identifier fluid, long amount) {
-        this(TagKey.of(RegistryKeys.FLUID, fluid), amount);
+    public FluidIngredient withContent(Identifier fluidId) {
+        return new FluidIngredient(Either.right(fluidId), amount);
     }
 
-    public FluidIngredient(Fluid fluid, long amount) {
-        this(Registries.FLUID.getKey(fluid).get().getValue(), amount);
+    public FluidIngredient withContent(RegistryKey<Fluid> fluidKey) {
+        return new FluidIngredient(Either.right(fluidKey.getValue()), amount);
     }
 
-    public FluidIngredient(FluidStack fluidStack) {
-        this(fluidStack.getFluid(), fluidStack.getAmount());
+    public FluidIngredient withContent(Fluid fluid) {
+        return new FluidIngredient(Either.right(Registries.FLUID.getId(fluid)), amount);
+    }
+
+    public FluidIngredient withContent(TagKey<Fluid> fluidTag) {
+        return new FluidIngredient(Either.left(fluidTag), amount);
+    }
+
+    public FluidIngredient withAmount(long withAmount) {
+        return new FluidIngredient(fluidContent, withAmount);
+    }
+
+    public FluidIngredient withAmount(float withAmount) {
+        return new FluidIngredient(fluidContent, (long)(withAmount * FluidStack.bucketAmount()));
+    }
+
+    public static FluidIngredient ofStack(FluidStack fluidStack) {
+        return new FluidIngredient(
+            Either.right(Registries.FLUID.getId(fluidStack.getFluid())),
+            fluidStack.getAmount());
+    }
+
+    public Text name() {
+        return Text.of((Identifier)fluidContent.map(
+            tag -> tag.id(),
+            id ->  id));
     }
 
     @Override
@@ -58,31 +84,37 @@ public class FluidIngredient implements Predicate<FluidStack> {
     }
 
     public boolean matchesFluid(Fluid fluid) {
-        return fluidTag.map(
-            tag -> fluid.isIn(tag),
-            id -> Registries.FLUID.getKey(fluid).isPresent() && id == Registries.FLUID.getKey(fluid).get().getValue());
+        Registries.FLUID.get(Identifier.of("")).matchesType(fluid);
+        return fluidContent.map(
+            tag -> Registries.FLUID.getEntry(fluid).isIn(tag),
+            id -> Registries.FLUID.get(id).matchesType(fluid));
     }
 
     public boolean matchesFluid(@Nullable FluidStack fluidStack) {
-        if (fluidStack == null)
-            return false;
-        return matchesFluid(fluidStack.getFluid());
+        return fluidStack != null && matchesFluid(fluidStack.getFluid());
     }
 
-    public FluidStack getFirstFluidStack() {
-        return FluidStack.create((Fluid)fluidTag.map(
-            tag -> Registries.FLUID.stream().filter(fluid -> fluid.isIn(tag)).findFirst().get(),
-            id -> Registries.FLUID.getEntry(id).get().value()
-        ), amount);
-
+    // Intended for recipe viewer plugins
+    public List<FluidStack> getFluidStacks() {
+        return (List<FluidStack>)fluidContent.map(
+            tag -> Registries.FLUID.streamEntries()
+                .filter(fluidEntry -> fluidEntry.isIn(tag))
+                .map(fluidEntry -> FluidStack.create(fluidEntry.value(), amount))
+                .collect(Collectors.toList()),
+            id -> List.of(FluidStack.create(Registries.FLUID.get(fluidContent.right().get()), amount)));
     }
 
     public boolean isEmpty() {
         return this == EMPTY;
     }
 
-    public long getAmount() {
-        return amount;
+    @Override
+    public String toString() {
+        return "FluidIngredient{" +
+                 "fluidContent={" +
+                    "tag=" + fluidContent.left() +
+                    ", id=" + fluidContent.right() + "}" +
+                 ", amount=" + amount +
+                 '}';
     }
-    
 }

@@ -32,17 +32,15 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
     
     public OritechEMIRecipe(RecipeEntry<OritechRecipe> entry, EmiRecipeCategory category, Class<? extends MachineBlockEntity> screenProviderSource, BlockState machineState) {
         super(category, entry.id(), 150, 66);
-
-        var fluidDivider = Platform.isNeoForge() ? 81 : 1;  // no idea why this is needed
         
         recipe = entry.value();
         recipe.getInputs().forEach(ingredient -> this.inputs.add(EmiIngredient.of(ingredient)));
         recipe.getResults().forEach(stack -> this.outputs.add(EmiStack.of(stack)));
         
-        if (recipe.getFluidInput() != null && recipe.getFluidInput().getAmount() > 0)
-            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFirstFluidStack().getFluid(), Math.max(recipe.getFluidInput().getAmount() / fluidDivider, 1)));
-        if (recipe.getFluidOutput() != null && recipe.getFluidInput().getAmount() > 0)
-            this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), Math.max(recipe.getFluidInput().getAmount() / fluidDivider, 1)));
+        if (recipe.getFluidInput() != null && recipe.getFluidInput().amount() > 0)
+            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluidStacks().getFirst().getFluid(), Math.max(recipe.getFluidInput().amount(), 1)));
+        if (recipe.getFluidOutput() != null && recipe.getFluidInput().amount() > 0)
+            this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), Math.max(recipe.getFluidInput().amount(), 1)));
         
         try {
             var screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(new BlockPos(0, 0, 0), machineState);
@@ -67,8 +65,8 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         recipe.getInputs().forEach(ingredient -> this.inputs.add(EmiIngredient.of(ingredient)));
         recipe.getResults().forEach(stack -> this.outputs.add(EmiStack.of(stack)));
         
-        if (recipe.getFluidInput() != null && recipe.getFluidInput().getAmount() > 0)
-            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFirstFluidStack().getFluid(), recipe.getFluidInput().getAmount()));
+        if (recipe.getFluidInput() != null && recipe.getFluidInput().amount() > 0)
+            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluidStacks().getFirst().getFluid(), recipe.getFluidInput().amount()));
         if (recipe.getFluidOutput() != null && recipe.getFluidOutput().getAmount() > 0)
             this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), recipe.getFluidOutput().getAmount()));
             

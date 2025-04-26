@@ -6,12 +6,14 @@
     }
   ],
   "type": "oritech:centrifuge_fluid",
-  "fluidInputIngredient": {
+  "fluidInput": {
     "amount": 1000,
-    "tag": "#minecraft:water"
+    "fluid": "minecraft:water"
   },
-  "fluidOutputAmount": 0,
-  "fluidOutputVariant": "minecraft:empty",
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
   "ingredients": [
     {
       "tag": "c:clumps/osmium"

@@ -65,11 +65,19 @@ public abstract class OritechRecipeBuilder {
     }
 
     public OritechRecipeBuilder fluidInput(Fluid in, float bucketAmount) {
-        return fluidInput(new FluidIngredient(in, (long)(bucketAmount * FluidStack.bucketAmount())));
+        return fluidInput(new FluidIngredient().withContent(in).withAmount(bucketAmount));
     }
 
     public OritechRecipeBuilder fluidInput(Fluid in) {
-        return fluidInput(new FluidIngredient(in, FluidStack.bucketAmount()));
+        return fluidInput(in, 1.0f);
+    }
+
+    public OritechRecipeBuilder fluidInput(TagKey<Fluid> in) {
+        return fluidInput(in, 1.0f);
+    }
+
+    public OritechRecipeBuilder fluidInput(TagKey<Fluid> in, float bucketAmount)  {
+        return fluidInput(new FluidIngredient().withContent(in).withAmount(bucketAmount));
     }
 
     public OritechRecipeBuilder fluidOutput(FluidStack out) {

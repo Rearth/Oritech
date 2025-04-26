@@ -6,12 +6,14 @@
     }
   ],
   "type": "oritech:centrifuge_fluid",
-  "fluidInputIngredient": {
+  "fluidInput": {
     "amount": 125,
-    "tag": "#immersiveengineering:creosote"
+    "fluid": "immersiveengineering:creosote"
   },
-  "fluidOutputAmount": 0,
-  "fluidOutputVariant": "minecraft:empty",
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
   "ingredients": [
     {
       "tag": "minecraft:planks"

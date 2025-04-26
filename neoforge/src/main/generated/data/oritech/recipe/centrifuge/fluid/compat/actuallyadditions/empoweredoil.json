@@ -6,12 +6,14 @@
     }
   ],
   "type": "oritech:centrifuge_fluid",
-  "fluidInputIngredient": {
+  "fluidInput": {
     "amount": 1000,
-    "tag": "#actuallyadditions:crystallized_oil"
+    "fluid": "actuallyadditions:crystallized_oil"
   },
-  "fluidOutputAmount": 81000,
-  "fluidOutputVariant": "actuallyadditions:empowered_oil",
+  "fluidOutput": {
+    "amount": 1000,
+    "fluid": "actuallyadditions:empowered_oil"
+  },
   "ingredients": [
     {
       "item": "actuallyadditions:empowered_canola_seed"

@@ -1,11 +1,13 @@
 {
   "type": "oritech:centrifuge_fluid",
-  "fluidInputIngredient": {
+  "fluidInput": {
     "amount": 8100,
-    "tag": "#oritech:still_oil"
+    "tag": "#c:biodiesel"
   },
-  "fluidOutputAmount": 0,
-  "fluidOutputVariant": "minecraft:empty",
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
   "ingredients": [
     {
       "tag": "minecraft:sand"

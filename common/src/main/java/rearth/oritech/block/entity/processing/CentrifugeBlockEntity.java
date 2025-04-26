@@ -100,14 +100,14 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     public static boolean recipeInputMatchesTank(FluidStack available, OritechRecipe recipe) {
         
-        var recipeNeedsFluid = recipe.getFluidInput() != null && recipe.getFluidInput().getAmount() > 0;
+        var recipeNeedsFluid = recipe.getFluidInput() != null && recipe.getFluidInput().amount() > 0;
         if (!recipeNeedsFluid) return true;
         
         var isTankEmpty = available.isEmpty();
         if (isTankEmpty) return false;
         
         var recipeFluid = recipe.getFluidInput();
-        return recipeFluid.matchesFluid(available) && available.getAmount() >= recipe.getFluidInput().getAmount();
+        return recipeFluid.matchesFluid(available) && available.getAmount() >= recipe.getFluidInput().amount();
     }
     
     @Override
@@ -136,8 +136,8 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         var input = activeRecipe.getFluidInput();
         var output = activeRecipe.getFluidOutput();
         
-        if (input != null && input.getAmount() > 0)
-            fluidContainer.getInputContainer().extract(fluidContainer.getInStack().copyWithAmount(input.getAmount()), false);
+        if (input != null && input.amount() > 0)
+            fluidContainer.getInputContainer().extract(fluidContainer.getInStack().copyWithAmount(input.amount()), false);
         if (output != null && output.getAmount() > 0)
             fluidContainer.getOutputContainer().insert(output, false);
         

@@ -1,12 +1,16 @@
 package rearth.oritech.init.recipes;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import dev.architectury.fluid.FluidStack;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.StructEndec;
 import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.EndecRecipeSerializer;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;
@@ -15,19 +19,18 @@ import rearth.oritech.util.FluidIngredient;
 
 public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> implements RecipeType<OritechRecipe> {
     
-    public static final Endec<Fluid> FLUID_ENDEC = CodecUtils.toEndec(Registries.FLUID.getCodec());
-    
-    // this doesnt work on neoforge client sadly (client logs the errors only somehow)
-    //public static final Endec<FluidStack> FLUID_STACK_ENDEC = Codec.either(CodecUtils.toEndecWithRegistries(FluidStack.CODEC, FluidStack.STREAM_CODEC), SIMPLE_FLUID.catchErrors(FALLBACK));
+    public static final MapCodec<FluidStack> FLUID_STACK_MAP_CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
+        Identifier.CODEC.fieldOf("fluid").forGetter(f -> Registries.FLUID.getId(((FluidStack)f).getFluid())),
+        Codec.LONG.fieldOf("amount").forGetter(f -> ((FluidStack)f).getAmount())
+    ).apply(inst, (fluid, amount) -> FluidStack.create(Registries.FLUID.get(fluid), amount)));
     
     public static final Endec<OritechRecipe> ORI_RECIPE_ENDEC = StructEndecBuilder.of(
       Endec.INT.optionalFieldOf("time", OritechRecipe::getTime, 60),
       CodecUtils.toEndec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
       MinecraftEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
       MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
-      CodecUtils.toEndec(FluidIngredient.MAP_CODEC.codec()).fieldOf("fluidInputIngredient", elem -> elem.getFluidInput()),
-      FLUID_ENDEC.fieldOf("fluidOutputVariant", elem -> elem.getFluidOutput().getFluid()),
-      Endec.LONG.fieldOf("fluidOutputAmount", elem -> elem.getFluidOutput().getAmount() * OritechRecipe.fluidDivider),
+      CodecUtils.toEndec(FluidIngredient.MAP_CODEC.codec()).fieldOf("fluidInput", elem -> elem.getFluidInput()),
+      CodecUtils.toEndec(FLUID_STACK_MAP_CODEC.codec()).fieldOf("fluidOutput", elem -> elem.getFluidOutput()),
       OritechRecipe::new
     );
     

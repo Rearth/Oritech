@@ -116,7 +116,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
         super.craftItem(activeRecipe, outputInventory, inputInventory);
         
         var input = activeRecipe.getFluidInput();
-        fluidStorage.extract(fluidStorage.getStack().copyWithAmount(input.getAmount()), false);
+        fluidStorage.extract(fluidStorage.getStack().copyWithAmount(input.amount()), false);
     }
     
     @Override

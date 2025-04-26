@@ -8,12 +8,14 @@
     }
   ],
   "type": "oritech:fuel_generator",
-  "fluidInputIngredient": {
+  "fluidInput": {
     "amount": 8100,
-    "tag": "#techreborn:nitrofuel"
+    "fluid": "techreborn:nitrofuel"
   },
-  "fluidOutputAmount": 0,
-  "fluidOutputVariant": "minecraft:empty",
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
   "ingredients": [],
   "results": [],
   "time": 200
