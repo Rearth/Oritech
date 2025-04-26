@@ -1152,6 +1152,7 @@
   "text.config.oritech-config.section.particleAccelerator": "Parçacık Hızlandırıcı",
   "text.config.oritech-config.option.bendFactor": "Parçacık Eğrisi Gereksinim Faktörü",
   "text.config.oritech-config.option.accelerationRFCost": "Baz Parçacık RF İvme Maliyeti",
+  "text.config.oritech-config.option.acceleratorMotorRFCapacity": "Accelerator Motor RF Capacity",
   "text.config.oritech-config.option.maxGateDist": "Maksimum Parçacık Geçidi Mesafesi",
   "text.config.oritech-config.option.endPortalRequiredSpeed": "Minimum End Portal Çarpışma Enerjisi",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "Minimum Nether Portalı Çarpışma Enerjisi",
