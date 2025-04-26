@@ -1152,6 +1152,7 @@
   "text.config.oritech-config.section.particleAccelerator": "Akcelerator Cząstek",
   "text.config.oritech-config.option.bendFactor": "Wskaźnik Wymagań Krzywizny Cząstek",
   "text.config.oritech-config.option.accelerationRFCost": "Podstawowy Koszt RF Przyspieszenia Cząstek",
+  "text.config.oritech-config.option.acceleratorMotorRFCapacity": "Accelerator Motor RF Capacity",
   "text.config.oritech-config.option.maxGateDist": "Maksymalny Zasięg Bramy Cząstek",
   "text.config.oritech-config.option.endPortalRequiredSpeed": "Minimalna Energia Kolizji Portalu Końca",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "Minimalna Energia Kolizji Portalu Netheru",
