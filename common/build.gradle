@@ -14,8 +14,8 @@ dependencies {
     modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
 
     // owo lib (or owo-lib-neoforge)
-    modImplementation "io.wispforest:owo-lib:0.12.15+1.21"
-    annotationProcessor modImplementation("io.wispforest:owo-lib:0.12.15+1.21")
+    modImplementation "io.wispforest:owo-lib:${owo_version}"
+    annotationProcessor modImplementation("io.wispforest:owo-lib:${owo_version}")
 
     // geckolib
     modImplementation "software.bernie.geckolib:geckolib-fabric-1.21.1:4.6.6"

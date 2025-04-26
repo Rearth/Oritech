@@ -7,11 +7,11 @@
   ],
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 1000,
+    "amount": 12,
     "fluid": "actuallyadditions:refined_canola_oil"
   },
   "fluidOutput": {
-    "amount": 1000,
+    "amount": 12,
     "fluid": "actuallyadditions:crystallized_oil"
   },
   "ingredients": [

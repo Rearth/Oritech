@@ -7,7 +7,7 @@
   ],
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 1000,
+    "amount": 12,
     "fluid": "pneumaticcraft:yeast_culture"
   },
   "fluidOutput": {

@@ -1,6 +1,7 @@
 package rearth.oritech.util;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,11 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import dev.architectury.fluid.FluidStack;
+import io.wispforest.endec.Endec;
+import io.wispforest.endec.impl.BuiltInEndecs;
+import io.wispforest.endec.impl.StructEndecBuilder;
+import io.wispforest.owo.serialization.CodecUtils;
+import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.registry.Registries;
@@ -23,13 +29,29 @@ import net.minecraft.util.Identifier;
 
 // Inspired by Immersive Engineering https://github.com/BluSunrize/ImmersiveEngineering/blob/1.21.1/src/api/java/blusunrize/immersiveengineering/api/crafting/FluidTagInput.java
 public record FluidIngredient(Either<TagKey<Fluid>, Identifier> fluidContent, long amount) implements Predicate<FluidStack> {
-    public static final MapCodec<FluidIngredient> MAP_CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
-        Codec.mapEither(
-            TagKey.codec(RegistryKeys.FLUID).fieldOf("tag"),
-            Identifier.CODEC.fieldOf("fluid")
-        ).forGetter(t -> t.fluidContent),
-        Codec.LONG.fieldOf("amount").forGetter(t -> t.amount)
-    ).apply(inst, FluidIngredient::new));
+    // public static final MapCodec<FluidIngredient> MAP_CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
+    //     Codec.mapEither(
+    //         TagKey.codec(RegistryKeys.FLUID).fieldOf("tag"),
+    //         Identifier.CODEC.fieldOf("fluid")
+    //     ).forGetter(t -> t.fluidContent),
+    //     Codec.LONG.fieldOf("amount").forGetter(t -> t.amount)
+    // ).apply(inst, FluidIngredient::new));
+
+    public static Endec<TagKey<Fluid>> TAG_PREFIXED = 
+                ;
+
+    public static final Endec<FluidIngredient> FLUID_INGREDIENT_ENDEC = StructEndecBuilder.of(
+        CodecUtils.eitherEndec(
+            Endec.STRING.xmap(
+                s -> {
+                    if (s.charAt(0) != '#') throw new IllegalStateException("tag must start with #");
+                    return TagKey.of(RegistryKeys.FLUID, Identifier.of(s.substring(1)));
+                },
+                tag -> "#" + tag.id()
+            ),
+            MinecraftEndecs.IDENTIFIER).fieldOf("fluid", FluidIngredient::fluidContent),
+        Endec.LONG.fieldOf("amount", FluidIngredient::amount),
+        FluidIngredient::new);
 
     public static final FluidIngredient EMPTY = new FluidIngredient();
 

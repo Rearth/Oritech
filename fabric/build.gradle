@@ -55,7 +55,7 @@ dependencies {
     // yes yes all this needs to be cleaned up and properly versioned, but I'm waiting to clean up the CSL mess first
 
     // owo lib
-    modImplementation "io.wispforest:owo-lib:0.12.11+1.21"
+    modImplementation "io.wispforest:owo-lib:${owo_version}"
 
     // geckolib
     modImplementation "software.bernie.geckolib:geckolib-fabric-1.21.1:4.6.6"

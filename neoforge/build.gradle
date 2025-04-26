@@ -57,7 +57,7 @@ dependencies {
     include modApi("dev.technici4n:GrandPower:3.0.2")
 
     // owo lib
-    modImplementation "io.wispforest:owo-lib-neoforge:0.12.15-beta.9+1.21"
+    modImplementation "io.wispforest:owo-lib-neoforge:${owo_version}"
     forgeRuntimeLibrary(include(api("io.wispforest:endec:0.1.8")))
     forgeRuntimeLibrary(include(api("io.wispforest.endec:netty:0.1.4")))
     forgeRuntimeLibrary(include(api("io.wispforest.endec:gson:0.1.5")))

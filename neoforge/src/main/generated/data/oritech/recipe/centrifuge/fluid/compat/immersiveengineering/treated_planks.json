@@ -7,7 +7,7 @@
   ],
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 125,
+    "amount": 1,
     "fluid": "immersiveengineering:creosote"
   },
   "fluidOutput": {

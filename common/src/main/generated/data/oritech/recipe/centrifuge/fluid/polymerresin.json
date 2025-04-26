@@ -2,7 +2,7 @@
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 8100,
-    "tag": "#c:biodiesel"
+    "fluid": "#c:biodiesel"
   },
   "fluidOutput": {
     "amount": 0,
