@@ -1152,6 +1152,7 @@
   "text.config.oritech-config.section.particleAccelerator": "Particle Accelerator",
   "text.config.oritech-config.option.bendFactor": "Fator de Exigência da Curvatura das Partículas",
   "text.config.oritech-config.option.accelerationRFCost": "Custo RF base para a Aceleração",
+  "text.config.oritech-config.option.acceleratorMotorRFCapacity": "Accelerator Motor RF Capacity",
   "text.config.oritech-config.option.maxGateDist": "Distância Máxima da Válvula de Partículas",
   "text.config.oritech-config.option.endPortalRequiredSpeed": "Minimum End Portal Collision Energy",
   "text.config.oritech-config.option.netherPortalRequiredSpeed": "Minimum Nether Portal Collision Energy",
