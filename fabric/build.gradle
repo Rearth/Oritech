@@ -123,7 +123,7 @@ tasks.remapJar {
 publishMods {
     file = remapJar.archiveFile
     changelog = file("../CHANGELOG.md").getText()
-    type = BETA
+    type = ALPHA
     modLoaders.add("fabric")
 
     modrinth {
@@ -134,7 +134,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("athena-ctm")
+        requires("stitch")
         requires("fabric-api")
         requires("architectury-api")
 
@@ -149,7 +149,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("athena")
+        requires("stitch")
         requires("fabric-api")
         requires("architectury-api")
 
