@@ -1,6 +1,5 @@
 package rearth.oritech.block.blocks.pipes.item;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -18,6 +17,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.function.TriFunction;
+import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
@@ -35,7 +35,7 @@ public class ItemPipeBlock extends GenericPipeBlock {
     
     @Override
     public TriFunction<World, BlockPos, Direction, Boolean> apiValidationFunction() {
-        return ((world, pos, direction) -> ItemStorage.SIDED.find(world, pos, direction) != null);
+        return ((world, pos, direction) -> ItemApi.BLOCK.find(world, pos, direction) != null);
     }
     
     @Override

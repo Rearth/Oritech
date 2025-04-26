@@ -6,7 +6,7 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "minecraft:feather"
+      "tag": "c:feathers"
     },
     {
       "item": "minecraft:saddle"

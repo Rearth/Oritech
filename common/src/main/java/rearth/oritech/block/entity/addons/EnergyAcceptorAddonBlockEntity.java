@@ -3,10 +3,10 @@ package rearth.oritech.block.entity.addons;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
-import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;

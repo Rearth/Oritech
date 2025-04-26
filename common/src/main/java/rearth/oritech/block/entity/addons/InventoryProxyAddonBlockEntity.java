@@ -1,28 +1,28 @@
 package rearth.oritech.block.entity.addons;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.DelegatingInventoryStorage;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.InventoryProxyScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MachineAddonController;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.DelegatingInventoryStorage;
 
 import java.util.Objects;
 
-public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements ItemApi.BlockProvider, ExtendedScreenHandlerFactory {
+public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements ItemApi.BlockProvider, ExtendedMenuProvider {
     
     private MachineAddonController cachedController;
     private int targetSlot = 0;
@@ -81,8 +81,9 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     }
     
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
-        return new InventoryProxyScreenHandler.InvProxyData(pos, getControllerPos(), targetSlot);
+    public void saveExtraData(PacketByteBuf buf) {
+        var data = new InventoryProxyScreenHandler.InvProxyData(pos, getControllerPos(), targetSlot);
+        InventoryProxyScreenHandler.InvProxyData.PACKET_CODEC.encode(buf, data);
     }
     
     @Override

@@ -14,7 +14,7 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "minecraft:copper_ingot"
+      "tag": "c:ingots/copper"
     },
     {
       "tag": "c:ingots/tin"

@@ -1,6 +1,5 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.util.Identifier;
 import rearth.oritech.item.tools.armor.ExoArmorItem;
 import software.bernie.geckolib.model.DefaultedEntityGeoModel;

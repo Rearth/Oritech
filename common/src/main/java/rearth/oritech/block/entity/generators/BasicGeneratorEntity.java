@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.generators;
 
 import dev.architectury.registry.fuel.FuelRegistry;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.Items;
@@ -47,7 +46,7 @@ public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
         var fuelTime = FuelRegistry.get(firstItem);
         if (fuelTime > 0) {
             if (firstItem.getItem() instanceof BucketItem) {
-                this.getInputView().set(0, ItemVariant.of(Items.BUCKET, firstItem.getComponentChanges()).toStack());
+                this.getInputView().set(0, Items.BUCKET.getDefaultStack());
             } else {
                 firstItem.decrement(1);
             }

@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "energizedpower"
+    }
+  ],
+  "type": "energizedpower:assembling_machine",
+  "inputs": [
+    {
+      "input": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    {
+      "input": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    {
+      "input": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    {
+      "input": {
+        "item": "minecraft:blaze_powder"
+      }
+    }
+  ],
+  "output": {
+    "item": "minecraft:blaze_rod"
+  }
+}

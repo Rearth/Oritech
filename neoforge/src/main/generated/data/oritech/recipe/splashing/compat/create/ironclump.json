@@ -1,0 +1,25 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:splashing",
+  "ingredients": [
+    {
+      "tag": "c:clumps/iron"
+    }
+  ],
+  "results": [
+    {
+      "count": 9,
+      "id": "minecraft:iron_nugget"
+    },
+    {
+      "chance": 0.5,
+      "count": 2,
+      "id": "oritech:small_nickel_dust"
+    }
+  ]
+}

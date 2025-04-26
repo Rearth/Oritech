@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "oritech:biomass"
+            "items": "#c:fuels/bio"
           }
         ]
       },

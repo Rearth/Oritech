@@ -1,10 +1,6 @@
 package rearth.oritech.block.entity.augmenter;
 
 import com.mojang.serialization.Codec;
-import io.wispforest.owo.network.ClientAccess;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.SpawnReason;
@@ -26,6 +22,7 @@ import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.Attachment;
 import rearth.oritech.api.attachment.AttachmentApi;
+import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.init.TagContent;
@@ -40,29 +37,29 @@ import java.util.function.Supplier;
 public class PlayerAugments {
     public static final Map<Identifier, PlayerAugment> allAugments = new HashMap<>();
 
-    private static final PlayerAugment hpBoost = new PlayerStatEnhancingAugment(Oritech.id("hpboost"), EntityAttributes.GENERIC_MAX_HEALTH, 6, EntityAttributeModifier.Operation.ADD_VALUE);
-    private static final PlayerAugment hpBoostMore = new PlayerStatEnhancingAugment(Oritech.id("hpboostmore"), EntityAttributes.GENERIC_MAX_HEALTH, 4, EntityAttributeModifier.Operation.ADD_VALUE);
-    private static final PlayerAugment hpBoostUltra = new PlayerStatEnhancingAugment(Oritech.id("hpboostultra"), EntityAttributes.GENERIC_MAX_HEALTH, 10, EntityAttributeModifier.Operation.ADD_VALUE);
-    private static final PlayerAugment hpBoostUltimate = new PlayerStatEnhancingAugment(Oritech.id("hpboostultimate"), EntityAttributes.GENERIC_MAX_HEALTH, 10, EntityAttributeModifier.Operation.ADD_VALUE);
-    private static final PlayerAugment speedBoost = new PlayerStatEnhancingAugment(Oritech.id("speedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
-    private static final PlayerAugment superSpeedBoost = new PlayerStatEnhancingAugment(Oritech.id("superspeedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25f, EntityAttributeModifier.Operation.ADD_VALUE, true);
-    private static final PlayerAugment stepAssist = new PlayerStatEnhancingAugment(Oritech.id("stepassist"), EntityAttributes.GENERIC_STEP_HEIGHT, 0.6f, EntityAttributeModifier.Operation.ADD_VALUE, true);
-    private static final PlayerAugment dwarf = new PlayerStatEnhancingAugment(Oritech.id("dwarf"), EntityAttributes.GENERIC_SCALE, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
-    private static final PlayerAugment giant = new PlayerStatEnhancingAugment(Oritech.id("giant"), EntityAttributes.GENERIC_SCALE, 1f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
-    private static final PlayerAugment armor = new PlayerStatEnhancingAugment(Oritech.id("armor"), EntityAttributes.GENERIC_ARMOR, 4f, EntityAttributeModifier.Operation.ADD_VALUE);
-    private static final PlayerAugment betterArmor = new PlayerStatEnhancingAugment(Oritech.id("betterarmor"), EntityAttributes.GENERIC_ARMOR, 6f, EntityAttributeModifier.Operation.ADD_VALUE);
-    private static final PlayerAugment ultimateArmor = new PlayerStatEnhancingAugment(Oritech.id("ultimatearmor"), EntityAttributes.GENERIC_ARMOR, 8f, EntityAttributeModifier.Operation.ADD_VALUE);
-    private static final PlayerAugment weaponReach = new PlayerStatEnhancingAugment(Oritech.id("weaponreach"), EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-    private static final PlayerAugment blockReach = new PlayerStatEnhancingAugment(Oritech.id("blockreach"), EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-    private static final PlayerAugment farBlockReach = new PlayerStatEnhancingAugment(Oritech.id("farblockreach"), EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 1f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
-    private static final PlayerAugment miningSpeed = new PlayerStatEnhancingAugment(Oritech.id("miningspeed"), EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, 0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, false);
-    private static final PlayerAugment superMiningSpeed = new PlayerStatEnhancingAugment(Oritech.id("superminingspeed"), EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, 3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
-    private static final PlayerAugment luck = new PlayerStatEnhancingAugment(Oritech.id("luck"), EntityAttributes.GENERIC_LUCK, 500f, EntityAttributeModifier.Operation.ADD_VALUE, false);
-    private static final PlayerAugment gravity = new PlayerStatEnhancingAugment(Oritech.id("gravity"), EntityAttributes.GENERIC_GRAVITY, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
-    private static final PlayerAugment attackDamage = new PlayerStatEnhancingAugment(Oritech.id("attackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 4f, EntityAttributeModifier.Operation.ADD_VALUE, false, true);
-    private static final PlayerAugment superAttackDamage = new PlayerStatEnhancingAugment(Oritech.id("superattackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 6f, EntityAttributeModifier.Operation.ADD_VALUE, false, true);
+    private static final PlayerAugment hpBoost = new PlayerStatEnhancingAugment(Oritech.id("augment/hpboost"), EntityAttributes.GENERIC_MAX_HEALTH, 6, EntityAttributeModifier.Operation.ADD_VALUE);
+    private static final PlayerAugment hpBoostMore = new PlayerStatEnhancingAugment(Oritech.id("augment/hpboostmore"), EntityAttributes.GENERIC_MAX_HEALTH, 4, EntityAttributeModifier.Operation.ADD_VALUE);
+    private static final PlayerAugment hpBoostUltra = new PlayerStatEnhancingAugment(Oritech.id("augment/hpboostultra"), EntityAttributes.GENERIC_MAX_HEALTH, 10, EntityAttributeModifier.Operation.ADD_VALUE);
+    private static final PlayerAugment hpBoostUltimate = new PlayerStatEnhancingAugment(Oritech.id("augment/hpboostultimate"), EntityAttributes.GENERIC_MAX_HEALTH, 10, EntityAttributeModifier.Operation.ADD_VALUE);
+    private static final PlayerAugment speedBoost = new PlayerStatEnhancingAugment(Oritech.id("augment/speedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+    private static final PlayerAugment superSpeedBoost = new PlayerStatEnhancingAugment(Oritech.id("augment/superspeedboost"), EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25f, EntityAttributeModifier.Operation.ADD_VALUE, true);
+    private static final PlayerAugment stepAssist = new PlayerStatEnhancingAugment(Oritech.id("augment/stepassist"), EntityAttributes.GENERIC_STEP_HEIGHT, 0.6f, EntityAttributeModifier.Operation.ADD_VALUE, true);
+    private static final PlayerAugment dwarf = new PlayerStatEnhancingAugment(Oritech.id("augment/dwarf"), EntityAttributes.GENERIC_SCALE, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
+    private static final PlayerAugment giant = new PlayerStatEnhancingAugment(Oritech.id("augment/giant"), EntityAttributes.GENERIC_SCALE, 1f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, true);
+    private static final PlayerAugment armor = new PlayerStatEnhancingAugment(Oritech.id("augment/armor"), EntityAttributes.GENERIC_ARMOR, 4f, EntityAttributeModifier.Operation.ADD_VALUE);
+    private static final PlayerAugment betterArmor = new PlayerStatEnhancingAugment(Oritech.id("augment/betterarmor"), EntityAttributes.GENERIC_ARMOR, 6f, EntityAttributeModifier.Operation.ADD_VALUE);
+    private static final PlayerAugment ultimateArmor = new PlayerStatEnhancingAugment(Oritech.id("augment/ultimatearmor"), EntityAttributes.GENERIC_ARMOR, 8f, EntityAttributeModifier.Operation.ADD_VALUE);
+    private static final PlayerAugment weaponReach = new PlayerStatEnhancingAugment(Oritech.id("augment/weaponreach"), EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+    private static final PlayerAugment blockReach = new PlayerStatEnhancingAugment(Oritech.id("augment/blockreach"), EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+    private static final PlayerAugment farBlockReach = new PlayerStatEnhancingAugment(Oritech.id("augment/farblockreach"), EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 1f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
+    private static final PlayerAugment miningSpeed = new PlayerStatEnhancingAugment(Oritech.id("augment/miningspeed"), EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, 0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, false);
+    private static final PlayerAugment superMiningSpeed = new PlayerStatEnhancingAugment(Oritech.id("augment/superminingspeed"), EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, 3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
+    private static final PlayerAugment luck = new PlayerStatEnhancingAugment(Oritech.id("augment/luck"), EntityAttributes.GENERIC_LUCK, 500f, EntityAttributeModifier.Operation.ADD_VALUE, false);
+    private static final PlayerAugment gravity = new PlayerStatEnhancingAugment(Oritech.id("augment/gravity"), EntityAttributes.GENERIC_GRAVITY, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
+    private static final PlayerAugment attackDamage = new PlayerStatEnhancingAugment(Oritech.id("augment/attackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 4f, EntityAttributeModifier.Operation.ADD_VALUE, false, true);
+    private static final PlayerAugment superAttackDamage = new PlayerStatEnhancingAugment(Oritech.id("augment/superattackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 6f, EntityAttributeModifier.Operation.ADD_VALUE, false, true);
 
-    private static final PlayerAugment flight = new PlayerCustomAugment(Oritech.id("flight"), true) {
+    private static final PlayerAugment flight = new PlayerCustomAugment(Oritech.id("augment/flight"), true) {
         @Override
         public void onInstalled(PlayerEntity player) {
             player.getAbilities().allowFlying = true;
@@ -100,7 +97,7 @@ public class PlayerAugments {
         }
     };
 
-    private static final PlayerAugment cloak = new PlayerCustomAugment(Oritech.id("cloak"), true) {
+    private static final PlayerAugment cloak = new PlayerCustomAugment(Oritech.id("augment/cloak"), true) {
         @Override
         public void onInstalled(PlayerEntity player) {
             player.setInvisible(true);
@@ -132,9 +129,9 @@ public class PlayerAugments {
         }
     };
 
-    public static final PlayerAugment portal = new PlayerPortalAugment(Oritech.id("portal"), true);
+    public static final PlayerAugment portal = new PlayerPortalAugment(Oritech.id("augment/portal"), true);
 
-    public static final PlayerAugment nightVision = new PlayerCustomAugment(Oritech.id("nightvision"), true) {
+    public static final PlayerAugment nightVision = new PlayerCustomAugment(Oritech.id("augment/nightvision"), true) {
         @Override
         public void onInstalled(PlayerEntity player) {
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 999999, 0, true, false, false));
@@ -161,7 +158,7 @@ public class PlayerAugments {
         }
     };
 
-    public static final PlayerAugment waterBreathing = new PlayerCustomAugment(Oritech.id("waterbreath")) {
+    public static final PlayerAugment waterBreathing = new PlayerCustomAugment(Oritech.id("augment/waterbreath")) {
         @Override
         public void onInstalled(PlayerEntity player) {
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.WATER_BREATHING, 999999, 0, true, false, false));
@@ -188,7 +185,7 @@ public class PlayerAugments {
         }
     };
 
-    public static final PlayerAugment autoFeeder = new PlayerTickingAugment(Oritech.id("autofeeder"), true) {
+    public static final PlayerAugment autoFeeder = new PlayerTickingAugment(Oritech.id("augment/autofeeder"), true) {
 
         @Override
         public void serverTick(PlayerEntity player) {
@@ -224,7 +221,7 @@ public class PlayerAugments {
         }
     };
 
-    public static final PlayerAugment magnet = new PlayerTickingAugment(Oritech.id("magnet"), true) {
+    public static final PlayerAugment magnet = new PlayerTickingAugment(Oritech.id("augment/magnet"), true) {
 
         @Override
         public void serverTick(PlayerEntity player) {
@@ -266,7 +263,7 @@ public class PlayerAugments {
         }
     };
 
-    public static final PlayerAugment oreFinder = new PlayerTickingAugment(Oritech.id("orefinder"), true) {
+    public static final PlayerAugment oreFinder = new PlayerTickingAugment(Oritech.id("augment/orefinder"), true) {
 
         @Override
         public void serverTick(PlayerEntity player) {
@@ -285,7 +282,7 @@ public class PlayerAugments {
             BlockPos.iterate(target.getX() - range, target.getY() - range, target.getZ() - range, target.getX() + range, target.getY() + range, target.getZ() + range)
                     .forEach(pos -> {
                         var state = world.getBlockState(pos);
-                        var isOre = state.isIn(ConventionalBlockTags.ORES);
+                        var isOre = state.isIn(TagContent.CONVENTIONAL_ORES);
                         if (isOre) highlightPositions.add(pos.toImmutable());
                     });
 
@@ -330,6 +327,11 @@ public class PlayerAugments {
 
 
     public static void init() {
+        
+        if (EnergyApi.BLOCK == null) {
+            System.out.println("APIs not defined, skipping augment init (if this is not a datagen run then something is very wrong)");
+            return;
+        }
 
         addAugmentAsset(hpBoost);
         addAugmentAsset(hpBoostMore);
@@ -386,21 +388,6 @@ public class PlayerAugments {
         for (var augment : allAugments.values()) {
             if (augment instanceof TickingAugment tickingAugment && augment.isInstalled(player) && augment.isEnabled(player))
                 tickingAugment.clientTick(player);
-        }
-    }
-
-    @Environment(EnvType.CLIENT)
-    public static void handlePlayerAugmentOperation(NetworkContent.AugmentOperationSyncPacket message, ClientAccess access) {
-
-        var player = access.player();
-
-        var augmentInstance = PlayerAugments.allAugments.get(message.id());
-        if (message.operation() == PlayerAugments.AugmentOperation.ADD.ordinal()) {
-            augmentInstance.installToPlayer(player);
-        } else if (message.operation() == PlayerAugments.AugmentOperation.REMOVE.ordinal()) {
-            augmentInstance.removeFromPlayer(player);
-        } else if (message.operation() == PlayerAugments.AugmentOperation.TOGGLE.ordinal()) {
-            augmentInstance.toggle(player);
         }
     }
 

@@ -1,6 +1,6 @@
 package rearth.oritech.block.entity.augmenter;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -13,11 +13,11 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -27,6 +27,10 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
@@ -37,10 +41,6 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.AugmentRecipe;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -50,7 +50,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.*;
 
 public class AugmentApplicationEntity extends BlockEntity implements BlockEntityTicker<AugmentApplicationEntity>, MultiblockMachineController, GeoBlockEntity,
-                                                                       ExtendedScreenHandlerFactory, ItemApi.BlockProvider, EnergyApi.BlockProvider, ScreenProvider {
+                                                                       ExtendedMenuProvider, ItemApi.BlockProvider, EnergyApi.BlockProvider, ScreenProvider {
     
     public final Set<Identifier> researchedAugments = new HashSet<>();
     
@@ -482,8 +482,8 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     }
     
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
-        return new ModScreens.BasicData(pos);
+    public void saveExtraData(PacketByteBuf buf) {
+        buf.writeBlockPos(pos);
     }
     
     @Override
@@ -556,7 +556,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     
     @Override
     public ScreenHandlerType<?> getScreenHandlerType() {
-        return ModScreens.MODIFIED_INV_SCREEN;
+        return ModScreens.AUGMENTER_INV_SCREEN;
     }
     
     public static class ResearchState {

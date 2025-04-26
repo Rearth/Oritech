@@ -3,13 +3,13 @@
   "category": "misc",
   "key": {
     "b": {
-      "item": "minecraft:furnace"
+      "tag": "c:player_workstations/furnaces"
     },
     "c": {
       "tag": "c:ingots/electrum"
     },
     "f": {
-      "item": "minecraft:copper_ingot"
+      "tag": "c:ingots/copper"
     },
     "m": {
       "tag": "c:silicon"

@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "b": {
-      "item": "minecraft:iron_block"
+      "tag": "c:storage_blocks/iron"
     },
     "c": {
       "tag": "c:ingots/nickel"

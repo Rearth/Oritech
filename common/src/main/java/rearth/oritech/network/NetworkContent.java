@@ -1,6 +1,7 @@
 package rearth.oritech.network;
 
 import dev.architectury.fluid.FluidStack;
+import dev.architectury.registry.menu.MenuRegistry;
 import io.wispforest.owo.network.OwoNetChannel;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.fluid.Fluids;
@@ -10,6 +11,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
+import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.block.base.entity.*;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.accelerator.BlackHoleBlockEntity;
@@ -21,6 +28,7 @@ import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
+import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.interaction.*;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -39,12 +47,6 @@ import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
-import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 
 import java.util.List;
 import java.util.Map;
@@ -605,7 +607,7 @@ public class NetworkContent {
         
         MACHINE_CHANNEL.registerClientbound(AugmentOperationSyncPacket.class, ((message, access) -> {
             if (access != null)
-                PlayerAugments.handlePlayerAugmentOperation(message, access);   // this weird redict is need for server-only class-loading reasons?
+                PlayerAugmentsClient.handlePlayerAugmentOperation(message, access);   // this weird redict is need for server-only class-loading reasons?
             
         }));
         
@@ -743,7 +745,7 @@ public class NetworkContent {
             
             if (entity instanceof AugmentApplicationEntity modifierEntity) {
                 modifierEntity.screenInvOverride = true;
-                player.openHandledScreen(modifierEntity);
+                MenuRegistry.openExtendedMenu(player, modifierEntity);
             }
         });
         

@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "c": {
-      "item": "minecraft:redstone"
+      "tag": "c:dusts/redstone"
     },
     "s": {
       "tag": "c:ingots/nickel"

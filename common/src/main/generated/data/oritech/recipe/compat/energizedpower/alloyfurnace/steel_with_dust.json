@@ -1,0 +1,27 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "energizedpower"
+      ]
+    }
+  ],
+  "type": "energizedpower:alloy_furnace",
+  "inputs": [
+    {
+      "input": {
+        "tag": "c:ingots/iron"
+      }
+    },
+    {
+      "input": {
+        "tag": "c:dusts/coal"
+      }
+    }
+  ],
+  "output": {
+    "item": "oritech:steel_ingot"
+  },
+  "ticks": 500
+}

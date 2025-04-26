@@ -33,7 +33,7 @@ public class SimpleInventoryStorage implements Inventory, ItemApi.InventoryStora
     @Override
     public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
         var slotStack = getStack(slot);
-        var slotLimit = getSlotLimit(slot);
+        var slotLimit = Math.min(getSlotLimit(slot), addedStack.getMaxCount());
         
         if (slotStack.isEmpty()) {
             var toInsert = Math.min(slotLimit, addedStack.getCount());

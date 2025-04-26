@@ -1,0 +1,16 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ae2"
+    }
+  ],
+  "type": "ae2:charger",
+  "ingredient": {
+    "tag": "c:gems/amethyst"
+  },
+  "result": {
+    "count": 1,
+    "id": "oritech:fluxite"
+  }
+}

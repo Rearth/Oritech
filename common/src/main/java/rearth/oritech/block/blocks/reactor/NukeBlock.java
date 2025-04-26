@@ -2,6 +2,7 @@ package rearth.oritech.block.blocks.reactor;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -20,6 +21,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
+import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
 
 import java.util.List;
@@ -57,9 +59,18 @@ public class NukeBlock extends Block {
     
     private void primeTnt(World world, BlockPos pos) {
         if (!world.isClient) {
+            
+            if (Oritech.CONFIG.boringNukes()) {
+                var center = pos.toCenterPos();
+                world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                world.createExplosion(null, center.x, center.y, center.z, 3, true, World.ExplosionSourceType.TNT);
+                world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                return;
+            }
+            
             var target = small ? BlockContent.REACTOR_EXPLOSION_MEDIUM : BlockContent.REACTOR_EXPLOSION_LARGE;
             world.setBlockState(pos, target.getDefaultState());
-            world.playSound((PlayerEntity) null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0F, 1.0F);
         }
     }
     
@@ -68,7 +79,7 @@ public class NukeBlock extends Block {
             return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
         } else {
             primeTnt(world, pos);
-            Item item = stack.getItem();
+            var item = stack.getItem();
             if (stack.isOf(Items.FLINT_AND_STEEL)) {
                 stack.damage(1, player, LivingEntity.getSlotForHand(hand));
             } else {
@@ -82,7 +93,7 @@ public class NukeBlock extends Block {
     
     protected void onProjectileHit(World world, BlockState state, BlockHitResult hit, ProjectileEntity projectile) {
         if (!world.isClient) {
-            BlockPos blockPos = hit.getBlockPos();
+            var blockPos = hit.getBlockPos();
             if (projectile.isOnFire() && projectile.canModifyAt(world, blockPos)) {
                 primeTnt(world, blockPos);
             }

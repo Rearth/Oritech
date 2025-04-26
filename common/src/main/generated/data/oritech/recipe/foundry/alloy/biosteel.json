@@ -9,7 +9,7 @@
       "item": "oritech:raw_biopolymer"
     },
     {
-      "item": "minecraft:iron_ingot"
+      "tag": "c:ingots/iron"
     }
   ],
   "results": [

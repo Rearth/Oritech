@@ -12,10 +12,10 @@
       "item": "minecraft:glass_bottle"
     },
     "m": {
-      "item": "minecraft:copper_ingot"
+      "tag": "c:ingots/copper"
     },
     "s": {
-      "item": "minecraft:iron_block"
+      "tag": "c:storage_blocks/iron"
     }
   },
   "pattern": [

@@ -1,0 +1,9 @@
+{
+  "values": [
+    "oritech:copper_clump",
+    {
+      "id": "create:crushed_raw_copper",
+      "required": false
+    }
+  ]
+}

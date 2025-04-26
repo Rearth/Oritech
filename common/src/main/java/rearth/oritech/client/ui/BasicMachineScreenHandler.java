@@ -8,21 +8,22 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
-import rearth.oritech.block.entity.generators.SteamEngineEntity;
-import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
+import rearth.oritech.block.entity.generators.SteamEngineEntity;
+import rearth.oritech.util.ScreenProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class BasicMachineScreenHandler extends ScreenHandler {
     
@@ -50,8 +51,8 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     public BlockEntity blockEntity;
     protected List<Integer> armorSlots;
     
-    public BasicMachineScreenHandler(int syncId, PlayerInventory inventory, ModScreens.BasicData setupData) {
-        this(syncId, inventory, inventory.player.getWorld().getBlockEntity(setupData.pos()));
+    public BasicMachineScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
     }
     
     // on server, also called from client constructor

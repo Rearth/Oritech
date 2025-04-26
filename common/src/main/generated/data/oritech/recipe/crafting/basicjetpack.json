@@ -12,7 +12,7 @@
       "tag": "c:ingots/steel"
     },
     "t": {
-      "item": "minecraft:leather"
+      "tag": "c:leathers"
     }
   },
   "pattern": [

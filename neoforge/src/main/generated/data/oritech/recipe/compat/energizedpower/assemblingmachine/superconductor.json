@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "energizedpower"
+    }
+  ],
+  "type": "energizedpower:assembling_machine",
+  "inputs": [
+    {
+      "input": {
+        "item": "oritech:flux_gate"
+      }
+    },
+    {
+      "input": {
+        "tag": "c:wires"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:dubios_container"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:energite_ingot"
+      }
+    }
+  ],
+  "output": {
+    "item": "oritech:superconductor"
+  }
+}

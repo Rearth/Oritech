@@ -6,7 +6,7 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "minecraft:raw_copper"
+      "tag": "c:raw_materials/copper"
     }
   ],
   "results": [

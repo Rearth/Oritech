@@ -1,7 +1,7 @@
 package rearth.oritech.block.blocks.interaction;
 
+import dev.architectury.registry.menu.MenuRegistry;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -15,6 +15,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -123,9 +124,7 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
             }
             
             laserArm.initAddons();
-            
-            var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
-            player.openHandledScreen(handler);
+            MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, laserArm);
             
         }
         

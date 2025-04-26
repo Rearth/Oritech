@@ -1,0 +1,29 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mekanism"
+    }
+  ],
+  "type": "oritech:grinder",
+  "fluidInputAmount": 0,
+  "fluidInputVariant": "minecraft:empty",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:ores/tin"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "mekanism:raw_tin"
+    },
+    {
+      "count": 1,
+      "id": "mekanism:raw_lead"
+    }
+  ],
+  "time": 140
+}

@@ -1,6 +1,6 @@
 package rearth.oritech.block.entity.interaction;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -11,10 +11,10 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.property.Properties;
@@ -25,6 +25,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
@@ -35,10 +39,6 @@ import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -49,7 +49,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
 
-public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTicker<TreefellerBlockEntity>, GeoBlockEntity, EnergyApi.BlockProvider, ItemApi.BlockProvider, ScreenProvider, ExtendedScreenHandlerFactory {
+public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTicker<TreefellerBlockEntity>, GeoBlockEntity, EnergyApi.BlockProvider, ItemApi.BlockProvider, ExtendedMenuProvider, ScreenProvider {
     
     private static final int LOG_COST = 100;
     private static final int LEAF_COST = 10;
@@ -308,11 +308,6 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     }
     
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
-        return new ModScreens.BasicData(pos);
-    }
-    
-    @Override
     public Text getDisplayName() {
         return Text.of("");
     }
@@ -330,5 +325,10 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     
     private void sendNetworkEntry() {
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
+    }
+    
+    @Override
+    public void saveExtraData(PacketByteBuf buf) {
+        buf.writeBlockPos(pos);
     }
 }

@@ -1,18 +1,19 @@
 package rearth.oritech.util;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.Entity.RemovalReason;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.blocks.augmenter.AugmentApplicationBlock;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -52,6 +53,8 @@ public class PortalEntity extends Entity implements GeoEntity {
             if (targetWorld != null) {
                 BlockPos targetPos = target.pos();
                 Vec3d centerPos = targetPos.toCenterPos();
+                
+                AugmentApplicationBlock.lastTeleportedPlayer = new Pair<>(targetWorld.getTime(), serverPlayer);
 
                 serverPlayer.teleport(
                     targetWorld,

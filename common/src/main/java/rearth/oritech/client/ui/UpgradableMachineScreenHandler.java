@@ -2,9 +2,13 @@ package rearth.oritech.client.ui;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.world.World;
+import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.MachineAddonController;
+
+import java.util.Objects;
 
 import static rearth.oritech.block.base.entity.UpgradableMachineBlockEntity.AddonUiData;
 
@@ -13,6 +17,14 @@ public class UpgradableMachineScreenHandler extends BasicMachineScreenHandler {
     protected final AddonUiData addonUiData;
     protected final World worldAccess;
     protected final float quality;
+    
+    public UpgradableMachineScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
+        this(syncId, inventory, ModScreens.UpgradableData.PACKET_CODEC.decode(buf));
+    }
+    
+    public UpgradableMachineScreenHandler(int syncId, PlayerInventory inventory, ModScreens.UpgradableData data) {
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(data.pos())), data.addonUiData(), data.coreQuality());
+    }
     
     // on server, also called from client constructor
     public UpgradableMachineScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity, AddonUiData addonUiData, float coreQuality) {
@@ -32,6 +44,6 @@ public class UpgradableMachineScreenHandler extends BasicMachineScreenHandler {
     @Override
     public boolean showRedstoneAddon() {
         return super.showRedstoneAddon() ||
-            addonUiData.positions().stream().anyMatch(addonPos -> this.worldAccess.getBlockState(addonPos).getBlock().equals(BlockContent.MACHINE_REDSTONE_ADDON));
+                 addonUiData.positions().stream().anyMatch(addonPos -> this.worldAccess.getBlockState(addonPos).getBlock().equals(BlockContent.MACHINE_REDSTONE_ADDON));
     }
 }

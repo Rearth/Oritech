@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "productivemetalworks"
+    }
+  ],
+  "type": "productivemetalworks:fluid_alloying",
+  "fluids": [
+    {
+      "amount": 1,
+      "fluid": "oritech:still_biofuel"
+    },
+    {
+      "amount": 1,
+      "fluid": "oritech:still_molten_fluxite"
+    }
+  ],
+  "result": {
+    "amount": 1,
+    "id": "oritech:still_fuel"
+  },
+  "speed": 10
+}

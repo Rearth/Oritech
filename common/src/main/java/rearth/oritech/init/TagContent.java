@@ -6,75 +6,106 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.biome.Biome;
 import rearth.oritech.Oritech;
 
 public class TagContent {
     
-    // only add tags for common stuff, such as dusts and nuggets. Clumps and gems are oritech-only
+    // only add tags for common stuff, such as dusts and nuggets. Gems are oritech-only
     // items
     // vanilla variants
-    public static final TagKey<Item> COPPER_DUSTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dusts/copper"));
-    public static final TagKey<Item> COPPER_NUGGETS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "nuggets/copper"));
-    public static final TagKey<Item> IRON_DUSTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dusts/iron"));
-    public static final TagKey<Item> GOLD_DUSTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dusts/gold"));
-    public static final TagKey<Item> QUARTZ_DUSTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dusts/quartz"));
-    public static final TagKey<Item> COAL_DUSTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dusts/coal"));
-    public static final TagKey<Item> URANIUM_DUSTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dusts/uranium"));
-    public static final TagKey<Item> PLUTONIUM_DUSTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dusts/plutonium"));
-    public static final TagKey<Item> ELECTRUM_DUSTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dusts/electrum"));
+    public static final TagKey<Item> CLUMPS = cItemTag("clumps");
+    public static final TagKey<Item> DUSTS = cItemTag("dusts");
+
+    public static final TagKey<Item> COPPER_CLUMPS = cItemTag("clumps/copper");
+    public static final TagKey<Item> COPPER_DUSTS = cItemTag("dusts/copper");
+    public static final TagKey<Item> COPPER_NUGGETS = cItemTag("nuggets/copper");
     
-    public static final TagKey<Item> STEEL_INGOTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ingots/steel"));
-    public static final TagKey<Item> ELECTRUM_INGOTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ingots/electrum"));
+    public static final TagKey<Item> IRON_CLUMPS = cItemTag("clumps/iron");
+    public static final TagKey<Item> IRON_DUSTS = cItemTag("dusts/iron");
+
+    public static final TagKey<Item> GOLD_CLUMPS = cItemTag("clumps/gold");
+    public static final TagKey<Item> GOLD_DUSTS = cItemTag("dusts/gold");
     
-    // custom ores
-    public static final TagKey<Item> NICKEL_RAW_MATERIALS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/nickel"));
-    public static final TagKey<Item> NICKEL_DUSTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dusts/nickel"));
-    public static final TagKey<Item> NICKEL_NUGGETS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "nuggets/nickel"));
-    public static final TagKey<Item> NICKEL_INGOTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ingots/nickel"));
-    public static final TagKey<Item> NICKEL_ORES = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ores/nickel"));
-    public static final TagKey<Block> NICKEL_ORE_BLOCKS = TagKey.of(RegistryKeys.BLOCK, Identifier.of("c", "ores/nickel"));
+    public static final TagKey<Item> QUARTZ_DUSTS = cItemTag("dusts/quartz");
+    public static final TagKey<Item> COAL_DUSTS = cItemTag("dusts/coal");
+
+    // custom ores -----
+    // nickel
+    public static final TagKey<Block> NICKEL_ORE_BLOCKS = cBlockTag("ores/nickel");
+    public static final TagKey<Item> NICKEL_ORES = cItemTag("ores/nickel");
+    public static final TagKey<Item> NICKEL_RAW_MATERIALS = cItemTag("raw_materials/nickel");
+    public static final TagKey<Item> NICKEL_CLUMPS = cItemTag("clumps/nickel");
+    public static final TagKey<Item> NICKEL_DUSTS = cItemTag("dusts/nickel");
+    public static final TagKey<Item> NICKEL_INGOTS = cItemTag("ingots/nickel");
+    public static final TagKey<Item> NICKEL_NUGGETS = cItemTag("nuggets/nickel");
     
-    public static final TagKey<Item> PLATINUM_RAW_MATERIALS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/platinum"));
-    public static final TagKey<Item> PLATINUM_DUSTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dusts/platinum"));
-    public static final TagKey<Item> PLATINUM_NUGGETS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "nuggets/platinum"));
-    public static final TagKey<Item> PLATINUM_INGOTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ingots/platinum"));
-    public static final TagKey<Item> PLATINUM_ORES = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ores/platinum"));
-    public static final TagKey<Block> PLATINUM_ORE_BLOCKS = TagKey.of(RegistryKeys.BLOCK, Identifier.of("c", "ores/platinum"));
+    // platinum
+    public static final TagKey<Block> PLATINUM_ORE_BLOCKS = cBlockTag("ores/platinum");
+    public static final TagKey<Item> PLATINUM_ORES = cItemTag("ores/platinum");
+    public static final TagKey<Item> PLATINUM_RAW_MATERIALS = cItemTag("raw_materials/platinum");
+    public static final TagKey<Item> PLATINUM_CLUMPS = cItemTag("clumps/platinum");
+    public static final TagKey<Item> PLATINUM_DUSTS = cItemTag("dusts/platinum");
+    public static final TagKey<Item> PLATINUM_INGOTS = cItemTag("ingots/platinum");
+    public static final TagKey<Item> PLATINUM_NUGGETS = cItemTag("nuggets/platinum");
     
-    public static final TagKey<Item> URANIUM_RAW_MATERIALS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "raw_materials/uranium"));
-    public static final TagKey<Item> URANIUM_ORES = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ores/uranium"));
-    public static final TagKey<Block> URANIUM_ORE_BLOCKS = TagKey.of(RegistryKeys.BLOCK, Identifier.of("c", "ores/uranium"));
+    // uranium
+    public static final TagKey<Block> URANIUM_ORE_BLOCKS = cBlockTag("ores/uranium");
+    public static final TagKey<Item> URANIUM_ORES = cItemTag("ores/uranium");
+    public static final TagKey<Item> URANIUM_RAW_MATERIALS = cItemTag("raw_materials/uranium");
+    public static final TagKey<Item> URANIUM_CLUMPS = cItemTag("clumps/uranium");
+    public static final TagKey<Item> URANIUM_DUSTS = cItemTag("dusts/uranium");
     
+    // plutonium
+    public static final TagKey<Item> PLUTONIUM_DUSTS = cItemTag("dusts/plutonium");
+
+    // alloys
+    public static final TagKey<Item> ELECTRUM_INGOTS = cItemTag("ingots/electrum");
+    public static final TagKey<Item> ELECTRUM_DUSTS = cItemTag("dusts/electrum");
+    public static final TagKey<Item> STEEL_INGOTS = cItemTag("ingots/steel");
+
+    // plating
+    public static final TagKey<Item> MACHINE_PLATING = oritechItemTag("plating");
+
     // plastic
-    public static final TagKey<Item> PLASTIC_PLATES = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "plates/plastic"));
+    public static final TagKey<Item> PLASTIC_PLATES = cItemTag("plates/plastic");
     
     // biomass
-    public static final TagKey<Item> BIOMASS = TagKey.of(RegistryKeys.ITEM, Oritech.id("biomass"));
-    
-    // plating
-    public static final TagKey<Item> MACHINE_PLATING = TagKey.of(RegistryKeys.ITEM, Oritech.id("plating"));
+    // BIOMATTER is any plantlike item that can be pulverized into biomass
+    public static final TagKey<Item> BIOMATTER = oritechItemTag("biomatter");
+    // BIOMASS tag is for the biomass item and other similar items (Mekanism's bio fuel, Tech Reborn's plantball, etc.)
+    public static final TagKey<Item> BIOMASS = cItemTag("fuels/bio");
+    public static final TagKey<Item> BIOMASS_BLOCK = cItemTag("fuels/block/bio");
+
+    // frame support
+    public static final TagKey<Block> MACHINE_FRAME_SUPPORT = TagKey.of(RegistryKeys.BLOCK, Oritech.id("frame_support"));
 
     // silicon
-    public static final TagKey<Item> SILICON = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "silicon"));
+    public static final TagKey<Item> SILICON = cItemTag("silicon");
 
     // carbon fibre
-    public static final TagKey<Item> CARBON_FIBRE = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "carbon_fibre"));
+    public static final TagKey<Item> CARBON_FIBRE = cItemTag("carbon_fibre");
 
     // wires
-    public static final TagKey<Item> WIRES = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "wires"));
+    public static final TagKey<Item> WIRES = cItemTag("wires");
     
     // blocks
-    public static final TagKey<Block> DRILL_MINEABLE = TagKey.of(RegistryKeys.BLOCK, Oritech.id("mineable/drill"));
-    public static final TagKey<Block> RESOURCE_NODES = TagKey.of(RegistryKeys.BLOCK, Oritech.id("resource_nodes"));
-    public static final TagKey<Block> LASER_PASSTHROUGH = TagKey.of(RegistryKeys.BLOCK, Oritech.id("laser_passthrough"));
-    public static final TagKey<Block> LASER_ACCELERATED = TagKey.of(RegistryKeys.BLOCK, Oritech.id("laser_accelerated"));
+    public static final TagKey<Block> DRILL_MINEABLE = oritechBlockTag("mineable/drill");
+    public static final TagKey<Block> RESOURCE_NODES = oritechBlockTag("resource_nodes");
+    public static final TagKey<Block> LASER_PASSTHROUGH = oritechBlockTag("laser_passthrough");
+    public static final TagKey<Block> LASER_ACCELERATED = oritechBlockTag("laser_accelerated");
 
     // trees
-    public static final TagKey<Block> CUTTER_LOGS_MINEABLE = TagKey.of(RegistryKeys.BLOCK, Oritech.id("mineable/cutter_logs"));
-    public static final TagKey<Block> CUTTER_LEAVES_MINEABLE = TagKey.of(RegistryKeys.BLOCK, Oritech.id("mineable/cutter_leaves"));
+    public static final TagKey<Block> CUTTER_LOGS_MINEABLE = oritechBlockTag("mineable/cutter_logs");
+    public static final TagKey<Block> CUTTER_LEAVES_MINEABLE = oritechBlockTag("mineable/cutter_leaves");
+    
+    // c stuff
+    public static final TagKey<Block> CONVENTIONAL_ORES = TagKey.of(RegistryKeys.BLOCK, Identifier.of("c", "ores"));
+    public static final TagKey<Item> CONVENTIONAL_FERTILIZER = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "fertilizers"));
+    public static final TagKey<Biome> CONVENTIONAL_COLD = TagKey.of(RegistryKeys.BIOME, Identifier.of("c", "is_cold"));
     
     // reactor
-    public static final TagKey<Block> REACTOR_WALL_BLOCKS = TagKey.of(RegistryKeys.BLOCK, Oritech.id("reactor_wall_blocks"));
+    public static final TagKey<Block> REACTOR_WALL_BLOCKS = oritechBlockTag("reactor_wall_blocks");
     public static final TagKey<Item> REACTOR_COOLANT = TagKey.of(RegistryKeys.ITEM, Oritech.id("reactor_coolant_items"));
     
     // feeder blacklist
@@ -96,7 +127,45 @@ public class TagContent {
     public static final TagKey<EntityType<?>> SPAWNER_BLACKLIST = TagKey.of(RegistryKeys.ENTITY_TYPE, Oritech.id("spawner_blacklist"));
     
     // unstable container contents
-    public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_LOW = TagKey.of(RegistryKeys.BLOCK, Oritech.id("unstable_container/low"));
-    public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_MEDIUM = TagKey.of(RegistryKeys.BLOCK, Oritech.id("unstable_container/medium"));
-    public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_HIGH = TagKey.of(RegistryKeys.BLOCK, Oritech.id("unstable_container/high"));
+    public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_LOW = oritechBlockTag("unstable_container/low");
+    public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_MEDIUM = oritechBlockTag("unstable_container/medium");
+    public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_HIGH = oritechBlockTag("unstable_container/high");
+
+    // recyclables
+    public static final TagKey<Item> RECYCLES_TO_NETHERITE_SCRAP = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/netherite_scrap"));
+    public static final TagKey<Item> RECYCLES_TO_DIAMOND = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/diamond"));
+    public static final TagKey<Item> RECYCLES_TO_IRON_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/iron_dust"));
+    public static final TagKey<Item> RECYCLES_TO_SMALL_IRON_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/small_iron_dust"));
+    public static final TagKey<Item> RECYCLES_TO_GOLD_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/gold_dust"));
+    public static final TagKey<Item> RECYCLES_TO_SMALL_GOLD_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/small_gold_dust"));
+    public static final TagKey<Item> RECYCLES_TO_COPPER_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/copper_dust"));
+    public static final TagKey<Item> RECYCLES_TO_SMALL_COPPER_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/small_copper_dust"));
+    public static final TagKey<Item> RECYCLES_TO_2_QUARTZ_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/quartz_dust_2"));
+    public static final TagKey<Item> RECYCLES_TO_4_QUARTZ_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/quartz_dust_4"));
+    public static final TagKey<Item> RECYCLES_TO_REDSTONE_DUST = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/redstone_dust"));
+    public static final TagKey<Item> RECYCLES_TO_GRAVEL = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/gravel"));
+    public static final TagKey<Item> RECYCLES_TO_SAND = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/sand"));
+    public static final TagKey<Item> RECYCLES_TO_RED_SAND = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/red_sand"));
+    public static final TagKey<Item> RECYCLES_TO_STRING = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/string"));
+    public static final TagKey<Item> RECYCLES_TO_BIOMASS = TagKey.of(RegistryKeys.ITEM, Oritech.id("recyclable/biomass"));
+
+    public static TagKey<Item> itemTag(String namespace, String path) {
+        return TagKey.of(RegistryKeys.ITEM, Identifier.of(namespace, path));
+    }
+
+    public static TagKey<Item> cItemTag(String path) {
+        return itemTag("c", path);
+    }
+
+    public static TagKey<Block> cBlockTag(String path) {
+        return TagKey.of(RegistryKeys.BLOCK, Identifier.of("c", path));
+    }
+
+    private static TagKey<Item> oritechItemTag(String path) {
+        return TagKey.of(RegistryKeys.ITEM, Oritech.id(path));
+    }
+
+    private static TagKey<Block> oritechBlockTag(String path) {
+        return TagKey.of(RegistryKeys.BLOCK, Oritech.id(path));
+    }
 }

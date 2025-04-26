@@ -16,17 +16,17 @@
     },
     {
       "input": {
-        "item": "oritech:biomass"
+        "tag": "c:fuels/bio"
       }
     },
     {
       "input": {
-        "item": "oritech:biomass"
+        "tag": "c:fuels/bio"
       }
     },
     {
       "input": {
-        "item": "oritech:biomass"
+        "tag": "c:fuels/bio"
       }
     }
   ],

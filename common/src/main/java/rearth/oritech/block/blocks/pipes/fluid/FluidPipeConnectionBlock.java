@@ -1,6 +1,5 @@
 package rearth.oritech.block.blocks.pipes.fluid;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -14,6 +13,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
@@ -29,7 +29,7 @@ public class FluidPipeConnectionBlock extends ExtractablePipeConnectionBlock {
     
     @Override
     public TriFunction<World, BlockPos, Direction, Boolean> apiValidationFunction() {
-        return ((world, pos, direction) -> FluidStorage.SIDED.find(world, pos, direction) != null);
+        return ((world, pos, direction) -> FluidApi.BLOCK.find(world, pos, direction) != null);
     }
     
     @Nullable

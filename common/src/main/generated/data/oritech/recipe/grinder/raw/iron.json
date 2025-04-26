@@ -6,7 +6,7 @@
   "fluidOutputVariant": "minecraft:empty",
   "ingredients": [
     {
-      "item": "minecraft:raw_iron"
+      "tag": "c:raw_materials/iron"
     }
   ],
   "results": [

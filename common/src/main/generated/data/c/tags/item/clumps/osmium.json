@@ -1,0 +1,8 @@
+{
+  "values": [
+    {
+      "id": "create:crushed_raw_osmium",
+      "required": false
+    }
+  ]
+}

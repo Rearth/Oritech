@@ -12,7 +12,7 @@
       "tag": "c:ingots/steel"
     },
     {
-      "item": "minecraft:iron_ingot"
+      "tag": "c:ingots/iron"
     },
     {
       "tag": "c:plates/plastic"

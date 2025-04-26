@@ -1,7 +1,7 @@
 package rearth.oritech.block.entity.accelerator;
 
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.wispforest.owo.util.VectorRandomUtils;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Portal;
@@ -15,10 +15,10 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -31,6 +31,8 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.AcceleratorScreenHandler;
@@ -40,14 +42,12 @@ import rearth.oritech.init.SoundContent;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity>, ItemApi.BlockProvider, ExtendedScreenHandlerFactory, ScreenProvider {
+public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity>, ItemApi.BlockProvider, ExtendedMenuProvider, ScreenProvider {
     
     private AcceleratorParticleLogic.ActiveParticle particle;
     public ItemStack activeItemParticle = ItemStack.EMPTY;
@@ -451,8 +451,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     @Override
-    public Object getScreenOpeningData(ServerPlayerEntity player) {
-        return new ModScreens.BasicData(pos);
+    public void saveExtraData(PacketByteBuf buf) {
+        buf.writeBlockPos(pos);
     }
     
     @Override

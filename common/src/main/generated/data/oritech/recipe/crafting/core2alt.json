@@ -3,10 +3,10 @@
   "category": "misc",
   "key": {
     "c": {
-      "item": "minecraft:lapis_lazuli"
+      "tag": "c:gems/lapis"
     },
     "s": {
-      "item": "minecraft:iron_ingot"
+      "tag": "c:ingots/iron"
     }
   },
   "pattern": [

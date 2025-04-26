@@ -1,0 +1,29 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "immersiveengineering"
+    }
+  ],
+  "type": "oritech:grinder",
+  "fluidInputAmount": 0,
+  "fluidInputVariant": "minecraft:empty",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:ores/silver"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "immersiveengineering:raw_silver"
+    },
+    {
+      "count": 1,
+      "id": "oritech:copper_dust"
+    }
+  ],
+  "time": 140
+}

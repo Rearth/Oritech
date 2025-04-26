@@ -1,5 +1,9 @@
 {
   "values": [
-    "oritech:coal_dust"
+    "oritech:coal_dust",
+    {
+      "id": "immersiveengineering:dust_hop_graphite",
+      "required": false
+    }
   ]
 }

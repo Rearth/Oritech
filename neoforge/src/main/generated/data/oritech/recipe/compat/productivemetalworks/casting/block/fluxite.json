@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "productivemetalworks"
+    }
+  ],
+  "type": "productivemetalworks:block_casting",
+  "cast": [],
+  "consume_cast": false,
+  "fluid": {
+    "amount": 1000,
+    "fluid": "oritech:still_molten_fluxite"
+  },
+  "result": {
+    "count": 1,
+    "id": "oritech:fluxite_block"
+  }
+}

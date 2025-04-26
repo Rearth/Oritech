@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "powah"
+    }
+  ],
+  "type": "powah:energizing",
+  "energy": 12000,
+  "ingredients": [
+    {
+      "tag": "c:gems/amethyst"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:fluxite"
+  }
+}

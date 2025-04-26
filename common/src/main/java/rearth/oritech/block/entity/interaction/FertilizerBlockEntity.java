@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.interaction;
 
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.block.*;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
@@ -18,14 +17,15 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 
 import java.util.List;
 import java.util.Objects;
@@ -103,7 +103,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     public void finishBlockWork(BlockPos processed) {
         
         var inventoryStack = inventory.getStack(0);
-        var fertilizerInInventory = !inventoryStack.isEmpty() && inventoryStack.isIn(ConventionalItemTags.FERTILIZERS);
+        var fertilizerInInventory = !inventoryStack.isEmpty() && inventoryStack.isIn(TagContent.CONVENTIONAL_FERTILIZER);
         var fertilizerStrength = fertilizerInInventory ? 2 : 1;
         var fertilized = false;
         

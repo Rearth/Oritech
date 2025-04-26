@@ -1,0 +1,16 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "actuallyadditions"
+    }
+  ],
+  "type": "actuallyadditions:pressing",
+  "fluid": {
+    "amount": 80,
+    "id": "oritech:still_biofuel"
+  },
+  "ingredient": {
+    "tag": "c:fuels/bio"
+  }
+}

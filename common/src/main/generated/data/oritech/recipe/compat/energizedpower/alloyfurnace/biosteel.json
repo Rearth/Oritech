@@ -1,0 +1,27 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "energizedpower"
+      ]
+    }
+  ],
+  "type": "energizedpower:alloy_furnace",
+  "inputs": [
+    {
+      "input": {
+        "tag": "c:ingots/iron"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:raw_biopolymer"
+      }
+    }
+  ],
+  "output": {
+    "item": "oritech:biosteel_ingot"
+  },
+  "ticks": 500
+}

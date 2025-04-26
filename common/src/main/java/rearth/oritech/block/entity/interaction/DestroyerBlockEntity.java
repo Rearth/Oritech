@@ -1,12 +1,7 @@
 package rearth.oritech.block.entity.interaction;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CocoaBlock;
-import net.minecraft.block.CropBlock;
-import net.minecraft.block.NetherWartBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.UnbreakableComponent;
@@ -20,6 +15,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
@@ -35,6 +31,7 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.FakeMachinePlayer;
 
 import java.util.List;
 import java.util.Objects;
@@ -49,7 +46,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     // non-persistent
     public BlockPos quarryTarget = BlockPos.ORIGIN;
     public float targetHardness = 1f;
-    private PlayerEntity destroyerPlayerEntity = null;
+    private ServerPlayerEntity destroyerPlayerEntity = null;
     
     public DestroyerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.DESTROYER_BLOCK_ENTITY, pos, state);
@@ -120,18 +117,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     }
     
     private PlayerEntity getDestroyerPlayerEntity() {
-        if (destroyerPlayerEntity == null) {
-            destroyerPlayerEntity = new PlayerEntity(world, pos, 0, new GameProfile(UUID.randomUUID(), "laser")) {
-                @Override
-                public boolean isSpectator() {
-                    return false;
-                }
-                
-                @Override
-                public boolean isCreative() {
-                    return false;
-                }
-            };
+        if (destroyerPlayerEntity == null && world instanceof ServerWorld serverWorld) {
+            destroyerPlayerEntity = FakeMachinePlayer.create(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_destroyer"), inventory);
         }
         
         return destroyerPlayerEntity;
@@ -152,7 +139,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         for (int i = 1; i <= range; i++) {
             var checkPos = toolPosition.down(i);
             var targetState = world.getBlockState(checkPos);
-            if (!targetState.isAir() && !targetState.isLiquid()) {  // pass through both air and liquid
+            if (!targetState.isAir() && !targetState.getFluidState().isStill()) {  // pass through both air and liquid
                 quarryTarget = checkPos;
                 targetHardness = Math.clamp(targetState.getHardness(world, checkPos), 0, 100);
                 syncQuarryNetworkData();
@@ -183,7 +170,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         }
         
         // remove fluids
-        if (targetState.isLiquid()) {
+        if (targetState.getFluidState().isStill()) {
             world.setBlockState(targetPosition, Blocks.AIR.getDefaultState());
         }
         

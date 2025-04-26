@@ -1,0 +1,19 @@
+{
+  "type": "oritech:centrifuge_fluid",
+  "fluidInputAmount": 81000,
+  "fluidInputVariant": "minecraft:water",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:clumps/iron"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "oritech:iron_gem"
+    }
+  ],
+  "time": 300
+}

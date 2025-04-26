@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "oritech:grinder",
+  "fluidInputAmount": 0,
+  "fluidInputVariant": "minecraft:empty",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:raw_materials/zinc"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "create:crushed_raw_zinc"
+    },
+    {
+      "count": 3,
+      "id": "create:zinc_nugget"
+    },
+    {
+      "count": 1,
+      "id": "minecraft:gunpowder"
+    }
+  ],
+  "time": 140
+}

@@ -1,7 +1,8 @@
 package rearth.oritech.block.blocks.arcane;
 
 import com.mojang.serialization.MapCodec;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -12,6 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -59,8 +61,8 @@ public class EnchanterBlock extends HorizontalFacingBlock implements BlockEntity
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
         if (!world.isClient) {
-            var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
-            player.openHandledScreen(handler);
+            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+                MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
         }
         
         return ActionResult.SUCCESS;

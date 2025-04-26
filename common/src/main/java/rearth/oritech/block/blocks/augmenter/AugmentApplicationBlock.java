@@ -1,6 +1,8 @@
 package rearth.oritech.block.blocks.augmenter;
 
 import com.mojang.serialization.MapCodec;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -13,12 +15,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Pair;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -46,6 +50,8 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
     
     private final VoxelShape[] HITBOXES = computeShapes();
     private final HashMap<PlayerEntity, Long> lastContact = new HashMap<>();
+    
+    public static Pair<Long, PlayerEntity> lastTeleportedPlayer;    // used to skip inv opening if a player just teleported in
     
     public AugmentApplicationBlock(Settings settings) {
         super(settings);
@@ -107,6 +113,13 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
         
         if (!(entity instanceof PlayerEntity player)) return;
         
+        if (lastTeleportedPlayer != null) {
+            var age = world.getTime() - lastTeleportedPlayer.getLeft();
+            if (age < 20) {
+                return;
+            }
+        }
+        
         var centerPos = pos.toBottomCenterPos().add(0, 0.2, 0);
         
         var dist = entity.getPos().distanceTo(centerPos);
@@ -123,7 +136,9 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
                 if (locked) {
                     var blockEntity = (AugmentApplicationEntity) world.getBlockEntity(pos);
                     blockEntity.loadAvailableStations(player);
-                    player.openHandledScreen(blockEntity);
+                    
+                    var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+                    MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
                 }
             }
         }
@@ -184,7 +199,9 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
         
         var blockEntity = (AugmentApplicationEntity) world.getBlockEntity(pos);
         blockEntity.loadAvailableStations(player);
-        player.openHandledScreen(blockEntity);
+        
+        var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+        MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
         
         return ActionResult.SUCCESS;
     }

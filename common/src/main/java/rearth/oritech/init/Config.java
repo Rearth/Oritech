@@ -78,6 +78,7 @@ public class Config {
     public int ventRelativeRate = 100;
     public int maxHeat = 2000;
     public int maxUnstableTicks = 400;
+    public boolean boringNukes = false;
     
     @SectionHeader("arcane")
     public int enchanterCostMultiplier = 5;

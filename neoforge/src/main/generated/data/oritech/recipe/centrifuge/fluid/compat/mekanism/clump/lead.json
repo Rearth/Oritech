@@ -1,0 +1,25 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mekanism"
+    }
+  ],
+  "type": "oritech:centrifuge_fluid",
+  "fluidInputAmount": 81000,
+  "fluidInputVariant": "minecraft:water",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "tag": "c:clumps/lead"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "mekanism:dust_lead"
+    }
+  ],
+  "time": 300
+}

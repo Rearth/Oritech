@@ -1,6 +1,7 @@
 package rearth.oritech.block.blocks.storage;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
@@ -16,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.text.Text;
@@ -27,12 +29,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 import rearth.oritech.util.MachineAddonController;
-import rearth.oritech.api.energy.EnergyApi;
 
 import java.util.List;
 import java.util.Objects;
@@ -110,8 +112,8 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
             
             machineEntity.initAddons();
             
-            var handler = (ExtendedScreenHandlerFactory) world.getBlockEntity(pos);
-            player.openHandledScreen(handler);
+            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+                MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
             
         }
         

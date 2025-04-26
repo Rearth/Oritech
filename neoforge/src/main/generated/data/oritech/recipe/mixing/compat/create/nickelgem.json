@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    {
+      "item": "oritech:nickel_gem"
+    },
+    {
+      "item": "oritech:nickel_gem"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "oritech:nickel_ingot"
+    }
+  ]
+}

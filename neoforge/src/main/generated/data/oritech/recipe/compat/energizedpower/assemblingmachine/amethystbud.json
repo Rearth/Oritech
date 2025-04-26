@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "energizedpower"
+    }
+  ],
+  "type": "energizedpower:assembling_machine",
+  "inputs": [
+    {
+      "input": {
+        "tag": "c:gems/amethyst"
+      }
+    },
+    {
+      "input": {
+        "tag": "c:gems/amethyst"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:enderic_compound"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:overcharged_crystal"
+      }
+    }
+  ],
+  "output": {
+    "item": "minecraft:budding_amethyst"
+  }
+}

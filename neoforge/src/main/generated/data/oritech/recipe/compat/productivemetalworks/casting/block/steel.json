@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "productivemetalworks"
+    }
+  ],
+  "type": "productivemetalworks:block_casting",
+  "cast": [],
+  "consume_cast": false,
+  "fluid": {
+    "amount": 900,
+    "fluid": "productivemetalworks:molten_steel"
+  },
+  "result": {
+    "count": 1,
+    "id": "oritech:steel_block"
+  }
+}

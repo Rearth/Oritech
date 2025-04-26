@@ -11,17 +11,17 @@
   "inputs": [
     {
       "input": {
-        "item": "oritech:plastic_sheet"
+        "tag": "c:plates/plastic"
       }
     },
     {
       "input": {
-        "item": "oritech:electrum_ingot"
+        "tag": "c:ingots/electrum"
       }
     },
     {
       "input": {
-        "item": "oritech:electrum_ingot"
+        "tag": "c:ingots/electrum"
       }
     },
     {

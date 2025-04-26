@@ -11,10 +11,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import rearth.oritech.block.blocks.addons.MachineAddonBlock;
-import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.block.blocks.addons.MachineAddonBlock;
+import rearth.oritech.block.entity.addons.AddonBlockEntity;
 
 import java.util.*;
 

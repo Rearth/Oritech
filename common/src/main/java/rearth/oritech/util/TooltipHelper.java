@@ -8,13 +8,13 @@ import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.interaction.DeepDrillEntity;
 import rearth.oritech.block.entity.processing.AtomicForgeBlockEntity;
-import rearth.oritech.api.energy.EnergyApi;
 
 import java.text.NumberFormat;
 import java.util.List;

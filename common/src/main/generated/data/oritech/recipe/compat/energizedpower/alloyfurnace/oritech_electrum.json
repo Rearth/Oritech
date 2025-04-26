@@ -1,0 +1,27 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "energizedpower"
+      ]
+    }
+  ],
+  "type": "energizedpower:alloy_furnace",
+  "inputs": [
+    {
+      "input": {
+        "tag": "c:ingots/gold"
+      }
+    },
+    {
+      "input": {
+        "tag": "c:dusts/redstone"
+      }
+    }
+  ],
+  "output": {
+    "item": "oritech:electrum_ingot"
+  },
+  "ticks": 500
+}

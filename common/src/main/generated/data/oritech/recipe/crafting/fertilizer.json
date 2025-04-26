@@ -9,7 +9,7 @@
       "item": "oritech:processing_unit"
     },
     "f": {
-      "item": "minecraft:copper_ingot"
+      "tag": "c:ingots/copper"
     },
     "m": {
       "tag": "c:silicon"

@@ -8,11 +8,11 @@ import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunctionType;
-import rearth.oritech.block.entity.storage.SmallTankEntity;
-import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
-import rearth.oritech.init.LootContent;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
+import rearth.oritech.block.entity.storage.SmallTankEntity;
+import rearth.oritech.init.LootContent;
 
 import java.util.List;
 

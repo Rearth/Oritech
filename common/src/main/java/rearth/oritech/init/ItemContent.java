@@ -9,13 +9,13 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import rearth.oritech.item.UnstableContainerItem;
 import rearth.oritech.item.other.CustomTooltipItem;
 import rearth.oritech.item.other.MobCaptureItem;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 import rearth.oritech.item.tools.WeedKiller;
 import rearth.oritech.item.tools.Wrench;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
-import rearth.oritech.item.UnstableContainerItem;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

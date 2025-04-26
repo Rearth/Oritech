@@ -1,8 +1,11 @@
 package rearth.oritech.item.tools.harvesting;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import dev.architectury.event.EventResult;
+import dev.architectury.utils.value.IntValue;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.DataComponentTypes;
@@ -21,6 +24,7 @@ import net.minecraft.item.ToolMaterial;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -31,15 +35,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
 import rearth.oritech.init.ComponentContent;
-import rearth.oritech.init.ToolsContent;
 import rearth.oritech.init.TagContent;
+import rearth.oritech.init.ToolsContent;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
@@ -140,10 +140,10 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
     // called as event in Oritech initializer
     // area mode: breaks 3x1 blocks unless player is sneaking
     // silk touch mode: adds a temporary silk touch, which is then removed in the after break event
-    public static boolean preMine(World world, PlayerEntity player, BlockPos pos, BlockState blockState, BlockEntity blockEntity) {
+    public static EventResult preMine(World world, BlockPos pos, BlockState state, ServerPlayerEntity player, @Nullable IntValue xp) {
 
         var handStack = player.getMainHandStack();
-        if (handStack == null || !handStack.isOf(ToolsContent.PROMETHIUM_PICKAXE)) return true;
+        if (handStack == null || !handStack.isOf(ToolsContent.PROMETHIUM_PICKAXE)) return EventResult.pass();
 
         // break additional blocks in preMine (Block.onBreak) instead of postMine (Block.onBroken)
         // so that the block still exists when determining which face of the block the player was looking at
@@ -169,7 +169,7 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
             }
         }
         
-        return true;
+        return EventResult.pass();
     }
     
     @Override

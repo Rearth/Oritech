@@ -8,8 +8,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.ArrayList;
 

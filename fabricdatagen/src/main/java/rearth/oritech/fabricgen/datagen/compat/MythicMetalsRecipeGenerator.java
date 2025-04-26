@@ -3,18 +3,24 @@ package rearth.oritech.fabricgen.datagen.compat;
 import io.wispforest.owo.util.ReflectionUtils;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.recipe.Ingredient;
+import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import nourl.mythicmetals.MythicMetals;
 import nourl.mythicmetals.item.ItemSet;
 import nourl.mythicmetals.item.MythicItems;
 import nourl.mythicmetals.misc.RegistryHelper;
-import rearth.oritech.fabricgen.datagen.RecipeGenerator;
+import rearth.oritech.api.recipe.FoundryRecipeBuilder;
+import rearth.oritech.api.recipe.GrinderRecipeBuilder;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 
+import static rearth.oritech.init.TagContent.cItemTag;
+import static rearth.oritech.init.TagContent.itemTag;
+
 public class MythicMetalsRecipeGenerator {
+    private static final String PATH = "compat/mythicmetals/";
+
     public static void generateRecipes(RecipeExporter exporter) {
         addMMFragmentRecipes(exporter);
         addMMAlloyRecipes(exporter);
@@ -24,16 +30,19 @@ public class MythicMetalsRecipeGenerator {
         ReflectionUtils.iterateAccessibleStaticFields(MythicItems.class, ItemSet.class, (itemSet, name, field) -> {
             var rawOre = itemSet.getRawOre();
             if (rawOre != null)
-                RecipeGenerator.addGrinderRecipe(exporter, Ingredient.fromTag(TagKey.of(RegistryKeys.ITEM, RegistryHelper.id("ores/" + name))), rawOre, 2, "compat/mythicmetals/" + name);
+                GrinderRecipeBuilder.build().input(TagKey.of(RegistryKeys.ITEM, RegistryHelper.id("ores/" + name))).result(rawOre, 2).export(exporter, "compat/mythicmetals/" + name);
         });
 
     }
 
     public static void addMMAlloyRecipes(RecipeExporter exporter) {
-        RecipeGenerator.addAlloyRecipe(exporter, Ingredient.fromTag(ConventionalItemTags.COPPER_INGOTS), Ingredient.fromTag(TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "ingots/tin"))), MythicItems.BRONZE.getIngot(), 1, "compat/mythicmetals/bronze");
-        RecipeGenerator.addAlloyRecipe(exporter, Ingredient.ofItems(MythicItems.MANGANESE.getIngot()), Ingredient.ofItems(MythicItems.QUADRILLUM.getIngot()), MythicItems.DURASTEEL.getIngot(), "compat/mythicmetals/durasteel");
-        RecipeGenerator.addAlloyRecipe(exporter, Ingredient.fromTag(TagContent.PLATINUM_INGOTS), Ingredient.ofItems(MythicItems.Mats.STARRITE), MythicItems.STAR_PLATINUM.getIngot(), "compat/mythicmetals/star_platinum");
-        RecipeGenerator.addAlloyRecipe(exporter, Ingredient.fromTag(ConventionalItemTags.IRON_INGOTS), Ingredient.ofItems(MythicItems.MANGANESE.getIngot()), ItemContent.STEEL_INGOT, "compat/mythicmetals/manganese_steel");
+        FoundryRecipeBuilder.build().input(ConventionalItemTags.COPPER_INGOTS).input(cItemTag("ingots/tin")).result(MythicItems.BRONZE.getIngot(), 2).export(exporter, PATH + "bronze");
+        FoundryRecipeBuilder.build().input(MythicItems.MANGANESE.getIngot()).input(MythicItems.QUADRILLUM.getIngot()).result(MythicItems.DURASTEEL.getIngot()).export(exporter, PATH + "durasteel");
+        FoundryRecipeBuilder.build().input(TagContent.PLATINUM_INGOTS).input(MythicItems.Mats.STARRITE).result(MythicItems.STAR_PLATINUM.getIngot()).export(exporter, PATH + "star_platinum");
+        FoundryRecipeBuilder.build().input(ConventionalItemTags.IRON_INGOTS).input(MythicItems.MANGANESE.getIngot()).result(ItemContent.STEEL_INGOT, 2).export(exporter, PATH + "manganese_steel");
+        FoundryRecipeBuilder.build().input(ConventionalItemTags.GOLD_INGOTS).input(cItemTag("ingots/silver")).result(ItemContent.ELECTRUM_INGOT, 2).export(exporter, PATH + "electrumalt");
+        FoundryRecipeBuilder.build().input(itemTag(MythicMetals.MOD_ID, "midas_raw_ores")).input(MythicItems.MIDAS_GOLD.getRawOre()).result(Items.GOLD_INGOT, 2).export(exporter, PATH + "midasgold");
+
     }
     
 }

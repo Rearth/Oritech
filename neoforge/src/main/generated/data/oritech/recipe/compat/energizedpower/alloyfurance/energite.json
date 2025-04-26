@@ -1,0 +1,25 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "energizedpower"
+    }
+  ],
+  "type": "energizedpower:alloy_furnace",
+  "inputs": [
+    {
+      "input": {
+        "tag": "c:ingots/nickel"
+      }
+    },
+    {
+      "input": {
+        "item": "oritech:fluxite"
+      }
+    }
+  ],
+  "output": {
+    "item": "oritech:energite_ingot"
+  },
+  "ticks": 500
+}

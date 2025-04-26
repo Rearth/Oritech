@@ -1,0 +1,16 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mekanismgenerators"
+    }
+  ],
+  "type": "oritech:fuel_generator",
+  "fluidInputAmount": 8100,
+  "fluidInputVariant": "mekanismgenerators:bioethanol",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [],
+  "results": [],
+  "time": 60
+}

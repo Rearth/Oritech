@@ -1,0 +1,15 @@
+{
+  "type": "oritech:cooler",
+  "fluidInputAmount": 81000,
+  "fluidInputVariant": "minecraft:lava",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [],
+  "results": [
+    {
+      "count": 2,
+      "id": "minecraft:obsidian"
+    }
+  ],
+  "time": 200
+}

@@ -1,0 +1,27 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "energizedpower"
+      ]
+    }
+  ],
+  "type": "energizedpower:alloy_furnace",
+  "inputs": [
+    {
+      "input": {
+        "tag": "c:ingots/nickel"
+      }
+    },
+    {
+      "input": {
+        "tag": "c:gems/diamond"
+      }
+    }
+  ],
+  "output": {
+    "item": "oritech:adamant_ingot"
+  },
+  "ticks": 800
+}

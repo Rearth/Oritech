@@ -16,7 +16,6 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.pipes.AbstractPipeBlock;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
-import rearth.oritech.block.blocks.pipes.GenericPipeDuctBlock;
 import rearth.oritech.block.entity.interaction.PipeBoosterBlockEntity;
 
 import java.util.*;

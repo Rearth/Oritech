@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "a": {
-      "item": "minecraft:chain"
+      "tag": "c:chains"
     },
     "b": {
       "item": "oritech:ceiling_light"

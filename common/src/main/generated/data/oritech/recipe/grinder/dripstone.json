@@ -1,0 +1,19 @@
+{
+  "type": "oritech:grinder",
+  "fluidInputAmount": 0,
+  "fluidInputVariant": "minecraft:empty",
+  "fluidOutputAmount": 0,
+  "fluidOutputVariant": "minecraft:empty",
+  "ingredients": [
+    {
+      "item": "minecraft:dripstone_block"
+    }
+  ],
+  "results": [
+    {
+      "count": 4,
+      "id": "minecraft:pointed_dripstone"
+    }
+  ],
+  "time": 200
+}
