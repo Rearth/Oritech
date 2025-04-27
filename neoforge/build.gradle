@@ -121,7 +121,7 @@ tasks.remapJar {
 publishMods {
     file = remapJar.archiveFile
     changelog = file("../CHANGELOG.md").getText()
-    type = BETA
+    type = ALPHA
     modLoaders.add("neoforge")
 
     modrinth {
@@ -132,7 +132,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("athena-ctm")
+        requires("stitch")
         requires("architectury-api")
 
         announcementTitle = "Neoforge Version on Modrinth"
@@ -146,7 +146,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("athena")
+        requires("stitch")
         requires("architectury-api")
 
         javaVersions.add(JavaVersion.VERSION_21)

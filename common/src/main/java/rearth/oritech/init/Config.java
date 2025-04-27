@@ -78,6 +78,7 @@ public class Config {
     public int ventRelativeRate = 100;
     public int maxHeat = 2000;
     public int maxUnstableTicks = 400;
+    public boolean boringNukes = false;
     
     @SectionHeader("arcane")
     public int enchanterCostMultiplier = 5;
@@ -91,6 +92,7 @@ public class Config {
     public int maxGateDist = 10;
     public float bendFactor = 2.5f;
     public int accelerationRFCost = 10;
+    public long acceleratorMotorRFCapacity = 5_000_000L;
     public int endPortalRequiredSpeed = 10000;
     public int netherPortalRequiredSpeed = 5000;
     public int blackHoleRequiredSpeed = 15000;

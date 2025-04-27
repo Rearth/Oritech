@@ -8,6 +8,7 @@ import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
@@ -409,6 +410,11 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
         
         if (field.isAnnotationPresent(NoBlockItem.class)) return;
         
+        var targetGroup = ItemContent.Groups.machines;
+        if (field.isAnnotationPresent(ItemContent.ItemGroupTarget.class)) {
+            targetGroup = field.getAnnotation(ItemContent.ItemGroupTarget.class).value();
+        }
+        
         if (field.isAnnotationPresent(UseGeoBlockItem.class)) {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), getGeoBlockItem(value, identifier, field.getAnnotation(UseGeoBlockItem.class).scale()));
         } else if ((value.equals(BlockContent.SMALL_TANK_BLOCK) || value.equals(BlockContent.CREATIVE_TANK_BLOCK)) && FluidApi.ITEM != null) {
@@ -419,13 +425,13 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
             var item = new SmallEnergyStorageBlockItem(value, new Item.Settings().component(EnergyApi.ITEM.getEnergyComponent(), 0L));
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), item);
             EnergyApi.ITEM.registerForItem(() -> item);
+            
+            var variantStack = new ItemStack(item);
+            variantStack.set(EnergyApi.ITEM.getEnergyComponent(), Oritech.CONFIG.smallEnergyStorage.energyCapacity());
+            ItemGroups.add(targetGroup, variantStack);
+            
         } else {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), createBlockItem(value, identifier));
-        }
-        
-        var targetGroup = ItemContent.Groups.machines;
-        if (field.isAnnotationPresent(ItemContent.ItemGroupTarget.class)) {
-            targetGroup = field.getAnnotation(ItemContent.ItemGroupTarget.class).value();
         }
         
         if (!field.isAnnotationPresent(NoAutoDrop.class)) {

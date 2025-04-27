@@ -6,13 +6,14 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
 import rearth.oritech.init.BlockEntitiesContent;
 
 public class AcceleratorMotorBlockEntity extends BlockEntity implements EnergyApi.BlockProvider {
     
-    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(5_000_000, 5_000_000, 5_000_000, this::markDirty);
+    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(Oritech.CONFIG.acceleratorMotorRFCapacity(), Oritech.CONFIG.acceleratorMotorRFCapacity(), Oritech.CONFIG.acceleratorMotorRFCapacity(), this::markDirty);
     
     public AcceleratorMotorBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ACCELERATOR_MOTOR_BLOCK_ENTITY, pos, state);

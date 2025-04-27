@@ -1,5 +1,6 @@
 package rearth.oritech.api.recipe;
 
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -86,11 +87,11 @@ public abstract class OritechRecipeBuilder {
     }
 
     public OritechRecipeBuilder fluidOutput(Fluid out, float bucketAmount) {
-        return fluidOutput(FluidStack.create(out, (long)(bucketAmount * FluidStack.bucketAmount())));
+        return fluidOutput(FluidStack.create(out, (long)(bucketAmount * FluidStackHooks.bucketAmount())));
     }
 
     public OritechRecipeBuilder fluidOutput(Fluid out) {
-        return fluidOutput(FluidStack.create(out, FluidStack.bucketAmount()));
+        return fluidOutput(FluidStack.create(out, FluidStackHooks.bucketAmount()));
     }
 
     public OritechRecipeBuilder result(ItemStack out) {

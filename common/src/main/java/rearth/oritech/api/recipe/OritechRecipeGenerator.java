@@ -489,7 +489,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // fuel
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(cFluidTag("oil")).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(TagContent.BIOFUEL).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel_from_biofuel");
-        CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOMASS).fluidOutput(FluidContent.STILL_BIOFUEL.get(), 0.1f).timeMultiplier(0.2f).export(exporter, "biofuel");
+        CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOMASS).fluidInput(Fluids.WATER, 0.25f).fluidOutput(FluidContent.STILL_BIOFUEL.get(), 0.1f).timeMultiplier(0.2f).export(exporter, "biofuel");
         
         // biosteel
         FoundryRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).input(cItemTag("ingots/iron")).result(ItemContent.BIOSTEEL_INGOT).export(exporter, "biosteel");

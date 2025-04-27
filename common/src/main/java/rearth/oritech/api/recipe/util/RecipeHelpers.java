@@ -9,13 +9,15 @@ import net.minecraft.item.ItemConvertible;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.tag.TagKey;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.GrinderRecipeBuilder;
 import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
+
 import java.util.List;
-import org.jetbrains.annotations.Nullable;
 
 public class RecipeHelpers {
+    
     public static void addDustRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, String suffix) {
         addDustRecipe(exporter, ingot, dust, null, suffix);
     }
@@ -28,11 +30,11 @@ public class RecipeHelpers {
             RecipeProvider.offerBlasting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 100, Oritech.MOD_ID);
         }
     }
-
+    
     public static CraftingRecipeJsonBuilder createInsulatedCableRecipe(RecipeCategory category, Item output, int count, Ingredient input, Ingredient insulation) {
         return ShapedRecipeJsonBuilder.create(category, output, count).input('c', input).input('i', insulation).pattern("iii").pattern("ccc").pattern("iii");
     }
-
+    
     public static Ingredient of(ItemConvertible item) {
         return Ingredient.ofItems(item);
     }

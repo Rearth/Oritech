@@ -9,6 +9,7 @@ import net.minecraft.util.Formatting;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
+import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyApi.
         var storedEnergy = stack.getOrDefault(EnergyApi.ITEM.getEnergyComponent(), 0L);
         
         if (storedEnergy != 0) {
-            var text = Text.translatable("tooltip.oritech.energy_stored", storedEnergy);
+            var text = Text.translatable("tooltip.oritech.energy_stored", TooltipHelper.getEnergyText(storedEnergy));
             tooltip.add(text.formatted(Formatting.GOLD));
         }
         

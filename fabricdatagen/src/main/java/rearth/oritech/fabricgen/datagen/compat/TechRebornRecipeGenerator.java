@@ -102,7 +102,7 @@ public class TechRebornRecipeGenerator {
     
     public static void addTechRebornPulverizerRecipes(RecipeExporter exporter) {
         PulverizerRecipeBuilder.build().input(TRContent.Ingots.ALUMINUM.asTag()).result(TRContent.Ingots.ALUMINUM.getDust().asItem()).export(exporter, PATH + "aluminum");
-        PulverizerRecipeBuilder.build().input(TRContent.Ores.BAUXITE.asTag()).result(TRContent.Dusts.BAUXITE.asItem()).export(exporter, "bauxite");
+        PulverizerRecipeBuilder.build().input(TRContent.Ores.BAUXITE.asTag()).result(TRContent.Dusts.BAUXITE.asItem()).export(exporter, PATH + "bauxite");
         PulverizerRecipeBuilder.build().input(TRContent.Ingots.BRASS.asTag()).result(TRContent.Ingots.BRASS.getDust().asItem()).export(exporter, PATH + "brass");
         PulverizerRecipeBuilder.build().input(TRContent.Ingots.BRONZE.asTag()).result(TRContent.Ingots.BRONZE.getDust().asItem()).export(exporter, PATH + "bronze");
         PulverizerRecipeBuilder.build().input(TRContent.Ingots.CHROME.asTag()).result(TRContent.Ingots.CHROME.getDust().asItem()).export(exporter, PATH + "chrome");
