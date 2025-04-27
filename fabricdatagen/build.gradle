@@ -76,6 +76,10 @@ dependencies {
 
     // yes yes all this needs to be cleaned up, and recipe viewers made conditional, but I'm waiting to clean up the CSL mess first
 
+    // not sure why this is needed, but the datagen is failing to run with a JEI NoClassDefFound error if it's not here
+    // it started happening when I stored the recipe category input slot in a temp variable and called addFluidStack() on it more than once
+    modRuntimeOnly "mezz.jei:jei-1.21.1-fabric:${jei_version}"
+
     // owo lib
     modImplementation "io.wispforest:owo-lib:0.12.11+1.21"
 

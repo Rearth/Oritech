@@ -2,7 +2,7 @@
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 1000,
-    "fluid": "oritech:still_oil"
+    "fluid": "#c:oil"
   },
   "fluidOutput": {
     "amount": 1000,

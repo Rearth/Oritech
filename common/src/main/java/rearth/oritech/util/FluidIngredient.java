@@ -73,10 +73,10 @@ public record FluidIngredient(Either<TagKey<Fluid>, Identifier> fluidContent, lo
     }
 
     public FluidIngredient withContent(TagKey<Fluid> fluidTag) {
-        var tagEntries = Registries.FLUID.getEntryList(fluidTag);
-        if (tagEntries.isPresent() && tagEntries.get().size() > 0)
-            return new FluidIngredient(Either.left(fluidTag), amount == 0 ? FluidStack.bucketAmount() : amount);
-        return EMPTY;
+        // even if the tag is empty now, it might not be later.
+        // don't test for empty tag at this point. If a tag might be empty, it would be better
+        // to add conditional loading for the recipes that use it.
+        return new FluidIngredient(Either.left(fluidTag), amount == 0 ? FluidStack.bucketAmount() : amount);
     }
 
     public FluidIngredient withAmount(long withAmount) {
@@ -92,7 +92,10 @@ public record FluidIngredient(Either<TagKey<Fluid>, Identifier> fluidContent, lo
     }
 
     public Text name() {
-        return Text.of(fluidContent.map(tag -> tag.id(), id -> id));
+        Identifier fluidId = fluidContent.map(tag -> tag.id(), id -> id);
+        return hasTag() 
+            ? Text.of("#" + fluidId.getNamespace() + ":" + fluidId.getPath())
+            : Text.translatable("fluid." + fluidContent.map(tag -> tag.id(), id -> id).toTranslationKey());
     }
 
     @Override
@@ -119,6 +122,22 @@ public record FluidIngredient(Either<TagKey<Fluid>, Identifier> fluidContent, lo
 
     public boolean isEmpty() {
         return this == EMPTY;
+    }
+
+    public boolean hasTag() {
+        return fluidContent.left().isPresent();
+    }
+
+    // mostly for convenience in recipe viewers
+    // make sure this is a tag calling, otherwise it could throw an exception
+    public TagKey<Fluid> getTag() {
+        return fluidContent.left().get();
+    }
+
+    // mostly for convenience in recipe viewers
+    // make sure this isn't a tag before calling, otherwise it could throw an exception
+    public Fluid getFluid() {
+        return Registries.FLUID.get(fluidContent.right().get());
     }
 
     @Override

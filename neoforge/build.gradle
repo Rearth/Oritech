@@ -78,7 +78,7 @@ dependencies {
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
         case "emi": modRuntimeOnly "dev.emi:emi-neoforge:${emi_version}"; break
         case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"; break
-        case "jei": modRuntimeOnly "mezz.jei:jei-1.21.1-neoforge:19.21.0.245"
+        case "jei": modRuntimeOnly "mezz.jei:jei-1.21.1-neoforge:${jei_version}"
         case "disabled": break
         default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, JEI, or disabled.")
     }

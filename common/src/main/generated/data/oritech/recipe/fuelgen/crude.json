@@ -2,7 +2,7 @@
   "type": "oritech:fuel_generator",
   "fluidInput": {
     "amount": 8100,
-    "fluid": "oritech:still_oil"
+    "fluid": "#c:oil"
   },
   "fluidOutput": {
     "amount": 0,

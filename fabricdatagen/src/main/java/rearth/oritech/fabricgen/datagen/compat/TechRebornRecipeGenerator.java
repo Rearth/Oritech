@@ -21,7 +21,6 @@ import rearth.oritech.fabricgen.datagen.RecipeGenerator;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.FluidIngredient;
 import reborncore.common.crafting.RebornRecipe;
 import reborncore.common.crafting.SizedIngredient;
 import reborncore.common.fluid.FluidValue;

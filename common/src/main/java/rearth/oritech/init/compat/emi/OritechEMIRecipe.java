@@ -10,6 +10,7 @@ import dev.emi.emi.api.recipe.BasicEmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.block.BlockState;
@@ -37,8 +38,14 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         recipe.getInputs().forEach(ingredient -> this.inputs.add(EmiIngredient.of(ingredient)));
         recipe.getResults().forEach(stack -> this.outputs.add(EmiStack.of(stack)));
         
-        if (recipe.getFluidInput() != null && recipe.getFluidInput().amount() > 0)
-            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluidStacks().getFirst().getFluid(), Math.max(recipe.getFluidInput().amount(), 1)));
+        if (recipe.getFluidInput() != null && recipe.getFluidInput().amount() > 0) {
+            var inputAmount = Math.max(recipe.getFluidInput().amount(), 1);
+            if (recipe.getFluidInput().fluidContent().left().isPresent()) {
+                this.inputs.add(new TagEmiIngredient(recipe.getFluidInput().fluidContent().left().get(), inputAmount));
+            } else {
+                this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluidStacks().getFirst().getFluid(), inputAmount));
+            }
+        }
         if (recipe.getFluidOutput() != null && recipe.getFluidInput().amount() > 0)
             this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), Math.max(recipe.getFluidInput().amount(), 1)));
         
@@ -65,8 +72,14 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         recipe.getInputs().forEach(ingredient -> this.inputs.add(EmiIngredient.of(ingredient)));
         recipe.getResults().forEach(stack -> this.outputs.add(EmiStack.of(stack)));
         
-        if (recipe.getFluidInput() != null && recipe.getFluidInput().amount() > 0)
-            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluidStacks().getFirst().getFluid(), recipe.getFluidInput().amount()));
+        if (recipe.getFluidInput() != null && recipe.getFluidInput().amount() > 0) {
+            var inputAmount = Math.max(recipe.getFluidInput().amount(), 1);
+            if (recipe.getFluidInput().hasTag()) {
+                this.inputs.add(new TagEmiIngredient(recipe.getFluidInput().getTag(), inputAmount));
+            } else {
+                this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluid(), inputAmount));
+            }
+        }
         if (recipe.getFluidOutput() != null && recipe.getFluidOutput().getAmount() > 0)
             this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), recipe.getFluidOutput().getAmount()));
             

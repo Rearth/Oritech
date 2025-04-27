@@ -132,7 +132,11 @@ public class OritechRecipeCategory implements IRecipeCategory<OritechRecipe> {
         if (!(recipe.getFluidInput() != null && recipe.getFluidInput().isEmpty())) {
             var fluidIngredient = recipe.getFluidInput();
             var shownAmount = Math.max(1, fluidIngredient.amount());
-            builder.addInputSlot(10, 6).addFluidStack(fluidIngredient.getFluidStacks().getFirst().getFluid(), shownAmount).setBackground(fluidBackground, -2, -2).setFluidRenderer(shownAmount, false, 10, 46);
+            var inputSlot = builder.addInputSlot(10, 6);
+            for (var fluidStack : fluidIngredient.getFluidStacks()) {
+                inputSlot = inputSlot.addFluidStack(fluidStack.getFluid(), shownAmount);
+            }
+            inputSlot.setBackground(fluidBackground, -2, -2).setFluidRenderer(shownAmount, false, 10, 46);
         }
         
         // results

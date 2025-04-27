@@ -18,10 +18,8 @@ import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
@@ -157,8 +155,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // lava
         LavaGeneratorRecipeBuilder.build().fluidInput(Fluids.LAVA, 0.1f).timeInSeconds(12).export(exporter, "lava");
         // fuel
-        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_OIL.get(), 0.1f).timeInSeconds(3).export(exporter, "crude");
-        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_FUEL.get(), 0.1f).timeInSeconds(12).export(exporter, "fuel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(cFluidTag("oil"), 0.1f).timeInSeconds(3).export(exporter, "crude");
+        FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.TURBOFUEL, 0.1f).timeInSeconds(12).export(exporter, "fuel");
         //steam
         // 0.000396 buckets is 32 (fabric) droplets
         SteamGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_STEAM.get(), 0.000396f).time(1).export(exporter, "steameng");
@@ -467,7 +465,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.SOLID_BIOFUEL).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_biomass");
         CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOMASS_BLOCK).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_bioblock");
-        CentrifugeFluidRecipeBuilder.build().input(ItemTags.SAND).result(ItemContent.POLYMER_RESIN).fluidInput(TagKey.of(RegistryKeys.FLUID, Identifier.of("c", "biodiesel")), 0.1f).time(100).export(exporter, "polymerresin");
+        CentrifugeFluidRecipeBuilder.build().input(ItemTags.SAND).result(ItemContent.POLYMER_RESIN).fluidInput(cFluidTag("biodiesel"), 0.1f).time(100).export(exporter, "polymerresin");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).result(ItemContent.PLASTIC_SHEET).fluidInput(Fluids.WATER, 0.5f).export(exporter, "plasticoil");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.POLYMER_RESIN).result(ItemContent.PLASTIC_SHEET).fluidInput(Fluids.WATER, 0.5f).time(66).export(exporter, "plasticbio");
         
@@ -489,8 +487,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerMotorRecipe(exporter, ItemContent.ADVANCED_BATTERY, of(TagContent.ELECTRUM_INGOTS), of(ItemContent.ENERGITE_INGOT), of(TagContent.STEEL_INGOTS), "advbattery");
         
         // fuel
-        CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(FluidContent.STILL_OIL.get()).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel");
-        CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(FluidContent.STILL_BIOFUEL.get()).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel_from_biofuel");
+        CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(cFluidTag("oil")).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel");
+        CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(TagContent.BIOFUEL).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel_from_biofuel");
         CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOMASS).fluidOutput(FluidContent.STILL_BIOFUEL.get(), 0.1f).timeMultiplier(0.2f).export(exporter, "biofuel");
         
         // biosteel

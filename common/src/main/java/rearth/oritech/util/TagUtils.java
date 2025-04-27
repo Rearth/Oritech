@@ -1,6 +1,7 @@
 package rearth.oritech.util;
 
 import net.minecraft.block.Block;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
@@ -44,5 +45,17 @@ public class TagUtils {
 
     public static TagKey<Block> oritechBlockTag(String path) {
         return TagKey.of(RegistryKeys.BLOCK, Oritech.id(path));
+    }
+
+    public static TagKey<Fluid> cFluidTag(String path) {
+        return fluidTag(C_TAG_NAMESPACE, path);
+    }
+
+    public static TagKey<Fluid> fluidTag(String namespace, String path) {        
+        return TagKey.of(RegistryKeys.FLUID, Identifier.of(namespace, path));
+    }
+
+    public static TagKey<Fluid> oritechFluidTag(String path) {
+        return fluidTag(Oritech.MOD_ID, path);
     }
 }
