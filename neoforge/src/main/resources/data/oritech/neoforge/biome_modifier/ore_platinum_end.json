@@ -1,0 +1,6 @@
+{
+    "type": "neoforge:add_features",
+    "biomes": "#minecraft:is_the_end",
+    "features": "oritech:ore_platinum_end",
+    "step": "underground_ores"
+  }
