@@ -18,6 +18,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -432,6 +433,13 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
                   Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.6875, 0.125, 0.5625, 0.9375, 0.4375, 0.6875), facing, face),
                   Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0.125, 0.3125, 0.3125, 0.4375, 0.4375), facing, face),
                   Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.6875, 0.125, 0.3125, 0.9375, 0.4375, 0.4375), facing, face));
+                MACHINE_SILK_TOUCH_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = VoxelShapes.union(
+                  Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
+                  Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.375, 0.25, 0.875), facing, face),
+                  Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.625, 0.1875, 0.3125, 0.6875, 0.25, 0.8125), facing, face),
+                  Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.1875, 0.25, 0.875, 0.25, 0.4375), facing, face),
+                  Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.1875, 0.875, 0.1875, 0.875), facing, face)
+                );
             }
         }
     }
