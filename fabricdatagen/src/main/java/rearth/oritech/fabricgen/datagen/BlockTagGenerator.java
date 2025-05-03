@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
+import static rearth.oritech.init.TagContent.cBlockTag;
+
 public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
     
     public BlockTagGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
@@ -65,6 +67,17 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .add(BlockContent.DEEPSLATE_NICKEL_ORE)
           .add(BlockContent.DEEPSLATE_PLATINUM_ORE)
           .add(BlockContent.DEEPSLATE_URANIUM_ORE)
+          .add(BlockContent.ENDSTONE_PLATINUM_ORE);
+        
+        getOrCreateTagBuilder(cBlockTag("ores_in_ground/stone"))
+          .add(BlockContent.NICKEL_ORE);
+
+        getOrCreateTagBuilder(cBlockTag("ores_in_ground/deepslate"))
+          .add(BlockContent.DEEPSLATE_NICKEL_ORE)
+          .add(BlockContent.DEEPSLATE_PLATINUM_ORE)
+          .add(BlockContent.DEEPSLATE_URANIUM_ORE);
+        
+        getOrCreateTagBuilder(cBlockTag("ores_in_ground/end_stone"))
           .add(BlockContent.ENDSTONE_PLATINUM_ORE);
         
         getOrCreateTagBuilder(BlockTags.NEEDS_STONE_TOOL)

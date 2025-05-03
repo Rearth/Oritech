@@ -51,6 +51,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(getClumpTag("nickel")).add(ItemContent.NICKEL_CLUMP).addOptional(Identifier.of("create", "crushed_raw_nickel"));
         getOrCreateTagBuilder(getClumpTag("platinum")).add(ItemContent.PLATINUM_CLUMP).addOptional(Identifier.of("create", "crushed_raw_platinum"));
         // for compat
+        getOrCreateTagBuilder(getClumpTag("zinc")).addOptional(Identifier.of("create", "crushed_raw_zinc"));
         getOrCreateTagBuilder(getClumpTag("uranium")).addOptional(Identifier.of("create", "crushed_raw_uranium"));
         getOrCreateTagBuilder(getClumpTag("osmium")).addOptional(Identifier.of("create", "crushed_raw_osmium"));
         
@@ -117,7 +118,6 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         
         getOrCreateTagBuilder(TagContent.STEEL_INGOTS).add(ItemContent.STEEL_INGOT).add(ItemContent.BIOSTEEL_INGOT);
         getOrCreateTagBuilder(TagContent.QUARTZ_DUSTS).add(ItemContent.QUARTZ_DUST);
-        getOrCreateTagBuilder(TagContent.COAL_DUSTS).add(ItemContent.COAL_DUST).addOptional(Identifier.of("immersiveengineering", "dust_hop_graphite"));
         
         // vanilla variants
         getOrCreateTagBuilder(TagContent.COPPER_DUSTS).add(ItemContent.COPPER_DUST);
