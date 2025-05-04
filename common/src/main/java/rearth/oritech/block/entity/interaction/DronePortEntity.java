@@ -178,11 +178,15 @@ public class DronePortEntity extends BlockEntity
         nbt.putBoolean("has_fluid_addon", hasFluidAddon);
         nbt.putBoolean("disabled_via_redstone", disabledViaRedstone);
         nbt.putLong("energy_stored", energyStorage.amount);
-        
+
         if (targetPosition != null) {
             nbt.putLong("target_position", targetPosition.asLong());
         }
-        
+
+        var cardCompound = new NbtCompound();
+        Inventories.writeNbt(cardCompound, cardInventory.heldStacks, false, registryLookup);
+        nbt.put("cards", cardCompound);
+
         if (incomingPacket != null) {
             var compound = new NbtCompound();
             DefaultedList<ItemStack> list = DefaultedList.ofSize(incomingPacket.transferredStacks.size());
@@ -208,6 +212,8 @@ public class DronePortEntity extends BlockEntity
         disabledViaRedstone = nbt.getBoolean("disabled_via_redstone");
         energyStorage.amount = nbt.getLong("energy_stored");
         targetPosition = BlockPos.fromLong(nbt.getLong("target_position"));
+
+        Inventories.readNbt(nbt.getCompound("cards"), cardInventory.heldStacks, registryLookup);
         
         if (nbt.contains("incoming")) {
             DefaultedList<ItemStack> list = DefaultedList.ofSize(15, ItemStack.EMPTY);
