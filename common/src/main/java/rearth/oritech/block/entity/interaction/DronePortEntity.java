@@ -210,7 +210,7 @@ public class DronePortEntity extends BlockEntity
         targetPosition = BlockPos.fromLong(nbt.getLong("target_position"));
         
         if (nbt.contains("incoming")) {
-            DefaultedList<ItemStack> list = DefaultedList.ofSize(15);
+            DefaultedList<ItemStack> list = DefaultedList.ofSize(15, ItemStack.EMPTY);
             Inventories.readNbt(nbt.getCompound("incoming"), list, registryLookup);
             var fluid = FluidStack.CODEC.parse(NbtOps.INSTANCE, nbt.get("fluidmoving")).result().orElse(FluidStack.empty());
             var arrivalTime = nbt.getLong("incomingTime");
