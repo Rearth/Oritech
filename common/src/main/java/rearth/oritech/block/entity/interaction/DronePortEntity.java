@@ -112,6 +112,7 @@ public class DronePortEntity extends BlockEntity
     private DroneTransferData incomingPacket;
     private DroneAnimState animState = DroneAnimState.IDLE;
     private boolean networkDirty;
+    private boolean receivingPackage;
     
     // config
     private final long baseEnergyUsage = 1024;
@@ -254,6 +255,7 @@ public class DronePortEntity extends BlockEntity
         
         Oritech.LOGGER.debug("receiving drone package: " + incomingPacket);
         
+        receivingPackage = true;
         long totalToInsert = incomingPacket.transferredStacks.stream().mapToLong(ItemStack::getCount).sum();
         long totalInserted = 0;
         for (var stack : incomingPacket.transferredStacks) {
@@ -269,6 +271,7 @@ public class DronePortEntity extends BlockEntity
             fluidStorage.insertFromDrone(incomingPacket.movedFluid, false);
         }
         
+        receivingPackage = false;
         incomingPacket = null;
         markDirty();
     }
@@ -765,7 +768,7 @@ public class DronePortEntity extends BlockEntity
         
         @Override
         public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
-            if (DronePortEntity.this.incomingPacket != null) return 0;
+            if (DronePortEntity.this.incomingPacket != null && !receivingPackage) return 0;
             return super.insertToSlot(addedStack, slot, simulate);
         }
     }
