@@ -48,7 +48,7 @@ public class LaserArmEntityBehavior {
                 var stackRef = new StackContext(player.getEquippedStack(EquipmentSlot.CHEST), updated -> player.getInventory().armor.set(EquipmentSlot.CHEST.getEntitySlotId(), updated));
                 var candidate = EnergyApi.ITEM.find(stackRef);
                 if (candidate != null) {
-                    var amount = EnergyApi.transfer(laserEntity.getEnergyStorageForMultiblock(null), candidate, laserEntity.energyRequiredToFire(), false);
+                    var amount = candidate.insert(laserEntity.energyRequiredToFire(), false);
                     return amount > 0;
                 }
                 

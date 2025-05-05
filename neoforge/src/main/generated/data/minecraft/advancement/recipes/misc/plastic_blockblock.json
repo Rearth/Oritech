@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_plastic_sheet": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:plastic_sheet"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:plastic_blockblock"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_plastic_sheet"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:plastic_blockblock"
+    ]
+  }
+}

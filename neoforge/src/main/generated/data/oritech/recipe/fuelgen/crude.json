@@ -1,0 +1,14 @@
+{
+  "type": "oritech:fuel_generator",
+  "fluidInput": {
+    "amount": 100,
+    "fluid": "#c:oil"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [],
+  "results": [],
+  "time": 60
+}

@@ -102,7 +102,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
         
         // remove inputs
         // correct amount and variant is already validated in getRecipe, so we can directly remove it
-        var fluidStack = activeRecipe.getFluidInput();
+        var fluidStack = fluidStorage.getStack().copyWithAmount(activeRecipe.getFluidInput().amount());
         fluidStorage.extract(fluidStack, false);
     }
     
@@ -124,7 +124,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
         for (var recipeEntry : availableRecipes) {
             var recipe = recipeEntry.value();
             var recipeFluid = recipe.getFluidInput();
-            if (recipeFluid.isFluidEqual(checkedTank.getStack()) && checkedTank.getStack().getAmount() >= recipeFluid.getAmount())
+            if (recipeFluid.matchesFluid(checkedTank.getStack()) && checkedTank.getStack().getAmount() >= recipeFluid.amount())
                 return Optional.of(recipeEntry);
         }
         

@@ -4,11 +4,10 @@ icon: oritech:fluid_pipe
 related_items: [oritech:fluid_pipe]
 ---
 
-Fluid pipes behave similarly to item pipes. However, they also have a small internal storage at each connection.
-Like item pipes, when set to extract, they will extract from all neighboring blocks.
-However, unlike item pipes, blocks can also push fluids into a pipe, which the pipe then moves to the next available fluid storage.
+Fluid pipes behave similarly to item pipes. They connect to fluid containers, and can be set to extract by right-clicking a connection. They also do not have an internal inventory.
 
 To store fluids, you can use a fluid tank. The small fluid tank stores up to *256* buckets of fluid.
+
 When broken, the small tank retains all of its content in the item NBT. A comparator output will reflect the tank's fill status.
 Stacked tanks will automatically let the fluid flow downward.
 

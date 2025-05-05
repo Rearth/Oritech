@@ -13,6 +13,8 @@ import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
+import rearth.oritech.util.FluidIngredient;
+
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.util.SimpleCraftingInventory;
 
@@ -20,31 +22,36 @@ import java.util.List;
 
 public class OritechRecipe implements Recipe<RecipeInput> {
     
-    public static final int fluidDivider = Platform.isNeoForge() ? 81 : 1;  // dirty hack because bucket amounts are 81000 in neo, and 1000 in fabric, but datagen/recipes are on fabric
-    
     protected final OritechRecipeType type;
     protected final List<Ingredient> inputs;
     protected final List<ItemStack> results;
-    protected final FluidStack fluidInput;
+    protected final FluidIngredient fluidInput;
     protected final FluidStack fluidOutput;
     protected final int time;
 
-    public static final OritechRecipe DUMMY = new OritechRecipe(-1, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER, FluidStack.empty(), FluidStack.empty());
+    public static final OritechRecipe DUMMY = new OritechRecipe(-1, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER, FluidIngredient.EMPTY, FluidStack.empty());
     
-    public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, @Nullable FluidStack fluidInput, @Nullable FluidStack fluidOutput) {
+    public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, @Nullable FluidIngredient fluidInput, @Nullable FluidStack fluidOutput) {
         this.type = type;
         this.results = results;
         this.inputs = inputs;
         this.time = time;
-        if (fluidInput == null) fluidInput = FluidStack.empty();
-        this.fluidInput = fluidInput;
+        if (fluidInput == null) fluidInput = FluidIngredient.EMPTY;
+        this.fluidInput = fluidInput.withAmount(fluidInput.amount());
         if (fluidOutput == null) fluidOutput = FluidStack.empty();
         this.fluidOutput = fluidOutput;
+        if (!fluidOutput.isEmpty())
+            this.fluidOutput.setAmount(this.fluidOutput.getAmount());
+    }
+
+    public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, @Nullable FluidIngredient fluidInput, Fluid outVariant, long outAmount) {
+        this(time, inputs, results, type, fluidInput, FluidStack.create(outVariant, outAmount));
     }
     
     public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, Fluid inVariant, long inAmount, Fluid outVariant, long outAmount) {
-        this(time, inputs, results, type, FluidStack.create(inVariant, inAmount / fluidDivider), FluidStack.create(outVariant, outAmount / fluidDivider));
+        this(time, inputs, results, type, new FluidIngredient().withContent(inVariant).withAmount(inAmount), FluidStack.create(outVariant, outAmount));
     }
+    
     
     @Override
     public boolean matches(RecipeInput input, World world) {
@@ -158,7 +165,7 @@ public class OritechRecipe implements Recipe<RecipeInput> {
         return type;
     }
     
-    public @Nullable FluidStack getFluidInput() {
+    public @Nullable FluidIngredient getFluidInput() {
         return fluidInput;
     }
     

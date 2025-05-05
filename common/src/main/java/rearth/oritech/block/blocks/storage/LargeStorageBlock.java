@@ -104,6 +104,9 @@ public class LargeStorageBlock extends SmallStorageBlock {
                         world.spawnEntity(itemEntity);
                     }
                 }
+                
+                storageBlock.inventory.heldStacks.clear();
+                storageBlock.inventory.markDirty();
             }
         }
         

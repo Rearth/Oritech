@@ -112,6 +112,7 @@ public class DronePortEntity extends BlockEntity
     private DroneTransferData incomingPacket;
     private DroneAnimState animState = DroneAnimState.IDLE;
     private boolean networkDirty;
+    private boolean receivingPackage;
     
     // config
     private final long baseEnergyUsage = 1024;
@@ -177,11 +178,15 @@ public class DronePortEntity extends BlockEntity
         nbt.putBoolean("has_fluid_addon", hasFluidAddon);
         nbt.putBoolean("disabled_via_redstone", disabledViaRedstone);
         nbt.putLong("energy_stored", energyStorage.amount);
-        
+
         if (targetPosition != null) {
             nbt.putLong("target_position", targetPosition.asLong());
         }
-        
+
+        var cardCompound = new NbtCompound();
+        Inventories.writeNbt(cardCompound, cardInventory.heldStacks, false, registryLookup);
+        nbt.put("cards", cardCompound);
+
         if (incomingPacket != null) {
             var compound = new NbtCompound();
             DefaultedList<ItemStack> list = DefaultedList.ofSize(incomingPacket.transferredStacks.size());
@@ -207,9 +212,11 @@ public class DronePortEntity extends BlockEntity
         disabledViaRedstone = nbt.getBoolean("disabled_via_redstone");
         energyStorage.amount = nbt.getLong("energy_stored");
         targetPosition = BlockPos.fromLong(nbt.getLong("target_position"));
+
+        Inventories.readNbt(nbt.getCompound("cards"), cardInventory.heldStacks, registryLookup);
         
         if (nbt.contains("incoming")) {
-            DefaultedList<ItemStack> list = DefaultedList.ofSize(15);
+            DefaultedList<ItemStack> list = DefaultedList.ofSize(15, ItemStack.EMPTY);
             Inventories.readNbt(nbt.getCompound("incoming"), list, registryLookup);
             var fluid = FluidStack.CODEC.parse(NbtOps.INSTANCE, nbt.get("fluidmoving")).result().orElse(FluidStack.empty());
             var arrivalTime = nbt.getLong("incomingTime");
@@ -254,6 +261,7 @@ public class DronePortEntity extends BlockEntity
         
         Oritech.LOGGER.debug("receiving drone package: " + incomingPacket);
         
+        receivingPackage = true;
         long totalToInsert = incomingPacket.transferredStacks.stream().mapToLong(ItemStack::getCount).sum();
         long totalInserted = 0;
         for (var stack : incomingPacket.transferredStacks) {
@@ -269,6 +277,7 @@ public class DronePortEntity extends BlockEntity
             fluidStorage.insertFromDrone(incomingPacket.movedFluid, false);
         }
         
+        receivingPackage = false;
         incomingPacket = null;
         markDirty();
     }
@@ -765,7 +774,7 @@ public class DronePortEntity extends BlockEntity
         
         @Override
         public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
-            if (DronePortEntity.this.incomingPacket != null) return 0;
+            if (DronePortEntity.this.incomingPacket != null && !receivingPackage) return 0;
             return super.insertToSlot(addedStack, slot, simulate);
         }
     }

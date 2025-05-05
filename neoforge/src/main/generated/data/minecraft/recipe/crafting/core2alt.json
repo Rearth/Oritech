@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "tag": "c:gems/lapis"
+    },
+    "s": {
+      "tag": "c:ingots/iron"
+    }
+  },
+  "pattern": [
+    "sss",
+    "scs",
+    "sss"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:machine_core_2"
+  }
+}

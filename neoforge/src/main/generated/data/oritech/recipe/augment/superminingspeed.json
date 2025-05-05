@@ -1,0 +1,46 @@
+{
+  "type": "oritech:augment",
+  "applyCost": [
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:energite_ingot"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "tag": "c:storage_blocks/redstone"
+      }
+    }
+  ],
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:augment/miningspeed",
+    "oritech:augment/superspeedboost"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:energite_ingot"
+      }
+    },
+    {
+      "count": 48,
+      "ingredient": {
+        "item": "oritech:flux_gate"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:duratium_ingot"
+      }
+    }
+  ],
+  "rfCost": 450000000,
+  "time": 2400,
+  "uiX": 80,
+  "uiY": 10
+}

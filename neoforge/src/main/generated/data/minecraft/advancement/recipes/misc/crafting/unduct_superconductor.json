@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_superconductor": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:superconductor"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/unduct_superconductor"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_superconductor"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/unduct_superconductor"
+    ]
+  }
+}

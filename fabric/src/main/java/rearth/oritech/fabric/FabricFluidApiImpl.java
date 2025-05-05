@@ -233,7 +233,7 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         
         @Override
         protected FluidStack createSnapshot() {
-            return container.getStack();
+            return container.getStack().copy();
         }
         
         @Override
@@ -353,7 +353,7 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         
         @Override
         protected Pair<FluidStack, FluidStack> createSnapshot() {
-            return new Pair<>(container.getInStack(), container.getOutStack());
+            return new Pair<>(container.getInStack().copy(), container.getOutStack().copy());
         }
         
         @Override
@@ -441,7 +441,7 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         
         @Override
         protected List<FluidStack> createSnapshot() {
-            return storage.getContent();
+            return storage.getContent().stream().map(FluidStack::copy).toList();
         }
         
         @Override

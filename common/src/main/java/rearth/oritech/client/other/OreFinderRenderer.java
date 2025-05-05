@@ -22,7 +22,7 @@ public class OreFinderRenderer {
         if (world == null || renderedBlocks == null) return;
         var age = world.getTime() - receivedAt;
         
-        if (age > 40) return;
+        if (age > 15) return;
         
         for (var pos : renderedBlocks) {
             var state = world.getBlockState(pos);

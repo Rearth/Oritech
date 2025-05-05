@@ -1,9 +1,13 @@
 {
   "type": "oritech:lava_generator",
-  "fluidInputAmount": 8100,
-  "fluidInputVariant": "minecraft:lava",
-  "fluidOutputAmount": 0,
-  "fluidOutputVariant": "minecraft:empty",
+  "fluidInput": {
+    "amount": 8100,
+    "fluid": "minecraft:lava"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
   "ingredients": [],
   "results": [],
   "time": 240

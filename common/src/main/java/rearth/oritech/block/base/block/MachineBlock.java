@@ -103,6 +103,9 @@ public abstract class MachineBlock extends HorizontalFacingBlock implements Bloc
                     world.spawnEntity(itemEntity);
                 }
             }
+            
+            entity.inventory.heldStacks.clear();
+            entity.inventory.markDirty();
         }
     }
     

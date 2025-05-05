@@ -57,7 +57,7 @@ dependencies {
     include modApi("dev.technici4n:GrandPower:3.0.2")
 
     // owo lib
-    modImplementation "io.wispforest:owo-lib-neoforge:0.12.15-beta.9+1.21"
+    modImplementation "io.wispforest:owo-lib-neoforge:${owo_version}"
     forgeRuntimeLibrary(include(api("io.wispforest:endec:0.1.8")))
     forgeRuntimeLibrary(include(api("io.wispforest.endec:netty:0.1.4")))
     forgeRuntimeLibrary(include(api("io.wispforest.endec:gson:0.1.5")))
@@ -78,7 +78,7 @@ dependencies {
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
         case "emi": modRuntimeOnly "dev.emi:emi-neoforge:${emi_version}"; break
         case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"; break
-        case "jei": modRuntimeOnly "mezz.jei:jei-1.21.1-neoforge:19.21.0.245"
+        case "jei": modRuntimeOnly "mezz.jei:jei-1.21.1-neoforge:${jei_version}"
         case "disabled": break
         default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, JEI, or disabled.")
     }
@@ -121,7 +121,7 @@ tasks.remapJar {
 publishMods {
     file = remapJar.archiveFile
     changelog = file("../CHANGELOG.md").getText()
-    type = BETA
+    type = ALPHA
     modLoaders.add("neoforge")
 
     modrinth {
@@ -132,7 +132,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("athena-ctm")
+        requires("stitch")
         requires("architectury-api")
 
         announcementTitle = "Neoforge Version on Modrinth"
@@ -146,7 +146,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("athena")
+        requires("stitch")
         requires("architectury-api")
 
         javaVersions.add(JavaVersion.VERSION_21)

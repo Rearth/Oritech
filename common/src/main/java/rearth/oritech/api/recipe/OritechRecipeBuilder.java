@@ -4,6 +4,7 @@ import dev.architectury.hooks.fluid.FluidStackHooks;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.util.FluidIngredient;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -25,7 +26,7 @@ public abstract class OritechRecipeBuilder {
     protected final OritechRecipeType type;
     protected List<Ingredient> inputs;
     protected List<ItemStack> results;
-    protected FluidStack fluidInput;
+    protected FluidIngredient fluidInput;
     protected FluidStack fluidOutput;
     protected int time = 200;
     protected float timeMultiplier = 1f;
@@ -59,17 +60,25 @@ public abstract class OritechRecipeBuilder {
         return input(Ingredient.fromTag(in));
     }
 
-    public OritechRecipeBuilder fluidInput(FluidStack in) {
+    public OritechRecipeBuilder fluidInput(FluidIngredient in) {
         fluidInput = in;
         return this;
     }
 
     public OritechRecipeBuilder fluidInput(Fluid in, float bucketAmount) {
-        return fluidInput(FluidStack.create(in, (long)(bucketAmount * FluidStackHooks.bucketAmount())));
+        return fluidInput(new FluidIngredient().withContent(in).withAmount(bucketAmount));
     }
 
     public OritechRecipeBuilder fluidInput(Fluid in) {
-        return fluidInput(FluidStack.create(in, FluidStackHooks.bucketAmount()));
+        return fluidInput(in, 1.0f);
+    }
+
+    public OritechRecipeBuilder fluidInput(TagKey<Fluid> in) {
+        return fluidInput(in, 1.0f);
+    }
+
+    public OritechRecipeBuilder fluidInput(TagKey<Fluid> in, float bucketAmount)  {
+        return fluidInput(new FluidIngredient().withContent(in).withAmount(bucketAmount));
     }
 
     public OritechRecipeBuilder fluidOutput(FluidStack out) {
@@ -150,7 +159,7 @@ public abstract class OritechRecipeBuilder {
                 inputs != null ? inputs : List.of(),
                 results != null ? results : List.of(),
                 type,
-                fluidInput != null ? fluidInput : FluidStack.empty(),
+                fluidInput != null ? fluidInput : FluidIngredient.EMPTY,
                 fluidOutput != null ? fluidOutput : FluidStack.empty()),
             null);
     }

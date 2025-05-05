@@ -119,6 +119,9 @@ public class ItemFilterBlock extends Block implements BlockEntityProvider {
                     world.spawnEntity(itemEntity);
                 }
             }
+            
+            entity.inventory.heldStacks.clear();
+            entity.inventory.markDirty();
         }
         
         return super.onBreak(world, pos, state, player);

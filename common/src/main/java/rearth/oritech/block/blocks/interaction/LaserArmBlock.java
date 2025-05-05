@@ -153,6 +153,9 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
                         world.spawnEntity(itemEntity);
                     }
                 }
+                
+                storageBlock.inventory.heldStacks.clear();
+                storageBlock.inventory.markDirty();
             }
         }
         

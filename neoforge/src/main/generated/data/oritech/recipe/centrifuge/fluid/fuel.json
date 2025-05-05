@@ -1,0 +1,18 @@
+{
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 1000,
+    "fluid": "#c:oil"
+  },
+  "fluidOutput": {
+    "amount": 1000,
+    "fluid": "oritech:still_fuel"
+  },
+  "ingredients": [
+    {
+      "item": "oritech:fluxite"
+    }
+  ],
+  "results": [],
+  "time": 200
+}

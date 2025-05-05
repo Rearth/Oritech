@@ -86,6 +86,9 @@ public class ChargerBlock extends HorizontalFacingBlock implements BlockEntityPr
                     world.spawnEntity(itemEntity);
                 }
             }
+            
+            entity.inventory.heldStacks.clear();
+            entity.inventory.markDirty();
         }
         
         return super.onBreak(world, pos, state, player);

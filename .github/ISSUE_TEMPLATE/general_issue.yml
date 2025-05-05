@@ -47,13 +47,6 @@ body:
     validations:
       required: true
   - type: input
-    attributes:
-      label: Fabric API version
-      description: What version of Fabric API (or forgified fabric api) are you using?
-      placeholder: e.g. 0.100.3+1.21
-    validations:
-      required: true
-  - type: input
     id: oritech-version
     attributes:
       label: Oritech version

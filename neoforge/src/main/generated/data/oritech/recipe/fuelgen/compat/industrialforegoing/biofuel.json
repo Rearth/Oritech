@@ -6,10 +6,14 @@
     }
   ],
   "type": "oritech:fuel_generator",
-  "fluidInputAmount": 8100,
-  "fluidInputVariant": "industrialforegoing:biofuel",
-  "fluidOutputAmount": 0,
-  "fluidOutputVariant": "minecraft:empty",
+  "fluidInput": {
+    "amount": 100,
+    "fluid": "industrialforegoing:biofuel"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
   "ingredients": [],
   "results": [],
   "time": 60

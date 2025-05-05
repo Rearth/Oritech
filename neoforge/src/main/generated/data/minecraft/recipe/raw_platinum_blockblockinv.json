@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:storage_blocks/raw_platinum"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "oritech:raw_platinum"
+  }
+}

@@ -134,7 +134,7 @@ public class PlayerAugments {
     public static final PlayerAugment nightVision = new PlayerCustomAugment(Oritech.id("augment/nightvision"), true) {
         @Override
         public void onInstalled(PlayerEntity player) {
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 999999, 0, true, false, false));
+            player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 9999999, 0, true, false, false));
         }
 
         @Override
@@ -161,7 +161,7 @@ public class PlayerAugments {
     public static final PlayerAugment waterBreathing = new PlayerCustomAugment(Oritech.id("augment/waterbreath")) {
         @Override
         public void onInstalled(PlayerEntity player) {
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.WATER_BREATHING, 999999, 0, true, false, false));
+            player.addStatusEffect(new StatusEffectInstance(StatusEffects.WATER_BREATHING, 9999999, 0, true, false, false));
         }
 
         @Override
@@ -274,7 +274,7 @@ public class PlayerAugments {
             var world = player.getWorld();
             var target = BlockPos.ofFloored(player.getEyePos());
 
-            if (world.getTime() % 20 != 0) return;
+            if (world.getTime() % 5 != 0) return;
 
             var range = 16;
 
@@ -374,6 +374,19 @@ public class PlayerAugments {
         for (var augment : allAugments.values()) {
             if (augment.isInstalled(player))
                 augment.onPlayerLoad(player);
+            
+            // migrate old augment IDs
+            // this can be removed in a few versions
+            if (augment instanceof PlayerStatEnhancingAugment statEnhancingAugment) {
+                
+                var oldId = statEnhancingAugment.id.withPath(statEnhancingAugment.id.getPath().replace("augment/", ""));
+                var instance = player.getAttributeInstance(statEnhancingAugment.targetAttribute);
+                if (instance == null) continue;
+                if (instance.hasModifier(oldId)) {
+                    Oritech.LOGGER.info("Removing old augment id {} from player {}", oldId, player.getName().getString());
+                    instance.removeModifier(oldId);
+                }
+            }
         }
     }
 
@@ -647,7 +660,7 @@ public class PlayerAugments {
             if (instance == null) return;
             instance.overwritePersistentModifier(new EntityAttributeModifier(id, amount, operation));
             this.onInstalled(player);
-
+            
             if (autoSync && !player.getWorld().isClient)
                 NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentOperationSyncPacket(this.id, AugmentOperation.ADD.ordinal()));
         }

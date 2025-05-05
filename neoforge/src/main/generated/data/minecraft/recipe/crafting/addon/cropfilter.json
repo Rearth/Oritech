@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "tag": "oritech:plating"
+    },
+    "c": {
+      "item": "oritech:processing_unit"
+    },
+    "f": {
+      "tag": "c:carbon_fibre"
+    },
+    "s": {
+      "item": "oritech:motor"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:crop_filter_addon"
+  }
+}

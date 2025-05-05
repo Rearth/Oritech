@@ -1,6 +1,6 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
-import static rearth.oritech.init.TagContent.cItemTag;
+import static rearth.oritech.util.TagUtils.cItemTag;
 
 import appeng.core.definitions.AEBlocks;
 import appeng.core.definitions.AEItems;

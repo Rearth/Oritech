@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 1.0,
+  "group": "oritech",
+  "ingredient": {
+    "item": "oritech:electrum_dust"
+  },
+  "result": {
+    "count": 1,
+    "id": "oritech:electrum_ingot"
+  }
+}

@@ -6,10 +6,14 @@
     }
   ],
   "type": "oritech:centrifuge_fluid",
-  "fluidInputAmount": 81000,
-  "fluidInputVariant": "minecraft:water",
-  "fluidOutputAmount": 20250,
-  "fluidOutputVariant": "pneumaticcraft:yeast_culture",
+  "fluidInput": {
+    "amount": 1000,
+    "fluid": "minecraft:water"
+  },
+  "fluidOutput": {
+    "amount": 250,
+    "fluid": "pneumaticcraft:yeast_culture"
+  },
   "ingredients": [
     {
       "tag": "c:mushrooms"

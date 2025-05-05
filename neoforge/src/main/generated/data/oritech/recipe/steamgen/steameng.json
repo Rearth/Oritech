@@ -1,0 +1,14 @@
+{
+  "type": "oritech:steam_engine",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "oritech:still_steam"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [],
+  "results": [],
+  "time": 1
+}

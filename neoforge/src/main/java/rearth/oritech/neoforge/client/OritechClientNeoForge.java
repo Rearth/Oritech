@@ -23,6 +23,8 @@ import rearth.oritech.client.renderers.PortalEntityRenderer;
 import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.init.FluidContent;
 
+import static net.neoforged.fml.loading.FMLEnvironment.dist;
+
 @Mod(value = Oritech.MOD_ID, dist = Dist.CLIENT)
 public class OritechClientNeoForge {
     
@@ -33,7 +35,7 @@ public class OritechClientNeoForge {
         OritechClient.initialize();
     }
     
-    @EventBusSubscriber(modid = Oritech.MOD_ID)
+    @EventBusSubscriber(modid = Oritech.MOD_ID, value = Dist.CLIENT)
     public static class CustomEvents {
         
         @SubscribeEvent

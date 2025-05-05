@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "minecraft:ender_eye"
+    },
+    "c": {
+      "item": "oritech:enderic_lens"
+    },
+    "f": {
+      "item": "oritech:overcharged_crystal"
+    },
+    "s": {
+      "tag": "oritech:plating"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:arcane_augment_station"
+  }
+}

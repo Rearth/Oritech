@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_machine_processing_addon": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:machine_processing_addon"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/addon/processing"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_machine_processing_addon"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/addon/processing"
+    ]
+  }
+}

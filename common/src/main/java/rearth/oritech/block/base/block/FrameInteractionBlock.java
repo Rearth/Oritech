@@ -118,6 +118,9 @@ public abstract class FrameInteractionBlock extends HorizontalFacingBlock implem
                         world.spawnEntity(itemEntity);
                     }
                 }
+                
+                itemContainer.inventory.heldStacks.clear();
+                itemContainer.inventory.markDirty();
             }
         }
         

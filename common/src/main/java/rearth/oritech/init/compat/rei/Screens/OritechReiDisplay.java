@@ -1,5 +1,6 @@
 package rearth.oritech.init.compat.rei.Screens;
 
+import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import io.wispforest.owo.compat.rei.ReiUIAdapter;
 import io.wispforest.owo.ui.component.Components;
@@ -19,10 +20,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemConvertible;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
+import rearth.oritech.client.ui.BasicMachineScreen;
 import rearth.oritech.init.compat.rei.OritechDisplay;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.InventorySlotAssignment;
@@ -30,6 +33,8 @@ import rearth.oritech.util.ScreenProvider;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 
@@ -127,16 +132,25 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         );
         
         // fluids
-        if (display.entry.value().getFluidInput() != null && display.entry.value().getFluidInput().getAmount() > 0) {
-            var fluid = display.entry.value().getFluidInput().getFluid();
-            var amount = display.entry.value().getFluidInput().getAmount();
+        if (display.entry.value().getFluidInput() != null && display.entry.value().getFluidInput().amount() > 0) {
+            var fluidInput = display.entry.value().getFluidInput();
             
-            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(display.entry.value().getFluidInput(), new ScreenProvider.BarConfiguration(4, 5, 16, 50)));
+            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluidInput.getFluidStacks().getFirst(), new ScreenProvider.BarConfiguration(4, 5, 16, 50)));
             
             
-            var text = amount > 0
-                ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(display.entry.value().getFluidInput()).getString())
+            var text = fluidInput.amount() > 0
+                ? Text.translatable("tooltip.oritech.fluid_content", fluidInput.amount(), fluidInput.name())
                 : Text.translatable("tooltip.oritech.fluid_empty");
+
+            if (fluidInput.hasTag()) {
+                var joiner = new StringJoiner(", ", "\n", "");
+                joiner.setEmptyValue("");
+                for (var fluidStack : fluidInput.getFluidStacks()) {
+                    joiner.add(fluidStack.getName().getString());
+                }
+                var fluidsText = MutableText.of(Text.of(Text.of(joiner.toString()).asTruncatedString(40)).getContent()).withColor(BasicMachineScreen.GRAY_TEXT_COLOR);
+                text.append(fluidsText);
+            }
 
             var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
             foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));
@@ -146,13 +160,12 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         }
         
         if (display.entry.value().getFluidOutput() != null && display.entry.value().getFluidOutput().getAmount() > 0) {
-            var fluid = display.entry.value().getFluidOutput().getFluid();
             var amount = display.entry.value().getFluidOutput().getAmount();
             
             root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(display.entry.value().getFluidOutput(), new ScreenProvider.BarConfiguration(123, 5, 16, 50)));
             
             var text = amount > 0
-                ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(display.entry.value().getFluidOutput()).getString())
+                ? Text.translatable("tooltip.oritech.fluid_content", amount, FluidStackHooks.getName(display.entry.value().getFluidOutput()).getString())
                 : Text.translatable("tooltip.oritech.fluid_empty");
             var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
             foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));
