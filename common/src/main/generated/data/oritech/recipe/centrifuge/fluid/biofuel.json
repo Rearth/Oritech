@@ -1,9 +1,13 @@
 {
   "type": "oritech:centrifuge_fluid",
-  "fluidInputAmount": 20250,
-  "fluidInputVariant": "minecraft:water",
-  "fluidOutputAmount": 8100,
-  "fluidOutputVariant": "oritech:still_biofuel",
+  "fluidInput": {
+    "amount": 20250,
+    "fluid": "minecraft:water"
+  },
+  "fluidOutput": {
+    "amount": 8100,
+    "fluid": "oritech:still_biofuel"
+  },
   "ingredients": [
     {
       "tag": "c:fuels/bio"

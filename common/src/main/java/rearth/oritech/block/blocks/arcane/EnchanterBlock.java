@@ -97,6 +97,9 @@ public class EnchanterBlock extends HorizontalFacingBlock implements BlockEntity
                     world.spawnEntity(itemEntity);
                 }
             }
+            
+            entity.inventory.heldStacks.clear();
+            entity.inventory.markDirty();
         }
         
         return super.onBreak(world, pos, state, player);

@@ -32,8 +32,7 @@ This means that at higher speeds, the distance between guide blocks can be large
 ## Particle Collisions
 
 When 2 particles (from different particle accelerator controllers) collide with each other, they can result in a different item. Depending on the recipe,
-the required collision energy will differ. The collision energy is based on the relative speeds of the particles. Particles crashing
-into each other in a head-on collision will add their speeds together, but if they are going in the same direction you'll only get the speed difference as collision energy.
+the required collision energy will differ. The collision energy is the sum of the speeds of both particles. The item type is irrelevant here, only the speeds matter.
 
 For example, if 2 particles crash into each other while moving in opposite directions each at 500 m/s, the collision energy will be 1000J (500 + 500).
 If one if the particles travels at 1000 m/s, and the other one only at 1 m/s, the resulting energy will be 1001J (1000 + 1). This means that you don't need to speed
@@ -51,7 +50,7 @@ When a redstone signal is applied to a non-straight guide block, it becomes a sw
 
 At higher speeds, the particle can't take tight turns. If the last full 90-degree turn is too close, it exits the guided path and shoots out into the world. If the distance between guide blocks is too big, or no next guide is found, it will also shoot out. The minimum distance between turns is calculated as follows:
 
-> sqrt(speed) / 3
+> sqrt(speed) / 2.5
 
 The following picture shows how the curve dist is being calculated ingame. To allow higher speeds, either increase the distance between the corners, or make the corners themselves longer:
 <center>
@@ -66,7 +65,7 @@ Entities hit by the particle take damage based on the particle's speed. When exi
 and destroys blocks until momentum is depleted. When two particles collide (from different controllers), they can create new items.
 
 Passing through an accelerator motor speeds up the particle by 1 m/s, requiring the motor to be powered.
-The power requirement increases with speed. Each time a motor speeds up a particle, it consumes RF in the same amounts as the particles current speed.
+The power requirement increases with speed. Each time a motor speeds up a particle, it consumes the particles current speed * 10 RF.
 Both particle motors and sensors can be used as straight guides.
 
 ---

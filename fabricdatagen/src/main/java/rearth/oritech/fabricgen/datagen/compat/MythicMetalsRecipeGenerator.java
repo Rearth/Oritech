@@ -15,8 +15,7 @@ import rearth.oritech.api.recipe.GrinderRecipeBuilder;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 
-import static rearth.oritech.init.TagContent.cItemTag;
-import static rearth.oritech.init.TagContent.itemTag;
+import static rearth.oritech.util.TagUtils.*;
 
 public class MythicMetalsRecipeGenerator {
     private static final String PATH = "compat/mythicmetals/";

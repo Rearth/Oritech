@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_reactor_vent": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:reactor_vent"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/reactorvent"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_reactor_vent"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/reactorvent"
+    ]
+  }
+}

@@ -222,6 +222,9 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
                         world.spawnEntity(itemEntity);
                     }
                 }
+                
+                storageBlock.inventory.heldStacks.clear();
+                storageBlock.inventory.markDirty();
             }
         }
         

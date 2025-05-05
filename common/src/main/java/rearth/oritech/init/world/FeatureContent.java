@@ -17,6 +17,8 @@ import rearth.oritech.init.world.features.uranium.UraniumPatchFeature;
 import rearth.oritech.init.world.features.uranium.UraniumPatchFeatureConfig;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
+// this currently only works on fabric (see https://github.com/Rearth/Oritech/pull/359 & https://github.com/architectury/architectury-api/issues/480)
+// when adding/changing features, make sure to update the neo json files aswell
 public class FeatureContent implements ArchitecturyRegistryContainer<Feature<?>> {
     
     public static final Feature<OilSpringFeatureConfig> OIL_SPRING = new OilSpringFeature(CodecUtils.toCodec(OilSpringFeatureConfig.OIL_FEATURE_ENDEC));

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 1.0,
+  "group": "platinumblasting",
+  "ingredient": {
+    "item": "oritech:raw_platinum"
+  },
+  "result": {
+    "count": 1,
+    "id": "oritech:platinum_ingot"
+  }
+}

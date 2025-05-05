@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_small_plutonium_dust": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:small_plutonium_dust"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:plutonium_dustblock"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_small_plutonium_dust"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:plutonium_dustblock"
+    ]
+  }
+}

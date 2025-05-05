@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "oritech:energy_pipe"
+    },
+    "p": {
+      "tag": "oritech:plating"
+    },
+    "s": {
+      "item": "minecraft:stone"
+    }
+  },
+  "pattern": [
+    "csc",
+    "sps",
+    "csc"
+  ],
+  "result": {
+    "count": 4,
+    "id": "oritech:energy_pipe_duct_block"
+  }
+}

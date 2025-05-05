@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_framed_fluid_pipe": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:framed_fluid_pipe"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/frame_fluid"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_framed_fluid_pipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/frame_fluid"
+    ]
+  }
+}

@@ -87,6 +87,9 @@ public class TreefellerBlock extends HorizontalFacingBlock implements BlockEntit
                     world.spawnEntity(itemEntity);
                 }
             }
+            
+            entity.inventory.heldStacks.clear();
+            entity.inventory.markDirty();
         }
         
         return super.onBreak(world, pos, state, player);

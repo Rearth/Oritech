@@ -8,14 +8,14 @@ dependencies {
     // We depend on Fabric Loader here to use the Fabric @Environment annotations,
     // which get remapped to the correct annotations on each platform.
     // Do NOT use other classes from Fabric Loader.
-    // modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
 
     // Architectury API. This is optional, and you can comment it out if you don't need it.
     modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
 
     // owo lib (or owo-lib-neoforge)
-    modImplementation "io.wispforest:owo-lib:0.12.15+1.21"
-    annotationProcessor modImplementation("io.wispforest:owo-lib:0.12.15+1.21")
+    modImplementation "io.wispforest:owo-lib:${owo_version}"
+    annotationProcessor modImplementation("io.wispforest:owo-lib:${owo_version}")
 
     // geckolib
     modImplementation "software.bernie.geckolib:geckolib-fabric-1.21.1:4.6.6"
@@ -28,7 +28,7 @@ dependencies {
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:16.0.754"
 
     // JEI
-    modCompileOnly "mezz.jei:jei-${minecraft_version}-common-api-intermediary:19.21.0.246"
+    modCompileOnly "mezz.jei:jei-${minecraft_version}-common-api-intermediary:${jei_version}"
 
     // JADE (needed for addon)
     modImplementation "curse.maven:jade-324717:5639994"
@@ -42,14 +42,14 @@ sourceSets {
     main {
         resources.srcDir "src/main/generated"
         resources.exclude ".cache"
-        // exclude compat recipes from common because they're loader specific
-        resources.exclude "**/compat"
+        // exclude recipes from common because they're loader specific
+        resources.exclude "**/recipe"
     }
     fabric {
-        // make compat recipes available to fabric build
+        // make recipes available to fabric build
         resources {
             srcDir "src/main/generated"
-            include "**/compat/**"
+            include "**/recipe/**"
         }
         output.resourcesDir = "data"
     }

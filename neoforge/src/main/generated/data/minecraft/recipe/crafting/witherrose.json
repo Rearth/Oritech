@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "tag": "minecraft:flowers"
+    },
+    "s": {
+      "item": "minecraft:wither_rose"
+    }
+  },
+  "pattern": [
+    " s ",
+    "csc",
+    " s "
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:wither_crop_block"
+  }
+}

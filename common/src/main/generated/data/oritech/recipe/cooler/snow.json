@@ -1,9 +1,13 @@
 {
   "type": "oritech:cooler",
-  "fluidInputAmount": 81000,
-  "fluidInputVariant": "oritech:still_steam",
-  "fluidOutputAmount": 0,
-  "fluidOutputVariant": "minecraft:empty",
+  "fluidInput": {
+    "amount": 81000,
+    "fluid": "oritech:still_steam"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
   "ingredients": [],
   "results": [
     {

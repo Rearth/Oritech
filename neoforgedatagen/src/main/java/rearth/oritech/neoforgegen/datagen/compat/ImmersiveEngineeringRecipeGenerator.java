@@ -1,7 +1,7 @@
 package rearth.oritech.neoforgegen.datagen.compat;
 
 import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
-import static rearth.oritech.init.TagContent.cItemTag;
+import static rearth.oritech.util.TagUtils.cItemTag;
 
 import java.util.List;
 
@@ -26,6 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.Tags;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.api.recipe.FoundryRecipeBuilder;
 import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
@@ -77,6 +78,7 @@ public class ImmersiveEngineeringRecipeGenerator {
 
     private static void addCentrifuging(RecipeOutput exporter) {
         CentrifugeFluidRecipeBuilder.build().input(ItemTags.PLANKS).result(IEBlocks.WoodenDecoration.TREATED_WOOD.get(TreatedWoodStyles.HORIZONTAL).get().asItem()).fluidInput(IEFluids.CREOSOTE.still().get(), 0.125f).export(exporter, "compat/immersiveengineering/treated_planks");
+        CentrifugeRecipeBuilder.build().input(IEItems.Ingredients.DUST_HOP_GRAPHITE.get()).result(ItemContent.CARBON_FIBRE_STRANDS).export(exporter, "compat/immersiveengineering/carbon_fibre_strands");
     }
 
     private static void addGeneratorFuels(RecipeOutput exporter) {

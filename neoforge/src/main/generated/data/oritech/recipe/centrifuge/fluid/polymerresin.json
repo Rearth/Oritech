@@ -1,0 +1,23 @@
+{
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 100,
+    "fluid": "#c:biodiesel"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "ingredients": [
+    {
+      "tag": "minecraft:sand"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:polymer_resin"
+    }
+  ],
+  "time": 100
+}

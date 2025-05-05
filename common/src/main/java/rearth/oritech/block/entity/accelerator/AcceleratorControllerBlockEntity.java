@@ -11,6 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -82,6 +83,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
+        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
         
         if (particle != null && activeItemParticle != null && activeItemParticle != ItemStack.EMPTY) {
             var data = new NbtCompound();
@@ -96,12 +98,12 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         } else {
             nbt.remove("particle");
         }
-        
     }
     
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
+        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
         
         if (nbt.contains("particle")) {
             var data = nbt.getCompound("particle");
@@ -116,7 +118,6 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             item.ifPresent(stack -> activeItemParticle = stack);
             particle = new AcceleratorParticleLogic.ActiveParticle(new Vec3d(posX, posY, posZ), speed, lastGate, nextGate);
         }
-        
     }
     
     private void initParticleLogic() {

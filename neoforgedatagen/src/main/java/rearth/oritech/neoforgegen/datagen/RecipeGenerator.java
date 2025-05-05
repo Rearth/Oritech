@@ -28,6 +28,7 @@ import net.neoforged.neoforge.common.conditions.WithConditions;
 import owmii.powah.Powah;
 import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
+import rearth.oritech.api.recipe.OritechRecipeGenerator;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.neoforgegen.datagen.compat.ActuallyAdditionsRecipeGenerator;
@@ -56,6 +57,15 @@ public class RecipeGenerator extends RecipeProvider implements IConditionBuilder
 
     @Override
     protected void buildRecipes(RecipeOutput exporter) {
+        var oritechRecipes = new OritechRecipeGenerator(packOutput, registries);
+        // runs OritechRecipeGenerator.generate(), but it's named differently here due to mapping differences
+        oritechRecipes.buildRecipes(exporter);
+
+        // Uranium clumps don't exist in Oritech, but Oritech should still be able to do something with them if they're added by another mod (like Create).
+        // Also added in Fabric datagen with Fabric load conditions, but the Fabric versions should be excluded from the Neoforge build
+        CentrifugeRecipeBuilder.build().input(TagContent.URANIUM_CLUMPS).result(ItemContent.URANIUM_DUST, 2).result(ItemContent.SMALL_PLUTONIUM_DUST).timeMultiplier(0.5f).export(exporter.withConditions(this.not(this.tagEmpty(TagContent.URANIUM_CLUMPS))), "compat/clump/crushed_uranium");
+        CentrifugeRecipeBuilder.build().input(TagContent.URANIUM_CLUMPS).result(ItemContent.URANIUM_DUST, 3).fluidInput(Fluids.WATER).timeMultiplier(0.5f).export(exporter.withConditions(this.not(this.tagEmpty(TagContent.URANIUM_CLUMPS))), "compat/clumpwet/crushed_uranium");
+
         ActuallyAdditionsRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(ActuallyAdditions.MODID)));
         AppliedEnergistics2RecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(AEConstants.MOD_ID)));
         CreateRecipeGenerator.generateRecipes(packOutput, registries, exporter.withConditions(this.modLoaded(Create.ID)));
@@ -68,10 +78,5 @@ public class RecipeGenerator extends RecipeProvider implements IConditionBuilder
         PneumaticcraftRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(Names.MOD_ID)));
         PowahRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(Powah.MOD_ID)));
         ProductiveMetalworksRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(ProductiveMetalworks.MODID)));
-
-        // Uranium clumps don't exist in Oritech, but Oritech should still be able to do something with them if they're added by another mod (like Create).
-        // Also added in Fabric datagen with Fabric load conditions, but the Fabric versions should be excluded from the Neoforge build
-        CentrifugeRecipeBuilder.build().input(TagContent.URANIUM_CLUMPS).result(ItemContent.URANIUM_DUST, 2).result(ItemContent.SMALL_PLUTONIUM_DUST).timeMultiplier(0.5f).export(exporter.withConditions(this.not(this.tagEmpty(TagContent.URANIUM_CLUMPS))), "compat/clump/crushed_uranium");
-        CentrifugeRecipeBuilder.build().input(TagContent.URANIUM_CLUMPS).result(ItemContent.URANIUM_DUST, 3).fluidInput(Fluids.WATER).timeMultiplier(0.5f).export(exporter.withConditions(this.not(this.tagEmpty(TagContent.URANIUM_CLUMPS))), "compat/clumpwet/crushed_uranium");
     }
 }

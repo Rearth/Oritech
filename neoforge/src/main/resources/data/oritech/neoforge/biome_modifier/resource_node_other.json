@@ -1,0 +1,6 @@
+{
+    "type": "neoforge:add_features",
+    "biomes": "#minecraft:is_overworld",
+    "features": "oritech:ore_nickel",
+    "step": "underground_ores"
+  }

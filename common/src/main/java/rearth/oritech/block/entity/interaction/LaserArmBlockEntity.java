@@ -170,14 +170,12 @@ public class LaserArmBlockEntity extends BlockEntity implements
                 energyStorage.amount -= energyRequiredToFire();
                 this.targetDirection = currentLivingTarget.getBlockPos();
                 lastFiredAt = world.getTime();
-                networkDirty = true;
             } else {
                 pendingLivingTargets.remove(currentLivingTarget);
                 currentLivingTarget = null;
                 currentTarget = null;
-                networkDirty = true;
             }
-            ;
+            networkDirty = true;
         } else {
             loadNextLivingTarget();
         }
@@ -321,10 +319,11 @@ public class LaserArmBlockEntity extends BlockEntity implements
     }
     
     private boolean huntedTarget(LivingEntity entity) {
+        // Regardless of mode, laser will always target player to charge energy storing chestplate
+        if (entity instanceof PlayerEntity) return true;
         // Not including Allay, Villagers, Trader, Iron Golem, Snow Golem
         // Also not including pets
         return switch (hunterTargetMode) {
-            // Regardless of mode, laser will always target player to charge energy storing chestplate
             case HunterTargetMode.HOSTILE_ONLY -> entity instanceof Monster;
             case HunterTargetMode.HOSTILE_NEUTRAL -> {
                 if ((entity instanceof AnimalEntity animal && animal.getLovingPlayer() == null) || entity instanceof WaterCreatureEntity)

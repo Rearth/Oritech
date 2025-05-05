@@ -257,7 +257,7 @@ public class FabricItemApi implements BlockItemApi {
         
         @Override
         protected List<ItemStack> createSnapshot() {
-            return IntStream.range(0, container.getSlotCount()).mapToObj(container::getStackInSlot).toList();
+            return IntStream.range(0, container.getSlotCount()).mapToObj(slot -> container.getStackInSlot(slot).copy()).toList();
         }
         
         @Override

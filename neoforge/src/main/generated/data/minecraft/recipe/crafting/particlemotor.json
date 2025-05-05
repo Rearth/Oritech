@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "i": {
+      "item": "oritech:duratium_ingot"
+    },
+    "o": {
+      "item": "oritech:advanced_battery"
+    },
+    "r": {
+      "tag": "c:ingots/electrum"
+    },
+    "t": {
+      "item": "oritech:superconductor"
+    }
+  },
+  "pattern": [
+    " t ",
+    "rrr",
+    "oio"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:accelerator_motor"
+  }
+}

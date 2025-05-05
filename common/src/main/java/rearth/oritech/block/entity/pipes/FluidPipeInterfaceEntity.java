@@ -36,11 +36,14 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         var block = (ExtractablePipeConnectionBlock) state.getBlock();
         if (world.isClient || !block.isExtractable(state)) return;
         
+        var boosted = isBoostAvailable();
+        
         // boosted pipe works every tick, otherwise only every N tick
-        if (world.getTime() % TRANSFER_PERIOD != 0 && !isBoostAvailable())
+        if (world.getTime() % TRANSFER_PERIOD != 0 && !boosted)
             return;
         
         var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
+        var transferAmount = boosted ? MAX_TRANSFER_RATE * 100 : MAX_TRANSFER_RATE;
         
         // try to get fluid to transfer
         // one transaction for each side
@@ -62,7 +65,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                                         .findFirst();
             
             if (extractionCandidate.isPresent()) {
-                var extractionTest = extractionCandidate.get().copyWithAmount(MAX_TRANSFER_RATE);
+                var extractionTest = extractionCandidate.get().copyWithAmount(transferAmount);
                 var movedAmount = sourceContainer.extract(extractionTest, true);
                 stackToMove = extractionTest;
                 stackToMove.setAmount(movedAmount);

@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.fabricmc.fabric.api.tag.convention.v2.TagUtil;
-import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
@@ -18,7 +17,7 @@ import rearth.oritech.init.ToolsContent;
 
 import java.util.concurrent.CompletableFuture;
 
-import static rearth.oritech.init.TagContent.cItemTag;
+import static rearth.oritech.util.TagUtils.*;
 
 public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
     
@@ -51,6 +50,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(getClumpTag("nickel")).add(ItemContent.NICKEL_CLUMP).addOptional(Identifier.of("create", "crushed_raw_nickel"));
         getOrCreateTagBuilder(getClumpTag("platinum")).add(ItemContent.PLATINUM_CLUMP).addOptional(Identifier.of("create", "crushed_raw_platinum"));
         // for compat
+        getOrCreateTagBuilder(getClumpTag("zinc")).addOptional(Identifier.of("create", "crushed_raw_zinc"));
         getOrCreateTagBuilder(getClumpTag("uranium")).addOptional(Identifier.of("create", "crushed_raw_uranium"));
         getOrCreateTagBuilder(getClumpTag("osmium")).addOptional(Identifier.of("create", "crushed_raw_osmium"));
         
@@ -117,7 +117,6 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         
         getOrCreateTagBuilder(TagContent.STEEL_INGOTS).add(ItemContent.STEEL_INGOT).add(ItemContent.BIOSTEEL_INGOT);
         getOrCreateTagBuilder(TagContent.QUARTZ_DUSTS).add(ItemContent.QUARTZ_DUST);
-        getOrCreateTagBuilder(TagContent.COAL_DUSTS).add(ItemContent.COAL_DUST).addOptional(Identifier.of("immersiveengineering", "dust_hop_graphite"));
         
         // vanilla variants
         getOrCreateTagBuilder(TagContent.COPPER_DUSTS).add(ItemContent.COPPER_DUST);
@@ -509,21 +508,5 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(Items.LEATHER_LEGGINGS)
           .add(Items.RABBIT_FOOT)
           .add(Items.RABBIT_HIDE);
-    }
-    
-    public static TagKey<Item> getStorageBlockTag(String path) {
-        return cItemTag("storage_blocks/" + path);
-    }
-    
-    public static TagKey<Item> getIngotTag(String path) {
-        return cItemTag("ingots/" + path);
-    }
-
-    public static TagKey<Item> getClumpTag(String path) {
-        return cItemTag("clumps/" + path);
-    }
-    
-    public static TagKey<Item> getDustTag(String path) {
-        return cItemTag("dusts/" + path);
     }
 }

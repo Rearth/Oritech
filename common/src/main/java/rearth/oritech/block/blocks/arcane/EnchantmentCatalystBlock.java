@@ -108,6 +108,9 @@ public class EnchantmentCatalystBlock extends HorizontalFacingBlock implements B
                     world.spawnEntity(itemEntity);
                 }
             }
+            
+            entity.inventory.heldStacks.clear();
+            entity.inventory.markDirty();
         }
         
         return super.onBreak(world, pos, state, player);

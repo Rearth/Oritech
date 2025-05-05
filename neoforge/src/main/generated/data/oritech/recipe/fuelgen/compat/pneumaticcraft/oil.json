@@ -6,10 +6,14 @@
     }
   ],
   "type": "oritech:fuel_generator",
-  "fluidInputAmount": 81000,
-  "fluidInputVariant": "pneumaticcraft:oil",
-  "fluidOutputAmount": 0,
-  "fluidOutputVariant": "minecraft:empty",
+  "fluidInput": {
+    "amount": 1000,
+    "fluid": "pneumaticcraft:oil"
+  },
+  "fluidOutput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
   "ingredients": [],
   "results": [],
   "time": 60

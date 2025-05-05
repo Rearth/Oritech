@@ -55,7 +55,7 @@ dependencies {
     // yes yes all this needs to be cleaned up and properly versioned, but I'm waiting to clean up the CSL mess first
 
     // owo lib
-    modImplementation "io.wispforest:owo-lib:0.12.11+1.21"
+    modImplementation "io.wispforest:owo-lib:${owo_version}"
 
     // geckolib
     modImplementation "software.bernie.geckolib:geckolib-fabric-1.21.1:4.6.6"
@@ -70,7 +70,7 @@ dependencies {
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
         case "emi": modRuntimeOnly "dev.emi:emi-fabric:${emi_version}"; break
         case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:16.0.754"; break
-        case "jei": modRuntimeOnly "mezz.jei:jei-1.21.1-fabric:19.21.0.245"
+        case "jei": modRuntimeOnly "mezz.jei:jei-1.21.1-fabric:${jei_version}"
         case "disabled": break
         default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, JEI, or disabled.")
     }
@@ -103,7 +103,7 @@ processResources {
         expand version: project.version
     }
 
-    // include the fabric compat recipes that were excluded from the common:main sourceSet
+    // include the fabric recipes that were excluded from the common:main sourceSet
     from(project(":common").sourceSets.fabric.resources)
 }
 

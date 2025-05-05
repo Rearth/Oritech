@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_reactor_wall": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:reactor_wall"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/reactorplatingcrafting"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_reactor_wall"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/reactorplatingcrafting"
+    ]
+  }
+}
