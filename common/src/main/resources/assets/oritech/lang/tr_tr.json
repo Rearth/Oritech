@@ -293,6 +293,15 @@
   "tooltip.oritech.weed_killer": "Geniş bir yarıçap içindeki tüm çimen ve bitkileri temizler",
   "tooltip.oritech.cooler_block": "Soğuk biyomlarda iki kat daha hızlı (ve verimli) çalışır.",
   "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
+  "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
+  "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
+  "tooltip.oritech.capture_item_desc_1": [
+    {
+      "text": "Küçük, büyülü, zeki bir uçan yaratığın beynini ele geçirebilir. ",
+      "italic": true,
+      "color": "gray"
+    }
+  ],
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Yaşayabilir bir varlığı şununla ele geçirerek elde edilir: ",
@@ -301,13 +310,6 @@
     },
     {
       "translate": "item.oritech.dubios_container",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_1": [
-    {
-      "text": "Küçük, büyülü, zeki bir uçan yaratığın beynini ele geçirebilir. ",
       "italic": true,
       "color": "gray"
     }
