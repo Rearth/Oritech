@@ -293,6 +293,11 @@
   "tooltip.oritech.weed_killer": "Elimina toda la hierba y plantas en un radio amplio",
   "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
   "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
+  "tooltip.oritech.portable_laser.1": "Left mouse fires a continous beam that can transfer energy, mine blocks, damage",
+  "tooltip.oritech.portable_laser.2": "entities and transform mined items similar to an enderic laser.",
+  "tooltip.oritech.portable_laser.3": "Right-Click creates a high-energy explosion.",
+  "tooltip.oritech.portable_laser.4": "",
+  "tooltip.oritech.portable_laser.5": "Works with most pickaxe enchantments, unbreaking, and sharpness.",
   "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
   "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
   "tooltip.oritech.capture_item_desc_1": [
@@ -779,6 +784,12 @@
       "color": "#ffd505"
     }
   ],
+  "item.oritech.portable_laser": [
+    {
+      "text": "Enderic Railgun",
+      "color": "#ffd505"
+    }
+  ],
   "item.oritech.steel_ingot": "Lingote de acero",
   "item.oritech.steel_dust": "Polvo de acero",
   "item.oritech.coal_dust": "Polvo de carbón",
@@ -1084,6 +1095,7 @@
   "text.config.oritech-config.category.exoChestplate": "Peto exo",
   "text.config.oritech-config.category.basicDrill": "Taladro Básico",
   "text.config.oritech-config.category.chainSaw": "Sierra de Cadena",
+  "text.config.oritech-config.category.portableLaserConfig": "Enderic Railgun",
   "text.config.oritech-config.option.chainsawTreeCutting": "Enable Tree Cutting for Chainsaw",
   "text.config.oritech-config.section.augments": "Player Augmentation",
   "text.config.oritech-config.option.charger.energyCapacity": "Capacidad de Energía del Cargador",
@@ -1120,6 +1132,11 @@
   "text.config.oritech-config.option.basicDrill.energyCapacity": "Capacidad de Energía del Taladro Básico",
   "text.config.oritech-config.option.basicDrill.energyUsage": "Uso de Energía del Taladro Básico",
   "text.config.oritech-config.option.basicDrill.chargeSpeed": "Velocidad de Carga del Taladro Básico",
+  "text.config.oritech-config.option.portableLaserConfig.energyCapacity": "Capacidad de Energía",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerTick": "Energy per Tick",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "Energy per Explosion",
+  "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "Block Break Speed",
+  "text.config.oritech-config.option.portableLaserConfig.damageBase": "Base Damage",
   "text.config.oritech-config.option.chainSaw.energyCapacity": "Capacidad de Energía de la Sierra de Cadena",
   "text.config.oritech-config.option.chainSaw.energyUsage": "Uso de Energía de la Sierra de Cadena",
   "text.config.oritech-config.option.chainSaw.chargeSpeed": "Velocidad de Carga de la Sierra de Cadena",
