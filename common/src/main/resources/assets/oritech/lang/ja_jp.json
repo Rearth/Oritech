@@ -293,6 +293,15 @@
   "tooltip.oritech.weed_killer": "広い半径の草や植物をすべて取り除きます。",
   "tooltip.oritech.cooler_block": "冷たいバイオームでは2倍の速さ（と効率）になります。",
   "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
+  "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
+  "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
+  "tooltip.oritech.capture_item_desc_1": [
+    {
+      "text": "神秘的で小さい知能を持つ飛行生物の頭脳を捕獲できます。",
+      "italic": true,
+      "color": "gray"
+    }
+  ],
   "tooltip.oritech.intelligence_item": [
     {
       "text": "一部のエンティティを捕獲することで入手できます。\n捕らえるにはこれを使用：",
@@ -301,13 +310,6 @@
     },
     {
       "translate": "item.oritech.dubios_container",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_1": [
-    {
-      "text": "神秘的で小さい知能を持つ飛行生物の頭脳を捕獲できます。",
       "italic": true,
       "color": "gray"
     }
