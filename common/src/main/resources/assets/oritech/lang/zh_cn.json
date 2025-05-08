@@ -293,6 +293,11 @@
   "tooltip.oritech.weed_killer": "在较大范围内移除所有草和植物",
   "tooltip.oritech.cooler_block": "速度（和效率）在寒冷生物群系加倍。",
   "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
+  "tooltip.oritech.portable_laser.1": "Left mouse fires a continous beam that can transfer energy, mine blocks, damage",
+  "tooltip.oritech.portable_laser.2": "entities and transform mined items similar to an enderic laser.",
+  "tooltip.oritech.portable_laser.3": "Right-Click creates a high-energy explosion.",
+  "tooltip.oritech.portable_laser.4": "",
+  "tooltip.oritech.portable_laser.5": "Works with most pickaxe enchantments, unbreaking, and sharpness.",
   "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
   "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
   "tooltip.oritech.capture_item_desc_1": [
@@ -779,6 +784,12 @@
       "color": "#ffd505"
     }
   ],
+  "item.oritech.portable_laser": [
+    {
+      "text": "Enderic Railgun",
+      "color": "#ffd505"
+    }
+  ],
   "item.oritech.steel_ingot": "钢锭",
   "item.oritech.steel_dust": "钢粉",
   "item.oritech.coal_dust": "煤粉",
@@ -1084,6 +1095,7 @@
   "text.config.oritech-config.category.exoChestplate": "外骨骼胸甲",
   "text.config.oritech-config.category.basicDrill": "基础钻头",
   "text.config.oritech-config.category.chainSaw": "链锯",
+  "text.config.oritech-config.category.portableLaserConfig": "Enderic Railgun",
   "text.config.oritech-config.option.chainsawTreeCutting": "启用链锯伐木功能",
   "text.config.oritech-config.section.augments": "植入体改造",
   "text.config.oritech-config.option.charger.energyCapacity": "充能器能量容量",
@@ -1120,6 +1132,11 @@
   "text.config.oritech-config.option.basicDrill.energyCapacity": "基础钻头能量容量",
   "text.config.oritech-config.option.basicDrill.energyUsage": "基础钻头能量消耗",
   "text.config.oritech-config.option.basicDrill.chargeSpeed": "基础钻头充能速度",
+  "text.config.oritech-config.option.portableLaserConfig.energyCapacity": "能量容量",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerTick": "Energy per Tick",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "Energy per Explosion",
+  "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "Block Break Speed",
+  "text.config.oritech-config.option.portableLaserConfig.damageBase": "Base Damage",
   "text.config.oritech-config.option.chainSaw.energyCapacity": "链锯能量容量",
   "text.config.oritech-config.option.chainSaw.energyUsage": "链锯能量消耗",
   "text.config.oritech-config.option.chainSaw.chargeSpeed": "链锯充能速度",
