@@ -292,6 +292,7 @@
   "tooltip.oritech.reactor_redstone_port.4": "Çıkış modlarını değiştirmek için bloğa Sağ Tıklayın.",
   "tooltip.oritech.weed_killer": "Geniş bir yarıçap içindeki tüm çimen ve bitkileri temizler",
   "tooltip.oritech.cooler_block": "Soğuk biyomlarda iki kat daha hızlı (ve verimli) çalışır.",
+  "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Yaşayabilir bir varlığı şununla ele geçirerek elde edilir: ",
@@ -416,7 +417,15 @@
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Etkili Işın Hasarı",
   "tooltip.oritech.item_pipe.1": "Çıkarmayı değiştirmek için Sağ-tıklayın.",
   "tooltip.oritech.item_pipe.2": "Yalnızca boş olmayan ilk yuvadan çıkarır.",
-  "tooltip.oritech.item_pipe.3": "Mevcut en yakın envantere aktarılır.",
+  "tooltip.oritech.item_pipe.3": [
+    "Click it with a ",
+    {
+      "text": "motor item",
+      "color": "#ff830e"
+    },
+    " to upgrade the pipe to extract from all slots."
+  ],
+  "tooltip.oritech.item_pipe.4": "Deposits into the closest available inventory.",
   "title.oritech.machine.addon_looting": "%d Ganimet",
   "tooltip.oritech.machine.addon_looting": "Verim eklenti sayısı. 3 etkili maksimum değerdir",
   "title.oritech.item_filter.toggle_energy_statistics": "Çıkışı Göster",
