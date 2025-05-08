@@ -292,6 +292,7 @@
   "tooltip.oritech.reactor_redstone_port.4": "右键该方块以改变输出模式。",
   "tooltip.oritech.weed_killer": "在较大范围内移除所有草和植物",
   "tooltip.oritech.cooler_block": "速度（和效率）在寒冷生物群系加倍。",
+  "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
   "tooltip.oritech.intelligence_item": [
     {
       "text": "以捕获一个可行的实体来获取，需使用 ",
@@ -416,7 +417,15 @@
   "tooltip.oritech.laser_arm.addon_hunter_damage": "有效光束伤害",
   "tooltip.oritech.item_pipe.1": "右键切换至提取模式",
   "tooltip.oritech.item_pipe.2": "仅从首个非空槽位提取。",
-  "tooltip.oritech.item_pipe.3": "存入最近的可用物品栏。",
+  "tooltip.oritech.item_pipe.3": [
+    "Click it with a ",
+    {
+      "text": "motor item",
+      "color": "#ff830e"
+    },
+    " to upgrade the pipe to extract from all slots."
+  ],
+  "tooltip.oritech.item_pipe.4": "Deposits into the closest available inventory.",
   "title.oritech.machine.addon_looting": "%d 掠夺",
   "tooltip.oritech.machine.addon_looting": "产量插件数量。有效的最大值为3",
   "title.oritech.item_filter.toggle_energy_statistics": "显示输出",
