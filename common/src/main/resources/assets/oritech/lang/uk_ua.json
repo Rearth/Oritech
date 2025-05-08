@@ -293,6 +293,11 @@
   "tooltip.oritech.weed_killer": "Видаляє всю траву та рослини в широкому радіусі",
   "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
   "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
+  "tooltip.oritech.portable_laser.1": "Left mouse fires a continous beam that can transfer energy, mine blocks, damage",
+  "tooltip.oritech.portable_laser.2": "entities and transform mined items similar to an enderic laser.",
+  "tooltip.oritech.portable_laser.3": "Right-Click creates a high-energy explosion.",
+  "tooltip.oritech.portable_laser.4": "",
+  "tooltip.oritech.portable_laser.5": "Works with most pickaxe enchantments, unbreaking, and sharpness.",
   "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
   "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
   "tooltip.oritech.capture_item_desc_1": [
@@ -779,6 +784,12 @@
       "color": "#ffd505"
     }
   ],
+  "item.oritech.portable_laser": [
+    {
+      "text": "Enderic Railgun",
+      "color": "#ffd505"
+    }
+  ],
   "item.oritech.steel_ingot": "Steel Ingot",
   "item.oritech.steel_dust": "Steel Dust",
   "item.oritech.coal_dust": "Coal Dust",
@@ -1084,6 +1095,7 @@
   "text.config.oritech-config.category.exoChestplate": "Exo Chestplate",
   "text.config.oritech-config.category.basicDrill": "Basic Drill",
   "text.config.oritech-config.category.chainSaw": "Chain Saw",
+  "text.config.oritech-config.category.portableLaserConfig": "Enderic Railgun",
   "text.config.oritech-config.option.chainsawTreeCutting": "Enable Tree Cutting for Chainsaw",
   "text.config.oritech-config.section.augments": "Player Augmentation",
   "text.config.oritech-config.option.charger.energyCapacity": "Charger Energy Capacity",
@@ -1120,6 +1132,11 @@
   "text.config.oritech-config.option.basicDrill.energyCapacity": "Basic Drill Energy Capacity",
   "text.config.oritech-config.option.basicDrill.energyUsage": "Basic Drill Energy Usage",
   "text.config.oritech-config.option.basicDrill.chargeSpeed": "Basic Drill Charge Speed",
+  "text.config.oritech-config.option.portableLaserConfig.energyCapacity": "Energy Capacity",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerTick": "Energy per Tick",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "Energy per Explosion",
+  "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "Block Break Speed",
+  "text.config.oritech-config.option.portableLaserConfig.damageBase": "Base Damage",
   "text.config.oritech-config.option.chainSaw.energyCapacity": "Chain Saw Energy Capacity",
   "text.config.oritech-config.option.chainSaw.energyUsage": "Chain Saw Energy Usage",
   "text.config.oritech-config.option.chainSaw.chargeSpeed": "Chain Saw Charge Speed",
