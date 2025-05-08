@@ -292,6 +292,7 @@
   "tooltip.oritech.reactor_redstone_port.4": "Right-Click the block to change output modes.",
   "tooltip.oritech.weed_killer": "Remove toda a grama e plantas em um amplo raio",
   "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
+  "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Obtido ao capturar uma entidade viável com o ",
@@ -416,7 +417,15 @@
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Dano efetivo do feixe",
   "tooltip.oritech.item_pipe.1": "Right-click to toggle extraction.",
   "tooltip.oritech.item_pipe.2": "Only extracts from the first non-empty slot.",
-  "tooltip.oritech.item_pipe.3": "Deposits into the closest available inventory.",
+  "tooltip.oritech.item_pipe.3": [
+    "Click it with a ",
+    {
+      "text": "motor item",
+      "color": "#ff830e"
+    },
+    " to upgrade the pipe to extract from all slots."
+  ],
+  "tooltip.oritech.item_pipe.4": "Deposits into the closest available inventory.",
   "title.oritech.machine.addon_looting": "%d Looting",
   "tooltip.oritech.machine.addon_looting": "Contagem de addon de rendimento. 3 é o máximo efetivo",
   "title.oritech.item_filter.toggle_energy_statistics": "Show Output",
