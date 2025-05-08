@@ -292,6 +292,7 @@
   "tooltip.oritech.reactor_redstone_port.4": "Right-Click the block to change output modes.",
   "tooltip.oritech.weed_killer": "Rimuove tutte le erbacce e le piante in un grosso raggio",
   "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
+  "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Ottenuto catturando un'entità fittizia con la",
@@ -416,7 +417,15 @@
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Danno effettivo del fascio",
   "tooltip.oritech.item_pipe.1": "Right-click to toggle extraction.",
   "tooltip.oritech.item_pipe.2": "Only extracts from the first non-empty slot.",
-  "tooltip.oritech.item_pipe.3": "Deposits into the closest available inventory.",
+  "tooltip.oritech.item_pipe.3": [
+    "Click it with a ",
+    {
+      "text": "motor item",
+      "color": "#ff830e"
+    },
+    " to upgrade the pipe to extract from all slots."
+  ],
+  "tooltip.oritech.item_pipe.4": "Deposits into the closest available inventory.",
   "title.oritech.machine.addon_looting": "Saccheggio %d",
   "tooltip.oritech.machine.addon_looting": "Rendimento del numero di estensioni. 3 è il massimo effettivo",
   "title.oritech.item_filter.toggle_energy_statistics": "Show Output",
