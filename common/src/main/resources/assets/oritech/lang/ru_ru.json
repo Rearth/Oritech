@@ -293,6 +293,15 @@
   "tooltip.oritech.weed_killer": "Удаляет все травы и растения в широком радиусе",
   "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
   "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
+  "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
+  "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
+  "tooltip.oritech.capture_item_desc_1": [
+    {
+      "text": "Позволяет захватывать мозг небольшого волшебного разумного существа.",
+      "italic": true,
+      "color": "gray"
+    }
+  ],
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Получено путем захвата жизнеспособной сущности с ",
@@ -301,13 +310,6 @@
     },
     {
       "translate": "контейнер с товаром",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_1": [
-    {
-      "text": "Позволяет захватывать мозг небольшого волшебного разумного существа.",
       "italic": true,
       "color": "gray"
     }
