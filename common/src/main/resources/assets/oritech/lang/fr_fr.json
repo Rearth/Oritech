@@ -293,6 +293,15 @@
   "tooltip.oritech.weed_killer": "Supprime toute l'herbe et les plantes dans un large rayon",
   "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
   "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
+  "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
+  "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
+  "tooltip.oritech.capture_item_desc_1": [
+    {
+      "text": "Peut capturer le cerveau d'une petite créature volante magique et intelligente. Le",
+      "italic": true,
+      "color": "gray"
+    }
+  ],
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Acquis en capturant une entité viable avec le ",
@@ -301,13 +310,6 @@
     },
     {
       "translate": "item.oritech.dubios_container",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_1": [
-    {
-      "text": "Peut capturer le cerveau d'une petite créature volante magique et intelligente. Le",
       "italic": true,
       "color": "gray"
     }
