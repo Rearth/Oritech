@@ -292,6 +292,7 @@
   "tooltip.oritech.reactor_redstone_port.4": "出力モードを変更するにはブロックを右クリックです。",
   "tooltip.oritech.weed_killer": "広い半径の草や植物をすべて取り除きます。",
   "tooltip.oritech.cooler_block": "冷たいバイオームでは2倍の速さ（と効率）になります。",
+  "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
   "tooltip.oritech.intelligence_item": [
     {
       "text": "一部のエンティティを捕獲することで入手できます。\n捕らえるにはこれを使用：",
@@ -416,7 +417,15 @@
   "tooltip.oritech.laser_arm.addon_hunter_damage": "有効ビームダメージ",
   "tooltip.oritech.item_pipe.1": "右クリックで搬出の切り替えができます。",
   "tooltip.oritech.item_pipe.2": "空ではない最初のスロットからのみ抽出されます。",
-  "tooltip.oritech.item_pipe.3": "最も近くにあるインベントリーに預けます。",
+  "tooltip.oritech.item_pipe.3": [
+    "Click it with a ",
+    {
+      "text": "motor item",
+      "color": "#ff830e"
+    },
+    " to upgrade the pipe to extract from all slots."
+  ],
+  "tooltip.oritech.item_pipe.4": "Deposits into the closest available inventory.",
   "title.oritech.machine.addon_looting": "%d ドロップ増加",
   "tooltip.oritech.machine.addon_looting": "生成量アドオンの数です。最大値は3です。",
   "title.oritech.item_filter.toggle_energy_statistics": "出力を表示",
