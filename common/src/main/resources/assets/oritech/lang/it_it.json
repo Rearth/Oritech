@@ -293,6 +293,15 @@
   "tooltip.oritech.weed_killer": "Rimuove tutte le erbacce e le piante in un grosso raggio",
   "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
   "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
+  "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
+  "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
+  "tooltip.oritech.capture_item_desc_1": [
+    {
+      "text": "Può catturare il cervello di una piccola creatura magica volante e intelligente. La",
+      "italic": true,
+      "color": "grigio"
+    }
+  ],
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Ottenuto catturando un'entità fittizia con la",
@@ -301,13 +310,6 @@
     },
     {
       "translate": "Contenitore Dubbioso",
-      "italic": true,
-      "color": "grigio"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_1": [
-    {
-      "text": "Può catturare il cervello di una piccola creatura magica volante e intelligente. La",
       "italic": true,
       "color": "grigio"
     }
