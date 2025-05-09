@@ -153,7 +153,7 @@ public class DronePortEntity extends BlockEntity
     
     private void checkPositionCard() {
         
-        var source = cardInventory.heldStacks.get(0);
+        var source = cardInventory.getHeldStacks().get(0);
         if (source.getItem() instanceof LaserTargetDesignator && source.contains(ComponentContent.TARGET_POSITION.get())) {
             var target = source.get(ComponentContent.TARGET_POSITION.get());
             setTargetFromDesignator(target);
@@ -161,8 +161,8 @@ public class DronePortEntity extends BlockEntity
             return;
         }
         
-        cardInventory.heldStacks.set(1, source);
-        cardInventory.heldStacks.set(0, ItemStack.EMPTY);
+        cardInventory.getHeldStacks().set(1, source);
+        cardInventory.getHeldStacks().set(0, ItemStack.EMPTY);
         cardInventory.markDirty();
         this.markDirty();
         
@@ -171,7 +171,7 @@ public class DronePortEntity extends BlockEntity
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+        Inventories.writeNbt(nbt, inventory.getHeldStacks(), false, registryLookup);
         addMultiblockToNbt(nbt);
         writeAddonToNbt(nbt);
         fluidStorage.writeNbt(nbt, "");
@@ -184,7 +184,7 @@ public class DronePortEntity extends BlockEntity
         }
 
         var cardCompound = new NbtCompound();
-        Inventories.writeNbt(cardCompound, cardInventory.heldStacks, false, registryLookup);
+        Inventories.writeNbt(cardCompound, cardInventory.getHeldStacks(), false, registryLookup);
         nbt.put("cards", cardCompound);
 
         if (incomingPacket != null) {
@@ -203,7 +203,7 @@ public class DronePortEntity extends BlockEntity
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+        Inventories.readNbt(nbt, inventory.getHeldStacks(), registryLookup);
         loadMultiblockNbtData(nbt);
         loadAddonNbtData(nbt);
         fluidStorage.readNbt(nbt, "");
@@ -213,7 +213,7 @@ public class DronePortEntity extends BlockEntity
         energyStorage.amount = nbt.getLong("energy_stored");
         targetPosition = BlockPos.fromLong(nbt.getLong("target_position"));
 
-        Inventories.readNbt(nbt.getCompound("cards"), cardInventory.heldStacks, registryLookup);
+        Inventories.readNbt(nbt.getCompound("cards"), cardInventory.getHeldStacks(), registryLookup);
         
         if (nbt.contains("incoming")) {
             DefaultedList<ItemStack> list = DefaultedList.ofSize(15, ItemStack.EMPTY);
@@ -285,7 +285,7 @@ public class DronePortEntity extends BlockEntity
     private void sendDrone() {
         var targetPort = (DronePortEntity) world.getBlockEntity(targetPosition);
         var arriveTime = world.getTime() + takeOffTime + landTime;
-        var data = new DroneTransferData(inventory.heldStacks.stream().filter(stack -> !stack.isEmpty()).toList(), fluidStorage.getStack(), arriveTime);
+        var data = new DroneTransferData(inventory.getHeldStacks().stream().filter(stack -> !stack.isEmpty()).toList(), fluidStorage.getStack(), arriveTime);
         targetPort.setIncomingPacket(data);
         
         inventory.clear();
@@ -331,7 +331,7 @@ public class DronePortEntity extends BlockEntity
         if (disabledViaRedstone || targetPosition == null || (inventory.isEmpty() && fluidStorage.getAmount() == 0) || energyStorage.amount < calculateEnergyUsage() || incomingPacket != null)
             return false;
         var targetEntity = world.getBlockEntity(targetPosition);
-        if (!(targetEntity instanceof DronePortEntity targetPort) || targetPort.disabledViaRedstone || targetPort.getIncomingPacket() != null || !targetPort.canAcceptPayload(inventory.heldStacks, fluidStorage.getStack()))
+        if (!(targetEntity instanceof DronePortEntity targetPort) || targetPort.disabledViaRedstone || targetPort.getIncomingPacket() != null || !targetPort.canAcceptPayload(inventory.getHeldStacks(), fluidStorage.getStack()))
             return false;
         
         
@@ -575,7 +575,7 @@ public class DronePortEntity extends BlockEntity
     
     @Override
     public int getComparatorSlotAmount(int slot) {
-        if (inventory.heldStacks.size() <= slot)
+        if (inventory.getHeldStacks().size() <= slot)
             return hasFluidAddon ? ComparatorOutputProvider.getFluidStorageComparatorOutput(fluidStorage) : 0;
         
         var stack = inventory.getStack(slot);
