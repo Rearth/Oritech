@@ -292,14 +292,14 @@
   "tooltip.oritech.reactor_redstone_port.4": "Çıkış modlarını değiştirmek için bloğa Sağ Tıklayın.",
   "tooltip.oritech.weed_killer": "Geniş bir yarıçap içindeki tüm çimen ve bitkileri temizler",
   "tooltip.oritech.cooler_block": "Soğuk biyomlarda iki kat daha hızlı (ve verimli) çalışır.",
-  "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
-  "tooltip.oritech.portable_laser.1": "Left mouse fires a continous beam that can transfer energy, mine blocks, damage",
-  "tooltip.oritech.portable_laser.2": "entities and transform mined items similar to an enderic laser.",
-  "tooltip.oritech.portable_laser.3": "Right-Click creates a high-energy explosion.",
+  "tooltip.oritech.motor": "Tüm yuvalardan çıkarmak amacıyla yükseltmek için bir eşya borusu çıkarma arayüzüne sağ tıklayın.",
+  "tooltip.oritech.portable_laser.1": "Sol fare, enerji aktarabilen, blokları kazabilen, varlıklara hasar verebilen ve kazılan",
+  "tooltip.oritech.portable_laser.2": "eşyaları enderik lazere benzer şekilde dönüştürebilen sürekli bir ışın fırlatır.",
+  "tooltip.oritech.portable_laser.3": "Sağ-Tık yüksek enerjili bir patlama oluşturur.",
   "tooltip.oritech.portable_laser.4": "",
-  "tooltip.oritech.portable_laser.5": "Works with most pickaxe enchantments, unbreaking, and sharpness.",
-  "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
-  "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
+  "tooltip.oritech.portable_laser.5": "Çoğu kazma büyüsü ile çalışır, kırılmazlık ve keskinlik.",
+  "tooltip.oritech.portable_laser.status.begin": "Madencilik Modu: ",
+  "tooltip.oritech.portable_laser.status.hint": " (Geçiş yapmak için Eğil + Sağ Tıkla)",
   "tooltip.oritech.capture_item_desc_1": [
     {
       "text": "Küçük, büyülü, zeki bir uçan yaratığın beynini ele geçirebilir. ",
@@ -425,14 +425,14 @@
   "tooltip.oritech.item_pipe.1": "Çıkarmayı değiştirmek için Sağ-tıklayın.",
   "tooltip.oritech.item_pipe.2": "Yalnızca boş olmayan ilk yuvadan çıkarır.",
   "tooltip.oritech.item_pipe.3": [
-    "Click it with a ",
+    "Boruyu tüm yuvalardan çıkaracak şekilde yükseltmek için bir ",
     {
-      "text": "motor item",
+      "text": "motor eşyası",
       "color": "#ff830e"
     },
-    " to upgrade the pipe to extract from all slots."
+    " ile tıklayın."
   ],
-  "tooltip.oritech.item_pipe.4": "Deposits into the closest available inventory.",
+  "tooltip.oritech.item_pipe.4": "Mevcut en yakın envantere aktarılır.",
   "title.oritech.machine.addon_looting": "%d Ganimet",
   "tooltip.oritech.machine.addon_looting": "Verim eklenti sayısı. 3 etkili maksimum değerdir",
   "title.oritech.item_filter.toggle_energy_statistics": "Çıkışı Göster",
@@ -786,7 +786,7 @@
   ],
   "item.oritech.portable_laser": [
     {
-      "text": "Enderic Railgun",
+      "text": "Enderik Elektromanyetik Top",
       "color": "#ffd505"
     }
   ],
@@ -1095,7 +1095,7 @@
   "text.config.oritech-config.category.exoChestplate": "Exo Göğüslük",
   "text.config.oritech-config.category.basicDrill": "Basit Matkap",
   "text.config.oritech-config.category.chainSaw": "Testere",
-  "text.config.oritech-config.category.portableLaserConfig": "Enderic Railgun",
+  "text.config.oritech-config.category.portableLaserConfig": "Enderik Elektromanyetik Top",
   "text.config.oritech-config.option.chainsawTreeCutting": "Testere için Ağaç Kesmeyi Etkinleştir",
   "text.config.oritech-config.section.augments": "Oyuncu Güçlendirmesi",
   "text.config.oritech-config.option.charger.energyCapacity": "Şarj Cihazı Enerji Kapasitesi",
@@ -1133,10 +1133,10 @@
   "text.config.oritech-config.option.basicDrill.energyUsage": "Basit Matkap Enerji Kullanımı",
   "text.config.oritech-config.option.basicDrill.chargeSpeed": "Basit Matkap Şarj Hızı",
   "text.config.oritech-config.option.portableLaserConfig.energyCapacity": "Enerji Kapasitesi",
-  "text.config.oritech-config.option.portableLaserConfig.energyPerTick": "Energy per Tick",
-  "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "Energy per Explosion",
-  "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "Block Break Speed",
-  "text.config.oritech-config.option.portableLaserConfig.damageBase": "Base Damage",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerTick": "Tik başına Enerji",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "Patlama başına Enerji",
+  "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "Blok Kırma Hızı",
+  "text.config.oritech-config.option.portableLaserConfig.damageBase": "Baz Hasar",
   "text.config.oritech-config.option.chainSaw.energyCapacity": "Testere Enerji Kapasitesi",
   "text.config.oritech-config.option.chainSaw.energyUsage": "Testere Enerji Kullanımı",
   "text.config.oritech-config.option.chainSaw.chargeSpeed": "Testere Şarj Hızı",
