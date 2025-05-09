@@ -1,6 +1,7 @@
 package rearth.oritech.block.entity.generators;
 
 import dev.architectury.fluid.FluidStack;
+import dev.architectury.platform.Platform;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
@@ -40,6 +41,12 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     private static final int MAX_SPEED = 10;
     private static final int MAX_CHAIN_SIZE = 20;
     private static final float WATER_RATIO = 0.9f;
+    
+    // use lower amounts of steam on neo, because on fabric a bucket is 81000 droplets, and on neo its only 1000
+    // due to this, the pipe capacities would be reached super fast.
+    // So on neo, we reduce the amount of steam/water used/produced by X, and then increase the energy amount by X again
+    public static float STEAM_AMOUNT_MULTIPLIER = Platform.isNeoForge() ? 0.05f : 4f;
+    
     
     // how chaining works:
     // (non-chained non-empty) generator checks neighbors in both sides in N dist
@@ -104,7 +111,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         var speed = getSteamProcessingSpeed(steamTank);
         var workerCount = slaves.size() + 1;
         
-        var consumedCount = currentRecipe.getFluidInput().amount() * speed * workerCount;
+        var consumedCount = currentRecipe.getFluidInput().amount() * speed * workerCount * STEAM_AMOUNT_MULTIPLIER;
         var producedCount = consumedCount * WATER_RATIO;
         
         // update tanks
@@ -113,7 +120,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         
         // produce energy
         var energyEfficiency = getSteamEnergyEfficiency(speed);
-        var energyProduced = consumedCount * energyEfficiency * energyPerTick;
+        var energyProduced = consumedCount * energyEfficiency * energyPerTick / STEAM_AMOUNT_MULTIPLIER;
         energyStorage.insertIgnoringLimit((long) energyProduced, false);
         
         spawnParticles();
@@ -123,7 +130,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         progress = (int) (speed * 100f);
         
         // order/data: speed, efficiency, rf produced, steam consumed, slave count
-        clientStats = new NetworkContent.SteamEngineSyncPacket(pos, speed, energyEfficiency, (long) energyProduced, (long) consumedCount, slaves.size());
+        clientStats = new NetworkContent.SteamEngineSyncPacket(pos, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
         this.markDirty();
         
     }
@@ -131,6 +138,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     private void tickSlave() {
         // check if master is actually working
         var masterStats = master.clientStats;
+        if (masterStats == null) return;
         var wasWorking = master.isActivelyWorking();
         var speed = masterStats.speed();
         

@@ -42,6 +42,7 @@ import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.MachineAddonController;
@@ -208,6 +209,8 @@ public class NetworkContent {
                                       List<ReactorControllerBlockEntity.ComponentStatistics> componentHeats,
                                       long energy) {
     }
+    
+    public record LaserPlayerUsePacket() {}
     
     @SuppressWarnings("unchecked")
     public static void registerChannels() {
@@ -646,6 +649,12 @@ public class NetworkContent {
             }
             
         }));
+        
+        MACHINE_CHANNEL.registerServerbound(LaserPlayerUsePacket.class, (message, access) -> {
+            
+            PortableLaserItem.onUseTick(access.player());
+            
+        });
         
         UI_CHANNEL.registerServerbound(RedstoneAddonSyncPacket.class, (message, access) -> {
             

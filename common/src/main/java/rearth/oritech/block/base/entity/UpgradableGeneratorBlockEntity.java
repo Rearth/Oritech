@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
+import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -169,6 +170,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             // yes this will void excess steam. Generators will only stop producing when the RF storage is full, not the steam storage
             // this is by design and supposed to be one of the negatives of steam production
             produced *= Oritech.CONFIG.generators.steamEngineData.rfToSteamRatio();
+            produced *= SteamEngineEntity.STEAM_AMOUNT_MULTIPLIER;
             
             var extracted = boilerStorage.getInputContainer().extract(FluidStack.create(Fluids.WATER.getStill(), (long) produced), false);
             boilerStorage.getOutputContainer().insert(FluidStack.create(FluidContent.STILL_STEAM.get(), extracted), false);

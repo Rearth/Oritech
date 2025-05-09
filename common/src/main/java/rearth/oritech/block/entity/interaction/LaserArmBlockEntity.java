@@ -73,7 +73,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
     MultiblockMachineController, MachineAddonController, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
     
     public static final String LASER_PLAYER_NAME = "oritech_laser";
-    private static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
+    public static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
     
     // storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, this::markDirty);
@@ -212,7 +212,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
             dropped = net.minecraft.block.Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetPos, targetEntity, getLaserPlayerEntity(), ItemStack.EMPTY);
         }
         
-        var blockRecipe = tryGetRecipeOfBlock(targetBlockState);
+        var blockRecipe = tryGetLaserRecipe(targetBlockState, world);
         if (blockRecipe != null) {
             var recipe = blockRecipe.value();
             var farmedCount = 1 + yieldAddons;
@@ -237,7 +237,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         findNextBlockBreakTarget();
     }
     
-    private RecipeEntry<OritechRecipe> tryGetRecipeOfBlock(BlockState destroyed) {
+    public static RecipeEntry<OritechRecipe> tryGetLaserRecipe(BlockState destroyed, World world) {
         var inputItem = destroyed.getBlock().asItem();
         var inputInv = new SimpleCraftingInventory(new ItemStack(inputItem));
         var candidate = world.getRecipeManager().getFirstMatch(RecipeContent.LASER, inputInv, world);

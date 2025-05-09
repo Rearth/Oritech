@@ -126,7 +126,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
         }
         
         // fluid inputs
-        if (!(recipe.getFluidInput() != null && recipe.getFluidInput().isEmpty())) {
+        if (recipe.getFluidInput() != null && recipe.getFluidInput().amount() > 0) {
             var fluidIngredient = recipe.getFluidInput();
             var shownAmount = Math.max(1, fluidIngredient.amount());
             

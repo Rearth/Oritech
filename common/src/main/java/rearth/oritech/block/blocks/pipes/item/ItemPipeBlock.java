@@ -43,7 +43,7 @@ public class ItemPipeBlock extends GenericPipeBlock {
         
         var showExtra = Screen.hasControlDown();
         if (showExtra) {
-            for (int i = 1; i <= 3; i++) {
+            for (int i = 1; i <= 4; i++) {
                 tooltip.add(Text.translatable("tooltip.oritech.item_pipe." + i).formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
             }
         } else {

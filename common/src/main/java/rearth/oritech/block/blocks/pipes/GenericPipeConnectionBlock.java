@@ -25,7 +25,7 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     public GenericPipeConnectionBlock(Settings settings) {
         super(settings);
     }
-
+    
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
         if (oldState.getBlock().equals(state.getBlock())) return;
@@ -47,15 +47,15 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         var worldImp = (World) world;
         if (worldImp.isClient) return state;
-
+        
         if (!hasNeighboringMachine(state, worldImp, pos, false)) {
             // remove stale machine -> neighboring pipes mapping
             GenericPipeInterfaceEntity.removeStaleMachinePipeNeighbors(pos, getNetworkData(worldImp));
-
+            
             var normalState = getNormalBlock();
             return ((GenericPipeBlock) normalState.getBlock()).addConnectionStates(normalState, worldImp, pos, false);
         }
-
+        
         var interfaceState = state;
         if (!(neighborState.getBlock() instanceof AbstractPipeBlock)) {
             // only update connection if neighbor is a new machine
@@ -63,30 +63,30 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
             if (neighborState.isOf(Blocks.AIR) || !hasMachine) {
                 interfaceState = addConnectionStates(state, worldImp, pos, direction);
             }
-
+            
             if (!interfaceState.equals(state)) {
                 // reload connection when state has changed (e.g. machine added/removed)
                 GenericPipeInterfaceEntity.addNode(worldImp, pos, true, interfaceState, getNetworkData(worldImp));
             }
         }
-
+        
         return interfaceState;
     }
-
+    
     @Override
     protected boolean toggleSideConnection(BlockState state, Direction side, World world, BlockPos pos) {
         var property = directionToProperty(side);
         var createConnection = state.get(property) == NO_CONNECTION;
-
+        
         // check if connection would be valid if state is toggled
         var targetPos = pos.offset(side);
         if (createConnection && !isValidConnectionTarget(world.getBlockState(targetPos).getBlock(), world, side.getOpposite(), targetPos))
             return false;
-
+        
         // toggle connection state
         int nextConnectionState = getNextConnectionState(state, side, world, pos, state.get(property));
         var newState = addStraightState(state.with(property, nextConnectionState));
-
+        
         // transform to interface block if side is being enabled and machine is connected
         if (!hasNeighboringMachine(newState, world, pos, false)) {
             var normalBlock = (GenericPipeBlock) getNormalBlock().getBlock();
@@ -96,18 +96,18 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
         } else {
             world.setBlockState(pos, newState);
             GenericPipeInterfaceEntity.addNode(world, pos, true, newState, getNetworkData(world));
-
+            
             // update neighbor if it's a pipe
             updateNeighbors(world, pos, true);
         }
-
+        
         // play sound
         var soundGroup = getSoundGroup(state);
         world.playSound(null, pos, soundGroup.getPlaceSound(), SoundCategory.BLOCKS, soundGroup.getVolume() * .5f, soundGroup.getPitch());
-
+        
         return true;
     }
-
+    
     @SuppressWarnings("rawtypes")
     @Nullable
     @Override

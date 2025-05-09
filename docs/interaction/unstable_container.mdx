@@ -1,0 +1,24 @@
+---
+title: Schrödinger's Safe
+icon: oritech:unstable_container
+related_items: [oritech:unstable_container]
+---
+
+Schrödinger's Safe is used to store massive amounts of RF. The item is right-clicked on an existing unstable block (see the ingame tooltip for a specific list).
+This block will then be contained with the Schrödinger's Safe. Depending on how dangerous the original block is, the energy storage capacity of the safe will be increased.
+No machine cores are required for this multiblock, it is a self-assembling multiblock.
+
+Energy will be output on the top and bottom center blocks. It can be inserted anywhere else. The UI will show the contained block, the laser bonus, and the i/o data.
+
+<center>
+<ModAsset location="oritech:area/unstable_container" width={512} />
+</center>
+
+## Overcharging
+
+To further increase the amount of energy that can be stored in the safe, enderic lasers can be pointed at it. The lasers will not transfer energy to the safe, instead
+they will increase the storage capacity of it. The more (or faster) lasers are firing at the safe, the more energy it can store. This increases exponentially, so you can go
+to massive storage amounts.
+
+However the increased capacity is only available while the lasers are pointed at the safe and actively firing. If the lasers run out of energy or are no longer active, the
+storage capacity will slowly decrease back to its original value.

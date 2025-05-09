@@ -2,6 +2,7 @@ package rearth.oritech.neoforge.client;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayers;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -9,10 +10,12 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RenderHighlightEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
@@ -22,6 +25,7 @@ import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.PortalEntityRenderer;
 import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.init.FluidContent;
+import rearth.oritech.item.tools.PortableLaserItem;
 
 import static net.neoforged.fml.loading.FMLEnvironment.dist;
 
@@ -48,6 +52,14 @@ public class OritechClientNeoForge {
         @SubscribeEvent
         public static void onOutlineRender(RenderHighlightEvent.Block event) {
             BlockOutlineRenderer.render(MinecraftClient.getInstance().world, event.getCamera(), event.getPoseStack(), event.getMultiBufferSource());
+        }
+        
+        @SubscribeEvent
+        public static void onMouseLaserInput(InputEvent.MouseButton.Pre event) {
+            var client = MinecraftClient.getInstance();
+            var handled = OritechClient.handleMouseClicked(client, event.getButton(), event.getAction(), event.getModifiers());
+            if (handled) event.setCanceled(true);
+            
         }
         
     }

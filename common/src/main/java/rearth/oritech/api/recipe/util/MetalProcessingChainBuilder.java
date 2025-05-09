@@ -54,6 +54,7 @@ public class MetalProcessingChainBuilder {
     private float timeMultiplier = 1f;
     // for compat use. no need to add vanilla processing for other mods' ores
     private boolean vanillaProcessing = false;
+    private boolean skipCompactingRecipes = false;
 
     private MetalProcessingChainBuilder(String metalName) {
         this.metalName = metalName;
@@ -219,6 +220,11 @@ public class MetalProcessingChainBuilder {
         return this;
     }
 
+    public MetalProcessingChainBuilder skipCompacting() {
+        this.skipCompactingRecipes = true;
+        return this;
+    }
+
     private void validate(String path) throws IllegalStateException {
         if (ore == null)
             throw new IllegalStateException("ore is required for metal processing chain " + path);
@@ -315,7 +321,7 @@ public class MetalProcessingChainBuilder {
             }
             if (clumpItem != null && smallClumpItem != null)
                 RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, clumpItem, smallClumpItem);
-            if (nuggetItem != null)
+            if (nuggetItem != null && !skipCompactingRecipes)    // to avoid duplicate vanilla nugget -> item recipes
                 RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, ingotItem, nuggetItem);
         }
     }

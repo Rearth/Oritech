@@ -3,6 +3,8 @@ package rearth.oritech.block.entity.pipes;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -65,8 +67,9 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         BlockPos takenFrom = null;
         var moveCapacity = isBoostAvailable() ? 64 : TRANSFER_AMOUNT;
         
+        var hasMotor = state.get(ItemPipeConnectionBlock.HAS_MOTOR);
+        
         for (var sourcePos : sources) {
-            
             var blockedTimer = blockedUntil.getOrDefault(sourcePos, 0L);
             if (world.getTime() < blockedTimer) continue;
             
@@ -79,71 +82,82 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             var inventory = ItemApi.BLOCK.find(world, sourcePos, direction);
             if (inventory == null || !inventory.supportsExtraction()) continue;
             
-            var firstStack = getFirstStack(inventory, moveCapacity);
-            
-            if (!firstStack.isEmpty()) {
-                stackToMove = firstStack;
-                moveFromInventory = inventory;
-                takenFrom = sourcePos;
-                break;
+            for (int i = 0; i < inventory.getSlotCount(); i++) {
+                var slotStack = inventory.getStackInSlot(i);
+                if (slotStack.isEmpty()) continue;
+                var canTake = inventory.extractFromSlot(slotStack.copyWithCount(moveCapacity), i, true);
+                if (canTake > 0) {
+                    stackToMove = slotStack.copyWithCount(canTake);
+                    moveFromInventory = inventory;
+                    takenFrom = sourcePos;
+                } else {
+                    stackToMove = ItemStack.EMPTY;
+                }
+                
+                if (stackToMove.isEmpty()) continue;
+                
+                var targets = findNetworkTargets(pos, data);
+                if (targets == null) {
+                    System.err.println("Yeah your pipe network likely is too long. At: " + this.getPos());
+                    return;
+                }
+                
+                var netHash = targets.hashCode();
+                
+                if (netHash != filteredTargetsNetHash || filteredTargetItemStorages == null) {
+                    filteredTargetItemStorages = targets.stream()
+                                                   .filter(target -> {
+                                                       var targetDir = target.getRight();
+                                                       var pipePos = target.getLeft().add(targetDir.getVector());
+                                                       var pipeState = world.getBlockState(pipePos);
+                                                       if (!(pipeState.getBlock() instanceof ItemPipeConnectionBlock itemBlock))
+                                                           return true;   // edge case, this should never happen
+                                                       var extracting = itemBlock.isSideExtractable(pipeState, targetDir.getOpposite());
+                                                       return !extracting;
+                                                   })
+                                                   .map(target -> new Pair<>(ItemApi.BLOCK.find(world, target.getLeft(), target.getRight()), target.getLeft()))
+                                                   .filter(obj -> Objects.nonNull(obj.getLeft()) && obj.getLeft().supportsInsertion())
+                                                   .sorted(Comparator.comparingInt(a -> a.getRight().getManhattanDistance(pos)))
+                                                   .toList();
+                    
+                    filteredTargetsNetHash = netHash;
+                    cachedTransferPaths.clear();
+                }
+                
+                var toMove = stackToMove.getCount();
+                var moved = 0;
+                
+                for (var storagePair : filteredTargetItemStorages) {
+                    if (storagePair.getLeft().equals(moveFromInventory))
+                        continue;    // skip when targeting same machine
+                    
+                    var targetStorage = storagePair.getLeft();
+                    var wasEmptyStorage = IntStream.range(0, targetStorage.getSlotCount()).allMatch(slot -> targetStorage.getStackInSlot(slot).isEmpty());
+                    
+                    var inserted = targetStorage.insert(stackToMove, false);
+                    toMove -= inserted;
+                    moved += inserted;
+                    
+                    if (inserted > 0) {
+                        onItemMoved(this.pos, takenFrom, storagePair.getRight(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.pos, 0), new HashSet<>()), world, stackToMove.getItem(), inserted, wasEmptyStorage);
+                    }
+                    
+                    if (toMove <= 0) break;  // target has been found for all items
+                }
+                var extracted = moveFromInventory.extract(stackToMove.copyWithCount(moved), false);
+                
+                if (extracted != moved) {
+                    Oritech.LOGGER.warn("Invalid state while transferring inventory. Caused at position {}", pos);
+                }
+                
+                // only move one slot content
+                if (moved > 0)
+                    break;
+                
+                // only try to move the first non-empty stack without motors
+                if (!hasMotor)
+                    break;
             }
-            
-        }
-        
-        if (stackToMove.isEmpty()) return;
-        
-        var targets = findNetworkTargets(pos, data);
-        if (targets == null) {
-            System.err.println("Yeah your pipe network likely is too long. At: " + this.getPos());
-            return;
-        }
-        
-        var netHash = targets.hashCode();
-        
-        if (netHash != filteredTargetsNetHash || filteredTargetItemStorages == null) {
-            filteredTargetItemStorages = targets.stream()
-                                           .filter(target -> {
-                                               var direction = target.getRight();
-                                               var pipePos = target.getLeft().add(direction.getVector());
-                                               var pipeState = world.getBlockState(pipePos);
-                                               if (!(pipeState.getBlock() instanceof ItemPipeConnectionBlock itemBlock))
-                                                   return true;   // edge case, this should never happen
-                                               var extracting = itemBlock.isSideExtractable(pipeState, direction.getOpposite());
-                                               return !extracting;
-                                           })
-                                           .map(target -> new Pair<>(ItemApi.BLOCK.find(world, target.getLeft(), target.getRight()), target.getLeft()))
-                                           .filter(obj -> Objects.nonNull(obj.getLeft()) && obj.getLeft().supportsInsertion())
-                                           .sorted(Comparator.comparingInt(a -> a.getRight().getManhattanDistance(pos)))
-                                           .toList();
-            
-            filteredTargetsNetHash = netHash;
-            cachedTransferPaths.clear();
-        }
-        
-        var toMove = stackToMove.getCount();
-        var moved = 0;
-        
-        for (var storagePair : filteredTargetItemStorages) {
-            if (storagePair.getLeft().equals(moveFromInventory)) continue;    // skip when targeting same machine
-            
-            var targetStorage = storagePair.getLeft();
-            var wasEmptyStorage = IntStream.range(0, targetStorage.getSlotCount()).allMatch(slot -> targetStorage.getStackInSlot(slot).isEmpty());
-            
-            
-            var inserted = targetStorage.insert(stackToMove, false);
-            toMove -= inserted;
-            moved += inserted;
-            
-            if (inserted > 0) {
-                onItemMoved(this.pos, takenFrom, storagePair.getRight(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.pos, 0), new HashSet<>()), world, stackToMove.getItem(), inserted, wasEmptyStorage);
-            }
-            
-            if (toMove <= 0) break;  // target has been found for all items
-        }
-        var extracted = moveFromInventory.extract(stackToMove.copyWithCount(moved), false);
-        
-        if (extracted != moved) {
-            Oritech.LOGGER.warn("Invalid state while transferring inventory. Caused at position {}", pos);
         }
         
         if (moveCapacity > TRANSFER_AMOUNT) onBoostUsed();
@@ -289,18 +303,6 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     public void markDirty() {
         if (this.world != null)
             world.markDirty(pos);
-    }
-    
-    private static ItemStack getFirstStack(ItemApi.InventoryStorage inventory, int maxTransferAmount) {
-        
-        for (int i = 0; i < inventory.getSlotCount(); i++) {
-            var slotStack = inventory.getStackInSlot(i);
-            if (slotStack.isEmpty()) continue;
-            var extracted = inventory.extractFromSlot(slotStack.copyWithCount(maxTransferAmount), i, true);
-            if (extracted > 0) return slotStack.copyWithCount(extracted);
-        }
-        
-        return ItemStack.EMPTY;
     }
     
     public record RenderStackData(ItemStack rendered, List<BlockPos> path, Long startedAt, int pathLength) {

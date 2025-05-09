@@ -60,6 +60,8 @@ public class Config {
     public ToolData basicDrill = new ToolData(10_000, 10, 512);
     @Nest
     public ToolData chainSaw = new ToolData(10_000, 10, 512);
+    @Nest
+    public PortableLaserConfig portableLaserConfig = new PortableLaserConfig();
     public boolean chainsawTreeCutting = true;
     
     @SectionHeader("worldGeneration")
@@ -173,6 +175,14 @@ public class Config {
         public int blockBreakEnergyBase = 1024; // multiplied by block hardness
         public float damageTickBase = 2;
         public int range = 128;
+    }
+    
+    public static class PortableLaserConfig {
+        public long energyCapacity = 5_000_000;
+        public int energyPerTick = 4096;
+        public int energyPerBoom = 100_000;
+        public float blockBreakSpeed = 0.125f; // multiplied by block hardness
+        public int damageBase = 4;
     }
     
     public static class DeepDrillConfig {

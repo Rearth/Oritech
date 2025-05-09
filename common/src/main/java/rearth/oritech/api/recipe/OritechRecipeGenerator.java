@@ -1,15 +1,8 @@
 package rearth.oritech.api.recipe;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.data.DataOutput;
-import net.minecraft.data.server.recipe.CraftingRecipeJsonBuilder;
-import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.data.server.recipe.RecipeProvider;
-import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
-import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
+import net.minecraft.data.server.recipe.*;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
@@ -23,24 +16,23 @@ import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.FluidContent;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.TagContent;
-import rearth.oritech.init.ToolsContent;
+import rearth.oritech.init.*;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static rearth.oritech.api.recipe.util.RecipeHelpers.*;
 import static rearth.oritech.util.TagUtils.*;
 
 public class OritechRecipeGenerator extends RecipeProvider {
-
+    
     public OritechRecipeGenerator(DataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
         super(output, registriesFuture);
     }
-   
+    
     @Override
     public void generate(RecipeExporter exporter) {
-
+        
         addDeepDrillOres(exporter);
         addFuels(exporter);
         addBiomass(exporter);
@@ -158,8 +150,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         FuelGeneratorRecipeBuilder.build().fluidInput(cFluidTag("oil"), 0.1f).timeInSeconds(3).export(exporter, "crude");
         FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.TURBOFUEL, 0.1f).timeInSeconds(12).export(exporter, "fuel");
         //steam
-        // 0.000396 buckets is 32 (fabric) droplets
-        SteamGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_STEAM.get(), 0.000396f).time(1).export(exporter, "steameng");
+        // 32 fabric droplets / 32 neoforge mb (yes this will works, as we produce 2 millis per RF in the generator boilers, and then consume it at a 1:1 ratio)
+        SteamGeneratorRecipeBuilder.build().specificFluidInput(FluidContent.STILL_STEAM.get(), 32).time(1).export(exporter, "steameng");
     }
     
     private void addBiomass(RecipeExporter exporter) {
@@ -175,6 +167,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerChainsawRecipe(exporter, ToolsContent.CHAINSAW, of(TagContent.STEEL_INGOTS), of(ItemContent.MOTOR), of(ItemContent.ENDERIC_COMPOUND), of(ItemContent.ADAMANT_INGOT), "chainsaw");
         offerAxeRecipe(exporter, ToolsContent.PROMETHIUM_AXE, of(ItemContent.PROMETHEUM_INGOT), of(BlockContent.DESTROYER_BLOCK.asItem()), "promaxe");
         offerPickaxeRecipe(exporter, ToolsContent.PROMETHIUM_PICKAXE, of(ItemContent.PROMETHEUM_INGOT), of(BlockContent.DESTROYER_BLOCK.asItem()), "prompick");
+        
+        // enderic laser / portable laser
+        offerChainsawRecipe(exporter, ToolsContent.PORTABLE_LASER, of(ItemContent.ADVANCED_BATTERY), of(BlockContent.ACCELERATOR_MOTOR), of(ItemContent.ADAMANT_INGOT), of(BlockContent.LASER_ARM_BLOCK), "portablelaser");
         
         // designator
         offerDrillRecipe(exporter, ItemContent.TARGET_DESIGNATOR, of(TagContent.STEEL_INGOTS), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.PROCESSING_UNIT), of(TagContent.PLASTIC_PLATES), "designator");
@@ -506,9 +501,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
         // snow from steam in cooler
         CoolerRecipeBuilder.build().fluidInput(FluidContent.STILL_STEAM.get()).result(Items.SNOW_BLOCK, 3).export(exporter, "snow");
-
+        
         // obsidian from lava
-        CoolerRecipeBuilder.build().fluidInput(Fluids.LAVA).result(Items.OBSIDIAN, 2).export(exporter, "obsidian");        
+        CoolerRecipeBuilder.build().fluidInput(Fluids.LAVA).result(Items.OBSIDIAN, 2).export(exporter, "obsidian");
     }
     
     private void addCompactingRecipes(RecipeExporter exporter) {
@@ -539,58 +534,61 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
         // iron chain
         MetalProcessingChainBuilder.build("iron")
-            .ore(ItemTags.IRON_ORES)
-            .rawOre(cItemTag("raw_materials/iron"), Items.RAW_IRON)
-            .rawOreByproduct(ItemContent.RAW_NICKEL)
-            .ingot(cItemTag("ingots/iron"), Items.IRON_INGOT).nugget(cItemTag("nuggets/iron"), Items.IRON_NUGGET)
-            .clump(TagContent.IRON_CLUMPS, ItemContent.IRON_CLUMP).smallClump(ItemContent.SMALL_IRON_CLUMP).clumpByproduct(ItemContent.SMALL_NICKEL_CLUMP)
-            .dust(ItemContent.IRON_DUST).smallDust(ItemContent.SMALL_IRON_DUST).dustByproduct(ItemContent.SMALL_NICKEL_DUST)
-            .gem(ItemContent.IRON_GEM).gemCatalyst(ItemContent.FLUXITE)
-            .vanillaProcessing()
-            .export(exporter);
+          .ore(ItemTags.IRON_ORES)
+          .rawOre(cItemTag("raw_materials/iron"), Items.RAW_IRON)
+          .rawOreByproduct(ItemContent.RAW_NICKEL)
+          .ingot(cItemTag("ingots/iron"), Items.IRON_INGOT).nugget(cItemTag("nuggets/iron"), Items.IRON_NUGGET)
+          .clump(TagContent.IRON_CLUMPS, ItemContent.IRON_CLUMP).smallClump(ItemContent.SMALL_IRON_CLUMP).clumpByproduct(ItemContent.SMALL_NICKEL_CLUMP)
+          .dust(ItemContent.IRON_DUST).smallDust(ItemContent.SMALL_IRON_DUST).dustByproduct(ItemContent.SMALL_NICKEL_DUST)
+          .gem(ItemContent.IRON_GEM).gemCatalyst(ItemContent.FLUXITE)
+          .vanillaProcessing()
+          .skipCompacting()
+          .export(exporter);
         // copper chain
         MetalProcessingChainBuilder.build("copper")
-            .ore(ItemTags.COPPER_ORES)
-            .rawOre(cItemTag("raw_materials/copper"), Items.RAW_COPPER).rawOreByproduct(Items.RAW_GOLD)
-            .ingot(cItemTag("ingots/copper"), Items.COPPER_INGOT).nugget(TagContent.COPPER_NUGGETS, ItemContent.COPPER_NUGGET)
-            .clump(TagContent.COPPER_CLUMPS, ItemContent.COPPER_CLUMP).smallClump(ItemContent.SMALL_COPPER_CLUMP).clumpByproduct(ItemContent.SMALL_GOLD_CLUMP)
-            .dust(ItemContent.COPPER_DUST).smallDust(ItemContent.SMALL_COPPER_DUST).dustByproduct(ItemContent.SMALL_GOLD_DUST)
-            .gem(ItemContent.COPPER_GEM).gemCatalyst(ItemContent.FLUXITE)
-            .vanillaProcessing()
-            .export(exporter);
+          .ore(ItemTags.COPPER_ORES)
+          .rawOre(cItemTag("raw_materials/copper"), Items.RAW_COPPER).rawOreByproduct(Items.RAW_GOLD)
+          .ingot(cItemTag("ingots/copper"), Items.COPPER_INGOT).nugget(TagContent.COPPER_NUGGETS, ItemContent.COPPER_NUGGET)
+          .clump(TagContent.COPPER_CLUMPS, ItemContent.COPPER_CLUMP).smallClump(ItemContent.SMALL_COPPER_CLUMP).clumpByproduct(ItemContent.SMALL_GOLD_CLUMP)
+          .dust(ItemContent.COPPER_DUST).smallDust(ItemContent.SMALL_COPPER_DUST).dustByproduct(ItemContent.SMALL_GOLD_DUST)
+          .gem(ItemContent.COPPER_GEM).gemCatalyst(ItemContent.FLUXITE)
+          .vanillaProcessing()
+          .skipCompacting()
+          .export(exporter);
         // gold chain
         MetalProcessingChainBuilder.build("gold")
-            .ore(ItemTags.GOLD_ORES)
-            .rawOre(cItemTag("raw_materials/gold"), Items.RAW_GOLD).rawOreByproduct(Items.RAW_COPPER)
-            .ingot(cItemTag("ingots/gold"), Items.GOLD_INGOT).nugget(cItemTag("nuggets/gold"), Items.GOLD_NUGGET)
-            .clump(TagContent.GOLD_CLUMPS, ItemContent.GOLD_CLUMP).smallClump(ItemContent.SMALL_GOLD_CLUMP).clumpByproduct(ItemContent.SMALL_COPPER_CLUMP)
-            .dust(ItemContent.GOLD_DUST).smallDust(ItemContent.SMALL_GOLD_DUST).dustByproduct(ItemContent.SMALL_COPPER_DUST)
-            .gem(ItemContent.GOLD_GEM).gemCatalyst(ItemContent.FLUXITE)
-            .vanillaProcessing()
-            .export(exporter);
+          .ore(ItemTags.GOLD_ORES)
+          .rawOre(cItemTag("raw_materials/gold"), Items.RAW_GOLD).rawOreByproduct(Items.RAW_COPPER)
+          .ingot(cItemTag("ingots/gold"), Items.GOLD_INGOT).nugget(cItemTag("nuggets/gold"), Items.GOLD_NUGGET)
+          .clump(TagContent.GOLD_CLUMPS, ItemContent.GOLD_CLUMP).smallClump(ItemContent.SMALL_GOLD_CLUMP).clumpByproduct(ItemContent.SMALL_COPPER_CLUMP)
+          .dust(ItemContent.GOLD_DUST).smallDust(ItemContent.SMALL_GOLD_DUST).dustByproduct(ItemContent.SMALL_COPPER_DUST)
+          .gem(ItemContent.GOLD_GEM).gemCatalyst(ItemContent.FLUXITE)
+          .vanillaProcessing()
+          .skipCompacting()
+          .export(exporter);
         // nickel chain
         MetalProcessingChainBuilder.build("nickel")
-            .ore(TagContent.NICKEL_ORES)
-            .rawOre(TagContent.NICKEL_RAW_MATERIALS, ItemContent.RAW_NICKEL).rawOreByproduct(ItemContent.RAW_PLATINUM)
-            .ingot(TagContent.NICKEL_INGOTS, ItemContent.NICKEL_INGOT).nugget(TagContent.NICKEL_NUGGETS, ItemContent.NICKEL_NUGGET)
-            .clump(TagContent.NICKEL_CLUMPS, ItemContent.NICKEL_CLUMP).smallClump(ItemContent.SMALL_NICKEL_CLUMP).clumpByproduct(ItemContent.SMALL_PLATINUM_CLUMP)
-            .dust(ItemContent.NICKEL_DUST).smallDust(ItemContent.SMALL_NICKEL_DUST).dustByproduct(ItemContent.SMALL_PLATINUM_DUST)
-            .byproductAmount(2)
-            .gem(ItemContent.NICKEL_GEM).gemCatalyst(ItemContent.FLUXITE)
-            .vanillaProcessing()
-            .export(exporter);
+          .ore(TagContent.NICKEL_ORES)
+          .rawOre(TagContent.NICKEL_RAW_MATERIALS, ItemContent.RAW_NICKEL).rawOreByproduct(ItemContent.RAW_PLATINUM)
+          .ingot(TagContent.NICKEL_INGOTS, ItemContent.NICKEL_INGOT).nugget(TagContent.NICKEL_NUGGETS, ItemContent.NICKEL_NUGGET)
+          .clump(TagContent.NICKEL_CLUMPS, ItemContent.NICKEL_CLUMP).smallClump(ItemContent.SMALL_NICKEL_CLUMP).clumpByproduct(ItemContent.SMALL_PLATINUM_CLUMP)
+          .dust(ItemContent.NICKEL_DUST).smallDust(ItemContent.SMALL_NICKEL_DUST).dustByproduct(ItemContent.SMALL_PLATINUM_DUST)
+          .byproductAmount(2)
+          .gem(ItemContent.NICKEL_GEM).gemCatalyst(ItemContent.FLUXITE)
+          .vanillaProcessing()
+          .export(exporter);
         // platinum chain
         MetalProcessingChainBuilder.build("platinum")
-            .ore(TagContent.PLATINUM_ORES)
-            .rawOre(TagContent.PLATINUM_RAW_MATERIALS, ItemContent.RAW_PLATINUM).rawOreByproduct(ItemContent.FLUXITE)
-            .ingot(TagContent.PLATINUM_INGOTS, ItemContent.PLATINUM_INGOT).nugget(TagContent.PLATINUM_NUGGETS, ItemContent.PLATINUM_NUGGET)
-            .clump(TagContent.PLATINUM_CLUMPS, ItemContent.PLATINUM_CLUMP).smallClump(ItemContent.SMALL_PLATINUM_CLUMP).clumpByproduct(ItemContent.FLUXITE)
-            .dust(ItemContent.PLATINUM_DUST).smallDust(ItemContent.SMALL_PLATINUM_DUST).dustByproduct(ItemContent.FLUXITE)
-            .byproductAmount(1)
-            .gem(ItemContent.PLATINUM_GEM).gemCatalyst(ItemContent.FLUXITE)
-            .timeMultiplier(1.5f)
-            .vanillaProcessing()
-            .export(exporter);
+          .ore(TagContent.PLATINUM_ORES)
+          .rawOre(TagContent.PLATINUM_RAW_MATERIALS, ItemContent.RAW_PLATINUM).rawOreByproduct(ItemContent.FLUXITE)
+          .ingot(TagContent.PLATINUM_INGOTS, ItemContent.PLATINUM_INGOT).nugget(TagContent.PLATINUM_NUGGETS, ItemContent.PLATINUM_NUGGET)
+          .clump(TagContent.PLATINUM_CLUMPS, ItemContent.PLATINUM_CLUMP).smallClump(ItemContent.SMALL_PLATINUM_CLUMP).clumpByproduct(ItemContent.FLUXITE)
+          .dust(ItemContent.PLATINUM_DUST).smallDust(ItemContent.SMALL_PLATINUM_DUST).dustByproduct(ItemContent.FLUXITE)
+          .byproductAmount(1)
+          .gem(ItemContent.PLATINUM_GEM).gemCatalyst(ItemContent.FLUXITE)
+          .timeMultiplier(1.5f)
+          .vanillaProcessing()
+          .export(exporter);
     }
     
     private void addAlloys(RecipeExporter exporter) {
@@ -721,335 +719,335 @@ public class OritechRecipeGenerator extends RecipeProvider {
         var ARCANE_AUGMENT_STATION_ID = Registries.BLOCK.getId(BlockContent.ARCANE_AUGMENT_STATION);
         
         AugmentRecipeBuilder.build()
-            .researchCost(TagContent.MACHINE_PLATING, 64)
-            .researchCost(TagContent.COAL_DUSTS, 32)
-            .researchCost(ItemContent.BIOSTEEL_INGOT, 8)
-            .applyCost(TagContent.STEEL_INGOTS, 8)
-            .applyCost(cItemTag("ingots/iron"), 16)
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(5).uiY(70).time(400).rfCost(10_000_000)
-            .export(exporter, "hpboost");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(TagContent.CARBON_FIBRE, 32)
-            .researchCost(ItemContent.BIOSTEEL_INGOT, 16)
-            .researchCost(cItemTag("gems/diamond"), 4)
-            .applyCost(TagContent.CARBON_FIBRE, 8)
-            .applyCost(ItemContent.DURATIUM_INGOT, 4)
-            .requirement(Oritech.id("augment/armor"))
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(80).uiY(70).time(800).rfCost(50_000_000)
-            .export(exporter, "hpboostmore");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.ENERGITE_INGOT, 64)
-            .researchCost(ItemContent.DURATIUM_INGOT, 32)
-            .researchCost(Items.NETHER_STAR)
-            .applyCost(ItemContent.DURATIUM_DUST, 64)
-            .applyCost(cItemTag("storage_blocks/redstone"), 64)
-            .requirement(Oritech.id("augment/ultimatearmor"))
-            .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-            .uiX(165).uiY(70).time(1600).rfCost(200_000_000)
-            .export(exporter, "hpboostultra");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.ADAMANT_INGOT, 64)
-            .researchCost(Items.NETHER_STAR, 8)
-            .researchCost(ItemContent.URANIUM_PELLET, 64)
-            .researchCost(BlockContent.FLUXITE_BLOCK, 64)
-            .applyCost(ItemContent.ADAMANT_INGOT, 32)
-            .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
-            .applyCost(ItemContent.FLUXITE, 64)
-            .requirement(Oritech.id("augment/hpboostultra"))
-            .requirement(Oritech.id("augment/gravity"))
-            .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-            .uiX(205).uiY(40).time(2400).rfCost(500_000_000)
-            .export(exporter, "hpboostultimate");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.MOTOR, 32)
-            .researchCost(ItemContent.BIOSTEEL_INGOT, 64)
-            .researchCost(cItemTag("dusts/redstone"), 32)
-            .applyCost(ItemContent.MOTOR, 16)
-            .applyCost(cItemTag("ingots/iron"), 32)
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(5).uiY(30).time(600).rfCost(30_000_000)
-            .export(exporter, "speedboost");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.ENERGITE_INGOT, 64)
-            .researchCost(ItemContent.MAGNETIC_COIL, 32)
-            .researchCost(ItemContent.FLUX_GATE, 16)
-            .applyCost(ItemContent.MAGNETIC_COIL, 32)
-            .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
-            .applyCost(TagContent.ELECTRUM_DUSTS, 64)
-            .requirement(Oritech.id("augment/speedboost"))
-            .requirement(Oritech.id("augment/armor"))
-            .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-            .uiX(55).uiY(50).time(1800).rfCost(350_000_000)
-            .export(exporter, "superspeedboost");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.MOTOR, 32)
-            .researchCost(TagContent.STEEL_INGOTS, 64)
-            .researchCost(cItemTag("storage_blocks/iron"), 16)
-            .applyCost(ItemContent.MOTOR, 16)
-            .applyCost(cItemTag("ingots/iron"), 64)
-            .requirement(Oritech.id("augment/superspeedboost"))
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(80).uiY(50).time(800).rfCost(75_000_000)
-            .export(exporter, "stepassist");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.SILICON_WAFER, 64)
-            .researchCost(ItemContent.PROCESSING_UNIT, 32)
-            .researchCost(cItemTag("storage_blocks/gold"), 16)
-            .applyCost(TagContent.SILICON, 32)
-            .applyCost(cItemTag("storage_blocks/redstone"), 32)
-            .requirement(Oritech.id("augment/hpboost"))
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(30).uiY(90).time(400).rfCost(50_000_000)
-            .export(exporter, "dwarf");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.RAW_BIOPOLYMER, 64)
-            .researchCost(ItemContent.SMALL_URANIUM_DUST, 32)
-            .researchCost(TagContent.BIOMATTER, 64)
-            .applyCost(ItemContent.RAW_BIOPOLYMER, 32)
-            .applyCost(cItemTag("ingots/iron"), 64)
-            .requirement(Oritech.id("augment/dwarf"))
-            .requirement(Oritech.id("augment/armor"))
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(55).uiY(90).time(1600).rfCost(300_000_000)
-            .export(exporter, "giant");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(TagContent.STEEL_INGOTS, 64)
-            .researchCost(ItemContent.DURATIUM_INGOT, 8)
-            .researchCost(cItemTag("gems/diamond"), 16)
-            .applyCost(ItemContent.DURATIUM_INGOT, 4)
-            .applyCost(cItemTag("ingots/iron"), 32)
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(30).uiY(50).time(800).rfCost(80_000_000)
-            .export(exporter, "armor");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.ENERGITE_INGOT, 64)
-            .researchCost(ItemContent.MAGNETIC_COIL, 32)
-            .researchCost(cItemTag("gems/diamond"), 32)
-            .applyCost(ItemContent.MAGNETIC_COIL, 16)
-            .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
-            .applyCost(ItemContent.DURATIUM_INGOT, 8)
-            .requirement(Oritech.id("augment/autofeeder"))
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(105).uiY(50).time(1600).rfCost(280_000_000)
-            .export(exporter, "betterarmor");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.FLUXITE, 64)
-            .researchCost(ItemContent.HEISENBERG_COMPENSATOR, 32)
-            .researchCost(ItemContent.PLUTONIUM_PELLET, 64)
-            .researchCost(Items.NETHER_STAR, 8)
-            .applyCost(BlockContent.FLUXITE_BLOCK, 32)
-            .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
-            .applyCost(cItemTag("obsidians/normal"), 16)
-            .requirement(Oritech.id("augment/betterarmor"))
-            .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-            .uiX(155).uiY(50).time(2400).rfCost(500_000_000)
-            .export(exporter, "ultimatearmor");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.MAGNETIC_COIL, 64)
-            .researchCost(TagContent.ELECTRUM_INGOTS, 48)
-            .researchCost(cItemTag("storage_blocks/redstone"), 32)
-            .applyCost(ItemContent.MAGNETIC_COIL, 32)
-            .applyCost(cItemTag("storage_blocks/iron"), 64)
-            .requirement(Oritech.id("augment/blockreach"))
-            .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-            .uiX(140).uiY(70).time(1600).rfCost(150_000_000)
-            .export(exporter, "weaponreach");       
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.MOTOR, 64)
-            .researchCost(TagContent.STEEL_INGOTS, 48)
-            .researchCost(cItemTag("storage_blocks/copper"), 32)
-            .applyCost(ItemContent.MOTOR, 32)
-            .applyCost(cItemTag("ingots/copper"), 64)
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(115).uiY(90).time(900).rfCost(100_000_000)
-            .export(exporter, "blockreach");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.ENDERIC_LENS, 64)
-            .researchCost(cItemTag("ender_pearls"), 16)
-            .researchCost(cItemTag("storage_blocks/diamond"), 16)
-            .applyCost(ItemContent.ENDERIC_LENS, 32)
-            .applyCost(cItemTag("obsidians/normal"), 64)
-            .requirement(Oritech.id("augment/blockreach"))
-            .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-            .uiX(140).uiY(90).time(800).rfCost(200_000_000)
-            .export(exporter, "farblockreach");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.MAGNETIC_COIL, 48)
-            .researchCost(Items.QUARTZ_BLOCK, 64)
-            .researchCost(ItemContent.BASIC_BATTERY, 32)
-            .applyCost(Items.QUARTZ_BLOCK, 16)
-            .applyCost(cItemTag("ingots/iron"), 32)
-            .requirement(Oritech.id("augment/attackdamage"))
-            .requirement(Oritech.id("augment/speedboost"))
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(30).uiY(10).time(1200).rfCost(100_000_000)
-            .export(exporter, "miningspeed");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.ENERGITE_INGOT, 64)
-            .researchCost(ItemContent.FLUX_GATE, 48)
-            .researchCost(ItemContent.DURATIUM_INGOT, 64)
-            .applyCost(ItemContent.ENERGITE_INGOT, 32)
-            .applyCost(cItemTag("storage_blocks/redstone"), 64)
-            .requirement(Oritech.id("augment/miningspeed"))
-            .requirement(Oritech.id("augment/superspeedboost"))
-            .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-            .uiX(80).uiY(10).time(2400).rfCost(450_000_000)
-            .export(exporter, "superminingspeed");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(TagContent.STEEL_INGOTS, 64)
-            .researchCost(cItemTag("gems/diamond"), 48)
-            .researchCost(ItemContent.FLUXITE, 32)
-            .applyCost(TagContent.STEEL_INGOTS, 16)
-            .applyCost(ItemContent.DURATIUM_INGOT, 4)
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(5).uiY(10).time(1600).rfCost(150_000_000)
-            .export(exporter, "attackdamage");
-
-        AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.ENDERIC_COMPOUND, 64)
-            .researchCost(ItemContent.FLUXITE, 64)
-            .researchCost(cItemTag("rods/blaze"), 64)
-            .applyCost(ItemContent.ENDERIC_COMPOUND, 32)
-            .applyCost(cItemTag("storage_blocks/gold"), 64)
-            .requirement(Oritech.id("augment/hpboostultra"))
-            .requirement(Oritech.id("augment/ultimatearmor"))
-            .requiredStation(ARCANE_AUGMENT_STATION_ID)
-            .uiX(180).uiY(50).time(2800).rfCost(500_000_000)
-            .export(exporter, "superattackdamage");
+          .researchCost(TagContent.MACHINE_PLATING, 64)
+          .researchCost(TagContent.COAL_DUSTS, 32)
+          .researchCost(ItemContent.BIOSTEEL_INGOT, 8)
+          .applyCost(TagContent.STEEL_INGOTS, 8)
+          .applyCost(cItemTag("ingots/iron"), 16)
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(5).uiY(70).time(400).rfCost(10_000_000)
+          .export(exporter, "hpboost");
         
         AugmentRecipeBuilder.build()
-            .researchCost(TagContent.ELECTRUM_INGOTS, 64)
-            .researchCost(cItemTag("storage_blocks/lapis"), 48)
-            .researchCost(cItemTag("storage_blocks/gold"), 32)
-            .applyCost(cItemTag("storage_blocks/lapis"), 32)
-            .applyCost(cItemTag("storage_blocks/redstone"), 64)
-            .requiredStation(ARCANE_AUGMENT_STATION_ID)
-            .uiX(55).uiY(30).time(1800).rfCost(200_000_000)
-            .export(exporter, "luck");
+          .researchCost(TagContent.CARBON_FIBRE, 32)
+          .researchCost(ItemContent.BIOSTEEL_INGOT, 16)
+          .researchCost(cItemTag("gems/diamond"), 4)
+          .applyCost(TagContent.CARBON_FIBRE, 8)
+          .applyCost(ItemContent.DURATIUM_INGOT, 4)
+          .requirement(Oritech.id("augment/armor"))
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(80).uiY(70).time(800).rfCost(50_000_000)
+          .export(exporter, "hpboostmore");
         
         AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.MAGNETIC_COIL, 64)
-            .researchCost(ItemContent.FLUXITE, 48)
-            .researchCost(Items.PHANTOM_MEMBRANE, 8)
-            .applyCost(ItemContent.MAGNETIC_COIL, 32)
-            .applyCost(cItemTag("storage_blocks/iron"), 16)
-            .requirement(Oritech.id("augment/flight"))
-            .requiredStation(ARCANE_AUGMENT_STATION_ID)
-            .uiX(180).uiY(10).time(2200).rfCost(400_000_000)
-            .export(exporter, "gravity");
+          .researchCost(ItemContent.ENERGITE_INGOT, 64)
+          .researchCost(ItemContent.DURATIUM_INGOT, 32)
+          .researchCost(Items.NETHER_STAR)
+          .applyCost(ItemContent.DURATIUM_DUST, 64)
+          .applyCost(cItemTag("storage_blocks/redstone"), 64)
+          .requirement(Oritech.id("augment/ultimatearmor"))
+          .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+          .uiX(165).uiY(70).time(1600).rfCost(200_000_000)
+          .export(exporter, "hpboostultra");
         
         AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.FLUX_GATE, 64)
-            .researchCost(Items.WIND_CHARGE, 16)
-            .researchCost(ItemContent.PROMETHEUM_INGOT, 16)
-            .researchCost(ItemContent.PLUTONIUM_PELLET, 32)
-            .applyCost(ItemContent.FLUX_GATE, 32)
-            .applyCost(ItemContent.PLUTONIUM_PELLET, 8)
-            .requirement(Oritech.id("augment/betterarmor"))
-            .requirement(Oritech.id("augment/portal"))
-            .requiredStation(ARCANE_AUGMENT_STATION_ID)
-            .uiX(155).uiY(30).time(3600).rfCost(500_000_000)
-            .export(exporter, "flight");
+          .researchCost(ItemContent.ADAMANT_INGOT, 64)
+          .researchCost(Items.NETHER_STAR, 8)
+          .researchCost(ItemContent.URANIUM_PELLET, 64)
+          .researchCost(BlockContent.FLUXITE_BLOCK, 64)
+          .applyCost(ItemContent.ADAMANT_INGOT, 32)
+          .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
+          .applyCost(ItemContent.FLUXITE, 64)
+          .requirement(Oritech.id("augment/hpboostultra"))
+          .requirement(Oritech.id("augment/gravity"))
+          .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+          .uiX(205).uiY(40).time(2400).rfCost(500_000_000)
+          .export(exporter, "hpboostultimate");
         
         AugmentRecipeBuilder.build()
-            .researchCost(Items.ENDER_EYE, 64)
-            .researchCost(ItemContent.ENDERIC_LENS, 48)
-            .researchCost(cItemTag("gems/diamond"), 8)
-            .applyCost(ItemContent.ENDERIC_LENS, 32)
-            .applyCost(Items.GLOWSTONE, 64)
-            .requirement(Oritech.id("augment/orefinder"))
-            .requiredStation(ARCANE_AUGMENT_STATION_ID)
-            .uiX(155).uiY(10).time(3200).rfCost(100_000_000)
-            .export(exporter, "cloak");
+          .researchCost(ItemContent.MOTOR, 32)
+          .researchCost(ItemContent.BIOSTEEL_INGOT, 64)
+          .researchCost(cItemTag("dusts/redstone"), 32)
+          .applyCost(ItemContent.MOTOR, 16)
+          .applyCost(cItemTag("ingots/iron"), 32)
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(5).uiY(30).time(600).rfCost(30_000_000)
+          .export(exporter, "speedboost");
         
         AugmentRecipeBuilder.build()
-            .researchCost(cItemTag("ender_pearls"), 16)
-            .researchCost(cItemTag("obsidians/normal"), 48)
-            .researchCost(ItemContent.UNHOLY_INTELLIGENCE)
-            .researchCost(ItemContent.ADAMANT_INGOT, 32)
-            .applyCost(cItemTag("ender_pearls"), 8)
-            .applyCost(cItemTag("obsidians/crying"), 32)
-            .requiredStation(ARCANE_AUGMENT_STATION_ID)
-            .uiX(130).uiY(30).time(3000).rfCost(250_000_000)
-            .export(exporter, "portal");
+          .researchCost(ItemContent.ENERGITE_INGOT, 64)
+          .researchCost(ItemContent.MAGNETIC_COIL, 32)
+          .researchCost(ItemContent.FLUX_GATE, 16)
+          .applyCost(ItemContent.MAGNETIC_COIL, 32)
+          .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
+          .applyCost(TagContent.ELECTRUM_DUSTS, 64)
+          .requirement(Oritech.id("augment/speedboost"))
+          .requirement(Oritech.id("augment/armor"))
+          .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+          .uiX(55).uiY(50).time(1800).rfCost(350_000_000)
+          .export(exporter, "superspeedboost");
         
         AugmentRecipeBuilder.build()
-            .researchCost(cItemTag("ingots/gold"), 64)
-            .researchCost(ItemContent.ENDERIC_LENS, 48)
-            .researchCost(Items.GLOWSTONE, 64)
-            .applyCost(ItemContent.ENDERIC_LENS, 4)
-            .applyCost(Items.GLOWSTONE, 8)
-            .applyCost(Items.REDSTONE_LAMP, 8)
-            .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-            .uiX(105).uiY(30).time(2400).rfCost(50_000_000)
-            .export(exporter, "nightvision");
+          .researchCost(ItemContent.MOTOR, 32)
+          .researchCost(TagContent.STEEL_INGOTS, 64)
+          .researchCost(cItemTag("storage_blocks/iron"), 16)
+          .applyCost(ItemContent.MOTOR, 16)
+          .applyCost(cItemTag("ingots/iron"), 64)
+          .requirement(Oritech.id("augment/superspeedboost"))
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(80).uiY(50).time(800).rfCost(75_000_000)
+          .export(exporter, "stepassist");
         
         AugmentRecipeBuilder.build()
-            .researchCost(Items.PRISMARINE_CRYSTALS, 64)
-            .researchCost(ItemContent.BIOSTEEL_INGOT, 48)
-            .researchCost(Items.HEART_OF_THE_SEA)
-            .applyCost(ItemContent.BIOSTEEL_INGOT, 32)
-            .applyCost(Items.CONDUIT)
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(5).uiY(90).time(800).rfCost(50_000_000)
-            .export(exporter, "waterbreath");
+          .researchCost(ItemContent.SILICON_WAFER, 64)
+          .researchCost(ItemContent.PROCESSING_UNIT, 32)
+          .researchCost(cItemTag("storage_blocks/gold"), 16)
+          .applyCost(TagContent.SILICON, 32)
+          .applyCost(cItemTag("storage_blocks/redstone"), 32)
+          .requirement(Oritech.id("augment/hpboost"))
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(30).uiY(90).time(400).rfCost(50_000_000)
+          .export(exporter, "dwarf");
         
         AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.PROCESSING_UNIT, 64)
-            .researchCost(TagContent.BIOMATTER, 48)
-            .researchCost(Items.GOLDEN_CARROT, 64)
-            .applyCost(TagContent.BIOMATTER, 32)
-            .applyCost(BlockContent.ITEM_PIPE, 64)
-            .applyCost(Items.HOPPER, 8)
-            .requirement(Oritech.id("augment/armor"))
-            .requirement(Oritech.id("augment/hpboostmore"))
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(90).uiY(90).time(500).rfCost(30_000_000)
-            .export(exporter, "autofeeder");
+          .researchCost(ItemContent.RAW_BIOPOLYMER, 64)
+          .researchCost(ItemContent.SMALL_URANIUM_DUST, 32)
+          .researchCost(TagContent.BIOMATTER, 64)
+          .applyCost(ItemContent.RAW_BIOPOLYMER, 32)
+          .applyCost(cItemTag("ingots/iron"), 64)
+          .requirement(Oritech.id("augment/dwarf"))
+          .requirement(Oritech.id("augment/armor"))
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(55).uiY(90).time(1600).rfCost(300_000_000)
+          .export(exporter, "giant");
         
         AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.MAGNETIC_COIL, 64)
-            .researchCost(ItemContent.ENERGITE_INGOT, 48)
-            .researchCost(Items.LODESTONE, 2)
-            .applyCost(ItemContent.MAGNETIC_COIL, 32)
-            .applyCost(cItemTag("ingots/copper"), 64)
-            .requirement(Oritech.id("augment/superminingspeed"))
-            .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-            .uiX(105).uiY(10).time(2400).rfCost(400_000_000)
-            .export(exporter, "magnet");
+          .researchCost(TagContent.STEEL_INGOTS, 64)
+          .researchCost(ItemContent.DURATIUM_INGOT, 8)
+          .researchCost(cItemTag("gems/diamond"), 16)
+          .applyCost(ItemContent.DURATIUM_INGOT, 4)
+          .applyCost(cItemTag("ingots/iron"), 32)
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(30).uiY(50).time(800).rfCost(80_000_000)
+          .export(exporter, "armor");
         
         AugmentRecipeBuilder.build()
-            .researchCost(ItemContent.ENDERIC_LENS, 64)
-            .researchCost(Items.AMETHYST_BLOCK, 48)
-            .researchCost(ItemContent.OVERCHARGED_CRYSTAL)
-            .researchCost(ItemContent.PROMETHEUM_INGOT, 8)
-            .researchCost(Items.SCULK_SENSOR, 4)
-            .applyCost(ItemContent.ENDERIC_LENS, 32)
-            .applyCost(Items.REDSTONE_TORCH, 64)
-            .requirement(Oritech.id("augment/nightvision"))
-            .requirement(Oritech.id("augment/magnet"))
-            .requiredStation(ARCANE_AUGMENT_STATION_ID)
-            .uiX(130).uiY(10).time(3200).rfCost(200_000_000)
-            .export(exporter, "orefinder");
+          .researchCost(ItemContent.ENERGITE_INGOT, 64)
+          .researchCost(ItemContent.MAGNETIC_COIL, 32)
+          .researchCost(cItemTag("gems/diamond"), 32)
+          .applyCost(ItemContent.MAGNETIC_COIL, 16)
+          .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
+          .applyCost(ItemContent.DURATIUM_INGOT, 8)
+          .requirement(Oritech.id("augment/autofeeder"))
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(105).uiY(50).time(1600).rfCost(280_000_000)
+          .export(exporter, "betterarmor");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(ItemContent.FLUXITE, 64)
+          .researchCost(ItemContent.HEISENBERG_COMPENSATOR, 32)
+          .researchCost(ItemContent.PLUTONIUM_PELLET, 64)
+          .researchCost(Items.NETHER_STAR, 8)
+          .applyCost(BlockContent.FLUXITE_BLOCK, 32)
+          .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
+          .applyCost(cItemTag("obsidians/normal"), 16)
+          .requirement(Oritech.id("augment/betterarmor"))
+          .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+          .uiX(155).uiY(50).time(2400).rfCost(500_000_000)
+          .export(exporter, "ultimatearmor");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(ItemContent.MAGNETIC_COIL, 64)
+          .researchCost(TagContent.ELECTRUM_INGOTS, 48)
+          .researchCost(cItemTag("storage_blocks/redstone"), 32)
+          .applyCost(ItemContent.MAGNETIC_COIL, 32)
+          .applyCost(cItemTag("storage_blocks/iron"), 64)
+          .requirement(Oritech.id("augment/blockreach"))
+          .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+          .uiX(140).uiY(70).time(1600).rfCost(150_000_000)
+          .export(exporter, "weaponreach");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(ItemContent.MOTOR, 64)
+          .researchCost(TagContent.STEEL_INGOTS, 48)
+          .researchCost(cItemTag("storage_blocks/copper"), 32)
+          .applyCost(ItemContent.MOTOR, 32)
+          .applyCost(cItemTag("ingots/copper"), 64)
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(115).uiY(90).time(900).rfCost(100_000_000)
+          .export(exporter, "blockreach");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(ItemContent.ENDERIC_LENS, 64)
+          .researchCost(cItemTag("ender_pearls"), 16)
+          .researchCost(cItemTag("storage_blocks/diamond"), 16)
+          .applyCost(ItemContent.ENDERIC_LENS, 32)
+          .applyCost(cItemTag("obsidians/normal"), 64)
+          .requirement(Oritech.id("augment/blockreach"))
+          .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+          .uiX(140).uiY(90).time(800).rfCost(200_000_000)
+          .export(exporter, "farblockreach");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(ItemContent.MAGNETIC_COIL, 48)
+          .researchCost(Items.QUARTZ_BLOCK, 64)
+          .researchCost(ItemContent.BASIC_BATTERY, 32)
+          .applyCost(Items.QUARTZ_BLOCK, 16)
+          .applyCost(cItemTag("ingots/iron"), 32)
+          .requirement(Oritech.id("augment/attackdamage"))
+          .requirement(Oritech.id("augment/speedboost"))
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(30).uiY(10).time(1200).rfCost(100_000_000)
+          .export(exporter, "miningspeed");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(ItemContent.ENERGITE_INGOT, 64)
+          .researchCost(ItemContent.FLUX_GATE, 48)
+          .researchCost(ItemContent.DURATIUM_INGOT, 64)
+          .applyCost(ItemContent.ENERGITE_INGOT, 32)
+          .applyCost(cItemTag("storage_blocks/redstone"), 64)
+          .requirement(Oritech.id("augment/miningspeed"))
+          .requirement(Oritech.id("augment/superspeedboost"))
+          .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+          .uiX(80).uiY(10).time(2400).rfCost(450_000_000)
+          .export(exporter, "superminingspeed");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(TagContent.STEEL_INGOTS, 64)
+          .researchCost(cItemTag("gems/diamond"), 48)
+          .researchCost(ItemContent.FLUXITE, 32)
+          .applyCost(TagContent.STEEL_INGOTS, 16)
+          .applyCost(ItemContent.DURATIUM_INGOT, 4)
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(5).uiY(10).time(1600).rfCost(150_000_000)
+          .export(exporter, "attackdamage");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(ItemContent.ENDERIC_COMPOUND, 64)
+          .researchCost(ItemContent.FLUXITE, 64)
+          .researchCost(cItemTag("rods/blaze"), 64)
+          .applyCost(ItemContent.ENDERIC_COMPOUND, 32)
+          .applyCost(cItemTag("storage_blocks/gold"), 64)
+          .requirement(Oritech.id("augment/hpboostultra"))
+          .requirement(Oritech.id("augment/ultimatearmor"))
+          .requiredStation(ARCANE_AUGMENT_STATION_ID)
+          .uiX(180).uiY(50).time(2800).rfCost(500_000_000)
+          .export(exporter, "superattackdamage");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(TagContent.ELECTRUM_INGOTS, 64)
+          .researchCost(cItemTag("storage_blocks/lapis"), 48)
+          .researchCost(cItemTag("storage_blocks/gold"), 32)
+          .applyCost(cItemTag("storage_blocks/lapis"), 32)
+          .applyCost(cItemTag("storage_blocks/redstone"), 64)
+          .requiredStation(ARCANE_AUGMENT_STATION_ID)
+          .uiX(55).uiY(30).time(1800).rfCost(200_000_000)
+          .export(exporter, "luck");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(ItemContent.MAGNETIC_COIL, 64)
+          .researchCost(ItemContent.FLUXITE, 48)
+          .researchCost(Items.PHANTOM_MEMBRANE, 8)
+          .applyCost(ItemContent.MAGNETIC_COIL, 32)
+          .applyCost(cItemTag("storage_blocks/iron"), 16)
+          .requirement(Oritech.id("augment/flight"))
+          .requiredStation(ARCANE_AUGMENT_STATION_ID)
+          .uiX(180).uiY(10).time(2200).rfCost(400_000_000)
+          .export(exporter, "gravity");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(ItemContent.FLUX_GATE, 64)
+          .researchCost(Items.WIND_CHARGE, 16)
+          .researchCost(ItemContent.PROMETHEUM_INGOT, 16)
+          .researchCost(ItemContent.PLUTONIUM_PELLET, 32)
+          .applyCost(ItemContent.FLUX_GATE, 32)
+          .applyCost(ItemContent.PLUTONIUM_PELLET, 8)
+          .requirement(Oritech.id("augment/betterarmor"))
+          .requirement(Oritech.id("augment/portal"))
+          .requiredStation(ARCANE_AUGMENT_STATION_ID)
+          .uiX(155).uiY(30).time(3600).rfCost(500_000_000)
+          .export(exporter, "flight");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(Items.ENDER_EYE, 64)
+          .researchCost(ItemContent.ENDERIC_LENS, 48)
+          .researchCost(cItemTag("gems/diamond"), 8)
+          .applyCost(ItemContent.ENDERIC_LENS, 32)
+          .applyCost(Items.GLOWSTONE, 64)
+          .requirement(Oritech.id("augment/orefinder"))
+          .requiredStation(ARCANE_AUGMENT_STATION_ID)
+          .uiX(155).uiY(10).time(3200).rfCost(100_000_000)
+          .export(exporter, "cloak");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(cItemTag("ender_pearls"), 16)
+          .researchCost(cItemTag("obsidians/normal"), 48)
+          .researchCost(ItemContent.UNHOLY_INTELLIGENCE)
+          .researchCost(ItemContent.ADAMANT_INGOT, 32)
+          .applyCost(cItemTag("ender_pearls"), 8)
+          .applyCost(cItemTag("obsidians/crying"), 32)
+          .requiredStation(ARCANE_AUGMENT_STATION_ID)
+          .uiX(130).uiY(30).time(3000).rfCost(250_000_000)
+          .export(exporter, "portal");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(cItemTag("ingots/gold"), 64)
+          .researchCost(ItemContent.ENDERIC_LENS, 48)
+          .researchCost(Items.GLOWSTONE, 64)
+          .applyCost(ItemContent.ENDERIC_LENS, 4)
+          .applyCost(Items.GLOWSTONE, 8)
+          .applyCost(Items.REDSTONE_LAMP, 8)
+          .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+          .uiX(105).uiY(30).time(2400).rfCost(50_000_000)
+          .export(exporter, "nightvision");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(Items.PRISMARINE_CRYSTALS, 64)
+          .researchCost(ItemContent.BIOSTEEL_INGOT, 48)
+          .researchCost(Items.HEART_OF_THE_SEA)
+          .applyCost(ItemContent.BIOSTEEL_INGOT, 32)
+          .applyCost(Items.CONDUIT)
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(5).uiY(90).time(800).rfCost(50_000_000)
+          .export(exporter, "waterbreath");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(ItemContent.PROCESSING_UNIT, 64)
+          .researchCost(TagContent.BIOMATTER, 48)
+          .researchCost(Items.GOLDEN_CARROT, 64)
+          .applyCost(TagContent.BIOMATTER, 32)
+          .applyCost(BlockContent.ITEM_PIPE, 64)
+          .applyCost(Items.HOPPER, 8)
+          .requirement(Oritech.id("augment/armor"))
+          .requirement(Oritech.id("augment/hpboostmore"))
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(90).uiY(90).time(500).rfCost(30_000_000)
+          .export(exporter, "autofeeder");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(ItemContent.MAGNETIC_COIL, 64)
+          .researchCost(ItemContent.ENERGITE_INGOT, 48)
+          .researchCost(Items.LODESTONE, 2)
+          .applyCost(ItemContent.MAGNETIC_COIL, 32)
+          .applyCost(cItemTag("ingots/copper"), 64)
+          .requirement(Oritech.id("augment/superminingspeed"))
+          .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+          .uiX(105).uiY(10).time(2400).rfCost(400_000_000)
+          .export(exporter, "magnet");
+        
+        AugmentRecipeBuilder.build()
+          .researchCost(ItemContent.ENDERIC_LENS, 64)
+          .researchCost(Items.AMETHYST_BLOCK, 48)
+          .researchCost(ItemContent.OVERCHARGED_CRYSTAL)
+          .researchCost(ItemContent.PROMETHEUM_INGOT, 8)
+          .researchCost(Items.SCULK_SENSOR, 4)
+          .applyCost(ItemContent.ENDERIC_LENS, 32)
+          .applyCost(Items.REDSTONE_TORCH, 64)
+          .requirement(Oritech.id("augment/nightvision"))
+          .requirement(Oritech.id("augment/magnet"))
+          .requiredStation(ARCANE_AUGMENT_STATION_ID)
+          .uiX(130).uiY(10).time(3200).rfCost(200_000_000)
+          .export(exporter, "orefinder");
     }
     
     private void addReactorBlocks(RecipeExporter exporter) {
@@ -1108,7 +1106,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         LaserRecipeBuilder.build().input(Items.AMETHYST_CLUSTER).result(ItemContent.FLUXITE).export(exporter, "fluxite");
         LaserRecipeBuilder.build().input(BlockContent.URANIUM_CRYSTAL).result(ItemContent.PLUTONIUM_DUST).export(exporter, "plutoniumdust");
     }
-
+    
     private void addCompactingRecipe(RecipeExporter exporter, ItemConvertible resBlock, ItemConvertible resItem, Ingredient itemIng, Ingredient blockIng) {
         ShapelessRecipeJsonBuilder
           .create(RecipeCategory.MISC, resItem, 9)
@@ -1122,7 +1120,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .pattern("###")
           .pattern("###")
           .criterion(hasItem(resItem), conditionsFromItem(resItem))
-          .offerTo(exporter, Identifier.of(RecipeProvider.getRecipeName(resBlock) + "block"));       
+          .offerTo(exporter, Identifier.of(RecipeProvider.getRecipeName(resBlock) + "block"));
     }
     
     // crafting shapes
