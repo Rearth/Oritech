@@ -55,7 +55,6 @@
   "advancements.oritech.steam_engine": "Steam Dreams",
   "advancements.oritech.steam_engine.description": "Harness the power of steam! You've turned water into energy—now let's hope it doesn't turn into a hot mess!",
   "key.oritech.augment_screen": "(Hold) Implant Controls [Oritech]",
-
   "oritech.text.augment.hpboost": "Steel-Infused Frame",
   "oritech.text.augment.hpboost.desc": "Integrates a durable framework, enhancing your body's resilience.",
   "oritech.text.augment.hpboost.desc.1": "Increases maximum health by 6 (3 hearts).",
@@ -155,7 +154,6 @@
   "oritech.text.augment.orefinder.desc": "Activates sub-terranean spectral analysis visor.",
   "oritech.text.augment.orefinder.desc.1": "Highlights nearby ores through walls.",
   "oritech.text.augment.orefinder.desc.2": "Toggleable via augment interface.",
-
   "oritech.text.energy_cost": "RF Research Cost: %s RF",
   "button.oritech.input_mode_fill_left_to_right": "Default",
   "button.oritech.input_mode_fill_evenly": "Fill Evenly",
@@ -295,6 +293,21 @@
   "tooltip.oritech.reactor_redstone_port.4": "Right-Click the block to change output modes.",
   "tooltip.oritech.weed_killer": "Removes all grass and plants in a wide radius",
   "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
+  "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
+  "tooltip.oritech.portable_laser.1": "Left mouse fires a continous beam that can transfer energy, mine blocks, damage",
+  "tooltip.oritech.portable_laser.2": "entities and transform mined items similar to an enderic laser.",
+  "tooltip.oritech.portable_laser.3": "Right-Click creates a high-energy explosion.",
+  "tooltip.oritech.portable_laser.4": "",
+  "tooltip.oritech.portable_laser.5": "Works with most pickaxe enchantments, unbreaking, and sharpness.",
+  "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
+  "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
+  "tooltip.oritech.capture_item_desc_1": [
+    {
+      "text": "Can capture the brain of a small, magical intelligent flying creature. The",
+      "italic": true,
+      "color": "gray"
+    }
+  ],
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Gained by capturing a viable entity with the ",
@@ -420,7 +433,15 @@
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Effective Beam Damage",
   "tooltip.oritech.item_pipe.1": "Right-click to toggle extraction.",
   "tooltip.oritech.item_pipe.2": "Only extracts from the first non-empty slot.",
-  "tooltip.oritech.item_pipe.3": "Deposits into the closest available inventory.",
+  "tooltip.oritech.item_pipe.3": [
+    "Click it with a ",
+    {
+      "text": "motor item",
+      "color": "#ff830e"
+    },
+    " to upgrade the pipe to extract from all slots."
+  ],
+  "tooltip.oritech.item_pipe.4": "Deposits into the closest available inventory.",
   "title.oritech.machine.addon_looting": "%d Looting",
   "tooltip.oritech.machine.addon_looting": "Yield addon count. 3 is the effective maximum",
   "title.oritech.item_filter.toggle_energy_statistics": "Show Output",
@@ -773,6 +794,12 @@
       "color": "#ffd505"
     }
   ],
+  "item.oritech.portable_laser": [
+    {
+      "text": "Enderic Railgun",
+      "color": "#ffd505"
+    }
+  ],
   "item.oritech.steel_ingot": "Steel Ingot",
   "item.oritech.steel_dust": "Steel Dust",
   "item.oritech.coal_dust": "Coal Dust",
@@ -1078,6 +1105,7 @@
   "text.config.oritech-config.category.exoChestplate": "Exo Chestplate",
   "text.config.oritech-config.category.basicDrill": "Basic Drill",
   "text.config.oritech-config.category.chainSaw": "Chain Saw",
+  "text.config.oritech-config.category.portableLaserConfig": "Enderic Railgun",
   "text.config.oritech-config.option.chainsawTreeCutting": "Enable Tree Cutting for Chainsaw",
   "text.config.oritech-config.section.augments": "Player Augmentation",
   "text.config.oritech-config.option.charger.energyCapacity": "Charger Energy Capacity",
@@ -1114,6 +1142,11 @@
   "text.config.oritech-config.option.basicDrill.energyCapacity": "Basic Drill Energy Capacity",
   "text.config.oritech-config.option.basicDrill.energyUsage": "Basic Drill Energy Usage",
   "text.config.oritech-config.option.basicDrill.chargeSpeed": "Basic Drill Charge Speed",
+  "text.config.oritech-config.option.portableLaserConfig.energyCapacity": "Energy Capacity",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerTick": "Energy per Tick",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "Energy per Explosion",
+  "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "Block Break Speed",
+  "text.config.oritech-config.option.portableLaserConfig.damageBase": "Base Damage",
   "text.config.oritech-config.option.chainSaw.energyCapacity": "Chain Saw Energy Capacity",
   "text.config.oritech-config.option.chainSaw.energyUsage": "Chain Saw Energy Usage",
   "text.config.oritech-config.option.chainSaw.chargeSpeed": "Chain Saw Charge Speed",

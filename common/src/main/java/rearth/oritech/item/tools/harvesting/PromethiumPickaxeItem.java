@@ -50,6 +50,7 @@ import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -109,42 +110,50 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
         
         return super.use(world, user, hand);
     }
-
+    
     public static List<BlockPos> getOffsetBlocks(World world, PlayerEntity player, BlockPos pos) {
         var handStack = player.getMainHandStack();
         if (handStack == null || !handStack.isOf(ToolsContent.PROMETHIUM_PICKAXE)) return List.of();
-
+        
         if (isAreaEnabled(handStack) && !player.isSneaking()) {
-            List<BlockPos> breakBlocks;
+            var breakBlocks = new ArrayList<BlockPos>();
             var playerHit = player.raycast(player.getBlockInteractionRange(), 0.0F, false);
             if (playerHit instanceof BlockHitResult blockHit) {
                 var blockSide = blockHit.getSide();
-
-                if (blockSide == Direction.UP || blockSide == Direction.DOWN) {
-                    var direction = player.getHorizontalFacing();
-                    if (direction == Direction.NORTH || direction == Direction.SOUTH) {
-                        breakBlocks = List.of(pos.north(), pos.south());
-                    } else {
-                        breakBlocks = List.of(pos.east(), pos.west());
-                    }
-                } else {
-                    breakBlocks = List.of(pos.up(), pos.down());
+                var perpA = Direction.EAST;
+                var perpB = Direction.NORTH;
+                
+                if (blockSide.equals(Direction.NORTH) || blockSide.equals(Direction.SOUTH)) {
+                    perpA = Direction.UP;
+                    perpB = Direction.EAST;
+                } else if (blockSide.equals(Direction.EAST) || blockSide.equals(Direction.WEST)) {
+                    perpA = Direction.UP;
+                    perpB = Direction.NORTH;
                 }
+                
+                for (int x = -1; x <= 1; x++) {
+                    for (int z = -1; z <= 1; z++) {
+                        if (x == 0 && z == 0) continue;
+                        var neighborPos = pos.add(perpA.getVector().multiply(x)).add(perpB.getVector().multiply(z));
+                        breakBlocks.add(neighborPos);
+                    }
+                }
+                
                 return ImmutableList.copyOf(Iterables.filter(breakBlocks, p -> world.getBlockState(p).isIn(TagContent.DRILL_MINEABLE)));
             }
         }
-
+        
         return List.of();
     }
     
     // called as event in Oritech initializer
-    // area mode: breaks 3x1 blocks unless player is sneaking
+    // area mode: breaks 3x3 blocks unless player is sneaking
     // silk touch mode: adds a temporary silk touch, which is then removed in the after break event
     public static EventResult preMine(World world, BlockPos pos, BlockState state, ServerPlayerEntity player, @Nullable IntValue xp) {
-
+        
         var handStack = player.getMainHandStack();
         if (handStack == null || !handStack.isOf(ToolsContent.PROMETHIUM_PICKAXE)) return EventResult.pass();
-
+        
         // break additional blocks in preMine (Block.onBreak) instead of postMine (Block.onBroken)
         // so that the block still exists when determining which face of the block the player was looking at
         if (isAreaEnabled(handStack)) {
@@ -185,7 +194,7 @@ public class PromethiumPickaxeItem extends MiningToolItem implements GeoItem {
         
         var area = isAreaEnabled(stack);
         
-        tooltip.add((area ? Text.translatable("tooltip.oritech.tool_mode.area_range.area") :  Text.translatable("tooltip.oritech.tool_mode.area_range.single")).formatted(Formatting.GOLD));
+        tooltip.add((area ? Text.translatable("tooltip.oritech.tool_mode.area_range.area") : Text.translatable("tooltip.oritech.tool_mode.area_range.single")).formatted(Formatting.GOLD));
         tooltip.add(Text.translatable("tooltip.oritech.promethium_pick").formatted(Formatting.DARK_GRAY));
         
     }

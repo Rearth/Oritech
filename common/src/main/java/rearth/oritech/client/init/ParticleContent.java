@@ -3,11 +3,15 @@ package rearth.oritech.client.init;
 import io.wispforest.owo.particles.ClientParticles;
 import io.wispforest.owo.particles.systems.ParticleSystem;
 import io.wispforest.owo.particles.systems.ParticleSystemController;
+import io.wispforest.owo.util.VectorRandomUtils;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+
+import java.util.concurrent.CompletableFuture;
 
 public class ParticleContent {
     
@@ -32,6 +36,12 @@ public class ParticleContent {
     public static final ParticleSystem<SoulParticleData> WANDERING_SOUL = PARTICLE_CONTROLLER.register(SoulParticleData.class, (world, pos, data) -> {
         ClientParticles.setVelocity(data.offset.multiply((1f / data.duration) * 1.5f));
         ClientParticles.spawnWithMaxAge(ParticleTypes.SCULK_SOUL, pos, data.duration);
+    });
+    
+    public static final ParticleSystem<Vec3d> LASER_BOOM = PARTICLE_CONTROLLER.register(Vec3d.class, (world, pos, data) -> {
+        var count = (int) (pos.distanceTo(data) * 0.6f + 1);
+        count = Math.min(count, 12);
+        spawnLineInnerStaggered(ParticleTypes.SONIC_BOOM, world, pos, data, count, 20);
     });
     
     public static final ParticleSystem<LineData> CATALYST_CONNECTION = PARTICLE_CONTROLLER.register(LineData.class, (world, pos, data) -> {
@@ -169,6 +179,22 @@ public class ParticleContent {
             ClientParticles.spawnWithMaxAge(particle, start, duration);
             start = start.add(increment);
         }
+    }
+    
+    private static void spawnLineInnerStaggered(ParticleEffect particle, World world, Vec3d start, Vec3d end, float particleCount, long pauseMillis) {
+        var increment = end.subtract(start).multiply(1f / particleCount);
+        
+        CompletableFuture.runAsync(() -> {
+            for (int i = 0; i < particleCount; i++) {
+                var pos =  start.add(increment.multiply(i));
+                world.addParticle(particle, pos.getX(), pos.getY(), pos.getZ(), 0, 0, 0);
+                try {
+                    Thread.sleep(pauseMillis);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        });
     }
     
     public static void registerParticles() {

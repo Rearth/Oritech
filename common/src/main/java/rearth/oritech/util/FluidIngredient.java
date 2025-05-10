@@ -82,9 +82,13 @@ public record FluidIngredient(Either<TagKey<Fluid>, Identifier> fluidContent, lo
     public FluidIngredient withAmount(long withAmount) {
         return new FluidIngredient(fluidContent, withAmount);
     }
-
+    
     public FluidIngredient withAmount(float withAmountInBuckets) {
         return new FluidIngredient(fluidContent, (long) (withAmountInBuckets * FluidStack.bucketAmount()));
+    }
+    
+    public FluidIngredient withSpecificAmount(long amountInMillis) {
+        return new FluidIngredient(fluidContent, amountInMillis);
     }
 
     public static FluidIngredient ofStack(FluidStack fluidStack) {

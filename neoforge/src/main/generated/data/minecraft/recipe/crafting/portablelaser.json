@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "oritech:adamant_ingot"
+    },
+    "e": {
+      "item": "oritech:laser_arm_block"
+    },
+    "m": {
+      "item": "oritech:accelerator_motor"
+    },
+    "s": {
+      "item": "oritech:advanced_battery"
+    }
+  },
+  "pattern": [
+    "aa ",
+    "ae ",
+    "mss"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:portable_laser"
+  }
+}

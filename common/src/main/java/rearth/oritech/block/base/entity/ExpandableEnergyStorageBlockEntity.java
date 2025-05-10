@@ -64,12 +64,22 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         public boolean supportsInsertion() {
             return false;
         }
+        
+        @Override
+        public long insert(long amount, boolean simulate) {
+            return 0L;
+        }
     };
     
     private final EnergyApi.EnergyStorage inputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
         public boolean supportsExtraction() {
             return false;
+        }
+        
+        @Override
+        public long extract(long amount, boolean simulate) {
+            return 0L;
         }
     };
     
@@ -106,8 +116,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         
         // todo caching for targets? Used to be BlockApiCache.create()
         var target = getOutputPosition(pos, getFacing());
-        var candidate = EnergyApi.BLOCK.find(world, target.getRight(), target.getLeft());
-        if (candidate != null) {
+        var candidate = EnergyApi.BLOCK.find(world, target.getRight(), target.getLeft().getOpposite());
+        if (candidate != null && candidate.supportsInsertion()) {
             EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }
     }
@@ -273,6 +283,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.FullEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, energyStorage.maxExtract));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.EnergyStatisticsPacket(pos, energyStorage.getCurrentStatistics(world.getTime())));
         
         return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
     }
