@@ -31,7 +31,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:compat/alloyforgery/electrum"
+        "recipe": "oritech:compat/alloyforgery/electrum"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -45,7 +45,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:compat/alloyforgery/electrum"
+      "oritech:compat/alloyforgery/electrum"
     ]
   }
 }

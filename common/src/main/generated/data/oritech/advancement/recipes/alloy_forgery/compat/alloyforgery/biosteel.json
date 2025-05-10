@@ -31,7 +31,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:compat/alloyforgery/biosteel"
+        "recipe": "oritech:compat/alloyforgery/biosteel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -45,7 +45,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:compat/alloyforgery/biosteel"
+      "oritech:compat/alloyforgery/biosteel"
     ]
   }
 }

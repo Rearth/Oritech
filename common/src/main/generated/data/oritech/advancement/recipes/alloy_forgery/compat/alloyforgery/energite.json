@@ -31,7 +31,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:compat/alloyforgery/energite"
+        "recipe": "oritech:compat/alloyforgery/energite"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -45,7 +45,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:compat/alloyforgery/energite"
+      "oritech:compat/alloyforgery/energite"
     ]
   }
 }
