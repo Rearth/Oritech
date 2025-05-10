@@ -14,6 +14,7 @@ import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
 import rearth.oritech.api.recipe.FoundryRecipeBuilder;
 import rearth.oritech.api.recipe.GrinderRecipeBuilder;
+import rearth.oritech.api.recipe.OritechRecipeGenerator;
 import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
 
 import java.util.Arrays;
@@ -307,22 +308,22 @@ public class MetalProcessingChainBuilder {
         // This should be fine, because any mod that adds ores, dusts, etc. will provide their own smelting/blasting recipes
         if (vanillaProcessing) {
             if (dustItem != null) {
-                RecipeProvider.offerSmelting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
-                RecipeProvider.offerBlasting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
-                RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, dustItem, smallDustItem);
+                OritechRecipeGenerator.offerSmelting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
+                OritechRecipeGenerator.offerBlasting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
+                OritechRecipeGenerator.offerCompactingRecipe(exporter, RecipeCategory.MISC, dustItem, smallDustItem);
             }
             if (smallDustItem != null) {
-                RecipeProvider.offerSmelting(exporter, List.of(smallDustItem), RecipeCategory.MISC, nuggetItem, 0.5f, 50, Oritech.MOD_ID);
-                RecipeProvider.offerBlasting(exporter, List.of(smallDustItem), RecipeCategory.MISC, nuggetItem, 0.5f, 25, Oritech.MOD_ID);
+                OritechRecipeGenerator.offerSmelting(exporter, List.of(smallDustItem), RecipeCategory.MISC, nuggetItem, 0.5f, 50, Oritech.MOD_ID);
+                OritechRecipeGenerator.offerBlasting(exporter, List.of(smallDustItem), RecipeCategory.MISC, nuggetItem, 0.5f, 25, Oritech.MOD_ID);
             }
             if (gemItem != null) {
-                RecipeProvider.offerSmelting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
-                RecipeProvider.offerBlasting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
+                OritechRecipeGenerator.offerSmelting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
+                OritechRecipeGenerator.offerBlasting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
             }
             if (clumpItem != null && smallClumpItem != null)
-                RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, clumpItem, smallClumpItem);
+                OritechRecipeGenerator.offerCompactingRecipe(exporter, RecipeCategory.MISC, clumpItem, smallClumpItem);
             if (nuggetItem != null && !skipCompactingRecipes)    // to avoid duplicate vanilla nugget -> item recipes
-                RecipeProvider.offerCompactingRecipe(exporter, RecipeCategory.MISC, ingotItem, nuggetItem);
+                OritechRecipeGenerator.offerCompactingRecipe(exporter, RecipeCategory.MISC, ingotItem, nuggetItem);
         }
     }
 

@@ -8,16 +8,20 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.recipe.AbstractCookingRecipe;
+import net.minecraft.recipe.BlastingRecipe;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.SmeltingRecipe;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.*;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -83,7 +87,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // centrifuge dirt into clay
         CentrifugeFluidRecipeBuilder.build().input(ItemTags.DIRT).result(Items.CLAY).fluidInput(Fluids.WATER, 0.25f).export(exporter, "clay");
         // create dirt from sand + biomass
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, Items.DIRT, 2).input('s', ItemTags.SAND).input('b', TagContent.BIOMASS).pattern("sb").pattern("bs").criterion("has_biomass", conditionsFromTag(TagContent.BIOMASS)).offerTo(exporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, Items.DIRT, 2).input('s', ItemTags.SAND).input('b', TagContent.BIOMASS).pattern("sb").pattern("bs").criterion("has_biomass", conditionsFromTag(TagContent.BIOMASS)).offerTo(exporter, Oritech.id("dirt_from_sand_and_biomass"));
         // dripstone from dripstone block
         PulverizerRecipeBuilder.build().input(Items.DRIPSTONE_BLOCK).result(Items.POINTED_DRIPSTONE, 4).addToGrinder().export(exporter, "dripstone");
         // shroomlight from logs and 3 glowstone
@@ -522,6 +526,25 @@ public class OritechRecipeGenerator extends RecipeProvider {
         addCompactingRecipe(exporter, BlockContent.RAW_NICKEL_BLOCK, ItemContent.RAW_NICKEL, of(TagContent.NICKEL_RAW_MATERIALS), of(getStorageBlockTag("raw_nickel")));
         addCompactingRecipe(exporter, BlockContent.RAW_PLATINUM_BLOCK, ItemContent.RAW_PLATINUM, of(TagContent.PLATINUM_RAW_MATERIALS), of(getStorageBlockTag("raw_platinum")));
         
+    }
+
+    // offerSmelting, offerBlasting, and offerMultipleOptions copied from RecipeProvider, and altered to force Oritech id onto recipes
+    // I don't really like this, but any other way I found to get these recipes to have the oritech namespace in Neoforge wasn't working.
+    public static void offerSmelting(RecipeExporter exporter, List<ItemConvertible> inputs, RecipeCategory category, ItemConvertible output, float experience, int cookingTime, String group) {
+      offerMultipleOptions(exporter, RecipeSerializer.SMELTING, SmeltingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_smelting");
+    }
+
+    public static void offerBlasting(RecipeExporter exporter, List<ItemConvertible> inputs, RecipeCategory category, ItemConvertible output, float experience, int cookingTime, String group) {
+      offerMultipleOptions(exporter, RecipeSerializer.BLASTING, BlastingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_blasting");
+    }
+
+    public static <T extends AbstractCookingRecipe> void offerMultipleOptions(RecipeExporter exporter, RecipeSerializer<T> serializer, AbstractCookingRecipe.RecipeFactory<T> recipeFactory, List<ItemConvertible> inputs, RecipeCategory category, ItemConvertible output, float experience, int cookingTime, String group, String suffix) {
+      Iterator<ItemConvertible> var10 = inputs.iterator();
+
+      while(var10.hasNext()) {
+         ItemConvertible itemConvertible = (ItemConvertible)var10.next();
+         CookingRecipeJsonBuilder.create(Ingredient.ofItems(new ItemConvertible[]{itemConvertible}), category, output, experience, cookingTime, serializer, recipeFactory).group(group).criterion(hasItem(itemConvertible), conditionsFromItem(itemConvertible)).offerTo(exporter, Oritech.id(getItemPath(output) + suffix + "_" + getItemPath(itemConvertible)));
+      }
     }
     
     private void addOreChains(RecipeExporter exporter) {
@@ -1112,7 +1135,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .create(RecipeCategory.MISC, resItem, 9)
           .input(blockIng)
           .criterion(hasItem(resBlock), conditionsFromItem(resBlock))
-          .offerTo(exporter, Identifier.of(RecipeProvider.getRecipeName(resBlock) + "blockinv"));
+          .offerTo(exporter, Oritech.id(RecipeProvider.getRecipeName(resBlock) + "blockinv"));
         ShapedRecipeJsonBuilder
           .create(RecipeCategory.MISC, resBlock)
           .input('#', itemIng)
@@ -1120,38 +1143,38 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .pattern("###")
           .pattern("###")
           .criterion(hasItem(resItem), conditionsFromItem(resItem))
-          .offerTo(exporter, Identifier.of(RecipeProvider.getRecipeName(resBlock) + "block"));
+          .offerTo(exporter, Oritech.id(RecipeProvider.getRecipeName(resBlock) + "block"));
     }
     
     // crafting shapes
     public void offerCableRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, String suffix) {
         var item = output.getItem();
-        createCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, "crafting/" + suffix);
+        createCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerInsulatedCableRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, Ingredient insulation, String suffix) {
         var item = output.getItem();
-        createInsulatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, "crafting/" + suffix);
+        createInsulatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerFramedCableRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, String suffix) {
         var item = output.getItem();
-        createFramedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, "crafting/frame_" + suffix);
+        createFramedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/frame_" + suffix));
     }
     
     public void offerCableFromFrameRecipe(RecipeExporter exporter, ItemStack output, Ingredient frame, String suffix) {
         var item = output.getItem();
-        ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item, output.getCount()).input(frame).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, "crafting/unframe_" + suffix);
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item, output.getCount()).input(frame).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/unframe_" + suffix));
     }
     
     public void offerCableDuctRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, String suffix) {
         var item = output.getItem();
-        createCableDuctRecipe(RecipeCategory.MISC, item, output.getCount(), input).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, "crafting/duct_" + suffix);
+        createCableDuctRecipe(RecipeCategory.MISC, item, output.getCount(), input).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/duct_" + suffix));
     }
     
     public void offerCableFromDuctRecipe(RecipeExporter exporter, ItemStack output, Ingredient duct, String suffix) {
         var item = output.getItem();
-        ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item, output.getCount()).input(duct).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, "crafting/unduct_" + suffix);
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item, output.getCount()).input(duct).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/unduct_" + suffix));
     }
     
     public CraftingRecipeJsonBuilder createCableRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
@@ -1168,7 +1191,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
     
     public void offerMotorRecipe(RecipeExporter exporter, Item output, Ingredient shaft, Ingredient core, Ingredient wall, String suffix) {
         var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', shaft).input('c', core).input('w', wall).pattern(" s ").pattern("wcw").pattern("wcw");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "motor/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("motor/" + suffix));
     }
     
     public void offerManualAlloyRecipe(RecipeExporter exporter, Item output, Ingredient A, Ingredient B, String suffix) {
@@ -1177,7 +1200,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
     
     public void offerManualAlloyRecipe(RecipeExporter exporter, Item output, Ingredient A, Ingredient B, int count, String suffix) {
         var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, count).input('a', A).input('b', B).pattern("aa ").pattern("bb ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/alloy/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/alloy/" + suffix));
     }
     
     public void offerGeneratorRecipe(RecipeExporter exporter, Item output, Ingredient base, Ingredient sides, Ingredient core, Ingredient frame, String suffix) {
@@ -1185,7 +1208,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("fff")
                         .pattern("fcf")
                         .pattern("sbs");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerFurnaceRecipe(RecipeExporter exporter, Item output, Ingredient bottom, Ingredient botSides, Ingredient middleSides, Ingredient core, Ingredient top, String suffix) {
@@ -1193,7 +1216,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("fff")
                         .pattern("mcm")
                         .pattern("sbs");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerAtomicForgeRecipe(RecipeExporter exporter, Item output, Ingredient base, Ingredient middleSides, Ingredient core, Ingredient top, Ingredient frame, String suffix) {
@@ -1201,7 +1224,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("fsf")
                         .pattern("mcm")
                         .pattern("bbb");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerBatteryRecipe(RecipeExporter exporter, Item output, Ingredient inner, Ingredient sides, Ingredient top, String suffix) {
@@ -1209,7 +1232,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern(" t ")
                         .pattern("fcf")
                         .pattern("fcf");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerMachineFrameRecipe(RecipeExporter exporter, Item output, Ingredient base, Ingredient alt, int count, String suffix) {
@@ -1217,7 +1240,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern(" s ")
                         .pattern("csc")
                         .pattern(" s ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerMachineCoreRecipe(RecipeExporter exporter, Item output, Ingredient base, Ingredient alt, String suffix) {
@@ -1229,7 +1252,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("sss")
                         .pattern("scs")
                         .pattern("sss");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerDrillRecipe(RecipeExporter exporter, Item output, Ingredient core, Ingredient motor, Ingredient center, Ingredient head, String suffix) {
@@ -1237,7 +1260,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern(" a ")
                         .pattern("aea")
                         .pattern("mss");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerWrenchRecipe(RecipeExporter exporter, Item output, Ingredient A, Ingredient B, String suffix) {
@@ -1245,7 +1268,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern(" a ")
                         .pattern(" ba")
                         .pattern("a  ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerChainsawRecipe(RecipeExporter exporter, Item output, Ingredient core, Ingredient motor, Ingredient center, Ingredient head, String suffix) {
@@ -1253,7 +1276,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("aa ")
                         .pattern("ae ")
                         .pattern("mss");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerAxeRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
@@ -1261,7 +1284,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("pp ")
                         .pattern("pc ")
                         .pattern(" c ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerPickaxeRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
@@ -1269,7 +1292,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("ppp")
                         .pattern(" c ")
                         .pattern(" c ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerHelmetRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
@@ -1277,7 +1300,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("ppp")
                         .pattern("pcp")
                         .pattern("   ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerChestplateRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
@@ -1285,7 +1308,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("p p")
                         .pattern("ppp")
                         .pattern("pcp");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerLegsRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
@@ -1293,7 +1316,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("ppp")
                         .pattern("pcp")
                         .pattern("p p");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerFeetRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
@@ -1301,7 +1324,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("   ")
                         .pattern("p p")
                         .pattern("c c");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerRodRecipe(RecipeExporter exporter, Item output, Ingredient cap, Ingredient rod, String suffix) {
@@ -1309,7 +1332,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern(" c ")
                         .pattern(" r ")
                         .pattern(" r ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerRodCombinationRecipe(RecipeExporter exporter, Item output, Ingredient cap, Ingredient rod, String suffix) {
@@ -1317,7 +1340,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("   ")
                         .pattern("rcr")
                         .pattern("   ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerStarRecipe(RecipeExporter exporter, Item output, Ingredient inner, Ingredient outer, String suffix) {
@@ -1325,7 +1348,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern(" o ")
                         .pattern("oco")
                         .pattern(" o ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerTankRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, Ingredient sides, String suffix) {
@@ -1337,20 +1360,20 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("ppp")
                         .pattern("scs")
                         .pattern("ppp");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerTwoComponentRecipe(RecipeExporter exporter, Item output, Ingredient A, Ingredient B, String suffix) {
         var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('a', A).input('b', B)
                         .pattern("ab ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerLeverRecipe(RecipeExporter exporter, Item output, Ingredient A, Ingredient B, String suffix) {
         var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('a', A).input('b', B)
                         .pattern("a  ")
                         .pattern("b  ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerParticleMotorRecipe(RecipeExporter exporter, Item output, Ingredient rail, Ingredient top, Ingredient baseInner, Ingredient baseOuter, String suffix) {
@@ -1358,7 +1381,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern(" t ")
                         .pattern("rrr")
                         .pattern("oio");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerMachinePlatingRecipe(RecipeExporter exporter, Item output, Ingredient side, Ingredient edge, Ingredient core, int count, String suffix) {
@@ -1366,7 +1389,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("eae")
                         .pattern("aca")
                         .pattern("eae");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerDoorRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
@@ -1374,13 +1397,13 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("aa ")
                         .pattern("aa ")
                         .pattern("aa ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerSlabRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
         var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.BUILDING_BLOCKS, output, 6).input('a', A)
                         .pattern("aaa");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/slab/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/slab/" + suffix));
     }
     
     public void offerStairsRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
@@ -1388,12 +1411,12 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("a  ")
                         .pattern("aa ")
                         .pattern("aaa");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/stairs/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/stairs/" + suffix));
     }
     
     public void offerPressurePlateRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
         var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, 1).input('a', A)
                         .pattern("aa");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, "crafting/pressureplate/" + suffix);
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/pressureplate/" + suffix));
     }
 }

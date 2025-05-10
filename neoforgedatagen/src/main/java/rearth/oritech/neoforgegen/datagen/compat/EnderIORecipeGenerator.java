@@ -70,7 +70,7 @@ public class EnderIORecipeGenerator {
             .pattern("fff")
             .pattern("fcf")
             .pattern("sbs")
-            .unlockedBy(provider.getHasName(conduitBinder), provider.has(conduitBinder)).save(exporter, PATH + "crafting/pump");
+            .unlockedBy(provider.getHasName(conduitBinder), provider.has(conduitBinder)).save(exporter, Oritech.id(PATH + "crafting/pump"));
     }
 
     private static void addFireCrafting(RecipeOutput exporter) {
