@@ -275,14 +275,14 @@ public class MetalProcessingChainBuilder {
         if (clumpItem != null) {
             CentrifugeRecipeBuilder.build()
                 .input(clumpIngredient)
-                .result(firstNonNull(centrifugeResult, gemItem))
+                .result(firstNonNull(centrifugeResult, gemItem), centrifugeResult != null ? centrifugeAmount : 1)
                 .result(Optional.fromNullable(dustByproduct), byproductAmount)
                 .timeMultiplier(timeMultiplier)
                 .export(exporter, resourcePath + "clump/" + metalName);
             CentrifugeFluidRecipeBuilder.build()
                 .input(clumpIngredient)
                 .fluidInput(Fluids.WATER)
-                .result(firstNonNull(centrifugeResult, gemItem), 2)
+                .result(firstNonNull(centrifugeResult, gemItem), centrifugeResult != null ? centrifugeAmount * 2 : 2)
                 .time(300).timeMultiplier(timeMultiplier)
                 .export(exporter, resourcePath + "clump/" + metalName);
         }

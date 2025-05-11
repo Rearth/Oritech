@@ -25,6 +25,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
@@ -37,12 +38,12 @@ import rearth.oritech.init.TagContent;
 public class ImmersiveEngineeringRecipeGenerator {
     private static final String PATH = "compat/immersiveengineering/";
 
-    public static void generateRecipes(RecipeOutput exporter) {
+    public static void generateRecipes(IConditionBuilder conditionBuilder, RecipeOutput exporter) {
         addAlloying(exporter);
         addIEAlloying(exporter);
         addCentrifuging(exporter);
         addGeneratorFuels(exporter);
-        addMetalProcessing(exporter);
+        addMetalProcessing(conditionBuilder, exporter);
     }
 
     private static void addAlloying(RecipeOutput exporter) {
@@ -86,7 +87,8 @@ public class ImmersiveEngineeringRecipeGenerator {
         FuelGeneratorRecipeBuilder.build().fluidInput(IEFluids.HIGH_POWER_BIODIESEL.still().get(), 0.1f).timeInSeconds(12).export(exporter, PATH + "highpowerbiodiesel");
     }
 
-    private static void addMetalProcessing(RecipeOutput exporter) {
+    private static void addMetalProcessing(IConditionBuilder conditionBuilder, RecipeOutput exporter) {
+        var conditionExporter = exporter.withConditions(conditionBuilder.not(conditionBuilder.modLoaded("jaopca")));
         // bauxite/aluminum
         MetalProcessingChainBuilder.build("aluminum").resourcePath(PATH)
             .ore(cItemTag("ores/aluminum"))
@@ -94,7 +96,7 @@ public class ImmersiveEngineeringRecipeGenerator {
             .ingot(IETags.getTagsFor(EnumMetals.ALUMINUM).ingot, IEItems.Metals.INGOTS.get(EnumMetals.ALUMINUM).get())
             .nugget(IETags.getTagsFor(EnumMetals.ALUMINUM).nugget, IEItems.Metals.NUGGETS.get(EnumMetals.ALUMINUM).get())
             .dust(IEItems.Metals.DUSTS.get(EnumMetals.ALUMINUM).get()).dustByproduct(ItemContent.QUARTZ_DUST).byproductAmount(1)
-            .export(exporter);
+            .export(conditionExporter);
         // silver
         MetalProcessingChainBuilder.build("silver").resourcePath(PATH)
             .ore(cItemTag("ores/silver"))
@@ -102,7 +104,7 @@ public class ImmersiveEngineeringRecipeGenerator {
             .ingot(IETags.getTagsFor(EnumMetals.SILVER).ingot, IEItems.Metals.INGOTS.get(EnumMetals.SILVER).get())
             .nugget(IETags.getTagsFor(EnumMetals.SILVER).nugget, IEItems.Metals.NUGGETS.get(EnumMetals.SILVER).get())
             .dust(IEItems.Metals.DUSTS.get(EnumMetals.SILVER).get()).dustByproduct(ItemContent.SMALL_COPPER_DUST)
-            .export(exporter);
+            .export(conditionExporter);
         // lead
         MetalProcessingChainBuilder.build("lead").resourcePath(PATH)
             .ore(cItemTag("ores/lead"))
@@ -110,6 +112,6 @@ public class ImmersiveEngineeringRecipeGenerator {
             .ingot(IETags.getTagsFor(EnumMetals.LEAD).ingot, IEItems.Metals.INGOTS.get(EnumMetals.LEAD).get())
             .nugget(IETags.getTagsFor(EnumMetals.LEAD).nugget, IEItems.Metals.NUGGETS.get(EnumMetals.LEAD).get())
             .dust(IEItems.Metals.DUSTS.get(EnumMetals.LEAD).get()).dustByproduct(ItemContent.SMALL_GOLD_DUST)
-            .export(exporter);
+            .export(conditionExporter);
     }
 }
