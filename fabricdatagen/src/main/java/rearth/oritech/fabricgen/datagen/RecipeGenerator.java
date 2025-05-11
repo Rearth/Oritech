@@ -40,15 +40,6 @@ public class RecipeGenerator extends FabricRecipeProvider {
     public void generate(RecipeExporter exporter) {
         var oritechRecipes = new OritechRecipeGenerator(output, registriesFuture);
         oritechRecipes.generate(exporter);
-
-        // Uranium clumps don't exist in Oritech, but Oritech should still be able to do something with them if they're added by another mod (like Create).
-          // in the compat space so that the Fabric versions won't go into Neoforge
-        CentrifugeRecipeBuilder.build()
-        .input(TagContent.URANIUM_CLUMPS).result(ItemContent.URANIUM_DUST, 2).result(ItemContent.SMALL_PLUTONIUM_DUST).timeMultiplier(0.5f)
-        .export(this.withConditions(exporter, new TagsPopulatedResourceCondition(TagContent.URANIUM_CLUMPS)), "compat/clump/crushed_uranium");
-        CentrifugeFluidRecipeBuilder.build()
-        .input(TagContent.URANIUM_CLUMPS).result(ItemContent.URANIUM_DUST, 3).fluidInput(Fluids.WATER).timeMultiplier(0.5f)
-        .export(this.withConditions(exporter, new TagsPopulatedResourceCondition(TagContent.URANIUM_CLUMPS)), "compat/clumpwet/crushed_uranium");
         
         // Fabric mod compat generation
         AlloyForgeryRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(AlloyForgery.MOD_ID))));
