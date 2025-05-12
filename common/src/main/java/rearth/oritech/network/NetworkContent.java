@@ -97,7 +97,7 @@ public class NetworkContent {
                                              BlockPos areaMin, BlockPos areaMax, boolean redstoneDisable) {
     }   // times are in ticks
     
-    public record QuarryTargetPacket(BlockPos position, BlockPos quarryTarget, int range, int yieldAddons,
+    public record QuarryTargetPacket(BlockPos position, BlockPos quarryTarget, int range, int yieldAddons, boolean hasSilkTouchAddon,
                                      float operationSpeed) {
     }
     
@@ -129,7 +129,7 @@ public class NetworkContent {
     
     public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize,
                                      int yieldAddons, int hunterAddons, int hunterTargetMode, boolean cropAddon,
-                                     int targetEntityId, boolean redstonePowered) {
+                                     boolean hasSilkTouchAddon, int targetEntityId, boolean redstonePowered) {
     }
     
     public record DeepDrillSyncPacket(BlockPos position, long lastWorkTime) {
@@ -273,6 +273,7 @@ public class NetworkContent {
                 laserArmBlock.yieldAddons = message.yieldAddons;
                 laserArmBlock.hunterAddons = message.hunterAddons;
                 laserArmBlock.hasCropFilterAddon = message.cropAddon;
+                laserArmBlock.hasSilkTouchAddon = message.hasSilkTouchAddon;
                 laserArmBlock.setLivingTargetFromNetwork(message.targetEntityId);
                 laserArmBlock.hunterTargetMode = LaserArmBlockEntity.HunterTargetMode.fromValue(message.hunterTargetMode);
                 laserArmBlock.setRedstonePowered(message.redstonePowered);
@@ -526,6 +527,7 @@ public class NetworkContent {
                 machine.quarryTarget = message.quarryTarget;
                 machine.range = message.range;
                 machine.yieldAddons = message.yieldAddons;
+                machine.hasSilkTouchAddon = message.hasSilkTouchAddon;
                 
                 var oldData = machine.getBaseAddonData();
                 var newData = new MachineAddonController.BaseAddonData(message.operationSpeed, oldData.efficiency(), oldData.energyBonusCapacity(), oldData.energyBonusTransfer(), oldData.extraChambers());

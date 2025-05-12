@@ -735,6 +735,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             
             for (int i = 0; i < items.size(); i++) {
                 var ingredient = items.get(i);
+                if (ingredient.ingredient().getMatchingStacks().length == 0) continue;
                 var stack = Arrays.stream(ingredient.ingredient().getMatchingStacks()).findFirst().get();
                 stack = new ItemStack(stack.getItem(), ingredient.count());
                 

@@ -18,6 +18,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -29,8 +30,11 @@ import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
+import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.addons.EnergyAcceptorAddonBlockEntity;
+import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MachineAddonController;
@@ -65,6 +69,7 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
     public static VoxelShape[][] MACHINE_ULTIMATE_ADDON_SHAPE;
     public static VoxelShape[][] STEAM_BOILER_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_YIELD_ADDON_SHAPE;
+    public static VoxelShape[][] MACHINE_SILK_TOUCH_ADDON_SHAPE;
     
     // because this parameter is needed in appendProperties, but we can't initialize or pass it to that
     private static boolean constructorAssignmentSupportWorkaround = false;
@@ -105,6 +110,14 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
             var checkEntity = world.getBlockEntity(checkPos);
             if (checkEntity instanceof MachineAddonController machineEntity) {
                 AddonBlockEntity.pendingInits.add(machineEntity);
+                break;
+            } else if (checkEntity instanceof ItemEnergyFrameInteractionBlockEntity machineEntity) {
+                AddonBlockEntity.pendingInits.add(machineEntity);
+                break;
+            } else if (checkEntity instanceof MachineCoreEntity machineEntity) {
+                if (machineEntity.isEnabled() && machineEntity.getCachedController() instanceof MachineAddonController addonController) {
+                    AddonBlockEntity.pendingInits.add(addonController);
+                }
                 break;
             } else if (checkEntity instanceof AddonBlockEntity addonEntity) {
                 var addonState = addonEntity.getCachedState();
@@ -281,6 +294,8 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
                 tooltip.add(Text.translatable("tooltip.oritech.addon_redstone_desc").formatted(Formatting.GRAY));
             if (blockType == BlockContent.MACHINE_PROCESSING_ADDON)
                 tooltip.add(Text.translatable("tooltip.oritech.processing_addon_desc").formatted(Formatting.GRAY));
+            if(blockType == BlockContent.MACHINE_SILK_TOUCH_ADDON)
+                tooltip.add(Text.translatable("tooltip.oritech.addon_silk_touch_desc").formatted(Formatting.GRAY));
             
             if (addonSettings.extender()) {
                 tooltip.add(Text.translatable("tooltip.oritech.addon_extender_desc").formatted(Formatting.GRAY));
@@ -307,6 +322,7 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
         MACHINE_SPEED_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
         STEAM_BOILER_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
         MACHINE_YIELD_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
+        MACHINE_SILK_TOUCH_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
         for (var facing : Direction.values()) {
             if (!facing.getAxis().isHorizontal()) continue;
             for (var face : BlockFace.values()) {
@@ -428,6 +444,13 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
                   Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.6875, 0.125, 0.5625, 0.9375, 0.4375, 0.6875), facing, face),
                   Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0.125, 0.3125, 0.3125, 0.4375, 0.4375), facing, face),
                   Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.6875, 0.125, 0.3125, 0.9375, 0.4375, 0.4375), facing, face));
+                MACHINE_SILK_TOUCH_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = VoxelShapes.union(
+                  Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
+                  Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.125, 0.125, 0.125, 0.375, 0.25, 0.875), facing, face),
+                  Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.625, 0.1875, 0.3125, 0.6875, 0.25, 0.8125), facing, face),
+                  Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.1875, 0.25, 0.875, 0.25, 0.4375), facing, face),
+                  Geometry.rotateVoxelShape(VoxelShapes.cuboid(0.4375, 0.125, 0.1875, 0.875, 0.1875, 0.875), facing, face)
+                );
             }
         }
     }

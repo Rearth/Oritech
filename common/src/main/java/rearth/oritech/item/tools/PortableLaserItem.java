@@ -287,7 +287,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         List<ItemStack> dropped;
         dropped = Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetPos, targetEntity, player, tool);
         
-        var blockRecipe = LaserArmBlockEntity.tryGetLaserRecipe(targetBlockState, world);
+        var blockRecipe = LaserArmBlockEntity.tryGetRecipeOfBlock(targetBlockState, world);
         if (blockRecipe != null) {
             var recipe = blockRecipe.value();
             var farmedCount = 1;

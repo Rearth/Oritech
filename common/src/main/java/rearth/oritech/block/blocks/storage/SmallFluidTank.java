@@ -9,6 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -143,8 +144,9 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
         var stack = getBasePickStack(tankEntity.isCreative);
         
         if (tankEntity.fluidStorage.getAmount() > 0) {
-            var fluidStack = tankEntity.fluidStorage.getStack();
+            var fluidStack = tankEntity.fluidStorage.getStack().copy();
             stack.set(FluidApi.ITEM.getFluidComponent(), fluidStack);
+            stack.set(DataComponentTypes.MAX_STACK_SIZE, 1);
         }
         
         return stack;
@@ -160,7 +162,7 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
         
         if (itemStack.contains(FluidApi.ITEM.getFluidComponent())) {
             var tankEntity = (SmallTankEntity) world.getBlockEntity(pos);
-            tankEntity.fluidStorage.setStack(itemStack.get(FluidApi.ITEM.getFluidComponent()));
+            tankEntity.fluidStorage.setStack(itemStack.get(FluidApi.ITEM.getFluidComponent()).copy());
         }
     }
     

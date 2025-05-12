@@ -65,6 +65,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.ENERGITE_DUST)
           .add(ItemContent.URANIUM_DUST)
           .add(ItemContent.PLUTONIUM_DUST)
+          .add(ItemContent.COAL_DUST)
           .add(ItemContent.STEEL_DUST);
         
         getOrCreateTagBuilder(getDustTag("nickel")).add(ItemContent.NICKEL_DUST);
@@ -77,6 +78,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(getDustTag("steel")).add(ItemContent.STEEL_DUST);
         getOrCreateTagBuilder(getDustTag("uranium")).add(ItemContent.URANIUM_DUST);
         getOrCreateTagBuilder(getDustTag("plutonium")).add(ItemContent.PLUTONIUM_DUST);
+        getOrCreateTagBuilder(TagContent.COAL_DUSTS).add(ItemContent.COAL_DUST);
         
         
         // ingots

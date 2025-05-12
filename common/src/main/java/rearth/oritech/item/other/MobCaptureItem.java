@@ -29,6 +29,7 @@ public class MobCaptureItem extends Item {
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
         
         var resultingItem = ItemContent.UNHOLY_INTELLIGENCE;
+        if (entity.isDead()) return ActionResult.PASS;
         
         for (var target : targets) {
             if (entity.getType().equals(target)) {

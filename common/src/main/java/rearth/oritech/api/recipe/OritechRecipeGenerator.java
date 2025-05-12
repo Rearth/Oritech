@@ -384,6 +384,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerGeneratorRecipe(exporter, BlockContent.STEAM_BOILER_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.ADAMANT_INGOT), of(cItemTag("ingots/copper")), of(BlockContent.FLUID_PIPE), "addon/steamboiler");
         offerGeneratorRecipe(exporter, BlockContent.STEAM_BOILER_ADDON.asItem(), of(TagContent.SILICON), of(ItemContent.ADAMANT_INGOT), of(BlockContent.FLUID_PIPE), of(TagContent.COAL_DUSTS), "addon/steamboileralt");
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_REDSTONE_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(Items.REPEATER), of(Items.COMPARATOR), of(cItemTag("dusts/redstone")), "addon/redstone");
+        offerGeneratorRecipe(exporter, BlockContent.MACHINE_SILK_TOUCH_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemTags.WOOL), of(Items.DIAMOND_PICKAXE), of(TagContent.PLASTIC_PLATES), "addon/silktouch");
         offerTwoComponentRecipe(exporter, BlockContent.CAPACITOR_ADDON_EXTENDER.asItem(), of(BlockContent.MACHINE_EXTENDER.asItem()), of(BlockContent.MACHINE_CAPACITOR_ADDON), "addon/capextender");
         
         // cores

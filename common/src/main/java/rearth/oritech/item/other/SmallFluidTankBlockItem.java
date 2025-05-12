@@ -41,7 +41,7 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
         if (content.isEmpty()) {
             return super.getName(stack);
         } else {
-            return FluidStackHooks.getName(content).copy().formatted(Formatting.ITALIC).append(Text.literal(" ")).append(super.getName(stack));
+            return FluidStackHooks.getName(content).copy().append(Text.literal(" ")).append(super.getName(stack));
         }
     }
     
