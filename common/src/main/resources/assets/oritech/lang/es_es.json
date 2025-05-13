@@ -1140,6 +1140,7 @@
   "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "Energy per Explosion",
   "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "Block Break Speed",
   "text.config.oritech-config.option.portableLaserConfig.damageBase": "Base Damage",
+  "text.config.oritech-config.option.portableLaserConfig.explosionStrength": "Explosion Strength",
   "text.config.oritech-config.option.chainSaw.energyCapacity": "Capacidad de Energía de la Sierra de Cadena",
   "text.config.oritech-config.option.chainSaw.energyUsage": "Uso de Energía de la Sierra de Cadena",
   "text.config.oritech-config.option.chainSaw.chargeSpeed": "Velocidad de Carga de la Sierra de Cadena",
