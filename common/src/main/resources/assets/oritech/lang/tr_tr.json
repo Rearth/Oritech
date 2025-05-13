@@ -1140,6 +1140,7 @@
   "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "Patlama başına Enerji",
   "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "Blok Kırma Hızı",
   "text.config.oritech-config.option.portableLaserConfig.damageBase": "Baz Hasar",
+  "text.config.oritech-config.option.portableLaserConfig.explosionStrength": "Explosion Strength",
   "text.config.oritech-config.option.chainSaw.energyCapacity": "Testere Enerji Kapasitesi",
   "text.config.oritech-config.option.chainSaw.energyUsage": "Testere Enerji Kullanımı",
   "text.config.oritech-config.option.chainSaw.chargeSpeed": "Testere Şarj Hızı",
