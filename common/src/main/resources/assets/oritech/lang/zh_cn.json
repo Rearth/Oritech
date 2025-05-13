@@ -1140,6 +1140,7 @@
   "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "Energy per Explosion",
   "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "Block Break Speed",
   "text.config.oritech-config.option.portableLaserConfig.damageBase": "Base Damage",
+  "text.config.oritech-config.option.portableLaserConfig.explosionStrength": "Explosion Strength",
   "text.config.oritech-config.option.chainSaw.energyCapacity": "链锯能量容量",
   "text.config.oritech-config.option.chainSaw.energyUsage": "链锯能量消耗",
   "text.config.oritech-config.option.chainSaw.chargeSpeed": "链锯充能速度",
