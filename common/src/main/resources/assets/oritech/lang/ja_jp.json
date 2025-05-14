@@ -1140,7 +1140,7 @@
   "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "爆発ごとのエネルギー",
   "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "ブロック破壊速度",
   "text.config.oritech-config.option.portableLaserConfig.damageBase": "基本ダメージ",
-  "text.config.oritech-config.option.portableLaserConfig.explosionStrength": "Explosion Strength",
+  "text.config.oritech-config.option.portableLaserConfig.explosionStrength": "爆発の強度",
   "text.config.oritech-config.option.chainSaw.energyCapacity": "チェーンソーのエネルギー容量",
   "text.config.oritech-config.option.chainSaw.energyUsage": "チェーンソーのエネルギー使用量",
   "text.config.oritech-config.option.chainSaw.chargeSpeed": "チェーンソーのチャージ速度",
