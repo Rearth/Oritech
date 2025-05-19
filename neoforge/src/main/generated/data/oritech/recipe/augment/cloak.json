@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 32,
@@ -14,6 +14,10 @@
       }
     }
   ],
+  "effect": {
+    "effectStrength": 0,
+    "potionEffectId": "minecraft:invisibility"
+  },
   "requiredStation": "oritech:arcane_augment_station",
   "requirements": [
     "oritech:augment/orefinder"
@@ -40,6 +44,7 @@
   ],
   "rfCost": 100000000,
   "time": 3200,
+  "toggleable": true,
   "uiX": 155,
   "uiY": 10
 }

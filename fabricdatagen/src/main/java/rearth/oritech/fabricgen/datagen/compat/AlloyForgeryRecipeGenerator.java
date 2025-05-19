@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.item.Item;
 import net.minecraft.registry.tag.TagKey;
+import rearth.oritech.Oritech;
 import rearth.oritech.fabricgen.datagen.RecipeGenerator;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
@@ -28,7 +29,7 @@ public class AlloyForgeryRecipeGenerator {
             .criterion(RecipeGenerator.hasItem(inputB), RecipeGenerator.conditionsFromItem(inputB))
             .setMinimumForgeTier(minForgeTier)
             .setFuelPerTick(fuelPerTick)
-            .offerTo(exporter, "compat/alloyforgery/" + suffix);
+            .offerTo(exporter, Oritech.id("compat/alloyforgery/") + suffix);
     }
 
     private static void offerAFAlloyRecipe(RecipeExporter exporter, TagKey<Item> inputA, TagKey<Item> inputB, Item result, int resultCount, int minForgeTier, int fuelPerTick, String suffix) {
@@ -39,6 +40,6 @@ public class AlloyForgeryRecipeGenerator {
             .criterion("has_" + inputB.id().toUnderscoreSeparatedString(), RecipeGenerator.conditionsFromTag(inputB))
             .setMinimumForgeTier(minForgeTier)
             .setFuelPerTick(fuelPerTick)
-            .offerTo(exporter, "compat/alloyforgery/" + suffix);
+            .offerTo(exporter, Oritech.id("compat/alloyforgery/") + suffix);
     }
 }

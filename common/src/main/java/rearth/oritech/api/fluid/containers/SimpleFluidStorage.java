@@ -104,7 +104,7 @@ public class SimpleFluidStorage extends FluidApi.SingleSlotStorage {
     
     @Override
     public void setStack(FluidStack stack) {
-        content = stack;
+        content = stack.copy();
     }
     
     @Override

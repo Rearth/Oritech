@@ -1,6 +1,7 @@
 package rearth.oritech.neoforge;
 
 import dev.technici4n.grandpower.api.ILongEnergyStorage;
+import dev.technici4n.grandpower.impl.NonLongWrapper;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -65,6 +66,7 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
         var candidate = world.getCapability(ILongEnergyStorage.BLOCK, pos, state, entity, direction);
         if (candidate == null) return null;
         if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
+        if (candidate instanceof NonLongWrapper outerWrapper && outerWrapper.storage() instanceof ContainerStorageWrapper wrapper) return wrapper.container;
         return new NeoforgeStorageWrapper(candidate);
     }
     

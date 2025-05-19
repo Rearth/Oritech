@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 32,
@@ -19,6 +19,11 @@
       }
     }
   ],
+  "effect": {
+    "amount": 8.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.armor"
+  },
   "requiredStation": "oritech:advanced_augment_station",
   "requirements": [
     "oritech:augment/betterarmor"
@@ -51,6 +56,7 @@
   ],
   "rfCost": 500000000,
   "time": 2400,
+  "toggleable": false,
   "uiX": 155,
   "uiY": 50
 }

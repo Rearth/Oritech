@@ -31,7 +31,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:compat/alloyforgery/duratium"
+        "recipe": "oritech:compat/alloyforgery/duratium"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -45,7 +45,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:compat/alloyforgery/duratium"
+      "oritech:compat/alloyforgery/duratium"
     ]
   }
 }

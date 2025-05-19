@@ -221,7 +221,8 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
       BlockContent.CAPACITOR_ADDON_EXTENDER,
       BlockContent.QUARRY_ADDON,
       BlockContent.MACHINE_HUNTER_ADDON,
-      BlockContent.QUARRY_ADDON
+      BlockContent.QUARRY_ADDON,
+      BlockContent.MACHINE_SILK_TOUCH_ADDON
     ).build(null);
     
     @AssignSidedInventory

@@ -2,6 +2,7 @@
   "values": [
     "minecraft:sandstone_stairs",
     "minecraft:sandstone_wall",
+    "minecraft:gravel",
     "minecraft:smooth_sandstone_stairs"
   ]
 }

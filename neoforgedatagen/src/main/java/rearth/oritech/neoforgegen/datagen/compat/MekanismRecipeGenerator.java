@@ -18,6 +18,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.AtomicForgeRecipeBuilder;
 import rearth.oritech.api.recipe.FoundryRecipeBuilder;
@@ -29,11 +30,11 @@ import rearth.oritech.init.TagContent;
 public class MekanismRecipeGenerator {
     private static final String PATH = "compat/mekanism/";
 
-    public static void generateRecipes(RecipeOutput exporter) {
+    public static void generateRecipes(IConditionBuilder conditionBuilder, RecipeOutput exporter) {
         addAlloying(exporter);
         addAtomicForging(exporter);
         addDustGrinding(exporter);
-        addMetalProcessing(exporter);
+        addMetalProcessing(conditionBuilder, exporter);
         addMekInfusing(exporter);
     }
 
@@ -101,7 +102,8 @@ public class MekanismRecipeGenerator {
         RecipeHelpers.addDustRecipe(exporter, of(Tags.Items.OBSIDIANS), MekanismItems.OBSIDIAN_DUST.asItem(), "compat/mekanism/dust/obsidian");
     }
     
-    private static void addMetalProcessing(RecipeOutput exporter) {
+    private static void addMetalProcessing(IConditionBuilder conditionBuilder, RecipeOutput exporter) {
+        var conditionExporter = exporter.withConditions(conditionBuilder.not(conditionBuilder.modLoaded("jaopca")));
         // osmium
         MetalProcessingChainBuilder.build("osmium").resourcePath(PATH)
             .ore(MekanismTags.Items.ORES.get(OreType.OSMIUM))
@@ -119,7 +121,7 @@ public class MekanismRecipeGenerator {
             .dustByproduct(ItemContent.SMALL_PLATINUM_DUST)
             .byproductAmount(2)
             .timeMultiplier(1.5f)
-            .export(exporter);
+            .export(conditionExporter);
         // tin
         MetalProcessingChainBuilder.build("tin").resourcePath(PATH)
             .ore(MekanismTags.Items.ORES.get(OreType.TIN))
@@ -135,7 +137,7 @@ public class MekanismRecipeGenerator {
             .centrifugeResult(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.TIN).asItem())
             .dust(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.TIN).asItem())
             .dustByproduct(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.LEAD).asItem())
-            .export(exporter);
+            .export(conditionExporter);
         // lead
         MetalProcessingChainBuilder.build("lead").resourcePath(PATH)
             .ore(MekanismTags.Items.ORES.get(OreType.LEAD))
@@ -151,7 +153,7 @@ public class MekanismRecipeGenerator {
             .centrifugeResult(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.LEAD).asItem())
             .dust(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.LEAD).asItem())
             .dustByproduct(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, PrimaryResource.TIN).asItem())
-            .export(exporter);
+            .export(conditionExporter);
     }
 
     private static void addMekInfusing(RecipeOutput exporter) {

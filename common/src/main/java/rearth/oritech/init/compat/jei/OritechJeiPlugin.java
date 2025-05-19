@@ -74,12 +74,12 @@ public class OritechJeiPlugin implements IModPlugin {
     
     private void registerOritechCategory(IRecipeCategoryRegistration registration, OritechRecipeType type, Block block, Class<? extends MachineBlockEntity> machineClass) {
         registration.addRecipeCategories(
-          new OritechRecipeCategory(type, machineClass, block, registration.getJeiHelpers().getGuiHelper()));
+          new OritechJeiRecipeCategory(type, machineClass, block, registration.getJeiHelpers().getGuiHelper()));
     }
     
     private void registerCustom(IRecipeCategoryRegistration registration, OritechRecipeType type, Block block, Boolean isGenerator, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment assignments) {
         registration.addRecipeCategories(
-          new OritechRecipeCategory(type, block, registration.getJeiHelpers().getGuiHelper(), isGenerator, slots, assignments));
+          new OritechJeiRecipeCategory(type, block, registration.getJeiHelpers().getGuiHelper(), isGenerator, slots, assignments));
     }
     
     @Override

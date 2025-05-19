@@ -127,6 +127,12 @@ public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvi
         });
     }
     
+    public void resetCaches() {
+        delegatedItem.clear();
+        delegatedFluid.clear();
+        delegatedEnergy.clear();
+    }
+    
     public boolean isEnabled() {
         return this.getCachedState().get(MachineCoreBlock.USED);
     }

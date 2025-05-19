@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 32,
@@ -14,6 +14,11 @@
       }
     }
   ],
+  "effect": {
+    "amount": 6.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.attack_damage"
+  },
   "requiredStation": "oritech:arcane_augment_station",
   "requirements": [
     "oritech:augment/hpboostultra",
@@ -41,6 +46,7 @@
   ],
   "rfCost": 500000000,
   "time": 2800,
+  "toggleable": false,
   "uiX": 180,
   "uiY": 50
 }

@@ -1,0 +1,12 @@
+- Complete rework of the cybernetical augmentation backend. Is much more robust now, and fully data driven. This means modpack makers can add their own augments now!
+- Add enderic railgun explosion power config option
+- Reduce resource boulder spawn amounts
+- Make augmentation center recipe cheaper
+- Fix indestructible blocks being destroyed by nukes (@zeng-github01)
+- Fix nugger outputs of some recipes, disable compat ore recipes when JAOPCA is loaded (@jshipley)
+- Fix crafting recipes being in the wrong directory / namespace on Neoforge (sorry to all the modpacks that already adjusted their recipes for 0.15, but this change needs
+to be made) (@jshipley)
+- Fix uranium clump processing on fabric (@jshipley)
+- Fix crash with fluid pipes inserting into machine cores in some edge cases
+- Fix iron helmet missing recyclable tag
+- Fix gravel -> sand recipe

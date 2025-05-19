@@ -5,6 +5,8 @@ import com.google.common.collect.Multimap;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.TickEvent;
+import io.wispforest.endec.impl.ReflectiveEndecBuilder;
+import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
@@ -17,6 +19,7 @@ import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
 import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
+import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -40,6 +43,10 @@ public final class Oritech {
         return Identifier.of(MOD_ID, path);
     }
     
+    static {
+        ReflectiveEndecBuilder.SHARED_INSTANCE.register(MinecraftEndecs.IDENTIFIER, Identifier.class);
+    }
+    
     public static void initialize() {
         
         LOGGER.info("Begin Oritech initialization");
@@ -49,6 +56,9 @@ public final class Oritech {
         
         // for pipe data
         LifecycleEvent.SERVER_STARTED.register(Oritech::onServerStarted);
+        
+        // for augment data
+        LifecycleEvent.SERVER_STARTED.register(server -> PlayerAugments.loadAllAugments(server.getRecipeManager()));
         
         // for particle collisions
         TickEvent.SERVER_POST.register(elem -> AcceleratorParticleLogic.onTickEnd());
@@ -105,7 +115,7 @@ public final class Oritech {
         res.put(RegistryKeys.ITEM_GROUP.getValue(), () -> ArchitecturyRegistryContainer.register(ItemGroups.class, MOD_ID, false));
         res.put(RegistryKeys.RECIPE_SERIALIZER.getValue(), ArchitecturyRecipeRegistryContainer::finishSerializerRegister);
         res.put(RegistryKeys.LOOT_FUNCTION_TYPE.getValue(), FluidContent::registerItemsToGroups);
-        res.put(Identifier.of("minecraft", "enchantment_provider_type"), PlayerAugments::init);   // this works just fine on fabric aswell, as they key is not really relevant there. Intentionally registered before the real attachments to avoid locking issues on neoforge
+        res.put(Identifier.of("neoforge", "attachment_types"), Augment::registerAttachmentTypes);   // this works just fine on fabric aswell, as they key is not really relevant there.
         
         return res;
     }

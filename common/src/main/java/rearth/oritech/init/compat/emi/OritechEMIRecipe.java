@@ -1,17 +1,11 @@
 package rearth.oritech.init.compat.emi;
 
-import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-
-import dev.architectury.platform.Platform;
 import dev.emi.emi.api.recipe.BasicEmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.Fluid;
@@ -23,6 +17,11 @@ import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+
+import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 
 public class OritechEMIRecipe extends BasicEmiRecipe {
     
@@ -41,7 +40,8 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         if (recipe.getFluidInput() != null && recipe.getFluidInput().amount() > 0) {
             var inputAmount = Math.max(recipe.getFluidInput().amount(), 1);
             if (recipe.getFluidInput().fluidContent().left().isPresent()) {
-                this.inputs.add(new TagEmiIngredient(recipe.getFluidInput().fluidContent().left().get(), inputAmount));
+                var tagIng = EmiIngredient.of(recipe.getFluidInput().fluidContent().left().get(), inputAmount);
+                this.inputs.add(tagIng);
             } else {
                 this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluidStacks().getFirst().getFluid(), inputAmount));
             }
@@ -102,7 +102,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         var emiIngredients = this.inputs;
         for (int i = 0; i < emiIngredients.size(); i++) {
             var input = emiIngredients.get(i);
-            if (input.isEmpty()) continue;
+            if (input.isEmpty() && input.getAmount() <= 0) continue;
             
             var isFluid = input.getEmiStacks().stream().anyMatch(stack -> stack.getKey() instanceof Fluid);
             if (isFluid && input.getAmount() > 0) {
@@ -122,7 +122,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
             
             var isFluid = result.getEmiStacks().stream().anyMatch(stack -> stack.getKey() instanceof Fluid);
             if (isFluid && result.getAmount() > 0) {
-                widgets.addTank(result, 120, 6, 18, 50, (int) result.getAmount()).drawBack(false);
+                widgets.addTank(result, 120, 6, 18, 50, (int) result.getAmount()).drawBack(false).recipeContext(this);
                 widgets.addTexture(GUI_COMPONENTS, 120, 6, 18, 50, 48, 0, 14, 50, 98, 96);
             } else {
                 var pos = slots.get(slotOffsets.outputStart() + i);

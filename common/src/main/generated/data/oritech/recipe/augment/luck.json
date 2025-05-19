@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 32,
@@ -14,6 +14,11 @@
       }
     }
   ],
+  "effect": {
+    "amount": 100.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.luck"
+  },
   "requiredStation": "oritech:arcane_augment_station",
   "requirements": [],
   "researchCost": [
@@ -38,6 +43,7 @@
   ],
   "rfCost": 200000000,
   "time": 1800,
+  "toggleable": false,
   "uiX": 55,
   "uiY": 30
 }

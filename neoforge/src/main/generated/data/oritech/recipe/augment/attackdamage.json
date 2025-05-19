@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 16,
@@ -14,6 +14,11 @@
       }
     }
   ],
+  "effect": {
+    "amount": 4.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.attack_damage"
+  },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [],
   "researchCost": [
@@ -38,6 +43,7 @@
   ],
   "rfCost": 150000000,
   "time": 1600,
+  "toggleable": false,
   "uiX": 5,
   "uiY": 10
 }

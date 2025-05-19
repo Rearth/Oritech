@@ -73,7 +73,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
     MultiblockMachineController, MachineAddonController, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
     
     public static final String LASER_PLAYER_NAME = "oritech_laser";
-    private static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
+    public static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
     
     // storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, this::markDirty);
@@ -96,6 +96,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
     public int yieldAddons = 0;
     public int hunterAddons = 0;
     public boolean hasCropFilterAddon = false;
+    public boolean hasSilkTouchAddon = false;
     
     // config
     private final int range = Oritech.CONFIG.laserArmConfig.range();
@@ -206,13 +207,15 @@ public class LaserArmBlockEntity extends BlockEntity implements
         // added getLaserPlayerEntity() to make ae2 certus quartz drop from certus
         // quartz clusters because it's expecting an entity in
         // LootContextParameters.THIS_ENTITY
-        if (yieldAddons > 0) {
+        if (hasSilkTouchAddon) {
+            dropped = DestroyerBlockEntity.getSilkTouchDrops(targetBlockState, (ServerWorld) world, targetPos, targetEntity, getLaserPlayerEntity());
+        } else if (yieldAddons > 0) {
             dropped = DestroyerBlockEntity.getLootDrops(targetBlockState, (ServerWorld) world, targetPos, targetEntity, yieldAddons, getLaserPlayerEntity());
         } else {
-            dropped = net.minecraft.block.Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetPos, targetEntity, getLaserPlayerEntity(), ItemStack.EMPTY);
+            dropped = Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetPos, targetEntity, getLaserPlayerEntity(), ItemStack.EMPTY);
         }
         
-        var blockRecipe = tryGetRecipeOfBlock(targetBlockState);
+        var blockRecipe = tryGetRecipeOfBlock(targetBlockState, world);
         if (blockRecipe != null) {
             var recipe = blockRecipe.value();
             var farmedCount = 1 + yieldAddons;
@@ -237,7 +240,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         findNextBlockBreakTarget();
     }
     
-    private RecipeEntry<OritechRecipe> tryGetRecipeOfBlock(BlockState destroyed) {
+    public static RecipeEntry<OritechRecipe> tryGetRecipeOfBlock(BlockState destroyed, World world) {
         var inputItem = destroyed.getBlock().asItem();
         var inputInv = new SimpleCraftingInventory(new ItemStack(inputItem));
         var candidate = world.getRecipeManager().getFirstMatch(RecipeContent.LASER, inputInv, world);
@@ -444,6 +447,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         yieldAddons = 0;
         hunterAddons = 0;
         hasCropFilterAddon = false;
+        hasSilkTouchAddon = false;
         
         MachineAddonController.super.gatherAddonStats(addons);
     }
@@ -460,6 +464,8 @@ public class LaserArmBlockEntity extends BlockEntity implements
             yieldAddons++;
         if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON))
             hasCropFilterAddon = true;
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON))
+            hasSilkTouchAddon = true;
         
     }
     
@@ -474,7 +480,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
     private void updateNetwork() {
         var entityId = currentLivingTarget != null ? currentLivingTarget.getId() : -1;
         var sendTarget = currentTarget != null ? currentTarget : BlockPos.ORIGIN;
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons, hunterAddons, hunterTargetMode.value, hasCropFilterAddon, entityId, redstonePowered));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons, hunterAddons, hunterTargetMode.value, hasCropFilterAddon, hasSilkTouchAddon, entityId, redstonePowered));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
         networkDirty = false;
     }
@@ -531,6 +537,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         nbt.putInt("yieldAddons", yieldAddons);
         nbt.putInt("hunterAddons", hunterAddons);
         nbt.putBoolean("cropAddon", hasCropFilterAddon);
+        nbt.putBoolean("silkAddon", hasSilkTouchAddon);
         nbt.putInt("hunterTargetMode", hunterTargetMode.value);
         
         if (targetDirection != null && currentTarget != null) {
@@ -564,6 +571,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         hunterAddons = nbt.getInt("hunterAddons");
         hunterTargetMode = HunterTargetMode.fromValue(nbt.getInt("hunterTargetMode"));
         hasCropFilterAddon = nbt.getBoolean("cropAddon");
+        hasSilkTouchAddon = nbt.getBoolean("silkAddon");
         
         if (nbt.contains("pendingPositions")) {
             pendingArea = Arrays.stream(nbt.getLongArray("pendingPositions")).mapToObj(BlockPos::fromLong).collect(Collectors.toCollection(ArrayDeque::new));
@@ -826,13 +834,20 @@ public class LaserArmBlockEntity extends BlockEntity implements
     
     @Override
     public List<Pair<Text, Text>> getExtraExtensionLabels() {
-        if (areaSize == 1 && yieldAddons == 0 && hunterAddons == 0)
+        if (areaSize == 1 && yieldAddons == 0 && hunterAddons == 0 && !hasSilkTouchAddon)
             return ScreenProvider.super.getExtraExtensionLabels();
         if (hunterAddons > 0)
             return List.of(
               new Pair<>(Text.translatable("title.oritech.machine.addon_range", (int) hunterRange()), Text.translatable("tooltip.oritech.laser_arm.addon_hunter_range")),
               new Pair<>(Text.translatable("title.oritech.laser_arm.addon_hunter_damage", String.format("%.2f", getDamageTick())), Text.translatable("tooltip.oritech.laser_arm.addon_hunter_damage")),
               new Pair<>(Text.translatable("title.oritech.machine.addon_looting", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_looting")));
+        
+        if (hasSilkTouchAddon) {
+            return List.of(
+              new Pair<>(Text.translatable("title.oritech.machine.addon_range", areaSize), Text.translatable("tooltip.oritech.laser_arm.addon_range")),
+              new Pair<>(Text.translatable("enchantment.minecraft.silk_touch"), Text.translatable("tooltip.oritech.machine.addon_silk_touch")));
+        }
+        
         return List.of(
           new Pair<>(Text.translatable("title.oritech.machine.addon_range", areaSize), Text.translatable("tooltip.oritech.laser_arm.addon_range")),
           new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")));

@@ -18,6 +18,7 @@ import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
+import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.network.NetworkContent;
 
 import java.util.ArrayList;
@@ -229,7 +230,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         
         var player = Objects.requireNonNull(this.client).player;
         
-        var augmentsToAdd = new ArrayList<PlayerAugments.PlayerAugment>();
+        var augmentsToAdd = new ArrayList<Augment>();
         
         for (var augment : PlayerAugments.allAugments.values()) {
             var isInstalled = augment.isInstalled(player);
@@ -277,12 +278,6 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
     
     private void toggleAugment(Identifier id) {
         NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.AugmentPlayerTogglePacket(id));
-        
-        var instance = PlayerAugments.allAugments.get(id);
-        if (instance.autoSync) {
-            // directly toggle on client, instead of sending the toggle command to server, and then syncing to client
-            instance.toggle(this.client.player);
-        }
     }
     
     @Override

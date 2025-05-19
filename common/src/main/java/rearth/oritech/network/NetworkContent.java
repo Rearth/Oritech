@@ -29,6 +29,7 @@ import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
+import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.interaction.*;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -42,6 +43,7 @@ import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.MachineAddonController;
@@ -97,10 +99,13 @@ public class NetworkContent {
     }   // times are in ticks
     
     public record QuarryTargetPacket(BlockPos position, BlockPos quarryTarget, int range, int yieldAddons,
+                                     boolean hasSilkTouchAddon,
                                      float operationSpeed) {
     }
     
-    public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced, long steamConsumed, int slaves) {}
+    public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced,
+                                        long steamConsumed, int slaves) {
+    }
     
     public record SpawnerSyncPacket(BlockPos position, Identifier spawnedMob, boolean hasCage, int collectedSouls,
                                     int maxSouls) {
@@ -128,7 +133,7 @@ public class NetworkContent {
     
     public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize,
                                      int yieldAddons, int hunterAddons, int hunterTargetMode, boolean cropAddon,
-                                     int targetEntityId, boolean redstonePowered) {
+                                     boolean hasSilkTouchAddon, int targetEntityId, boolean redstonePowered) {
     }
     
     public record DeepDrillSyncPacket(BlockPos position, long lastWorkTime) {
@@ -181,7 +186,7 @@ public class NetworkContent {
                                     List<Long> startedTimes, List<Integer> researchTimes) {
     }
     
-    public record AugmentOperationSyncPacket(Identifier id, int operation) {
+    public record AugmentPlayerStatePacket(Map<Identifier, Augment.AugmentState> data) {
     }
     
     public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn,
@@ -207,6 +212,9 @@ public class NetworkContent {
     public record ReactorUISyncPacket(BlockPos position, List<BlockPos> componentPositions,
                                       List<ReactorControllerBlockEntity.ComponentStatistics> componentHeats,
                                       long energy) {
+    }
+    
+    public record LaserPlayerUsePacket() {
     }
     
     @SuppressWarnings("unchecked")
@@ -270,6 +278,7 @@ public class NetworkContent {
                 laserArmBlock.yieldAddons = message.yieldAddons;
                 laserArmBlock.hunterAddons = message.hunterAddons;
                 laserArmBlock.hasCropFilterAddon = message.cropAddon;
+                laserArmBlock.hasSilkTouchAddon = message.hasSilkTouchAddon;
                 laserArmBlock.setLivingTargetFromNetwork(message.targetEntityId);
                 laserArmBlock.hunterTargetMode = LaserArmBlockEntity.HunterTargetMode.fromValue(message.hunterTargetMode);
                 laserArmBlock.setRedstonePowered(message.redstonePowered);
@@ -523,6 +532,7 @@ public class NetworkContent {
                 machine.quarryTarget = message.quarryTarget;
                 machine.range = message.range;
                 machine.yieldAddons = message.yieldAddons;
+                machine.hasSilkTouchAddon = message.hasSilkTouchAddon;
                 
                 var oldData = machine.getBaseAddonData();
                 var newData = new MachineAddonController.BaseAddonData(message.operationSpeed, oldData.efficiency(), oldData.energyBonusCapacity(), oldData.energyBonusTransfer(), oldData.extraChambers());
@@ -604,13 +614,6 @@ public class NetworkContent {
             
         }));
         
-        
-        MACHINE_CHANNEL.registerClientbound(AugmentOperationSyncPacket.class, ((message, access) -> {
-            if (access != null)
-                PlayerAugmentsClient.handlePlayerAugmentOperation(message, access);   // this weird redict is need for server-only class-loading reasons?
-            
-        }));
-        
         MACHINE_CHANNEL.registerClientbound(ReactorUIDataPacket.class, ((message, access) -> {
             
             var entity = access.player().getWorld().getBlockEntity(message.position);
@@ -646,6 +649,14 @@ public class NetworkContent {
             }
             
         }));
+        
+        MACHINE_CHANNEL.registerServerbound(LaserPlayerUsePacket.class, (message, access) -> {
+            PortableLaserItem.onUseTick(access.player());
+        });
+        
+        MACHINE_CHANNEL.registerClientbound(AugmentPlayerStatePacket.class, (message, access) -> {
+            PlayerAugmentsClient.setPlayerAugment(access, message.data);
+        });
         
         UI_CHANNEL.registerServerbound(RedstoneAddonSyncPacket.class, (message, access) -> {
             
@@ -715,7 +726,7 @@ public class NetworkContent {
             var entity = access.player().getWorld().getBlockEntity(message.position);
             
             if (entity instanceof AugmentApplicationEntity modifierEntity) {
-                var operation = PlayerAugments.AugmentOperation.values()[message.operationId];
+                var operation = PlayerAugments.AugmentApplicatorOperation.values()[message.operationId];
                 switch (operation) {
                     case RESEARCH -> {
                         modifierEntity.researchAugment(message.id, player.isCreative(), player);

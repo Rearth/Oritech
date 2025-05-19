@@ -3,6 +3,13 @@
     {
       "type": "neoforge:mod_loaded",
       "modid": "create"
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:mod_loaded",
+        "modid": "jaopca"
+      }
     }
   ],
   "type": "oritech:centrifuge_fluid",
@@ -21,7 +28,7 @@
   ],
   "results": [
     {
-      "count": 2,
+      "count": 18,
       "id": "create:zinc_nugget"
     }
   ],

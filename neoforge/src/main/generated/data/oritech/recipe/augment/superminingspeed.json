@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 32,
@@ -14,6 +14,11 @@
       }
     }
   ],
+  "effect": {
+    "amount": 1.0,
+    "attributeOperationType": 2,
+    "entityAttributeId": "minecraft:player.block_break_speed"
+  },
   "requiredStation": "oritech:advanced_augment_station",
   "requirements": [
     "oritech:augment/miningspeed",
@@ -41,6 +46,7 @@
   ],
   "rfCost": 450000000,
   "time": 2400,
+  "toggleable": true,
   "uiX": 80,
   "uiY": 10
 }

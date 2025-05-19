@@ -144,14 +144,6 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
     
     @Override
-    public void initAddons() {
-        super.initAddons();
-        // trigger block update to allow pipes to connect
-        world.updateNeighbors(pos, getCachedState().getBlock());
-        world.updateNeighbors(pos.up(), world.getBlockState(pos.up()).getBlock());
-    }
-    
-    @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
         if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON)) {
             hasFluidAddon = true;
@@ -162,6 +154,23 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     public void resetAddons() {
         super.resetAddons();
         hasFluidAddon = false;
+    }
+    
+    @Override
+    public void initAddons(BlockPos brokenAddon) {
+        hasFluidAddon = false;
+        super.initAddons(brokenAddon);
+        
+        // reset cache of core above
+        var coreCandidate = world.getBlockEntity(pos.up(), BlockEntitiesContent.MACHINE_CORE_ENTITY);
+        if (coreCandidate.isPresent()) {
+            var core = coreCandidate.get();
+            core.resetCaches();
+        }
+        
+        // trigger block update to allow pipes to connect/disconnect
+        world.updateNeighbors(pos, getCachedState().getBlock());
+        world.updateNeighbors(pos.up(), world.getBlockState(pos.up()).getBlock());
     }
     
     @Override
@@ -256,6 +265,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     @Override
     public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
+        if (!hasFluidAddon) return null;
         return fluidContainer.getStorageForDirection(direction);
     }
 }

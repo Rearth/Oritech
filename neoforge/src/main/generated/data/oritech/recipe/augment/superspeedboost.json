@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 32,
@@ -19,6 +19,11 @@
       }
     }
   ],
+  "effect": {
+    "amount": 0.25,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.movement_speed"
+  },
   "requiredStation": "oritech:advanced_augment_station",
   "requirements": [
     "oritech:augment/speedboost",
@@ -46,6 +51,7 @@
   ],
   "rfCost": 350000000,
   "time": 1800,
+  "toggleable": true,
   "uiX": 55,
   "uiY": 50
 }

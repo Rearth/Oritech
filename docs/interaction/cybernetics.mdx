@@ -40,11 +40,6 @@ All augmentations must first be researched in the Cybernetic Augmentation Center
 3. Center stores all researched blueprints (per-machine, this means they'll be lost when the machine is destroyed)
 4. Existing player augmentations can be scanned via UI import button (bottom-left)
 
-<Callout variant="info">
-    Most augmentation data, such as research/apply cost, UI positioning, research stations, and dependencies can be configured via datapacks.
-    Adding / changing the augmentations themselves is not possible (yet).
-</Callout>
-
 ### Augmentation Management
 - All Augmentations are installed permanently (no maintenance or energy is required)
 - Some augments can be toggled; others remain always-active
@@ -58,3 +53,14 @@ All augmentations must first be researched in the Cybernetic Augmentation Center
 <center>
 <ModAsset location="oritech:area/cyborg_ui" width={700} />
 </center>
+
+### Information for modpack developers:
+The augments are fully configurable and data driven. New augments can be created using datapacks. There are 3 augment types: Modifier augments, that operate
+by changing an entity attribute of the player, such as speed or reach. Next there are effect attributes, that grant an effect similar to a potion. The last type
+are custom augments, that include fully custom logic, such as the ore vision or portal augment. These custom augments can be referenced via data packs, but
+their logic needs to be implemented in a full java mod.
+
+Completely new augments can be created with datapacks, and existing augments can be changed.
+Take a look at this file as an example for an augment definition: https://github.com/Rearth/Oritech/blob/1.21/common/src/main/generated/data/oritech/recipe/augment/attackdamage.json
+
+When adding new augments, keep in mind that translation entries and textures are also required. Textures go in the "oritech/textures/gui/augment" directory.

@@ -57,11 +57,11 @@ public class TechRebornRecipeGenerator {
     public static void addCraftRecipes(RecipeExporter exporter) {
         var output = TRContent.Parts.CARBON_MESH.asItem();
         var shapelessBuilder = ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, 1).input(Ingredient.fromTag(TagContent.CARBON_FIBRE)).input(Ingredient.fromTag(TagContent.CARBON_FIBRE));
-        shapelessBuilder.criterion(RecipeGenerator.hasItem(output), RecipeGenerator.conditionsFromItem(output)).offerTo(exporter, PATH + RecipeGenerator.getItemPath(output));
+        shapelessBuilder.criterion(RecipeGenerator.hasItem(output), RecipeGenerator.conditionsFromItem(output)).offerTo(exporter, Oritech.id(PATH + RecipeGenerator.getItemPath(output)));
         
         output = TRContent.Machine.LAMP_INCANDESCENT.asItem();
         var shapedBuilder = ShapedRecipeJsonBuilder.create(RecipeCategory.DECORATIONS, output, 1).input('G', ConventionalItemTags.GLASS_PANES_COLORLESS).input('C', TRContent.Cables.COPPER).input('F', TagContent.CARBON_FIBRE).pattern("GGG").pattern("CFC").pattern("GGG");
-        shapedBuilder.criterion(RecipeGenerator.hasItem(output), RecipeGenerator.conditionsFromItem(output)).offerTo(exporter, PATH + RecipeGenerator.getItemPath(output));
+        shapedBuilder.criterion(RecipeGenerator.hasItem(output), RecipeGenerator.conditionsFromItem(output)).offerTo(exporter, Oritech.id(PATH + RecipeGenerator.getItemPath(output)));
     }
     
     public static void addOritechAlloys(RecipeExporter exporter) {
