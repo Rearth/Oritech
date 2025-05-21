@@ -21,7 +21,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:compat/techreborn/carbon_mesh"
+        "recipe": "oritech:compat/techreborn/carbon_mesh"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -34,7 +34,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:compat/techreborn/carbon_mesh"
+      "oritech:compat/techreborn/carbon_mesh"
     ]
   }
 }

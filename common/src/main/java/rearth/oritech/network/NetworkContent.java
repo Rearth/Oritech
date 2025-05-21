@@ -29,6 +29,7 @@ import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
+import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.interaction.*;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -97,11 +98,14 @@ public class NetworkContent {
                                              BlockPos areaMin, BlockPos areaMax, boolean redstoneDisable) {
     }   // times are in ticks
     
-    public record QuarryTargetPacket(BlockPos position, BlockPos quarryTarget, int range, int yieldAddons, boolean hasSilkTouchAddon,
+    public record QuarryTargetPacket(BlockPos position, BlockPos quarryTarget, int range, int yieldAddons,
+                                     boolean hasSilkTouchAddon,
                                      float operationSpeed) {
     }
     
-    public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced, long steamConsumed, int slaves) {}
+    public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced,
+                                        long steamConsumed, int slaves) {
+    }
     
     public record SpawnerSyncPacket(BlockPos position, Identifier spawnedMob, boolean hasCage, int collectedSouls,
                                     int maxSouls) {
@@ -182,7 +186,7 @@ public class NetworkContent {
                                     List<Long> startedTimes, List<Integer> researchTimes) {
     }
     
-    public record AugmentOperationSyncPacket(Identifier id, int operation) {
+    public record AugmentPlayerStatePacket(Map<Identifier, Augment.AugmentState> data) {
     }
     
     public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn,
@@ -210,7 +214,8 @@ public class NetworkContent {
                                       long energy) {
     }
     
-    public record LaserPlayerUsePacket() {}
+    public record LaserPlayerUsePacket() {
+    }
     
     @SuppressWarnings("unchecked")
     public static void registerChannels() {
@@ -609,13 +614,6 @@ public class NetworkContent {
             
         }));
         
-        
-        MACHINE_CHANNEL.registerClientbound(AugmentOperationSyncPacket.class, ((message, access) -> {
-            if (access != null)
-                PlayerAugmentsClient.handlePlayerAugmentOperation(message, access);   // this weird redict is need for server-only class-loading reasons?
-            
-        }));
-        
         MACHINE_CHANNEL.registerClientbound(ReactorUIDataPacket.class, ((message, access) -> {
             
             var entity = access.player().getWorld().getBlockEntity(message.position);
@@ -653,9 +651,11 @@ public class NetworkContent {
         }));
         
         MACHINE_CHANNEL.registerServerbound(LaserPlayerUsePacket.class, (message, access) -> {
-            
             PortableLaserItem.onUseTick(access.player());
-            
+        });
+        
+        MACHINE_CHANNEL.registerClientbound(AugmentPlayerStatePacket.class, (message, access) -> {
+            PlayerAugmentsClient.setPlayerAugment(access, message.data);
         });
         
         UI_CHANNEL.registerServerbound(RedstoneAddonSyncPacket.class, (message, access) -> {
@@ -726,7 +726,7 @@ public class NetworkContent {
             var entity = access.player().getWorld().getBlockEntity(message.position);
             
             if (entity instanceof AugmentApplicationEntity modifierEntity) {
-                var operation = PlayerAugments.AugmentOperation.values()[message.operationId];
+                var operation = PlayerAugments.AugmentApplicatorOperation.values()[message.operationId];
                 switch (operation) {
                     case RESEARCH -> {
                         modifierEntity.researchAugment(message.id, player.isCreative(), player);

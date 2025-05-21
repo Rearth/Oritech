@@ -3,6 +3,13 @@
     {
       "type": "neoforge:mod_loaded",
       "modid": "energizedpower"
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:mod_loaded",
+        "modid": "jaopca"
+      }
     }
   ],
   "type": "oritech:grinder",

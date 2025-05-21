@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 16,
@@ -14,6 +14,11 @@
       }
     }
   ],
+  "effect": {
+    "amount": 0.6,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.step_height"
+  },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [
     "oritech:augment/superspeedboost"
@@ -40,6 +45,7 @@
   ],
   "rfCost": 75000000,
   "time": 800,
+  "toggleable": true,
   "uiX": 80,
   "uiY": 50
 }

@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 16,
@@ -14,6 +14,11 @@
       }
     }
   ],
+  "effect": {
+    "amount": 1.0,
+    "attributeOperationType": 2,
+    "entityAttributeId": "minecraft:player.block_break_speed"
+  },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [
     "oritech:augment/attackdamage",
@@ -41,6 +46,7 @@
   ],
   "rfCost": 100000000,
   "time": 1200,
+  "toggleable": false,
   "uiX": 30,
   "uiY": 10
 }

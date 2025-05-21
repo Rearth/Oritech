@@ -121,7 +121,7 @@ tasks.remapJar {
 publishMods {
     file = remapJar.archiveFile
     changelog = file("../CHANGELOG.md").getText()
-    type = ALPHA
+    type = BETA
     modLoaders.add("neoforge")
 
     modrinth {

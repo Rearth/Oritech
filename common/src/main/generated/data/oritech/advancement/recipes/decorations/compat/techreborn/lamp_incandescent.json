@@ -21,7 +21,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:compat/techreborn/lamp_incandescent"
+        "recipe": "oritech:compat/techreborn/lamp_incandescent"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -34,7 +34,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:compat/techreborn/lamp_incandescent"
+      "oritech:compat/techreborn/lamp_incandescent"
     ]
   }
 }

@@ -62,7 +62,7 @@
   "oritech.text.augment.hpboostmore.desc": "カーボンファイバーを用いて呼吸器系を補強することでスタミナを増強する。",
   "oritech.text.augment.hpboostmore.desc.1": "最大体力を4ポイント加えます。（2ハート分）",
   "oritech.text.augment.hpboostultra": "超重複マトリクス",
-  "oritech.text.augment.hpboostultra.desc": "余剰なナノマシンを投与することで生物学的システムをオーバークロックする。",
+  "oritech.text.augment.hpboostultra.desc": "冗長性ナノマシンを投与することで生物学的システムをオーバークロックする。",
   "oritech.text.augment.hpboostultra.desc.1": "最大体力が10ポイント向上します。（5ハート分）",
   "oritech.text.augment.hpboostultimate": "歩く要塞",
   "oritech.text.augment.hpboostultimate.desc": "液体金属を有機組織に注入することで比類なき耐久性を獲得する。",
@@ -220,7 +220,8 @@
   "tooltip.oritech.charger": "装備の充電と燃料の供給に使用します。",
   "tooltip.oritech.addon_speed_desc": "動作速度 ",
   "tooltip.oritech.addon_efficiency_desc": "エネルギー効率 ",
-  "tooltip.oritech.addon_yield_desc": "フラグメントフォージでの副産物を二倍生成する。\nブロックデストロイヤーとエンダリックレーザーでのブロック破壊だとドロップ量が増加する。",
+  "tooltip.oritech.addon_yield_desc": "フラグメントフォージでの副産物を二倍生成します。\nブロックデストロイヤーとエンダリックレーザーでのブロック破壊のドロップ量が増加します。",
+  "tooltip.oritech.addon_silk_touch_desc": "ブロックデストロイヤーとエンダリックレーザーにシルクタッチを適用させます。",
   "tooltip.oritech.processing_addon_desc": "処理サイクルを実行する度に、追加のレシピ処理を可能にします。",
   "tooltip.oritech.addon_fluid_desc": "遠心分離機とドローンポートに適用可能です。\n流体の扱いを可能にします。",
   "tooltip.oritech.addon_acceptor_desc": "機械本体の代わりにこのアドオンにエネルギーを挿入可能にします。",
@@ -292,6 +293,21 @@
   "tooltip.oritech.reactor_redstone_port.4": "出力モードを変更するにはブロックを右クリックです。",
   "tooltip.oritech.weed_killer": "広い半径の草や植物をすべて取り除きます。",
   "tooltip.oritech.cooler_block": "冷たいバイオームでは2倍の速さ（と効率）になります。",
+  "tooltip.oritech.motor": "アイテムパイプの抽出面を右クリックして、すべてのスロットから取り出せるようにアップグレードできます。",
+  "tooltip.oritech.portable_laser.1": "左クリックは超直線的ビームを発射し、エネルギーの輸送、ブロックの採掘、エンティティに",
+  "tooltip.oritech.portable_laser.2": "ダメージを与えたり、エンダリックレーザーのように破壊したアイテムを変化させられます。",
+  "tooltip.oritech.portable_laser.3": "右クリックすると高エネルギーの爆発が発生します。",
+  "tooltip.oritech.portable_laser.4": "",
+  "tooltip.oritech.portable_laser.5": "ほとんどのツルハシのエンチャント、不可壊、ダメージ増加も機能します。",
+  "tooltip.oritech.portable_laser.status.begin": "採掘モード：",
+  "tooltip.oritech.portable_laser.status.hint": "（スニーク＋右クリックで切り替え）",
+  "tooltip.oritech.capture_item_desc_1": [
+    {
+      "text": "神秘的で小さい知能を持つ飛行生物の頭脳を捕獲できます。",
+      "italic": true,
+      "color": "gray"
+    }
+  ],
   "tooltip.oritech.intelligence_item": [
     {
       "text": "一部のエンティティを捕獲することで入手できます。\n捕らえるにはこれを使用：",
@@ -300,13 +316,6 @@
     },
     {
       "translate": "item.oritech.dubios_container",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_1": [
-    {
-      "text": "神秘的で小さい知能を持つ飛行生物の頭脳を捕獲できます。",
       "italic": true,
       "color": "gray"
     }
@@ -357,6 +366,7 @@
   "tooltip.oritech.laser_arm.addon_range": "有効ビーム半径",
   "title.oritech.machine.addon_fortune": "%d 幸運",
   "tooltip.oritech.machine.addon_fortune": "生成量アドオンの数です。最大値は3です。",
+  "tooltip.oritech.machine.addon_silk_touch": "シルクタッチアドオンと幸運アドオンが同時にインストールされると、シルクタッチが優先されます。",
   "tooltip.oritech.machine.quality": "機械の品質： %d\n\nこのブロックに追加できるアドオンの数に影響します。\n\nより良いコアを使用することで品質を向上できます。\n\n現在の品質の詳細： %s",
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
@@ -416,7 +426,15 @@
   "tooltip.oritech.laser_arm.addon_hunter_damage": "有効ビームダメージ",
   "tooltip.oritech.item_pipe.1": "右クリックで搬出の切り替えができます。",
   "tooltip.oritech.item_pipe.2": "空ではない最初のスロットからのみ抽出されます。",
-  "tooltip.oritech.item_pipe.3": "最も近くにあるインベントリーに預けます。",
+  "tooltip.oritech.item_pipe.3": [
+    "すべてのスロットから取り出せるようにするには、",
+    {
+      "text": "アイテムのモーター",
+      "color": "#ff830e"
+    },
+    "を手に持ちクリックしてアップグレードします。"
+  ],
+  "tooltip.oritech.item_pipe.4": "最も近くにある使用可能なインベントリーに送ります。",
   "title.oritech.machine.addon_looting": "%d ドロップ増加",
   "tooltip.oritech.machine.addon_looting": "生成量アドオンの数です。最大値は3です。",
   "title.oritech.item_filter.toggle_energy_statistics": "出力を表示",
@@ -486,7 +504,7 @@
   "tooltip.oritech.uranium_pellet": "原子炉の燃料として使用.",
   "tooltip.oritech.small_plutonium_pellet": "原子炉の燃料として使用.",
   "tooltip.oritech.plutonium_pellet": "原子炉の燃料として使用.",
-  "tooltip.oritech.machine_core_block": "高性能のコアほど、より多くのアドオンエクステンダーを接続することができます。",
+  "tooltip.oritech.machine_core_block": "高性能のコアほど、より多くのマシンエクステンダーを接続することができます。",
   "tooltip.oritech.creative_tank": "中身の入ったバケツを右クリックして設定する。空のバケツなら中身を空にします。",
   "tooltip.oritech.fuel_generator_block.extra": "エネルギーは見た目通りの接続ポートからのみ出力できます。",
   "block.oritech.banana_block": "バナナブロック",
@@ -570,20 +588,21 @@
   "block.oritech.machine_core_5": "エリートマシンコア",
   "block.oritech.machine_core_6": "ウルトラマシンコア",
   "block.oritech.machine_core_7": "アルティメットマシンコア",
-  "block.oritech.machine_speed_addon": "マシンスピードアドオン",
+  "block.oritech.machine_speed_addon": "スピードアドオン",
   "block.oritech.machine_processing_addon": "補助処理室アドオン",
   "block.oritech.machine_ultimate_addon": "シナジーマトリクスアドオン",
-  "block.oritech.machine_fluid_addon": "マシン流体アドオン",
-  "block.oritech.machine_yield_addon": "マシン生成量アドオン",
+  "block.oritech.machine_fluid_addon": "流体アドオン",
+  "block.oritech.machine_yield_addon": "生成量アドオン",
+  "block.oritech.machine_silk_touch_addon": "シルクタッチアドオン",
   "block.oritech.steam_boiler_addon": "スチームボイラーアドオン",
   "block.oritech.crop_filter_addon": "シードフィルターアドオン",
   "block.oritech.quarry_addon": "クァーリーアドオン",
-  "block.oritech.machine_hunter_addon": "マシンハンターアドオン",
-  "block.oritech.machine_efficiency_addon": "マシン効率アドオン",
-  "block.oritech.machine_capacitor_addon": "マシンキャパシターアドオン",
-  "block.oritech.machine_acceptor_addon": "マシンアクセプターアドオン",
-  "block.oritech.machine_inventory_proxy_addon": "マシンインベントリ代理アドオン",
-  "block.oritech.machine_redstone_addon": "レッドストーン制御アドオン",
+  "block.oritech.machine_hunter_addon": "ハンターアドオン",
+  "block.oritech.machine_efficiency_addon": "効率アドオン",
+  "block.oritech.machine_capacitor_addon": "コンデンサーアドオン",
+  "block.oritech.machine_acceptor_addon": "アクセプターアドオン",
+  "block.oritech.machine_inventory_proxy_addon": "インベントリ代理アドオン",
+  "block.oritech.machine_redstone_addon": "コントロールユニットアドオン",
   "block.oritech.machine_extender": "マシンエクステンダー",
   "block.oritech.still_oil_block": "原油",
   "block.oritech.still_fuel_block": "ターボ燃料",
@@ -628,7 +647,7 @@
   "block.oritech.nickel_plating_stairs": "ニッケル強化プレートの階段",
   "block.oritech.nickel_plating_pressure_plate": "銅強化プレートの感圧板",
   "block.oritech.industrial_glass_block": "工業用ガラス",
-  "block.oritech.capacitor_addon_extender": "エネルギーバンクアドオン",
+  "block.oritech.capacitor_addon_extender": "パワーバンクアドオン",
   "block.oritech.treefeller_block": "ツリーカッター",
   "block.oritech.steel_block": "スチールブロック",
   "block.oritech.energite_block": "エネルギナイトブロック",
@@ -768,6 +787,12 @@
       "color": "#ffd505"
     }
   ],
+  "item.oritech.portable_laser": [
+    {
+      "text": "エンダリックレールガン",
+      "color": "#ffd505"
+    }
+  ],
   "item.oritech.steel_ingot": "スチールインゴット",
   "item.oritech.steel_dust": "スチールダスト",
   "item.oritech.coal_dust": "石炭ダスト",
@@ -873,7 +898,7 @@
   "tooltip.oritech.target_designator.set_to": "[%s] に設定中",
   "tooltip.oritech.target_designator.no_target": "ターゲット無設定",
   "tooltip.oritech.pipe_duct_warning": "パイプにのみ接続し、機械には接続しません。",
-  "tooltip.oritech.unstable_laser_tooltip": "レーザーはこの機械に送電しません。代わりに、このマシンの",
+  "tooltip.oritech.unstable_laser_tooltip": "レーザーはこの機械に送電しません。代わりに、この機械の",
   "tooltip.oritech.unstable_laser_tooltip.2": "蓄電容量を増やすことができます。この数は指数関数的に増加します(最大5000倍)",
   "tooltip.oritech.unstable_contained_tooltip": "ブロックごとの能力倍率。より危険なブロック=より良い。",
   "message.oritech.tool_mode.area_effect": "複数範囲",
@@ -1073,6 +1098,7 @@
   "text.config.oritech-config.category.exoChestplate": "Exoチェストプレート",
   "text.config.oritech-config.category.basicDrill": "基本のドリル",
   "text.config.oritech-config.category.chainSaw": "チェーンソー",
+  "text.config.oritech-config.category.portableLaserConfig": "エンダリックレールガン",
   "text.config.oritech-config.option.chainsawTreeCutting": "チェーンソーで木全体を切断できる",
   "text.config.oritech-config.section.augments": "プレイヤーオーグメンテーション",
   "text.config.oritech-config.option.charger.energyCapacity": "充電器のエネルギー容量",
@@ -1109,6 +1135,12 @@
   "text.config.oritech-config.option.basicDrill.energyCapacity": "基本のドリルのエネルギー容量",
   "text.config.oritech-config.option.basicDrill.energyUsage": "基本のドリルのエネルギー使用量",
   "text.config.oritech-config.option.basicDrill.chargeSpeed": "基本のドリルのチャージ速度",
+  "text.config.oritech-config.option.portableLaserConfig.energyCapacity": "エネルギー容量",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerTick": "ティックあたりのエネルギー",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "爆発ごとのエネルギー",
+  "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "ブロック破壊速度",
+  "text.config.oritech-config.option.portableLaserConfig.damageBase": "基本ダメージ",
+  "text.config.oritech-config.option.portableLaserConfig.explosionStrength": "爆発の強度",
   "text.config.oritech-config.option.chainSaw.energyCapacity": "チェーンソーのエネルギー容量",
   "text.config.oritech-config.option.chainSaw.energyUsage": "チェーンソーのエネルギー使用量",
   "text.config.oritech-config.option.chainSaw.chargeSpeed": "チェーンソーのチャージ速度",

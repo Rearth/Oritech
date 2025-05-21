@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 32,
@@ -20,6 +20,9 @@
       }
     }
   ],
+  "effect": {
+    "customAugmentId": "oritech:augment/autofeeder"
+  },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [
     "oritech:augment/armor",
@@ -47,6 +50,7 @@
   ],
   "rfCost": 30000000,
   "time": 500,
+  "toggleable": true,
   "uiX": 90,
   "uiY": 90
 }

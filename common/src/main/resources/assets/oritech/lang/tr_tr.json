@@ -220,14 +220,15 @@
   "tooltip.oritech.charger": "Ekipmanı şarj etmek ve doldurmak için kullanılır.",
   "tooltip.oritech.addon_speed_desc": "Çalışma Hızı ",
   "tooltip.oritech.addon_efficiency_desc": "Enerji Verimliliği ",
-  "tooltip.oritech.addon_yield_desc": "Parça Dövücü'da yan ürün miktarını iki katına çıkarır. Blok Yok Edici ve Enderik Lazer'de blok kırma verimini artırır",
+  "tooltip.oritech.addon_yield_desc": "Parça Dövücü'de yan ürün miktarını iki katına çıkarır. Blok Yok Edici ve Enderik Lazer'de blok kırma verimini artırır.",
+  "tooltip.oritech.addon_silk_touch_desc": "Yok Edici ve Enderik Lazer üzerinde İpeksi Dokunuş uygulanabilir.",
   "tooltip.oritech.processing_addon_desc": "Döngü başına ek bir tarif örneğinin işlenmesine izin verir.",
-  "tooltip.oritech.addon_fluid_desc": "Sıvı işlemeye izin verir. Santrifüje uygulanabilir",
-  "tooltip.oritech.addon_acceptor_desc": "Enerji vekili gibi davranır",
+  "tooltip.oritech.addon_fluid_desc": "Sıvı işlemeye izin verir. Santrifüj ve drone limanına uygulanabilir.",
+  "tooltip.oritech.addon_acceptor_desc": "Makinenin kendisi yerine eklentiye enerji eklenmesine izin verir.",
   "tooltip.oritech.addon_crop_desc": "Blok Yok Edici ve Enderik Lazere uygulanabilir. Yetiştirilmemiş mahsulleri veya hayvanları atlar",
   "tooltip.oritech.addon_proxy_desc": "Belirli envanter yuvalarına erişim sağlar",
   "tooltip.oritech.addon_proxy_select": "Vekil hedef yuvasını seç",
-  "tooltip.oritech.addon_quarry_desc": "Blok yok edici ve Enderik Lazere uygulanabilir. Çalışma alanı boyutunu artırır",
+  "tooltip.oritech.addon_quarry_desc": "Blok yok edici ve Enderik Lazer'e uygulanabilir. Çalışma alanı boyutunu artırır.",
   "tooltip.oritech.addon_hunter_desc": "Enderik Lazer'e uygulanabilir. Canlı varlıkları hedef almak için kullanılır. Menzil her eklentiyle artar.",
   "tooltip.oritech.addon_redstone_desc": "Daha fazla redstone ve karşılaştırıcı yapılandırmasına izin verir",
   "tooltip.oritech.addon_capacity_desc": "Enerji Kapasitesi ",
@@ -292,6 +293,21 @@
   "tooltip.oritech.reactor_redstone_port.4": "Çıkış modlarını değiştirmek için bloğa Sağ Tıklayın.",
   "tooltip.oritech.weed_killer": "Geniş bir yarıçap içindeki tüm çimen ve bitkileri temizler",
   "tooltip.oritech.cooler_block": "Soğuk biyomlarda iki kat daha hızlı (ve verimli) çalışır.",
+  "tooltip.oritech.motor": "Tüm yuvalardan çıkarmak amacıyla yükseltmek için bir eşya borusu çıkarma arayüzüne sağ tıklayın.",
+  "tooltip.oritech.portable_laser.1": "Sol fare, enerji aktarabilen, blokları kazabilen, varlıklara hasar verebilen ve kazılan",
+  "tooltip.oritech.portable_laser.2": "eşyaları enderik lazere benzer şekilde dönüştürebilen sürekli bir ışın fırlatır.",
+  "tooltip.oritech.portable_laser.3": "Sağ-Tık yüksek enerjili bir patlama oluşturur.",
+  "tooltip.oritech.portable_laser.4": "",
+  "tooltip.oritech.portable_laser.5": "Çoğu kazma büyüsü ile çalışır, kırılmazlık ve keskinlik.",
+  "tooltip.oritech.portable_laser.status.begin": "Madencilik Modu: ",
+  "tooltip.oritech.portable_laser.status.hint": " (Geçiş yapmak için Eğil + Sağ Tıkla)",
+  "tooltip.oritech.capture_item_desc_1": [
+    {
+      "text": "Küçük, büyülü, zeki bir uçan yaratığın beynini ele geçirebilir. ",
+      "italic": true,
+      "color": "gray"
+    }
+  ],
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Yaşayabilir bir varlığı şununla ele geçirerek elde edilir: ",
@@ -300,13 +316,6 @@
     },
     {
       "translate": "item.oritech.dubios_container",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_1": [
-    {
-      "text": "Küçük, büyülü, zeki bir uçan yaratığın beynini ele geçirebilir. ",
       "italic": true,
       "color": "gray"
     }
@@ -357,6 +366,7 @@
   "tooltip.oritech.laser_arm.addon_range": "Etkili ışın yarıçapı",
   "title.oritech.machine.addon_fortune": "%d Servet",
   "tooltip.oritech.machine.addon_fortune": "Verim eklenti sayısı. 3 etkili maksimum değerdir",
+  "tooltip.oritech.machine.addon_silk_touch": "İpeksi Dokunuş eklentisi ve Servet Eklentisi aynı anda yüklendiğinde, İpeksi Dokunuş öncelik kazanır.",
   "tooltip.oritech.machine.quality": "Makine Kalitesi: %d\n\nBu bloğa kaç katman makine\neklentisi eklenebileceğini kontrol eder.\n\nBunu artırmak için daha iyi çekirdekler kullanın\n\nMevcut kalite ilerlemesi: %s",
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
@@ -416,7 +426,15 @@
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Etkili Işın Hasarı",
   "tooltip.oritech.item_pipe.1": "Çıkarmayı değiştirmek için Sağ-tıklayın.",
   "tooltip.oritech.item_pipe.2": "Yalnızca boş olmayan ilk yuvadan çıkarır.",
-  "tooltip.oritech.item_pipe.3": "Mevcut en yakın envantere aktarılır.",
+  "tooltip.oritech.item_pipe.3": [
+    "Boruyu tüm yuvalardan çıkaracak şekilde yükseltmek için bir ",
+    {
+      "text": "motor eşyası",
+      "color": "#ff830e"
+    },
+    " ile tıklayın."
+  ],
+  "tooltip.oritech.item_pipe.4": "Mevcut en yakın envantere aktarılır.",
   "title.oritech.machine.addon_looting": "%d Ganimet",
   "tooltip.oritech.machine.addon_looting": "Verim eklenti sayısı. 3 etkili maksimum değerdir",
   "title.oritech.item_filter.toggle_energy_statistics": "Çıkışı Göster",
@@ -570,20 +588,21 @@
   "block.oritech.machine_core_5": "Elit Makine Çekirdeği",
   "block.oritech.machine_core_6": "Ultra Makine Çekirdeği",
   "block.oritech.machine_core_7": "Nihai Makine Çekirdeği",
-  "block.oritech.machine_speed_addon": "Makine Hız Eklentisi",
+  "block.oritech.machine_speed_addon": "Hız Eklentisi",
   "block.oritech.machine_processing_addon": "Yardımcı İşlem Bölmesi Eklentisi",
   "block.oritech.machine_ultimate_addon": "Sinerji Matrisi Eklentisi",
-  "block.oritech.machine_fluid_addon": "Makine Sıvı Eklentisi",
-  "block.oritech.machine_yield_addon": "Makine Verim Eklentisi",
+  "block.oritech.machine_fluid_addon": "Sıvı Eklentisi",
+  "block.oritech.machine_yield_addon": "Verim Eklentisi",
+  "block.oritech.machine_silk_touch_addon": "İpeksi Dokunuş Eklentisi",
   "block.oritech.steam_boiler_addon": "Buhar Kazanı Eklentisi",
   "block.oritech.crop_filter_addon": "Ekin Filtre Eklentisi",
   "block.oritech.quarry_addon": "Maden Ocağı Eklentisi",
-  "block.oritech.machine_hunter_addon": "Makine Avcı Eklentisi",
-  "block.oritech.machine_efficiency_addon": "Makine Verimlilik Eklentisi",
-  "block.oritech.machine_capacitor_addon": "Makine Kapasitör Eklentisi",
-  "block.oritech.machine_acceptor_addon": "Makine Kabul Edici Eklentisi",
-  "block.oritech.machine_inventory_proxy_addon": "Makine Envanter Vekili Eklentisi",
-  "block.oritech.machine_redstone_addon": "Redstone Control Unit Eklentisi",
+  "block.oritech.machine_hunter_addon": "Avcı Eklentisi",
+  "block.oritech.machine_efficiency_addon": "Verimlilik Eklentisi",
+  "block.oritech.machine_capacitor_addon": "Kapasitör Eklentisi",
+  "block.oritech.machine_acceptor_addon": "Kabul Edici Eklentisi",
+  "block.oritech.machine_inventory_proxy_addon": "Envanter Vekili Eklentisi",
+  "block.oritech.machine_redstone_addon": "Kontrol Birimi Eklentisi",
   "block.oritech.machine_extender": "Makine Genişletici",
   "block.oritech.still_oil_block": "Ham Petrol",
   "block.oritech.still_fuel_block": "Turbo Yakıt",
@@ -765,6 +784,12 @@
   "item.oritech.prometheum_ingot": [
     {
       "text": "Prometheum",
+      "color": "#ffd505"
+    }
+  ],
+  "item.oritech.portable_laser": [
+    {
+      "text": "Enderik Elektromanyetik Top",
       "color": "#ffd505"
     }
   ],
@@ -1073,6 +1098,7 @@
   "text.config.oritech-config.category.exoChestplate": "Exo Göğüslük",
   "text.config.oritech-config.category.basicDrill": "Basit Matkap",
   "text.config.oritech-config.category.chainSaw": "Testere",
+  "text.config.oritech-config.category.portableLaserConfig": "Enderik Elektromanyetik Top",
   "text.config.oritech-config.option.chainsawTreeCutting": "Testere için Ağaç Kesmeyi Etkinleştir",
   "text.config.oritech-config.section.augments": "Oyuncu Güçlendirmesi",
   "text.config.oritech-config.option.charger.energyCapacity": "Şarj Cihazı Enerji Kapasitesi",
@@ -1109,6 +1135,12 @@
   "text.config.oritech-config.option.basicDrill.energyCapacity": "Basit Matkap Enerji Kapasitesi",
   "text.config.oritech-config.option.basicDrill.energyUsage": "Basit Matkap Enerji Kullanımı",
   "text.config.oritech-config.option.basicDrill.chargeSpeed": "Basit Matkap Şarj Hızı",
+  "text.config.oritech-config.option.portableLaserConfig.energyCapacity": "Enerji Kapasitesi",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerTick": "Tik başına Enerji",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "Patlama başına Enerji",
+  "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "Blok Kırma Hızı",
+  "text.config.oritech-config.option.portableLaserConfig.damageBase": "Baz Hasar",
+  "text.config.oritech-config.option.portableLaserConfig.explosionStrength": "Patlama Gücü",
   "text.config.oritech-config.option.chainSaw.energyCapacity": "Testere Enerji Kapasitesi",
   "text.config.oritech-config.option.chainSaw.energyUsage": "Testere Enerji Kullanımı",
   "text.config.oritech-config.option.chainSaw.chargeSpeed": "Testere Şarj Hızı",

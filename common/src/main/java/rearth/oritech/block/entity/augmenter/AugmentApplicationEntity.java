@@ -38,7 +38,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.recipes.AugmentRecipe;
+import rearth.oritech.init.recipes.AugmentDataRecipe;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -159,7 +159,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
             return;
         }
         
-        var recipe = (AugmentRecipe) world.getRecipeManager().get(augment).get().value();
+        var recipe = (AugmentDataRecipe) world.getRecipeManager().get(augment).get().value();
         
         var extracted = energyStorage.extract(recipe.getRfCost(), false);
         
@@ -220,7 +220,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
             return;
         }
         
-        var recipe = (AugmentRecipe) world.getRecipeManager().get(augment).get().value();
+        var recipe = (AugmentDataRecipe) world.getRecipeManager().get(augment).get().value();
         
         // remove available resources
         for (var wantedInput : recipe.getApplyCost()) {

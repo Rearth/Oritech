@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 32,
@@ -13,6 +13,10 @@
       }
     }
   ],
+  "effect": {
+    "effectStrength": 0,
+    "potionEffectId": "minecraft:water_breathing"
+  },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [],
   "researchCost": [
@@ -36,6 +40,7 @@
   ],
   "rfCost": 50000000,
   "time": 800,
+  "toggleable": false,
   "uiX": 5,
   "uiY": 90
 }

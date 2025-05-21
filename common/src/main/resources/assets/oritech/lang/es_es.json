@@ -220,14 +220,15 @@
   "tooltip.oritech.charger": "Se usa para cargar y llenar equipamiento.",
   "tooltip.oritech.addon_speed_desc": "Velocidad de Operación ",
   "tooltip.oritech.addon_efficiency_desc": "Eficiencia Energética ",
-  "tooltip.oritech.addon_yield_desc": "Duplica la cantidad de subproductos en la Forja de Fragmentos. Aumenta el rendimiento de ruptura de bloques en el Destructor de Bloques y Láser Endérico",
+  "tooltip.oritech.addon_yield_desc": "Doubles byproduct amount in Fragment Forge. Increases block breaking yield in Block Destroyer and Enderic Laser.",
+  "tooltip.oritech.addon_silk_touch_desc": "Applicable Silk Touch on Destroyer and Enderic Laser.",
   "tooltip.oritech.processing_addon_desc": "Allows an additional recipe instance to be processed per cycle.",
-  "tooltip.oritech.addon_fluid_desc": "Permite el procesamiento de fluidos. Aplicable a la centrífuga",
-  "tooltip.oritech.addon_acceptor_desc": "Actúa como proxy de energía",
+  "tooltip.oritech.addon_fluid_desc": "Allows fluid processing. Applicable to centrifuge and drone port.",
+  "tooltip.oritech.addon_acceptor_desc": "Allows energy to be inserted to the addon instead of the machine itself.",
   "tooltip.oritech.addon_crop_desc": "Aplicable al Destructor de Bloques y Láser Endérico. Omite cultivos no crecidos o animales",
   "tooltip.oritech.addon_proxy_desc": "Permite acceso a ranuras específicas del inventario",
   "tooltip.oritech.addon_proxy_select": "Seleccionar ranura objetivo del proxy",
-  "tooltip.oritech.addon_quarry_desc": "Aplicable al destructor de bloques y Láser Endérico. Aumenta el tamaño del área de trabajo",
+  "tooltip.oritech.addon_quarry_desc": "Applicable to block destroyer and Enderic Laser. Increases working area size.",
   "tooltip.oritech.addon_hunter_desc": "Applicable to Enderic Laser. Used to target living entities. Range increases with each addon.",
   "tooltip.oritech.addon_redstone_desc": "Permite configuración adicional de redstone y comparador",
   "tooltip.oritech.addon_capacity_desc": "Capacidad de Energía ",
@@ -292,6 +293,21 @@
   "tooltip.oritech.reactor_redstone_port.4": "Right-Click the block to change output modes.",
   "tooltip.oritech.weed_killer": "Elimina toda la hierba y plantas en un radio amplio",
   "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
+  "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
+  "tooltip.oritech.portable_laser.1": "Left mouse fires a continous beam that can transfer energy, mine blocks, damage",
+  "tooltip.oritech.portable_laser.2": "entities and transform mined items similar to an enderic laser.",
+  "tooltip.oritech.portable_laser.3": "Right-Click creates a high-energy explosion.",
+  "tooltip.oritech.portable_laser.4": "",
+  "tooltip.oritech.portable_laser.5": "Works with most pickaxe enchantments, unbreaking, and sharpness.",
+  "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
+  "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
+  "tooltip.oritech.capture_item_desc_1": [
+    {
+      "text": "Puede capturar el cerebro de una pequeña criatura voladora mágica e inteligente. El",
+      "italic": true,
+      "color": "gray"
+    }
+  ],
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Obtenido al capturar una entidad viable con el ",
@@ -300,13 +316,6 @@
     },
     {
       "translate": "item.oritech.dubios_container",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_1": [
-    {
-      "text": "Puede capturar el cerebro de una pequeña criatura voladora mágica e inteligente. El",
       "italic": true,
       "color": "gray"
     }
@@ -357,6 +366,7 @@
   "tooltip.oritech.laser_arm.addon_range": "Radio efectivo del rayo",
   "title.oritech.machine.addon_fortune": "Fortuna %d",
   "tooltip.oritech.machine.addon_fortune": "Contador de complementos. 3 es el máximo efectivo",
+  "tooltip.oritech.machine.addon_silk_touch": "When Silk Touch addon and Fortune Addon are installed at the same time, Silk Touch takes priority.",
   "tooltip.oritech.machine.quality": "Calidad de la Máquina: %d\n\nControla cuántas capas de complementos\nse pueden añadir a este bloque.\n\nUsa mejores núcleos para aumentar esto\n\nProgreso actual de calidad: %s",
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
@@ -416,7 +426,15 @@
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Daño efectivo del rayo",
   "tooltip.oritech.item_pipe.1": "Right-click to toggle extraction.",
   "tooltip.oritech.item_pipe.2": "Only extracts from the first non-empty slot.",
-  "tooltip.oritech.item_pipe.3": "Deposits into the closest available inventory.",
+  "tooltip.oritech.item_pipe.3": [
+    "Click it with a ",
+    {
+      "text": "motor item",
+      "color": "#ff830e"
+    },
+    " to upgrade the pipe to extract from all slots."
+  ],
+  "tooltip.oritech.item_pipe.4": "Deposits into the closest available inventory.",
   "title.oritech.machine.addon_looting": "Botín %d",
   "tooltip.oritech.machine.addon_looting": "Contador de complementos. 3 es el máximo efectivo",
   "title.oritech.item_filter.toggle_energy_statistics": "Show Output",
@@ -570,20 +588,21 @@
   "block.oritech.machine_core_5": "Núcleo de máquina élite",
   "block.oritech.machine_core_6": "Núcleo de máquina ultra",
   "block.oritech.machine_core_7": "Núcleo de máquina definitivo",
-  "block.oritech.machine_speed_addon": "Complemento de velocidad de máquina",
+  "block.oritech.machine_speed_addon": "Speed Addon",
   "block.oritech.machine_processing_addon": "Auxiliary Processing Chamber Addon",
   "block.oritech.machine_ultimate_addon": "Synergy Matrix Addon",
-  "block.oritech.machine_fluid_addon": "Complemento de fluidos de máquina",
-  "block.oritech.machine_yield_addon": "Complemento de rendimiento de máquina",
+  "block.oritech.machine_fluid_addon": "Fluid Addon",
+  "block.oritech.machine_yield_addon": "Yield Addon",
+  "block.oritech.machine_silk_touch_addon": "Silk Touch Addon",
   "block.oritech.steam_boiler_addon": "Complemento de caldera de vapor",
   "block.oritech.crop_filter_addon": "Complemento de filtro de cultivo",
   "block.oritech.quarry_addon": "Complemento de cantera",
-  "block.oritech.machine_hunter_addon": "Complemento cazador de máquina",
-  "block.oritech.machine_efficiency_addon": "Complemento de eficiencia de máquina",
-  "block.oritech.machine_capacitor_addon": "Complemento de capacitor de máquina",
-  "block.oritech.machine_acceptor_addon": "Complemento de aceptador de máquina",
-  "block.oritech.machine_inventory_proxy_addon": "Complemento de proxy de inventario de máquina",
-  "block.oritech.machine_redstone_addon": "Complemento de unidad de control de redstone",
+  "block.oritech.machine_hunter_addon": "Hunter Addon",
+  "block.oritech.machine_efficiency_addon": "Efficiency Addon",
+  "block.oritech.machine_capacitor_addon": "Capacitor Addon",
+  "block.oritech.machine_acceptor_addon": "Acceptor Addon",
+  "block.oritech.machine_inventory_proxy_addon": "Inventory Proxy Addon",
+  "block.oritech.machine_redstone_addon": "Control Unit Addon",
   "block.oritech.machine_extender": "Extensor de Máquina",
   "block.oritech.still_oil_block": "Petroleo Crudo",
   "block.oritech.still_fuel_block": "Turbofuel",
@@ -765,6 +784,12 @@
   "item.oritech.prometheum_ingot": [
     {
       "text": "Prometheum",
+      "color": "#ffd505"
+    }
+  ],
+  "item.oritech.portable_laser": [
+    {
+      "text": "Enderic Railgun",
       "color": "#ffd505"
     }
   ],
@@ -1073,6 +1098,7 @@
   "text.config.oritech-config.category.exoChestplate": "Peto exo",
   "text.config.oritech-config.category.basicDrill": "Taladro Básico",
   "text.config.oritech-config.category.chainSaw": "Sierra de Cadena",
+  "text.config.oritech-config.category.portableLaserConfig": "Enderic Railgun",
   "text.config.oritech-config.option.chainsawTreeCutting": "Enable Tree Cutting for Chainsaw",
   "text.config.oritech-config.section.augments": "Player Augmentation",
   "text.config.oritech-config.option.charger.energyCapacity": "Capacidad de Energía del Cargador",
@@ -1109,6 +1135,12 @@
   "text.config.oritech-config.option.basicDrill.energyCapacity": "Capacidad de Energía del Taladro Básico",
   "text.config.oritech-config.option.basicDrill.energyUsage": "Uso de Energía del Taladro Básico",
   "text.config.oritech-config.option.basicDrill.chargeSpeed": "Velocidad de Carga del Taladro Básico",
+  "text.config.oritech-config.option.portableLaserConfig.energyCapacity": "Capacidad de Energía",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerTick": "Energy per Tick",
+  "text.config.oritech-config.option.portableLaserConfig.energyPerBoom": "Energy per Explosion",
+  "text.config.oritech-config.option.portableLaserConfig.blockBreakSpeed": "Block Break Speed",
+  "text.config.oritech-config.option.portableLaserConfig.damageBase": "Base Damage",
+  "text.config.oritech-config.option.portableLaserConfig.explosionStrength": "Explosion Strength",
   "text.config.oritech-config.option.chainSaw.energyCapacity": "Capacidad de Energía de la Sierra de Cadena",
   "text.config.oritech-config.option.chainSaw.energyUsage": "Uso de Energía de la Sierra de Cadena",
   "text.config.oritech-config.option.chainSaw.chargeSpeed": "Velocidad de Carga de la Sierra de Cadena",

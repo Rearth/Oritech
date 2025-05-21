@@ -3,8 +3,6 @@ package rearth.oritech;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientRawInputEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
-import dev.architectury.event.events.common.EntityEvent;
-import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
@@ -47,8 +45,13 @@ public final class OritechClient {
         });
         
         ClientTickEvent.CLIENT_PRE.register(client -> {
-            if (client.player != null)
-                PlayerAugments.clientTickAugments(client.player);
+            var player = client.player;
+            if (player == null) return;
+            
+            for (var augment : PlayerAugments.allAugments.values()) {
+                if (augment.isEnabled(player))
+                    augment.refreshClient(player);
+            }
         });
         
         // send mining laser use events to server

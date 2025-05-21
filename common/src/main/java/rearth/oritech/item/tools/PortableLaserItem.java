@@ -131,7 +131,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         var hit = getPlayerTargetRay(player);
         if (hit != null) {
             world.createExplosion(null, new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.LIGHTNING_BOLT), player),
-              null, hit.getPos(), 6, false, World.ExplosionSourceType.MOB);
+              null, hit.getPos(), Oritech.CONFIG.portableLaserConfig.explosionStrength(), false, World.ExplosionSourceType.MOB);
             
             endPos = hit.getPos();
         } else {

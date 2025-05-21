@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 32,
@@ -14,6 +14,11 @@
       }
     }
   ],
+  "effect": {
+    "amount": 0.3,
+    "attributeOperationType": 1,
+    "entityAttributeId": "minecraft:player.block_interaction_range"
+  },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [],
   "researchCost": [
@@ -38,6 +43,7 @@
   ],
   "rfCost": 100000000,
   "time": 900,
+  "toggleable": false,
   "uiX": 115,
   "uiY": 90
 }

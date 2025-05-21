@@ -24,7 +24,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
-import net.neoforged.neoforge.common.conditions.WithConditions;
 import owmii.powah.Powah;
 import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
@@ -68,12 +67,12 @@ public class RecipeGenerator extends RecipeProvider implements IConditionBuilder
 
         ActuallyAdditionsRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(ActuallyAdditions.MODID)));
         AppliedEnergistics2RecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(AEConstants.MOD_ID)));
-        CreateRecipeGenerator.generateRecipes(packOutput, registries, exporter.withConditions(this.modLoaded(Create.ID)));
+        CreateRecipeGenerator.generateRecipes(this, packOutput, registries, exporter.withConditions(this.modLoaded(Create.ID)));
         EnderIORecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(EnderCore.MOD_ID)), this);
-        EnergizedPowerRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(EPAPI.MOD_ID)));
-        ImmersiveEngineeringRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(ImmersiveEngineering.MODID)));
+        EnergizedPowerRecipeGenerator.generateRecipes(this, exporter.withConditions(this.modLoaded(EPAPI.MOD_ID)));
+        ImmersiveEngineeringRecipeGenerator.generateRecipes(this, exporter.withConditions(this.modLoaded(ImmersiveEngineering.MODID)));
         IndustrialForegoingRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(Reference.MOD_ID)));
-        MekanismRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(Mekanism.MODID)));
+        MekanismRecipeGenerator.generateRecipes(this, exporter.withConditions(this.modLoaded(Mekanism.MODID)));
         MekanismGeneratorsRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(MekanismGenerators.MODID)));
         PneumaticcraftRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(Names.MOD_ID)));
         PowahRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(Powah.MOD_ID)));

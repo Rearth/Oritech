@@ -25,6 +25,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.api.recipe.FoundryRecipeBuilder;
@@ -37,11 +38,11 @@ import rearth.oritech.init.TagContent;
 public class CreateRecipeGenerator {
     private static final String PATH = "compat/create/";
 
-    public static void generateRecipes(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries, RecipeOutput exporter) { 
+    public static void generateRecipes(IConditionBuilder conditionBuilder, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries, RecipeOutput exporter) { 
         addAlloying(exporter);
         addBlasting(exporter);
         addCentrifuging(exporter);
-        addMetalProcessing(exporter);
+        addMetalProcessing(conditionBuilder, exporter);
 
         CreateCrushingRecipeGen.registerAll(packOutput, registries, exporter);
         CreateMixingRecipeGen.registerAll(packOutput, registries, exporter);
@@ -68,7 +69,7 @@ public class CreateRecipeGenerator {
         CentrifugeFluidRecipeBuilder.build().input(AllItems.WHEAT_FLOUR.asItem()).result(AllItems.DOUGH.asItem()).fluidInput(Fluids.WATER).export(exporter, PATH + "dough");
     }
 
-    private static void addMetalProcessing(RecipeOutput exporter) {
+    private static void addMetalProcessing(IConditionBuilder conditionBuilder, RecipeOutput exporter) {
         MetalProcessingChainBuilder.build("zinc").resourcePath(PATH)
             .ore(cItemTag("ores/zinc"))
             .rawOre(cItemTag("raw_materials/zinc"), AllItems.RAW_ZINC.asItem()).rawOreByproduct(Items.GUNPOWDER)
@@ -76,7 +77,7 @@ public class CreateRecipeGenerator {
             .nugget(cItemTag("nuggets/zinc"), AllItems.ZINC_NUGGET.asItem())
             .clump(cItemTag("clumps/zinc"), AllItems.CRUSHED_ZINC.asItem()).clumpByproduct(Items.GUNPOWDER).byproductAmount(1)
             .centrifugeResult(AllItems.ZINC_NUGGET.asItem(), 9)
-            .export(exporter);
+            .export(exporter.withConditions(conditionBuilder.not(conditionBuilder.modLoaded("jaopca"))));
     }
 
     private static class CreateCrushingRecipeGen extends CrushingRecipeGen {

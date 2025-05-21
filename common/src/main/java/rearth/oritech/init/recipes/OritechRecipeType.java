@@ -1,9 +1,5 @@
 package rearth.oritech.init.recipes;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-
 import dev.architectury.fluid.FluidStack;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.StructEndec;
@@ -30,7 +26,7 @@ public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> impl
       MinecraftEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
       MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
       FluidIngredient.FLUID_INGREDIENT_ENDEC.optionalFieldOf("fluidInput", OritechRecipe::getFluidInput, FluidIngredient.EMPTY),
-      FLUID_STACK_ENDEC.optionalFieldOf("fluidOutput", elem -> elem.getFluidOutput(), FluidStack.empty()),
+      FLUID_STACK_ENDEC.optionalFieldOf("fluidOutput", OritechRecipe::getFluidOutput, FluidStack.empty()),
       OritechRecipe::new
     );
     

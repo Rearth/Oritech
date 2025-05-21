@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 32,
@@ -14,6 +14,11 @@
       }
     }
   ],
+  "effect": {
+    "amount": 0.3,
+    "attributeOperationType": 1,
+    "entityAttributeId": "minecraft:player.entity_interaction_range"
+  },
   "requiredStation": "oritech:advanced_augment_station",
   "requirements": [
     "oritech:augment/blockreach"
@@ -40,6 +45,7 @@
   ],
   "rfCost": 150000000,
   "time": 1600,
+  "toggleable": false,
   "uiX": 140,
   "uiY": 70
 }

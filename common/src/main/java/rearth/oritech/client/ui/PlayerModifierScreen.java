@@ -26,7 +26,7 @@ import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
-import rearth.oritech.init.recipes.AugmentRecipe;
+import rearth.oritech.init.recipes.AugmentDataRecipe;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.SizedIngredient;
 import rearth.oritech.util.TooltipHelper;
@@ -158,9 +158,10 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         }
         
         
-        for (var augmentId : shownAugments.keySet()) {
-            var augmentState = shownAugments.get(augmentId);
-            var augmentRecipe = (AugmentRecipe) this.handler.player.getWorld().getRecipeManager().get(augmentId).get().value();
+        for (var entry : shownAugments.entrySet()) {
+            var augmentId = entry.getKey();
+            var augmentState = entry.getValue();
+            var augmentRecipe = (AugmentDataRecipe) this.handler.player.getWorld().getRecipeManager().get(augmentId).get().value();
             
             var isResearched = this.handler.blockEntity.researchedAugments.contains(augmentId);
             var isResearching = this.handler.blockEntity.availableStations.values().stream().filter(Objects::nonNull).anyMatch(station -> station.selectedResearch.equals(augmentId));
@@ -195,7 +196,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
                 hasRequirements = false;
             }
             
-            var operation = PlayerAugments.AugmentOperation.RESEARCH;
+            var operation = PlayerAugments.AugmentApplicatorOperation.RESEARCH;
             var tooltipTitleText = Text.translatable(augmentKey(augmentId)).formatted(Formatting.BOLD);
             var tooltipOperation = "oritech.text.augment_op.research";
             var tooltipDesc = Text.translatable(augmentKey(augmentId) + ".desc").formatted(Formatting.ITALIC, Formatting.GRAY);
@@ -208,13 +209,13 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             }
             
             if (isApplied) {
-                operation = PlayerAugments.AugmentOperation.REMOVE;
+                operation = PlayerAugments.AugmentApplicatorOperation.REMOVE;
                 tooltipOperation = "oritech.text.augment_op.remove";
             } else if (isResearched) {
-                operation = PlayerAugments.AugmentOperation.ADD;
+                operation = PlayerAugments.AugmentApplicatorOperation.ADD;
                 tooltipOperation = "oritech.text.augment_op.apply";
             } else if (isResearching) {
-                operation = PlayerAugments.AugmentOperation.NONE;
+                operation = PlayerAugments.AugmentApplicatorOperation.NONE;
                 tooltipOperation = "oritech.text.augment_op.pending";
             }
             
@@ -347,7 +348,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         var leftOffset = 20;
         
         for (var augmentId : PlayerAugments.allAugments.keySet()) {
-            var augmentRecipe = (AugmentRecipe) this.handler.player.getWorld().getRecipeManager().get(augmentId).get().value();
+            var augmentRecipe = (AugmentDataRecipe) this.handler.player.getWorld().getRecipeManager().get(augmentId).get().value();
             
             var position = new Vector2i(leftOffset + augmentRecipe.getUiX() * 4, (int) (augmentRecipe.getUiY() / 100f * maxHeight));
             
@@ -373,7 +374,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             highlight.positioning(Positioning.absolute(position.x - backgroundAugmentFrameSize / 2 - 1, position.y - backgroundAugmentFrameSize / 2 - 1));
             
             for (var dependencyId : augmentRecipe.getRequirements()) {
-                var dependencyRecipe = (AugmentRecipe) this.handler.player.getWorld().getRecipeManager().get(dependencyId).get().value();
+                var dependencyRecipe = (AugmentDataRecipe) this.handler.player.getWorld().getRecipeManager().get(dependencyId).get().value();
                 var dependencyPos = new Vector2i(leftOffset + dependencyRecipe.getUiX() * 4, (int) (dependencyRecipe.getUiY() / 100f * maxHeight));
                 
                 var depId = augmentId.getPath() + "_" + dependencyId.getPath();
@@ -386,13 +387,13 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             
             highlighters.add(highlight);
             
-            shownAugments.put(augmentId, new AugmentUiState(highlight, background, icon, null, PlayerAugments.AugmentOperation.NEEDS_INIT, parent));
+            shownAugments.put(augmentId, new AugmentUiState(highlight, background, icon, null, PlayerAugments.AugmentApplicatorOperation.NEEDS_INIT, parent));
             
         }
         
     }
     
-    private void onAugmentClick(Identifier id, PlayerAugments.AugmentOperation operation, boolean confirmed) {
+    private void onAugmentClick(Identifier id, PlayerAugments.AugmentApplicatorOperation operation, boolean confirmed) {
         
         if (!confirmed) {
             showAugmentDialog(id, operation);
@@ -407,9 +408,9 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.LoadPlayerAugmentsToMachinePacket(this.handler.blockPos));
         
         var loadedAugmentsCount = 0;
-        for (var augmentId : PlayerAugments.allAugments.keySet()) {
-            var augment = PlayerAugments.allAugments.get(augmentId);
-            var isResearched = this.handler.blockEntity.researchedAugments.contains(augmentId);
+        for (var entry : PlayerAugments.allAugments.entrySet()) {
+            var augment = entry.getValue();
+            var isResearched = this.handler.blockEntity.researchedAugments.contains(entry.getKey());
             var isInstalled = augment.isInstalled(handler.player);
             
             if (isInstalled && !isResearched) {
@@ -428,9 +429,9 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
     }
     
-    private void showAugmentDialog(Identifier id, PlayerAugments.AugmentOperation operation) {
+    private void showAugmentDialog(Identifier id, PlayerAugments.AugmentApplicatorOperation operation) {
         
-        var researchRecipe = (AugmentRecipe) this.handler.blockEntity.getWorld().getRecipeManager().get(id).get().value();
+        var researchRecipe = (AugmentDataRecipe) this.handler.blockEntity.getWorld().getRecipeManager().get(id).get().value();
         
         var isCreative = this.handler.player.isCreative();
         var hasResources = true;
@@ -472,9 +473,9 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             hasRequiredStation = true;
         }
         
-        if (!operation.equals(PlayerAugments.AugmentOperation.REMOVE)) {
+        if (!operation.equals(PlayerAugments.AugmentApplicatorOperation.REMOVE)) {
             
-            if (operation.equals(PlayerAugments.AugmentOperation.RESEARCH)) {
+            if (operation.equals(PlayerAugments.AugmentApplicatorOperation.RESEARCH)) {
                 var rfCost = researchRecipe.getRfCost();
                 var parsedCost = TooltipHelper.getEnergyText(rfCost);
                 
@@ -490,7 +491,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             
             var itemContainer = Containers.horizontalFlow(Sizing.fill(100), Sizing.content(1));
             var shownCost = researchRecipe.getResearchCost();
-            if (operation.equals(PlayerAugments.AugmentOperation.ADD)) {
+            if (operation.equals(PlayerAugments.AugmentApplicatorOperation.ADD)) {
                 shownCost = researchRecipe.getApplyCost();
             }
             
@@ -531,11 +532,11 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         buttonPanel.horizontalAlignment(HorizontalAlignment.RIGHT);
         
         var confirmKey = "text.oritech.begin_research";
-        if (operation.equals(PlayerAugments.AugmentOperation.ADD)) {
+        if (operation.equals(PlayerAugments.AugmentApplicatorOperation.ADD)) {
             confirmKey = "text.oritech.install";
-        } else if (operation.equals(PlayerAugments.AugmentOperation.REMOVE)) {
+        } else if (operation.equals(PlayerAugments.AugmentApplicatorOperation.REMOVE)) {
             confirmKey = "text.oritech.remove";
-        } else if (operation.equals(PlayerAugments.AugmentOperation.NONE)) {
+        } else if (operation.equals(PlayerAugments.AugmentApplicatorOperation.NONE)) {
             confirmKey = "text.oritech.noop";
         }
         
@@ -559,7 +560,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             confirmButton.tooltip(Text.translatable("text.oritech.augmenter_creative_tooltip"));
         }
         
-        if (operation.equals(PlayerAugments.AugmentOperation.NONE) || operation.equals(PlayerAugments.AugmentOperation.RESEARCH) && (!hasRequiredStation || !hasResources || !hasEnergy) || operation.equals(PlayerAugments.AugmentOperation.ADD) && !hasResources) {
+        if (operation.equals(PlayerAugments.AugmentApplicatorOperation.NONE) || operation.equals(PlayerAugments.AugmentApplicatorOperation.RESEARCH) && (!hasRequiredStation || !hasResources || !hasEnergy) || operation.equals(PlayerAugments.AugmentApplicatorOperation.ADD) && !hasResources) {
             confirmButton.active(false);
         }
         
@@ -607,10 +608,10 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         private TextureComponent background;
         private TextureComponent icon;
         private BoxComponent blocker;
-        private PlayerAugments.AugmentOperation openOp;
+        private PlayerAugments.AugmentApplicatorOperation openOp;
         private final FlowLayout parent;
         
-        private AugmentUiState(BoxComponent highlight, TextureComponent background, TextureComponent icon, BoxComponent blocker, PlayerAugments.AugmentOperation openOp, FlowLayout parent) {
+        private AugmentUiState(BoxComponent highlight, TextureComponent background, TextureComponent icon, BoxComponent blocker, PlayerAugments.AugmentApplicatorOperation openOp, FlowLayout parent) {
             this.highlight = highlight;
             this.background = background;
             this.icon = icon;

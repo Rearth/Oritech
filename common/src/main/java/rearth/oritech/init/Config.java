@@ -183,6 +183,7 @@ public class Config {
         public int energyPerBoom = 100_000;
         public float blockBreakSpeed = 0.125f; // multiplied by block hardness
         public int damageBase = 4;
+        public int explosionStrength = 6;
     }
     
     public static class DeepDrillConfig {

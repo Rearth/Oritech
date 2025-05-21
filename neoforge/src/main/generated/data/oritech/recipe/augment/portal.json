@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 8,
@@ -14,6 +14,9 @@
       }
     }
   ],
+  "effect": {
+    "customAugmentId": "oritech:augment/portal"
+  },
   "requiredStation": "oritech:arcane_augment_station",
   "requirements": [],
   "researchCost": [
@@ -43,6 +46,7 @@
   ],
   "rfCost": 250000000,
   "time": 3000,
+  "toggleable": true,
   "uiX": 130,
   "uiY": 30
 }

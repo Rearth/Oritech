@@ -13,8 +13,6 @@ import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockContent;
 
-import java.util.Objects;
-
 public class PlayerModifierScreenHandler extends ScreenHandler {
     
     @NotNull
@@ -49,11 +47,6 @@ public class PlayerModifierScreenHandler extends ScreenHandler {
         
         if (blockEntity.getWorld().isClient)
             this.blockEntity.loadAvailableStations(this.player);    // this should yield the same result on the client, so instead of syncing them we just call it on the client again
-        
-        // add dummy slot positions to allow inv sync
-//        for (int i = 0; i < 5; i++) {
-//            this.addSlot(new Slot(this.blockEntity.inventory, i, -500, -500));
-//        }
         
     }
     

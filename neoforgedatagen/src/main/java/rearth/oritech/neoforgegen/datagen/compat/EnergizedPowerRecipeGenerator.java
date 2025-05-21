@@ -17,6 +17,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.BlockContent;
@@ -26,9 +27,9 @@ import rearth.oritech.init.TagContent;
 public class EnergizedPowerRecipeGenerator {
     public static final String PATH = "compat/energizedpower";
 
-    public static void generateRecipes(RecipeOutput exporter) {
+    public static void generateRecipes(IConditionBuilder conditionBuilder, RecipeOutput exporter) {
         addOritechAlloys(exporter);
-        addEPMetalProcessingRecipes(exporter);
+        addEPMetalProcessingRecipes(conditionBuilder, exporter);
         addOritechAssemblerRecipes(exporter);
         // not adding EP assembling recipes to Oritech because EP uses multiple ingredients from each slot and Oritech only supports single ingredients
         addOritechOreFiltrationRecipes(exporter);
@@ -77,13 +78,13 @@ public class EnergizedPowerRecipeGenerator {
             new ItemStack(ItemContent.STEEL_INGOT), 500, "steel_with_dust");
     }
 
-    public static void addEPMetalProcessingRecipes(RecipeOutput exporter) {
+    public static void addEPMetalProcessingRecipes(IConditionBuilder conditionBuilder, RecipeOutput exporter) {
         MetalProcessingChainBuilder.build("tin").resourcePath(PATH)
             .ore(CommonItemTags.ORES_TIN)
             .rawOre(CommonItemTags.RAW_MATERIALS_TIN, EPItems.RAW_TIN.get()).rawOreByproduct(Items.RAW_GOLD)
             .ingot(CommonItemTags.INGOTS_TIN, EPItems.TIN_INGOT.get())
             .dust(EPItems.TIN_DUST.get()).dustByproduct(ItemContent.COPPER_NUGGET)
-            .export(exporter);
+            .export(exporter.withConditions(conditionBuilder.not(conditionBuilder.modLoaded("jaopca"))));
     }
 
     public static void addOritechAssemblerRecipes(RecipeOutput exporter) {

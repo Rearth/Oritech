@@ -42,7 +42,7 @@ public class AttachmentApiImpl {
             Oritech.LOGGER.warn("Getting attachment that has not been registered: {}", attachment.identifier());
             return null;
         }
-        return entity.getAttached(type);
+        return entity.getAttachedOrCreate(type);
     }
     
     public static <T> void setAttachment(LivingEntity entity, Attachment<T> attachment, T value) {

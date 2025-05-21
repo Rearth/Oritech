@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 4,
@@ -20,6 +20,10 @@
       }
     }
   ],
+  "effect": {
+    "effectStrength": 0,
+    "potionEffectId": "minecraft:night_vision"
+  },
   "requiredStation": "oritech:advanced_augment_station",
   "requirements": [],
   "researchCost": [
@@ -44,6 +48,7 @@
   ],
   "rfCost": 50000000,
   "time": 2400,
+  "toggleable": true,
   "uiX": 105,
   "uiY": 30
 }

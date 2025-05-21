@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 4,
@@ -14,6 +14,11 @@
       }
     }
   ],
+  "effect": {
+    "amount": 4.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.armor"
+  },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [],
   "researchCost": [
@@ -38,6 +43,7 @@
   ],
   "rfCost": 80000000,
   "time": 800,
+  "toggleable": false,
   "uiX": 30,
   "uiY": 50
 }

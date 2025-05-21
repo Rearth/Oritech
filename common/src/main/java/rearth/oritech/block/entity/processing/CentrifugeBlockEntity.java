@@ -160,6 +160,14 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     public void initAddons(BlockPos brokenAddon) {
         hasFluidAddon = false;
         super.initAddons(brokenAddon);
+        
+        // reset cache of core above
+        var coreCandidate = world.getBlockEntity(pos.up(), BlockEntitiesContent.MACHINE_CORE_ENTITY);
+        if (coreCandidate.isPresent()) {
+            var core = coreCandidate.get();
+            core.resetCaches();
+        }
+        
         // trigger block update to allow pipes to connect/disconnect
         world.updateNeighbors(pos, getCachedState().getBlock());
         world.updateNeighbors(pos.up(), world.getBlockState(pos.up()).getBlock());

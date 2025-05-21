@@ -12,6 +12,7 @@ import net.minecraft.registry.tag.TagKey;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.GrinderRecipeBuilder;
+import rearth.oritech.api.recipe.OritechRecipeGenerator;
 import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
 
 import java.util.List;
@@ -26,8 +27,8 @@ public class RecipeHelpers {
         PulverizerRecipeBuilder.build().input(ingot).result(dust).export(exporter, suffix);
         GrinderRecipeBuilder.build().input(ingot).result(dust).time(140).export(exporter, suffix);
         if (ingotSmelted != null) {
-            RecipeProvider.offerSmelting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 200, Oritech.MOD_ID);
-            RecipeProvider.offerBlasting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 100, Oritech.MOD_ID);
+            OritechRecipeGenerator.offerSmelting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 200, Oritech.MOD_ID);
+            OritechRecipeGenerator.offerBlasting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 100, Oritech.MOD_ID);
         }
     }
     

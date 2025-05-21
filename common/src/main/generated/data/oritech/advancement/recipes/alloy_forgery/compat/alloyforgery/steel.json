@@ -31,7 +31,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:compat/alloyforgery/steel"
+        "recipe": "oritech:compat/alloyforgery/steel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -45,7 +45,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:compat/alloyforgery/steel"
+      "oritech:compat/alloyforgery/steel"
     ]
   }
 }
