@@ -40,11 +40,6 @@ related_items: [oritech:augment_application_block, oritech:simple_augment_statio
 3. 赛博改造中心存储所有已研究的蓝图（每个机器独立，机器被破坏后丢失）
 4. 可以通过UI左下角的导入按钮扫描玩家已有的植入体
 
-<Callout variant="info">
-    大多数植入体数据，例如研究/应用消耗、UI位置、研究站和依赖关系可以通过数据包配置。
-    目前无法添加/更改植入体。
-</Callout>
-
 ### 植入体管理
 - 所有植入体都是永久安装的（不需要维持或能量）
 - 一些植入体可以切换开关；有些则始终激活
@@ -58,3 +53,16 @@ related_items: [oritech:augment_application_block, oritech:simple_augment_statio
 <center>
 <ModAsset location="oritech:area/cyborg_ui" width={700} />
 </center>
+
+### 面向整合包开发者的说明：
+植入体完全可配置并由数据驱动。可以通过数据包创建新的植入体。共有3种植入体类型：
+修饰符植入体，通过修饰更改玩家的实体属性，如速度或触及距离。
+下一种是效果植入体，像药水那样给予效果。
+最后一种是自定义植入体，包含完全自定义的逻辑，如矿石感应或便携折跃。
+这些自定义植入体可以通过数据包引用，
+但它们的逻辑需要在一个完整的JAVA模组中实现。
+
+可以通过数据包创建全新的植入体，也可以更改已有的植入体。
+看一看这个植入体定义的示例文件：https://github.com/Rearth/Oritech/blob/1.21/common/src/main/generated/data/oritech/recipe/augment/attackdamage.json
+
+添加新的植入体时，记得补充翻译条目和纹理。纹理放在 "oritech/textures/gui/augment" 文件夹中。
