@@ -188,7 +188,7 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
                 }
             });
 
-            long extracted = container.extract(maxAmount, false);
+            var extracted = container.extract(maxAmount, false);
 
             // no idea what this does, but it does seem to fix it
             if (context != null) {
