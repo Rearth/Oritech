@@ -1,0 +1,22 @@
+---
+title: 岩盤ドリル
+icon: oritech:deep_drill_block
+related_items: [oritech:deep_drill_block]
+---
+
+<center>
+<ModAsset location="oritech:area/bedrock_extraction" width={800} />
+</center>
+
+岩盤ドリルは、[鉱石資源ノード](../resources/resource_node)が存在する場所において、岩盤の下から鉱石を採掘できる装置です。
+この[マルチブロック](../processing/multiblocks)構成の機械は、資源ノード上に設置した状態でのみ動作し、[エンダリックレーザー](../interaction/enderic_laser)による電力供給が必要です。
+
+右クリックすると、ターゲットとなる鉱石資源ノードが下方に表示されます。3x3の範囲で最も近い目に見える鉱石ノードをターゲットとし、最大3ブロック下まで探索します。
+
+<Callout variant="info">
+    鉱石資源ノードは無限に存在し、破壊することはできません。
+</Callout>
+
+稼働中、ベッドロック抽出機はその直下の鉱石を直接採掘し、3x3の範囲全体をカバーします。各動作ではランダムに1つのブロックが選択されます。
+すべてのブロックが鉱石ノードである必要はありません。
+抽出機の真下に最も多くの鉱石が存在する場所を探すと、より高い採掘効率が得られます。

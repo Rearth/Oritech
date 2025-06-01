@@ -1,0 +1,14 @@
+{
+  "machine_basics.mdx": "機械の基本",
+  "multiblocks.mdx": "マルチブロックシステム",
+  "addons.mdx": "アドオン一覧",
+  "pulverizer.mdx": "粉砕機",
+  "assembler.mdx": "組立機",
+  "centrifuge.mdx": "遠心分離機",
+  "foundry.mdx": "鋳造所",
+  "fragment_forge.mdx": "破片加工機",
+  "atomic_forge.mdx": "アトミックフォージ",
+  "generators.mdx": "発電機システム",
+  "steam_engine.mdx": "蒸気動力システム",
+  "reactor": "核反応炉"
+}
