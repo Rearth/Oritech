@@ -363,6 +363,7 @@
   "tooltip.oritech.energy_max_transfer": "最大传输速率： ",
   "tooltip.oritech.energy_transfer_rate": "%d RF/刻",
   "tooltip.oritech.energy_capacity": "%d RF",
+  "tooltip.oritech.laser_arm_block.extra": "Can also be built on walls and ceilings.",
   "title.oritech.machine.addon_range": "%d 范围",
   "tooltip.oritech.block_destroyer.addon_range": "最大挖掘深度",
   "tooltip.oritech.laser_arm.addon_range": "有效光束半径",
