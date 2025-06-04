@@ -363,6 +363,7 @@
   "tooltip.oritech.energy_max_transfer": "Maks Aktarım Hızı: ",
   "tooltip.oritech.energy_transfer_rate": "%d RF/t",
   "tooltip.oritech.energy_capacity": "%d RF",
+  "tooltip.oritech.laser_arm_block.extra": "Can also be built on walls and ceilings.",
   "title.oritech.machine.addon_range": "%d Menzil",
   "tooltip.oritech.block_destroyer.addon_range": "Maksimum kazma derinliği",
   "tooltip.oritech.laser_arm.addon_range": "Etkili ışın yarıçapı",
