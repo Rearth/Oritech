@@ -4,7 +4,7 @@
       "model": "oritech:block/wither_crop_block_stage0"
     },
     "age=1": {
-      "model": "oritech:block/wither_crop_block_stage0"
+      "model": "oritech:block/wither_crop_block_stage1"
     },
     "age=2": {
       "model": "oritech:block/wither_crop_block_stage1"

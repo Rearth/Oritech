@@ -13,6 +13,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -34,6 +35,7 @@ import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
@@ -47,7 +49,7 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
     
     public LaserArmBlock(Settings settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(ASSEMBLED, false).with(Properties.HORIZONTAL_FACING, Direction.NORTH));
+        setDefaultState(getDefaultState().with(ASSEMBLED, false).with(Properties.FACING, Direction.UP));
         LaserArmBlockBehavior.registerDefaults();
         LaserArmEntityBehavior.registerDefaults();
     }
@@ -69,10 +71,15 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
+    public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
+        return Objects.requireNonNull(super.getPlacementState(ctx)).with(Properties.FACING, ctx.getSide());
+    }
+    
+    @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
         builder.add(ASSEMBLED);
-        builder.add(Properties.HORIZONTAL_FACING);
+        builder.add(Properties.FACING);
     }
     
     @Override
@@ -115,6 +122,7 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
             // first time created
             if (isAssembled && !wasAssembled) {
                 NetworkContent.MACHINE_CHANNEL.serverHandle(entity).send(new NetworkContent.MachineSetupEventPacket(pos));
+                laserArm.initAddons();
                 return ActionResult.SUCCESS;
             }
             

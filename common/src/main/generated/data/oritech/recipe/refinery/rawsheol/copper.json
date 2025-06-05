@@ -1,0 +1,25 @@
+{
+  "type": "oritech:refinery",
+  "fluidInput": {
+    "amount": 20250,
+    "fluid": "oritech:still_sheol_fire"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 16200,
+      "fluid": "minecraft:lava"
+    }
+  ],
+  "ingredients": [
+    {
+      "tag": "c:raw_materials/copper"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "oritech:copper_clump"
+    }
+  ],
+  "time": 200
+}

@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public class RefineryScreenHandler extends UpgradableMachineScreenHandler {
     
-    private final RefineryBlockEntity refinery;
+    protected final RefineryBlockEntity refinery;
     protected FluidApi.SingleSlotStorage outputAContainer;
     protected FluidApi.SingleSlotStorage outputBContainer;
     protected FluidApi.SingleSlotStorage outputCContainer;

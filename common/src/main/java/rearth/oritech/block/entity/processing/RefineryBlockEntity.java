@@ -36,13 +36,14 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 public class RefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
-    // todo recipe viewer display of all outputs
+    // todo wiki entry
     // own storage is exposed through this multiblock, the other storages are exposed through the respective modules
     public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(64 * FluidStackHooks.bucketAmount(), this::markDirty);
     public final SimpleFluidStorage nodeA = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
@@ -51,7 +52,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     private int moduleCount;    // range 0-2
     
     public RefineryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REFINERY_ENTITY, pos, state, Oritech.CONFIG.processingMachines.fragmentForgeData.energyPerTick());
+        super(BlockEntitiesContent.REFINERY_ENTITY, pos, state, Oritech.CONFIG.processingMachines.refineryData.energyPerTick());
     }
     
     @Override
@@ -102,8 +103,12 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         
         // get recipes matching input items
         var candidates = Objects.requireNonNull(world).getRecipeManager().getAllMatches(getOwnRecipeType(), getInputInventory(), world);
-        // filter out recipes based on input tank
-        var fluidRecipe = candidates.stream().filter(candidate -> CentrifugeBlockEntity.recipeInputMatchesTank(ownStorage.getInputContainer().getStack(), candidate.value())).findAny();
+        // filter out recipes based on input tank. Have the ones with input items first.
+        var fluidRecipe = candidates
+                            .stream()
+                            .filter(candidate -> CentrifugeBlockEntity.recipeInputMatchesTank(ownStorage.getInputContainer().getStack(), candidate.value()))
+                            .sorted(Comparator.comparingInt(a -> -a.value().getInputs().size()))
+                            .findAny();
         if (fluidRecipe.isPresent()) {
             return fluidRecipe;
         }
@@ -146,7 +151,10 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         // if both are installed, output all as normal
         // todo add gui tooltip for this behaviour
         
+        if (recipe.getFluidOutputs().isEmpty()) return List.of();
         var outA = recipe.getFluidOutputs().get(0);
+        
+        if (recipe.getFluidOutputs().size() == 1) return List.of(outA);
         var outB = recipe.getFluidOutputs().get(1);
         
         return switch (moduleCount) {
@@ -198,12 +206,12 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.fragmentForgeData.energyCapacity();
+        return Oritech.CONFIG.processingMachines.refineryData.energyCapacity();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.fragmentForgeData.maxEnergyInsertion();
+        return Oritech.CONFIG.processingMachines.refineryData.maxEnergyInsertion();
     }
     
     @Override

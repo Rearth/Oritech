@@ -76,7 +76,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         private final BoxComponent fillOverlay;
         private float lastFill;
         private Fluid lastDrawnFluid;
-        private ColoredSpriteComponent background;
+        protected ColoredSpriteComponent background;
         private final TextureComponent foreGround;
         private final ScreenProvider.BarConfiguration config;
         private final FluidApi.SingleSlotStorage storage;

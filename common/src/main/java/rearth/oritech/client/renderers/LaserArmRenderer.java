@@ -6,6 +6,8 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
@@ -20,8 +22,11 @@ import software.bernie.geckolib.renderer.GeoBlockRenderer;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import static net.minecraft.client.render.RenderPhase.VIEW_OFFSET_Z_LAYERING;
+import static net.minecraft.util.math.Direction.*;
+import static net.minecraft.util.math.Direction.DOWN;
 
 public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
     public LaserArmRenderer(String modelPath) {
@@ -38,6 +43,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
     public int getRenderDistance() {
         return 128;
     }
+    
     @Override
     public boolean rendersOutsideBoundingBox(T blockEntity) {
         return true;
@@ -49,8 +55,9 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         
         if (laserEntity.getCurrentTarget() == null || !laserEntity.isFiring()) return;
         
-        var startOffset = new Vector3f(0, 1.65f, 0);
-        var startPos = Vec3d.of(laserEntity.getPos()).add(0.5, 1.55, 0.5);
+        var facing = laserEntity.getCachedState().get(Properties.FACING);
+        var startPos = laserEntity.laserHead;
+        var startOffset = new Vec3d(0, 1.65f, 0);
         
         var targetPos = laserEntity.getVisualTarget();
         var targetBlock = laserEntity.getWorld().getBlockState(laserEntity.getCurrentTarget()).getBlock();
@@ -69,7 +76,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         targetPos = lerp(laserEntity.lastRenderPosition, targetPos, 0.06f);
         laserEntity.lastRenderPosition = targetPos;
         
-        var targetPosOffset = targetPos.subtract(Vec3d.of(laserEntity.getPos()));
+        var targetPosOffset = worldToOffsetPosition(facing, targetPos, startPos).add(startOffset);
         
         var forward = targetPos.subtract(startPos).normalize();
         if (!laserEntity.isTargetingEnergyContainer() && !laserEntity.isTargetingBuddingAmethyst() && laserEntity.getWorld().random.nextFloat() > 0.7)
@@ -88,7 +95,10 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
             widthMultiplier = (float) (camDist / 20f);
         RenderSystem.lineWidth((float) (Math.sin((laserEntity.getWorld().getTime() + partialTick) * 0.3) * 2 + 7) / widthMultiplier);
         
-        lineConsumer.vertex(matrices.peek().getPositionMatrix(), startOffset.x, startOffset.y, startOffset.z)
+        // startOffset = new Vec3d(0, 2, 0);
+        // targetPosOffset = new Vec3d(0, 5, 0);
+        
+        lineConsumer.vertex(matrices.peek().getPositionMatrix(), (float) startOffset.x, (float) startOffset.y, (float) startOffset.z)
           .color(138, 242, 223, 255)
           .light(packedLight)
           .overlay(packedOverlay)
@@ -100,7 +110,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
           .normal(1, 0, 0);
         
         // render a second one at right angle to first one
-        lineConsumer.vertex(matrices.peek().getPositionMatrix(), startOffset.x, startOffset.y, startOffset.z)
+        lineConsumer.vertex(matrices.peek().getPositionMatrix(), (float) startOffset.x, (float) startOffset.y, (float) startOffset.z)
           .color(138, 242, 223, 255)
           .light(packedLight)
           .overlay(packedOverlay)
@@ -123,12 +133,56 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         return new Vec3d((random.nextFloat() * 2 - 1) * range, (random.nextFloat() * 2 - 1) * range, (random.nextFloat() * 2 - 1) * range).add(drillCenter);
     }
     
+    @Override
+    protected void rotateBlock(Direction facing, MatrixStack poseStack) {
+        if (Objects.requireNonNull(facing) == Direction.DOWN) {
+            poseStack.translate(0,  1, 0);
+            poseStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
+        } else if (facing == Direction.WEST) {
+            poseStack.translate(0.5,  0.5, 0);
+            poseStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(90));
+        } else if (facing == Direction.EAST) {
+            poseStack.translate(-0.5,  0.5, 0);
+            poseStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(270));
+        } else if (facing == Direction.SOUTH) {
+            poseStack.translate(0,  0.5, -0.5);
+            poseStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
+        } else if (facing == Direction.NORTH) {
+            poseStack.translate(0,  0.5, 0.5);
+            poseStack.multiply(RotationAxis.NEGATIVE_X.rotationDegrees(90));
+        }
+    }
+    
     public static Vec3d lerp(Vec3d a, Vec3d b, float f) {
         return new Vec3d(lerp(a.x, b.x, f), lerp(a.y, b.y, f), lerp(a.z, b.z, f));
     }
     
     public static double lerp(double a, double b, double f) {
         return a + f * (b - a);
+    }
+    
+    private static Vec3d worldToOffsetPosition(Direction facing, Vec3d worldTarget, Vec3d ownPos) {
+        Vec3d relativeWorld = worldTarget.subtract(ownPos);
+        
+        double relX = relativeWorld.getX();
+        double relY = relativeWorld.getY();
+        double relZ = relativeWorld.getZ();
+        
+        if (Objects.requireNonNull(facing) == NORTH) {
+            return new Vec3d(relX, -relZ, relY);
+        } else if (facing == SOUTH) {
+            return new Vec3d(relX, relZ, -relY);
+        } else if (facing == WEST) {
+            return new Vec3d(relY, -relX, relZ);
+        } else if (facing == EAST) {
+            return new Vec3d(-relY, relX, relZ);
+        } else if (facing == UP) {
+            return new Vec3d(relX, relY, relZ);
+        } else if (facing == DOWN) {
+            return new Vec3d(relX, -relY, -relZ);
+        }
+        throw new IllegalArgumentException();
+        
     }
 }
 

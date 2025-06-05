@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:small_tank_block"
+    },
+    "c": {
+      "item": "oritech:metal_beam_block"
+    },
+    "f": {
+      "tag": "c:ingots/iron"
+    },
+    "s": {
+      "item": "minecraft:slime_ball"
+    }
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:refinery_module_block"
+  }
+}

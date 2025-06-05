@@ -1,0 +1,38 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mekanism"
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:mod_loaded",
+        "modid": "jaopca"
+      }
+    }
+  ],
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 1000,
+    "fluid": "oritech:still_sulfuric_acid"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 250,
+      "fluid": "oritech:still_mineral_slurry"
+    }
+  ],
+  "ingredients": [
+    {
+      "tag": "c:clumps/osmium"
+    }
+  ],
+  "results": [
+    {
+      "count": 4,
+      "id": "mekanism:dust_osmium"
+    }
+  ],
+  "time": 450
+}

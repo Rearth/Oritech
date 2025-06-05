@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "i": {
+      "item": "minecraft:cauldron"
+    },
+    "o": {
+      "tag": "c:ingots/steel"
+    },
+    "r": {
+      "item": "oritech:refinery_module_block"
+    },
+    "t": {
+      "item": "oritech:motor"
+    }
+  },
+  "pattern": [
+    " t ",
+    "rrr",
+    "oio"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:refinery_block"
+  }
+}

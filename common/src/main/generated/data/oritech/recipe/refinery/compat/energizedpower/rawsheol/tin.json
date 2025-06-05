@@ -1,0 +1,33 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "energizedpower"
+      ]
+    }
+  ],
+  "type": "oritech:refinery",
+  "fluidInput": {
+    "amount": 20250,
+    "fluid": "oritech:still_sheol_fire"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 16200,
+      "fluid": "minecraft:lava"
+    }
+  ],
+  "ingredients": [
+    {
+      "tag": "c:raw_materials/tin"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "energizedpower:tin_dust"
+    }
+  ],
+  "time": 200
+}

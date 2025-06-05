@@ -1,6 +1,10 @@
 package rearth.oritech.client.ui;
 
+import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.core.Positioning;
+import io.wispforest.owo.ui.core.Sizing;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import rearth.oritech.util.ScreenProvider;
@@ -35,6 +39,24 @@ public class RefineryScreen extends UpgradableMachineScreen<RefineryScreenHandle
         
         addFluidDisplay(overlay, outCDisplay);
         updateFluidDisplay(outCDisplay);
+        
+        var moduleCount = handler.refinery.getModuleCount();
+        if (moduleCount < 1) {
+            var blocker = Components.button(Text.literal("\uD83D\uDEAB"), event -> {});
+            blocker.positioning(Positioning.absolute(outBConfig.x(), outBConfig.y()));
+            blocker.sizing(Sizing.fixed(outBConfig.width()), Sizing.fixed(outBConfig.height()));
+            blocker.active(false);
+            blocker.zIndex(5);
+            overlay.child(blocker);
+        }
+        if (moduleCount < 2) {
+            var blocker = Components.button(Text.literal("\uD83D\uDEAB"), event -> {});
+            blocker.positioning(Positioning.absolute(outCConfig.x(), outCConfig.y()));
+            blocker.sizing(Sizing.fixed(outCConfig.width()), Sizing.fixed(outCConfig.height()));
+            blocker.tooltip(Text.translatable("tooltip.oritech.module_2_missing"));
+            blocker.active(false);
+            overlay.child(blocker);
+        }
         
     }
     

@@ -128,6 +128,8 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
             var controllerBlock = world.getBlockState(controllerPos);
             if (controllerBlock.getBlock() instanceof MachineBlock machineBlock) {
                 return machineBlock.onUseWithItem(stack, state, world, pos, player, hand, hit);
+            } else if (controllerBlock.getBlock() instanceof RefineryModuleBlock machineBlock) {
+                return machineBlock.onUseWithItem(stack, state, world, pos, player, hand, hit);
             }
         }
         

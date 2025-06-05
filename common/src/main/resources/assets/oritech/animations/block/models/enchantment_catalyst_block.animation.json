@@ -113,6 +113,24 @@
 					}
 				}
 			}
+		},
+		"empty": {
+			"loop": true,
+			"bones": {
+				"all": {
+					"rotation": {
+						"vector": [-68.81947, -0.64126, -27.37218]
+					},
+					"position": {
+						"vector": [0, -3.25, 0]
+					}
+				},
+				"frame2": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
 		}
 	},
 	"geckolib_format_version": 2

@@ -1,0 +1,25 @@
+{
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 81000,
+    "fluid": "oritech:still_sulfuric_acid"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 20250,
+      "fluid": "oritech:still_mineral_slurry"
+    }
+  ],
+  "ingredients": [
+    {
+      "tag": "c:clumps/gold"
+    }
+  ],
+  "results": [
+    {
+      "count": 4,
+      "id": "oritech:gold_gem"
+    }
+  ],
+  "time": 300
+}

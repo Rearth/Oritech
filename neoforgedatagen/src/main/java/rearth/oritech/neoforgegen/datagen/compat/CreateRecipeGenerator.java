@@ -134,9 +134,6 @@ public class CreateRecipeGenerator {
         }
 
         public List<GeneratedRecipe> all = List.of(
-            create(Oritech.id("compat/create/copperclump"), b -> b.require(TagContent.COPPER_CLUMPS).output(AllItems.COPPER_NUGGET.asItem(), 9).output(0.5f, ItemContent.SMALL_GOLD_DUST, 2)),
-            create(Oritech.id("compat/create/ironclump"), b -> b.require(TagContent.IRON_CLUMPS).output(Items.IRON_NUGGET, 9).output(0.5f, ItemContent.SMALL_NICKEL_DUST, 2)),
-            create(Oritech.id("compat/create/goldclump"), b -> b.require(TagContent.GOLD_CLUMPS).output(Items.GOLD_NUGGET, 9).output(0.5f, ItemContent.SMALL_COPPER_DUST, 2)),
             create(Oritech.id("compat/create/nickelclump"), b -> b.require(TagContent.NICKEL_CLUMPS).output(ItemContent.NICKEL_NUGGET, 9).output(0.5f, ItemContent.SMALL_PLATINUM_DUST, 2)),
             create(Oritech.id("compat/create/platinumclump"), b -> b.require(TagContent.PLATINUM_CLUMPS).output(ItemContent.PLATINUM_NUGGET, 9).output(0.25f, ItemContent.FLUXITE)),
             create(Oritech.id("compat/create/uraniumclump"), b -> b.require(TagContent.URANIUM_CLUMPS).output(ItemContent.URANIUM_DUST, 2).output(0.25f, ItemContent.SMALL_PLUTONIUM_DUST)),

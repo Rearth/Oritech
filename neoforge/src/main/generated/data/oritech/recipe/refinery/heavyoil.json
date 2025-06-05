@@ -1,0 +1,28 @@
+{
+  "type": "oritech:refinery",
+  "fluidInput": {
+    "amount": 1000,
+    "fluid": "oritech:still_heavy_oil"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 1000,
+      "fluid": "oritech:still_diesel"
+    },
+    {
+      "amount": 250,
+      "fluid": "oritech:still_naphtha"
+    },
+    {
+      "amount": 250,
+      "fluid": "oritech:still_sulfuric_acid"
+    }
+  ],
+  "ingredients": [
+    {
+      "tag": "minecraft:sand"
+    }
+  ],
+  "results": [],
+  "time": 120
+}
