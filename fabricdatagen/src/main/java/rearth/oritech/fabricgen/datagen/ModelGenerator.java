@@ -12,6 +12,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ToolsContent;
 
@@ -131,6 +132,9 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.REACTOR_EXPLOSION_MEDIUM, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.REACTOR_EXPLOSION_LARGE, BlockContent.MACHINE_SPEED_ADDON);
         
+        for (var fluid : FluidContent.FLUID_ATTRIBUTES)
+            blockStateModelGenerator.registerStateWithModelReference(fluid.getBlock(), Blocks.WATER);
+        
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_1);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_2);
         blockStateModelGenerator.registerSimpleCubeAll(BlockContent.MACHINE_CORE_3);
@@ -145,7 +149,7 @@ public class ModelGenerator extends FabricModelProvider {
         //arcane
         blockStateModelGenerator.registerSimpleState(BlockContent.SPAWNER_CAGE_BLOCK);
         blockStateModelGenerator.registerSimpleState(BlockContent.SPAWNER_CONTROLLER_BLOCK);
-        blockStateModelGenerator.registerCrop(BlockContent.WITHER_CROP_BLOCK, CropBlock.AGE, 0, 0, 1, 2, 3, 3, 4, 5);
+        blockStateModelGenerator.registerCrop(BlockContent.WITHER_CROP_BLOCK, CropBlock.AGE, 0, 1, 1, 2, 3, 3, 4, 5);
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.ENCHANTER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);   // uses geckolib
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.UNSTABLE_CONTAINER, BlockContent.MACHINE_SPEED_ADDON);   // uses geckolib
         blockStateModelGenerator.registerStateWithModelReference(BlockContent.ENCHANTMENT_CATALYST_BLOCK, BlockContent.MACHINE_SPEED_ADDON);   // uses geckolib
@@ -219,6 +223,10 @@ public class ModelGenerator extends FabricModelProvider {
         nickelPlatingPool.slab(BlockContent.NICKEL_PLATING_SLAB);
         nickelPlatingPool.pressurePlate(BlockContent.NICKEL_PLATING_PRESSURE_PLATE);
         
+        var carbonPlatingPool = blockStateModelGenerator.registerCubeAllModelTexturePool(BlockContent.CARBON_PLATING_BLOCK);
+        carbonPlatingPool.stairs(BlockContent.CARBON_PLATING_STAIRS);
+        carbonPlatingPool.slab(BlockContent.CARBON_PLATING_SLAB);
+        carbonPlatingPool.pressurePlate(BlockContent.CARBON_PLATING_PRESSURE_PLATE);
         
     }
     
@@ -235,6 +243,9 @@ public class ModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(ToolsContent.EXO_JETPACK, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.JETPACK_ELYTRA, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.JETPACK_EXO_ELYTRA, Models.GENERATED);
+        
+        for (var fluid : FluidContent.FLUID_ATTRIBUTES)
+            itemModelGenerator.register(fluid.getBucketItem(), Models.GENERATED);
         
         for (var item : ItemContent.autoRegisteredModels) {
             itemModelGenerator.register(item, Models.GENERATED);

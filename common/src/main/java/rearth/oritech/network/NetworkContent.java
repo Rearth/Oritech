@@ -1,5 +1,6 @@
 package rearth.oritech.network;
 
+import com.mojang.serialization.Codec;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.MenuRegistry;
 import io.wispforest.owo.network.OwoNetChannel;
@@ -7,6 +8,8 @@ import io.wispforest.owo.serialization.CodecUtils;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -222,6 +225,10 @@ public class NetworkContent {
     public record LaserPlayerUsePacket() {
     }
     
+    // these two are basically copies of the architectury built-in fluid stack codecs, but using the OPTIONAL_STREAM_CODEC to allow for empty fluid stacks
+    public static Codec<FluidStack> FLUID_STACK_CODEC;
+    public static PacketCodec<RegistryByteBuf, FluidStack> FLUID_STACK_STREAM_CODEC;
+    
     @SuppressWarnings("unchecked")
     public static void registerChannels() {
         
@@ -229,7 +236,7 @@ public class NetworkContent {
         
         MACHINE_CHANNEL.builder().register(ItemFilterBlockEntity.FILTER_ITEMS_ENDEC, (Class<Map<Integer, ItemStack>>) (Object) Map.class); // I don't even know what kind of abomination this cast is, but it seems to work
         MACHINE_CHANNEL.builder().register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
-        MACHINE_CHANNEL.builder().register(CodecUtils.toEndecWithRegistries(FluidStack.CODEC, FluidStack.STREAM_CODEC), FluidStack.class);
+        MACHINE_CHANNEL.builder().register(CodecUtils.toEndecWithRegistries(FLUID_STACK_CODEC, FLUID_STACK_STREAM_CODEC), FluidStack.class);
         
         
         MACHINE_CHANNEL.registerClientbound(MachineSyncPacket.class, ((message, access) -> {

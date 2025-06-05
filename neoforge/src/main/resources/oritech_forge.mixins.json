@@ -11,7 +11,8 @@
   ],
   "mixins": [
     "ServerPlayerEntityMixin",
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "NetworkWarningShutupMixin"
   ],
   "injectors": {
     "defaultRequire": 1

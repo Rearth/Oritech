@@ -148,6 +148,8 @@ public class Config {
         public FurnaceConfig furnaceData = new FurnaceConfig();
         @Nest
         public BasicEnergyMachineData pulverizerData = new BasicEnergyMachineData(25000, 32 * 8, 0, 32);
+        @Nest
+        public BasicEnergyMachineData refineryData = new BasicEnergyMachineData(50000, 64 * 8, 0, 64);
     }
     
     public static class Generators {

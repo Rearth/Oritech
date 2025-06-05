@@ -30,6 +30,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.Pair;
@@ -101,7 +102,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
     // config
     private final int range = Oritech.CONFIG.laserArmConfig.range();
     
-    private Vec3d laserHead;
+    public Vec3d laserHead;
     
     // working data
     private BlockPos targetDirection;
@@ -122,7 +123,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
     
     public LaserArmBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.LASER_ARM_ENTITY, pos, state);
-        laserHead = Vec3d.of(pos.up()).add(0.5, 0.55, 0.5);
+        laserHead = getLaserHeadPosition().toCenterPos();
     }
     
     @Override
@@ -275,7 +276,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
             }
         }
         
-        var direction = Vec3d.of(targetDirection.subtract(pos.up())).normalize();
+        var direction = Vec3d.of(targetDirection.subtract(getLaserHeadPosition())).normalize();
         var from = laserHead.add(direction.multiply(1.5));
         
         var nextBlock = basicRaycast(from, direction, range, 0.45F);
@@ -318,7 +319,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
     }
     
     private boolean validTarget(LivingEntity entity) {
-        return entity.isAlive() && canSee(entity) && huntedTarget(entity) && entity.getPos().isInRange(pos.up().toCenterPos(), hunterRange());
+        return entity.isAlive() && canSee(entity) && huntedTarget(entity) && entity.getPos().isInRange(getLaserHeadPosition().toCenterPos(), hunterRange());
     }
     
     private boolean huntedTarget(LivingEntity entity) {
@@ -393,6 +394,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
             var targetState = world.getBlockState(targetBlockPos);
             if (isSearchTerminatorBlock(targetState)) return null;
             if (!canPassThrough(targetState, targetBlockPos)) return targetBlockPos;
+            
             
             if (searchOffset == 0.0F)
                 return null;
@@ -595,7 +597,8 @@ public class LaserArmBlockEntity extends BlockEntity implements
     
     @Override
     public Direction getFacingForMultiblock() {
-        return Direction.NORTH;
+        var state = getCachedState();
+        return state.get(Properties.FACING).getOpposite();
     }
     
     @Override
@@ -631,7 +634,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 1, 0)
+          new Vec3i(1, 0, 0)
         );
     }
     //endregion
@@ -655,7 +658,8 @@ public class LaserArmBlockEntity extends BlockEntity implements
     
     @Override
     public Direction getFacingForAddon() {
-        return Direction.NORTH;
+        var state = getCachedState();
+        return state.get(Properties.FACING).getOpposite();
     }
     
     @Override
@@ -676,7 +680,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, -1, 0)
+          new Vec3i(-1, 0, 0)
         );
     }
     
@@ -761,7 +765,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         if (hunterAddons > 0 && currentLivingTarget != null) {
             return currentLivingTarget.getEyePos().subtract(0.5f, 0, 0.5f);
         } else {
-            return Vec3d.of(getCurrentTarget()).add(0, 0.5, 0);
+            return getCurrentTarget().toCenterPos();
         }
     }
     
@@ -903,7 +907,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
     
     @Override
     public Property<Direction> getBlockFacingProperty() {
-        return ScreenProvider.super.getBlockFacingProperty();
+        return Properties.FACING;
     }
     
     @Nullable
@@ -969,6 +973,13 @@ public class LaserArmBlockEntity extends BlockEntity implements
     public String currentRedstoneEffect() {
         if (redstonePowered) return "tooltip.oritech.redstone_disabled";
         return "tooltip.oritech.redstone_enabled_direct";
+    }
+    
+    public BlockPos getLaserHeadPosition() {
+        var state = getCachedState();
+        var facing = state.get(Properties.FACING);
+        var offset = new Vec3i(-1, 0, 0);
+        return new BlockPos(Geometry.offsetToWorldPosition(facing, offset, pos));
     }
     
     @Override

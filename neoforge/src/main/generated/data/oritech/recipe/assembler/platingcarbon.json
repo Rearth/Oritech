@@ -1,0 +1,29 @@
+{
+  "type": "oritech:assembler",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:ingots/steel"
+    },
+    {
+      "tag": "c:ingots/steel"
+    },
+    {
+      "item": "oritech:reinforced_carbon_sheet"
+    },
+    {
+      "tag": "c:plates/plastic"
+    }
+  ],
+  "results": [
+    {
+      "count": 8,
+      "id": "oritech:carbon_plating_block"
+    }
+  ],
+  "time": 160
+}

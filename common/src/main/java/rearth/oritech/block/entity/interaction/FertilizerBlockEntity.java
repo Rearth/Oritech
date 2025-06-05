@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.interaction;
 
+import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.block.*;
 import net.minecraft.fluid.Fluid;
@@ -24,6 +25,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.network.NetworkContent;
 
@@ -35,9 +37,14 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     public static final long FLUID_USAGE = (long) (Oritech.CONFIG.fertilizerConfig.liquidPerBlockUsage() * FluidStackHooks.bucketAmount());   // per block, tick usage is this divided by work time
     
     private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty) {
+        
         @Override
-        public Fluid getEmptyVariant() {
-            return Fluids.WATER;
+        public long insert(FluidStack toInsert, boolean simulate) {
+            var fluid = toInsert.getFluid();
+            if (fluid.equals(FluidContent.STILL_MINERAL_SLURRY.get()) || fluid.equals(Fluids.WATER))
+                return super.insert(toInsert, simulate);
+            
+            return 0;
         }
     };
     
@@ -104,7 +111,9 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
         
         var inventoryStack = inventory.getStack(0);
         var fertilizerInInventory = !inventoryStack.isEmpty() && inventoryStack.isIn(TagContent.CONVENTIONAL_FERTILIZER);
+        var mineralSlurried = fluidStorage.getFluid().equals(FluidContent.STILL_MINERAL_SLURRY.get());
         var fertilizerStrength = fertilizerInInventory ? 2 : 1;
+        fertilizerStrength *= mineralSlurried ? 2 : 1;
         var fertilized = false;
         
         var targetPosition = processed.down();
@@ -132,7 +141,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
             world.setBlockState(farmlandPosition, farmlandState.with(Properties.MOISTURE, 7));
         }
         
-        if (fertilized == true) {
+        if (fertilized) {
             if (fertilizerInInventory) {
                 inventoryStack.decrement(1);
                 inventory.setStack(0, inventoryStack);

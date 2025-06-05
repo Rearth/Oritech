@@ -237,6 +237,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(TagContent.MACHINE_PLATING)
           .add(BlockContent.MACHINE_PLATING_BLOCK.asItem())
           .add(BlockContent.IRON_PLATING_BLOCK.asItem())
+          .add(BlockContent.CARBON_PLATING_BLOCK.asItem())
           .add(BlockContent.NICKEL_PLATING_BLOCK.asItem());
         
         // silicon

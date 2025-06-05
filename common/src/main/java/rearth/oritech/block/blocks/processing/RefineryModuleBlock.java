@@ -1,6 +1,7 @@
 package rearth.oritech.block.blocks.processing;
 
 import com.mojang.serialization.MapCodec;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,15 +14,20 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.entity.augmenter.AugmentResearchStationBlockEntity;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.block.entity.processing.RefineryModuleBlockEntity;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.StackContext;
 
 import java.util.List;
 import java.util.Objects;
@@ -91,6 +97,14 @@ public class RefineryModuleBlock extends HorizontalFacingBlock implements BlockE
         }
         
         return ActionResult.SUCCESS;
+    }
+    
+    @Override
+    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        
+        if (ItemFluidApi.tryFluidBlockItemInteraction(stack, world, pos, player, hand)) return ItemActionResult.success(true);
+        
+        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
     }
     
     @Override

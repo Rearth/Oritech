@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_refinery_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:refinery_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:crafting/refinery"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_refinery_block"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:crafting/refinery"
+    ]
+  }
+}

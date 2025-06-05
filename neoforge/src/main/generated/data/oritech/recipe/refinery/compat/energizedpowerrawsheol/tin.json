@@ -1,0 +1,38 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "energizedpower"
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:mod_loaded",
+        "modid": "jaopca"
+      }
+    }
+  ],
+  "type": "oritech:refinery",
+  "fluidInput": {
+    "amount": 250,
+    "fluid": "oritech:still_sheol_fire"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 200,
+      "fluid": "minecraft:lava"
+    }
+  ],
+  "ingredients": [
+    {
+      "tag": "c:raw_materials/tin"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "energizedpower:tin_dust"
+    }
+  ],
+  "time": 200
+}

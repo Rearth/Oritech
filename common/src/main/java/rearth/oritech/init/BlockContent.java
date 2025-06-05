@@ -371,6 +371,14 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block IRON_PLATING_PRESSURE_PLATE = new PressurePlateBlock(BlockSetType.IRON, AbstractBlock.Settings.copy(Blocks.STONE_BUTTON));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block CARBON_PLATING_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block CARBON_PLATING_SLAB = new SlabBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block CARBON_PLATING_STAIRS = new StairsBlock(CARBON_PLATING_BLOCK.getDefaultState(), AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block CARBON_PLATING_PRESSURE_PLATE = new PressurePlateBlock(BlockSetType.IRON, AbstractBlock.Settings.copy(Blocks.STONE_BUTTON));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block NICKEL_PLATING_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block NICKEL_PLATING_SLAB = new SlabBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));

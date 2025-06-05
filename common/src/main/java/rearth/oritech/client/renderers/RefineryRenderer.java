@@ -41,7 +41,7 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> ext
         var inputStack = animatable.ownStorage.getInStack();
         if (!inputStack.isEmpty()) {
             // render in stack
-            renderFluidCube(new Vec3d(-22 / 16f, 9 / 16f, -5 / 16f), new Vector3f(7 / 16f, 15 / 16f, 10 / 16f), inputStack, animatable.ownStorage.getCapacity(), consumer, poseStack, packedLight, packedOverlay, -1, lastHeight);
+            renderFluidCube(new Vec3d(-24 / 16f, 3 / 16f, 11 / 16f), new Vector3f(12 / 16f, 25 / 16f, 28 / 16f), inputStack, animatable.ownStorage.getCapacity(), consumer, poseStack, packedLight, packedOverlay, -1, lastHeight);
         }
         
         var moduleCount = animatable.getModuleCount();
@@ -59,7 +59,7 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> ext
     
     private static Pair<Vec3d, Vector3f> getTankCoordinates(int i) {
         return switch (i) {
-            case 0 -> new Pair<>(new Vec3d(-24 / 16f, 3 / 16f, 11 / 16f), new Vector3f(12 / 16f, 25 / 16f, 28 / 16f));
+            case 0 -> new Pair<>(new Vec3d(-22 / 16f, 9 / 16f, -5 / 16f), new Vector3f(7 / 16f, 15 / 16f, 10 / 16f));
             case 1 ->
               new Pair<>(new Vec3d(-21 / 16f, 0 / 16f + 2, -5 / 16f), new Vector3f(26 / 16f, 14 / 16f, 26 / 16f));
             case 2 ->
