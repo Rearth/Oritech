@@ -1016,7 +1016,7 @@
   "text.config.oritech-config.option.processingMachines.foundryData.maxEnergyInsertion": "最大エネルギー入力量",
   "text.config.oritech-config.option.processingMachines.foundryData.maxEnergyExtraction": "最大エネルギー出力量",
   "text.config.oritech-config.option.processingMachines.foundryData.energyPerTick": "ティックあたりのエネルギー",
-  "text.config.oritech-config.category.processingMachines.coolerData": "工業用冷凍機のデータ",
+  "text.config.oritech-config.category.processingMachines.coolerData": "工業用冷凍機データ",
   "text.config.oritech-config.option.processingMachines.coolerData.energyCapacity": "エネルギー容量",
   "text.config.oritech-config.option.processingMachines.coolerData.maxEnergyInsertion": "最大エネルギー入力量",
   "text.config.oritech-config.option.processingMachines.coolerData.maxEnergyExtraction": "最大エネルギー出力量",
