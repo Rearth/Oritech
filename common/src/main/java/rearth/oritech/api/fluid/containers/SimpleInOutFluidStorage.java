@@ -228,4 +228,9 @@ public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage {
     public FluidStack getOutStack() {
         return contentOut;
     }
+    
+    @Override
+    public FluidApi.FluidStorage getStorageForSlot(int slot) {
+        return slot == 0 ? inputContainer : outputContainer;
+    }
 }

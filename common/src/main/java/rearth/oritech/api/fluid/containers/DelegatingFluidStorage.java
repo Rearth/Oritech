@@ -93,4 +93,10 @@ public class DelegatingFluidStorage extends FluidApi.FluidStorage {
         
         return false;
     }
+    
+    @Nullable
+    public FluidApi.FluidStorage getBackend() {
+        if (canUseBackend()) return backingStorage.get();
+        return null;
+    }
 }

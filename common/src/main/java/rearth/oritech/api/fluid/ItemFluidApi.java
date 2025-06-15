@@ -56,10 +56,7 @@ public interface ItemFluidApi {
         
         if (!world.isClient) {
             if (candidate.getContent().getFirst().isEmpty()) { // from tank to item
-                var moved = FluidApi.transferFirst(fluidStorage, candidate, FluidStackHooks.bucketAmount() * 8, false);
-                if (moved == 0) {   // attempt last if first did not work
-                    moved = FluidApi.transferLast(fluidStorage, candidate, FluidStackHooks.bucketAmount() * 8, false);
-                }
+                var moved = FluidApi.transferLastIncludingInputs(fluidStorage, candidate, FluidStackHooks.bucketAmount() * 8, false);
                 Oritech.LOGGER.debug("moved to item {} {}", moved, stackRef.getValue());
             } else {    // from item to tank
                 var moved = FluidApi.transferFirst(candidate, fluidStorage, FluidStackHooks.bucketAmount() * 8, false);

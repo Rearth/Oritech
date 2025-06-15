@@ -4,7 +4,9 @@ import dev.architectury.fluid.FluidStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.fluid.containers.DelegatingFluidStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FluidApi {
@@ -23,6 +25,26 @@ public class FluidApi {
         var kind = from.getContent().getLast();
         if (kind.isEmpty()) return 0L;
         return transfer(from, to, kind.copyWithAmount(max), simulate);
+    }
+    
+    public static long transferLastIncludingInputs(FluidStorage from, FluidStorage to, long max, boolean simulate) {
+        if (from.getContent().isEmpty()) return 0L;
+        
+        if (from instanceof DelegatingFluidStorage delegatingFluidStorage && delegatingFluidStorage.getBackend() != null)
+            from = delegatingFluidStorage.getBackend();
+        
+        if (from instanceof MultiSlotStorage multiSlotStorage) {
+            for (int i = multiSlotStorage.getSlotCount() - 1; i >= 0; i--) {
+                var storage = multiSlotStorage.getStorageForSlot(i);
+                if (!storage.getContent().isEmpty()) {
+                    var moved = transferLast(storage, to, max, simulate);
+                    if (moved > 0) return moved;
+                }
+            }
+        }
+        
+        return transferLast(from, to, max, simulate);
+        
     }
     
     public static long transfer(FluidStorage from, FluidStorage to, FluidStack toMove, boolean simulate) {
@@ -88,6 +110,7 @@ public class FluidApi {
         public abstract void setStack(int slot, FluidStack stack);
         public abstract FluidStack getStack(int slot);
         public abstract int getSlotCount();
+        public abstract FluidStorage getStorageForSlot(int slot);
         
     }
     
