@@ -32,6 +32,10 @@ public class PlayerAugments {
     }
     
     public static void serverTickAugments(ServerPlayerEntity player) {
+        
+        if (player.getWorld().getTime() % 80 == 0)
+            refreshPlayerAugments(player);
+        
         for (var augment : allAugments.values()) {
             if (augment.isEnabled(player)) {
                 if (player.getServerWorld().getTime() % augment.refreshInterval() == 0)
