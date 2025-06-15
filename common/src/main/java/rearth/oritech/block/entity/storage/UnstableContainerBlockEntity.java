@@ -227,6 +227,10 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     
     @Override
     public List<Vec3i> getCorePositions() {
+        return getCoreOffsets();
+    }
+    
+    public static List<Vec3i> getCoreOffsets() {
         return List.of(
           new Vec3i(-1, -2, -1),
           new Vec3i(0, -2, -1),

@@ -999,6 +999,7 @@
   "text.oritech.loaded_augments": "Loaded Augments: %s",
   "oritech.text.augment_resource_cost": "Resource Cost:",
   "text.oritech.begin_research": "Begin Research",
+  "text.oritech.unstable_container_blocked": "Unable to place, area is obstructed.",
   "text.oritech.install": "Install",
   "text.oritech.remove": "Remove",
   "text.oritech.noop": "",
