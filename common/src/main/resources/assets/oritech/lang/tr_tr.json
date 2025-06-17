@@ -992,7 +992,7 @@
   "text.oritech.loaded_augments": "Yüklenen Güçlendirmeler: %s",
   "oritech.text.augment_resource_cost": "Kaynak Maliyeti:",
   "text.oritech.begin_research": "Araştırmaya Başla",
-  "text.oritech.unstable_container_blocked": "Unable to place, area is obstructed.",
+  "text.oritech.unstable_container_blocked": "Yerleştirilemiyor, alanda engel var.",
   "text.oritech.install": "Kur",
   "text.oritech.remove": "Kaldır",
   "text.oritech.noop": "",
