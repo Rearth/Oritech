@@ -3,8 +3,6 @@ package rearth.oritech.block.entity.storage;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -31,14 +29,15 @@ import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.storage.UnstableContainerBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ItemContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -50,26 +49,32 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-public class UnstableContainerBlockEntity extends BlockEntity implements ScreenProvider, ExtendedMenuProvider, BlockEntityTicker<UnstableContainerBlockEntity>,
+public class UnstableContainerBlockEntity extends NetworkedBlockEntity implements ScreenProvider, ExtendedMenuProvider,
                                                                            GeoBlockEntity, MultiblockMachineController, EnergyApi.BlockProvider {
     
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("setup").thenPlay("idle");
     public static final RawAnimation IDLE = RawAnimation.begin().thenPlay("idle");
+    
     public static final Long BASE_CAPACITY = Oritech.CONFIG.unstableContainerBaseCapacity();
     
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
+    @SyncField(SyncType.GUI_OPEN)
     public BlockState capturedBlock = Blocks.AIR.getDefaultState();
-    private boolean networkDirty = false;
-    private long age = 0;
+    @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
     public float qualityMultiplier = 1f;
+    @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
+    public DynamicStatisticEnergyStorage.EnergyStatistics currentStats;
+    
+    private long age = 0;
     private boolean dropped = false;
     
+    // scaling storage
     public final SimpleEnergyStorage laserInputStorage = new SimpleEnergyStorage(100_000_000, 0, 100_000_000);
     
     //own storage
+    @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
     protected final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(20_000_000L, 20_000_000L, 20_000_000L, this::markDirty);
     
     private final EnergyApi.EnergyStorage outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
@@ -81,16 +86,12 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
-    // client only
-    public DynamicStatisticEnergyStorage.EnergyStatistics currentStats;
-    
     public UnstableContainerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY, pos, state);
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, UnstableContainerBlockEntity blockEntity) {
-        if (world.isClient) return;
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         age++;
         if (age > 10 && !state.get(UnstableContainerBlock.SETUP_DONE)) {
@@ -103,8 +104,6 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
         
         if (energyStorage.amount > 0)
             outputEnergy();
-        
-        updateNetwork();
     }
     
     private void adjustEnergyStorageSize() {
@@ -169,40 +168,10 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
         
     }
     
-    private boolean isActivelyViewed() {
-        var closestPlayer = Objects.requireNonNull(world).getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 15, false);
-        return closestPlayer != null && closestPlayer.currentScreenHandler instanceof BasicMachineScreenHandler handler && getPos().equals(handler.getBlockPos());
-    }
-    
-    private void updateNetwork() {
-        
-        // sync contained block
-        if (world.getTime() % 80 == 0 || (networkDirty && world.getTime() % 15 == 0))
-            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.UnstableContainerContentPacket(pos, Registries.BLOCK.getId(capturedBlock.getBlock()), qualityMultiplier));
-        
-        if (!networkDirty) return;
-        if (world.getTime() % 15 != 0 && !isActivelyViewed()) return;
-        
-        var statistics = energyStorage.getCurrentStatistics(world.getTime());
-        
-        networkDirty = false;
-        
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.EnergyStatisticsPacket(pos, statistics));
-    }
-    
-    private void sendFullNetworkEntry() {
-        var statistics = energyStorage.getCurrentStatistics(world.getTime());
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.UnstableContainerContentPacket(pos, Registries.BLOCK.getId(capturedBlock.getBlock()), qualityMultiplier));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.EnergyStatisticsPacket(pos, statistics));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.FullEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, energyStorage.maxExtract));
-    }
-    
     @Override
-    public void markDirty() {
-        world.markDirty(pos);
-        networkDirty = true;
+    public void preNetworkUpdate(SyncType type) {
+        super.preNetworkUpdate(type);
+        currentStats = energyStorage.getCurrentStatistics(world.getTime());
     }
     
     @Override
@@ -227,6 +196,10 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     
     @Override
     public List<Vec3i> getCorePositions() {
+        return getCoreOffsets();
+    }
+    
+    public static List<Vec3i> getCoreOffsets() {
         return List.of(
           new Vec3i(-1, -2, -1),
           new Vec3i(0, -2, -1),
@@ -401,7 +374,8 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     
     @Override
     public void saveExtraData(PacketByteBuf buf) {
-        updateNetwork();
+        sendUpdate(SyncType.GUI_OPEN);
+        // todo clean this up once everything has been updated
         var data = new ModScreens.UpgradableData(pos, new MachineAddonController.AddonUiData(List.of(), List.of(), 1f, 1f, pos, 0), getCoreQuality());
         ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
     }
@@ -413,7 +387,6 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     
     @Override
     public @Nullable ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        sendFullNetworkEntry();
         return new UpgradableMachineScreenHandler(syncId, playerInventory, this, new MachineAddonController.AddonUiData(List.of(), List.of(), 1f, 1f, pos, 0), getCoreQuality());
     }
 }

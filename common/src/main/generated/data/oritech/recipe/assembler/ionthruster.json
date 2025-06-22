@@ -1,0 +1,29 @@
+{
+  "type": "oritech:assembler",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "item": "oritech:reinforced_carbon_sheet"
+    },
+    {
+      "item": "oritech:reinforced_carbon_sheet"
+    },
+    {
+      "item": "oritech:advanced_battery"
+    },
+    {
+      "item": "oritech:flux_gate"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "oritech:ion_thruster"
+    }
+  ],
+  "time": 400
+}

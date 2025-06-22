@@ -17,6 +17,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -150,6 +152,8 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
         var maxVelocity = Math.max(Math.max(Math.abs(player.getVelocity().x), Math.abs(player.getVelocity().y)), Math.abs(player.getVelocity().z));
         
         if (maxVelocity < 0.01 || player.currentScreenHandler instanceof PlayerModifierScreenHandler) return false;
+        
+        player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ITEM_AXE_STRIP, SoundCategory.BLOCKS);
         
         var facing = state.get(Properties.HORIZONTAL_FACING);
         var rotation = switch (facing) {

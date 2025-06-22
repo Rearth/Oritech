@@ -34,7 +34,7 @@ dependencies {
     modImplementation "curse.maven:jade-324717:5639994"
 
     // oracle index
-    modCompileOnly "curse.maven:oracle-index-1206582:6300146"
+    modCompileOnly "curse.maven:oracle-index-1206582:6538216"
 
 }
 

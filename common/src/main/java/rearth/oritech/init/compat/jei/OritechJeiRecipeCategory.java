@@ -19,6 +19,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -39,6 +40,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
     public final IDrawableAnimated arrow;
     public final IDrawableStatic background;
     public final IDrawableStatic fluidBackground;
+    private final ScreenProvider.ArrowConfiguration indicatorConfig;
     
     // JEI really feels like the worst of the 3 recipe viewers here
     public OritechJeiRecipeCategory(OritechRecipeType type, Class<? extends MachineBlockEntity> screenProviderSource, Block machine, IGuiHelper helper) {
@@ -49,6 +51,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
             var screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(new BlockPos(0, 0, 0), machine.getDefaultState());
             this.slots = screenProvider.getGuiSlots();
             this.slotOffsets = screenProvider.getSlotAssignments();
+            this.indicatorConfig = screenProvider.getIndicatorConfiguration();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -70,6 +73,10 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
         
         this.slots = slots;
         this.slotOffsets = slotOffsets;
+        this.indicatorConfig = new ScreenProvider.ArrowConfiguration(
+          Oritech.id("textures/gui/modular/arrow_empty.png"),
+          Oritech.id("textures/gui/modular/arrow_full.png"),
+          80, 35, 29, 16, true);
         
     }
     
@@ -95,17 +102,17 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
     
     @Override
     public int getHeight() {
-        return 66;
+        return 70;
     }
     
     @Override
     public void draw(OritechRecipe recipe, IRecipeSlotsView recipeSlotsView, DrawContext guiGraphics, double mouseX, double mouseY) {
         
-        arrow.draw(guiGraphics, 80 - 23, 41 - 17);
+        arrow.draw(guiGraphics, indicatorConfig.x() - 23, indicatorConfig.y() - 17);
         
         // data
         var duration = String.format("%.0f", recipe.getTime() / 20f);
-        guiGraphics.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable("emi.title.oritech.cookingtime", duration, recipe.getTime()), (int) (getWidth() * 0.35), (int) (getHeight() * 0.88), 0xffffff);
+        guiGraphics.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable("emi.title.oritech.cookingtime", duration, recipe.getTime()), (int) (getWidth() * 0.35), (int) (getHeight() * 0.9), 0xffffff);
         
     }
     
@@ -122,7 +129,8 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
             if (input.isEmpty()) continue;
             
             var pos = slots.get(slotOffsets.inputStart() + i);
-            builder.addInputSlot(pos.x() - offsetX, pos.y() - offsetY).addIngredients(input).setBackground(background, -1, -1);
+            var usedY = Math.clamp(2, pos.y() - offsetY, getHeight() - 18 - 4);
+            builder.addInputSlot(pos.x() - offsetX, usedY).addIngredients(input).setBackground(background, -1, -1);
         }
         
         // fluid inputs
@@ -146,13 +154,17 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
             if (output.isEmpty()) continue;
             
             var pos = slots.get(slotOffsets.outputStart() + i);
-            builder.addOutputSlot(pos.x() - offsetX, pos.y() - offsetY).addItemStack(output).setBackground(background, -1, -1);
+            var usedY = Math.clamp(1, pos.y() - offsetY, getHeight() - 18 - 4);
+            builder.addOutputSlot(pos.x() - offsetX, usedY).addItemStack(output).setBackground(background, -1, -1);
         }
         
         // fluid outputs
-        if (!(recipe.getFluidOutput() != null && recipe.getFluidOutput().isEmpty())) {
-            var stack = recipe.getFluidOutput();
-            builder.addOutputSlot(120, 6).addFluidStack(stack.getFluid(), stack.getAmount()).setBackground(fluidBackground, -2, -2).setFluidRenderer(stack.getAmount(), false, 10, 46);
+        var tankCount = 0;
+        var tankStartX = recipe.getFluidOutputs().size() > 1 ? 80 : 120;
+        for (var fluidResult : recipe.getFluidOutputs()) {
+            if (fluidResult.isEmpty()) continue;
+            builder.addOutputSlot(tankStartX + tankCount *  20, 6).addFluidStack(fluidResult.getFluid(), fluidResult.getAmount()).setBackground(fluidBackground, -2, -2).setFluidRenderer(fluidResult.getAmount(), false, 10, 46);
+            tankCount++;
         }
     }
 }

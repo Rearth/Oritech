@@ -4,10 +4,7 @@
     "amount": 500,
     "fluid": "minecraft:water"
   },
-  "fluidOutput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
+  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "oritech:raw_biopolymer"
@@ -19,5 +16,5 @@
       "id": "oritech:plastic_sheet"
     }
   ],
-  "time": 200
+  "time": 120
 }

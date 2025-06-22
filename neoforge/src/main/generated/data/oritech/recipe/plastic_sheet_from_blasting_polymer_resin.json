@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 10,
+  "experience": 0.5,
+  "group": "plastic_manual_blast",
+  "ingredient": {
+    "item": "oritech:polymer_resin"
+  },
+  "result": {
+    "count": 1,
+    "id": "oritech:plastic_sheet"
+  }
+}

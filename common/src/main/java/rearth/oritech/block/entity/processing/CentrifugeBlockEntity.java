@@ -62,7 +62,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         if (!recipeInputMatchesTank(fluidContainer.getInStack(), recipe)) return false;
         
         // check if output fluid would fit
-        var output = recipe.getFluidOutput();
+        var output = recipe.getFluidOutputs().isEmpty() ? null : recipe.getFluidOutputs().getFirst();
         if (output != null && !output.isEmpty()) { // only verify fluid output if fluid output exists
             
             if (fluidContainer.getOutStack().getAmount() + output.getAmount() > fluidContainer.getCapacity())
@@ -134,7 +134,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     private void craftFluids(OritechRecipe activeRecipe) {
         
         var input = activeRecipe.getFluidInput();
-        var output = activeRecipe.getFluidOutput();
+        var output = activeRecipe.getFluidOutputs().isEmpty() ? null : activeRecipe.getFluidOutputs().getFirst();
         
         if (input != null && input.amount() > 0)
             fluidContainer.getInputContainer().extract(fluidContainer.getInStack().copyWithAmount(input.amount()), false);

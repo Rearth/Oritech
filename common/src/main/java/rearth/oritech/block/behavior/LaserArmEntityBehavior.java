@@ -49,6 +49,7 @@ public class LaserArmEntityBehavior {
                 var candidate = EnergyApi.ITEM.find(stackRef);
                 if (candidate != null) {
                     var amount = candidate.insert(laserEntity.energyRequiredToFire(), false);
+                    if (amount > 0) candidate.update();
                     return amount > 0;
                 }
                 

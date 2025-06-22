@@ -2,13 +2,13 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 24,
       "ingredient": {
         "tag": "c:storage_blocks/lapis"
       }
     },
     {
-      "count": 64,
+      "count": 24,
       "ingredient": {
         "tag": "c:storage_blocks/redstone"
       }
@@ -29,13 +29,13 @@
       }
     },
     {
-      "count": 48,
+      "count": 32,
       "ingredient": {
         "tag": "c:storage_blocks/lapis"
       }
     },
     {
-      "count": 32,
+      "count": 24,
       "ingredient": {
         "tag": "c:storage_blocks/gold"
       }

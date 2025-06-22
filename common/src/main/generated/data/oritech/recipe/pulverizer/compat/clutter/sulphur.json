@@ -12,10 +12,7 @@
     "amount": 0,
     "fluid": "minecraft:empty"
   },
-  "fluidOutput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
+  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "clutter:sulphur_block"

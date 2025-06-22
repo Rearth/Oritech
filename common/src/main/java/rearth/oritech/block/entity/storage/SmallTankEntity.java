@@ -3,7 +3,6 @@ package rearth.oritech.block.entity.storage;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,6 +27,9 @@ import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.storage.SmallFluidTank;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
@@ -38,9 +40,9 @@ import rearth.oritech.util.*;
 import java.util.List;
 import java.util.Objects;
 
-public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvider, ItemApi.BlockProvider, ComparatorOutputProvider, ScreenProvider, ExtendedMenuProvider, BlockEntityTicker<SmallTankEntity> {
+public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, ItemApi.BlockProvider, ComparatorOutputProvider,
+                                                                       ScreenProvider, ExtendedMenuProvider {
     
-    private boolean netDirty = false;
     private int lastComparatorOutput = 0;
     public final boolean isCreative;
     
@@ -48,6 +50,7 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
     
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::markDirty, new InventorySlotAssignment(0, 2, 2, 1));
     
+    @SyncField({SyncType.TICK, SyncType.INITIAL})
     public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
     
     public SmallTankEntity(BlockPos pos, BlockState state, boolean isCreative) {
@@ -81,13 +84,8 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, SmallTankEntity blockEntity) {
-        // fill/drain buckets
-        
-        if (world.isClient) return;
-        
-        if (world.getTime() % 80 == 0)
-            netDirty = true;    // to ensure this syncs when no charges are triggered, and inventory isn't opened
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        // fills/drains buckets
         
         // in creative, set tank fill level
         if (isCreative) {
@@ -104,11 +102,7 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
         if (fluidStorage.getAmount() > 0)
             outputToBelow();
         
-        if (netDirty) {
-            updateComparators(world, pos, state);
-            updateNetwork();
-        }
-        
+        updateComparators(world, pos, state);
     }
     
     private void outputToBelow() {
@@ -129,7 +123,6 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
         
         SimpleFluidStorage.transfer(ownTank, belowTank, ownTank.getCapacity(), false);
     }
-    
     
     private void updateComparators(World world, BlockPos pos, BlockState state) {
         var previous = lastComparatorOutput;
@@ -192,12 +185,6 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
         }
     }
     
-    private void updateNetwork() {
-        netDirty = false;
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(
-          new NetworkContent.SingleVariantFluidSyncPacketAPI(pos, Registries.FLUID.getId(fluidStorage.getFluid()).toString(), fluidStorage.getAmount()));
-    }
-    
     @Override
     public int getComparatorOutput() {
         if (fluidStorage.getFluid().equals(Fluids.EMPTY)) return 0;
@@ -209,10 +196,7 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
     @Override
     public void markDirty() {
         super.markDirty();
-        
-        this.netDirty = true;
-        
-        if (world != null) {
+        if (world != null && getCachedState().get(SmallFluidTank.LIT) != isGlowingFluid()) {
             world.setBlockState(getPos(), getCachedState().with(SmallFluidTank.LIT, isGlowingFluid()));
         }
     }
@@ -220,6 +204,7 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
     
     @Override
     public void saveExtraData(PacketByteBuf buf) {
+        sendUpdate(SyncType.GUI_OPEN);
         buf.writeBlockPos(pos);
     }
     
@@ -231,7 +216,6 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        this.markDirty();
         return new BasicMachineScreenHandler(syncId, playerInventory, this);
     }
     

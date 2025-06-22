@@ -10,10 +10,7 @@
     "amount": 100,
     "fluid": "mekanismgenerators:bioethanol"
   },
-  "fluidOutput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
+  "fluidOutputs": [],
   "ingredients": [],
   "results": [],
   "time": 60

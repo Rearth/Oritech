@@ -1,0 +1,26 @@
+{
+  "type": "oritech:atomic_forge",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:ingots/platinum"
+    },
+    {
+      "item": "oritech:reinforced_carbon_sheet"
+    },
+    {
+      "item": "oritech:reinforced_carbon_sheet"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:duratium_ingot"
+    }
+  ],
+  "time": 200
+}

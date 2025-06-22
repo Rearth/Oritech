@@ -8,6 +8,8 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 
+import java.util.Objects;
+
 import static net.minecraft.util.math.Direction.*;
 
 public class Geometry {
@@ -19,15 +21,38 @@ public class Geometry {
         return ownPos.add(rotated);
     }
     
+    public static Vec3d worldToOffsetPosition(Direction facing, Vec3d worldTarget, Vec3d ownPos) {
+        Vec3d relativeWorld = worldTarget.subtract(ownPos);
+        
+        double relX = relativeWorld.getX();
+        double relY = relativeWorld.getY();
+        double relZ = relativeWorld.getZ();
+        
+        if (Objects.requireNonNull(facing) == NORTH) {
+            return new Vec3d(-relX, relY, -relZ);
+        } else if (facing == SOUTH) {
+            return new Vec3d(relX, relY, relZ);
+        } else if (facing == WEST) {
+            return new Vec3d(relZ, relY, -relX);
+        } else if (facing == EAST) {
+            return new Vec3d(-relZ, relY, relX);
+        } else if (facing == UP) {
+            return new Vec3d(relX, -relZ, relY);
+        } else if (facing == DOWN) {
+            return new Vec3d(relX, relZ, -relY);
+        }
+        throw new IllegalArgumentException();
+        
+    }
+    
     public static Vec3i rotatePosition(Vec3i relativePos, Direction facing) {
         return switch (facing) {
             case NORTH -> new BlockPos(relativePos.getZ(), relativePos.getY(), relativePos.getX());
             case WEST -> new BlockPos(relativePos.getX(), relativePos.getY(), -relativePos.getZ());
             case SOUTH -> new BlockPos(-relativePos.getZ(), relativePos.getY(), -relativePos.getX());
             case EAST -> new BlockPos(-relativePos.getX(), relativePos.getY(), relativePos.getZ());
-            case UP -> new BlockPos(relativePos.getZ(), -relativePos.getX(), -relativePos.getY());
+            case UP -> new BlockPos(-relativePos.getZ(), -relativePos.getX(), -relativePos.getY());
             case DOWN -> new BlockPos(relativePos.getZ(), relativePos.getX(), relativePos.getY());
-            default -> relativePos;
         };
     }
     public static Vec3d rotatePosition(Vec3d relativePos, Direction facing) {
@@ -36,9 +61,8 @@ public class Geometry {
             case WEST -> new Vec3d(relativePos.getX(), relativePos.getY(), -relativePos.getZ());
             case SOUTH -> new Vec3d(-relativePos.getZ(), relativePos.getY(), -relativePos.getX());
             case EAST -> new Vec3d(-relativePos.getX(), relativePos.getY(), relativePos.getZ());
-            case UP -> new Vec3d(relativePos.getZ(), -relativePos.getX(), -relativePos.getY());
+            case UP -> new Vec3d(-relativePos.getZ(), -relativePos.getX(), -relativePos.getY());
             case DOWN -> new Vec3d(relativePos.getZ(), relativePos.getX(), relativePos.getY());
-            default -> relativePos;
         };
     }
     

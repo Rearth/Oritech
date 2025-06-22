@@ -2,8 +2,6 @@ package rearth.oritech.block.entity.interaction;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -19,11 +17,12 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MultiblockMachineController;
@@ -40,18 +39,18 @@ import java.util.List;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
-public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<DeepDrillEntity>, EnergyApi.BlockProvider, GeoBlockEntity, ItemApi.BlockProvider, MultiblockMachineController {
+public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.BlockProvider, GeoBlockEntity, ItemApi.BlockProvider, MultiblockMachineController {
     
     // work data
     private boolean initialized;
     private final List<Block> targetedOre = new ArrayList<>();
     private int progress;
+    @SyncField
     private long lastWorkTime;
-    private boolean networkDirty;
     
     // config
-    private int worktime = Oritech.CONFIG.deepDrillConfig.stepsPerOre();
-    private int energyPerStep = Oritech.CONFIG.deepDrillConfig.energyPerStep();
+    private final int worktime = Oritech.CONFIG.deepDrillConfig.stepsPerOre();
+    private final int energyPerStep = Oritech.CONFIG.deepDrillConfig.energyPerStep();
     
     // storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.deepDrillConfig.energyCapacity(), 0, 0, this::markDirty);
@@ -79,9 +78,9 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
         return !targetedOre.isEmpty();
     }
     
+    
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, DeepDrillEntity blockEntity) {
-        if (world.isClient) return;
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         if (isActive(state) && !initialized && (world.getTime() + pos.asLong()) % 60 == 0) {
             init(false);
@@ -95,7 +94,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
             progress++;
             energyStorage.amount -= energyPerStep;
             lastWorkTime = world.getTime();
-            networkDirty = true;
+            markDirty();
             
             var particlePos = getCenter(0);
             ParticleContent.FURNACE_BURNING.spawn(world, Vec3d.of(particlePos), 1);
@@ -114,8 +113,6 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
             progress -= worktime;
             this.markDirty();
         }
-        
-        updateNetwork();
         
     }
     
@@ -142,13 +139,6 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
                 }
             }
         }  
-    }
-    
-    private void updateNetwork() {
-        if (networkDirty && world.getTime() % 5 == 0) {
-            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.DeepDrillSyncPacket(pos, lastWorkTime));
-            networkDirty = false;
-        }
     }
     
     private void craftResult(World world, BlockPos pos) {

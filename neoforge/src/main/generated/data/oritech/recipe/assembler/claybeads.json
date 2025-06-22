@@ -1,0 +1,29 @@
+{
+  "type": "oritech:assembler",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "item": "minecraft:clay_ball"
+    },
+    {
+      "item": "minecraft:clay_ball"
+    },
+    {
+      "tag": "minecraft:sand"
+    },
+    {
+      "item": "minecraft:redstone"
+    }
+  ],
+  "results": [
+    {
+      "count": 32,
+      "id": "oritech:clay_catalyst_beads"
+    }
+  ],
+  "time": 200
+}

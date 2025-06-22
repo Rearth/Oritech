@@ -40,6 +40,7 @@ import rearth.oritech.block.blocks.pipes.item.ItemPipeDuctBlock;
 import rearth.oritech.block.blocks.processing.*;
 import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
+import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.init.ItemContent.Compostable;
 import rearth.oritech.item.OritechGeoItem;
 import rearth.oritech.item.other.SmallEnergyStorageBlockItem;
@@ -107,6 +108,10 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @NoBlockItem
     public static final Block PUMP_TRUNK_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.CHAIN).nonOpaque());
     @NoBlockItem
+    public static final Block TANK_ITEM_MODEL = new Block(AbstractBlock.Settings.copy(Blocks.CHAIN).nonOpaque());   // workaround because I don't understand how to properly get the model to load
+    @NoBlockItem
+    public static final Block CREATIVE_TANK_ITEM_MODEL = new Block(AbstractBlock.Settings.copy(Blocks.CHAIN).nonOpaque());   // workaround because I don't understand how to properly get the model to load
+    @NoBlockItem
     public static final Block QUARRY_BEAM_INNER = new Block(AbstractBlock.Settings.copy(Blocks.CHAIN).nonOpaque().luminance(item -> 5));
     @NoBlockItem
     public static final Block QUARRY_BEAM_RING = new Block(AbstractBlock.Settings.copy(Blocks.CHAIN).nonOpaque().luminance(item -> 5));
@@ -142,6 +147,10 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block CENTRIFUGE_BLOCK = new CentrifugeBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.3f)
     public static final Block ATOMIC_FORGE_BLOCK = new AtomicForgeBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
+    @UseGeoBlockItem(scale = 0.3f)
+    public static final Block REFINERY_BLOCK = new RefineryBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
+    @UseGeoBlockItem(scale = 0.3f)
+    public static final Block REFINERY_MODULE_BLOCK = new RefineryModuleBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block BIO_GENERATOR_BLOCK = new BioGeneratorBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
@@ -177,6 +186,9 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @NoAutoDrop
     @DispenserPlace
     public static final Block CREATIVE_TANK_BLOCK = new CreativeFluidTank(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).luminance(state -> state.get(Properties.LIT) ? 15 : 0).hardness(-1.0F));
+    
+    public static final Item SMALL_TANK_ITEM = new SmallFluidTankBlockItem(SMALL_TANK_BLOCK, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
+    public static final Item CREATIVE_TANK_ITEM = new SmallFluidTankBlockItem(CREATIVE_TANK_BLOCK, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block AUGMENT_APPLICATION_BLOCK = new AugmentApplicationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
@@ -359,6 +371,14 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block IRON_PLATING_PRESSURE_PLATE = new PressurePlateBlock(BlockSetType.IRON, AbstractBlock.Settings.copy(Blocks.STONE_BUTTON));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block CARBON_PLATING_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block CARBON_PLATING_SLAB = new SlabBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block CARBON_PLATING_STAIRS = new StairsBlock(CARBON_PLATING_BLOCK.getDefaultState(), AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block CARBON_PLATING_PRESSURE_PLATE = new PressurePlateBlock(BlockSetType.IRON, AbstractBlock.Settings.copy(Blocks.STONE_BUTTON));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block NICKEL_PLATING_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block NICKEL_PLATING_SLAB = new SlabBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
@@ -367,14 +387,14 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block NICKEL_PLATING_PRESSURE_PLATE = new PressurePlateBlock(BlockSetType.IRON, AbstractBlock.Settings.copy(Blocks.STONE_BUTTON));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block METAL_BEAM_BLOCK = new MetalBeamBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block METAL_BEAM_BLOCK = new MetalBeamBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().solid());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block INDUSTRIAL_GLASS_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.GLASS).requiresTool().strength(7.0F, 8.0F).nonOpaque());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     @UseGeoBlockItem(scale = 0.5f)
-    public static final Block TECH_DOOR = new TechDoorBlock(AbstractBlock.Settings.copy(Blocks.IRON_DOOR).strength(8f));
+    public static final Block TECH_DOOR = new TechDoorBlock(AbstractBlock.Settings.copy(Blocks.IRON_DOOR).strength(8f).solid());
     @NoBlockItem
-    public static final Block TECH_DOOR_HINGE = new TechDoorBlockHinge(AbstractBlock.Settings.copy(Blocks.IRON_DOOR).strength(8f));
+    public static final Block TECH_DOOR_HINGE = new TechDoorBlockHinge(AbstractBlock.Settings.copy(Blocks.IRON_DOOR).strength(8f).solid());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block STEEL_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
@@ -418,8 +438,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
         
         if (field.isAnnotationPresent(UseGeoBlockItem.class)) {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), getGeoBlockItem(value, identifier, field.getAnnotation(UseGeoBlockItem.class).scale()));
-        } else if ((value.equals(BlockContent.SMALL_TANK_BLOCK) || value.equals(BlockContent.CREATIVE_TANK_BLOCK)) && FluidApi.ITEM != null) {
-            var item = new SmallFluidTankBlockItem(value, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
+        } else if (FluidApi.ITEM != null && (value instanceof SmallFluidTank)) {
+            var item = value.equals(BlockContent.SMALL_TANK_BLOCK) ? SMALL_TANK_ITEM : CREATIVE_TANK_ITEM;
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), item);
             FluidApi.ITEM.registerForItem(() -> item);
         } else if (value.equals(BlockContent.SMALL_STORAGE_BLOCK) && EnergyApi.ITEM != null) {

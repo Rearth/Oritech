@@ -1,0 +1,25 @@
+{
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 1000,
+    "fluid": "oritech:still_sulfuric_acid"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 250,
+      "fluid": "oritech:still_mineral_slurry"
+    }
+  ],
+  "ingredients": [
+    {
+      "tag": "c:clumps/platinum"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "oritech:platinum_gem"
+    }
+  ],
+  "time": 450
+}

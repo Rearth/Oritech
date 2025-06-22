@@ -40,6 +40,7 @@ public class OritechEMIPlugin implements EmiPlugin {
         registerOritechCategory(registry, manager, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK, CentrifugeBlockEntity.class);
         registerOritechCategory(registry, manager, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK, CentrifugeBlockEntity.class);
         registerOritechCategory(registry, manager, RecipeContent.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE_BLOCK, AtomicForgeBlockEntity.class);
+        registerOritechCategory(registry, manager, RecipeContent.REFINERY, BlockContent.REFINERY_BLOCK, RefineryBlockEntity.class);
         
         // generators
         registerOritechCategory(registry, manager, RecipeContent.BIO_GENERATOR, BlockContent.BIO_GENERATOR_BLOCK, BioGeneratorEntity.class);

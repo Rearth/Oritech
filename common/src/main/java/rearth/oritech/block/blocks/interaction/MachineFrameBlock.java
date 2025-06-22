@@ -12,11 +12,11 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import rearth.oritech.init.TagContent;
 
 import java.util.List;
@@ -59,24 +59,19 @@ public class MachineFrameBlock extends Block {
     }
     
     private VoxelShape getShape(BlockState state) {
-        var shape = boundingShapes[0];
-        
-        if (state.get(NORTH))
-            shape = VoxelShapes.union(shape, boundingShapes[1]);
-        if (state.get(EAST))
-            shape = VoxelShapes.union(shape, boundingShapes[2]);
-        if (state.get(SOUTH))
-            shape = VoxelShapes.union(shape, boundingShapes[3]);
-        if (state.get(WEST))
-            shape = VoxelShapes.union(shape, boundingShapes[4]);
-        if (state.get(UP))
-            shape = VoxelShapes.union(shape, boundingShapes[5]);
-        if (state.get(DOWN))
-            shape = VoxelShapes.union(shape, boundingShapes[6]);
-        
-        return shape;
+        return boundingShapes[packStates(state)];
     }
-    
+
+    private static int packStates(BlockState state) {
+        int i = 0;
+        if (state.get(NORTH)) i |= 1;
+        if (state.get(EAST)) i |= 2;
+        if (state.get(SOUTH)) i |= 4;
+        if (state.get(WEST)) i |= 8;
+        if (state.get(UP)) i |= 16;
+        if (state.get(DOWN)) i |= 32;
+        return i;
+    }
     
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
@@ -91,15 +86,15 @@ public class MachineFrameBlock extends Block {
     }
     
     protected VoxelShape[] createShapes() {
-        VoxelShape inner = Block.createCuboidShape(5, 5, 5, 11, 11, 11);
-        VoxelShape north = Block.createCuboidShape(5, 5, 0, 11, 11, 5);
-        VoxelShape east = Block.createCuboidShape(0, 5, 5, 5, 11, 11);
-        VoxelShape south = Block.createCuboidShape(5, 5, 11, 11, 11, 16);
-        VoxelShape west = Block.createCuboidShape(11, 5, 5, 16, 11, 11);
-        VoxelShape up = Block.createCuboidShape(5, 5, 5, 11, 16, 11);
-        VoxelShape down = Block.createCuboidShape(5, 0, 5, 11, 5, 11);
-        
-        return new VoxelShape[] {inner, north, west, south, east, up, down};
+        return GenericPipeBlock.createShapes(
+                Block.createCuboidShape(5, 5, 5, 11, 11, 11),
+                Block.createCuboidShape(5, 5, 0, 11, 11, 5),
+                Block.createCuboidShape(0, 5, 5, 5, 11, 11),
+                Block.createCuboidShape(5, 5, 11, 11, 11, 16),
+                Block.createCuboidShape(11, 5, 5, 16, 11, 11),
+                Block.createCuboidShape(5, 5, 5, 11, 16, 11),
+                Block.createCuboidShape(5, 0, 5, 11, 5, 11)
+        );
     }
     
     @Nullable

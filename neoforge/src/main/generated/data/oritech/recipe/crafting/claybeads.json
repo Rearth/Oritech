@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "tag": "minecraft:sand"
+    },
+    "c": {
+      "item": "minecraft:redstone"
+    },
+    "f": {
+      "item": "minecraft:clay_ball"
+    }
+  },
+  "pattern": [
+    "bb ",
+    "cf ",
+    "   "
+  ],
+  "result": {
+    "count": 8,
+    "id": "oritech:clay_catalyst_beads"
+  }
+}

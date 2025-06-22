@@ -1,5 +1,6 @@
 package rearth.oritech.fabric;
 
+import dev.architectury.fluid.FluidStack;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.EntityElytraEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -11,6 +12,7 @@ import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.item.tools.armor.JetpackElytraItem;
 import rearth.oritech.item.tools.armor.JetpackExoElytraItem;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
+import rearth.oritech.network.NetworkContent;
 
 public final class OritechFabricMod implements ModInitializer {
     @Override
@@ -25,6 +27,10 @@ public final class OritechFabricMod implements ModInitializer {
         FluidApi.ITEM = fluidApiInstance;
         
         ItemApi.BLOCK = new FabricItemApi();
+        
+        NetworkContent.FLUID_STACK_CODEC = FluidStack.CODEC;
+        NetworkContent.FLUID_STACK_STREAM_CODEC = FluidStack.STREAM_CODEC;
+        
         
         // Run our common setup.
         Oritech.runAllRegistries();

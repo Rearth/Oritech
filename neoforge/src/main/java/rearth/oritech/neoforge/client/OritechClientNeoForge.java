@@ -2,7 +2,11 @@ package rearth.oritech.neoforge.client;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayers;
-import net.minecraft.util.Hand;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -14,8 +18,8 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RenderHighlightEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
@@ -23,11 +27,10 @@ import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.PortalEntityRenderer;
+import rearth.oritech.client.renderers.SmallTankItemRenderer;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.init.FluidContent;
-import rearth.oritech.item.tools.PortableLaserItem;
-
-import static net.neoforged.fml.loading.FMLEnvironment.dist;
 
 @Mod(value = Oritech.MOD_ID, dist = Dist.CLIENT)
 public class OritechClientNeoForge {
@@ -96,8 +99,40 @@ public class OritechClientNeoForge {
                 }
             }, attribute.getSourceFluid().getFluidType()));
             
+            event.registerItem(new TankItemExtensions(Oritech.id("tank_item_model")), BlockContent.SMALL_TANK_ITEM);
+            event.registerItem(new TankItemExtensions(Oritech.id("creative_tank_item_model")), BlockContent.CREATIVE_TANK_ITEM);
+            
         }
         
+    }
+    
+    private static class TankItemRenderer extends BuiltinModelItemRenderer {
+        
+        private final SmallTankItemRenderer itemRenderer;
+        
+        public TankItemRenderer(Identifier modelId) {
+            super(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+            this.itemRenderer = new SmallTankItemRenderer(modelId);
+        }
+        
+        @Override
+        public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+            // super.render(stack, mode, matrices, vertexConsumers, light, overlay);
+            itemRenderer.render(stack, mode, matrices, vertexConsumers, light, overlay);
+        }
+    }
+    
+    private static class TankItemExtensions implements IClientItemExtensions {
+        private final TankItemRenderer renderer;
+        
+        private TankItemExtensions(Identifier modelId) {
+            this.renderer = new TankItemRenderer(modelId);
+        }
+        
+        @Override
+        public @NotNull BuiltinModelItemRenderer getCustomRenderer() {
+            return renderer;
+        }
     }
     
 }

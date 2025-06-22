@@ -51,6 +51,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerTy
     public static final ScreenHandlerType<ItemFilterScreenHandler> ITEM_FILTER_SCREEN = MenuRegistry.ofExtended((ItemFilterScreenHandler::new));
     public static final ScreenHandlerType<PlayerModifierScreenHandler> MODIFIER_SCREEN = MenuRegistry.ofExtended((PlayerModifierScreenHandler::new));
     public static final ScreenHandlerType<RedstoneAddonScreenHandler> REDSTONE_ADDON_SCREEN = MenuRegistry.ofExtended((RedstoneAddonScreenHandler::new));
+    public static final ScreenHandlerType<RefineryScreenHandler> REFINERY_SCREEN = MenuRegistry.ofExtended((RefineryScreenHandler::new));
     
     public static final ScreenHandlerType<DroneScreenHandler> DRONE_SCREEN = MenuRegistry.ofExtended((DroneScreenHandler::new));
     public static final ScreenHandlerType<CentrifugeScreenHandler> CENTRIFUGE_SCREEN = MenuRegistry.ofExtended((CentrifugeScreenHandler::new));
@@ -66,6 +67,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerTy
         MenuRegistry.registerScreenFactory(CHARGER_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(FUEL_PORT_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(AUGMENTER_INV_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
+        MenuRegistry.registerScreenFactory(REFINERY_SCREEN, RefineryScreen::new);
         
         MenuRegistry.registerScreenFactory(PULVERIZER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(GRINDER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);

@@ -36,6 +36,10 @@ public final class OritechClient {
         
         // used for augment UI
         ClientTickEvent.CLIENT_PRE.register(client -> {
+            
+            if (PlayerAugments.allAugments.isEmpty() && client.world != null)
+                PlayerAugments.loadAllAugments(client.world.getRecipeManager());
+            
             if (AUGMENT_SELECTOR.wasPressed() && activeScreen == null) {
                 activeScreen = new AugmentSelectionScreen();
                 client.setScreen(activeScreen);

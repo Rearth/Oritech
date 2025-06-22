@@ -3,6 +3,7 @@ package rearth.oritech.item.other;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.block.Block;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
@@ -28,7 +29,7 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
             tooltip.add(Text.translatable("tooltip.oritech.fluid_empty"));
         } else {
             var amount = data.getAmount() / (float) FluidStackHooks.bucketAmount();
-            tooltip.add(Text.translatable("tooltip.oritech.fluid_content_tank_tooltip", amount, FluidStackHooks.getName(data).getString()));
+            tooltip.add(Text.translatable("tooltip.oritech.fluid_content_tank_tooltip", amount, FluidStackHooks.getName(data).getString()).formatted(Formatting.GRAY));
         }
         
         super.appendTooltip(stack, context, tooltip, type);
@@ -58,7 +59,14 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
     
     @Override
     public int getItemBarColor(ItemStack stack) {
-        return 0x07bdff;
+        var content = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
+        if (content.isEmpty())
+            return 0x07bdff;
+        
+        if (content.getFluid().equals(Fluids.LAVA))
+            return 0xff8000;
+        
+        return FluidStackHooks.getColor(content);
     }
     
     @Override

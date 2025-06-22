@@ -66,6 +66,14 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     @AssignSidedInventory
     public static final BlockEntityType<AtomicForgeBlockEntity> ATOMIC_FORGE_ENTITY = BlockEntityType.Builder.create(AtomicForgeBlockEntity::new, BlockContent.ATOMIC_FORGE_BLOCK).build(null);
     
+    @AssignSidedFluid
+    @AssignSidedInventory
+    @AssignSidedEnergy
+    public static final BlockEntityType<RefineryBlockEntity> REFINERY_ENTITY = BlockEntityType.Builder.create(RefineryBlockEntity::new, BlockContent.REFINERY_BLOCK).build(null);
+    
+    @AssignSidedFluid
+    public static final BlockEntityType<RefineryModuleBlockEntity> REFINERY_MODULE_ENTITY = BlockEntityType.Builder.create(RefineryModuleBlockEntity::new, BlockContent.REFINERY_MODULE_BLOCK).build(null);
+    
     @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<BioGeneratorEntity> BIO_GENERATOR_ENTITY = BlockEntityType.Builder.create(BioGeneratorEntity::new, BlockContent.BIO_GENERATOR_BLOCK).build(null);

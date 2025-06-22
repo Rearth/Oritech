@@ -1,0 +1,25 @@
+{
+  "type": "oritech:refinery",
+  "fluidInput": {
+    "amount": 250,
+    "fluid": "oritech:still_sheol_fire"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 200,
+      "fluid": "minecraft:lava"
+    }
+  ],
+  "ingredients": [
+    {
+      "tag": "c:raw_materials/iron"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "oritech:iron_clump"
+    }
+  ],
+  "time": 200
+}

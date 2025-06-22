@@ -41,24 +41,25 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
         if (!state.get(FrameInteractionBlock.HAS_FRAME) || entity.getAreaMin() == null || entity.getLastTarget() == null)
             return;
         
+        var currentTarget = entity.getCurrentTarget();
+        var renderedPosition = Vec3d.of(currentTarget);
         
-        var renderedPosition = Vec3d.of(entity.getCurrentTarget());
         var movingOffset = new Vec3d(0, 0, 0);
-        var time = entity.getWorld().getTime() + tickDelta;
-        var passedTime = time - entity.getMoveStartedAt();
         var random = entity.getWorld().random;
         
-        // check if currently moving, otherwise we can skip those calculations
-        if (time < entity.getMoveStartedAt() + entity.getMoveTime() && entity.getMoveStartedAt() > 1) {
-            var movementDoneAmount = passedTime / (float) entity.getMoveTime();
-            var offset = Vec3d.of(entity.getCurrentTarget().subtract(entity.getLastTarget())).multiply(movementDoneAmount);
-            renderedPosition = Vec3d.of(entity.getLastTarget()).add(offset);
+        if (entity.isMoving()) {
+            var lastPosition = Vec3d.of(entity.getLastTarget());
+            var progress = entity.getCurrentProgress() / entity.getMoveTime();
+            var offset = renderedPosition.subtract(lastPosition);
+            renderedPosition = lastPosition.add(offset.multiply(progress));
         } else {
-            // apply slight movement while working
-            var offsetY = renderRandom.nextFloat() * 0.009 - 0.004;
+            // apply slight shaking while working
+            var offsetY = renderRandom.nextFloat() * 0.012 - 0.004;
             movingOffset = new Vec3d(0, offsetY, 0);
         }
-        renderedPosition = LaserArmRenderer.lerp(entity.lastRenderedPosition, renderedPosition, 0.1f);
+        
+        
+        renderedPosition = LaserArmRenderer.lerp(entity.lastRenderedPosition, renderedPosition, 0.04f);
         entity.lastRenderedPosition = renderedPosition;
         var targetOffset = renderedPosition.subtract(Vec3d.of(entity.getPos())).add(movingOffset);
         

@@ -12,10 +12,7 @@
     "amount": 8100,
     "fluid": "techreborn:nitrofuel"
   },
-  "fluidOutput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
+  "fluidOutputs": [],
   "ingredients": [],
   "results": [],
   "time": 200

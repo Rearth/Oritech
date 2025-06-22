@@ -16,6 +16,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
@@ -115,6 +117,8 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
                         Oritech.LOGGER.debug("moved from item {} {}", moved, stackRef.getValue());
                     }
                 }
+                
+                world.playSoundAtBlockCenter(pos, SoundEvents.ENTITY_AXOLOTL_SPLASH, SoundCategory.PLAYERS, 0.8f, 1.4f, true);
                 
                 return ItemActionResult.success(true);
             }

@@ -26,22 +26,22 @@ public class OritechRecipe implements Recipe<RecipeInput> {
     protected final List<Ingredient> inputs;
     protected final List<ItemStack> results;
     protected final FluidIngredient fluidInput;
-    protected final FluidStack fluidOutput;
+    protected final List<FluidStack> fluidOutputs;
     protected final int time;
 
     public static final OritechRecipe DUMMY = new OritechRecipe(-1, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER, FluidIngredient.EMPTY, FluidStack.empty());
     
     public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, @Nullable FluidIngredient fluidInput, @Nullable FluidStack fluidOutput) {
+        this(time, inputs, results, type, fluidInput, (fluidOutput == null || fluidOutput.isEmpty()) ? List.of() : List.of(fluidOutput));
+    }
+    public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, @Nullable FluidIngredient fluidInput, List<FluidStack> fluidOutputs) {
         this.type = type;
         this.results = results;
         this.inputs = inputs;
         this.time = time;
         if (fluidInput == null) fluidInput = FluidIngredient.EMPTY;
         this.fluidInput = fluidInput.withAmount(fluidInput.amount());
-        if (fluidOutput == null) fluidOutput = FluidStack.empty();
-        this.fluidOutput = fluidOutput;
-        if (!fluidOutput.isEmpty())
-            this.fluidOutput.setAmount(this.fluidOutput.getAmount());
+        this.fluidOutputs = fluidOutputs;
     }
 
     public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, @Nullable FluidIngredient fluidInput, Fluid outVariant, long outAmount) {
@@ -138,7 +138,6 @@ public class OritechRecipe implements Recipe<RecipeInput> {
                  ", inputs=" + inputs +
                  ", results=" + results +
                  ", fluidInput=" + fluidInput +
-                 ", fluidOutput=" + fluidOutput +
                  ", time=" + time +
                  '}';
     }
@@ -146,7 +145,7 @@ public class OritechRecipe implements Recipe<RecipeInput> {
     public int getTime() {
         return time;
     }
-
+    
     public List<Ingredient> getInputs() {
         return inputs;
     }
@@ -169,7 +168,7 @@ public class OritechRecipe implements Recipe<RecipeInput> {
         return fluidInput;
     }
     
-    public @Nullable FluidStack getFluidOutput() {
-        return fluidOutput;
+    public List<FluidStack> getFluidOutputs() {
+        return fluidOutputs;
     }
 }

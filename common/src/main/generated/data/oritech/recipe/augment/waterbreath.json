@@ -9,7 +9,7 @@
     },
     {
       "ingredient": {
-        "item": "minecraft:conduit"
+        "tag": "minecraft:fishes"
       }
     }
   ],

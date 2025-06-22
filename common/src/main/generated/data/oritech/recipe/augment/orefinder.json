@@ -24,15 +24,14 @@
   ],
   "researchCost": [
     {
-      "count": 64,
+      "count": 32,
       "ingredient": {
         "item": "oritech:enderic_lens"
       }
     },
     {
-      "count": 48,
       "ingredient": {
-        "item": "minecraft:amethyst_block"
+        "item": "minecraft:spyglass"
       }
     },
     {
@@ -41,13 +40,12 @@
       }
     },
     {
-      "count": 8,
+      "count": 2,
       "ingredient": {
         "item": "oritech:prometheum_ingot"
       }
     },
     {
-      "count": 4,
       "ingredient": {
         "item": "minecraft:sculk_sensor"
       }

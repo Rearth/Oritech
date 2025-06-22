@@ -12,8 +12,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
-import rearth.oritech.network.NetworkContent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -173,7 +173,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     }
     
     private void sendUpdateToServer() {
-        NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.ItemFilterSyncPacket(handler.blockPos, handler.blockEntity.getFilterSettings()));
+        NetworkManager.sendToServer(new ItemFilterBlockEntity.ItemFilterPayload(handler.blockPos, handler.blockEntity.getFilterSettings()));
     }
     
     private void toggleWhitelist() {

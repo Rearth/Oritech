@@ -49,15 +49,7 @@ public class EnergyPipeConnectionBlock extends GenericPipeConnectionBlock {
 
     @Override
     protected VoxelShape[] createShapes() {
-        VoxelShape inner = Block.createCuboidShape(6, 6, 6, 10, 10, 10);
-        VoxelShape north = Block.createCuboidShape(6, 6, 0, 10, 10, 6);
-        VoxelShape east = Block.createCuboidShape(0, 6, 6, 6, 10, 10);
-        VoxelShape south = Block.createCuboidShape(6, 6, 10, 10, 10, 16);
-        VoxelShape west = Block.createCuboidShape(10, 6, 6, 16, 10, 10);
-        VoxelShape up = Block.createCuboidShape(6, 10, 6, 10, 16, 10);
-        VoxelShape down = Block.createCuboidShape(6, 0, 6, 10, 6, 10);
-
-        return new VoxelShape[]{inner, north, west, south, east, up, down};
+        return THIN_SHAPES;
     }
     
     @Override

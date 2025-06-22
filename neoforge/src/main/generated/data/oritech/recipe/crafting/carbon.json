@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "a": {
+      "tag": "c:ingots/steel"
+    },
+    "c": {
+      "item": "oritech:reinforced_carbon_sheet"
+    },
+    "e": {
+      "item": "minecraft:stone"
+    }
+  },
+  "pattern": [
+    "eae",
+    "aca",
+    "eae"
+  ],
+  "result": {
+    "count": 2,
+    "id": "oritech:carbon_plating_block"
+  }
+}

@@ -101,6 +101,7 @@ public class ItemContent implements ArchitecturyRegistryContainer<Item> {
     public static final Item ENDERIC_COMPOUND = new Item(new Item.Settings());
     public static final Item INSULATED_WIRE = new Item(new Item.Settings());
     public static final Item MAGNETIC_COIL = new Item(new Item.Settings());
+    public static final Item CLAY_CATALYST_BEADS = new Item(new Item.Settings());
     public static final Item MOTOR = new CustomTooltipItem(new Item.Settings(), "tooltip.oritech.motor");
     public static final Item BASIC_BATTERY = new Item(new Item.Settings());
     public static final Item RAW_SILICON = new Item(new Item.Settings());
@@ -109,6 +110,8 @@ public class ItemContent implements ArchitecturyRegistryContainer<Item> {
     public static final Item POLYMER_RESIN = new Item(new Item.Settings());
     public static final Item PLASTIC_SHEET = new Item(new Item.Settings());
     public static final Item PROCESSING_UNIT = new Item(new Item.Settings());
+    public static final Item REINFORCED_CARBON_SHEET = new Item(new Item.Settings());
+    public static final Item ION_THRUSTER = new Item(new Item.Settings());
     public static final Item ADVANCED_COMPUTING_ENGINE = new Item(new Item.Settings());
     public static final Item SILICON_WAFER = new Item(new Item.Settings());
     public static final Item DUBIOS_CONTAINER = new MobCaptureItem(new Item.Settings().maxCount(16), List.of(EntityType.VEX, EntityType.ALLAY, EntityType.PHANTOM));

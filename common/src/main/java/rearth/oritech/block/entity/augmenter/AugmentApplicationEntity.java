@@ -18,6 +18,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -38,6 +40,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.SoundContent;
 import rearth.oritech.init.recipes.AugmentDataRecipe;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
@@ -251,6 +254,8 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
         var augmentInstance = PlayerAugments.allAugments.get(augment);
         augmentInstance.installToPlayer(player);
         this.markNetDirty();
+        
+        player.getWorld().playSound(null, player.getBlockPos(), SoundContent.SHORT_SERVO, SoundCategory.BLOCKS);
     }
     
     public void removeAugmentFromPlayer(Identifier augment, PlayerEntity player) {

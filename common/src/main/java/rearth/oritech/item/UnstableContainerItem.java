@@ -13,8 +13,11 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
@@ -107,6 +110,17 @@ public class UnstableContainerItem extends Item implements GeoItem {
             targetMultiplier = 1f;
         } else if (targetBlockState.isIn(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH)) {
             targetMultiplier = 5f;
+        }
+        
+        for (var offset : UnstableContainerBlockEntity.getCoreOffsets()) {
+            // the block is symetrical, so offsets don't matter here
+            var worldPos = targetBlockPos.add(offset);
+            var candidateState = context.getWorld().getBlockState(worldPos);
+            if (!candidateState.isReplaceable()) {
+                context.getPlayer().sendMessage(Text.translatable("text.oritech.unstable_container_blocked"));
+                ParticleContent.HIGHLIGHT_BLOCK.spawn(context.getWorld(), Vec3d.of(worldPos));
+                return ActionResult.FAIL;
+            }
         }
         
         if (targetMultiplier > 0) {

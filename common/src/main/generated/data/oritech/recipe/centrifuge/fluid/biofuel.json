@@ -4,10 +4,12 @@
     "amount": 20250,
     "fluid": "minecraft:water"
   },
-  "fluidOutput": {
-    "amount": 8100,
-    "fluid": "oritech:still_biofuel"
-  },
+  "fluidOutputs": [
+    {
+      "amount": 8100,
+      "fluid": "oritech:still_biofuel"
+    }
+  ],
   "ingredients": [
     {
       "tag": "c:fuels/bio"

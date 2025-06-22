@@ -73,7 +73,6 @@ import java.util.function.Consumer;
 import static rearth.oritech.block.entity.interaction.LaserArmBlockEntity.BLOCK_BREAK_ENERGY;
 import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
 
-// todo recipe
 public class PortableLaserItem extends Item implements OritechEnergyItem, GeoItem {
     
     public static final int ACTION_COOLDOWN = 24;

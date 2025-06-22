@@ -1,0 +1,11 @@
+{
+  "type": "oritech:lava_generator",
+  "fluidInput": {
+    "amount": 8100,
+    "fluid": "oritech:still_sheol_fire"
+  },
+  "fluidOutputs": [],
+  "ingredients": [],
+  "results": [],
+  "time": 800
+}

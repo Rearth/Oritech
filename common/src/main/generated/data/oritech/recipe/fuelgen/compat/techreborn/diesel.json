@@ -12,10 +12,7 @@
     "amount": 8100,
     "fluid": "techreborn:diesel"
   },
-  "fluidOutput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
+  "fluidOutputs": [],
   "ingredients": [],
   "results": [],
   "time": 280

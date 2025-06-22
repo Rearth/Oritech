@@ -187,7 +187,16 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
                     container.update();
                 }
             });
-            return container.extract(maxAmount, false);
+
+            var extracted = container.extract(maxAmount, false);
+
+            // no idea what this does, but it does seem to fix it
+            if (context != null) {
+                stack.set(EnergyApi.ITEM.getEnergyComponent(), container.getAmount());
+                context.exchange(ItemVariant.of(stack), 1, transaction);
+            }
+
+            return extracted;
         }
         
         @Override

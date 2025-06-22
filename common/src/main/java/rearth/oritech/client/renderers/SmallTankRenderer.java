@@ -36,10 +36,8 @@ public class SmallTankRenderer implements BlockEntityRenderer<SmallTankEntity> {
         matrices.translate(0.126, 0.126, 0.126);
         matrices.scale(0.745f, 0.745f * fill, 0.745f);
         
-        // because fabric fluidRender() doesnt seem to do the job, we manually draw rects:
         var entry = matrices.peek();
         var modelMatrix = entry.getPositionMatrix();
-        var normalMatrix = entry.getNormalMatrix();
         
         // Draw the cube using quads
         for (Direction direction : Direction.values()) {
@@ -51,7 +49,7 @@ public class SmallTankRenderer implements BlockEntityRenderer<SmallTankEntity> {
         
     }
     
-    private void drawQuad(Direction direction, VertexConsumer consumer, Matrix4f modelMatrix, MatrixStack.Entry normalMatrix, Sprite sprite, int color, int light, int overlay) {
+    public static void drawQuad(Direction direction, VertexConsumer consumer, Matrix4f modelMatrix, MatrixStack.Entry normalMatrix, Sprite sprite, int color, int light, int overlay) {
         // Define the vertices of the quad based on the direction it's facing
         
         var normal = direction.getUnitVector();
@@ -75,11 +73,11 @@ public class SmallTankRenderer implements BlockEntityRenderer<SmallTankEntity> {
     }
     
     private static float[] getFrameU() {
-        return new float[] {0, 1, 1, 0};
+        return new float[]{0, 1, 1, 0};
     }
     
     private static float[] getFrameV() {
-        return new float[] {0, 0, 1, 1};
+        return new float[]{0, 0, 1, 1};
     }
     
     private static float[][] getQuadVerticesByDirection(Direction direction) {

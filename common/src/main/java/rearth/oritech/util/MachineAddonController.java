@@ -298,8 +298,7 @@ public interface MachineAddonController {
     record AddonBlock(MachineAddonBlock addonBlock, BlockState state, BlockPos pos, AddonBlockEntity addonEntity) {
     }
     
-    record BaseAddonData(float speed, float efficiency, long energyBonusCapacity, long energyBonusTransfer, int extraChambers) {
-    }
+    record BaseAddonData(float speed, float efficiency, long energyBonusCapacity, long energyBonusTransfer, int extraChambers) { }
     
     record AddonUiData(List<BlockPos> positions, List<BlockPos> openSlots, float efficiency, float speed,
                        BlockPos ownPosition, int extraChambers) {

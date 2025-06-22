@@ -98,27 +98,18 @@ See the [open issues](https://github.com/rearth/Oritech/issues) for a list of pr
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any
-contributions you make are **greatly appreciated**.
+contributions you make are **greatly appreciated**. However, I do have a specific vision for the mod and what content
+would fit, so for content and balance changes please reach out to me first (via github issue/discussion or discord)
 
 * If you have suggestions for adding or removing projects, feel free
   to [open an issue](https://github.com/rearth/Oritech/issues/new) to discuss it, or directly create a pull request
   after you edit the *README.md* file with necessary changes.
 * Please make sure you check your spelling and grammar.
 * Create individual PR for each suggestion.
-* Please also read through the [Code Of Conduct](https://github.com/rearth/Oritech/blob/main/CODE_OF_CONDUCT.md) before
-  posting your first idea as well.
-
-### Creating A Pull Request
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ## Credits
 
-This mod is heavily inspired by the original techarium mod, which sadly never got finished. A lot of the machine names and models
+This mod is heavily inspired by the original techarium mod, which sadly hasn't been released in a playable version yet. A lot of the machine names and models
 were taken or strongly inspired by techarium. Huge thanks to the original techarium devs (YCar and Gecko and everyone else involved) for creating
 the assets and ideas, and also for making them available under the [CC BY-NC 4.0 DEED](https://creativecommons.org/licenses/by-nc/4.0/) license.
 

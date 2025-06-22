@@ -79,7 +79,7 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:11.0.3"
 
     // oracle index
-    modRuntimeOnly "curse.maven:oracle-index-1206582:6300146"
+    modRuntimeOnly "curse.maven:oracle-index-1206582:6538216"
     implementation "org.jsoup:jsoup:1.17.2"
 
     // compat mods for testing
@@ -88,6 +88,8 @@ dependencies {
     modImplementation "curse.maven:reborncore-237903:5608204"
 //    // Energized Power
     modImplementation "curse.maven:energized-power-782147:5650292"
+
+    modImplementation "curse.maven:tags-viewer-1119728:5807898"
 
     // create
     // modImplementation "net.createmod.ponder:Ponder-Fabric-${minecraft_version}:1.0.45"
@@ -122,7 +124,7 @@ tasks.remapJar {
 
 publishMods {
     file = remapJar.archiveFile
-    changelog = file("../CHANGELOG.md").getText()
+    changelog = file("../CHANGELOG.MD").getText()
     type = BETA
     modLoaders.add("fabric")
 

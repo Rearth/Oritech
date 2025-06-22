@@ -47,8 +47,8 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
               
               if (storage == null) return null;
               
-              if (storage instanceof FluidApi.InOutSlotStorage inOutContainer) {
-                  return InOutFluidContainerStorageWrapper.of(inOutContainer);
+              if (storage instanceof FluidApi.MultiSlotStorage inOutContainer) {
+                  return MultiSlotWrapper.of(inOutContainer);
               } else if (storage instanceof FluidApi.SingleSlotStorage singleContainer) {
                   return SingleSlotContainerStorageWrapper.of(singleContainer);
               } else if (storage instanceof DelegatingFluidStorage delegatedStorage) {
@@ -77,7 +77,7 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         return switch (candidate) {
             case null -> null;
             case SingleSlotContainerStorageWrapper wrapper -> wrapper.container;
-            case InOutFluidContainerStorageWrapper wrapper -> wrapper.container.getStorageForDirection(direction);
+            case MultiSlotWrapper wrapper -> wrapper.storage.getStorageForDirection(direction);
             case DelegatedContainerStorageWrapper wrapper -> wrapper.storage;
             default -> new FabricStorageWrapper(candidate, null);
         };
@@ -243,123 +243,92 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     }
     
     // this is used by other mods to interact with the oritech in/out fluid containers
-    public static class InOutFluidContainerStorageWrapper extends SnapshotParticipant<Pair<FluidStack, FluidStack>> implements Storage<FluidVariant> {
+    public static class MultiSlotWrapper extends SnapshotParticipant<List<FluidStack>> implements Storage<FluidVariant> {
         
-        public final FluidApi.InOutSlotStorage container;
-        private List<@NotNull StorageView<FluidVariant>> storageViews;
+        public final FluidApi.MultiSlotStorage storage;
         
-        public static InOutFluidContainerStorageWrapper of(FluidApi.InOutSlotStorage container) {
-            if (container == null) return null;
-            return new InOutFluidContainerStorageWrapper(container);
+        public static MultiSlotWrapper of(FluidApi.MultiSlotStorage storage) {
+            if (storage == null) return null;
+            return new MultiSlotWrapper(storage);
         }
         
-        private InOutFluidContainerStorageWrapper(FluidApi.InOutSlotStorage container) {
-            this.container = container;
+        private MultiSlotWrapper(FluidApi.MultiSlotStorage storage) {
+            this.storage = storage;
         }
         
         @Override
         public boolean supportsInsertion() {
-            return container.supportsInsertion();
+            return storage.supportsInsertion();
         }
         
         @Override
-        public long insert(FluidVariant fluidVariant, long amount, TransactionContext transaction) {
+        public long insert(FluidVariant fluidVariant, long l, TransactionContext transaction) {
             updateSnapshots(transaction);
             transaction.addCloseCallback((transactionContext, result) -> {
                 if (result.wasCommitted()) {
-                    container.update();
+                    storage.update();
                 }
             });
-            return container.insert(FluidStackHooksFabric.fromFabric(fluidVariant, amount), false);
+            return storage.insert(FluidStackHooksFabric.fromFabric(fluidVariant, l), false);
         }
         
         @Override
         public boolean supportsExtraction() {
-            return container.supportsExtraction();
+            return storage.supportsExtraction();
         }
         
         @Override
-        public long extract(FluidVariant fluidVariant, long amount, TransactionContext transaction) {
+        public long extract(FluidVariant fluidVariant, long l, TransactionContext transaction) {
             updateSnapshots(transaction);
             transaction.addCloseCallback((transactionContext, result) -> {
                 if (result.wasCommitted()) {
-                    container.update();
+                    storage.update();
                 }
             });
-            return container.extract(FluidStackHooksFabric.fromFabric(fluidVariant, amount), false);
+            return storage.extract(FluidStackHooksFabric.fromFabric(fluidVariant, l), false);
         }
         
         @Override
         public @NotNull Iterator<StorageView<FluidVariant>> iterator() {
-            
-            if (storageViews != null) return storageViews.iterator();
-            
-            storageViews = List.of(new StorageView<FluidVariant>() {
-                // in storage
+            return storage.getContent().stream().map(stack -> new StorageView<FluidVariant>() {
+                
                 @Override
                 public long extract(FluidVariant fluidVariant, long l, TransactionContext transactionContext) {
-                    return 0;
+                    return MultiSlotWrapper.this.extract(fluidVariant, l, transactionContext);
                 }
                 
                 @Override
                 public boolean isResourceBlank() {
-                    return container.getInStack().getFluid().equals(Fluids.EMPTY);
+                    return stack.isEmpty();
                 }
                 
                 @Override
                 public FluidVariant getResource() {
-                    return FluidStackHooksFabric.toFabric(container.getInStack());
+                    return FluidStackHooksFabric.toFabric(stack);
                 }
                 
                 @Override
                 public long getAmount() {
-                    return container.getInStack().getAmount();
+                    return stack.getAmount();
                 }
                 
                 @Override
                 public long getCapacity() {
-                    return container.getCapacity();
+                    return storage.getCapacity();
                 }
-            }.getUnderlyingView(), new StorageView<FluidVariant>() {
-                // out storage
-                @Override
-                public long extract(FluidVariant fluidVariant, long l, TransactionContext transactionContext) {
-                    return InOutFluidContainerStorageWrapper.this.extract(fluidVariant, l, transactionContext);
-                }
-                
-                @Override
-                public boolean isResourceBlank() {
-                    return container.getOutStack().getFluid().equals(Fluids.EMPTY);
-                }
-                
-                @Override
-                public FluidVariant getResource() {
-                    return FluidStackHooksFabric.toFabric(container.getOutStack());
-                }
-                
-                @Override
-                public long getAmount() {
-                    return container.getOutStack().getAmount();
-                }
-                
-                @Override
-                public long getCapacity() {
-                    return container.getCapacity();
-                }
-            }.getUnderlyingView());
-            
-            return storageViews.iterator();
+            }.getUnderlyingView()).iterator();
         }
         
         @Override
-        protected Pair<FluidStack, FluidStack> createSnapshot() {
-            return new Pair<>(container.getInStack().copy(), container.getOutStack().copy());
+        protected List<FluidStack> createSnapshot() {
+            return storage.getContent().stream().map(FluidStack::copy).toList();
         }
         
         @Override
-        protected void readSnapshot(Pair<FluidStack, FluidStack> snapshot) {
-            container.setInStack(snapshot.getLeft());
-            container.setOutStack(snapshot.getRight());
+        protected void readSnapshot(List<FluidStack> fluidStacks) {
+            for (int i = 0; i < fluidStacks.size(); i++) {
+                storage.setStack(i, fluidStacks.get(i));
+            }
         }
     }
     

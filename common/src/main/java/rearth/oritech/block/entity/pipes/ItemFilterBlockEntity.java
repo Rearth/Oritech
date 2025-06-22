@@ -1,11 +1,7 @@
 package rearth.oritech.block.entity.pipes;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import io.wispforest.endec.Endec;
-import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -15,6 +11,11 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
@@ -22,20 +23,24 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.pipes.item.ItemFilterBlock;
 import rearth.oritech.client.ui.ItemFilterScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.network.NetworkContent;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ItemFilterBlockEntity extends BlockEntity implements ItemApi.BlockProvider, ExtendedMenuProvider, BlockEntityTicker<ItemFilterBlockEntity> {
+public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemApi.BlockProvider, ExtendedMenuProvider {
     
     public final FilterBlockInventory inventory = new FilterBlockInventory(1, this::markDirty);
     
+    @SyncField(SyncType.GUI_OPEN)
     protected FilterData filterSettings = new FilterData(false, true, false, new HashMap<>());
     
     @Override
@@ -91,7 +96,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements ItemApi.BlockP
     
     @Override
     public void saveExtraData(PacketByteBuf buf) {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.ItemFilterSyncPacket(pos, filterSettings));
+        sendUpdate(SyncType.GUI_OPEN);
         buf.writeBlockPos(pos);
     }
     
@@ -107,10 +112,10 @@ public class ItemFilterBlockEntity extends BlockEntity implements ItemApi.BlockP
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, ItemFilterBlockEntity blockEntity) {
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         // if non-empty and inventory in target, move it
-        if (world.isClient || inventory.isEmpty()) return;
+        if (inventory.isEmpty()) return;
         
         var targetDirection = getCachedState().get(ItemFilterBlock.TARGET_DIR);
         var targetPos = pos.add(targetDirection.getVector());
@@ -140,20 +145,47 @@ public class ItemFilterBlockEntity extends BlockEntity implements ItemApi.BlockP
             world.markDirty(pos);
     }
     
+    public static void handleClientUpdate(ItemFilterPayload message, World world, DynamicRegistryManager registryAccess) {
+        var blockEntity = world.getBlockEntity(message.pos(), BlockEntitiesContent.ITEM_FILTER_ENTITY);
+        if (blockEntity.isPresent()) {
+            blockEntity.get().setFilterSettings(message.data);
+        }
+    
+    }
+    
     // items is a map of position index (in the filter GUI) to filtered item stack
-    public record FilterData(boolean useNbt, boolean useWhitelist, boolean useComponents,
-                             Map<Integer, ItemStack> items) {
+    public record FilterData(boolean useNbt, boolean useWhitelist, boolean useComponents, Map<Integer, ItemStack> items) {
+        
+        public static PacketCodec<RegistryByteBuf, FilterData> PACKET_CODEC = PacketCodec.tuple(
+          PacketCodecs.BOOL, FilterData::useNbt,
+          PacketCodecs.BOOL, FilterData::useWhitelist,
+          PacketCodecs.BOOL, FilterData::useComponents,
+          PacketCodecs.map(HashMap::new, PacketCodecs.INTEGER, ItemStack.PACKET_CODEC), FilterData::items,
+          FilterData::new
+        );
+        
+    }
+    
+    // used to send data to server
+    public record ItemFilterPayload(BlockPos pos, FilterData data) implements CustomPayload {
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return FILTER_PACKET_ID;
+        }
+        
+        public static final CustomPayload.Id<ItemFilterPayload> FILTER_PACKET_ID = new CustomPayload.Id<>(Oritech.id("filter"));
+        
+        public static final PacketCodec<RegistryByteBuf, ItemFilterPayload> PACKET_CODEC = PacketCodec.tuple(
+          BlockPos.PACKET_CODEC, ItemFilterPayload::pos,
+          FilterData.PACKET_CODEC, ItemFilterPayload::data,
+          ItemFilterPayload::new
+        );
     }
     
     public class FilterBlockInventory extends SimpleInventoryStorage {
         
         public FilterBlockInventory(int size, Runnable onUpdate) {
             super(size, onUpdate);
-        }
-        
-        @Override
-        public boolean supportsExtraction() {
-            return true;
         }
         
         public boolean canInsert(ItemStack stack) {
@@ -212,6 +244,4 @@ public class ItemFilterBlockEntity extends BlockEntity implements ItemApi.BlockP
             return super.insertToSlot(addedStack, slot, simulate);
         }
     }
-    
-    public static Endec<Map<Integer, ItemStack>> FILTER_ITEMS_ENDEC = Endec.map(Object::toString, Integer::valueOf, MinecraftEndecs.ITEM_STACK);
 }

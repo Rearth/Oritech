@@ -10,10 +10,7 @@
     "amount": 1000,
     "fluid": "pneumaticcraft:oil"
   },
-  "fluidOutput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
+  "fluidOutputs": [],
   "ingredients": [],
   "results": [],
   "time": 60

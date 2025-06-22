@@ -172,7 +172,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             produced *= Oritech.CONFIG.generators.steamEngineData.rfToSteamRatio();
             produced *= SteamEngineEntity.STEAM_AMOUNT_MULTIPLIER;
             
-            var extracted = boilerStorage.getInputContainer().extract(FluidStack.create(Fluids.WATER.getStill(), (long) produced), false);
+            var extracted = boilerStorage.getInputContainer().extract(FluidStack.create(Fluids.WATER.getStill(), Math.round(produced)), false);
             boilerStorage.getOutputContainer().insert(FluidStack.create(FluidContent.STILL_STEAM.get(), extracted), false);
         } else {
             energyStorage.amount += produced;

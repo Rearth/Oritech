@@ -1,0 +1,18 @@
+---
+title: Refinery
+icon: oritech:refinery_block
+related_items: [oritech:refinery_block, oritech:refinery_module_block]
+---
+
+The refinery can be used to process items and fluids. It has one item and one fluid input slot, with one item and 3 fluid output slots.
+
+<center>
+<ModAsset location="oritech:area/refinery" width={1000} />
+</center>
+
+However, by default only one fluid output slot is active. The enable the other 2 output slots, add refinery tank modules above. These are also multiblocks that need to be
+assembled with machine cores. They need to line up with the refinery itself to connect. The output fluids of the output tank 2 and 3 can be extracted from the modules, not the
+main refinery block.
+
+When no module is active/used, the remaining fluid is instead used for the initial output. This means the item and fluid output of the first slot is doubled.
+If only one module is installed, the second fluid output amount is doubled instead.

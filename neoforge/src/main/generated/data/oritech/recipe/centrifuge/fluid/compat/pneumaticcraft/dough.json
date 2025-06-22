@@ -10,10 +10,7 @@
     "amount": 1000,
     "fluid": "pneumaticcraft:yeast_culture"
   },
-  "fluidOutput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
+  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "pneumaticcraft:wheat_flour"

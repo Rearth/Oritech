@@ -27,7 +27,7 @@ public abstract class OritechRecipeBuilder {
     protected List<Ingredient> inputs;
     protected List<ItemStack> results;
     protected FluidIngredient fluidInput;
-    protected FluidStack fluidOutput;
+    protected List<FluidStack> fluidOutputs;
     protected int time = 200;
     protected float timeMultiplier = 1f;
     protected boolean addToGrinder;
@@ -36,6 +36,7 @@ public abstract class OritechRecipeBuilder {
     protected OritechRecipeBuilder(OritechRecipeType type, String resourcePath) {
         this.type = type;
         this.resourcePath = resourcePath;
+        this.fluidOutputs = new ArrayList<>();
     }
 
     public OritechRecipeBuilder input(List<Ingredient> in) {
@@ -86,7 +87,7 @@ public abstract class OritechRecipeBuilder {
     }
 
     public OritechRecipeBuilder fluidOutput(FluidStack out) {
-        fluidOutput = out;
+        fluidOutputs.add(out);
         return this;
     }
 
@@ -164,7 +165,7 @@ public abstract class OritechRecipeBuilder {
                 results != null ? results : List.of(),
                 type,
                 fluidInput != null ? fluidInput : FluidIngredient.EMPTY,
-                fluidOutput != null ? fluidOutput : FluidStack.empty()),
+                fluidOutputs != null ? fluidOutputs : List.of()),
             null);
     }
 }

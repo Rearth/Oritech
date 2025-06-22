@@ -10,10 +10,12 @@
     "amount": 1000,
     "fluid": "actuallyadditions:crystallized_oil"
   },
-  "fluidOutput": {
-    "amount": 1000,
-    "fluid": "actuallyadditions:empowered_oil"
-  },
+  "fluidOutputs": [
+    {
+      "amount": 1000,
+      "fluid": "actuallyadditions:empowered_oil"
+    }
+  ],
   "ingredients": [
     {
       "item": "actuallyadditions:empowered_canola_seed"

@@ -8,7 +8,7 @@
       }
     },
     {
-      "count": 64,
+      "count": 32,
       "ingredient": {
         "tag": "c:storage_blocks/gold"
       }
@@ -38,7 +38,7 @@
       }
     },
     {
-      "count": 64,
+      "count": 32,
       "ingredient": {
         "tag": "c:rods/blaze"
       }

@@ -26,6 +26,8 @@ public class ModRenderers {
         BlockEntityRendererFactories.register(BlockEntitiesContent.CENTRIFUGE_ENTITY, ctx -> new MachineRenderer<>("models/centrifuge_block"));
         BlockEntityRendererFactories.register(BlockEntitiesContent.ATOMIC_FORGE_ENTITY, ctx -> new MachineRenderer<>("models/atomic_forge_block"));
         BlockEntityRendererFactories.register(BlockEntitiesContent.POWERED_FURNACE_ENTITY, ctx -> new MachineRenderer<>("models/powered_furnace_block"));
+        BlockEntityRendererFactories.register(BlockEntitiesContent.REFINERY_ENTITY, ctx -> new RefineryRenderer<>("models/refinery_block"));
+        BlockEntityRendererFactories.register(BlockEntitiesContent.REFINERY_MODULE_ENTITY, ctx -> new MachineRenderer<>("models/refinery_module_block"));
         
         BlockEntityRendererFactories.register(BlockEntitiesContent.PLAYER_MODIFIER_BLOCK_ENTITY, ctx -> new MachineRenderer<>("models/augment_application_block"));
         
@@ -100,6 +102,8 @@ public class ModRenderers {
         RENDER_LAYERS.put(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION, RenderLayer.getTranslucent());
 
         Oritech.LOGGER.info("Registering Entities Renderers for " + Oritech.MOD_ID);
+        
+        
     }
 
 }

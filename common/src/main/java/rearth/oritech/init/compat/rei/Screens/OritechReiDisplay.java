@@ -1,6 +1,5 @@
 package rearth.oritech.init.compat.rei.Screens;
 
-import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import io.wispforest.owo.compat.rei.ReiUIAdapter;
 import io.wispforest.owo.ui.component.Components;
@@ -23,6 +22,7 @@ import net.minecraft.item.ItemConvertible;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.client.ui.BasicMachineScreen;
@@ -34,7 +34,6 @@ import rearth.oritech.util.ScreenProvider;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 
@@ -45,6 +44,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
     private final List<ScreenProvider.GuiSlot> slots;
     private final InventorySlotAssignment slotOffsets;
     protected final ItemConvertible icon;
+    private final ScreenProvider.ArrowConfiguration indicatorConfig;
     
     public OritechReiDisplay(OritechRecipeType recipeType, Class<? extends MachineBlockEntity> screenProviderSource, ItemConvertible icon) {
         
@@ -59,6 +59,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             this.isGenerator = screenProvider instanceof UpgradableGeneratorBlockEntity;
             this.slots = screenProvider.getGuiSlots();
             this.slotOffsets = screenProvider.getSlotAssignments();
+            this.indicatorConfig = screenProvider.getIndicatorConfiguration();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -73,6 +74,10 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         this.isGenerator = isGenerator;
         this.slots = slots;
         this.slotOffsets = assignments;
+        this.indicatorConfig = new ScreenProvider.ArrowConfiguration(
+          Oritech.id("textures/gui/modular/arrow_empty.png"),
+          Oritech.id("textures/gui/modular/arrow_full.png"),
+          80, 35, 29, 16, true);
     }
     
     @Override
@@ -90,6 +95,11 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         return List.of(adapter);
     }
     
+    @Override
+    public int getDisplayHeight() {
+        return 74;
+    }
+    
     public void fillDisplay(FlowLayout root, OritechDisplay display, ReiUIAdapter<FlowLayout> adapter) {
         
         var offsetX = 23;
@@ -101,16 +111,17 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             var entry = inputEntries.get(i);
             if (entry.isEmpty()) continue;
             var pos = slots.get(slotOffsets.inputStart() + i);
+            var usedY = Math.clamp(2, pos.y() - offsetY, getDisplayHeight() - 18 - 4);
             root.child(
               adapter.wrap(Widgets.createSlot(new Point(0, 0)).entries(entry).markInput())
-                .positioning(Positioning.absolute(pos.x() - offsetX, pos.y() - offsetY)));
+                .positioning(Positioning.absolute(pos.x() - offsetX, usedY)));
         }
         
         // arrow
         if (isGenerator) {
-            root.child(adapter.wrap(Widgets.createBurningFire(new Point(0, 0))).positioning(Positioning.absolute(77 - offsetX, 42 - offsetY)));
+            root.child(adapter.wrap(Widgets.createBurningFire(new Point(0, 0))).positioning(Positioning.absolute(indicatorConfig.x() - offsetX, indicatorConfig.y() -  offsetY)));
         } else {
-            root.child(adapter.wrap(Widgets.createArrow(new Point(0, 0))).positioning(Positioning.absolute(80 - offsetX, 39 - offsetY)));
+            root.child(adapter.wrap(Widgets.createArrow(new Point(0, 0))).positioning(Positioning.absolute(indicatorConfig.x() - offsetX, indicatorConfig.y() -  offsetY)));
         }
         
         // outputs
@@ -128,7 +139,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         var duration = String.format("%.0f", display.getEntry().value().getTime() / 20f);
         root.child(
           Components.label(Text.translatable("rei.title.oritech.cookingtime", duration, display.getEntry().value().getTime())).lineHeight(7)
-            .positioning(Positioning.relative(35, 97))
+            .positioning(Positioning.relative(90, 100))
         );
         
         // fluids
@@ -159,19 +170,26 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             root.child(foreGround);
         }
         
-        if (display.entry.value().getFluidOutput() != null && display.entry.value().getFluidOutput().getAmount() > 0) {
-            var amount = display.entry.value().getFluidOutput().getAmount();
-            
-            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(display.entry.value().getFluidOutput(), new ScreenProvider.BarConfiguration(123, 5, 16, 50)));
-            
-            var text = amount > 0
-                ? Text.translatable("tooltip.oritech.fluid_content", amount, FluidStackHooks.getName(display.entry.value().getFluidOutput()).getString())
-                : Text.translatable("tooltip.oritech.fluid_empty");
-            var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
-            foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));
-            foreGround.positioning(Positioning.absolute(122, 4));
-            foreGround.tooltip(text);
-            root.child(foreGround);
+        if (!display.entry.value().getFluidOutputs().isEmpty()) {
+            var tankCount = 0;
+            var tankStartX = display.entry.value().getFluidOutputs().size() > 1 ? 80 : 120;
+            for (var fluidResult : display.entry.value().getFluidOutputs()) {
+                if (fluidResult.isEmpty()) continue;
+                
+                var amount = fluidResult.getAmount();
+                root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluidResult, new ScreenProvider.BarConfiguration(tankStartX + tankCount * 20 + 1, 5, 16, 50)));
+                
+                var text = amount > 0
+                             ? Text.translatable("tooltip.oritech.fluid_content", amount, FluidStackHooks.getName(fluidResult).getString())
+                             : Text.translatable("tooltip.oritech.fluid_empty");
+                var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
+                foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));
+                foreGround.positioning(Positioning.absolute(tankStartX + tankCount * 20, 4));
+                foreGround.tooltip(text);
+                root.child(foreGround);
+                
+                tankCount++;
+            }
         }
         
     }

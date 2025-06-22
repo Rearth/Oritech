@@ -2,12 +2,14 @@
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 81000,
-    "fluid": "#c:oil"
+    "fluid": "oritech:still_diesel"
   },
-  "fluidOutput": {
-    "amount": 81000,
-    "fluid": "oritech:still_fuel"
-  },
+  "fluidOutputs": [
+    {
+      "amount": 81000,
+      "fluid": "oritech:still_fuel"
+    }
+  ],
   "ingredients": [
     {
       "item": "oritech:fluxite"

@@ -20,8 +20,10 @@ import net.minecraft.util.shape.VoxelShapes;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
+import rearth.oritech.block.blocks.processing.RefineryModuleBlock;
 import rearth.oritech.block.blocks.storage.LargeStorageBlock;
 import rearth.oritech.block.blocks.storage.SmallStorageBlock;
+import rearth.oritech.block.entity.processing.RefineryModuleBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
@@ -81,7 +83,7 @@ public class BlockOutlineRenderer {
             machineFacing = player.getHorizontalFacing().getOpposite();
         } else if (block instanceof AugmentResearchStationBlock) {
             machineFacing = player.getFacing();
-        } else if (!(block instanceof MultiblockMachine)) {
+        } else if (!(block instanceof MultiblockMachine || block instanceof RefineryModuleBlock)) {
             machineFacing = machineFacing.getOpposite();
         }
         

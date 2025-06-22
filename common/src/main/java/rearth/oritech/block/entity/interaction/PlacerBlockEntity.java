@@ -10,16 +10,18 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.AdditionalNetworkingProvider;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.network.NetworkContent;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
 
-public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
+public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements AdditionalNetworkingProvider {
     
     public PlacerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PLACER_BLOCK_ENTITY, pos, state);
@@ -62,15 +64,6 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
         }
         
         return null;
-    }
-    
-    // send inventory updates to client to correctly render the current item
-    @Override
-    public void sendMovementNetworkPacket(BlockPos from) {
-        super.sendMovementNetworkPacket(from);
-        
-        if (!isActivelyViewed())
-            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.InventorySyncPacket(pos, inventory.heldStacks));
     }
     
     @Override
@@ -125,5 +118,17 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
     @Override
     public ScreenHandlerType<?> getScreenHandlerType() {
         return ModScreens.PLACER_SCREEN;
+    }
+    
+    @Override
+    public List<Field> additionalSyncedFields(SyncType type) {
+        if (type.equals(SyncType.TICK)) {
+            try {
+                return List.of(ItemEnergyFrameInteractionBlockEntity.class.getDeclaredField("inventory"));
+            } catch (NoSuchFieldException e) {
+                Oritech.LOGGER.error("unable to register inventory as extra synced field for placed block.");
+            }
+        }
+        return List.of();
     }
 }

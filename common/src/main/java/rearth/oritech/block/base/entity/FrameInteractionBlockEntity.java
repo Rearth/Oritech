@@ -2,8 +2,6 @@ package rearth.oritech.block.base.entity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -16,10 +14,12 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.block.FrameInteractionBlock;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
 
 import java.util.HashMap;
@@ -27,23 +27,30 @@ import java.util.Objects;
 
 import static rearth.oritech.util.Geometry.*;
 
-public abstract class FrameInteractionBlockEntity extends BlockEntity implements BlockEntityTicker<FrameInteractionBlockEntity> {
+public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     
     private static final int MAX_SEARCH_LENGTH = Oritech.CONFIG.processingMachines.machineFrameMaxLength();
     private static final HashMap<Vec3i, HashMap<Vec3i, Vec3i>> occupiedAreas = new HashMap<>();
+    
+    @SyncField({SyncType.INITIAL, SyncType.SPARSE_TICK})
     private BlockPos areaMin;       // both min and max are inclusive
+    @SyncField({SyncType.INITIAL, SyncType.SPARSE_TICK})
     private BlockPos areaMax;
-    private BlockPos currentTarget; // rendering is based just on this (and move time)
+    @SyncField({SyncType.INITIAL, SyncType.SPARSE_TICK})
+    public boolean disabledViaRedstone;
+    
+    @SyncField
+    private BlockPos currentTarget;
+    @SyncField
     private BlockPos lastTarget;
-    private float currentProgress;    // not synced
-    private boolean moving;    // not synced
+    @SyncField
+    private boolean moving;
+    @SyncField
+    private float currentProgress;
+    
     private Vec3i currentDirection = new Vec3i(1, 0, 0);    // not synced
     public long lastWorkedAt;   // not synced
-    public boolean disabledViaRedstone;
-    public boolean networkDirty;
     
-    // client only
-    private long moveStartedAt;
     // for smooth client rendering only
     public Vec3d lastRenderedPosition = new Vec3d(0, 0, 0);
     
@@ -121,6 +128,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
             lastTarget = areaMin;
         }
         this.markDirty();
+        sendUpdate(SyncType.INITIAL);
         
         return true;
     }
@@ -201,34 +209,39 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, FrameInteractionBlockEntity blockEntity) {
-        if (world.isClient || !isActive(state) || !state.get(FrameInteractionBlock.HAS_FRAME) || getAreaMin() == null)
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        if (!isActive(state) || !state.get(FrameInteractionBlock.HAS_FRAME) || getAreaMin() == null)
             return;
         
         if (!canProgress()) return;
         
-        var posAtTickBegin = currentTarget.mutableCopy();
-        
-        while (currentProgress > 0.01 && canProgress()) {
+        while (currentProgress > 0.01) {
             if (!moving && currentProgress >= getWorkTime()) {
-                currentProgress -= getWorkTime();
-                finishBlockWork(currentTarget);
-                moving = true;
-                this.markDirty();
-            } else if (moving && currentProgress >= getMoveTime() && finishBlockMove()) {
-                updateToolPosInFrame();
-                currentProgress -= getMoveTime();
-                this.networkDirty = true;
-                
-                if (hasWorkAvailable(currentTarget)) moving = false;
+                markDirty();
+                if (startBlockMove()) { // only complete work if we can move to the next position
+                    currentProgress -= getWorkTime();
+                    finishBlockWork(lastTarget);
+                    updateToolPosInFrame();
+                    moving = true;
+                } else {
+                    break;  // next pos is blocked. Keep current progress, but dont perform any more actions.
+                }
+            } else if (moving && currentProgress >= getMoveTime()) {
+                markDirty();
+                if (hasWorkAvailable(currentTarget)) {
+                    moving = false;
+                    currentProgress -= getMoveTime();
+                } else if (startBlockMove()) {
+                    updateToolPosInFrame();
+                    currentProgress -= getMoveTime();
+                } else {
+                    break;
+                }
                 
             } else {
                 break;
             }
         }
-        
-        if (this.networkDirty)
-            sendMovementNetworkPacket(posAtTickBegin);
         
         doProgress(moving);
         currentProgress++;
@@ -292,7 +305,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         }
     }
     
-    private boolean finishBlockMove() {
+    private boolean startBlockMove() {
         
         var nextPos = currentTarget.add(currentDirection);
         var nextDir = currentDirection;
@@ -328,17 +341,6 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     
     private void highlightBlock(BlockPos block) {
         ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3d.of(block), null);
-    }
-    
-    public void sendMovementNetworkPacket(BlockPos from) {
-        networkDirty = false;
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineFrameMovementPacket(pos, currentTarget, from, areaMin, areaMax, disabledViaRedstone));
-    }
-    
-    @Override
-    public void markDirty() {
-        if (this.world != null)
-            world.markDirty(pos);
     }
     
     public abstract BlockState getMachineHead();
@@ -417,13 +419,5 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     
     public ItemStack getToolheadAdditionalRender() {
         return null;
-    }
-    
-    public long getMoveStartedAt() {
-        return moveStartedAt;
-    }
-    
-    public void setMoveStartedAt(long moveStartedAt) {
-        this.moveStartedAt = moveStartedAt;
     }
 }

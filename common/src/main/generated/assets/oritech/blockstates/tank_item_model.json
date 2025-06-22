@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/tank_item_model"
+    }
+  }
+}

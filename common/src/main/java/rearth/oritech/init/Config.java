@@ -61,6 +61,8 @@ public class Config {
     @Nest
     public ToolData chainSaw = new ToolData(10_000, 10, 512);
     @Nest
+    public ElectricMaceData electricMace = new ElectricMaceData();
+    @Nest
     public PortableLaserConfig portableLaserConfig = new PortableLaserConfig();
     public boolean chainsawTreeCutting = true;
     
@@ -79,7 +81,7 @@ public class Config {
     public int ventBaseRate = 4;
     public int ventRelativeRate = 100;
     public int maxHeat = 2000;
-    public int maxUnstableTicks = 400;
+    public int maxUnstableTicks = 600;
     public boolean boringNukes = false;
     
     @SectionHeader("arcane")
@@ -148,6 +150,8 @@ public class Config {
         public FurnaceConfig furnaceData = new FurnaceConfig();
         @Nest
         public BasicEnergyMachineData pulverizerData = new BasicEnergyMachineData(25000, 32 * 8, 0, 32);
+        @Nest
+        public BasicEnergyMachineData refineryData = new BasicEnergyMachineData(50000, 64 * 8, 0, 64);
     }
     
     public static class Generators {
@@ -184,6 +188,14 @@ public class Config {
         public float blockBreakSpeed = 0.125f; // multiplied by block hardness
         public int damageBase = 4;
         public int explosionStrength = 6;
+    }
+    
+    public static class ElectricMaceData {
+        public long energyCapacity = 500_000;
+        public int energyUsage = 2048;
+        public int chargeSpeed = 50_000;
+        public int baseDamage = 8;
+        public int lightningCostMultiplier = 8;
     }
     
     public static class DeepDrillConfig {

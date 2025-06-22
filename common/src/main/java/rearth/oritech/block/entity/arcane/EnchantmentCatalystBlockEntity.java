@@ -52,6 +52,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     public static final RawAnimation STABILIZED = RawAnimation.begin().thenLoop("stabilized");
     public static final RawAnimation UNSTABLE = RawAnimation.begin().thenLoop("unstable");
+    public static final RawAnimation EMPTY = RawAnimation.begin().thenLoop("empty");
     
     public final int baseSoulCapacity = Oritech.CONFIG.catalystBaseSouls();
     public final int maxProgress = 20;
@@ -64,7 +65,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     private int progress;
     private boolean isHyperEnchanting;
     private boolean networkDirty;
-    private String lastAnimation = "idle";
+    private String lastAnimation = "invalid";
     private int lastComparatorOutput;
     
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(2, this::markDirty) {
@@ -145,9 +146,15 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         }
         
         // periodically re-trigger animation updates
-        if (world.getTime() % 60 == 0)
-            lastAnimation = "idle";
+        if (world.getTime() % 60 == 0) {
+            lastAnimation = "invalid";
+            updateAnimation();
+        }
         
+    }
+    
+    private boolean isEmpty() {
+        return collectedSouls <= 0;
     }
     
     @Override
@@ -346,18 +353,19 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "machine", 4, state -> {
             if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED))
-                return state.setAndContinue(IDLE);
+                return state.setAndContinue(EMPTY);
             return PlayState.CONTINUE;
         })
                           .triggerableAnim("stabilized", STABILIZED)
                           .triggerableAnim("idle", IDLE)
                           .triggerableAnim("unstable", UNSTABLE)
+                          .triggerableAnim("empty", EMPTY)
                           .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
     }
     
     private void updateAnimation() {
         
-        var targetAnim = "idle";
+        var targetAnim = isEmpty() ? "empty" : "idle";
         if (maxSouls > baseSoulCapacity)
             targetAnim = "stabilized";
         

@@ -24,13 +24,13 @@
   ],
   "researchCost": [
     {
-      "count": 64,
+      "count": 32,
       "ingredient": {
         "item": "minecraft:ender_eye"
       }
     },
     {
-      "count": 48,
+      "count": 8,
       "ingredient": {
         "item": "oritech:enderic_lens"
       }

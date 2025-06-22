@@ -1,13 +1,19 @@
 package rearth.oritech.api.item.containers;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.collection.DefaultedList;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.networking.UpdatableField;
 
-public class SimpleInventoryStorage implements Inventory, ItemApi.InventoryStorage {
+import java.util.List;
+
+public class SimpleInventoryStorage implements Inventory, ItemApi.InventoryStorage, UpdatableField<Void, List<ItemStack>> {
     
     private final int size;
     public final DefaultedList<ItemStack> heldStacks;
@@ -167,5 +173,46 @@ public class SimpleInventoryStorage implements Inventory, ItemApi.InventoryStora
     
     public DefaultedList<ItemStack> getHeldStacks() {
         return heldStacks;
+    }
+    
+    @Override
+    public List<ItemStack> getDeltaData() {
+        return heldStacks;
+    }
+    
+    @Override
+    public Void getFullData() {
+        return null;
+    }
+    
+    @Override
+    public PacketCodec<? extends ByteBuf, List<ItemStack>> getDeltaCodec() {
+        return ItemStack.OPTIONAL_LIST_PACKET_CODEC;
+    }
+    
+    @Override
+    public PacketCodec<? extends ByteBuf, Void> getFullCodec() {
+        return null;
+    }
+    
+    @Override
+    public boolean useDeltaOnly(SyncType type) {
+        return true;
+    }
+    
+    @Override
+    public void handleFullUpdate(Void updatedData) {
+    
+    }
+    
+    @Override
+    public void handleDeltaUpdate(List<ItemStack> updatedData) {
+        this.heldStacks.clear();
+        
+        for (int i = 0; i < updatedData.size(); i++) {
+            var added = updatedData.get(i);
+            this.heldStacks.set(i, added);
+        }
+        
     }
 }

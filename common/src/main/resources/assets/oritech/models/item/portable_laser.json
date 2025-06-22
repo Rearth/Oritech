@@ -99,6 +99,6 @@
     }
   },
   "textures": {
-    "particle": "oritech:item/railgun"
+    "particle": "oritech:block/machine_particle_texture"
   }
 }

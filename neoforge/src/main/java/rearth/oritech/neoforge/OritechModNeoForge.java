@@ -3,6 +3,7 @@ package rearth.oritech.neoforge;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
 import net.minecraft.component.ComponentType;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.RegistryKeys;
@@ -13,16 +14,18 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.neoforge.AttachmentApiImpl;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.networking.neoforge.NetworkManagerImpl;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
+import rearth.oritech.network.NetworkContent;
 
 @Mod(Oritech.MOD_ID)
 public final class OritechModNeoForge {
@@ -48,6 +51,9 @@ public final class OritechModNeoForge {
         energyApiInstance = new NeoforgeEnergyApiImpl();
         EnergyApi.BLOCK = energyApiInstance;
         EnergyApi.ITEM = energyApiInstance;
+        
+        NetworkContent.FLUID_STACK_CODEC = net.neoforged.neoforge.fluids.FluidStack.OPTIONAL_CODEC.xmap(FluidStackHooksForge::fromForge, FluidStackHooksForge::toForge);
+        NetworkContent.FLUID_STACK_STREAM_CODEC = net.neoforged.neoforge.fluids.FluidStack.OPTIONAL_STREAM_CODEC.xmap(FluidStackHooksForge::fromForge, FluidStackHooksForge::toForge);
         
         Oritech.initialize();
         
@@ -104,6 +110,22 @@ public final class OritechModNeoForge {
                 Oritech.LOGGER.debug(event.getRegistryKey().toString());
                 Oritech.EVENT_MAP.get(id).forEach(Runnable::run);
             }
+            
+        }
+        
+        @SubscribeEvent
+        public void register(final RegisterPayloadHandlersEvent event) {
+            var registrar = event.registrar("1");
+            
+            for (var toInit : NetworkManagerImpl.PENDING_S2C_INITS) {
+                toInit.accept(registrar);
+            }
+            NetworkManagerImpl.PENDING_S2C_INITS.clear();
+            
+            for (var toInit : NetworkManagerImpl.PENDING_C2S_INITS) {
+                toInit.accept(registrar);
+            }
+            NetworkManagerImpl.PENDING_C2S_INITS.clear();
             
         }
         

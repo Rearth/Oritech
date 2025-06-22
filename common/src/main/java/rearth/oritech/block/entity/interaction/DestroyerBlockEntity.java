@@ -19,19 +19,19 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockFrameInteractionEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.FakeMachinePlayer;
 
 import java.util.List;
@@ -40,13 +40,19 @@ import java.util.UUID;
 
 public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
+    @SyncField(SyncType.GUI_OPEN)
     public boolean hasCropFilterAddon;
+    @SyncField(SyncType.GUI_OPEN)
     public boolean hasSilkTouchAddon;
-    public int range = 1;
+    @SyncField(SyncType.GUI_OPEN)
     public int yieldAddons = 0;
+    @SyncField({SyncType.GUI_OPEN, SyncType.SPARSE_TICK})
+    public int range = 1;
 
     // non-persistent
+    @SyncField
     public BlockPos quarryTarget = BlockPos.ORIGIN;
+    
     public float targetHardness = 1f;
     private ServerPlayerEntity destroyerPlayerEntity = null;
 
@@ -151,7 +157,6 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             if (!targetState.isAir() && !targetState.getFluidState().isStill()) {  // pass through both air and liquid
                 quarryTarget = checkPos;
                 targetHardness = Math.clamp(targetState.getHardness(world, checkPos), 0, 100);
-                syncQuarryNetworkData();
                 return new Pair<>(checkPos, targetState);
             }
         }
@@ -341,16 +346,6 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
                 new Vec3i(0, 0, -1),
                 new Vec3i(0, 0, 1)
         );
-    }
-
-    @Override
-    public void sendMovementNetworkPacket(BlockPos from) {
-        super.sendMovementNetworkPacket(from);
-        syncQuarryNetworkData();
-    }
-
-    private void syncQuarryNetworkData() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.QuarryTargetPacket(pos, quarryTarget, range, yieldAddons, hasSilkTouchAddon, getBaseAddonData().speed()));
     }
 
     @Override

@@ -25,6 +25,9 @@ import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.ReactorScreenHandler;
@@ -36,7 +39,7 @@ import rearth.oritech.util.Geometry;
 
 import java.util.*;
 
-public class ReactorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<ReactorControllerBlockEntity>, EnergyApi.BlockProvider, ExtendedMenuProvider {
+public class ReactorControllerBlockEntity extends NetworkedBlockEntity implements EnergyApi.BlockProvider, ExtendedMenuProvider {
     
     public static final int MAX_SIZE = Oritech.CONFIG.maxSize();
     public static final int RF_PER_PULSE = Oritech.CONFIG.rfPerPulse();
@@ -50,24 +53,28 @@ public class ReactorControllerBlockEntity extends BlockEntity implements BlockEn
     private final HashMap<Vector2i, ReactorFuelPortEntity> fuelPorts = new HashMap<>();     // same grid, but contains a reference to the port at the ceiling
     private final HashMap<Vector2i, ReactorAbsorberPortEntity> absorberPorts = new HashMap<>(); // same
     private final HashMap<Vector2i, Integer> componentHeats = new HashMap<>();              // same grid, contains the current heat of the component
-    private final HashMap<Vector2i, ComponentStatistics> componentStats = new HashMap<>(); // mainly for client displays, same grid
     private final HashSet<Pair<BlockPos, Direction>> energyPorts = new HashSet<>();   // list of all energy port outputs (e.g. the targets to output to)
     private final HashSet<BlockPos> redstonePorts = new HashSet<>();   // list of all redstone ports
     
+    @SyncField(SyncType.GUI_TICK)
+    public final HashMap<Vector2i, ComponentStatistics> componentStats = new HashMap<>(); // mainly for client displays, same grid
+    
+    @SyncField(SyncType.GUI_TICK)
     public SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(0, Oritech.CONFIG.reactorMaxEnergyStored(), Oritech.CONFIG.reactorMaxEnergyStored(), this::markDirty);
+    
     public boolean active = false;
+    
+    @SyncField(SyncType.GUI_OPEN)
+    public BlockPos areaMin;
+    @SyncField(SyncType.GUI_OPEN)
+    public BlockPos areaMax;
+    
     private int reactorStackHeight;
-    private BlockPos areaMin;
-    private BlockPos areaMax;
     private boolean disabledViaRedstone = false;
     private int unstableTicks = 0;
     public long disabledUntil = 0;
     
     private boolean doAutoInit = false; // used to auto-init when save is being loaded
-    
-    // client only
-    public NetworkContent.ReactorUIDataPacket uiData;
-    public NetworkContent.ReactorUISyncPacket uiSyncData;
     
     public ReactorControllerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.REACTOR_CONTROLLER_BLOCK_ENTITY, pos, state);
@@ -80,22 +87,21 @@ public class ReactorControllerBlockEntity extends BlockEntity implements BlockEn
     // absorbers remove fixed heat amount from all neighboring blocks
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, ReactorControllerBlockEntity blockEntity) {
-        if (world.isClient) return;
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         if (!active && doAutoInit) {
             doAutoInit = false;
             init(null);
         }
         
-        
         if (!active || activeComponents.isEmpty()) return;
         
         var activeRods = 0;
         var hottestHeat = 0;
         
-        for (var localPos : activeComponents.keySet()) {
-            var component = activeComponents.get(localPos);
+        for (var entry : activeComponents.entrySet()) {
+            var localPos = entry.getKey();
+            var component = entry.getValue();
             var componentHeat = componentHeats.get(localPos);
             
             if (component instanceof ReactorRodBlock rodBlock) {
@@ -240,9 +246,15 @@ public class ReactorControllerBlockEntity extends BlockEntity implements BlockEn
             unstableTicks = 0;
         }
         
-        if (world.getTime() % 2 == 0)
-            sendUINetworkData();
+    }
+    
+    @Override
+    public void preNetworkUpdate(SyncType type) {
+        super.preNetworkUpdate(type);
         
+        if (type != SyncType.GUI_TICK) return;
+        for (var port : fuelPorts.values()) port.updateNetwork();
+        for (var port : absorberPorts.values()) port.updateNetwork();
     }
     
     private boolean isDisabled() {
@@ -561,25 +573,6 @@ public class ReactorControllerBlockEntity extends BlockEntity implements BlockEn
         return energyStorage;
     }
     
-    private void sendUINetworkData() {
-        
-        if (!active || activeComponents.isEmpty() || !isActivelyViewed()) return;
-        
-        for (var port : fuelPorts.values()) port.updateNetwork();
-        for (var port : absorberPorts.values()) port.updateNetwork();
-        
-        var positionsFlat = activeComponents.keySet();
-        var positions = positionsFlat.stream().map(pos -> areaMin.add(pos.x + 1, 1, pos.y + 1)).toList();
-        var heats = positionsFlat.stream().map(pos -> componentStats.getOrDefault(pos, ComponentStatistics.EMPTY)).toList();
-        
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.ReactorUISyncPacket(pos, positions, heats, energyStorage.getAmount()));
-    }
-    
-    private boolean isActivelyViewed() {
-        var closestPlayer = Objects.requireNonNull(world).getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 5, false);
-        return closestPlayer != null && closestPlayer.currentScreenHandler instanceof ReactorScreenHandler handler && getPos().equals(handler.reactorEntity.pos);
-    }
-    
     @Override
     public Text getDisplayName() {
         return Text.of("");
@@ -593,8 +586,7 @@ public class ReactorControllerBlockEntity extends BlockEntity implements BlockEn
     
     @Override
     public void saveExtraData(PacketByteBuf buf) {
-        var previewMax = new BlockPos(areaMax.getX(), areaMin.getY() + 1, areaMax.getZ());
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.ReactorUIDataPacket(pos, areaMin, areaMax, previewMax));
+        sendUpdate(SyncType.GUI_OPEN);
         buf.writeBlockPos(pos);
     }
     

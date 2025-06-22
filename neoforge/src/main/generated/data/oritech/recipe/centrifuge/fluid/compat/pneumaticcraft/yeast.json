@@ -10,10 +10,12 @@
     "amount": 1000,
     "fluid": "minecraft:water"
   },
-  "fluidOutput": {
-    "amount": 250,
-    "fluid": "pneumaticcraft:yeast_culture"
-  },
+  "fluidOutputs": [
+    {
+      "amount": 250,
+      "fluid": "pneumaticcraft:yeast_culture"
+    }
+  ],
   "ingredients": [
     {
       "tag": "c:mushrooms"

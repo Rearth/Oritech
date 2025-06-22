@@ -1,6 +1,7 @@
 package rearth.oritech.block.entity.reactor;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
+import io.netty.buffer.Unpooled;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -9,6 +10,8 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -18,12 +21,14 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
@@ -34,7 +39,9 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMe
     
     private final InOutInventoryStorage inventory = new InOutInventoryStorage(1, this::markDirty, new InventorySlotAssignment(0, 1, 1, 0));
     
+    @SyncField(SyncType.GUI_TICK)
     public int availableFuel;
+    @SyncField(SyncType.GUI_TICK)
     public int currentFuelOriginalCapacity;
     
     public ReactorAbsorberPortEntity(BlockPos pos, BlockState state) {
@@ -96,7 +103,10 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMe
     }
     
     public void updateNetwork() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.ReactorPortDataPacket(pos, currentFuelOriginalCapacity, availableFuel));
+        var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
+        var fieldCount = NetworkManager.encodeFields(this, SyncType.GUI_TICK, usedBuf);
+        if (fieldCount == 0) return;
+        NetworkManager.sendBlockHandle(this, new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), SyncType.GUI_TICK, usedBuf.array()));
     }
     
     @Override

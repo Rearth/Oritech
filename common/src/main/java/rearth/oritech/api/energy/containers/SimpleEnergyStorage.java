@@ -1,8 +1,13 @@
 package rearth.oritech.api.energy.containers;
 
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.networking.UpdatableField;
 
-public class SimpleEnergyStorage extends EnergyApi.EnergyStorage {
+public class SimpleEnergyStorage extends EnergyApi.EnergyStorage implements UpdatableField<Void, Long> {
     private final long maxInsert;
     private final long maxExtract;
     private final long capacity;
@@ -76,5 +81,40 @@ public class SimpleEnergyStorage extends EnergyApi.EnergyStorage {
     @Override
     public void update() {
         onUpdate.run();
+    }
+    
+    @Override
+    public Long getDeltaData() {
+        return amount;
+    }
+    
+    @Override
+    public Void getFullData() {
+        return null;
+    }
+    
+    @Override
+    public boolean useDeltaOnly(SyncType type) {
+        return true;
+    }
+    
+    @Override
+    public PacketCodec<? extends ByteBuf, Long> getDeltaCodec() {
+        return PacketCodecs.VAR_LONG;
+    }
+    
+    @Override
+    public PacketCodec<? extends ByteBuf, Void> getFullCodec() {
+        return null;
+    }
+    
+    @Override
+    public void handleFullUpdate(Void updatedData) {
+    
+    }
+    
+    @Override
+    public void handleDeltaUpdate(Long updatedData) {
+        this.amount = updatedData;
     }
 }

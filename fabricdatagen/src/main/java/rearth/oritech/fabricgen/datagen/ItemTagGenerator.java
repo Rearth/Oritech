@@ -237,6 +237,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(TagContent.MACHINE_PLATING)
           .add(BlockContent.MACHINE_PLATING_BLOCK.asItem())
           .add(BlockContent.IRON_PLATING_BLOCK.asItem())
+          .add(BlockContent.CARBON_PLATING_BLOCK.asItem())
           .add(BlockContent.NICKEL_PLATING_BLOCK.asItem());
         
         // silicon
@@ -300,6 +301,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ToolsContent.EXO_BOOTS);
         
         getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
+          .add(ToolsContent.ELECTRIC_MACE)
           .add(ItemContent.WRENCH);
         
         getOrCreateTagBuilder(cItemTag("tools/wrench"))
@@ -307,6 +309,9 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         
         getOrCreateTagBuilder(TagContent.REACTOR_COOLANT)
           .add(Items.ICE, Items.BLUE_ICE, Items.PACKED_ICE);
+        
+        getOrCreateTagBuilder(ItemTags.MACE_ENCHANTABLE)
+          .add(ToolsContent.ELECTRIC_MACE);
         
         // storage blocks
         getOrCreateTagBuilder(ConventionalItemTags.STORAGE_BLOCKS)

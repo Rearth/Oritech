@@ -10,7 +10,9 @@ import rearth.oritech.api.fluid.FluidApi;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class SimpleInOutFluidStorage extends FluidApi.InOutSlotStorage {
+// a specific storage for a generic "one input slot -> one output slot".
+// In is slot 0, out is slot 1.
+public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage {
     
     private FluidStack contentIn;
     private FluidStack contentOut;
@@ -100,31 +102,6 @@ public class SimpleInOutFluidStorage extends FluidApi.InOutSlotStorage {
         };
     }
     
-    public SimpleInOutFluidStorage(Long capacity) {
-        this(capacity, () -> {
-        });
-    }
-    
-    @Override
-    public void setInStack(FluidStack stack) {
-        contentIn = stack;
-    }
-    
-    @Override
-    public FluidStack getInStack() {
-        return contentIn;
-    }
-    
-    @Override
-    public void setOutStack(FluidStack stack) {
-        contentOut = stack;
-    }
-    
-    @Override
-    public FluidStack getOutStack() {
-        return contentOut;
-    }
-    
     @Override
     public long getCapacity() {
         return capacity;
@@ -132,7 +109,7 @@ public class SimpleInOutFluidStorage extends FluidApi.InOutSlotStorage {
     
     @Override
     public long insert(FluidStack toInsert, boolean simulate) {
-        return insertTo(toInsert, simulate, capacity, contentIn, this::setInStack);
+        return insertTo(toInsert, simulate, capacity, contentIn, stack -> setStack(0, stack));
     }
     
     @Override
@@ -166,6 +143,29 @@ public class SimpleInOutFluidStorage extends FluidApi.InOutSlotStorage {
         if (direction.equals(Direction.UP)) return inputContainer;
         if (direction.equals(Direction.DOWN)) return outputContainer;
         return this;
+    }
+    
+    @Override
+    public void setStack(int slot, FluidStack stack) {
+        if (slot == 0) {
+            contentIn = stack;
+        } else {
+            contentOut = stack;
+        }
+    }
+    
+    @Override
+    public FluidStack getStack(int slot) {
+        if (slot == 0) {
+            return contentIn;
+        } else {
+            return contentOut;
+        }
+    }
+    
+    @Override
+    public int getSlotCount() {
+        return 2;
     }
     
     public void writeNbt(NbtCompound nbt, String suffix) {
@@ -219,5 +219,18 @@ public class SimpleInOutFluidStorage extends FluidApi.InOutSlotStorage {
         } else {
             return 0L;
         }
+    }
+    
+    public FluidStack getInStack() {
+        return contentIn;
+    }
+    
+    public FluidStack getOutStack() {
+        return contentOut;
+    }
+    
+    @Override
+    public FluidApi.FluidStorage getStorageForSlot(int slot) {
+        return slot == 0 ? inputContainer : outputContainer;
     }
 }

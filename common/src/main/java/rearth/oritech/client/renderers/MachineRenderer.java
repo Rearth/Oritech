@@ -2,6 +2,7 @@ package rearth.oritech.client.renderers;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
@@ -31,6 +32,12 @@ public class MachineRenderer<T extends BlockEntity & GeoAnimatable> extends GeoB
         
         super.rotateBlock(facing, poseStack);
         
+    }
+    
+    // this overrides a method from IBlockEntityRendererExtension on NF. Since this extension mixin is not available in common, we just declare the methode without\
+    // the override annotation
+    public Box getRenderBoundingBox(BlockEntity blockEntity) {
+        return Box.of(blockEntity.getPos().toCenterPos(), 4, 4, 4);
     }
 }
 

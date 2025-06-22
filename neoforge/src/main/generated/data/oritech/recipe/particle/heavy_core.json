@@ -4,10 +4,7 @@
     "amount": 0,
     "fluid": "minecraft:empty"
   },
-  "fluidOutput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
+  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "minecraft:reinforced_deepslate"

@@ -28,6 +28,9 @@ import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
@@ -40,29 +43,26 @@ import rearth.oritech.util.StackContext;
 
 import java.util.List;
 
-public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidApi.BlockProvider, EnergyApi.BlockProvider, ItemApi.BlockProvider,
+public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, EnergyApi.BlockProvider, ItemApi.BlockProvider,
                                                                  ScreenProvider, ExtendedMenuProvider {
     
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.charger.energyCapacity(), Oritech.CONFIG.charger.maxEnergyInsertion(), Oritech.CONFIG.charger.maxEnergyExtraction(), this::markDirty);
+    
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
+    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
     
     // 0 = bucket/item to be charged/filled, 1 = empty bucket/charged/fill item
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::markDirty, new InventorySlotAssignment(0, 1, 1, 1));
     
-    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
-    
-    private boolean networkDirty = false;
     
     public ChargerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.CHARGER_BLOCK_ENTITY, pos, state);
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, ChargerBlockEntity blockEntity) {
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (world.isClient) return;
-        
-        if (networkDirty) {
-            updateNetwork();
-        }
         
         // stop if no input is given, or it's a stackable item
         if (inventory.getStack(0).isEmpty() || inventory.getStack(0).getCount() > 1) return;
@@ -93,12 +93,6 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     }
     
     @Override
-    public void markDirty() {
-        super.markDirty();
-        networkDirty = true;
-    }
-    
-    @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         fluidStorage.writeNbt(nbt, "");
@@ -112,13 +106,6 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
         fluidStorage.readNbt(nbt, "");
         Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
         energyStorage.amount = nbt.getLong("energy_stored");
-    }
-    
-    private void updateNetwork() {
-        networkDirty = false;
-        
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SingleVariantFluidSyncPacketAPI(pos, Registries.FLUID.getId(fluidStorage.getFluid()).toString(), fluidStorage.getAmount()));
     }
     
     // return true if nothing is left to charge/fill
@@ -158,13 +145,13 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     
     @Override
     public void saveExtraData(PacketByteBuf buf) {
+        this.sendUpdate(SyncType.GUI_OPEN);
         buf.writeBlockPos(pos);
     }
     
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        updateNetwork();
         return new BasicMachineScreenHandler(syncId, playerInventory, this);
     }
     

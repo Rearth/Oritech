@@ -12,10 +12,7 @@
     "amount": 8100,
     "fluid": "techreborn:nitrocoal_fuel"
   },
-  "fluidOutput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
+  "fluidOutputs": [],
   "ingredients": [],
   "results": [],
   "time": 240

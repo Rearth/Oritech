@@ -4,10 +4,11 @@ import rearth.oritech.Oritech;
 import rearth.oritech.util.registry.ArchitecturyRecipeRegistryContainer;
 
 public class RecipeContent implements ArchitecturyRecipeRegistryContainer {
-
+    
     public static final OritechRecipeType PULVERIZER = new OritechRecipeType(Oritech.id("pulverizer"));
     public static final OritechRecipeType GRINDER = new OritechRecipeType(Oritech.id("grinder"));
     public static final OritechRecipeType ASSEMBLER = new OritechRecipeType(Oritech.id("assembler"));
+    public static final OritechRecipeType REFINERY = new OritechRecipeType(Oritech.id("refinery"));
     public static final OritechRecipeType FOUNDRY = new OritechRecipeType(Oritech.id("foundry"));
     public static final OritechRecipeType CENTRIFUGE = new OritechRecipeType(Oritech.id("centrifuge"));
     public static final OritechRecipeType CENTRIFUGE_FLUID = new OritechRecipeType(Oritech.id("centrifuge_fluid"));
@@ -21,6 +22,7 @@ public class RecipeContent implements ArchitecturyRecipeRegistryContainer {
     public static final OritechRecipeType COOLER = new OritechRecipeType(Oritech.id("cooler"));
     public static final OritechRecipeType REACTOR = new OritechRecipeType(Oritech.id("reactor"));
     public static final OritechRecipeType LASER = new OritechRecipeType(Oritech.id("laser"));
+    
     
     public static final AugmentDataRecipeType AUGMENT_DATA = new AugmentDataRecipeType(Oritech.id("augment_data"));
     

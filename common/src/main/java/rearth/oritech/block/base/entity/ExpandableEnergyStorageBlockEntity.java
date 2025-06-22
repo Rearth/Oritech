@@ -2,8 +2,6 @@ package rearth.oritech.block.base.entity;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -29,34 +27,39 @@ import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.storage.SmallStorageBlock;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.ItemContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyApi.BlockProvider, ItemApi.BlockProvider, MachineAddonController,
-                                                                                          ScreenProvider, ExtendedMenuProvider, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
+public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockEntity implements EnergyApi.BlockProvider, ItemApi.BlockProvider, MachineAddonController,
+                                                                                          ScreenProvider, ExtendedMenuProvider {
     
+    @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> connectedAddons = new ArrayList<>();
+    @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> openSlots = new ArrayList<>();
+    @SyncField(SyncType.GUI_OPEN)
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
     
-    private boolean networkDirty = false;
+    @SyncField(SyncType.GUI_TICK)
     private boolean redstonePowered;
     
-    // client only
+    @SyncField(SyncType.GUI_TICK)
     public DynamicStatisticEnergyStorage.EnergyStatistics currentStats;
     
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(1, this::markDirty);
     
     //own storage
+    @SyncField(SyncType.GUI_TICK)
     public final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
     
     private final EnergyApi.EnergyStorage outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
@@ -88,7 +91,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, ExpandableEnergyStorageBlockEntity blockEntity) {
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (world.isClient) return;
         
         energyStorage.tick((int) world.getTime());
@@ -97,8 +100,6 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
             outputEnergy();
         
         inputFromCrystal();
-        
-        if (networkDirty) sendNetworkEntry();
     }
     
     private void inputFromCrystal() {
@@ -159,6 +160,12 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         energyStorage.amount = nbt.getLong("energy_stored");
         Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
         redstonePowered = nbt.getBoolean("redstone");
+    }
+    
+    @Override
+    public void preNetworkUpdate(SyncType type) {
+        super.preNetworkUpdate(type);
+        currentStats = energyStorage.getCurrentStatistics(world.getTime());
     }
     
     @Override
@@ -231,9 +238,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     @Override
     public void updateEnergyContainer() {
-        
         MachineAddonController.super.updateEnergyContainer();
-        
         energyStorage.maxExtract = getDefaultExtractionRate() + addonData.energyBonusTransfer();
         
     }
@@ -247,31 +252,9 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     @Override
     public void saveExtraData(PacketByteBuf buf) {
-        sendNetworkEntry();
+        sendUpdate(SyncType.GUI_OPEN);
         var data = new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
         ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
-    }
-    
-    @Override
-    public void markDirty() {
-        super.markDirty();
-        networkDirty = true;
-    }
-    
-    private boolean isActivelyViewed() {
-        var closestPlayer = Objects.requireNonNull(world).getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 5, false);
-        return closestPlayer != null && closestPlayer.currentScreenHandler instanceof BasicMachineScreenHandler handler && getPos().equals(handler.getBlockPos());
-    }
-    
-    protected void sendNetworkEntry() {
-        
-        if (world.getTime() % 15 != 0 && !isActivelyViewed()) return;
-        
-        var statistics = energyStorage.getCurrentStatistics(world.getTime());
-        
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.EnergyStatisticsPacket(pos, statistics));
-        networkDirty = false;
     }
     
     @Override
@@ -282,9 +265,6 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.FullEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, energyStorage.maxExtract));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.EnergyStatisticsPacket(pos, energyStorage.getCurrentStatistics(world.getTime())));
-        
         return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
     }
     

@@ -10,10 +10,12 @@
     "amount": 1000,
     "fluid": "industrialforegoing:biofuel"
   },
-  "fluidOutput": {
-    "amount": 1000,
-    "fluid": "oritech:still_fuel"
-  },
+  "fluidOutputs": [
+    {
+      "amount": 1000,
+      "fluid": "oritech:still_fuel"
+    }
+  ],
   "ingredients": [
     {
       "item": "oritech:fluxite"

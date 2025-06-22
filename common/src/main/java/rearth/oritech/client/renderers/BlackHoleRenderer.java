@@ -18,7 +18,7 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
         
         var time = entity.getWorld().getTime();
         // render block getting sucked in
-        if (entity.currentlyPullingFrom != null && entity.pullingStartedAt + entity.pullTime > time && !entity.currentlyPulling.isAir()) {
+        if (entity.currentlyPullingFrom != null && entity.currentlyPulling != null && entity.pullingStartedAt + entity.pullTime > time && !entity.currentlyPulling.isAir()) {
             
             var progress = (float) Math.pow((time + tickDelta - entity.pullingStartedAt) / (float) entity.pullTime, 1.3f);
             var startPos = Vec3d.of(entity.currentlyPullingFrom);
