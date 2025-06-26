@@ -443,6 +443,7 @@
   "tooltip.oritech.item_pipe.4": "Поміщає в найближчий доступний інвентар.",
   "title.oritech.machine.addon_looting": "%d Мародерство",
   "tooltip.oritech.machine.addon_looting": "Кількість аддонів для врожайності. 3 - ефективний максимум",
+  "tooltip.oritech.machine.byproduct_bonus.tooltip": "Yield addon is installed. Byproducts are doubled.",
   "title.oritech.item_filter.toggle_energy_statistics": "Показати вивід",
   "title.oritech.energy.inAvgSecond": "∅ %s RF/t",
   "title.oritech.energy.inAvgSecond.tooltip": "Середній вхід RF/t за останню секунду.",
