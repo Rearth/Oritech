@@ -77,7 +77,13 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
         super.resetAddons();
         hasByproductAddon = false;
     }
-    
+
+    @Override
+    public void gatherAddonStats(List<AddonBlock> addons) {
+        hasByproductAddon = false;
+        super.gatherAddonStats(addons);
+    }
+
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
