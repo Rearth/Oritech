@@ -169,7 +169,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
     
     private int getItemOutputMultiplier() {
-        return getModuleCount() == 0 ? 2 : 1;
+        return getModuleCount() == 0 ? 1 : 2;
     }
     
     @Override
