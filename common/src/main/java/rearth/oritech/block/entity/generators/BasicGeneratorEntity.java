@@ -52,7 +52,6 @@ public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
             }
             progress = fuelTime;
             setCurrentMaxBurnTime(fuelTime);
-            markNetDirty();
             markDirty();
         }
     }

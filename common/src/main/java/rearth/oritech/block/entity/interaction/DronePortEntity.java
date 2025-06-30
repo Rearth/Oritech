@@ -34,6 +34,7 @@ import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.interaction.DronePortBlock;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
@@ -58,9 +59,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
-import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
-// todo handle animations by using geckolib synced anims
 public class DronePortEntity extends NetworkedBlockEntity
   implements ItemApi.BlockProvider, FluidApi.BlockProvider, EnergyApi.BlockProvider,
                GeoBlockEntity, MultiblockMachineController, MachineAddonController, ExtendedMenuProvider,
@@ -101,7 +100,6 @@ public class DronePortEntity extends NetworkedBlockEntity
     
     // animation
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    private final AnimationController<DronePortEntity> animationController = getAnimationController();
     
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
@@ -118,7 +116,6 @@ public class DronePortEntity extends NetworkedBlockEntity
     private BlockPos targetPosition;
     private long lastSentAt;
     private DroneTransferData incomingPacket;
-    private DroneAnimState animState = DroneAnimState.IDLE;
     private boolean receivingPackage;
     
     // config
@@ -178,15 +175,15 @@ public class DronePortEntity extends NetworkedBlockEntity
         nbt.putBoolean("has_fluid_addon", hasFluidAddon);
         nbt.putBoolean("disabled_via_redstone", disabledViaRedstone);
         nbt.putLong("energy_stored", energyStorage.amount);
-
+        
         if (targetPosition != null) {
             nbt.putLong("target_position", targetPosition.asLong());
         }
-
+        
         var cardCompound = new NbtCompound();
         Inventories.writeNbt(cardCompound, cardInventory.getHeldStacks(), false, registryLookup);
         nbt.put("cards", cardCompound);
-
+        
         if (incomingPacket != null) {
             var compound = new NbtCompound();
             DefaultedList<ItemStack> list = DefaultedList.ofSize(incomingPacket.transferredStacks.size());
@@ -212,7 +209,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         disabledViaRedstone = nbt.getBoolean("disabled_via_redstone");
         energyStorage.amount = nbt.getLong("energy_stored");
         targetPosition = BlockPos.fromLong(nbt.getLong("target_position"));
-
+        
         Inventories.readNbt(nbt.getCompound("cards"), cardInventory.getHeldStacks(), registryLookup);
         
         if (nbt.contains("incoming")) {
@@ -345,11 +342,11 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
     
     private void triggerNetworkSendAnimation() {
-        // todo
+        triggerAnim("machine", "takeoff");
     }
     
     private void triggerNetworkReceiveAnimation() {
-        // todo
+        triggerAnim("machine", "landing");
     }
     
     public boolean setTargetFromDesignator(BlockPos targetPos) {
@@ -529,13 +526,28 @@ public class DronePortEntity extends NetworkedBlockEntity
     
     @Override
     public void playSetupAnimation() {
-        animationController.setAnimation(SETUP);
-        animationController.forceAnimationReset();
+        triggerAnim("machine", "deploy");
     }
+    
+    public static final RawAnimation TAKEOFF = RawAnimation.begin().thenPlay("takeoff");
+    public static final RawAnimation LANDING = RawAnimation.begin().thenPlay("landing");
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(animationController);
+        controllers.add(new AnimationController<>(this, "machine", 0, state -> {
+            if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
+                var targetAnim = isActive(getCachedState()) ? MachineBlockEntity.IDLE : MachineBlockEntity.PACKAGED;
+                state.resetCurrentAnimation();
+                return state.setAndContinue(targetAnim);
+            } else {
+                // playing animation, keep going
+                return PlayState.CONTINUE;
+            }
+        })
+                          .triggerableAnim("takeoff", TAKEOFF)
+                          .triggerableAnim("landing", LANDING)
+                          .triggerableAnim("deploy", MachineBlockEntity.SETUP)
+                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
     }
     
     @Override
@@ -600,50 +612,10 @@ public class DronePortEntity extends NetworkedBlockEntity
         return true;
     }
     
-    private enum DroneAnimState {
-        IDLE, TAKEOFF, LANDING
-    }
-    
-    public static final RawAnimation TAKEOFF = RawAnimation.begin().thenPlay("takeoff").thenPlay("idle");
-    public static final RawAnimation LANDING = RawAnimation.begin().thenPlay("landing").thenPlay("idle");
-    
-    private AnimationController<DronePortEntity> getAnimationController() {
-        return new AnimationController<>(this, state -> {
-            
-            if (state.isCurrentAnimation(SETUP)) {
-                if (state.getController().hasAnimationFinished()) {
-                    state.setAndContinue(IDLE);
-                } else {
-                    return state.setAndContinue(SETUP);
-                }
-            }
-            
-            if (isActive(getCachedState())) {
-                switch (animState) {
-                    case IDLE -> {
-                        return state.setAndContinue(IDLE);
-                    }
-                    case TAKEOFF -> {
-                        return state.setAndContinue(TAKEOFF);
-                    }
-                    case LANDING -> {
-                        return state.setAndContinue(LANDING);
-                    }
-                    default -> {
-                        return PlayState.CONTINUE;
-                    }
-                }
-            } else {
-                return state.setAndContinue(PACKAGED);
-            }
-        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>());
-    }
-    
     @Override
     public void saveExtraData(PacketByteBuf buf) {
         sendUpdate(SyncType.GUI_OPEN);
-        var data = new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
-        ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
+        buf.writeBlockPos(pos);
     }
     
     @Override
@@ -654,7 +626,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new DroneScreenHandler(syncId, playerInventory, this, getUiData(), coreQuality);
+        return new DroneScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

@@ -8,7 +8,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -19,6 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.CentrifugeScreenHandler;
@@ -27,7 +28,6 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.List;
@@ -36,8 +36,10 @@ import java.util.Optional;
 
 public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
+    @SyncField(SyncType.GUI_TICK)
     public final SimpleInOutFluidStorage fluidContainer = new SimpleInOutFluidStorage(Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
     
+    @SyncField(SyncType.GUI_OPEN)
     public boolean hasFluidAddon = false;
     
     public CentrifugeBlockEntity(BlockPos pos, BlockState state) {
@@ -241,26 +243,12 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new CentrifugeScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+        return new CentrifugeScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
     public int getAnimationDuration() {
         return 20 * 9;
-    }
-    
-    @Override
-    protected void sendNetworkEntry() {
-        super.sendNetworkEntry();
-        
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(
-          new NetworkContent.CentrifugeFluidSyncPacket(
-            pos,
-            hasFluidAddon,
-            Registries.FLUID.getId(fluidContainer.getInStack().getFluid()).toString(),
-            fluidContainer.getInStack().getAmount(),
-            Registries.FLUID.getId(fluidContainer.getOutStack().getFluid()).toString(),
-            fluidContainer.getOutStack().getAmount()));
     }
     
     @Override

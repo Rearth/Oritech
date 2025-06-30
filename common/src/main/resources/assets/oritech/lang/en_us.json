@@ -450,6 +450,7 @@
   "tooltip.oritech.item_pipe.4": "Deposits into the closest available inventory.",
   "title.oritech.machine.addon_looting": "%d Looting",
   "tooltip.oritech.machine.addon_looting": "Yield addon count. 3 is the effective maximum",
+  "tooltip.oritech.machine.byproduct_bonus.tooltip": "Yield addon is installed. Byproducts are doubled.",
   "title.oritech.item_filter.toggle_energy_statistics": "Show Output",
   "title.oritech.energy.inAvgSecond": "∅ %s RF/t",
   "title.oritech.energy.inAvgSecond.tooltip": "Average RF/t input over the last second.",

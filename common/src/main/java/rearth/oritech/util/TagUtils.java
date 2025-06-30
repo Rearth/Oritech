@@ -10,9 +10,13 @@ import rearth.oritech.Oritech;
 
 public class TagUtils {
     public static String C_TAG_NAMESPACE = "c";
-
+    
     public static TagKey<Item> getStorageBlockTag(String path) {
         return cItemTag("storage_blocks/" + path);
+    }
+    
+    public static TagKey<Block> getStorageBlockyTag(String path) {
+        return cBlockTag("storage_blocks/" + path);
     }
     
     public static TagKey<Item> getIngotTag(String path) {

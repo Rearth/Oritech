@@ -1,18 +1,26 @@
 package rearth.oritech.api.fluid.containers;
 
 import dev.architectury.fluid.FluidStack;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.networking.UpdatableField;
+import rearth.oritech.network.NetworkContent;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 // a specific storage for a generic "one input slot -> one output slot".
 // In is slot 0, out is slot 1.
-public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage {
+public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implements UpdatableField<Void, Pair<FluidStack, FluidStack>> {
     
     private FluidStack contentIn;
     private FluidStack contentOut;
@@ -232,5 +240,63 @@ public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage {
     @Override
     public FluidApi.FluidStorage getStorageForSlot(int slot) {
         return slot == 0 ? inputContainer : outputContainer;
+    }
+    
+    @Override
+    public Pair<FluidStack, FluidStack> getDeltaData() {
+        return new Pair<>(contentIn, contentOut);
+    }
+    
+    @Override
+    public Void getFullData() {
+        return null;
+    }
+    
+    @Override
+    public PacketCodec<? extends ByteBuf, Pair<FluidStack, FluidStack>> getDeltaCodec() {
+        return new PacketCodec<>() {
+            @Override
+            public Pair<FluidStack, FluidStack> decode(ByteBuf buf) {
+                if (buf instanceof RegistryByteBuf registryByteBuf) {
+                    var left = NetworkContent.FLUID_STACK_STREAM_CODEC.decode(registryByteBuf);
+                    var right = NetworkContent.FLUID_STACK_STREAM_CODEC.decode(registryByteBuf);
+                    return new Pair<>(left, right);
+                } else {
+                    Oritech.LOGGER.error("Trying to decode storage data to non-registry buf! {}", buf);
+                    return new Pair<>(FluidStack.empty(), FluidStack.empty());
+                }
+            }
+            
+            @Override
+            public void encode(ByteBuf buf, Pair<FluidStack, FluidStack> value) {
+                if (buf instanceof RegistryByteBuf registryByteBuf) {
+                    NetworkContent.FLUID_STACK_STREAM_CODEC.encode(registryByteBuf, value.getLeft());
+                    NetworkContent.FLUID_STACK_STREAM_CODEC.encode(registryByteBuf, value.getRight());
+                } else {
+                    Oritech.LOGGER.error("Trying to encode storage data to non-registry buf! {} in {}", buf, value);
+                }
+            }
+        };
+    }
+    
+    @Override
+    public PacketCodec<? extends ByteBuf, Void> getFullCodec() {
+        return null;
+    }
+    
+    @Override
+    public boolean useDeltaOnly(SyncType type) {
+        return true;
+    }
+    
+    @Override
+    public void handleFullUpdate(Void updatedData) {
+    
+    }
+    
+    @Override
+    public void handleDeltaUpdate(Pair<FluidStack, FluidStack> updatedData) {
+        this.contentIn = updatedData.getLeft();
+        this.contentOut = updatedData.getRight();
     }
 }

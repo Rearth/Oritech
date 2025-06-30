@@ -1,6 +1,5 @@
 package rearth.oritech.init.recipes;
 
-import com.mojang.datafixers.util.Either;
 import dev.architectury.fluid.FluidStack;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.StructEndec;
@@ -8,10 +7,15 @@ import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.EndecRecipeSerializer;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.FluidIngredient;
 
 import java.util.List;
@@ -30,6 +34,16 @@ public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> impl
       MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
       FluidIngredient.FLUID_INGREDIENT_ENDEC.optionalFieldOf("fluidInput", OritechRecipe::getFluidInput, FluidIngredient.EMPTY),
       FLUID_STACK_ENDEC.listOf().optionalFieldOf("fluidOutputs", OritechRecipe::getFluidOutputs, List.of()),
+      OritechRecipe::new
+    );
+    
+    public static final PacketCodec<RegistryByteBuf, OritechRecipe> PACKET_CODEC = PacketCodec.tuple(
+      PacketCodecs.INTEGER, OritechRecipe::getTime,
+      Ingredient.PACKET_CODEC.collect(PacketCodecs.toList()), OritechRecipe::getInputs,
+      ItemStack.PACKET_CODEC.collect(PacketCodecs.toList()), OritechRecipe::getResults,
+      Identifier.PACKET_CODEC.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier), OritechRecipe::getOriType,
+      FluidIngredient.PACKET_CODEC, OritechRecipe::getFluidInput,
+      NetworkContent.FLUID_STACK_STREAM_CODEC.collect(PacketCodecs.toList()), OritechRecipe::getFluidOutputs,
       OritechRecipe::new
     );
     

@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 import static rearth.oritech.util.TagUtils.cBlockTag;
+import static rearth.oritech.util.TagUtils.getStorageBlockyTag;
 
 public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
     
@@ -166,5 +167,48 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
 
         getOrCreateTagBuilder(TagContent.MACHINE_FRAME_SUPPORT)
           .add(BlockContent.METAL_BEAM_BLOCK);
+        
+        // storage block tags
+        getOrCreateTagBuilder(getStorageBlockyTag("steel"))
+          .add(BlockContent.STEEL_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("energite"))
+          .add(BlockContent.ENERGITE_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("nickel"))
+          .add(BlockContent.NICKEL_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("biosteel"))
+          .add(BlockContent.BIOSTEEL_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("platinum"))
+          .add(BlockContent.PLATINUM_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("adamant"))
+          .add(BlockContent.ADAMANT_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("electrum"))
+          .add(BlockContent.ELECTRUM_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("duratium"))
+          .add(BlockContent.DURATIUM_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("biomass"))
+          .add(BlockContent.BIOMASS_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("plastic"))
+          .add(BlockContent.PLASTIC_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("fluxite"))
+          .add(BlockContent.FLUXITE_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("silicon"))
+          .add(BlockContent.SILICON_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("raw_nickel"))
+          .add(BlockContent.RAW_NICKEL_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("raw_platinum"))
+          .add(BlockContent.RAW_PLATINUM_BLOCK);
     }
 }

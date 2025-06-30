@@ -23,7 +23,6 @@ import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.MachineAddonController;
@@ -117,16 +116,14 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     @Override
     public void saveExtraData(PacketByteBuf buf) {
         sendUpdate(SyncType.GUI_OPEN);
-        var data = new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
-        ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
-        // todo change this?
+        buf.writeBlockPos(pos);
     }
     
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         // todo update constructors here
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+        return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

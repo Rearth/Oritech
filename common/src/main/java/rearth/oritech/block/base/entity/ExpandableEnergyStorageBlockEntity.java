@@ -253,8 +253,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     @Override
     public void saveExtraData(PacketByteBuf buf) {
         sendUpdate(SyncType.GUI_OPEN);
-        var data = new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
-        ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
+        buf.writeBlockPos(pos);
     }
     
     @Override
@@ -265,7 +264,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+        return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

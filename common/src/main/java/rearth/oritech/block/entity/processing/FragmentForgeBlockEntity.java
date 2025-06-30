@@ -5,10 +5,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.text.Text;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -25,6 +29,7 @@ import java.util.List;
 
 public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     
+    @SyncField(SyncType.GUI_OPEN)
     private boolean hasByproductAddon;
     
     public FragmentForgeBlockEntity(BlockPos pos, BlockState state) {
@@ -134,6 +139,12 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public int getInventorySize() {
         return 4;
+    }
+    
+    @Override
+    public List<Pair<Text, Text>> getExtraExtensionLabels() {
+        if (!hasByproductAddon) return super.getExtraExtensionLabels();
+        return List.of(new Pair<>(Text.literal("\uD83C\uDF40: Enabled"), Text.translatable("tooltip.oritech.machine.byproduct_bonus.tooltip")));
     }
     
     @Override

@@ -333,9 +333,6 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(getStorageBlockTag("steel"))
           .add(BlockContent.STEEL_BLOCK.asItem());
         
-        getOrCreateTagBuilder(getStorageBlockTag("steel"))
-          .add(BlockContent.STEEL_BLOCK.asItem());
-        
         getOrCreateTagBuilder(getStorageBlockTag("energite"))
           .add(BlockContent.ENERGITE_BLOCK.asItem());
         

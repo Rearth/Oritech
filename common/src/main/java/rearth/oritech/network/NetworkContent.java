@@ -194,17 +194,6 @@ public class NetworkContent {
         MACHINE_CHANNEL.builder().register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
         MACHINE_CHANNEL.builder().register(CodecUtils.toEndecWithRegistries(FLUID_STACK_CODEC, FLUID_STACK_STREAM_CODEC), FluidStack.class);
         
-        
-        MACHINE_CHANNEL.registerClientbound(MachineSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof MachineBlockEntity machine) {
-                machine.handleNetworkEntry(message);
-            }
-            
-        }));
-        
         MACHINE_CHANNEL.registerClientbound(MachineSetupEventPacket.class, ((message, access) -> {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);

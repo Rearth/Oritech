@@ -1,8 +1,5 @@
 package rearth.oritech.util;
 
-import io.wispforest.endec.Endec;
-import io.wispforest.endec.impl.StructEndecBuilder;
-import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -278,12 +275,6 @@ public interface MachineAddonController {
             connectedAddons.add(pos);
         }
     }
-    
-    default AddonUiData getUiData() {
-        var data = getBaseAddonData();
-        return new AddonUiData(getConnectedAddons(), getOpenAddonSlots(), data.efficiency, data.speed, getPosForAddon(), data.extraChambers);
-    }
-    
     private static Set<BlockPos> getNeighbors(BlockPos pos) {
         return Set.of(
           pos.add(-1, 0, 0),
@@ -300,19 +291,6 @@ public interface MachineAddonController {
     
     record BaseAddonData(float speed, float efficiency, long energyBonusCapacity, long energyBonusTransfer, int extraChambers) { }
     
-    record AddonUiData(List<BlockPos> positions, List<BlockPos> openSlots, float efficiency, float speed,
-                       BlockPos ownPosition, int extraChambers) {
-    }
-    
     BaseAddonData DEFAULT_ADDON_DATA = new BaseAddonData(1, 1, 0, 0, 0);
     
-    Endec<AddonUiData> ADDON_UI_ENDEC = StructEndecBuilder.of(
-      MinecraftEndecs.BLOCK_POS.listOf().fieldOf("addon_positions", AddonUiData::positions),
-      MinecraftEndecs.BLOCK_POS.listOf().fieldOf("open_slots", AddonUiData::openSlots),
-      Endec.FLOAT.fieldOf("efficiency", AddonUiData::efficiency),
-      Endec.FLOAT.fieldOf("speed", AddonUiData::speed),
-      MinecraftEndecs.BLOCK_POS.fieldOf("ownPosition", AddonUiData::ownPosition),
-      Endec.INT.fieldOf("extra_chambers", AddonUiData::extraChambers),
-      AddonUiData::new
-    );
 }

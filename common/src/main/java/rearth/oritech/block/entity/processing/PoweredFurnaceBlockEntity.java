@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -52,9 +53,9 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (world.isClient || !isActive(state)) return;
+        if (!isActive(state)) return;
         
         var recipeCandidate = world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, getFurnaceInput(), world);
         
@@ -80,7 +81,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
                     resetProgress();
                 }
                 
-                markNetDirty();
+                markDirty();
                 
             }
         } else {
@@ -91,9 +92,6 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
         if (world.getTime() % 18 == 0)
             updateFurnaceState(state);
         
-        if (networkDirty) {
-            updateNetwork();
-        }
     }
     
     private void updateFurnaceState(BlockState state) {

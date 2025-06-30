@@ -1,5 +1,6 @@
 package rearth.oritech.api.networking;
 
+import io.wispforest.endec.Endec;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -9,7 +10,22 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 
-public class ReflectiveRecordCodedBuilder {
+public class ReflectiveCodecBuilder {
+    
+    public static <E extends Enum<E>>PacketCodec<RegistryByteBuf, E> createForEnum(Class<E> enumClass) {
+        return new PacketCodec<>() {
+            @Override
+            public void encode(RegistryByteBuf buf, E value) {
+                buf.writeShort(value.ordinal());
+            }
+            
+            @Override
+            public E decode(RegistryByteBuf buf) {
+                var ordinal =  buf.readShort();
+                return enumClass.getEnumConstants()[ordinal];
+            }
+        };
+    }
     
     /**
      * Creates a PacketCodec for a given record type using reflection.

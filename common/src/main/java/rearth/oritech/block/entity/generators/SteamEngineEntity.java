@@ -17,6 +17,9 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
@@ -62,6 +65,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     private final Set<SteamEngineEntity> slaves = new HashSet<>();
     
     // client only
+    @SyncField(SyncType.GUI_TICK)
     public NetworkContent.SteamEngineSyncPacket clientStats;
     
     public SteamEngineEntity(BlockPos pos, BlockState state) {
@@ -69,7 +73,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         if (world.isClient || !isActive(state)) return;
         
@@ -84,8 +88,6 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         
         
         outputEnergy();
-        if (networkDirty)
-            updateNetwork();
     }
     
     // this is only called when steam is available
@@ -223,14 +225,6 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     @Override
     public BarConfiguration getFluidConfiguration() {
         return new BarConfiguration(149, 10, 18, 64);
-    }
-    
-    @Override
-    protected void sendNetworkEntry() {
-        super.sendNetworkEntry();
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorSteamSyncPacket(pos, boilerStorage.getInStack().getAmount(), boilerStorage.getOutStack().getAmount()));
-        
-        if (clientStats != null) NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(clientStats);
     }
     
     @Override

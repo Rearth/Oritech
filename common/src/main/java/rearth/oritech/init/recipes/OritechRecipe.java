@@ -1,7 +1,6 @@
 package rearth.oritech.init.recipes;
 
 import dev.architectury.fluid.FluidStack;
-import dev.architectury.platform.Platform;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -13,9 +12,8 @@ import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
-import rearth.oritech.util.FluidIngredient;
-
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.util.FluidIngredient;
 import rearth.oritech.util.SimpleCraftingInventory;
 
 import java.util.List;

@@ -17,6 +17,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.network.NetworkContent;
@@ -28,6 +30,7 @@ import java.util.Optional;
 
 public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGeneratorBlockEntity implements FluidApi.BlockProvider {
     
+    @SyncField
     public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty) {
         @Override
         public long insert(FluidStack toInsert, boolean simulate) {
@@ -41,13 +44,13 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         if (bucketInputAllowed() && !world.isClient && isActive(state)) {
             processBuckets();
         }
         
-        super.tick(world, pos, state, blockEntity);
+        super.serverTick(world, pos, state, blockEntity);
     }
     
     private void processBuckets() {
@@ -143,13 +146,6 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
         super.readNbt(nbt, registryLookup);
         fluidStorage.readNbt(nbt, "");
         Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
-    }
-    
-    @Override
-    protected void sendNetworkEntry() {
-        super.sendNetworkEntry();
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(
-          new NetworkContent.SingleVariantFluidSyncPacketAPI(pos, Registries.FLUID.getId(fluidStorage.getFluid()).toString(), fluidStorage.getAmount()));
     }
     
     @Override

@@ -8,9 +8,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.slot.Slot;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.DronePortEntity;
-import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.item.tools.LaserTargetDesignator;
-import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;
 
@@ -19,15 +17,11 @@ public class DroneScreenHandler extends UpgradableMachineScreenHandler {
     private final SimpleInventory cardInventory;
     
     public DroneScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, ModScreens.UpgradableData.PACKET_CODEC.decode(buf));
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
     }
     
-    public DroneScreenHandler(int syncId, PlayerInventory inventory, ModScreens.UpgradableData data) {
-        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(data.pos())), data.addonUiData(), data.coreQuality());
-    }
-    
-    public DroneScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity, MachineAddonController.AddonUiData addonUiData, float coreQuality) {
-        super(syncId, playerInventory, blockEntity, addonUiData, coreQuality);
+    public DroneScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
+        super(syncId, playerInventory, blockEntity);
 
         if (!(blockEntity instanceof DronePortEntity dronePortEntity)) {
             cardInventory = null;

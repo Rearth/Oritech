@@ -375,9 +375,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     @Override
     public void saveExtraData(PacketByteBuf buf) {
         sendUpdate(SyncType.GUI_OPEN);
-        // todo clean this up once everything has been updated
-        var data = new ModScreens.UpgradableData(pos, new MachineAddonController.AddonUiData(List.of(), List.of(), 1f, 1f, pos, 0), getCoreQuality());
-        ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
+        buf.writeBlockPos(pos);
     }
     
     @Override
@@ -387,6 +385,6 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     
     @Override
     public @Nullable ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this, new MachineAddonController.AddonUiData(List.of(), List.of(), 1f, 1f, pos, 0), getCoreQuality());
+        return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
     }
 }

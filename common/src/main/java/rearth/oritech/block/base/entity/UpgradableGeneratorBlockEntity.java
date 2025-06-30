@@ -19,11 +19,13 @@ import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.network.NetworkContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +33,14 @@ import java.util.Set;
 
 public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBlockEntity {
     
-    public int currentMaxBurnTime; // needed only for progress display
+    @SyncField
+    public int currentMaxBurnTime; // needed only for progress display and animation speed
     private List<ItemStack> pendingOutputs = new ArrayList<>(); // used if a recipe produces a byproduct at the end
     
     // this is used just for steam
+    @SyncField(SyncType.GUI_OPEN)
     public boolean isProducingSteam = false;
+    @SyncField(SyncType.GUI_TICK)
     public final SimpleInOutFluidStorage boilerStorage = new SimpleInOutFluidStorage(8 * FluidStackHooks.bucketAmount(), this::markDirty) {
         @Override
         public long insert(FluidStack toInsert, boolean simulate) {
@@ -51,7 +56,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         // check remaining burn time
         // if burn time is zero, try to consume item thus adding burn time
@@ -71,15 +76,10 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
                     burningFinished();
                 }
                 markDirty();
-                markNetDirty();
             }
         } else if (canFitEnergy()) {
             // try consume new item
             tryConsumeInput();
-        }
-        
-        if (networkDirty) {
-            updateNetwork();
         }
         
         outputEnergy();
@@ -213,15 +213,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             var stack = ItemStack.fromNbt(registryLookup, compound).get();
             pendingOutputs.add(stack);
         }
-    }
-    
-    @Override
-    protected void sendNetworkEntry() {
-        super.sendNetworkEntry();
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorUISyncPacket(getPos(), currentMaxBurnTime, isProducingSteam));
-        
-        if (isProducingSteam)
-            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorSteamSyncPacket(pos, boilerStorage.getInStack().getAmount(), boilerStorage.getOutStack().getAmount()));
     }
     
     protected abstract Set<Pair<BlockPos, Direction>> getOutputTargets(BlockPos pos, World world);

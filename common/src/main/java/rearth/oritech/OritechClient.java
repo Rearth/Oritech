@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
@@ -28,6 +29,7 @@ public final class OritechClient {
         
         Oritech.LOGGER.info("Oritech client initialization");
         ModScreens.registerScreens();
+        NetworkManager.initClient();
         
         KeyMappingRegistry.register(AUGMENT_SELECTOR);
         
