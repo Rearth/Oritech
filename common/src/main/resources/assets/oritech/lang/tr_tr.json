@@ -443,7 +443,7 @@
   "tooltip.oritech.item_pipe.4": "Mevcut en yakın envantere aktarılır.",
   "title.oritech.machine.addon_looting": "%d Ganimet",
   "tooltip.oritech.machine.addon_looting": "Verim eklenti sayısı. 3 etkili maksimum değerdir",
-  "tooltip.oritech.machine.byproduct_bonus.tooltip": "Yield addon is installed. Byproducts are doubled.",
+  "tooltip.oritech.machine.byproduct_bonus.tooltip": "Verim eklentisi yüklendi. Yan ürünler iki katına çıkartıldı.",
   "title.oritech.item_filter.toggle_energy_statistics": "Çıkışı Göster",
   "title.oritech.energy.inAvgSecond": "∅ %s RF/t",
   "title.oritech.energy.inAvgSecond.tooltip": "Son saniyedeki ortalama RF/t girişi.",
