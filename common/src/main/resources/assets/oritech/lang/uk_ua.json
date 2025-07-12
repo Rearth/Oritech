@@ -430,6 +430,7 @@
   "tooltip.oritech.laser_arm.addon_hunter_range": "Ефективна дальність променя",
   "title.oritech.laser_arm.addon_hunter_damage": "%d Пошкодження",
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Ефективне пошкодження променем",
+  "tooltip.oritech.pump_redstone": "Can be disabled with a redstone signal.",
   "tooltip.oritech.item_pipe.1": "Клацніть правою кнопкою миші, щоб переключити вилучення.",
   "tooltip.oritech.item_pipe.2": "Вилучає лише з першого непустого слота.",
   "tooltip.oritech.item_pipe.3": [
