@@ -430,6 +430,7 @@
   "tooltip.oritech.laser_arm.addon_hunter_range": "Effective beam range",
   "title.oritech.laser_arm.addon_hunter_damage": "%d Damage",
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Effective Beam Damage",
+  "tooltip.oritech.pump_redstone": "Can be disabled with a redstone signal.",
   "tooltip.oritech.item_pipe.1": "Right-click to toggle extraction.",
   "tooltip.oritech.item_pipe.2": "Only extracts from the first non-empty slot.",
   "tooltip.oritech.item_pipe.3": [
