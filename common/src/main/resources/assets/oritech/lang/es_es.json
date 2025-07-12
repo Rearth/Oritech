@@ -430,6 +430,7 @@
   "tooltip.oritech.laser_arm.addon_hunter_range": "Alcance efectivo del rayo",
   "title.oritech.laser_arm.addon_hunter_damage": "%d Daño",
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Daño efectivo del rayo",
+  "tooltip.oritech.pump_redstone": "Can be disabled with a redstone signal.",
   "tooltip.oritech.item_pipe.1": "Right-click to toggle extraction.",
   "tooltip.oritech.item_pipe.2": "Only extracts from the first non-empty slot.",
   "tooltip.oritech.item_pipe.3": [
