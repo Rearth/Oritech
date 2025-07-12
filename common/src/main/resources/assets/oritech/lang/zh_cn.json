@@ -430,6 +430,7 @@
   "tooltip.oritech.laser_arm.addon_hunter_range": "有效光束范围",
   "title.oritech.laser_arm.addon_hunter_damage": "%d 伤害",
   "tooltip.oritech.laser_arm.addon_hunter_damage": "有效光束伤害",
+  "tooltip.oritech.pump_redstone": "Can be disabled with a redstone signal.",
   "tooltip.oritech.item_pipe.1": "右键切换至提取模式",
   "tooltip.oritech.item_pipe.2": "仅从首个非空槽位提取。",
   "tooltip.oritech.item_pipe.3": [
