@@ -430,6 +430,7 @@
   "tooltip.oritech.laser_arm.addon_hunter_range": "Raggio effettivo del fascio",
   "title.oritech.laser_arm.addon_hunter_damage": "Danno %d",
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Danno effettivo del fascio",
+  "tooltip.oritech.pump_redstone": "Can be disabled with a redstone signal.",
   "tooltip.oritech.item_pipe.1": "Right-click to toggle extraction.",
   "tooltip.oritech.item_pipe.2": "Only extracts from the first non-empty slot.",
   "tooltip.oritech.item_pipe.3": [
