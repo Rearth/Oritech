@@ -430,6 +430,7 @@
   "tooltip.oritech.laser_arm.addon_hunter_range": "有効ビーム範囲",
   "title.oritech.laser_arm.addon_hunter_damage": "+%d ダメージ",
   "tooltip.oritech.laser_arm.addon_hunter_damage": "有効ビームダメージ",
+  "tooltip.oritech.pump_redstone": "Can be disabled with a redstone signal.",
   "tooltip.oritech.item_pipe.1": "右クリックで搬出の切り替えができます。",
   "tooltip.oritech.item_pipe.2": "空ではない最初のスロットからのみ抽出されます。",
   "tooltip.oritech.item_pipe.3": [
