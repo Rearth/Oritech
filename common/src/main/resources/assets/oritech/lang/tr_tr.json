@@ -430,6 +430,7 @@
   "tooltip.oritech.laser_arm.addon_hunter_range": "Etkili ışın aralığı",
   "title.oritech.laser_arm.addon_hunter_damage": "%d Hasar",
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Etkili Işın Hasarı",
+  "tooltip.oritech.pump_redstone": "Can be disabled with a redstone signal.",
   "tooltip.oritech.item_pipe.1": "Çıkarmayı değiştirmek için Sağ-tıklayın.",
   "tooltip.oritech.item_pipe.2": "Yalnızca boş olmayan ilk yuvadan çıkarır.",
   "tooltip.oritech.item_pipe.3": [
