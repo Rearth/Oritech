@@ -11,6 +11,8 @@ import rearth.oritech.client.ui.ItemFilterScreen;
 import java.util.ArrayList;
 import java.util.List;
 
+import static rearth.oritech.client.ui.ItemFilterScreen.FILTER_SIZE;
+
 class JeiItemFilterGhostHandler implements IGhostIngredientHandler<ItemFilterScreen> {
 
     @Override
@@ -20,7 +22,7 @@ class JeiItemFilterGhostHandler implements IGhostIngredientHandler<ItemFilterScr
             return targets;
         }
 
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < FILTER_SIZE; i++) {
             targets.add(new ItemFilterTarget<>(screen, i));
         }
         return targets;

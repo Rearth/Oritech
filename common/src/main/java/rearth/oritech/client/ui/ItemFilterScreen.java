@@ -22,11 +22,13 @@ import java.util.function.Predicate;
 import static rearth.oritech.client.ui.BasicMachineScreen.ITEM_SLOT;
 
 public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilterScreenHandler> {
-    
+
+    public static final int FILTER_SIZE = 12;
+
     private ButtonComponent whiteListButton;
     private ButtonComponent nbtButton;
     private ButtonComponent componentButton;
-    private final FlowLayout[] gridContainers = new FlowLayout[12];
+    private final FlowLayout[] gridContainers = new FlowLayout[FILTER_SIZE];
     private Map<Integer, ItemStack> cachedItems;
     
     public ItemFilterScreen(ItemFilterScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -43,7 +45,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         cachedItems = handler.blockEntity.getFilterSettings().items();
         Oritech.LOGGER.debug("loading item filters: " + cachedItems);
         
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < FILTER_SIZE; i++) {
             var storedStack = cachedItems.getOrDefault(i, ItemStack.EMPTY);
             
             var container = gridContainers[i];

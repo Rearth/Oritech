@@ -1,6 +1,5 @@
 package rearth.oritech.init.compat.rei;
 
-import io.wispforest.owo.ui.container.FlowLayout;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.drag.DraggableStack;
 import me.shedaniel.rei.api.client.gui.drag.DraggableStackVisitor;
@@ -13,6 +12,8 @@ import rearth.oritech.client.ui.ItemFilterScreen;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static rearth.oritech.client.ui.ItemFilterScreen.FILTER_SIZE;
+
 public class ReiItemFilterDraggableStackVisitor implements DraggableStackVisitor<ItemFilterScreen> {
 
     @Override
@@ -23,7 +24,7 @@ public class ReiItemFilterDraggableStackVisitor implements DraggableStackVisitor
         }
 
         var screen = context.getScreen();
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < FILTER_SIZE; i++) {
             var container = screen.getItemContainer(i);
             if (container.isInBoundingBox(cursor.x, cursor.y)) {
                 return screen.acceptItemStack(itemStack.copyWithCount(1), i)
@@ -36,7 +37,7 @@ public class ReiItemFilterDraggableStackVisitor implements DraggableStackVisitor
 
     @Override
     public Stream<BoundsProvider> getDraggableAcceptingBounds(DraggingContext<ItemFilterScreen> context, DraggableStack stack) {
-        return IntStream.range(0, 12)
+        return IntStream.range(0, FILTER_SIZE)
                 .mapToObj(i -> context.getScreen().getItemContainer(i))
                 .map(container -> BoundsProvider.ofRectangle(new Rectangle(container.x(), container.y(), container.width(), container.height())));
     }
