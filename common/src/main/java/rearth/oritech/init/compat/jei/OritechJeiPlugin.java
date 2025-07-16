@@ -6,7 +6,10 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
+import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
@@ -15,6 +18,7 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.Rect2i;
+import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +30,7 @@ import rearth.oritech.block.entity.generators.LavaGeneratorEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.client.ui.BasicMachineScreen;
+import rearth.oritech.client.ui.ItemFilterScreen;
 import rearth.oritech.client.ui.PlayerModifierScreen;
 import rearth.oritech.client.ui.ReactorScreen;
 import rearth.oritech.init.BlockContent;
@@ -150,7 +155,8 @@ public class OritechJeiPlugin implements IModPlugin {
         registration.addGenericGuiContainerHandler(BasicMachineScreen.class, new JeiExclusionZoneHandler());
         registration.addGenericGuiContainerHandler(ReactorScreen.class, new JeiExclusionZoneHandler());
         registration.addGenericGuiContainerHandler(PlayerModifierScreen.class, new JeiExclusionZoneHandler());
-        
+
+        registration.addGhostIngredientHandler(ItemFilterScreen.class, new ItemFilterGhostHandler());
     }
     
     private static class JeiExclusionZoneHandler implements IGuiContainerHandler<BaseOwoHandledScreen<FlowLayout, ?>> {
@@ -185,5 +191,48 @@ public class OritechJeiPlugin implements IModPlugin {
         }
         
         return result;
+    }
+
+    private static class ItemFilterGhostHandler implements IGhostIngredientHandler<ItemFilterScreen> {
+
+        @Override
+        public <I> @NotNull List<Target<I>> getTargetsTyped(@NotNull ItemFilterScreen screen, @NotNull ITypedIngredient<I> ingredient, boolean doStart) {
+            List<Target<I>> targets = new ArrayList<>();
+            if (ingredient.getType() != VanillaTypes.ITEM_STACK) {
+                return targets;
+            }
+
+            for (int i = 0; i < 12; i++) {
+                targets.add(new ItemFilterTarget<>(screen, i));
+            }
+            return targets;
+        }
+
+        @Override
+        public void onComplete() {}
+
+        static final class ItemFilterTarget<I> implements Target<I> {
+            private final ItemFilterScreen screen;
+            private final int index;
+            private final Rect2i area;
+
+            ItemFilterTarget(ItemFilterScreen screen, int index) {
+                this.screen = screen;
+                this.index = index;
+
+                var layout = screen.getItemContainer(index);
+                this.area = new Rect2i(layout.x(), layout.y(), layout.width(), layout.height());
+            }
+
+            @Override
+            public @NotNull Rect2i getArea() {
+                return area;
+            }
+
+            @Override
+            public void accept(@NotNull I itemStack) {
+                screen.acceptItemStack(((ItemStack) itemStack).copyWithCount(1), index);
+            }
+        }
     }
 }
