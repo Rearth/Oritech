@@ -4,6 +4,7 @@ import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
+import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.util.EntryStacks;
@@ -95,7 +96,12 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerMachineRecipeType(registry, RecipeContent.LASER);
         registerMachineRecipeType(registry, RecipeContent.REACTOR);
     }
-    
+
+    @Override
+    public void registerScreens(ScreenRegistry registry) {
+        registry.registerDraggableStackVisitor(new ReiItemFilterDraggableStackVisitor());
+    }
+
     private void registerOritechCategory(CategoryRegistry registry, OritechRecipeType recipeType, ItemConvertible machineIcon, BiFunction<OritechRecipeType, ItemConvertible, ? extends DisplayCategory<Display>> screenType) {
         var oriCategory = screenType.apply(recipeType, machineIcon);
         registry.add(oriCategory);
