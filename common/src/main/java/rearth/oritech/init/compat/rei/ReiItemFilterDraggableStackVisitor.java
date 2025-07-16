@@ -24,7 +24,7 @@ public class ReiItemFilterDraggableStackVisitor implements DraggableStackVisitor
 
         var screen = context.getScreen();
         for (int i = 0; i < 12; i++) {
-            FlowLayout container = screen.getItemContainer(i);
+            var container = screen.getItemContainer(i);
             if (container.isInBoundingBox(cursor.x, cursor.y)) {
                 return screen.acceptItemStack(itemStack.copyWithCount(1), i)
                         ? DraggedAcceptorResult.ACCEPTED
