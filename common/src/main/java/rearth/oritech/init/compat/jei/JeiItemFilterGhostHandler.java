@@ -17,7 +17,7 @@ class JeiItemFilterGhostHandler implements IGhostIngredientHandler<ItemFilterScr
 
     @Override
     public <I> @NotNull List<Target<I>> getTargetsTyped(@NotNull ItemFilterScreen screen, @NotNull ITypedIngredient<I> ingredient, boolean doStart) {
-        List<Target<I>> targets = new ArrayList<>();
+        var targets = new ArrayList<Target<I>>();
         if (ingredient.getType() != VanillaTypes.ITEM_STACK) {
             return targets;
         }
