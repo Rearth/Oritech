@@ -14,6 +14,9 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
@@ -33,6 +36,9 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
@@ -42,7 +48,7 @@ import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.init.recipes.AugmentDataRecipe;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -52,10 +58,8 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
 
-public class AugmentApplicationEntity extends BlockEntity implements BlockEntityTicker<AugmentApplicationEntity>, MultiblockMachineController, GeoBlockEntity,
+public class AugmentApplicationEntity extends NetworkedBlockEntity implements MultiblockMachineController, GeoBlockEntity,
                                                                        ExtendedMenuProvider, ItemApi.BlockProvider, EnergyApi.BlockProvider, ScreenProvider {
-    
-    public final Set<Identifier> researchedAugments = new HashSet<>();
     
     // config
     public static long maxEnergyTransfer = Oritech.CONFIG.augmenterMaxEnergy() / 10;
@@ -68,15 +72,18 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     // animation
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
+    public final Set<Identifier> researchedAugments = new HashSet<>();
     // working state
-    private boolean networkDirty = true;
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public final HashMap<Integer, ResearchState> availableStations = new HashMap<>();
+    
     public boolean screenInvOverride = false;
     
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(5, this::markDirty);
     
-    private final EnergyApi.EnergyStorage energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, maxEnergyStored, maxEnergyStored, this::markDirty);
-    private AnimationController<AugmentApplicationEntity> animationController;
+    @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
+    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, maxEnergyStored, maxEnergyStored, this::markDirty);
     
     
     public AugmentApplicationEntity(BlockPos pos, BlockState state) {
@@ -84,10 +91,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, AugmentApplicationEntity blockEntity) {
-        
-        if (world.isClient) return;
-        
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         screenInvOverride = false;
         
         // update research stations
@@ -102,10 +106,6 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
                 station.working = false;
                 this.markDirty();
             }
-        }
-        
-        if (networkDirty) {
-            updateNetwork();
         }
     }
     
@@ -253,7 +253,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
         
         var augmentInstance = PlayerAugments.allAugments.get(augment);
         augmentInstance.installToPlayer(player);
-        this.markNetDirty();
+        this.markDirty();
         
         player.getWorld().playSound(null, player.getBlockPos(), SoundContent.SHORT_SERVO, SoundCategory.BLOCKS);
     }
@@ -267,7 +267,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
         
         var augmentInstance = PlayerAugments.allAugments.get(augment);
         augmentInstance.removeFromPlayer(player);
-        this.markNetDirty();
+        this.markDirty();
     }
     
     public static void toggleAugmentForPlayer(Identifier augment, PlayerEntity player) {
@@ -327,7 +327,6 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
             
             var candidateState = world.getBlockState(candidatePos);
             if (!(candidateState.getBlock() instanceof AugmentResearchStationBlock) || !candidateState.get(MultiblockMachine.ASSEMBLED)) {
-                availableStations.put(i, null);
                 continue;
             }
             
@@ -337,52 +336,6 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
             var newState = new ResearchState(candidateState.getBlock(), false, Identifier.of(""), -1, -1);
             
             availableStations.put(i, newState);
-        }
-        
-    }
-    
-    private void markNetDirty() {
-        this.networkDirty = true;
-    }
-    
-    private void updateNetwork() {
-        this.networkDirty = false;
-        
-        var stations = new ArrayList<Identifier>();
-        var states = new ArrayList<Boolean>();
-        var targets = new ArrayList<Identifier>();
-        var startTimes = new ArrayList<Long>();
-        var durations = new ArrayList<Integer>();
-        
-        availableStations.values().forEach(station -> {
-            if (station == null) return;
-            stations.add(Registries.BLOCK.getId(station.type));
-            states.add(station.working);
-            targets.add(station.selectedResearch);
-            startTimes.add(station.researchStartedAt);
-            durations.add(station.workTime);
-        });
-        
-        // collect researched augments, send them to client
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AugmentDataPacket(pos, researchedAugments.stream().toList(), stations, states, targets, startTimes, durations));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.getAmount(), energyStorage.getCapacity()));
-    }
-    
-    public void handleAugmentUpdatePacket(NetworkContent.AugmentDataPacket packet) {
-        this.researchedAugments.clear();
-        this.researchedAugments.addAll(packet.allResearched());
-        
-        this.availableStations.clear();
-        
-        for (int i = 0; i < packet.researchBlocks().size(); i++) {
-            var station = Registries.BLOCK.get(packet.researchBlocks().get(i));
-            var state = packet.researchStates().get(i);
-            var target = packet.activeResearches().get(i);
-            var researchTime = packet.researchTimes().get(i);
-            var startedTime = packet.startedTimes().get(i);
-            
-            var res = new ResearchState(station, state, target, researchTime, startedTime);
-            availableStations.put(i, res);
         }
         
     }
@@ -445,25 +398,13 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     }
     
     @Override
-    public void markDirty() {
-        super.markDirty();
-        this.markNetDirty();
-    }
-    
-    @Override
-    public void playSetupAnimation() {
-        animationController.setAnimation(MachineBlockEntity.SETUP);
-        animationController.forceAnimationReset();
+    public void triggerSetupAnimation() {
+        triggerAnim("machine", "setup");
     }
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        animationController = getController();
-        controllers.add(animationController.setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
-    }
-    
-    private AnimationController<AugmentApplicationEntity> getController() {
-        return new AnimationController<>(this, "machine", 0, state -> {
+        controllers.add(new AnimationController<>(this, "machine", 0, state -> {
             
             if (state.isCurrentAnimation(MachineBlockEntity.SETUP)) {
                 if (state.getController().hasAnimationFinished()) {
@@ -478,7 +419,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
             } else {
                 return state.setAndContinue(MachineBlockEntity.PACKAGED);
             }
-        });
+        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()).triggerableAnim("setup", MachineBlockEntity.SETUP));
     }
     
     @Override
@@ -499,8 +440,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        updateNetwork();
-        
+        this.sendUpdate(SyncType.GUI_OPEN);
         var dist = player.squaredDistanceTo(this.pos.toBottomCenterPos());
         if (dist > 1 || screenInvOverride)
             return new BasicMachineScreenHandler(syncId, playerInventory, this);
@@ -571,6 +511,35 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
         public Identifier selectedResearch;
         public int workTime;
         public long researchStartedAt;
+        
+        public static PacketCodec<RegistryByteBuf, ResearchState> PACKET_CODEC = PacketCodec.tuple(
+          Identifier.PACKET_CODEC.xmap(Registries.BLOCK::get, Registries.BLOCK::getId), ResearchState::getType,
+          PacketCodecs.BOOL, ResearchState::getWorking,
+          Identifier.PACKET_CODEC, ResearchState::getSelectedResearch,
+          PacketCodecs.INTEGER, ResearchState::getWorkTime,
+          PacketCodecs.VAR_LONG, ResearchState::getResearchStartedAt,
+          ResearchState::new
+        );
+        
+        public Block getType() {
+            return type;
+        }
+        
+        public int getWorkTime() {
+            return workTime;
+        }
+        
+        public Identifier getSelectedResearch() {
+            return selectedResearch;
+        }
+        
+        public long getResearchStartedAt() {
+            return researchStartedAt;
+        }
+        
+        public boolean getWorking() {
+            return working;
+        }
         
         public ResearchState(Block type, boolean working, Identifier selectedResearch, int workTime, long researchStartedAt) {
             this.type = type;

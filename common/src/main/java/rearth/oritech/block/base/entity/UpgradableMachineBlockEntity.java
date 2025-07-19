@@ -6,7 +6,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
@@ -15,7 +14,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.MachineAddonController;
@@ -26,8 +26,11 @@ import java.util.List;
 
 public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity implements MachineAddonController {
     
+    @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> connectedAddons = new ArrayList<>();
+    @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> openSlots = new ArrayList<>();
+    @SyncField(SyncType.GUI_OPEN)
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
     
     public UpgradableMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
@@ -111,18 +114,11 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
         this.addonData = data;
         this.markDirty();
     }
-    
-    @Override
-    public void saveExtraData(PacketByteBuf buf) {
-        sendNetworkEntry();
-        var data = new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
-        ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
-    }
 
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+        return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

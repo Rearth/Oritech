@@ -17,9 +17,10 @@ import org.joml.Vector2f;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.api.Augment;
-import rearth.oritech.network.NetworkContent;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -277,7 +278,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
     }
     
     private void toggleAugment(Identifier id) {
-        NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.AugmentPlayerTogglePacket(id));
+        NetworkManager.sendToServer(new PlayerAugments.AugmentPlayerTogglePacket(id));
     }
     
     @Override

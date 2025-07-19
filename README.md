@@ -109,7 +109,7 @@ would fit, so for content and balance changes please reach out to me first (via 
 
 ## Credits
 
-This mod is heavily inspired by the original techarium mod, which sadly never got finished. A lot of the machine names and models
+This mod is heavily inspired by the original techarium mod, which sadly hasn't been released in a playable version yet. A lot of the machine names and models
 were taken or strongly inspired by techarium. Huge thanks to the original techarium devs (YCar and Gecko and everyone else involved) for creating
 the assets and ideas, and also for making them available under the [CC BY-NC 4.0 DEED](https://creativecommons.org/licenses/by-nc/4.0/) license.
 

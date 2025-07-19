@@ -95,7 +95,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
     public void addWidgets(WidgetHolder widgets) {
         
         var offsetX = 23;
-        var offsetY = 17;
+        var offsetY = 19;
         
         // central arrow/flame
         if (isGenerator) {
@@ -136,14 +136,14 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
                 tankCount++;
             } else {
                 var pos = slots.get(slotOffsets.outputStart() + i);
-                var usedY = Math.max(10, pos.y() - offsetY);
+                var usedY = Math.max(1, pos.y() - offsetY);
                 widgets.addSlot(result, pos.x() - offsetX, usedY).recipeContext(this);
             }
         }
         
         // data
         var duration = String.format("%.0f", recipe.getTime() / 20f);
-        widgets.addText(Text.translatable("emi.title.oritech.cookingtime", duration, recipe.getTime()), (int) (getDisplayWidth() * 0.5), (int) (getDisplayHeight() * 0.88), 0xFFFFFF, true);
+        widgets.addText(Text.translatable("emi.title.oritech.cookingtime", duration, recipe.getTime()), (int) (getDisplayWidth() * 0.33), (int) (getDisplayHeight() * 0.88), 0xFFFFFF, true);
         
     }
 }

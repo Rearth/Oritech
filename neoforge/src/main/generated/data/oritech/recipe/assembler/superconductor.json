@@ -10,7 +10,7 @@
       "item": "oritech:flux_gate"
     },
     {
-      "tag": "c:wires"
+      "tag": "c:ingots/electrum"
     },
     {
       "item": "oritech:dubios_container"
@@ -21,9 +21,9 @@
   ],
   "results": [
     {
-      "count": 3,
+      "count": 4,
       "id": "oritech:superconductor"
     }
   ],
-  "time": 320
+  "time": 256
 }

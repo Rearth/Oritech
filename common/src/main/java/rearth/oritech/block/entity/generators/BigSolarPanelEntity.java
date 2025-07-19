@@ -219,8 +219,7 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     }
     
     @Override
-    public void playSetupAnimation() {
-        animationController.setAnimation(MachineBlockEntity.SETUP);
-        animationController.forceAnimationReset();
+    public void triggerSetupAnimation() {
+        // todo
     }
 }

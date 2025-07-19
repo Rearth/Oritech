@@ -17,6 +17,7 @@ import rearth.oritech.block.entity.generators.LavaGeneratorEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.ui.ItemFilterScreen;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -60,7 +61,8 @@ public class OritechEMIPlugin implements EmiPlugin {
         registry.addRecipeHandler(ModScreens.ASSEMBLER_SCREEN, new EmiTransferHandler<>(RecipeContent.ASSEMBLER.getIdentifier()));
         registry.addRecipeHandler(ModScreens.FOUNDRY_SCREEN, new EmiTransferHandler<>(RecipeContent.FOUNDRY.getIdentifier()));
         registry.addRecipeHandler(ModScreens.ATOMIC_FORGE_SCREEN, new EmiTransferHandler<>(RecipeContent.ATOMIC_FORGE.getIdentifier()));
-        
+
+        registry.addDragDropHandler(ItemFilterScreen.class, new EmiItemFilterDragDropHandler());
     }
     
     private void registerOritechCategory(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType, ItemConvertible machine,  Class<? extends MachineBlockEntity> screenProviderSource) {

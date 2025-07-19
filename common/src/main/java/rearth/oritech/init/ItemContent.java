@@ -99,7 +99,6 @@ public class ItemContent implements ArchitecturyRegistryContainer<Item> {
     public static final Item COAL_DUST = new Item(new Item.Settings());
     public static final Item CARBON_FIBRE_STRANDS = new Item(new Item.Settings());
     public static final Item ENDERIC_COMPOUND = new Item(new Item.Settings());
-    public static final Item INSULATED_WIRE = new Item(new Item.Settings());
     public static final Item MAGNETIC_COIL = new Item(new Item.Settings());
     public static final Item CLAY_CATALYST_BEADS = new Item(new Item.Settings());
     public static final Item MOTOR = new CustomTooltipItem(new Item.Settings(), "tooltip.oritech.motor");

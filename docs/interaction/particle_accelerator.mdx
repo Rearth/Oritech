@@ -34,6 +34,11 @@ This means that at higher speeds, the distance between guide blocks can be large
 When 2 particles (from different particle accelerator controllers) collide with each other, they can result in a different item. Depending on the recipe,
 the required collision energy will differ. The collision energy is the sum of the speeds of both particles. The item type is irrelevant here, only the speeds matter.
 
+<Callout variant="info">
+    At high speeds quantum interference makes collision points unpredictable and occasionally miss when BOTH particles are moving at high speeds.
+    Make sure to put the particle into the same ring at opposing direction when colliding.
+</Callout>
+
 For example, if 2 particles crash into each other while moving in opposite directions each at 500 m/s, the collision energy will be 1000J (500 + 500).
 If one if the particles travels at 1000 m/s, and the other one only at 1 m/s, the resulting energy will be 1001J (1000 + 1). This means that you don't need to speed
 up both particles for a collision, in most cases it is easier to speed up just one particle, and then insert a second, slow particle into the same ring.

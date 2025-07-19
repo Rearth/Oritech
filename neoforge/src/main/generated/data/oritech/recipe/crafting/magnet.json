@@ -6,7 +6,7 @@
       "tag": "c:ingots/steel"
     },
     "i": {
-      "tag": "c:wires"
+      "tag": "c:ingots/nickel"
     }
   },
   "pattern": [
@@ -15,7 +15,7 @@
     "iii"
   ],
   "result": {
-    "count": 2,
+    "count": 4,
     "id": "oritech:magnetic_coil"
   }
 }

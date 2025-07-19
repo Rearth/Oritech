@@ -175,7 +175,6 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .fluidOutput(FluidContent.STILL_HEAVY_OIL.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.25f)
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.25f)
-          .timeInSeconds(6)
           .export(exporter, "oilbase");
         
         RefineryRecipeBuilder.build()
@@ -184,7 +183,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .fluidOutput(FluidContent.STILL_DIESEL.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.5f)
-          .timeInSeconds(6)
+          .timeMultiplier(1.6f)
           .export(exporter, "oilalt");
         
         // heavy oil
@@ -194,7 +193,6 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .fluidOutput(FluidContent.STILL_DIESEL.get(), 1f)
           .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.25f)
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.25f)
-          .timeInSeconds(6)
           .export(exporter, "heavyoil");
         
         // lava
@@ -203,16 +201,15 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .fluidOutput(FluidStack.create(FluidContent.STILL_STEAM.get(), 64_000))
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.1f)
           .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.2f)
-          .timeInSeconds(6)
           .export(exporter, "lava");
         
         RefineryRecipeBuilder.build()
           .input(ItemContent.ENDERIC_COMPOUND)
           .fluidInput(Fluids.LAVA)
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 1f)
-          .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 1f)
+          .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_STRANGE_MATTER.get(), 0.2f)
-          .timeInSeconds(6)
+          .timeMultiplier(1.6f)
           .export(exporter, "lavaalt");
         
         // biodiesel
@@ -221,7 +218,6 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .fluidInput(FluidContent.STILL_BIOFUEL.get())
           .fluidOutput(FluidContent.STILL_DIESEL.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.2f)
-          .timeInSeconds(6)
           .export(exporter, "biodiesel");
         
         // centrifuge turbofuel
@@ -246,17 +242,16 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(TagContent.QUARTZ_DUSTS)
           .fluidInput(FluidContent.STILL_NAPHTHA.get())
           .fluidOutput(FluidContent.STILL_SILICON_WASH.get(), 1f)
-          .timeMultiplier(0.5f)
           .export(exporter, "siliconwash");
         
         CentrifugeFluidRecipeBuilder.build()
           .input(Items.GRAVEL)
           .fluidInput(FluidContent.STILL_NAPHTHA.get())
           .fluidOutput(FluidContent.STILL_SILICON_WASH.get(), 0.05f)
-          .timeMultiplier(0.5f)
+          .timeMultiplier(1.6f)
           .export(exporter, "siliconwashbad");
         
-        // polymer resin from naphtha (manual) todo check if bucket remainder works
+        // polymer resin from naphtha (manual)
         offerManualFluidApplication(exporter, ItemContent.POLYMER_RESIN, of(FluidContent.STILL_NAPHTHA_BUCKET.get()), of(ItemTags.SAND), "manualresin");
         
         // polymer resin from naphtha in centrifuge
@@ -278,6 +273,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.DUBIOS_CONTAINER)
           .fluidInput(FluidContent.STILL_SULFURIC_ACID.get())
           .result(ItemContent.ADVANCED_BATTERY, 8)
+          .timeMultiplier(2f)
           .export(exporter, "advbatteryacid");
         
         // silicon from silicon wash + sand in refinery
@@ -285,6 +281,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemTags.SAND)
           .fluidInput(FluidContent.STILL_SILICON_WASH.get())
           .result(ItemContent.SILICON, 4)
+          .timeMultiplier(2f)
           .export(exporter, "siliconwashing");
         
         // silicon wafer in centrifuge
@@ -292,6 +289,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.CARBON_FIBRE_STRANDS)
           .fluidInput(FluidContent.STILL_SILICON_WASH.get())
           .result(ItemContent.SILICON_WAFER, 4)
+          .timeMultiplier(2f)
           .export(exporter, "siliconwafers");
         
         // quartz from mineral wash in refinery
@@ -299,6 +297,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.CLAY_CATALYST_BEADS)
           .fluidInput(FluidContent.STILL_MINERAL_SLURRY.get(), 0.25f)
           .result(Items.QUARTZ)
+          .timeMultiplier(2f)
           .export(exporter, "quartz");
         
         // reinforced carbon sheeting
@@ -306,6 +305,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.CARBON_FIBRE_STRANDS)
           .fluidInput(FluidContent.STILL_NAPHTHA.get(), 0.5f)
           .result(ItemContent.REINFORCED_CARBON_SHEET)
+          .timeMultiplier(3f)
           .export(exporter, "carbonsheet");
         
         // dubious container and strange matter in centrifuge
@@ -313,6 +313,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.DUBIOS_CONTAINER)
           .fluidInput(FluidContent.STILL_STRANGE_MATTER.get())
           .result(ItemContent.UNHOLY_INTELLIGENCE, 1)
+          .timeMultiplier(8f)
           .export(exporter, "unholyai");
     }
     
@@ -332,6 +333,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
         // enderic laser / portable laser
         offerChainsawRecipe(exporter, ToolsContent.PORTABLE_LASER, of(ItemContent.ADVANCED_BATTERY), of(BlockContent.ACCELERATOR_MOTOR), of(ItemContent.ADAMANT_INGOT), of(BlockContent.LASER_ARM_BLOCK), "portablelaser");
+        
+        // electric mace
+        offerDrillRecipe(exporter, ToolsContent.ELECTRIC_MACE, of(ItemContent.ADVANCED_BATTERY), of(ItemContent.CARBON_FIBRE_STRANDS), of(ItemContent.ADAMANT_INGOT), of(Items.HEAVY_CORE), "_emace");
         
         // designator
         offerDrillRecipe(exporter, ItemContent.TARGET_DESIGNATOR, of(TagContent.STEEL_INGOTS), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.PROCESSING_UNIT), of(TagContent.PLASTIC_PLATES), "designator");
@@ -397,7 +401,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // basic generator
         offerGeneratorRecipe(exporter, BlockContent.BASIC_GENERATOR_BLOCK.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(cItemTag("ingots/copper")), of(TagContent.NICKEL_INGOTS), "basicgen");
         // pulverizer
-        offerGeneratorRecipe(exporter, BlockContent.PULVERIZER_BLOCK.asItem(), of(cItemTag("storage_blocks/iron")), of(ItemContent.MOTOR), of(TagContent.NICKEL_INGOTS), of(TagContent.STEEL_INGOTS), "pulverizer");
+        offerGeneratorRecipe(exporter, BlockContent.PULVERIZER_BLOCK.asItem(), of(cItemTag("storage_blocks/copper")), of(ItemContent.MOTOR), of(TagContent.NICKEL_INGOTS), of(TagContent.STEEL_INGOTS), "pulverizer");
         offerGeneratorRecipe(exporter, BlockContent.PULVERIZER_BLOCK.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.MOTOR), of(TagContent.NICKEL_INGOTS), of(TagContent.STEEL_INGOTS), "pulverizeralt");
         // electric furnace
         offerFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE_BLOCK.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(TagContent.SILICON), of(TagContent.ELECTRUM_INGOTS), of(cItemTag("ingots/copper")), "electricfurnace");
@@ -410,8 +414,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // refinery
         offerParticleMotorRecipe(exporter, BlockContent.REFINERY_BLOCK.asItem(), of(BlockContent.REFINERY_MODULE_BLOCK.asItem()), of(ItemContent.MOTOR), of(Items.CAULDRON), of(cItemTag("ingots/steel")), "refinery");
         // refinery module
-        offerGeneratorRecipe(exporter, BlockContent.REFINERY_MODULE_BLOCK.asItem(), of(BlockContent.SMALL_TANK_BLOCK.asItem()), of(Items.SLIME_BALL), of(BlockContent.METAL_BEAM_BLOCK), of(cItemTag("ingots/iron")), "refinerymodule");
-        offerGeneratorRecipe(exporter, BlockContent.REFINERY_MODULE_BLOCK.asItem(), of(BlockContent.SMALL_TANK_BLOCK.asItem()), of(ItemContent.SILICON), of(BlockContent.METAL_BEAM_BLOCK), of(cItemTag("ingots/iron")), "refinerymodulealt");
+        offerGeneratorRecipe(exporter, BlockContent.REFINERY_MODULE_BLOCK.asItem(), of(BlockContent.SMALL_TANK_BLOCK.asItem()), of(Items.SLIME_BALL), of(BlockContent.METAL_BEAM_BLOCK), of(cItemTag("ingots/copper")), "refinerymodule");
+        offerGeneratorRecipe(exporter, BlockContent.REFINERY_MODULE_BLOCK.asItem(), of(BlockContent.SMALL_TANK_BLOCK.asItem()), of(ItemContent.SILICON), of(BlockContent.METAL_BEAM_BLOCK), of(cItemTag("ingots/copper")), "refinerymodulealt");
         // cooler
         offerGeneratorRecipe(exporter, BlockContent.COOLER_BLOCK.asItem(), of(Blocks.CAULDRON.asItem()), of(Blocks.ICE.asItem()), of(ItemContent.MOTOR), of(cItemTag("ingots/iron")), "cooler");
         // centrifuge
@@ -440,9 +444,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerAtomicForgeRecipe(exporter, BlockContent.CHARGER_BLOCK.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(ItemContent.PROCESSING_UNIT), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "chargeralt");
         
         // small storage
-        offerAtomicForgeRecipe(exporter, BlockContent.SMALL_STORAGE_BLOCK.asItem(), of(ItemContent.BASIC_BATTERY), of(TagContent.SILICON), of(ItemContent.MAGNETIC_COIL), of(TagContent.NICKEL_INGOTS), of(TagContent.WIRES), "smallstorage");
+        offerAtomicForgeRecipe(exporter, BlockContent.SMALL_STORAGE_BLOCK.asItem(), of(ItemContent.BASIC_BATTERY), of(TagContent.SILICON), of(ItemContent.MAGNETIC_COIL), of(TagContent.NICKEL_INGOTS), of(TagContent.NICKEL_INGOTS), "smallstorage");
         // large storage
-        offerAtomicForgeRecipe(exporter, BlockContent.LARGE_STORAGE_BLOCK.asItem(), of(ItemContent.ADVANCED_BATTERY), of(TagContent.STEEL_INGOTS), of(ItemContent.DUBIOS_CONTAINER), of(ItemContent.FLUX_GATE), of(TagContent.WIRES), "bigstorage");
+        offerAtomicForgeRecipe(exporter, BlockContent.LARGE_STORAGE_BLOCK.asItem(), of(ItemContent.ADVANCED_BATTERY), of(TagContent.STEEL_INGOTS), of(ItemContent.DUBIOS_CONTAINER), of(ItemContent.FLUX_GATE), of(ItemContent.MAGNETIC_COIL), "bigstorage");
         // unstable container
         offerAtomicForgeRecipe(exporter, ItemContent.UNSTABLE_CONTAINER, of(ItemContent.FLUXITE), of(ItemContent.DURATIUM_INGOT), of(BlockContent.LARGE_STORAGE_BLOCK), of(ItemContent.FLUX_GATE), of(ItemContent.SUPER_AI_CHIP), "unstablecontainer");
         
@@ -464,11 +468,11 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // machine frame
         offerMachineFrameRecipe(exporter, BlockContent.MACHINE_FRAME_BLOCK.asItem(), of(Items.IRON_BARS), of(TagContent.NICKEL_INGOTS), 16, "frame");
         // energy pipe
-        offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE.asItem(), 6), of(TagContent.ELECTRUM_INGOTS), of(TagContent.WIRES), "energy");
+        offerCableRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE.asItem(), 6), of(TagContent.ELECTRUM_INGOTS), "energy");
         // item pipe
         offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.ITEM_PIPE.asItem(), 6), of(TagContent.NICKEL_INGOTS), of(ItemTags.PLANKS), "item");
         // item filter
-        offerGeneratorRecipe(exporter, BlockContent.ITEM_FILTER_BLOCK.asItem(), of(TagContent.MACHINE_PLATING), of(TagContent.WIRES), of(ItemContent.PROCESSING_UNIT), of(TagContent.WIRES), "itemfilter");
+        offerGeneratorRecipe(exporter, BlockContent.ITEM_FILTER_BLOCK.asItem(), of(TagContent.MACHINE_PLATING), of(ItemTags.PLANKS), of(ItemContent.PROCESSING_UNIT), of(ItemTags.PLANKS), "itemfilter");
         // fluid pipe
         offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.FLUID_PIPE.asItem(), 6), of(TagContent.SILICON), of(cItemTag("ingots/copper")), "fluidpipe");
         
@@ -534,7 +538,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerTankRecipe(exporter, BlockContent.PARTICLE_COLLECTOR_BLOCK.asItem(), of(BlockContent.SUPERCONDUCTOR.asItem()), of(BlockContent.BIG_SOLAR_PANEL_BLOCK.asItem()), of(ItemContent.HEISENBERG_COMPENSATOR), "particlecollector");
         
         // addons
-        offerGeneratorRecipe(exporter, BlockContent.MACHINE_SPEED_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.MAGNETIC_COIL), of(ItemContent.BIOSTEEL_INGOT), of(TagContent.PLASTIC_PLATES), "addon/speed");
+        offerGeneratorRecipe(exporter, BlockContent.MACHINE_SPEED_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.MAGNETIC_COIL), of(TagContent.STEEL_INGOTS), of(TagContent.PLASTIC_PLATES), "addon/speed");
         offerAtomicForgeRecipe(exporter, BlockContent.MACHINE_PROCESSING_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.SUPER_AI_CHIP), of(ItemContent.FLUX_GATE), of(TagContent.PLATINUM_INGOTS), of(ItemContent.MOTOR), "addon/processing");
         offerAtomicForgeRecipe(exporter, BlockContent.MACHINE_PROCESSING_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.UNHOLY_INTELLIGENCE), of(Items.COMPARATOR), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.MOTOR), "addon/processingalt");
         offerAtomicForgeRecipe(exporter, BlockContent.MACHINE_ULTIMATE_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.HEISENBERG_COMPENSATOR), of(BlockContent.MACHINE_SPEED_ADDON), of(BlockContent.MACHINE_EFFICIENCY_ADDON), of(ItemContent.OVERCHARGED_CRYSTAL), "addon/ultimate");
@@ -565,7 +569,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_7.asItem(), of(ItemContent.PROMETHEUM_INGOT), of(BlockContent.SUPERCONDUCTOR.asItem()), "core7");
         
         // machine extender
-        offerMachineCoreRecipe(exporter, BlockContent.MACHINE_EXTENDER.asItem(), of(TagContent.MACHINE_PLATING), of(BlockContent.MACHINE_CORE_2.asItem()), "extender");
+        offerMachinePlatingRecipe(exporter, BlockContent.MACHINE_EXTENDER.asItem(), of(TagContent.MACHINE_PLATING), of(BlockContent.MACHINE_CORE_2.asItem()), of(ItemContent.DURATIUM_INGOT), 1, "extender");
         
         // augmenter
         // machine itself
@@ -597,13 +601,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerBeadsRecipe(exporter,ItemContent.CLAY_CATALYST_BEADS, 8, of(Items.CLAY_BALL), of(ItemTags.SAND), of(Items.REDSTONE), "claybeads");
         AssemblerRecipeBuilder.build().input(Items.CLAY_BALL).input(Items.CLAY_BALL).input(ItemTags.SAND).input(Items.REDSTONE).result(ItemContent.CLAY_CATALYST_BEADS, 32).timeMultiplier(1f).export(exporter, "claybeads");
         
-        // fine wires
-        offerCableRecipe(exporter, new ItemStack(ItemContent.INSULATED_WIRE, 4), of(TagContent.NICKEL_INGOTS), "insulatedwire");
-        AssemblerRecipeBuilder.build().input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(cItemTag("ingots/copper")).result(ItemContent.INSULATED_WIRE, 12).timeMultiplier(0.4f).export(exporter, "fwire");
-        
         // magnetic coils
-        offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.MAGNETIC_COIL, 2), of(TagContent.STEEL_INGOTS), of(TagContent.WIRES), "magnet");
-        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.WIRES).input(TagContent.WIRES).input(TagContent.WIRES).result(ItemContent.MAGNETIC_COIL, 2).timeMultiplier(0.4f).export(exporter, "magnet");
+        offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.MAGNETIC_COIL, 4), of(TagContent.STEEL_INGOTS), of(TagContent.NICKEL_INGOTS), "magnet");
+        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(cItemTag("ingots/copper")).result(ItemContent.MAGNETIC_COIL, 6).timeMultiplier(0.4f).export(exporter, "magnet");
         
         // motor
         offerMotorRecipe(exporter, ItemContent.MOTOR, of(TagContent.NICKEL_INGOTS), of(ItemContent.MAGNETIC_COIL), of(TagContent.STEEL_INGOTS), "motorcraft");
@@ -668,7 +668,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         AtomicForgeRecipeBuilder.build().input(ItemContent.SUPER_AI_CHIP).input(ItemContent.ADAMANT_INGOT).input(ItemContent.ADAMANT_INGOT).result(ItemContent.HEISENBERG_COMPENSATOR).time(60).export(exporter, "compensator");
         AtomicForgeRecipeBuilder.build().input(ItemContent.UNHOLY_INTELLIGENCE).input(ItemContent.ADAMANT_INGOT).input(ItemContent.ADAMANT_INGOT).result(ItemContent.HEISENBERG_COMPENSATOR).time(60).export(exporter, "compensatoralt");
         offerMotorRecipe(exporter, ItemContent.OVERCHARGED_CRYSTAL, of(Items.AMETHYST_BLOCK), of(ItemContent.ADVANCED_BATTERY), of(BlockContent.SUPERCONDUCTOR.asItem()), "overchargedcrystal");
-        AssemblerRecipeBuilder.build().input(ItemContent.FLUX_GATE).input(TagContent.WIRES).input(ItemContent.DUBIOS_CONTAINER).input(ItemContent.ENERGITE_INGOT).result(BlockContent.SUPERCONDUCTOR.asItem(), 3).timeMultiplier(1.6f).export(exporter, "superconductor");
+        AssemblerRecipeBuilder.build().input(ItemContent.FLUX_GATE).input(TagContent.ELECTRUM_INGOTS).input(ItemContent.DUBIOS_CONTAINER).input(ItemContent.ENERGITE_INGOT).result(BlockContent.SUPERCONDUCTOR.asItem(), 4).timeMultiplier(1.6f).export(exporter, "superconductor");
         AtomicForgeRecipeBuilder.build().input(ItemContent.HEISENBERG_COMPENSATOR).input(ItemContent.OVERCHARGED_CRYSTAL).input(ItemContent.OVERCHARGED_CRYSTAL).result(ItemContent.PROMETHEUM_INGOT).time(240).export(exporter, "prometheum");
         
         // ice in cooler
@@ -1160,7 +1160,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .applyCost(cItemTag("storage_blocks/redstone"), 24)
           .requiredStation(ARCANE_AUGMENT_STATION_ID)
           .uiX(55).uiY(30).time(1800).rfCost(200_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_LUCK, 100, EntityAttributeModifier.Operation.ADD_VALUE)
+          .modifierDefinition(EntityAttributes.GENERIC_LUCK, 5, EntityAttributeModifier.Operation.ADD_VALUE)
           .export(exporter, "luck");
         
         AugmentRecipeBuilder.build()
@@ -1488,8 +1488,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerDrillRecipe(RecipeExporter exporter, Item output, Ingredient core, Ingredient motor, Ingredient center, Ingredient head, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', core).input('m', motor).input('a', center).input('e', head)
+    public void offerDrillRecipe(RecipeExporter exporter, Item output, Ingredient doubleBase, Ingredient motor, Ingredient outer, Ingredient head, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', doubleBase).input('m', motor).input('a', outer).input('e', head)
                         .pattern(" a ")
                         .pattern("aea")
                         .pattern("mss");

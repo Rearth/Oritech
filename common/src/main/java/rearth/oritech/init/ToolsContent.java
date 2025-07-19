@@ -16,8 +16,10 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.Rarity;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.*;
 import rearth.oritech.item.tools.harvesting.*;
@@ -52,6 +54,7 @@ public class ToolsContent implements ArchitecturyRegistryContainer<Item> {
     public static final Item JETPACK_EXO_ELYTRA = new JetpackExoElytraItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, JETPACK_SETTINGS);
     
     public static final Item PORTABLE_LASER = new PortableLaserItem(UNBREAKING_SETTINGS);
+    public static final Item ELECTRIC_MACE = new ElectricMaceItem(UNBREAKING_SETTINGS.attributeModifiers(ElectricMaceItem.createAttributeModifiers()).rarity(Rarity.EPIC));
     
     public static final Item CHAINSAW = new ChainsawItem(ELECTRIC_MATERIAL, ELECTRIC_SETTINGS.attributeModifiers(AxeItem.createAttributeModifiers(ELECTRIC_MATERIAL, 5f, -2.4f)));
     public static final Item HAND_DRILL = new DrillItem(ELECTRIC_MATERIAL, TagContent.DRILL_MINEABLE, ELECTRIC_SETTINGS.attributeModifiers(PickaxeItem.createAttributeModifiers(ELECTRIC_MATERIAL, 1f, -2.4f)));

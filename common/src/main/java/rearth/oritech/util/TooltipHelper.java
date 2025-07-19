@@ -60,7 +60,7 @@ public class TooltipHelper {
                 var addonSlots = addonProvider.getAddonSlots();
                 tooltip.add(Text.translatable("tooltip.oritech.addon_desc").formatted(Formatting.GRAY).append(Text.literal(String.valueOf(addonSlots.size())).formatted(Formatting.GOLD)));
             }
-            if (entity instanceof MachineBlockEntity machineEntity) {
+            if (entity instanceof MachineBlockEntity machineEntity && machineEntity.getEnergyPerTick() > 1) {
                 var energyRate = machineEntity.getEnergyPerTick();
                 if (entity instanceof UpgradableGeneratorBlockEntity) {
                     tooltip.add(Text.translatable("tooltip.oritech.generator_rate_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", energyRate).formatted(Formatting.GOLD)));

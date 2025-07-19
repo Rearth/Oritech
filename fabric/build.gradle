@@ -86,8 +86,10 @@ dependencies {
 //    // Tech Reborn
     modImplementation "curse.maven:techreborn-233564:5608205"
     modImplementation "curse.maven:reborncore-237903:5608204"
-//    // Energized Power
-    modImplementation "curse.maven:energized-power-782147:5650292"
+
+    modImplementation "curse.maven:tags-viewer-1119728:5807898"
+
+    modImplementation "curse.maven:simple-conveyor-belts-1292980:6721806"
 
     // create
     // modImplementation "net.createmod.ponder:Ponder-Fabric-${minecraft_version}:1.0.45"
@@ -134,7 +136,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("stitch")
+        requires("athena-mod")
         requires("fabric-api")
         requires("architectury-api")
 
@@ -149,7 +151,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("stitch")
+        requires("athena")
         requires("fabric-api")
         requires("architectury-api")
 

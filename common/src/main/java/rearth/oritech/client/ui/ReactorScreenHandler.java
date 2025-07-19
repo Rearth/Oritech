@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.world.World;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 
@@ -36,5 +37,11 @@ public class ReactorScreenHandler extends ScreenHandler {
     }
     public boolean canUse(PlayerEntity player) {
         return true;
+    }
+    
+    @Override
+    public void sendContentUpdates() {
+        super.sendContentUpdates();
+        reactorEntity.sendUpdate(SyncType.GUI_TICK);
     }
 }

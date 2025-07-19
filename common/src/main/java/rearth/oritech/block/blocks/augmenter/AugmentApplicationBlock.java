@@ -37,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.OritechClient;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.Geometry;
 
 import java.util.HashMap;
@@ -192,7 +192,7 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
         
         // first time created
         if (isAssembled && !wasAssembled) {
-            NetworkContent.MACHINE_CHANNEL.serverHandle(entity).send(new NetworkContent.MachineSetupEventPacket(pos));
+            modifierEntity.triggerSetupAnimation();
             return ActionResult.SUCCESS;
         }
         

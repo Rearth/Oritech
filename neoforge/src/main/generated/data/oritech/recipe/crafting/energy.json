@@ -2,17 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "c": {
+    "#": {
       "tag": "c:ingots/electrum"
-    },
-    "i": {
-      "tag": "c:wires"
     }
   },
   "pattern": [
-    "iii",
-    "ccc",
-    "iii"
+    "   ",
+    "###"
   ],
   "result": {
     "count": 6,

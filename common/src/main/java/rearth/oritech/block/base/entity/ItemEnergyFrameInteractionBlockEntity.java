@@ -20,29 +20,31 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity
   implements ItemApi.BlockProvider, EnergyApi.BlockProvider, ExtendedMenuProvider, ScreenProvider, MachineAddonController, RedstoneAddonBlockEntity.RedstoneControllable {
     
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, this::markDirty);
-    
     
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(getInventorySize(), this::markDirty);
     
+    @SyncField({SyncType.GUI_OPEN})
     private final List<BlockPos> connectedAddons = new ArrayList<>();
+    @SyncField({SyncType.GUI_OPEN})
     private final List<BlockPos> openSlots = new ArrayList<>();
+    
+    @SyncField({SyncType.GUI_OPEN})
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
     
     public ItemEnergyFrameInteractionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -113,16 +115,14 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public void saveExtraData(PacketByteBuf buf) {
-        sendMovementNetworkPacket(getCurrentTarget());
-        var data = new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
-        ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
+        sendUpdate(SyncType.GUI_OPEN);
+        buf.writeBlockPos(pos);
     }
     
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.FullEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, energyStorage.maxExtract));
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+        return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
@@ -142,14 +142,8 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public float getProgress() {
-        if (world.isClient) {
-            var time = world.getTime();
-            // do not update progress while entity is moving
-            if (time < this.getMoveStartedAt() + this.getMoveTime() && this.getMoveStartedAt() > 1) {
-                return 0;
-            }
-        }
-        return (float) getCurrentProgress() / this.getWorkTime();
+        var maxTime = isMoving() ? getMoveTime() : getWorkTime();
+        return (float) getCurrentProgress() / maxTime;
     }
     
     @Override
@@ -185,20 +179,6 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     @Override
     public float getDisplayedEnergyTransfer() {
         return energyStorage.maxInsert;
-    }
-    
-    @Override
-    public void tick(World world, BlockPos pos, BlockState state, FrameInteractionBlockEntity blockEntity) {
-        super.tick(world, pos, state, blockEntity);
-        
-        if (!world.isClient && isActivelyViewed()) {
-            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineFrameGuiPacket(pos, energyStorage.amount, energyStorage.capacity, getCurrentProgress()));
-        }
-    }
-    
-    protected boolean isActivelyViewed() {
-        var closestPlayer = Objects.requireNonNull(world).getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 5, false);
-        return closestPlayer != null && closestPlayer.currentScreenHandler instanceof BasicMachineScreenHandler handler && getPos().equals(handler.getBlockPos());
     }
     
     @Override

@@ -15,6 +15,8 @@ public class DroneScreen extends UpgradableMachineScreen<DroneScreenHandler> {
     
     public static final Identifier CARD_SLOT = Oritech.id("textures/gui/modular/designator_arrow.png");
     private final DronePortEntity dronePort;
+    
+    private String lastMessage = "";
 
     public DroneScreen(DroneScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -22,12 +24,18 @@ public class DroneScreen extends UpgradableMachineScreen<DroneScreenHandler> {
     }
     
     @Override
+    protected void build(FlowLayout rootComponent) {
+        super.build(rootComponent);
+        lastMessage = dronePort.getStatusMessage();
+    }
+    
+    @Override
     protected void handledScreenTick() {
         super.handledScreenTick();
         
-        if (dronePort.getStatusMessage() != null) {
+        if (!dronePort.getStatusMessage().equals(lastMessage)) {
             var message = dronePort.getStatusMessage();
-            dronePort.setStatusMessage(null);
+            lastMessage = message;
             
             var label = Components.label(Text.translatable(message).formatted(Formatting.BLACK));
             label.horizontalTextAlignment(HorizontalAlignment.CENTER);

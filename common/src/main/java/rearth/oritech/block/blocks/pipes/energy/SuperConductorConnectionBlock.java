@@ -38,6 +38,11 @@ public class SuperConductorConnectionBlock extends GenericPipeConnectionBlock {
     }
     
     @Override
+    protected VoxelShape[] createShapes() {
+        return EXTRA_THICK_SHAPES;
+    }
+    
+    @Override
     public BlockState getConnectionBlock() {
         return BlockContent.SUPERCONDUCTOR_CONNECTION.getDefaultState();
     }

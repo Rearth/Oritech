@@ -26,7 +26,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.DronePortEntity;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
 
@@ -76,8 +75,8 @@ public class DronePortBlock extends Block implements BlockEntityProvider {
             
             // first time created
             if (isAssembled && !wasAssembled) {
-                NetworkContent.MACHINE_CHANNEL.serverHandle(entity).send(new NetworkContent.MachineSetupEventPacket(pos));
-				dronePort.initAddons();
+                dronePort.triggerSetupAnimation();
+                dronePort.initAddons();
                 return ActionResult.SUCCESS;
             }
             
@@ -85,11 +84,11 @@ public class DronePortBlock extends Block implements BlockEntityProvider {
                 player.sendMessage(Text.translatable("message.oritech.machine.missing_core"));
                 return ActionResult.SUCCESS;
             }
-
+            
             dronePort.initAddons();
             
             var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
+            MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
             
         }
         

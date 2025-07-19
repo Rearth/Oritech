@@ -8,13 +8,14 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.util.Helpers;
-import rearth.oritech.network.NetworkContent;
+
 
 public final class OritechClient {
     
@@ -61,7 +62,7 @@ public final class OritechClient {
         // send mining laser use events to server
         ClientTickEvent.CLIENT_PRE.register(client -> {
             if (client.player != null && client.player.getMainHandStack().getItem() instanceof PortableLaserItem && laserActive) {
-                NetworkContent.MACHINE_CHANNEL.clientHandle().send(new NetworkContent.LaserPlayerUsePacket());
+                NetworkManager.sendToServer(new PortableLaserItem.LaserPlayerUsePacket());
             } else {
                 laserActive = false;
             }

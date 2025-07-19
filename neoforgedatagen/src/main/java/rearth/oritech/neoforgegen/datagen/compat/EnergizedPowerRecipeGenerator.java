@@ -132,17 +132,10 @@ public class EnergizedPowerRecipeGenerator {
             new ItemStack(ItemContent.SOLID_BIOFUEL), "solidbiofuel");
         offerEPAssemblingMachineRecipe(exporter,
             new IngredientWithCount[]{
-                new IngredientWithCount(of(TagContent.NICKEL_INGOTS), 1),
+                new IngredientWithCount(of(TagContent.STEEL_INGOTS), 1),
                 new IngredientWithCount(of(TagContent.NICKEL_INGOTS), 1),
                 new IngredientWithCount(of(TagContent.NICKEL_INGOTS), 1),
                 new IngredientWithCount(of(Items.COPPER_INGOT), 1)},
-            new ItemStack(ItemContent.INSULATED_WIRE, 12), "fwire");
-        offerEPAssemblingMachineRecipe(exporter,
-            new IngredientWithCount[]{
-                new IngredientWithCount(of(TagContent.STEEL_INGOTS), 1),
-                new IngredientWithCount(of(TagContent.WIRES), 1),
-                new IngredientWithCount(of(TagContent.WIRES), 1),
-                new IngredientWithCount(of(TagContent.WIRES), 1)},
             new ItemStack(ItemContent.MAGNETIC_COIL, 2), "magnet");
         offerEPAssemblingMachineRecipe(exporter,
             new IngredientWithCount[]{
@@ -210,7 +203,7 @@ public class EnergizedPowerRecipeGenerator {
         offerEPAssemblingMachineRecipe(exporter,
             new IngredientWithCount[]{
                 new IngredientWithCount(of(ItemContent.FLUX_GATE), 1),
-                new IngredientWithCount(of(TagContent.WIRES), 1),
+                new IngredientWithCount(of(TagContent.ELECTRUM_INGOTS), 1),
                 new IngredientWithCount(of(ItemContent.DUBIOS_CONTAINER), 1),
                 new IngredientWithCount(of(ItemContent.ENERGITE_INGOT), 1)},
             new ItemStack(BlockContent.SUPERCONDUCTOR.asItem()), "superconductor");

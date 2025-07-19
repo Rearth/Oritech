@@ -9,7 +9,7 @@
       "item": "oritech:dubios_container"
     },
     "f": {
-      "tag": "c:wires"
+      "item": "oritech:magnetic_coil"
     },
     "m": {
       "tag": "c:ingots/steel"

@@ -4,46 +4,39 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.world.World;
-import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;
 
-import static rearth.oritech.block.base.entity.UpgradableMachineBlockEntity.AddonUiData;
-
 public class UpgradableMachineScreenHandler extends BasicMachineScreenHandler {
     
-    protected final AddonUiData addonUiData;
     protected final World worldAccess;
-    protected final float quality;
+    protected final MachineAddonController addonController;
     
     public UpgradableMachineScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, ModScreens.UpgradableData.PACKET_CODEC.decode(buf));
-    }
-    
-    public UpgradableMachineScreenHandler(int syncId, PlayerInventory inventory, ModScreens.UpgradableData data) {
-        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(data.pos())), data.addonUiData(), data.coreQuality());
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
     }
     
     // on server, also called from client constructor
-    public UpgradableMachineScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity, AddonUiData addonUiData, float coreQuality) {
+    public UpgradableMachineScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
         super(syncId, playerInventory, blockEntity);
-        this.addonUiData = addonUiData;
         
         // sync speed and efficiency to client entity, so the getProgress method works correctly
-        if (playerInventory.player.getWorld().isClient() && blockEntity instanceof MachineAddonController upgradableEntity) {
-            var baseData = new MachineAddonController.BaseAddonData(addonUiData.speed(), addonUiData.efficiency(), 100, 100, addonUiData.extraChambers());
-            upgradableEntity.setBaseAddonData(baseData);
+        if (blockEntity instanceof MachineAddonController upgradableEntity) {
+            addonController = upgradableEntity;
+        } else {
+            Oritech.LOGGER.debug("Creating Upgrade screen for non-upgradable block: {}", blockEntity);
+            addonController = null;
         }
         
         this.worldAccess = playerInventory.player.getWorld();
-        this.quality = coreQuality;
     }
     
     @Override
     public boolean showRedstoneAddon() {
         return super.showRedstoneAddon() ||
-                 addonUiData.positions().stream().anyMatch(addonPos -> this.worldAccess.getBlockState(addonPos).getBlock().equals(BlockContent.MACHINE_REDSTONE_ADDON));
+                 addonController.getConnectedAddons().stream().anyMatch(addonPos -> this.worldAccess.getBlockState(addonPos).getBlock().equals(BlockContent.MACHINE_REDSTONE_ADDON));
     }
 }

@@ -1,6 +1,6 @@
 {
     "type": "neoforge:add_features",
-    "biomes": "#minecraft:village_desert_has_structure",
+    "biomes": "#minecraft:has_structure/desert_pyramid",
     "features": "oritech:oil_spring_desert",
     "step": "lakes"
   }

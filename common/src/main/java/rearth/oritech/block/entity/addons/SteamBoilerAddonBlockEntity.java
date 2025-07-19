@@ -29,7 +29,10 @@ public class SteamBoilerAddonBlockEntity extends AddonBlockEntity implements Flu
         if (cachedController != null)
             return cachedController;
         
-        cachedController = (UpgradableGeneratorBlockEntity) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
+        var candidate = Objects.requireNonNull(world).getBlockEntity(getControllerPos());
+        if (candidate instanceof UpgradableGeneratorBlockEntity generator) {
+            cachedController = generator;
+        }
         return cachedController;
     }
     

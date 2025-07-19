@@ -7,6 +7,7 @@ public class CentrifugeFluidRecipeBuilder extends OritechRecipeBuilder {
 
     protected CentrifugeFluidRecipeBuilder() {
         super(RecipeContent.CENTRIFUGE_FLUID, "centrifuge/fluid");
+        this.time = 100;
     }
 
     public static OritechRecipeBuilder build() {

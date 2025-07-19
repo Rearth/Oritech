@@ -25,7 +25,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.block.entity.processing.RefineryModuleBlockEntity;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.StackContext;
 
@@ -85,7 +85,7 @@ public class RefineryModuleBlock extends HorizontalFacingBlock implements BlockE
             
             // first time created
             if (isAssembled && !wasAssembled) {
-                NetworkContent.MACHINE_CHANNEL.serverHandle(entity).send(new NetworkContent.MachineSetupEventPacket(pos));
+                machineEntity.triggerSetupAnimation();
                 return ActionResult.SUCCESS;
             }
             

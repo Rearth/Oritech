@@ -10,20 +10,20 @@
       "tag": "c:ingots/steel"
     },
     {
-      "tag": "c:wires"
+      "tag": "c:ingots/nickel"
     },
     {
-      "tag": "c:wires"
+      "tag": "c:ingots/nickel"
     },
     {
-      "tag": "c:wires"
+      "tag": "c:ingots/copper"
     }
   ],
   "results": [
     {
-      "count": 2,
+      "count": 6,
       "id": "oritech:magnetic_coil"
     }
   ],
-  "time": 80
+  "time": 64
 }

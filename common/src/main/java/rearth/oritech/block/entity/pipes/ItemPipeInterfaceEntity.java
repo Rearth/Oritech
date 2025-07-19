@@ -1,10 +1,11 @@
 package rearth.oritech.block.entity.pipes;
 
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -12,13 +13,14 @@ import net.minecraft.world.World;
 import org.apache.commons.lang3.time.StopWatch;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.blocks.pipes.AbstractPipeBlock;
 import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.network.NetworkContent;
+
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -169,9 +171,15 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         var path = cachedTransferPaths.computeIfAbsent(to, ignored -> calculatePath(startPos, from, to, network, world));
         if (path == null) return;
         
-        var codedPath = path.getLeft().stream().map(BlockPos::asLong).toList();
-        var packet = new NetworkContent.ItemPipeVisualTransferPacket(startPos, codedPath, new ItemStack(moved, movedCount));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(packet);
+        var codedPath = path.getLeft();
+        var pathLength = 0;
+        for (int i = 0; i < codedPath.size() - 1; i++) {
+            var pathPos = codedPath.get(i);
+            var nextPathPos = codedPath.get(i + 1);
+            pathLength += nextPathPos.getManhattanDistance(pathPos);
+        }
+        var packet = new RenderStackData(pos, new ItemStack(moved, movedCount), codedPath, world.getTime(), pathLength);
+        NetworkManager.sendBlockHandle(this, packet);
         
         if (wasEmpty) {
             var arrivalTime = world.getTime() + (int) calculatePathLength(path.getRight());
@@ -287,16 +295,13 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         return Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
     }
     
-    public void handleVisualTransferPacket(NetworkContent.ItemPipeVisualTransferPacket packet) {
-        var path = packet.codedStops().stream().map(BlockPos::fromLong).toList();
-        var pathLength = 0;
-        for (int i = 0; i < path.size() - 1; i++) {
-            var pathPos = path.get(i);
-            var nextPathPos = path.get(i + 1);
-            pathLength += nextPathPos.getManhattanDistance(pathPos);
+    public static void receiveVisualItemsPacket(RenderStackData message, World world, DynamicRegistryManager registryAccess) {
+        var blockEntity = world.getBlockEntity(message.self, BlockEntitiesContent.ITEM_PIPE_ENTITY);
+        if (blockEntity.isPresent()) {
+            var pipeEntity = blockEntity.get();
+            // use local time for moved item to avoid rendering issues caused by lag
+            pipeEntity.activeStacks.add(new RenderStackData(pipeEntity.pos, message.rendered, message.path, world.getTime(), message.pathLength));
         }
-        var data = new RenderStackData(packet.moved(), path, world.getTime(), pathLength);
-        activeStacks.add(data);
     }
     
     @Override
@@ -305,6 +310,13 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             world.markDirty(pos);
     }
     
-    public record RenderStackData(ItemStack rendered, List<BlockPos> path, Long startedAt, int pathLength) {
+    public record RenderStackData(BlockPos self, ItemStack rendered, List<BlockPos> path, Long startedAt, int pathLength) implements CustomPayload {
+        
+        public static final CustomPayload.Id<RenderStackData> PIPE_ITEMS_ID = new CustomPayload.Id<>(Oritech.id("pipe_items"));
+        
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return PIPE_ITEMS_ID;
+        }
     }
 }

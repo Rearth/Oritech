@@ -88,9 +88,6 @@ public class TagContent {
 
     // carbon fibre
     public static final TagKey<Item> CARBON_FIBRE = cItemTag("carbon_fibre");
-
-    // wires
-    public static final TagKey<Item> WIRES = cItemTag("wires");
     
     // blocks
     public static final TagKey<Block> DRILL_MINEABLE = oritechBlockTag("mineable/drill");
@@ -128,6 +125,8 @@ public class TagContent {
     
     // spawner blacklist
     public static final TagKey<EntityType<?>> SPAWNER_BLACKLIST = TagKey.of(RegistryKeys.ENTITY_TYPE, Oritech.id("spawner_blacklist"));
+    
+    public static final TagKey<Block> BLACK_HOLE_BLACKLIST = TagKey.of(RegistryKeys.BLOCK, Oritech.id("blackhole_blacklist"));
     
     // unstable container contents
     public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_LOW = oritechBlockTag("unstable_container/low");

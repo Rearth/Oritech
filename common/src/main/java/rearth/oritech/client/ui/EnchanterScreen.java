@@ -15,8 +15,10 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
-import rearth.oritech.network.NetworkContent;
+
 
 public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> {
     
@@ -54,8 +56,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     }
     
     private void onOpenClicked(ButtonComponent event) {
-        NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.EnchanterSelectionPacket(this.handler.blockPos, ""));
-        this.handler.enchanter.selectedEnchantment = null;
+        sendEnchantmentToServer(EnchanterBlockEntity.NONE_SELECTED);
         openSelectionPanel();
     }
     
@@ -73,9 +74,9 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         }
         
         Text description = Text.translatable("message.oritech.enchanter.insert_item");
-        var hasSelection = this.handler.enchanter.selectedEnchantment != null;
+        var hasSelection = this.handler.enchanter.getSelectedEnchantment() != null;
         if (hasSelection) {
-            description = this.handler.enchanter.selectedEnchantment.value().description();
+            description = this.handler.enchanter.getSelectedEnchantment().value().description();
         }
         openEnchantmentSelection.setMessage(description);
         
@@ -97,7 +98,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     }
     
     private void onStackChanged() {
-        if (handler.enchanter.selectedEnchantment != null) return;
+        if (handler.enchanter.getSelectedEnchantment() != null) return;
         openSelectionPanel();
         
     }
@@ -156,8 +157,14 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     }
     
     private void onEnchantmentSelected(RegistryEntry<Enchantment> entry, OverlayContainer<ScrollContainer<FlowLayout>> floatingPanel) {
-        this.handler.enchanter.selectedEnchantment = entry;
+        this.handler.enchanter.selectedEnchantment = Identifier.of(entry.getIdAsString());
+        sendEnchantmentToServer(Identifier.of(entry.getIdAsString()));
         floatingPanel.remove();
-        NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.EnchanterSelectionPacket(this.handler.blockPos, entry.getIdAsString()));
     }
+    
+    private void sendEnchantmentToServer(Identifier selected) {
+        NetworkManager.sendToServer(new EnchanterBlockEntity.SelectEnchantingPacket(this.handler.blockPos, selected));
+    }
+    
+    
 }

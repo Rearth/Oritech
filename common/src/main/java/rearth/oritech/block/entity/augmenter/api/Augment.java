@@ -3,11 +3,14 @@ package rearth.oritech.block.entity.augmenter.api;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.Attachment;
 import rearth.oritech.api.attachment.AttachmentApi;
-import rearth.oritech.network.NetworkContent;
+import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.block.entity.augmenter.PlayerAugments;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -105,7 +108,7 @@ public abstract class Augment {
     }
     
     public void syncToClient(PlayerEntity player, Map<Identifier, AugmentState> data) {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(player).send(new NetworkContent.AugmentPlayerStatePacket(data));
+        NetworkManager.sendPlayerHandle(new PlayerAugments.AugmentPlayerStatePacket(data), (ServerPlayerEntity) player);
     }
     
     public abstract int refreshInterval();

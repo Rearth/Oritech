@@ -8,6 +8,8 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
@@ -19,11 +21,12 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.ComparatorOutputProvider;
 
 public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity implements BlockEntityTicker<SpawnerControllerBlockEntity>, ComparatorOutputProvider {
@@ -140,7 +143,17 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         networkDirty = false;
         
         if (spawnedMob != null)
-            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SpawnerSyncPacket(pos, Registries.ENTITY_TYPE.getId(spawnedMob), hasCage, collectedSouls, maxSouls));
+            NetworkManager.sendBlockHandle(this, new SpawnerSyncPacket(pos, Registries.ENTITY_TYPE.getId(spawnedMob), hasCage, collectedSouls, maxSouls));
+    }
+    
+    public static void receiveUpdatePacket(SpawnerSyncPacket message, World world, DynamicRegistryManager dynamicRegistryManager) {
+        
+        if (world.getBlockEntity(message.position) instanceof SpawnerControllerBlockEntity spawnerEntity) {
+            spawnerEntity.loadEntityFromIdentifier(message.spawnedMob);
+            spawnerEntity.hasCage = message.hasCage;
+            spawnerEntity.collectedSouls = message.collectedSouls;
+            spawnerEntity.maxSouls = message.maxSouls;
+        }
     }
     
     @Override
@@ -264,5 +277,16 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         }
         
         this.markDirty();
+    }
+    
+    public record SpawnerSyncPacket(BlockPos position, Identifier spawnedMob, boolean hasCage, int collectedSouls, int maxSouls) implements CustomPayload {
+        
+        public static final CustomPayload.Id<SpawnerSyncPacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("spawner"));
+        
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return PACKET_ID;
+        }
+    } {
     }
 }

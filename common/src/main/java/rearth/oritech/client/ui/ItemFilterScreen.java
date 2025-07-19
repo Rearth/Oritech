@@ -12,8 +12,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
-import rearth.oritech.network.NetworkContent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,11 +22,13 @@ import java.util.function.Predicate;
 import static rearth.oritech.client.ui.BasicMachineScreen.ITEM_SLOT;
 
 public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilterScreenHandler> {
-    
+
+    public static final int FILTER_SIZE = 12;
+
     private ButtonComponent whiteListButton;
     private ButtonComponent nbtButton;
     private ButtonComponent componentButton;
-    private final FlowLayout[] gridContainers = new FlowLayout[12];
+    private final FlowLayout[] gridContainers = new FlowLayout[FILTER_SIZE];
     private Map<Integer, ItemStack> cachedItems;
     
     public ItemFilterScreen(ItemFilterScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -43,7 +45,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         cachedItems = handler.blockEntity.getFilterSettings().items();
         Oritech.LOGGER.debug("loading item filters: " + cachedItems);
         
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < FILTER_SIZE; i++) {
             var storedStack = cachedItems.getOrDefault(i, ItemStack.EMPTY);
             
             var container = gridContainers[i];
@@ -101,8 +103,8 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         for (int x = 0; x < 4; x++) {
             for (int y = 0; y < 3; y++) {
                 
-                var slotContainer = Containers.horizontalFlow(Sizing.fixed(19), Sizing.fixed(18));
-                var background = Components.texture(ITEM_SLOT, 0, 0, 18, 17, 18, 17).positioning(Positioning.absolute(0, 0));
+                var slotContainer = Containers.horizontalFlow(Sizing.fixed(18), Sizing.fixed(18));
+                var background = Components.texture(ITEM_SLOT, 0, 0, 18, 18, 18, 18).positioning(Positioning.absolute(0, 0));
                 
                 int finalX = x;
                 int finalY = y;
@@ -111,7 +113,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
                 slotContainer.child(background);
                 var idIndex = y * 4 + x;
                 gridContainers[idIndex] = slotContainer;
-                gridContainer.child(slotContainer.margins(Insets.of(0, 2, 0, 0)), y, x);
+                gridContainer.child(slotContainer.margins(Insets.of(0, 2, 0, 1)), y, x);
                 
             }
         }
@@ -173,7 +175,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     }
     
     private void sendUpdateToServer() {
-        NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.ItemFilterSyncPacket(handler.blockPos, handler.blockEntity.getFilterSettings()));
+        NetworkManager.sendToServer(new ItemFilterBlockEntity.ItemFilterPayload(handler.blockPos, handler.blockEntity.getFilterSettings()));
     }
     
     private void toggleWhitelist() {
@@ -216,47 +218,55 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     }
     
     private boolean onItemFrameBackgroundClicked(FlowLayout slotContainer, int x, int y) {
-        
+        return acceptItemStack(slotContainer, this.handler.getCursorStack(), y * 4 + x);
+    }
+
+    public boolean acceptItemStack(ItemStack itemStack, int index) {
+        return acceptItemStack(getItemContainer(index), itemStack, index);
+    }
+
+    public boolean acceptItemStack(FlowLayout slotContainer, ItemStack itemStack, int index) {
         if (slotContainer.children().size() >= 2) {
             slotContainer.removeChild(slotContainer.children().get(1));
         }
-        
-        var heldItem = this.handler.getCursorStack();
-        if (heldItem.isEmpty()) {
-            
-            var idIndex = y * 4 + x;
+
+        if (itemStack.isEmpty()) {
+
             var oldData = handler.blockEntity.getFilterSettings();
             var itemFilters = new HashMap<>(oldData.items());
-            itemFilters.remove(idIndex);
+            itemFilters.remove(index);
             var newData = new ItemFilterBlockEntity.FilterData(oldData.useNbt(), oldData.useWhitelist(), oldData.useComponents(), itemFilters);
             updateFilterSettings(newData); // this is only on client
             sendUpdateToServer();
-            
+
             return false;
         }
-        
-        var displayStack = new ItemStack(heldItem.getItem(), 1);
-        
-        if (heldItem.getComponents() != null)
-            displayStack.applyComponentsFrom(heldItem.getComponents());
-        
+
+        var displayStack = new ItemStack(itemStack.getItem(), 1);
+
+        if (itemStack.getComponents() != null)
+            displayStack.applyComponentsFrom(itemStack.getComponents());
+
         var itemComponent = Components.item(displayStack);
         itemComponent.positioning(Positioning.absolute(1, 1));
         itemComponent.showOverlay(true);
         itemComponent.setTooltipFromStack(true);
         slotContainer.child(itemComponent);
-        
-        var idIndex = y * 4 + x;
+
         var oldData = handler.blockEntity.getFilterSettings();
         var itemFilters = new HashMap<>(oldData.items());
-        itemFilters.put(idIndex, displayStack);
+        itemFilters.put(index, displayStack);
         var newData = new ItemFilterBlockEntity.FilterData(oldData.useNbt(), oldData.useWhitelist(), oldData.useComponents(), itemFilters);
         updateFilterSettings(newData); // this is only on client
-        
+
         Oritech.LOGGER.debug("stored map: " + itemFilters);
         sendUpdateToServer();
-        
+
         return true;
+    }
+
+    public FlowLayout getItemContainer(int index) {
+        return gridContainers[index];
     }
 
     private void updateFilterSettings(ItemFilterBlockEntity.FilterData filterData) {

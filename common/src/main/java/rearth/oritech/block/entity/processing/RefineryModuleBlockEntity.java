@@ -122,9 +122,8 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
     }
     
     @Override
-    public void playSetupAnimation() {
-        animationController.setAnimation(SETUP);
-        animationController.forceAnimationReset();
+    public void triggerSetupAnimation() {
+        triggerAnim("base_controller", "setup");
     }
     
     @Override
@@ -153,7 +152,7 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
             } else {
                 return state.setAndContinue(PACKAGED);
             }
-        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>());
+        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()).triggerableAnim("setup", SETUP);
     }
     
     public boolean isActive(BlockState state) {

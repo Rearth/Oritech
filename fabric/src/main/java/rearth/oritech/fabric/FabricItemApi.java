@@ -2,9 +2,11 @@ package rearth.oritech.fabric;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
@@ -166,7 +168,8 @@ public class FabricItemApi implements BlockItemApi {
         }
     }
     
-    public static class ContainerStorageWrapper extends SnapshotParticipant<List<ItemStack>> implements Storage<ItemVariant> {
+    // this is used by other mods to interact with oritech storages
+    public static class ContainerStorageWrapper extends SnapshotParticipant<List<ItemStack>> implements SlottedStorage<ItemVariant> {
         
         private final ItemApi.InventoryStorage container;
         
@@ -263,6 +266,32 @@ public class FabricItemApi implements BlockItemApi {
         @Override
         protected void readSnapshot(List<ItemStack> snapshot) {
             IntStream.range(0, snapshot.size()).forEach(slot -> container.setStackInSlot(slot, snapshot.get(slot)));
+        }
+        
+        @Override
+        public int getSlotCount() {
+            return container.getSlotCount();
+        }
+        
+        @Override
+        public SingleSlotStorage<ItemVariant> getSlot(int i) {
+            return new SingleStackStorage() {
+                @Override
+                protected ItemStack getStack() {
+                    return container.getStackInSlot(i);
+                }
+                
+                @Override
+                protected void setStack(ItemStack stack) {
+                    container.setStackInSlot(i, stack);
+                }
+                
+                @Override
+                protected void onFinalCommit() {
+                    super.onFinalCommit();
+                    container.update();
+                }
+            };
         }
     }
     

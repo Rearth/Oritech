@@ -42,12 +42,20 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
     public void addExtensionComponents(FlowLayout container) {
         super.addExtensionComponents(container);
         
-        var speed = 1 / handler.addonUiData.speed() * 100;
-        var efficiency = 1 / handler.addonUiData.efficiency() * 100;
-        var extraChambers = handler.addonUiData.extraChambers();
+        if (handler.addonController == null) return;
         
-        speedLabel = Components.label(Text.translatable("title.oritech.machine_speed", (int) speed));
-        efficiencyLabel = Components.label(Text.translatable("title.oritech.machine_efficiency", (int) efficiency));
+        var baseData = handler.addonController.getBaseAddonData();
+        
+        var speed = (int) (1f / baseData.speed() * 100);
+        var efficiency = (int) (1f / baseData.efficiency() * 100);
+        var extraChambers = baseData.extraChambers();
+        
+        // round to nearest 5
+        speed = Math.round(speed / 5f) * 5;
+        efficiency = Math.round(efficiency / 5f) * 5;
+        
+        speedLabel = Components.label(Text.translatable("title.oritech.machine_speed", speed));
+        efficiencyLabel = Components.label(Text.translatable("title.oritech.machine_efficiency", efficiency));
         
         container.child(Components.box(Sizing.fixed(73), Sizing.fixed(1)).color(new Color(0.8f, 0.8f, 0.8f)));
         container.child(speedLabel.tooltip(Text.translatable("tooltip.oritech.machine_speed")).margins(Insets.of(3)));
@@ -80,7 +88,9 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         
         var size = 25;
         
-        var level = handler.quality;
+        if (handler.addonController == null) return;
+        
+        var level = handler.addonController.getCoreQuality();
         var upgradeCount = level - 1;
         
         // the 6th upgrade needs to be rendered behind
@@ -111,8 +121,8 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
     }
     
     private Text getQualityTooltip() {
-        var quality = String.format("%.2f", handler.quality);
-        var effectiveQuality = (int) handler.quality;
+        var quality = String.format("%.2f", handler.addonController.getCoreQuality());
+        var effectiveQuality = (int) handler.addonController.getCoreQuality();
         return Text.translatable("tooltip.oritech.machine.quality", effectiveQuality, quality);
     }
     
@@ -159,7 +169,9 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         var previewX = 176 / 2 - 10;
         var previewY = 96 / 2 - 7;
         
-        for (var addonBlockPos : handler.addonUiData.positions()) {
+        var addonBlocks = handler.addonController.getConnectedAddons();
+        
+        for (var addonBlockPos : addonBlocks) {
             var addonBlock = handler.worldAccess.getBlockState(addonBlockPos);
             var addonBlockEntity = handler.worldAccess.getBlockEntity(addonBlockPos);
             
@@ -212,7 +224,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             
         }
         
-        for (var openPos : handler.addonUiData.openSlots()) {
+        for (var openPos : handler.addonController.getOpenAddonSlots()) {
             
             var relativePos = MultiblockMachineEntity.worldToRelativePos(handler.blockPos, openPos, handler.machineBlock.get(handler.screenData.getBlockFacingProperty()));
             var dummyBlock = BlockContent.ADDON_INDICATOR_BLOCK.getDefaultState();
@@ -224,7 +236,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             );
         }
         
-        if (handler.addonUiData.positions().isEmpty()) {
+        if (addonBlocks.isEmpty()) {
             detailsScrollPane.child(Components.label(Text.translatable("title.oritech.machine.no_addons")));
         }
         

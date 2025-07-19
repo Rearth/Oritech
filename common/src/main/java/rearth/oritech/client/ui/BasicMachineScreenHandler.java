@@ -10,13 +10,17 @@ import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerSyncHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.util.ScreenProvider;
@@ -198,4 +202,12 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         return screenData.hasRedstoneControlAvailable();
     }
     
+    @Override
+    public void sendContentUpdates() {
+        
+        if (blockEntity instanceof NetworkedBlockEntity networkedBlockEntity)
+            networkedBlockEntity.sendUpdate(SyncType.GUI_TICK, (ServerPlayerEntity) this.player());
+        
+        super.sendContentUpdates();
+    }
 }

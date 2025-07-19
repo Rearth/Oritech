@@ -76,8 +76,7 @@ public abstract class ExpandableMultiblockEnergyStorageBlockEntity extends Expan
     }
     
     @Override
-    public void playSetupAnimation() {
-        // this block has no animation
-    }
+    public void triggerSetupAnimation() {
     
+    }
 }

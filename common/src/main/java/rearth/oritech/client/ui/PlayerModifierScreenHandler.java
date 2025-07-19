@@ -9,6 +9,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockContent;
@@ -63,4 +64,9 @@ public class PlayerModifierScreenHandler extends ScreenHandler {
         return blockPos;
     }
     
+    @Override
+    public void sendContentUpdates() {
+        super.sendContentUpdates();
+        blockEntity.sendUpdate(SyncType.GUI_TICK);
+    }
 }

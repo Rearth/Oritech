@@ -1,5 +1,8 @@
 package rearth.oritech.api.energy.containers;
 
+import org.jetbrains.annotations.NotNull;
+import rearth.oritech.api.networking.SyncType;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -75,7 +78,7 @@ public class DynamicStatisticEnergyStorage extends DynamicEnergyStorage {
       long maxInsertSecond,
       long maxExtractSecond) {
         @Override
-        public String toString() {
+        public @NotNull String toString() {
             return "EnergyStatistics{" +
                      "avgInsertSecond=" + avgInsertSecond +
                      ", avgExtractSecond=" + avgExtractSecond +
@@ -88,4 +91,8 @@ public class DynamicStatisticEnergyStorage extends DynamicEnergyStorage {
         }
     }
     
+    @Override
+    public boolean useDeltaOnly(SyncType type) {
+        return false;
+    }
 }

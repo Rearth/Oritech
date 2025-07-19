@@ -256,10 +256,6 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(TagContent.CARBON_FIBRE)
           .add(ItemContent.CARBON_FIBRE_STRANDS);
         
-        // wires
-        getOrCreateTagBuilder(TagContent.WIRES)
-          .add(ItemContent.INSULATED_WIRE);
-        
         // equipment enchanting
         getOrCreateTagBuilder(ItemTags.SWORDS)
           .add(ToolsContent.CHAINSAW, ToolsContent.PROMETHIUM_AXE, ToolsContent.PORTABLE_LASER);
@@ -301,6 +297,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ToolsContent.EXO_BOOTS);
         
         getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
+          .add(ToolsContent.ELECTRIC_MACE)
           .add(ItemContent.WRENCH);
         
         getOrCreateTagBuilder(cItemTag("tools/wrench"))
@@ -308,6 +305,9 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         
         getOrCreateTagBuilder(TagContent.REACTOR_COOLANT)
           .add(Items.ICE, Items.BLUE_ICE, Items.PACKED_ICE);
+        
+        getOrCreateTagBuilder(ItemTags.MACE_ENCHANTABLE)
+          .add(ToolsContent.ELECTRIC_MACE);
         
         // storage blocks
         getOrCreateTagBuilder(ConventionalItemTags.STORAGE_BLOCKS)
@@ -325,9 +325,6 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(BlockContent.SILICON_BLOCK.asItem())
           .add(BlockContent.RAW_NICKEL_BLOCK.asItem())
           .add(BlockContent.RAW_PLATINUM_BLOCK.asItem());
-        
-        getOrCreateTagBuilder(getStorageBlockTag("steel"))
-          .add(BlockContent.STEEL_BLOCK.asItem());
         
         getOrCreateTagBuilder(getStorageBlockTag("steel"))
           .add(BlockContent.STEEL_BLOCK.asItem());

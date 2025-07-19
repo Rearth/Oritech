@@ -1,7 +1,10 @@
 package rearth.oritech.block.entity.augmenter;
 
 import io.wispforest.owo.network.ClientAccess;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import rearth.oritech.api.attachment.AttachmentApi;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 
@@ -11,8 +14,7 @@ import java.util.Map;
 // a ClientPlayerEntity class?
 public class PlayerAugmentsClient {
     
-    public static void setPlayerAugment(ClientAccess access, Map<Identifier, Augment.AugmentState> state) {
-        AttachmentApi.setAttachment(access.player(), Augment.ACTIVE_AUGMENTS_DATA, state);
+    public static void receiveAugmentState(Map<Identifier, Augment.AugmentState> data) {
+        AttachmentApi.setAttachment(MinecraftClient.getInstance().player, Augment.ACTIVE_AUGMENTS_DATA, data);
     }
-    
 }

@@ -49,6 +49,15 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
       Block.createCuboidShape(5, 11, 5, 11, 16, 11),
       Block.createCuboidShape(5, 0, 5, 11, 5, 11)
     );
+    public static final VoxelShape[] EXTRA_THICK_SHAPES = createShapes(
+      Block.createCuboidShape(4, 4, 4, 12, 12, 12),
+      Block.createCuboidShape(4, 4, 0, 12, 12, 4),
+      Block.createCuboidShape(12, 4, 4, 16, 12, 12),
+      Block.createCuboidShape(4, 4, 12, 12, 12, 16),
+      Block.createCuboidShape(0, 4, 4, 4, 12, 12),
+      Block.createCuboidShape(4, 12, 4, 12, 16, 12),
+      Block.createCuboidShape(4, 0, 4, 12, 4, 12)
+    );
     public static final VoxelShape[] THIN_SHAPES = createShapes(
       Block.createCuboidShape(6, 6, 6, 10, 10, 10),
       Block.createCuboidShape(6, 6, 0, 10, 10, 6),
@@ -235,7 +244,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         }
         
         var center = targetShape.getBoundingBox().getCenter();
-        var diff = center.subtract(new Vec3d(0.5, 0.5,0.5));
+        var diff = center.subtract(new Vec3d(0.5, 0.5, 0.5));
         if (diff.equals(Vec3d.ZERO))
             // center hit
             diff = hitPos.subtract(center.add(Vec3d.of(pos)));

@@ -5,7 +5,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
@@ -17,7 +16,9 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -26,7 +27,6 @@ import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.List;
@@ -38,6 +38,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     private boolean inColdArea;
     private boolean initialized = false;
     
+    @SyncField(SyncType.GUI_TICK)
     public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
     
     public CoolerBlockEntity(BlockPos pos, BlockState state) {
@@ -45,23 +46,15 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
-        super.tick(world, pos, state, blockEntity);
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        super.serverTick(world, pos, state, blockEntity);
         
-        if (!world.isClient && !initialized) {
+        if (!initialized) {
             initialized = true;
             var biome = world.getBiome(pos);
             inColdArea = biome.isIn(TagContent.CONVENTIONAL_COLD);
         }
         
-    }
-    
-    @Override
-    public AddonUiData getUiData() {
-        var base = super.getUiData();
-        if (!inColdArea) return base;
-        
-        return new AddonUiData(base.positions(), base.openSlots(), base.efficiency() * 0.5f, base.speed() * 0.5f, base.ownPosition(), base.extraChambers());
     }
     
     @Override
@@ -74,12 +67,6 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         fluidStorage.readNbt(nbt, "");
-    }
-    
-    @Override
-    protected void sendNetworkEntry() {
-        super.sendNetworkEntry();
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SingleVariantFluidSyncPacketAPI(pos, Registries.FLUID.getId(fluidStorage.getFluid()).toString(), fluidStorage.getAmount()));
     }
     
     @Override
@@ -113,10 +100,46 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     
     @Override
     protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
-        super.craftItem(activeRecipe, outputInventory, inputInventory);
+        
+        if (!processCraftInstance(activeRecipe)) return;
+        
+        if (supportExtraChambersAuto()) {
+            var chamberCount = getBaseAddonData().extraChambers();
+            
+            // remove extra fluid if more chambers are active
+            for (int i = 0; i < chamberCount; i++) {
+                if (!processCraftInstance(activeRecipe)) break;
+            }
+        }
+        
+    }
+    
+    // returns true if crafting has been successful
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private boolean processCraftInstance(OritechRecipe activeRecipe) {
+        
+        var results = getCraftingResults(activeRecipe);
+        if (results.isEmpty()) return false;
+        var result = results.getFirst();
+        
+        // try removing input fluid if output item would fit
+        if (inventory.heldStacks.getFirst().getCount() + result.getCount() > 64) return false;
         
         var input = activeRecipe.getFluidInput();
-        fluidStorage.extract(fluidStorage.getStack().copyWithAmount(input.amount()), false);
+        var extracted = fluidStorage.extract(fluidStorage.getStack().copyWithAmount(input.amount()), true);
+        if (extracted == activeRecipe.getFluidInput().amount()) {
+            // fluid is available, and item fits.
+            fluidStorage.extract(fluidStorage.getStack().copyWithAmount(input.amount()), false);
+            if (inventory.heldStacks.getFirst().isEmpty()) {
+                inventory.heldStacks.set(0, result.copy());
+            } else {
+                inventory.heldStacks.getFirst().increment(result.getCount());
+            }
+            
+            return true;
+        }
+        
+        return false;
     }
     
     @Override
@@ -170,7 +193,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 0,-1)
+          new Vec3i(0, 0, -1)
         );
     }
     
@@ -178,7 +201,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     public List<Vec3i> getAddonSlots() {
         
         return List.of(
-          new Vec3i(0, 0,-2)
+          new Vec3i(0, 0, -2)
         );
     }
     

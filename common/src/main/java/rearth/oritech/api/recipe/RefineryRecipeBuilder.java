@@ -7,6 +7,7 @@ public class RefineryRecipeBuilder extends OritechRecipeBuilder {
 
     protected RefineryRecipeBuilder() {
         super(RecipeContent.REFINERY, "refinery");
+        this.time = 80;
     }
 
     public static OritechRecipeBuilder build() {

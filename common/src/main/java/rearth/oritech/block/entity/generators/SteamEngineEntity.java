@@ -6,8 +6,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -17,8 +19,10 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -27,7 +31,6 @@ import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
 
@@ -56,20 +59,23 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     // progress is used to store/sync animation speed
     
+    private static Fluid USED_STEAM_FLUID;
+    
     public long masterHeartbeat; // set from master, used by slave
     public SteamEngineEntity master;
     
     private final Set<SteamEngineEntity> slaves = new HashSet<>();
     
     // client only
-    public NetworkContent.SteamEngineSyncPacket clientStats;
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
+    public SteamEngineSyncPacket clientStats;
     
     public SteamEngineEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.STEAM_ENGINE_ENTITY, pos, state, Oritech.CONFIG.generators.steamEngineData.steamToRfRatio());
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         if (world.isClient || !isActive(state)) return;
         
@@ -84,8 +90,6 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         
         
         outputEnergy();
-        if (networkDirty)
-            updateNetwork();
     }
     
     // this is only called when steam is available
@@ -130,7 +134,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         progress = (int) (speed * 100f);
         
         // order/data: speed, efficiency, rf produced, steam consumed, slave count
-        clientStats = new NetworkContent.SteamEngineSyncPacket(pos, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
+        clientStats = new SteamEngineSyncPacket(pos, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
         this.markDirty();
         
     }
@@ -186,7 +190,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     @Override
     public boolean boilerAcceptsInput(Fluid fluid) {
-        return fluid.equals(FluidContent.STILL_STEAM.get());
+        return fluid.equals(getUsedSteamFluid());
     }
     
     private void spawnParticles() {
@@ -223,14 +227,6 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     @Override
     public BarConfiguration getFluidConfiguration() {
         return new BarConfiguration(149, 10, 18, 64);
-    }
-    
-    @Override
-    protected void sendNetworkEntry() {
-        super.sendNetworkEntry();
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorSteamSyncPacket(pos, boilerStorage.getInStack().getAmount(), boilerStorage.getOutStack().getAmount()));
-        
-        if (clientStats != null) NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(clientStats);
     }
     
     @Override
@@ -321,5 +317,17 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
         if (inSlaveMode()) return master.boilerStorage.getStorageForDirection(direction);
         return boilerStorage.getStorageForDirection(direction);
+    }
+    
+    public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced,
+                                        long steamConsumed, int slaves) {
+    }
+    
+    public static Fluid getUsedSteamFluid() {
+        if (USED_STEAM_FLUID == null) {
+            USED_STEAM_FLUID = Registries.FLUID.get(Identifier.of(Oritech.CONFIG.generators.steamId()));
+        }
+        
+        return USED_STEAM_FLUID;
     }
 }

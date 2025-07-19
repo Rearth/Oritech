@@ -3,11 +3,13 @@ package rearth.oritech.client.renderers;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import io.wispforest.owo.ui.core.Color;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Pair;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -27,6 +29,12 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> ext
     
     public RefineryRenderer(String model) {
         super(new MachineModel<>(model));
+    }
+    
+    // this overrides a method from IBlockEntityRendererExtension on NF. Since this extension mixin is not available in common, we just declare the methode without\
+    // the override annotation
+    public Box getRenderBoundingBox(BlockEntity blockEntity) {
+        return Box.of(blockEntity.getPos().toCenterPos(), 6, 6, 6);
     }
     
     @Override

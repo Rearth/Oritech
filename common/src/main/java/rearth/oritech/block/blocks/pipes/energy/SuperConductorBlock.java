@@ -59,6 +59,11 @@ public class SuperConductorBlock extends GenericPipeBlock {
     }
     
     @Override
+    protected VoxelShape[] createShapes() {
+        return EXTRA_THICK_SHAPES;
+    }
+    
+    @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
         return SUPERCONDUCTOR_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }

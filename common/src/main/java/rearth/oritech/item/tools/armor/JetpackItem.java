@@ -1,21 +1,31 @@
 package rearth.oritech.item.tools.armor;
 
+import dev.architectury.fluid.FluidStack;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
+import rearth.oritech.init.ComponentContent;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -144,5 +154,29 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
         return Oritech.CONFIG.basicJetpack.chargeSpeed();
+    }
+    
+    public static void receiveUsagePacket(JetpackUsageUpdatePacket packet, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
+        var stack = player.getEquippedStack(EquipmentSlot.CHEST);
+        if (!(stack.getItem() instanceof BaseJetpackItem)) return;
+        
+        if (!(player instanceof ServerPlayerEntity serverPlayer)) return;
+        
+        // to prevent dedicated servers from kicking the player for flying
+        serverPlayer.networkHandler.floatingTicks = 0;
+        
+        stack.set(EnergyApi.ITEM.getEnergyComponent(), packet.energyStored);
+        if (packet.fluidAmount > 0)
+            stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(Registries.FLUID.get(Identifier.of(packet.fluidType)), packet.fluidAmount));
+    }
+    
+    public record JetpackUsageUpdatePacket(long energyStored, String fluidType, long fluidAmount) implements CustomPayload {
+        
+        public static final CustomPayload.Id<JetpackUsageUpdatePacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("jetpack_use"));
+        
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return PACKET_ID;
+        }
     }
 }

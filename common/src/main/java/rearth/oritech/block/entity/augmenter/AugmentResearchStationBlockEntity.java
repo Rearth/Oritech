@@ -90,6 +90,7 @@ public class AugmentResearchStationBlockEntity extends BlockEntity implements Mu
     }
     
     @Override
-    public void playSetupAnimation() {
+    public void triggerSetupAnimation() {
+    
     }
 }

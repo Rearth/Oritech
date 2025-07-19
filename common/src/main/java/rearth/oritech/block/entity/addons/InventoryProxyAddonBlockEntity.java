@@ -7,14 +7,18 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.DelegatingInventoryStorage;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.InventoryProxyScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -116,5 +120,20 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     @Override
     public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
         return inventory;
+    }
+    
+    public static void receiveSlotSelection(InventoryProxySlotSelectorPacket packet, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
+        if (player.getWorld().getBlockEntity(packet.position) instanceof InventoryProxyAddonBlockEntity addonBlock)
+            addonBlock.setTargetSlot(packet.slot);
+    }
+    
+    public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) implements CustomPayload {
+        
+        public static final CustomPayload.Id<InventoryProxySlotSelectorPacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("proxy_slot_sel"));
+        
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return PACKET_ID;
+        }
     }
 }

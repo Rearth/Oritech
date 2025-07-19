@@ -6,7 +6,7 @@
       "tag": "oritech:plating"
     },
     "c": {
-      "item": "oritech:biosteel_ingot"
+      "tag": "c:ingots/steel"
     },
     "f": {
       "tag": "c:plates/plastic"

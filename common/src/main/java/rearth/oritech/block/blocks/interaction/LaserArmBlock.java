@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.behavior.LaserArmEntityBehavior;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
 
@@ -121,7 +121,7 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
             
             // first time created
             if (isAssembled && !wasAssembled) {
-                NetworkContent.MACHINE_CHANNEL.serverHandle(entity).send(new NetworkContent.MachineSetupEventPacket(pos));
+                laserArm.triggerSetupAnimation();
                 laserArm.initAddons();
                 return ActionResult.SUCCESS;
             }

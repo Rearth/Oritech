@@ -1,5 +1,0 @@
-{
-  "texture": "oritech:textures/book/tablet_book.png",
-  "open_sound": "minecraft:block.amethyst_block.resonate",
-  "flipping_sound": "minecraft:block.comparator.click"
-}

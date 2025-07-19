@@ -9,10 +9,10 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.item.tools.armor.JetpackElytraItem;
 import rearth.oritech.item.tools.armor.JetpackExoElytraItem;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
-import rearth.oritech.network.NetworkContent;
 
 public final class OritechFabricMod implements ModInitializer {
     @Override
@@ -28,8 +28,8 @@ public final class OritechFabricMod implements ModInitializer {
         
         ItemApi.BLOCK = new FabricItemApi();
         
-        NetworkContent.FLUID_STACK_CODEC = FluidStack.CODEC;
-        NetworkContent.FLUID_STACK_STREAM_CODEC = FluidStack.STREAM_CODEC;
+        NetworkManager.FLUID_STACK_CODEC = FluidStack.CODEC;
+        NetworkManager.FLUID_STACK_STREAM_CODEC = FluidStack.STREAM_CODEC;
         
         
         // Run our common setup.

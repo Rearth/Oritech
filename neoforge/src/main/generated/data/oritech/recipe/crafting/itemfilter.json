@@ -9,10 +9,10 @@
       "item": "oritech:processing_unit"
     },
     "f": {
-      "tag": "c:wires"
+      "tag": "minecraft:planks"
     },
     "s": {
-      "tag": "c:wires"
+      "tag": "minecraft:planks"
     }
   },
   "pattern": [

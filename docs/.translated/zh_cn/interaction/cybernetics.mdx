@@ -1,0 +1,68 @@
+---
+title: 赛博改造
+icon: oritech:augment_application_block
+related_items: [oritech:augment_application_block, oritech:simple_augment_station, oritech:advanced_augment_station, oritech:arcane_augment_station]
+---
+
+赛博改造中心是一种允许你对你的身体安装赛博植入体的设备。
+这些植入体可以给你提供多种好处，例如增强力量、速度和防护。
+它们还可以赋予你新的能力，例如夜视或自动喂食。
+
+<Callout variant="info">
+    植入体是对玩家的永久升级，且不需要任何能量或资源来维持。
+</Callout>
+
+<center>
+<ModAsset location="oritech:augment_application_block" width={400} />
+</center>
+
+### 研究需求
+所有植入体都必须先在赛博改造中心里进行研究：
+1. 走进组装好的机器以打开研究与应用GUI
+2. 每种植入体都有独特的能量和资源消耗（存储在赛博改造中心或玩家物品栏）
+3. 通过右键点击机器或使用GUI左下角的按钮来访问机器物品栏
+4. 许多研究需要完成前置研究（如科技树所示）
+
+<center>
+<ModAsset location="oritech:area/cyborg_research_ui" width={700} />
+</center>
+
+### 研究站
+- 赛博改造中心有3个多方块研究站插槽（与使用插件槽位相似）
+- 每个研究站:
+  - 需要3个机器核心
+  - 同时只能进行一项研究
+  - 重复的研究站可以实现并行研究
+
+### 应用过程
+1. 已研究的植入体可以安装
+2. 应用植入体需要额外的资源
+3. 赛博改造中心存储所有已研究的蓝图（每个机器独立，机器被破坏后丢失）
+4. 可以通过UI左下角的导入按钮扫描玩家已有的植入体
+
+### 植入体管理
+- 所有植入体都是永久安装的（不需要维持或能量）
+- 一些植入体可以切换开关；有些则始终激活
+- 植入体可以被随时移除，但安装所使用的资源不会返还
+
+### 切换控制
+1. 按住配置植入体快捷键 (默认为[G])
+2. 将鼠标悬停在径向UI中要切换的植入体上
+3. 松开按键以切换
+
+<center>
+<ModAsset location="oritech:area/cyborg_ui" width={700} />
+</center>
+
+### 面向整合包开发者的说明：
+植入体完全可配置并由数据驱动。可以通过数据包创建新的植入体。共有3种植入体类型：
+修饰符植入体，通过修饰更改玩家的实体属性，如速度或触及距离。
+下一种是效果植入体，像药水那样给予效果。
+最后一种是自定义植入体，包含完全自定义的逻辑，如矿石感应或便携折跃。
+这些自定义植入体可以通过数据包引用，
+但它们的逻辑需要在一个完整的JAVA模组中实现。
+
+可以通过数据包创建全新的植入体，也可以更改已有的植入体。
+看一看这个植入体定义的示例文件：https://github.com/Rearth/Oritech/blob/1.21/common/src/main/generated/data/oritech/recipe/augment/attackdamage.json
+
+添加新的植入体时，记得补充翻译条目和纹理。纹理放在 "oritech/textures/gui/augment" 文件夹中。

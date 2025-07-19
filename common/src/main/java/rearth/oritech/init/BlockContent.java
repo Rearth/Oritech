@@ -187,8 +187,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @DispenserPlace
     public static final Block CREATIVE_TANK_BLOCK = new CreativeFluidTank(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).luminance(state -> state.get(Properties.LIT) ? 15 : 0).hardness(-1.0F));
     
-    public static final Item SMALL_TANK_ITEM = new SmallFluidTankBlockItem(SMALL_TANK_BLOCK, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
-    public static final Item CREATIVE_TANK_ITEM = new SmallFluidTankBlockItem(CREATIVE_TANK_BLOCK, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
+    public static final Item SMALL_TANK_ITEM = new SmallFluidTankBlockItem(SMALL_TANK_BLOCK, new Item.Settings());
+    public static final Item CREATIVE_TANK_ITEM = new SmallFluidTankBlockItem(CREATIVE_TANK_BLOCK, new Item.Settings());
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block AUGMENT_APPLICATION_BLOCK = new AugmentApplicationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
@@ -238,14 +238,15 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @NoBlockItem
     public static final Block MACHINE_CORE_HIDDEN = new MachineCoreBlock(AbstractBlock.Settings.copy(Blocks.OBSIDIAN).strength(80, 1900f).nonOpaque().solid(), 1);
     
-    public static final Block MACHINE_SPEED_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withSpeedMultiplier(0.9f).withEfficiencyMultiplier(1.05f).withBoundingShape(MachineAddonBlock.MACHINE_SPEED_ADDON_SHAPE));
-    public static final Block MACHINE_PROCESSING_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withEfficiencyMultiplier(1.5f).withChambers(1).withBoundingShape(MachineAddonBlock.MACHINE_PROCESSING_ADDON_SHAPE));
+    public static final Block MACHINE_SPEED_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withSpeedMultiplier(Oritech.CONFIG.addonConfig.speedAddonSpeed()).withEfficiencyMultiplier(Oritech.CONFIG.addonConfig.speedAddonEfficiency()).withBoundingShape(MachineAddonBlock.MACHINE_SPEED_ADDON_SHAPE));
+    public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withEfficiencyMultiplier(Oritech.CONFIG.addonConfig.efficiencyAddonEfficiency()).withBoundingShape(MachineAddonBlock.MACHINE_EFFICIENCY_ADDON_SHAPE));
+    public static final Block MACHINE_ULTIMATE_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withSpeedMultiplier(Oritech.CONFIG.addonConfig.ultimateAddonSpeed()).withEfficiencyMultiplier(Oritech.CONFIG.addonConfig.ultimateAddonEfficiency()).withBoundingShape(MachineAddonBlock.MACHINE_ULTIMATE_ADDON_SHAPE));
+    public static final Block QUARRY_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.QUARRY_ADDON_SHAPE));
+    public static final Block MACHINE_PROCESSING_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withEfficiencyMultiplier(Oritech.CONFIG.addonConfig.chamberAddonEfficiency()).withChambers(1).withBoundingShape(MachineAddonBlock.MACHINE_PROCESSING_ADDON_SHAPE));
     public static final Block MACHINE_FLUID_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_FLUID_ADDON_SHAPE));
     public static final Block MACHINE_YIELD_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_YIELD_ADDON_SHAPE));
     public static final Block CROP_FILTER_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.CROP_FILTER_ADDON_SHAPE));
-    public static final Block QUARRY_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withSpeedMultiplier(0.7f).withEfficiencyMultiplier(1.4f).withBoundingShape(MachineAddonBlock.QUARRY_ADDON_SHAPE));
     public static final Block MACHINE_HUNTER_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_HUNTER_ADDON_SHAPE));
-    public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withEfficiencyMultiplier(0.9f).withBoundingShape(MachineAddonBlock.MACHINE_EFFICIENCY_ADDON_SHAPE));
     public static final Block MACHINE_CAPACITOR_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withAddedCapacity(2_000_000).withAddedInsert(1_000).withBoundingShape(MachineAddonBlock.MACHINE_CAPACITOR_ADDON_SHAPE));
     public static final Block MACHINE_ACCEPTOR_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withAddedCapacity(500_000).withAddedInsert(2000).withAcceptEnergy(true).withBoundingShape(MachineAddonBlock.MACHINE_ACCEPTOR_ADDON_SHAPE));
     public static final Block MACHINE_INVENTORY_PROXY_ADDON = new InventoryProxyAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_INVENTORY_PROXY_ADDON_SHAPE));
@@ -253,7 +254,6 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block CAPACITOR_ADDON_EXTENDER = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withExtender(true).withNeedsSupport(false).withAddedCapacity(2_500_000).withAddedInsert(500));
     public static final Block STEAM_BOILER_ADDON = new SteamBoilerAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.STEAM_BOILER_ADDON_SHAPE));
     public static final Block MACHINE_REDSTONE_ADDON = new RedstoneAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_REDSTONE_ADDON_SHAPE));
-    public static final Block MACHINE_ULTIMATE_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withSpeedMultiplier(0.82f).withEfficiencyMultiplier(0.94f).withBoundingShape(MachineAddonBlock.MACHINE_ULTIMATE_ADDON_SHAPE));
     public static final Block MACHINE_SILK_TOUCH_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_SILK_TOUCH_ADDON_SHAPE));
     
     //region reactor

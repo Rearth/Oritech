@@ -17,6 +17,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -34,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.AcceleratorScreenHandler;
@@ -41,13 +44,14 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+// networking: last event could be automated. Inject event can just be called on server, and let vanilla handle sounds. Trail should be sent normally,
+// so maybe everything could just be moved to manually sent packets
 public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity>, ItemApi.BlockProvider, ExtendedMenuProvider, ScreenProvider {
     
     private AcceleratorParticleLogic.ActiveParticle particle;
@@ -137,7 +141,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             particle = new AcceleratorParticleLogic.ActiveParticle(startPosition.toCenterPos(), 1, nextGate, startPosition);
             activeItemParticle = inventory.getStack(0).split(1);
             
-            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AcceleratorParticleInsertEventPacket(pos));
+            var soundPos = pos.toCenterPos();
+            world.playSound(null, soundPos.x, soundPos.y, soundPos.z, SoundEvents.BLOCK_BAMBOO_WOOD_TRAPDOOR_OPEN, SoundCategory.BLOCKS);
         }
     }
     
@@ -149,12 +154,12 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     public void onParticleExited(Vec3d from, Vec3d to, BlockPos lastGate, Vec3d exitDirection, ParticleEvent reason) {
         
         var eventPosition = BlockPos.ofFloored(particle.position);
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new LastEventPacket(pos, reason, particle.velocity, eventPosition, AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
+        NetworkManager.sendBlockHandle(this, new LastEventPacket(pos, reason, particle.velocity, eventPosition, AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
         
         this.particle = null;
         
         var renderedTrail = List.of(from, to);
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AcceleratorParticleRenderPacket(pos, renderedTrail));
+        NetworkManager.sendBlockHandle(this, new ParticleRenderTrail(pos, renderedTrail));
         
         this.markDirty();
     }
@@ -170,8 +175,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             var success = tryCraftResult(relativeSpeed, activeItemParticle, secondControllerEntity.activeItemParticle);
         }
         
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new LastEventPacket(pos, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.ofFloored(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new LastEventPacket(secondController, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.ofFloored(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
+        NetworkManager.sendBlockHandle(this, new LastEventPacket(pos, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.ofFloored(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
+        NetworkManager.sendBlockHandle(this, new LastEventPacket(secondController, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.ofFloored(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
         
         this.removeParticleDueToCollision();
         secondControllerEntity.removeParticleDueToCollision();
@@ -334,42 +339,14 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             resultList.add(position);
         }
         
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.AcceleratorParticleRenderPacket(pos, resultList));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new LastEventPacket(pos, ParticleEvent.ACCELERATING, particle.velocity, BlockPos.ofFloored(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
+        NetworkManager.sendBlockHandle(this, new ParticleRenderTrail(pos, resultList));
+        NetworkManager.sendBlockHandle(this, new LastEventPacket(pos, ParticleEvent.ACCELERATING, particle.velocity, BlockPos.ofFloored(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
         
     }
     
     public AcceleratorParticleLogic.ActiveParticle getParticle() {
         return particle;
     }
-    
-    public void onParticleInsertedClient() {
-        var soundPos = pos.toCenterPos();
-        world.playSound(soundPos.x, soundPos.y, soundPos.z, SoundContent.CABLE_MOVING, SoundCategory.BLOCKS, 1f, 1f, true);
-    }
-    
-    public void onReceiveMovement(List<Vec3d> displayTrail) {
-        this.displayTrail = displayTrail;
-        if (displayTrail.size() < 2) return;
-        
-        var playerPos = MinecraftClient.getInstance().player.getPos();
-        
-        // play sound pos at closest segment
-        var minDist = Double.MAX_VALUE;
-        var soundPos = displayTrail.getFirst();
-        for (var candidate : displayTrail) {
-            var dist = candidate.distanceTo(playerPos);
-            if (dist < minDist) {
-                minDist = dist;
-                soundPos = candidate;
-            }
-        }
-        
-        var pitch = Math.pow(lastEvent.lastEventSpeed, 0.1);
-        world.playSound(soundPos.x, soundPos.y, soundPos.z, SoundContent.PARTICLE_MOVING, SoundCategory.BLOCKS, 2f, (float) pitch, true);
-        
-    }
-    
     // returns the amount of moment used
     public float handleParticleEntityCollision(BlockPos checkPos, AcceleratorParticleLogic.ActiveParticle particle, float remainingMomentum, LivingEntity mob) {
         
@@ -431,18 +408,6 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         storage.update();
         
         particle.velocity += 1;
-        
-    }
-    
-    public void onReceivedEvent(LastEventPacket event) {
-        this.lastEvent = event;
-        
-        var soundPos = event.lastEventPosition.toCenterPos();
-        if (event.lastEvent.equals(ParticleEvent.COLLIDED)) {
-            world.playSound(soundPos.x, soundPos.y, soundPos.z, SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.BLOCKS, 5f, 1, true);
-        } else if (event.lastEvent.equals(ParticleEvent.EXITED_FAST) || event.lastEvent.equals(ParticleEvent.EXITED_NO_GATE)) {
-            world.playSound(soundPos.x, soundPos.y, soundPos.z, SoundEvents.ENTITY_WIND_CHARGE_WIND_BURST.value(), SoundCategory.BLOCKS, 3f, 1, true);
-        }
         
     }
     
@@ -513,6 +478,44 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         return false;
     }
     
+    public static void receiveTrail(ParticleRenderTrail packet, World world, DynamicRegistryManager dynamicRegistryManager) {
+        if (world.getBlockEntity(packet.position) instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
+            var displayTrail = packet.particleTrail;
+            acceleratorBlock.displayTrail = displayTrail;
+            if (displayTrail.size() < 2) return;
+            
+            var playerPos = MinecraftClient.getInstance().player.getPos();
+            
+            // play sound pos at closest segment
+            var minDist = Double.MAX_VALUE;
+            var soundPos = displayTrail.getFirst();
+            for (var candidate : displayTrail) {
+                var dist = candidate.distanceTo(playerPos);
+                if (dist < minDist) {
+                    minDist = dist;
+                    soundPos = candidate;
+                }
+            }
+            
+            var pitch = Math.pow(acceleratorBlock.lastEvent.lastEventSpeed, 0.1);
+            world.playSound(soundPos.x, soundPos.y, soundPos.z, SoundContent.PARTICLE_MOVING, SoundCategory.BLOCKS, 2f, (float) pitch, true);
+            
+        }
+    }
+    
+    public static void receiveEvent(LastEventPacket packet, World world, DynamicRegistryManager dynamicRegistryManager) {
+        if (world.getBlockEntity(packet.position) instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
+            acceleratorBlock.lastEvent = packet;
+            
+            var soundPos = packet.lastEventPosition.toCenterPos();
+            if (packet.lastEvent.equals(ParticleEvent.COLLIDED)) {
+                world.playSound(soundPos.x, soundPos.y, soundPos.z, SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.BLOCKS, 5f, 1, true);
+            } else if (packet.lastEvent.equals(ParticleEvent.EXITED_FAST) || packet.lastEvent.equals(ParticleEvent.EXITED_NO_GATE)) {
+                world.playSound(soundPos.x, soundPos.y, soundPos.z, SoundEvents.ENTITY_WIND_CHARGE_WIND_BURST.value(), SoundCategory.BLOCKS, 3f, 1, true);
+            }
+        }
+    }
+    
     public record LastEventPacket(BlockPos position,
                                   ParticleEvent lastEvent,
 // for no gate found events, we can calculate the acceptable dist based on speed
@@ -521,7 +524,14 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
                                   BlockPos lastEventPosition,  // where it collided/exited
                                   float minBendDist,   // acceptable dist can be calculated from dist
                                   ItemStack activeParticle
-    ) {
+    ) implements CustomPayload {
+        
+        public static final CustomPayload.Id<LastEventPacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("accel_event"));
+        
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return PACKET_ID;
+        }
     }
     
     public enum ParticleEvent {
@@ -531,5 +541,15 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         COLLIDED,
         EXITED_FAST,    // particle was too fast to take curve
         EXITED_NO_GATE  // no gate found in range
+    }
+    
+    public record ParticleRenderTrail(BlockPos position, List<Vec3d> particleTrail) implements CustomPayload {
+        
+        public static final CustomPayload.Id<ParticleRenderTrail> PACKET_ID = new CustomPayload.Id<>(Oritech.id("accel_render"));
+        
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return PACKET_ID;
+        }
     }
 }

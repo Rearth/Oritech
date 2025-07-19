@@ -12,6 +12,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
@@ -26,7 +27,8 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
-import rearth.oritech.network.NetworkContent;
+import rearth.oritech.item.tools.ElectricMaceItem;
+
 import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRecipeRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
@@ -50,7 +52,8 @@ public final class Oritech {
     public static void initialize() {
         
         LOGGER.info("Begin Oritech initialization");
-        NetworkContent.registerChannels();  // this seems to break datagen for some reason as it claims its using client code?
+        NetworkManager.init();
+        NetworkManager.registerDefaultCodecs();
         ParticleContent.registerParticles();
         FeatureContent.initialize();
         
@@ -63,6 +66,7 @@ public final class Oritech {
         // for particle collisions
         TickEvent.SERVER_POST.register(elem -> AcceleratorParticleLogic.onTickEnd());
         TickEvent.SERVER_POST.register(elem -> AddonBlockEntity.completeInits());
+        TickEvent.SERVER_POST.register(elem -> ElectricMaceItem.processLightningEvents(elem.getOverworld()));
         
         // for player augment modifiers
         PlayerEvent.PLAYER_JOIN.register(PlayerAugments::refreshPlayerAugments);

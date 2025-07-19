@@ -15,7 +15,7 @@
     }
   ],
   "effect": {
-    "amount": 100.0,
+    "amount": 5.0,
     "attributeOperationType": 0,
     "entityAttributeId": "minecraft:generic.luck"
   },

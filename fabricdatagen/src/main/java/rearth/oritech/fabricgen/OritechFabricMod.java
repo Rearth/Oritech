@@ -1,7 +1,9 @@
 package rearth.oritech.fabricgen;
 
+import dev.architectury.fluid.FluidStack;
 import net.fabricmc.api.ModInitializer;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.fabric.FabricEnergyApiImpl;
 import rearth.oritech.fabric.FabricFluidApiImpl;
 import rearth.oritech.fabric.FabricItemApi;
@@ -22,6 +24,9 @@ public final class OritechFabricMod implements ModInitializer {
         FluidApi.ITEM = fluidApiInstance;
         
         ItemApi.BLOCK = new FabricItemApi();
+        
+        NetworkManager.FLUID_STACK_CODEC = FluidStack.CODEC;
+        NetworkManager.FLUID_STACK_STREAM_CODEC = FluidStack.STREAM_CODEC;
         
         // Run our common setup.
         Oritech.runAllRegistries();

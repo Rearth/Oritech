@@ -16,17 +16,17 @@
     },
     {
       "input": {
-        "tag": "c:wires"
+        "tag": "c:ingots/nickel"
       }
     },
     {
       "input": {
-        "tag": "c:wires"
+        "tag": "c:ingots/nickel"
       }
     },
     {
       "input": {
-        "tag": "c:wires"
+        "tag": "c:ingots/copper"
       }
     }
   ],

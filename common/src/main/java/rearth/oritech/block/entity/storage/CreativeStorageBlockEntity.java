@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ComparatorOutputProvider;
@@ -48,8 +49,8 @@ public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEnti
     }
 
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, ExpandableEnergyStorageBlockEntity blockEntity) {
-        energyStorage.amount = Integer.MAX_VALUE;
-        super.tick(world, pos, state, blockEntity);
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        energyStorage.amount = (long) (Integer.MAX_VALUE * 0.9f);
+        super.serverTick(world, pos, state, blockEntity);
     }
 }

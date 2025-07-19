@@ -260,10 +260,7 @@ public class AcceleratorParticleLogic {
     }
     
     public static float getParticleBendDist(float distA, float distB) {
-        var combinedDist = distA + distB;
-        var smallerDist = Math.min(distA, distB);
-        combinedDist += smallerDist;
-        return combinedDist;
+        return distA + distB;
     }
     
     @Nullable

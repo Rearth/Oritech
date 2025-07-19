@@ -9,7 +9,9 @@ import io.wispforest.owo.ui.core.*;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.network.NetworkContent;
+import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +92,6 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
         handler.addonEntity.setTargetSlot(slot);
         
         // sync to server entity
-        NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.InventoryProxySlotSelectorPacket(handler.blockPos, slot));
+        NetworkManager.sendToServer(new InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket(handler.blockPos, slot));
     }
 }

@@ -3,10 +3,8 @@ package rearth.oritech.block.entity.interaction;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.block.*;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.world.ServerWorld;
@@ -20,6 +18,8 @@ import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -27,7 +27,6 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.network.NetworkContent;
 
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +35,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     
     public static final long FLUID_USAGE = (long) (Oritech.CONFIG.fertilizerConfig.liquidPerBlockUsage() * FluidStackHooks.bucketAmount());   // per block, tick usage is this divided by work time
     
+    @SyncField(SyncType.GUI_TICK)
     private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty) {
         
         @Override
@@ -171,12 +171,6 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
             fluidStorage.setAmount(fluidStorage.getAmount() - getWaterUsagePerTick());
             ParticleContent.WATERING_EFFECT.spawn(world, Vec3d.of(getCurrentTarget().down()), 2);
         }
-    }
-    
-    @Override
-    public void sendMovementNetworkPacket(BlockPos from) {
-        super.sendMovementNetworkPacket(from);
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SingleVariantFluidSyncPacketAPI(pos, Registries.FLUID.getId(fluidStorage.getFluid()).toString(), fluidStorage.getAmount()));
     }
     
     @Override

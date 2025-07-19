@@ -80,4 +80,9 @@ public abstract class MultiblockGeneratorBlockEntity extends UpgradableGenerator
     public World getWorldForMultiblock() {
         return world;
     }
+    
+    @Override
+    public void triggerSetupAnimation() {
+        triggerAnim("base_controller", "setup");
+    }
 }

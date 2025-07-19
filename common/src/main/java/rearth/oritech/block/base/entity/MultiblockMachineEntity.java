@@ -10,6 +10,8 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.util.MultiblockMachineController;
 
@@ -19,6 +21,7 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
+    @SyncField(SyncType.GUI_OPEN)
     private float coreQuality = 1f;
     
     public MultiblockMachineEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
@@ -85,5 +88,10 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     // this seems to work as expected for some reason?
     public static Vec3i worldToRelativePos(Vec3i ownWorldPos, Vec3i worldPos, Direction ownFacing) {
         return worldPos.subtract(ownWorldPos);
+    }
+    
+    @Override
+    public void triggerSetupAnimation() {
+        triggerAnim("base_controller", "setup");
     }
 }

@@ -84,7 +84,6 @@ dependencies {
     }
 
     // compat mods for ingame testing
-    modRuntimeOnly "curse.maven:energized-power-782147:5797585"
     modRuntimeOnly "curse.maven:mekanism-268560:5680395"
     modRuntimeOnly "curse.maven:applied-energistics-2-223794:6087880"
     modRuntimeOnly "curse.maven:spark-361579:5759671"
@@ -132,7 +131,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("stitch")
+        requires("athena-mod")
         requires("architectury-api")
 
         announcementTitle = "Neoforge Version on Modrinth"
@@ -146,7 +145,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("stitch")
+        requires("athena")
         requires("architectury-api")
 
         javaVersions.add(JavaVersion.VERSION_21)

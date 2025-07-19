@@ -7,13 +7,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -23,22 +21,24 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.FluidContent;
-import rearth.oritech.network.NetworkContent;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity {
+public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity {
     
     private static final int MAX_SEARCH_COUNT = 100_000;
     private static final int ENERGY_USAGE = 512;   // per block pumped
@@ -46,10 +46,6 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     private final AnimationController<PumpBlockEntity> animationController = getAnimationController();
-    
-    // client only
-    public Fluid lastPumpedVariant;
-    public long lastPumpTime;
     
     private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
     
@@ -60,6 +56,9 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     private BlockPos toolheadPosition;
     private FloodFillSearch searchInstance;
     private Deque<BlockPos> pendingLiquidPositions;
+    
+    @SyncField(SyncType.TICK)
+    private long lastWorkTime;
     
     public PumpBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PUMP_BLOCK, pos, state);
@@ -86,11 +85,15 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, PumpBlockEntity blockEntity) {
-        if (world.isClient) {
-            if (isBusy())
-                spawnWorkingParticles();
-            return;
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        
+        if ((initialized && pendingLiquidPositions.isEmpty() && world.getTime() % 62 == 0) || (!initialized && toolheadLowered && !searchActive && world.getTime() % 62 == 0)) {
+            // reset
+            initialized = false;
+            toolheadLowered = false;
+            searchActive = false;
+            toolheadPosition = pos;
+            System.out.println("pump reset");
         }
         
         if (!initialized) {
@@ -98,7 +101,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             return;
         }
         
-        if (world.getTime() % PUMP_RATE == 0 && hasEnoughEnergy()) {
+        if (world.getTime() % PUMP_RATE == 0 && hasEnoughEnergy() && world.getReceivedRedstonePower(pos) <= 0) {
             
             if (pendingLiquidPositions.isEmpty() || tankIsFull()) return;
             
@@ -118,10 +121,20 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             addLiquidToTank(targetState);
             useEnergy();
             this.markDirty();
-            setLastPumpTime(world.getTime());
-            updateNetwork();
+            lastWorkTime = world.getTime();
+            
+            
+            var targetPos = pos.toCenterPos().addRandom(world.random, 0.5f);
+            var targetType = targetState.getParticle();
+            
+            if (targetType != null && world instanceof ServerWorld serverWorld)
+                serverWorld.spawnParticles(targetType, targetPos.getX(), targetPos.getY(), targetPos.getZ(), 1, 0, 0, 0, 1);
         }
         
+    }
+    
+    private boolean isBusy() {
+        return world.getTime() - lastWorkTime < 40;
     }
     
     public void onUsed(PlayerEntity player) {
@@ -131,7 +144,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
             if (!toolheadLowered) {
                 message = Text.translatable("message.oritech.pump.extending");
             } else if (searchActive) {
-                message= Text.translatable("message.oritech.pump.initializing");
+                message = Text.translatable("message.oritech.pump.initializing");
             } else {
                 message = Text.translatable("message.oritech.pump.no_fluids");
             }
@@ -146,17 +159,6 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         }
         
         player.sendMessage(message, true);
-    }
-    
-    private void spawnWorkingParticles() {
-        if (world.getTime() % 5 != 0) return;
-        
-        var targetPos = pos.toCenterPos();
-        var targetType = ParticleTypes.BUBBLE_COLUMN_UP;
-        if (lastPumpedVariant.equals(Fluids.LAVA)) targetType = ParticleTypes.LAVA;
-        if (lastPumpedVariant.equals(FluidContent.STILL_OIL)) targetType = ParticleTypes.FALLING_OBSIDIAN_TEAR;
-        
-        world.addParticle(targetType, targetPos.getX(), targetPos.getY(), targetPos.getZ(), 0, 0.3, 0);
     }
     
     private boolean hasEnoughEnergy() {
@@ -266,33 +268,19 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
         controllers.add(animationController);
     }
     
-    private void updateNetwork() {
-        var fluid = Registries.FLUID.getId(fluidStorage.getFluid()).toString();
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.PumpWorkSyncPacket(pos, fluid, world.getTime()));
-    }
-    
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return animatableInstanceCache;
     }
     
-    private boolean isBusy() {
-        return world.getTime() - lastPumpTime < 40;
-    }
-    
     private AnimationController<PumpBlockEntity> getAnimationController() {
         return new AnimationController<>(this, state -> {
-            if (isBusy()) return state.setAndContinue(MachineBlockEntity.WORKING);
-            return PlayState.STOP;
+            if (isBusy()) {
+                return state.setAndContinue(MachineBlockEntity.WORKING);
+            } else {
+                return state.setAndContinue(MachineBlockEntity.IDLE);
+            }
         });
-    }
-    
-    public void setLastPumpedVariant(Fluid lastPumpedVariant) {
-        this.lastPumpedVariant = lastPumpedVariant;
-    }
-    
-    public void setLastPumpTime(long lastPumpTime) {
-        this.lastPumpTime = lastPumpTime;
     }
     
     private static class FloodFillSearch {

@@ -73,12 +73,10 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
         var overlay = Containers.horizontalFlow(Sizing.fixed(329), Sizing.fixed(200));
         rootComponent.child(overlay.surface(ORITECH_PANEL));
         
-        if (handler.reactorEntity.uiData != null) {
-            addReactorComponentPreview(overlay);
-            addReactorStats(overlay);
-            addEnergyBar(overlay);
-            addReactorStatus(overlay);
-        }
+        addReactorComponentPreview(overlay);
+        addReactorStats(overlay);
+        addEnergyBar(overlay);
+        addReactorStatus(overlay);
         
         addTitle(overlay);
         rootComponent.child(tooltipContainer.positioning(Positioning.absolute(0, 0)));
@@ -110,16 +108,17 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
         
     }
     
+    private BlockPos getPreviewMax() {
+        return handler.reactorEntity.areaMax.withY(handler.reactorEntity.areaMin.getY() + 1);
+    }
+    
     private void addReactorComponentPreview(FlowLayout overlay) {
         
         var holoPreviewContainer = new ReactorPreviewContainer(Sizing.fixed(180), Sizing.fixed(164), FlowLayout.Algorithm.HORIZONTAL, this::onContainerMouseMove);
         holoPreviewContainer.surface(Surface.PANEL_INSET);
         holoPreviewContainer.margins(Insets.of(8));
         
-        var uiData = handler.reactorEntity.uiData;
-        if (uiData == null) return;
-        
-        var totalSize = uiData.previewMax().subtract(uiData.min());
+        var totalSize = getPreviewMax().subtract(handler.reactorEntity.areaMin);
         var leftCount = totalSize.getZ();
         var rightCount = totalSize.getX();
         var totalWidth = leftCount + rightCount + 3;
@@ -131,10 +130,10 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
         activeComponents = new ArrayList<>();
         activeOverlays = new HashSet<>();
         
-        BlockPos.stream(uiData.min(), uiData.previewMax()).forEach(pos -> {
+        BlockPos.stream(handler.reactorEntity.areaMin, getPreviewMax()).forEach(pos -> {
             var state = handler.world.getBlockState(pos);
             if (state.isAir()) return;
-            var offset = pos.subtract(uiData.min());
+            var offset = pos.subtract(handler.reactorEntity.areaMin);
             var projectedPosX = offset.getX() * 0.43f - offset.getZ() * 0.43f;
             var projectedPosY = offset.getX() * 0.224f + offset.getZ() * 0.224f + offset.getY() * 0.5f;
             var zIndex = offset.getY() - offset.getX() - offset.getZ();
@@ -172,7 +171,7 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
     protected void handledScreenTick() {
         super.handledScreenTick();
         
-        if (handler.reactorEntity.uiSyncData == null) return;
+        if (handler.reactorEntity.componentStats.isEmpty()) return;
         
         for (var overlay : activeOverlays) {
             var data = getStatsAtPosition(overlay.pos);
@@ -194,17 +193,17 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
             overlay.state = res;
         }
         
-        var stackHeight = handler.reactorEntity.uiData.max().getY() - handler.reactorEntity.uiData.min().getY() - 1;
+        var stackHeight = handler.reactorEntity.areaMax.getY() - handler.reactorEntity.areaMin.getY() - 1;
         
         // gather stats
-        var sumProducedEnergy = handler.reactorEntity.uiSyncData.componentHeats().stream()
+        var sumProducedEnergy = handler.reactorEntity.componentStats.values().stream()
                                   .mapToInt(data -> data.receivedPulses() * ReactorControllerBlockEntity.RF_PER_PULSE * stackHeight).sum();
         
-        var sumProducedHeat = handler.reactorEntity.uiSyncData.componentHeats().stream()
+        var sumProducedHeat = handler.reactorEntity.componentStats.values().stream()
                                 .filter(elem -> elem.receivedPulses() > 0)
                                 .mapToInt(ReactorControllerBlockEntity.ComponentStatistics::heatChanged).sum();
         
-        var hottestComponent = handler.reactorEntity.uiSyncData.componentHeats().stream()
+        var hottestComponent = handler.reactorEntity.componentStats.values().stream()
                                  .mapToInt(ReactorControllerBlockEntity.ComponentStatistics::storedHeat)
                                  .max().orElse(0);
         
@@ -283,7 +282,7 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
         var stats = getStatsAtPosition(pos);
         if (stats.storedHeat() == -1) return;
         
-        var stackHeight = handler.reactorEntity.uiData.max().getY() - handler.reactorEntity.uiData.min().getY() - 1;
+        var stackHeight = handler.reactorEntity.areaMax.getY() - handler.reactorEntity.areaMin.getY() - 1;
         var portPosition = pos.add(0, stackHeight, 0);
         var portEntity = handler.world.getBlockEntity(portPosition);
         if (portEntity != null && portEntity.isRemoved()) return;
@@ -333,13 +332,15 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
     
     public ReactorControllerBlockEntity.ComponentStatistics getStatsAtPosition(BlockPos pos) {
         
-        if (handler.reactorEntity.uiSyncData == null) return ReactorControllerBlockEntity.ComponentStatistics.EMPTY;
+        if (handler.reactorEntity.componentStats.isEmpty())
+            return ReactorControllerBlockEntity.ComponentStatistics.EMPTY;
         
-        var componentPositions = handler.reactorEntity.uiSyncData.componentPositions();
-        for (int i = 0; i < componentPositions.size(); i++) {
-            var candidate = componentPositions.get(i);
-            if (!candidate.equals(pos)) continue;
-            return handler.reactorEntity.uiSyncData.componentHeats().get(i);
+        var reactorMin = handler.reactorEntity.areaMin;
+        
+        for (var entry : handler.reactorEntity.componentStats.entrySet()) {
+            var localPos = entry.getKey();
+            var worldPos = reactorMin.add(localPos.x + 1, 1, localPos.y + 1);
+            if (worldPos.equals(pos)) return entry.getValue();
         }
         
         return ReactorControllerBlockEntity.ComponentStatistics.EMPTY;

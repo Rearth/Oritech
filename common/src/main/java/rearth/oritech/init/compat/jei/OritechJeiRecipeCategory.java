@@ -112,7 +112,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
         
         // data
         var duration = String.format("%.0f", recipe.getTime() / 20f);
-        guiGraphics.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable("emi.title.oritech.cookingtime", duration, recipe.getTime()), (int) (getWidth() * 0.35), (int) (getHeight() * 0.88), 0xffffff);
+        guiGraphics.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable("emi.title.oritech.cookingtime", duration, recipe.getTime()), (int) (getWidth() * 0.35), (int) (getHeight() * 0.9), 0xffffff);
         
     }
     
@@ -154,7 +154,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
             if (output.isEmpty()) continue;
             
             var pos = slots.get(slotOffsets.outputStart() + i);
-            var usedY = Math.clamp(2, pos.y() - offsetY, getHeight() - 18 - 4);
+            var usedY = Math.clamp(1, pos.y() - offsetY, getHeight() - 18 - 4);
             builder.addOutputSlot(pos.x() - offsetX, usedY).addItemStack(output).setBackground(background, -1, -1);
         }
         

@@ -25,6 +25,10 @@ public class Config {
     public FertilizerConfig fertilizerConfig = new FertilizerConfig();
     @Nest
     public MachineFrameData placerConfig = new MachineFrameData(10, 5, 8, 64);
+    @Nest
+    public AddonConfig addonConfig = new AddonConfig();
+    public boolean additiveAddons = true;
+    public boolean layeredExtenders = false;
     
     @SectionHeader("storageBlocks")
     @Nest
@@ -61,11 +65,13 @@ public class Config {
     @Nest
     public ToolData chainSaw = new ToolData(10_000, 10, 512);
     @Nest
+    public ElectricMaceData electricMace = new ElectricMaceData();
+    @Nest
     public PortableLaserConfig portableLaserConfig = new PortableLaserConfig();
     public boolean chainsawTreeCutting = true;
     
     @SectionHeader("worldGeneration")
-    public boolean generateOres = true;
+    public boolean generateOresFabricOnly = true;
     public boolean easyFindFeatures = true;
     
     @SectionHeader("reactor")
@@ -79,7 +85,7 @@ public class Config {
     public int ventBaseRate = 4;
     public int ventRelativeRate = 100;
     public int maxHeat = 2000;
-    public int maxUnstableTicks = 400;
+    public int maxUnstableTicks = 600;
     public boolean boringNukes = false;
     
     @SectionHeader("arcane")
@@ -88,6 +94,7 @@ public class Config {
     public int catalystRFPerSoul = 20;
     public int catalystCostMultiplier = 2;
     public int catalystHyperMultiplier = 2;
+    public float catalystHyperExpFactor = 1.15f;
     public int spawnerCostMultiplier = 1;
     
     @SectionHeader("particleAccelerator")
@@ -155,6 +162,7 @@ public class Config {
     public static class Generators {
         
         public float animationSpeedMultiplier = 10;
+        public String steamId = "oritech:still_steam";
         
         @Nest
         public BasicEnergyMachineData basicGeneratorData = new BasicEnergyMachineData(50_000, 0, 32 * 8, 32);
@@ -188,10 +196,27 @@ public class Config {
         public int explosionStrength = 6;
     }
     
+    public static class ElectricMaceData {
+        public long energyCapacity = 500_000;
+        public int energyUsage = 2048;
+        public int chargeSpeed = 50_000;
+        public int baseDamage = 8;
+        public int lightningCostMultiplier = 8;
+    }
+    
     public static class DeepDrillConfig {
         public long energyCapacity = 20000;
         public int stepsPerOre = 20;
         public int energyPerStep = 1024;
+    }
+    
+    public static class AddonConfig {
+        public float speedAddonSpeed = 0.5f;
+        public float speedAddonEfficiency = 1.2f;
+        public float efficiencyAddonEfficiency = 0.8f;
+        public float ultimateAddonSpeed = 0.25f;
+        public float ultimateAddonEfficiency = 1.1f;
+        public float chamberAddonEfficiency = 1.5f;
     }
     
     public static class CentrifugeConfig {

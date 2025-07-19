@@ -14,7 +14,6 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.network.NetworkContent;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -34,8 +33,7 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
     public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     
     private boolean setup = false;
-    
-    private final AnimationController<ParticleCollectorBlockEntity> animationController = getAnimationController();
+    private long resetAnimAt = Long.MAX_VALUE;
     
     public ParticleCollectorBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PARTICLE_COLLECTOR_BLOCK_ENTITY, pos, state);
@@ -65,6 +63,12 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
             setup = true;
         }
         
+        // this feels a bit stupid, but oh well.
+        if (resetAnimAt < world.getTime()) {
+            triggerAnim("machine", "idle");
+            resetAnimAt = Long.MAX_VALUE;
+        }
+        
         if (energyStorage.amount <= 0) return;
         
         // output energy to back
@@ -89,20 +93,14 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(animationController);
-    }
-    
-    private AnimationController<ParticleCollectorBlockEntity> getAnimationController() {
-        return new AnimationController<>(this, state -> PlayState.CONTINUE);
+        controllers.add(new AnimationController<>(this, "machine", state -> PlayState.CONTINUE)
+                          .triggerableAnim("work", WORK)
+                          .triggerableAnim("idle", IDLE));
     }
     
     public void triggerAnimation() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.ParticleAcceleratorAnimationPacket(pos));
-    }
-    
-    public void playAnimation() {
-        animationController.setAnimation(WORK);
-        animationController.forceAnimationReset();
+        triggerAnim("machine", "work");
+        resetAnimAt = world.getTime() + 15;
     }
     
     @Override

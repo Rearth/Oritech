@@ -15,7 +15,7 @@ public class OreFinderRenderer {
     public static List<BlockPos> renderedBlocks;
     public static long receivedAt;
     
-    private static final RenderLayer OVERLAY = RenderLayer.of("testoverlay", VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 786432, true, false, RenderLayer.MultiPhaseParameters.builder().lightmap(ENABLE_LIGHTMAP).program(SOLID_PROGRAM).texture(BLOCK_ATLAS_TEXTURE).depthTest(ALWAYS_DEPTH_TEST).target(OUTLINE_TARGET).cull(ENABLE_CULLING).build(false));
+    private static final RenderLayer OVERLAY = RenderLayer.of("testoverlay", VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 786432, true, false, RenderLayer.MultiPhaseParameters.builder().lightmap(DISABLE_LIGHTMAP).program(SOLID_PROGRAM).texture(BLOCK_ATLAS_TEXTURE).depthTest(ALWAYS_DEPTH_TEST).target(OUTLINE_TARGET).cull(ENABLE_CULLING).build(false));
     
     public static void doRender(MatrixStack matrices, Camera camera, VertexConsumerProvider vertexConsumers) {
         var world = MinecraftClient.getInstance().world;
@@ -34,7 +34,7 @@ public class OreFinderRenderer {
             var renderer = MinecraftClient.getInstance().getBlockRenderManager().getModelRenderer();
             var vertexProvider = vertexConsumers.getBuffer(OVERLAY);
             
-            renderer.renderFlat(world, MinecraftClient.getInstance().getBlockRenderManager().getModel(state), state, pos, matrices, vertexProvider, false, world.random, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+            renderer.render(world, MinecraftClient.getInstance().getBlockRenderManager().getModel(state), state, pos, matrices, vertexProvider, false, world.random, 0, 0);
             
             matrices.pop();
         }

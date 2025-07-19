@@ -219,7 +219,8 @@ public interface MultiblockMachineController {
         ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3d.of(block), null);
     }
     
-    void playSetupAnimation();
+    // this should be called on the server
+    void triggerSetupAnimation();
     
     record MultiBlockElement(BlockState state, MachineCoreBlock coreBlock, BlockPos pos) {
     }

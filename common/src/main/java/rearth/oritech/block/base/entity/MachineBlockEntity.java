@@ -2,8 +2,6 @@ package rearth.oritech.block.base.entity;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -13,8 +11,10 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.state.property.Properties;
@@ -23,15 +23,19 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
+import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
@@ -43,30 +47,35 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public abstract class MachineBlockEntity extends BlockEntity
-  implements ExtendedMenuProvider, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
+public abstract class MachineBlockEntity extends NetworkedBlockEntity
+  implements ExtendedMenuProvider, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
     
     // animations
     public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("deploy");
     public static final RawAnimation IDLE = RawAnimation.begin().thenPlayAndHold("idle");
-    public static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
+    public static final RawAnimation WORKING = RawAnimation.begin().thenPlay("working");
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
-    // crafting / processing
+    // synced data
+    @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK})
     public int progress;
-    protected int energyPerTick;
+    @SyncField({SyncType.GUI_TICK})
     protected OritechRecipe currentRecipe = OritechRecipe.DUMMY;
+    @SyncField({SyncType.GUI_TICK})
     protected InventoryInputMode inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
+    @SyncField({SyncType.GUI_TICK})
     protected boolean disabledViaRedstone = false;
+    @SyncField({SyncType.TICK})
     public long lastWorkedAt;
     
-    // network state
-    protected boolean networkDirty = true;
+    // static data
+    protected int energyPerTick;
     
-    //own storage
+    // own storages
     public final FilteringInventory inventory = new FilteringInventory(getInventorySize(), this::markDirty, getSlotAssignments());
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
     
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
@@ -79,9 +88,9 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (world.isClient || !isActive(state) || disabledViaRedstone) return;
+        if (!isActive(state) || disabledViaRedstone) return;
         
         // if a recipe is found, this means the input items are all available
         var recipeCandidate = getRecipe();
@@ -109,17 +118,12 @@ public abstract class MachineBlockEntity extends BlockEntity
                     resetProgress();
                 }
                 
-                markNetDirty();
                 markDirty();
             }
             
         } else {
             // this happens if either the input slot is empty, or the output slot is blocked
             if (progress > 0) resetProgress();
-        }
-        
-        if (networkDirty) {
-            updateNetwork();
         }
     }
     
@@ -139,47 +143,6 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     protected float calculateEnergyUsage() {
         return energyPerTick * getEfficiencyMultiplier() * (1 / getSpeedMultiplier());
-    }
-    
-    protected void updateNetwork() {
-        
-        if (!networkDirty) return;
-        
-        var updateFrequency = 5;
-        
-        // checks if a player has the inventory opened. In this case, update net every tick. In the screen we want to data to always be live, while otherwise it can be
-        // a few ticks old (e.g. for rendering), as this does not matter as much.
-        // Currently not perfect for multiplayer, as it doesn't track individual players. So all players that match the entity handle will receive the packets while
-        // the screen is open
-        if (isActivelyViewed()) updateFrequency = 2;
-        
-        if (Objects.requireNonNull(this.world).getTime() % updateFrequency != 0) return;
-        
-        sendNetworkEntry();
-    }
-    
-    private boolean isActivelyViewed() {
-        var closestPlayer = Objects.requireNonNull(world).getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 5, false);
-        return closestPlayer != null && closestPlayer.currentScreenHandler instanceof BasicMachineScreenHandler handler && getPos().equals(handler.getBlockPos());
-    }
-    
-    protected void sendNetworkEntry() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineSyncPacket(getPos(), energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, energyStorage.maxExtract, progress, currentRecipe, inventoryInputMode, lastWorkedAt, disabledViaRedstone));
-        networkDirty = false;
-    }
-    
-    // used to set relevant fields in client world
-    public void handleNetworkEntry(NetworkContent.MachineSyncPacket message) {
-        
-        this.setProgress(message.progress());
-        this.setEnergyStored(message.energy());
-        this.energyStorage.maxInsert = message.maxInsert();
-        this.energyStorage.maxExtract = message.maxExtract();
-        this.energyStorage.capacity = message.maxEnergy();
-        this.setCurrentRecipe(message.activeRecipe());
-        this.setInventoryInputMode(message.inputMode());
-        this.lastWorkedAt = message.lastWorkedAt();
-        this.disabledViaRedstone = message.disabledViaRedstone();
     }
     
     public List<ItemStack> getCraftingResults(OritechRecipe activeRecipe) {
@@ -228,11 +191,6 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     protected void resetProgress() {
         progress = 0;
-        markNetDirty();
-    }
-    
-    public void markNetDirty() {
-        networkDirty = true;
     }
     
     // check if output slots are valid, meaning: each slot is either empty, or of the same type and can add the target amount without overfilling
@@ -354,10 +312,6 @@ public abstract class MachineBlockEntity extends BlockEntity
         return world.getTime() - lastWorkedAt < 15;
     }
     
-    public void playSetupAnimation() {
-        triggerAnim("base_controller", "setup");
-    }
-    
     protected float getAnimationSpeed() {
         if (getRecipeDuration() < 0) return 1;
         var recipeTicks = getRecipeDuration() * getSpeedMultiplier();
@@ -379,7 +333,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     @Override
     public void saveExtraData(PacketByteBuf buf) {
-        sendNetworkEntry();
+        this.sendUpdate(SyncType.GUI_OPEN);
         buf.writeBlockPos(pos);
         
     }
@@ -428,7 +382,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         this.currentRecipe = currentRecipe;
     }
     
-    // lower = better for both
+    // lower = better for both (speed and efficiency)
     public float getSpeedMultiplier() {
         return 1;
     }
@@ -447,16 +401,12 @@ public abstract class MachineBlockEntity extends BlockEntity
                 break;
         }
         
-        markNetDirty();
+        markDirty();
     }
     
     @Override
     public InventoryInputMode getInventoryInputMode() {
         return inventoryInputMode;
-    }
-    
-    public void setInventoryInputMode(InventoryInputMode inventoryInputMode) {
-        this.inventoryInputMode = inventoryInputMode;
     }
     
     public abstract int getInventorySize();
@@ -506,15 +456,6 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     @Override
-    public void markDirty() {
-        // basically the same as the parent method, but without the comparator update for a slight speed increase
-        if (this.world != null)
-            world.markDirty(pos);
-        
-        markNetDirty();
-    }
-    
-    @Override
     public int getComparatorEnergyAmount() {
         return (int) ((energyStorage.amount / (float) energyStorage.capacity) * 15);
     }
@@ -543,6 +484,11 @@ public abstract class MachineBlockEntity extends BlockEntity
     @Override
     public void onRedstoneEvent(boolean isPowered) {
         this.disabledViaRedstone = isPowered;
+    }
+    
+    public static void receiveCycleModePacket(InventoryInputModeSelectorPacket packet, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
+        if (player.getWorld().getBlockEntity(packet.position()) instanceof MachineBlockEntity machineBlock)
+            machineBlock.cycleInputMode();
     }
     
     public class FilteringInventory extends InOutInventoryStorage {
@@ -597,4 +543,14 @@ public abstract class MachineBlockEntity extends BlockEntity
         }
     }
     
+    // Client -> Server (e.g. from UI interactions
+    public record InventoryInputModeSelectorPacket(BlockPos position) implements CustomPayload {
+        
+        public static final CustomPayload.Id<InventoryInputModeSelectorPacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("input_mode"));
+        
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return PACKET_ID;
+        }
+    }
 }

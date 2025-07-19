@@ -239,6 +239,7 @@ public class ModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(ToolsContent.EXO_BOOTS, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.CHAINSAW, Models.HANDHELD);
         itemModelGenerator.register(ToolsContent.HAND_DRILL, Models.HANDHELD);
+        itemModelGenerator.register(ToolsContent.ELECTRIC_MACE, Models.HANDHELD);
         itemModelGenerator.register(ToolsContent.JETPACK, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.EXO_JETPACK, Models.GENERATED);
         itemModelGenerator.register(ToolsContent.JETPACK_ELYTRA, Models.GENERATED);

@@ -112,6 +112,11 @@
       "oritech:nuke_explosion"
     ]
   },
+  "electric_shock": {
+    "sounds": [
+      "oritech:electric_shock"
+    ]
+  },
   "particle_moving": {
     "sounds": [
       {

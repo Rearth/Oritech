@@ -22,6 +22,8 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -46,6 +48,7 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
+import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.PortableLaserRenderer;
@@ -73,7 +76,6 @@ import java.util.function.Consumer;
 import static rearth.oritech.block.entity.interaction.LaserArmBlockEntity.BLOCK_BREAK_ENERGY;
 import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
 
-// todo recipe
 public class PortableLaserItem extends Item implements OritechEnergyItem, GeoItem {
     
     public static final int ACTION_COOLDOWN = 24;
@@ -461,5 +463,19 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
+    }
+    
+    public static void receiveUsePacket(LaserPlayerUsePacket packet, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
+        PortableLaserItem.onUseTick(player);
+    }
+    
+    public record LaserPlayerUsePacket() implements CustomPayload {
+        
+        public static final CustomPayload.Id<LaserPlayerUsePacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("laser_use"));
+        
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return PACKET_ID;
+        }
     }
 }

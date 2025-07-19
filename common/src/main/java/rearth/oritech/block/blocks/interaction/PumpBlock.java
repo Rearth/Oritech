@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
@@ -40,6 +41,11 @@ public class PumpBlock extends Block implements BlockEntityProvider {
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(Properties.HORIZONTAL_FACING);
+    }
+    
+    @Override
+    public boolean emitsRedstonePower(BlockState state) {
+        return true;
     }
     
     @Nullable
@@ -97,6 +103,11 @@ public class PumpBlock extends Block implements BlockEntityProvider {
     @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         super.appendTooltip(stack, context, tooltip, options);
+        var showExtra = Screen.hasControlDown();
+        
+        if (showExtra) {
+            tooltip.add(Text.translatable("tooltip.oritech.pump_redstone"));
+        }
         addMachineTooltip(tooltip, this, this);
     }
 }

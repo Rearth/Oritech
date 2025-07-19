@@ -45,7 +45,7 @@ public class SteamEngineScreen extends UpgradableMachineScreen<UpgradableMachine
         
         var steamEntity = ((SteamEngineEntity) handler.blockEntity);
         var data = steamEntity.clientStats;
-        if (data == null) return;
+        if (data == null || productionLabel == null) return;
         
         var rfProduced = data.energyProduced();
         var steamUsed = data.steamConsumed();

@@ -1,18 +1,21 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
+  "category": "redstone",
   "key": {
-    "c": {
-      "item": "oritech:machine_core_2"
-    },
-    "s": {
+    "a": {
       "tag": "oritech:plating"
+    },
+    "c": {
+      "item": "oritech:duratium_ingot"
+    },
+    "e": {
+      "item": "oritech:machine_core_2"
     }
   },
   "pattern": [
-    "sss",
-    "scs",
-    "sss"
+    "eae",
+    "aca",
+    "eae"
   ],
   "result": {
     "count": 1,

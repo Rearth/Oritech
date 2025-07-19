@@ -5,8 +5,6 @@ import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.UnbreakableComponent;
 import net.minecraft.enchantment.Enchantments;
@@ -22,6 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.registry.RegistryKeys;
@@ -42,6 +41,10 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.networking.WorldPacketCodec;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
@@ -56,7 +59,6 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -69,14 +71,15 @@ import java.util.stream.Collectors;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
-public class LaserArmBlockEntity extends BlockEntity implements
-  GeoBlockEntity, BlockEntityTicker<LaserArmBlockEntity>, EnergyApi.BlockProvider, ScreenProvider, ExtendedMenuProvider,
+public class LaserArmBlockEntity extends NetworkedBlockEntity implements
+  GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ExtendedMenuProvider,
     MultiblockMachineController, MachineAddonController, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
     
     public static final String LASER_PLAYER_NAME = "oritech_laser";
     public static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
     
     // storage
+    @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, this::markDirty);
     
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(3, this::markDirty);
@@ -89,14 +92,23 @@ public class LaserArmBlockEntity extends BlockEntity implements
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
     // addons
+    @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> connectedAddons = new ArrayList<>();
+    @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> openSlots = new ArrayList<>();
+    @SyncField(SyncType.GUI_OPEN)
     private float coreQuality = 1f;
+    @SyncField(SyncType.GUI_OPEN)
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
+    @SyncField(SyncType.GUI_OPEN)
     public int areaSize = 1;
+    @SyncField(SyncType.GUI_OPEN)
     public int yieldAddons = 0;
+    @SyncField(SyncType.GUI_OPEN)
     public int hunterAddons = 0;
+    @SyncField(SyncType.GUI_OPEN)
     public boolean hasCropFilterAddon = false;
+    @SyncField(SyncType.GUI_OPEN)
     public boolean hasSilkTouchAddon = false;
     
     // config
@@ -106,16 +118,21 @@ public class LaserArmBlockEntity extends BlockEntity implements
     
     // working data
     private BlockPos targetDirection;
-    private BlockPos currentTarget;
+    
+    @SyncField
+    private BlockPos currentTarget = BlockPos.ORIGIN;
+    @SyncField
     public HunterTargetMode hunterTargetMode = HunterTargetMode.HOSTILE_ONLY;
+    @SyncField
     private LivingEntity currentLivingTarget;
+    @SyncField
     private long lastFiredAt;
-    private int progress;
-    private int targetBlockEnergyNeeded = BLOCK_BREAK_ENERGY;
-    private boolean networkDirty;
+    @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
     private boolean redstonePowered;
+    private int progress;
     private ArrayDeque<BlockPos> pendingArea;
     private final ArrayDeque<LivingEntity> pendingLivingTargets = new ArrayDeque<>();
+    private int targetBlockEnergyNeeded = BLOCK_BREAK_ENERGY;
     
     // needed only on client
     public Vec3d lastRenderPosition;
@@ -127,23 +144,20 @@ public class LaserArmBlockEntity extends BlockEntity implements
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
-        if (world.isClient() || !isActive(state))
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        if (!isActive(state))
             return;
         
         if (!redstonePowered && energyStorage.getAmount() >= energyRequiredToFire()) {
             if (hunterAddons > 0) {
-                fireAtLivingEntities(world, pos, state, blockEntity);
-            } else if (currentTarget != null && !currentTarget.equals(BlockPos.ZERO)) {
-                fireAtBlocks(world, pos, state, blockEntity);
+                fireAtLivingEntities(world, pos, state, this);
+            } else if (currentTarget != null && !currentTarget.equals(BlockPos.ORIGIN)) {
+                fireAtBlocks(world, pos, state, this);
             } else if (targetDirection != null && !targetDirection.equals(BlockPos.ORIGIN) && (world.getTime() + pos.getZ()) % 40 == 0) {
                 // target pos is set, but no target is found (e.g. all blocks already mined). Periodically scan again for new blocks.
                 findNextBlockBreakTarget();
             }
         }
-        
-        if (networkDirty)
-            updateNetwork();
     }
     
     private void fireAtBlocks(World world, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
@@ -157,7 +171,6 @@ public class LaserArmBlockEntity extends BlockEntity implements
         if (behavior.fireAtBlock(world, this, targetBlock, targetBlockPos, targetBlockState, targetBlockEntity)) {
             energyStorage.amount -= energyRequiredToFire();
             lastFiredAt = world.getTime();
-            networkDirty = true;
         } else {
             findNextBlockBreakTarget();
         }
@@ -175,9 +188,8 @@ public class LaserArmBlockEntity extends BlockEntity implements
             } else {
                 pendingLivingTargets.remove(currentLivingTarget);
                 currentLivingTarget = null;
-                currentTarget = null;
+                currentTarget = BlockPos.ORIGIN;
             }
-            networkDirty = true;
         } else {
             loadNextLivingTarget();
         }
@@ -281,7 +293,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         
         var nextBlock = basicRaycast(from, direction, range, 0.45F);
         if (nextBlock == null) {
-            currentTarget = null;
+            currentTarget = BlockPos.ORIGIN;
             return;
         }
         
@@ -292,7 +304,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         
         
         if (!trySetNewTarget(nextBlock, false)) {
-            currentTarget = null;   // out of range or invalid for another reason
+            currentTarget = BlockPos.ORIGIN;   // out of range or invalid for another reason
         }
         
     }
@@ -479,14 +491,6 @@ public class LaserArmBlockEntity extends BlockEntity implements
         return (Oritech.CONFIG.laserArmConfig.damageTickBase() * (1 / addonData.speed()));
     }
     
-    private void updateNetwork() {
-        var entityId = currentLivingTarget != null ? currentLivingTarget.getId() : -1;
-        var sendTarget = currentTarget != null ? currentTarget : BlockPos.ORIGIN;
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons, hunterAddons, hunterTargetMode.value, hasCropFilterAddon, hasSilkTouchAddon, entityId, redstonePowered));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
-        networkDirty = false;
-    }
-    
     public boolean setTargetFromDesignator(BlockPos targetPos) {
         var success = trySetNewTarget(targetPos, true);
         findNextBlockBreakTarget();
@@ -520,7 +524,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         if (alsoSetDirection) {
             this.targetDirection = targetPos;
             pendingArea = null;
-            networkDirty = true;
+            markDirty();
         }
         this.markDirty();
         
@@ -578,15 +582,6 @@ public class LaserArmBlockEntity extends BlockEntity implements
         if (nbt.contains("pendingPositions")) {
             pendingArea = Arrays.stream(nbt.getLongArray("pendingPositions")).mapToObj(BlockPos::fromLong).collect(Collectors.toCollection(ArrayDeque::new));
         }
-    }
-    
-    @Override
-    public void markDirty() {
-        // basically the same as the parent method, but without the comparator update for a slight speed increase
-        if (this.world != null)
-            world.markDirty(pos);
-        
-        networkDirty = true;
     }
     
     //region multiblock
@@ -740,9 +735,8 @@ public class LaserArmBlockEntity extends BlockEntity implements
     }
     
     @Override
-    public void playSetupAnimation() {
-        animationController.setAnimation(MachineBlockEntity.SETUP);
-        animationController.forceAnimationReset();
+    public void triggerSetupAnimation() {
+        // todo
     }
     
     public boolean isActive(BlockState state) {
@@ -769,27 +763,6 @@ public class LaserArmBlockEntity extends BlockEntity implements
         }
     }
     
-    public void setCurrentTarget(BlockPos currentTarget) {
-        this.currentTarget = currentTarget;
-    }
-    
-    public void setLivingTargetFromNetwork(int id) {
-        if (id == -1) {
-            currentLivingTarget = null;
-        } else {
-            var candidate = world.getEntityById(id);
-            if (candidate instanceof LivingEntity livingEntity) {
-                currentLivingTarget = livingEntity;
-            } else {
-                currentLivingTarget = null;
-            }
-        }
-    }
-    
-    public long getLastFiredAt() {
-        return lastFiredAt;
-    }
-    
     
     @Override
     public BlockPos getPosForAddon() {
@@ -799,10 +772,6 @@ public class LaserArmBlockEntity extends BlockEntity implements
     @Override
     public World getWorldForAddon() {
         return getWorld();
-    }
-    
-    public void setLastFiredAt(long lastFiredAt) {
-        this.lastFiredAt = lastFiredAt;
     }
     
     public boolean isFiring() {
@@ -913,15 +882,13 @@ public class LaserArmBlockEntity extends BlockEntity implements
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.FullEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, energyStorage.maxExtract));
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+        return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
     public void saveExtraData(PacketByteBuf buf) {
-        updateNetwork();
-        var data = new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
-        ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
+        this.sendUpdate(SyncType.GUI_OPEN);
+        buf.writeBlockPos(pos);
         
     }
     
@@ -1015,4 +982,26 @@ public class LaserArmBlockEntity extends BlockEntity implements
             return values()[(ordinal() + 1) % values().length];
         }
     }
+    
+    public static WorldPacketCodec<RegistryByteBuf, LivingEntity> LASER_TARGET_PACKET_CODEC = new WorldPacketCodec<>() {
+        @Override
+        public LivingEntity decode(RegistryByteBuf buf, @Nullable World world) {
+            
+            var id = buf.readInt();
+            if (world != null && id >= 0) {
+                var candidate = world.getEntityById(id);
+                if (candidate instanceof LivingEntity livingEntity) {
+                    return livingEntity;
+                }
+            }
+            
+            return null;
+        }
+        
+        @Override
+        public void encode(RegistryByteBuf buf, LivingEntity value, @Nullable World world) {
+            var id = value != null ? value.getId() : -1;
+            buf.writeInt(id);
+        }
+    };
 }

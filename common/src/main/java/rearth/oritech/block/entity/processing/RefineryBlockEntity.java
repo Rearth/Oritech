@@ -23,7 +23,9 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -32,7 +34,6 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
 
@@ -43,12 +44,15 @@ import java.util.Optional;
 
 public class RefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
-    // todo wiki entry
     // own storage is exposed through this multiblock, the other storages are exposed through the respective modules
+    @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(64 * FluidStackHooks.bucketAmount(), this::markDirty);
+    @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public final SimpleFluidStorage nodeA = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
+    @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public final SimpleFluidStorage nodeB = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
     
+    @SyncField(SyncType.GUI_OPEN)
     private int moduleCount;    // range 0-2
     
     public RefineryBlockEntity(BlockPos pos, BlockState state) {
@@ -56,8 +60,8 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
-        super.tick(world, pos, state, blockEntity);
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        super.serverTick(world, pos, state, blockEntity);
         
         if (world.getTime() % 25 == 0) {
             refreshModules();
@@ -126,7 +130,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     public List<ItemStack> getCraftingResults(OritechRecipe activeRecipe) {
         var results = activeRecipe.getResults();
         if (results.isEmpty()) return List.of();
-        return List.of(results.getFirst().copyWithCount(results.getFirst().getCount() * getItemOutputMultiplier()));
+        return List.of(results.getFirst().copyWithCount(results.getFirst().getCount() * getItemOutputMultiplier(activeRecipe)));
     }
     
     private void craftFluids(OritechRecipe activeRecipe) {
@@ -149,7 +153,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         // if no modules are installed, output twice the resulting items and fluids
         // if one module is installed, output twice the output A
         // if both are installed, output all as normal
-        // todo add gui tooltip for this behaviour
+        // if the recipe also only less than 2 fluid outputs, output normal
         
         if (recipe.getFluidOutputs().isEmpty()) return List.of();
         var outA = recipe.getFluidOutputs().get(0);
@@ -165,7 +169,8 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         };
     }
     
-    private int getItemOutputMultiplier() {
+    private int getItemOutputMultiplier(OritechRecipe recipe) {
+        if (recipe.getFluidOutputs().size() <= 1) return 1;
         return getModuleCount() == 0 ? 2 : 1;
     }
     
@@ -187,16 +192,10 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         return super.canOutputRecipe(recipe);
     }
     
-    @Override
-    protected void sendNetworkEntry() {
-        super.sendNetworkEntry();
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.RefinerySyncPacket(getPos(), ownStorage.getInStack(), ownStorage.getOutStack(), nodeA.getStack(), nodeB.getStack(), moduleCount));
-    }
-    
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new RefineryScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+        return new RefineryScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
@@ -229,7 +228,6 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         var offsetLocal = Geometry.rotatePosition(new Vec3d(0.3, 0.5, 0.3), facing);
         var emitPosition = Vec3d.ofCenter(pos).add(offsetLocal);
         
-        // todo
         ParticleContent.COOLER_WORKING.spawn(world, emitPosition, 1);
         
     }

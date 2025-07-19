@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
+import rearth.oritech.api.networking.fabric.NetworkManagerImpl;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
@@ -34,7 +35,7 @@ public final class OritechFabricModClient implements ClientModInitializer {
         BuiltinItemRendererRegistry.INSTANCE.register(BlockContent.SMALL_TANK_ITEM, new TankItemRenderer(Oritech.id("tank_item_model")));
         BuiltinItemRendererRegistry.INSTANCE.register(BlockContent.CREATIVE_TANK_ITEM, new TankItemRenderer(Oritech.id("creative_tank_item_model")));
         
-        // used for elytra jetpack cape rendering. No Neoforge equivalent.
+        // used for elytra jetpack cape rendering. No Neoforge equivalent, meaning neoforge just doesnt get fixed capes.
         LivingEntityFeatureRenderEvents.ALLOW_CAPE_RENDER.register(player -> !(player.getEquippedStack(EquipmentSlot.CHEST).getItem() instanceof BaseJetpackItem));
         
         for (var entry : ModRenderers.RENDER_LAYERS.entrySet()) {
@@ -42,6 +43,12 @@ public final class OritechFabricModClient implements ClientModInitializer {
         }
         
         EntityRendererRegistry.register(EntitiesContent.PORTAL_ENTITY, PortalEntityRenderer::new);
+        
+        for (var runnable : NetworkManagerImpl.PENDING_S2C_INITS) {
+            runnable.run();
+        }
+        
+        NetworkManagerImpl.PENDING_S2C_INITS.clear();
     }
     
     private static boolean renderBlockOutline(WorldRenderContext worldRenderContext, WorldRenderContext.BlockOutlineContext blockOutlineContext) {

@@ -1,22 +1,12 @@
 package rearth.oritech.client.init;
 
 import dev.architectury.registry.menu.MenuRegistry;
-import io.wispforest.endec.Endec;
-import io.wispforest.endec.impl.StructEndecBuilder;
-import io.wispforest.owo.serialization.CodecUtils;
-import io.wispforest.owo.serialization.endec.MinecraftEndecs;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.math.BlockPos;
 import rearth.oritech.client.ui.*;
-import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
-
-import static rearth.oritech.util.MachineAddonController.ADDON_UI_ENDEC;
 
 public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerType<?>> {
     
@@ -104,14 +94,5 @@ public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerTy
     @Override
     public RegistryKey<Registry<ScreenHandlerType<?>>> getRegistryType() {
         return RegistryKeys.SCREEN_HANDLER;
-    }
-    
-    public record UpgradableData(BlockPos pos, MachineAddonController.AddonUiData addonUiData, float coreQuality) {
-        public static final Endec<UpgradableData> PACKET_ENDEC = StructEndecBuilder.of(
-          MinecraftEndecs.BLOCK_POS.fieldOf("pos", UpgradableData::pos),
-          ADDON_UI_ENDEC.fieldOf("addonUiData", UpgradableData::addonUiData),
-          Endec.FLOAT.fieldOf("coreQuality", UpgradableData::coreQuality),
-          UpgradableData::new);
-        public static final PacketCodec<PacketByteBuf, UpgradableData> PACKET_CODEC = CodecUtils.toPacketCodec(PACKET_ENDEC);
     }
 }

@@ -3,7 +3,6 @@ package rearth.oritech.block.entity.interaction;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -29,12 +28,14 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventoryInputMode;
@@ -49,7 +50,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
 
-public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTicker<TreefellerBlockEntity>, GeoBlockEntity, EnergyApi.BlockProvider, ItemApi.BlockProvider, ExtendedMenuProvider, ScreenProvider {
+public class TreefellerBlockEntity extends NetworkedBlockEntity implements BlockEntityTicker<NetworkedBlockEntity>, GeoBlockEntity, EnergyApi.BlockProvider, ItemApi.BlockProvider, ExtendedMenuProvider, ScreenProvider {
     
     private static final int LOG_COST = 100;
     private static final int LEAF_COST = 10;
@@ -58,8 +59,8 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     private long lastWorkedAt = 0;
-    private boolean networkDirty = false;
     
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 4000, 0, this::markDirty);
     
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(6, this::markDirty) {
@@ -76,9 +77,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, TreefellerBlockEntity blockEntity) {
-        if (world.isClient) return;
-        
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (energyStorage.amount >= LOG_COST) {
             if (pendingBlocks.isEmpty() && world.getTime() % 20 == 0) {
                 findTarget();
@@ -99,7 +98,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
                 lastWorkedAt = world.getTime();
 
                 energyStorage.amount -= energyCost;
-                this.markDirty();
+                markDirty();
                 
                 if (isLog) break; // only harvest 1 log, but multiple leaves
             }
@@ -111,17 +110,6 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
             var animName = isWorking ? "work" : "idle";
             playWorkAnimation(animName);
         }
-        
-        if (networkDirty && world.getTime() % 4 == 0) {
-            networkDirty = false;
-            sendNetworkEntry();
-        }
-    }
-    
-    @Override
-    public void markDirty() {
-        super.markDirty();
-        networkDirty = true;
     }
     
     private ActionResult breakTreeBlock(BlockState candidateState, BlockPos candidate) {
@@ -315,7 +303,6 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        sendNetworkEntry();
         return new BasicMachineScreenHandler(syncId, playerInventory, this);
     }
     
@@ -323,12 +310,9 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
         triggerAnim("machine", animName);
     }
     
-    private void sendNetworkEntry() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
-    }
-    
     @Override
     public void saveExtraData(PacketByteBuf buf) {
+        this.sendUpdate(SyncType.GUI_OPEN);
         buf.writeBlockPos(pos);
     }
 }

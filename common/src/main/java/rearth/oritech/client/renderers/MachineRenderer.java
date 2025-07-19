@@ -37,7 +37,7 @@ public class MachineRenderer<T extends BlockEntity & GeoAnimatable> extends GeoB
     // this overrides a method from IBlockEntityRendererExtension on NF. Since this extension mixin is not available in common, we just declare the methode without\
     // the override annotation
     public Box getRenderBoundingBox(BlockEntity blockEntity) {
-        return Box.of(blockEntity.getPos().toCenterPos(), 8, 8, 8);
+        return Box.of(blockEntity.getPos().toCenterPos(), 4, 4, 4);
     }
 }
 

@@ -270,8 +270,8 @@ public class MetalProcessingChainBuilder {
             RefineryRecipeBuilder.build()
               .input(rawOreIngredient)
               .fluidInput(FluidContent.STILL_SHEOL_FIRE.get(), 0.25f)
-              .result(firstNonNull(clumpItem, dustItem), 3)
-              .fluidOutput(Fluids.LAVA, 0.2f)
+              .result(firstNonNull(clumpItem, dustItem), 2)
+              .fluidOutput(Fluids.LAVA, 0.1f)
               .timeMultiplier(timeMultiplier)
               .export(exporter, resourcePath + "rawsheol/" + metalName);
         }
@@ -290,15 +290,15 @@ public class MetalProcessingChainBuilder {
               .input(clumpIngredient)
               .fluidInput(Fluids.WATER)
               .result(firstNonNull(centrifugeResult, gemItem), centrifugeResult != null ? centrifugeAmount * 2 : 2)
-              .time(300).timeMultiplier(timeMultiplier)
+              .timeMultiplier(timeMultiplier * 1.5f)
               .export(exporter, resourcePath + "clump/" + metalName);
             // sulfuric acid washing
             CentrifugeFluidRecipeBuilder.build()
               .input(clumpIngredient)
               .fluidInput(FluidContent.STILL_SULFURIC_ACID.get())
-              .result(firstNonNull(centrifugeResult, gemItem), centrifugeResult != null ? centrifugeAmount * 4 : 4)
+              .result(firstNonNull(centrifugeResult, gemItem), centrifugeResult != null ? centrifugeAmount * 3 : 3)
               .fluidOutput(FluidContent.STILL_MINERAL_SLURRY.get(), 0.25f)
-              .time(300).timeMultiplier(timeMultiplier)
+              .timeMultiplier(timeMultiplier * 1.5f)
               .export(exporter, resourcePath + "clumpacid/" + metalName);
         }
         

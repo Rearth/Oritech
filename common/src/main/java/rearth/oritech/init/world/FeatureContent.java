@@ -58,7 +58,7 @@ public class FeatureContent implements ArchitecturyRegistryContainer<Feature<?>>
         });
         
         // ores
-        if (Oritech.CONFIG.generateOres()) {
+        if (Oritech.CONFIG.generateOresFabricOnly()) {
             BiomeModifications.addProperties((context, mutable) -> {
                 if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
                     mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_ORES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_nickel")));
