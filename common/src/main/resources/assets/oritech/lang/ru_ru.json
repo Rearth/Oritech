@@ -380,7 +380,7 @@
   "title.oritech.machine_speed": "⌛ %s%% ",
   "tooltip.oritech.machine_speed": "Скорость обработки",
   "title.oritech.machine_efficiency": "⚡ %s%% ",
-  "tooltip.oritech.machine_efficiency": "Энергоэффективность",
+  "tooltip.oritech.machine_efficiency": "Energy Efficiency Change",
   "tooltip.oritech.steam_workers": "Связанные парогенераторы используют общий бак пара и воды этого блока.",
   "title.oritech.machine_energy_production": "↗️ %d RF/t ",
   "tooltip.oritech.steam_energy_production": "Общее производство (включая цепные генераторы)",
