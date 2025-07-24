@@ -304,6 +304,7 @@
   "tooltip.oritech.portable_laser.4": "",
   "tooltip.oritech.portable_laser.5": "ほとんどのツルハシのエンチャント、不可壊、ダメージ増加も機能します。",
   "tooltip.oritech.portable_laser.status.begin": "採掘モード：",
+  "tooltip.oritech.portable_laser.status.shot_mining_error": "No shot fired, mining mode is enabled.",
   "tooltip.oritech.portable_laser.status.hint": "（スニーク＋右クリックで切り替え）",
   "tooltip.oritech.capture_item_desc_1": [
     {
