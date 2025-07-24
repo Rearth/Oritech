@@ -304,6 +304,7 @@
   "tooltip.oritech.portable_laser.4": "",
   "tooltip.oritech.portable_laser.5": "Работает с большинством зачарований кирки, прочностью и остротой.",
   "tooltip.oritech.portable_laser.status.begin": "Режим копания: ",
+  "tooltip.oritech.portable_laser.status.shot_mining_error": "No shot fired, mining mode is enabled.",
   "tooltip.oritech.portable_laser.status.hint": " (Крадитесь + ПКМ для переключения)",
   "tooltip.oritech.capture_item_desc_1": [
     {
