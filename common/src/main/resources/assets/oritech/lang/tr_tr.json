@@ -304,6 +304,7 @@
   "tooltip.oritech.portable_laser.4": "",
   "tooltip.oritech.portable_laser.5": "Çoğu kazma büyüsü ile çalışır, kırılmazlık ve keskinlik.",
   "tooltip.oritech.portable_laser.status.begin": "Madencilik Modu: ",
+  "tooltip.oritech.portable_laser.status.shot_mining_error": "No shot fired, mining mode is enabled.",
   "tooltip.oritech.portable_laser.status.hint": " (Geçiş yapmak için Eğil + Sağ Tıkla)",
   "tooltip.oritech.capture_item_desc_1": [
     {
