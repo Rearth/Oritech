@@ -304,6 +304,7 @@
   "tooltip.oritech.portable_laser.4": "",
   "tooltip.oritech.portable_laser.5": "多数适用于镐的附魔，以及耐久和锋利会生效。",
   "tooltip.oritech.portable_laser.status.begin": "挖掘模式： ",
+  "tooltip.oritech.portable_laser.status.shot_mining_error": "No shot fired, mining mode is enabled.",
   "tooltip.oritech.portable_laser.status.hint": " （潜行并右键以切换）",
   "tooltip.oritech.capture_item_desc_1": [
     {
