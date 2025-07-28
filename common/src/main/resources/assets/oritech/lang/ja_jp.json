@@ -421,7 +421,7 @@
   "tooltip.oritech.accelerator": "粒子を粒子ガイドリングに注入します。",
   "tooltip.oritech.accelerator_motor": "エネルギーを使用して、移動する粒子を加速します。",
   "tooltip.oritech.accelerator_ring": "粒子の移動経路を設定するために使用します。\n右クリックで片方の端を回せます。\nレッドストーンで制御可能です。",
-  "tooltip.oritech.accelerator_sensor": "この中を通過する粒子の速度に基づいてレッドストーン信号を発生します。",
+  "tooltip.oritech.accelerator_sensor": "この中を通過する粒子の速度に基づいてレッドストーン信号を発します。",
   "button.oritech.enchanter.bane_of_long_names": "長過ぎるエンチャ名はやめろください",
   "title.oritech.enchanter.catalysts_available": "%d / %d カタリストが利用可能",
   "title.oritech.enchanter.catalysts": "%d / %d カタリスト",
