@@ -50,7 +50,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::setChanged, new InventorySlotAssignment(0, 2, 2, 1));
     
     @SyncField({SyncType.TICK, SyncType.INITIAL})
-    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), this::setChanged);
     
     public SmallTankEntity(BlockPos pos, BlockState state, boolean isCreative) {
         super(isCreative ? BlockEntitiesContent.CREATIVE_TANK_ENTITY : BlockEntitiesContent.SMALL_TANK_ENTITY, pos, state);

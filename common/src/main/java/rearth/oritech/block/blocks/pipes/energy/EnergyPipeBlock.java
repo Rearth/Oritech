@@ -76,7 +76,7 @@ public class EnergyPipeBlock extends GenericPipeBlock {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         var text = Component.translatable("tooltip.oritech.energy_max_transfer").withStyle(ChatFormatting.GRAY)
-            .append(Component.translatable("tooltip.oritech.energy_transfer_rate", Oritech.CONFIG.energyPipeTransferRate()).formatted(ChatFormatting.GOLD));
+            .append(Component.translatable("tooltip.oritech.energy_transfer_rate", Oritech.CONFIG.energyPipeTransferRate()).withStyle(ChatFormatting.GOLD));
         tooltip.add(text);
         super.appendHoverText(stack, context, tooltip, options);
     }

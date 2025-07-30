@@ -56,7 +56,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     private final int energyPerStep = Oritech.CONFIG.deepDrillConfig.energyPerStep();
     
     // storage
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.deepDrillConfig.energyCapacity(), 0, 0, this::markDirty);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.deepDrillConfig.energyCapacity(), 0, 0, this::setChanged);
     
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(1, this::setChanged);
     

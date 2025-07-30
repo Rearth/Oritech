@@ -29,7 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEntityTicker<ParticleCollectorBlockEntity>, EnergyApi.BlockProvider, GeoBlockEntity {
     
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.collectorEnergyStorage(), 0, Oritech.CONFIG.collectorEnergyStorage(), this::markDirty);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.collectorEnergyStorage(), 0, Oritech.CONFIG.collectorEnergyStorage(), this::setChanged);
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     public static final RawAnimation WORK = RawAnimation.begin().thenPlayAndHold("collect");

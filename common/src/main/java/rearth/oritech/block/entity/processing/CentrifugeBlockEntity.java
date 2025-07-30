@@ -39,7 +39,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
     @SyncField(SyncType.GUI_TICK)
-    public final SimpleInOutFluidStorage fluidContainer = new SimpleInOutFluidStorage(Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleInOutFluidStorage fluidContainer = new SimpleInOutFluidStorage(Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidStackHooks.bucketAmount(), this::setChanged);
     
     @SyncField(SyncType.GUI_OPEN)
     public boolean hasFluidAddon = false;

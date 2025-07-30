@@ -60,7 +60,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     public final HashMap<Vector2i, ComponentStatistics> componentStats = new HashMap<>(); // mainly for client displays, same grid
     
     @SyncField(SyncType.GUI_TICK)
-    public SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(0, Oritech.CONFIG.reactorMaxEnergyStored(), Oritech.CONFIG.reactorMaxEnergyStored(), this::markDirty);
+    public SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(0, Oritech.CONFIG.reactorMaxEnergyStored(), Oritech.CONFIG.reactorMaxEnergyStored(), this::setChanged);
     
     public boolean active = false;
     

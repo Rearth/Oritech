@@ -13,7 +13,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 
 public class AcceleratorMotorBlockEntity extends BlockEntity implements EnergyApi.BlockProvider {
     
-    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(Oritech.CONFIG.acceleratorMotorRFCapacity(), Oritech.CONFIG.acceleratorMotorRFCapacity(), Oritech.CONFIG.acceleratorMotorRFCapacity(), this::markDirty);
+    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(Oritech.CONFIG.acceleratorMotorRFCapacity(), Oritech.CONFIG.acceleratorMotorRFCapacity(), Oritech.CONFIG.acceleratorMotorRFCapacity(), this::setChanged);
     
     public AcceleratorMotorBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ACCELERATOR_MOTOR_BLOCK_ENTITY, pos, state);

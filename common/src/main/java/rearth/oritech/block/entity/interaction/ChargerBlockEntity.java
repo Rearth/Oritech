@@ -46,7 +46,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
                                                                  ScreenProvider, ExtendedMenuProvider {
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.charger.energyCapacity(), Oritech.CONFIG.charger.maxEnergyInsertion(), Oritech.CONFIG.charger.maxEnergyExtraction(), this::markDirty);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.charger.energyCapacity(), Oritech.CONFIG.charger.maxEnergyInsertion(), Oritech.CONFIG.charger.maxEnergyExtraction(), this::setChanged);
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::setChanged);
