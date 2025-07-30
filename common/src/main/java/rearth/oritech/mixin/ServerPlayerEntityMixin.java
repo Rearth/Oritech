@@ -12,10 +12,10 @@ import rearth.oritech.Oritech;
 public class ServerPlayerEntityMixin {
     
     @Inject(
-      method = "copyFrom",
+      method = "restoreFrom",
       at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/server/network/ServerPlayerEntity;setHealth(F)V"
+        target = "Lnet/minecraft/server/level/ServerPlayer;setHealth(F)V"
       )
     )
     private void onCopyFrom(ServerPlayer oldPlayer, boolean alive, CallbackInfo ci) {
