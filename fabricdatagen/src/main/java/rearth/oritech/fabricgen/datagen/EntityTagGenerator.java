@@ -15,7 +15,7 @@ public class EntityTagGenerator extends FabricTagProvider.EntityTypeTagProvider 
     
     @Override
     protected void addTags(HolderLookup.Provider wrapperLookup) {
-        tag(TagContent.SPAWNER_BLACKLIST)
+        getOrCreateTagBuilder(TagContent.SPAWNER_BLACKLIST)
           .add(EntityType.ENDER_DRAGON);    // this should never actually be loaded, but it's here as a failsafe
     }
 }

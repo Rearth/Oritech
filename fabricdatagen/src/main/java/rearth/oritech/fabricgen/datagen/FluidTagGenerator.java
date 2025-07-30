@@ -34,21 +34,21 @@ public class FluidTagGenerator extends FabricTagProvider.FluidTagProvider {
 //            .addOptional(Oritech.id("flowing_molten_energite")).addOptional(Oritech.id("still_molten_energite"))
 //            .addOptional(Oritech.id("flowing_molten_fluxite")).addOptional(Oritech.id("still_molten_fluxite"));
         
-        tag(cFluidTag("biodiesel")).add(FluidContent.STILL_BIOFUEL.get());
-        tag(cFluidTag("high_power_biodiesel")).add(FluidContent.STILL_FUEL.get());
+        getOrCreateTagBuilder(cFluidTag("biodiesel")).add(FluidContent.STILL_BIOFUEL.get());
+        getOrCreateTagBuilder(cFluidTag("high_power_biodiesel")).add(FluidContent.STILL_FUEL.get());
         
-        tag(ConventionalFluidTags.GASEOUS)
+        getOrCreateTagBuilder(ConventionalFluidTags.GASEOUS)
             .add(FluidContent.FLOWING_STEAM.get()).add(FluidContent.STILL_STEAM.get());
-        tag(cFluidTag("steam"))
+        getOrCreateTagBuilder(cFluidTag("steam"))
             .add(FluidContent.FLOWING_STEAM.get()).add(FluidContent.STILL_STEAM.get());
         
-        tag(TagContent.OIL)
+        getOrCreateTagBuilder(TagContent.OIL)
             .add(FluidContent.STILL_OIL.get());
         
-        tag(TagContent.BIOFUEL)
+        getOrCreateTagBuilder(TagContent.BIOFUEL)
             .add(FluidContent.STILL_BIOFUEL.get());
         
-        tag(TagContent.TURBOFUEL)
+        getOrCreateTagBuilder(TagContent.TURBOFUEL)
             .add(FluidContent.STILL_FUEL.get());
     }
 }
