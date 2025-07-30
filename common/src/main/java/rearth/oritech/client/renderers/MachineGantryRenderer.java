@@ -33,7 +33,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
     }
     
     @Override
-    public boolean rendersOutsideBoundingBox(FrameInteractionBlockEntity blockEntity) {
+    public boolean shouldRenderOffScreen(FrameInteractionBlockEntity blockEntity) {
         return true;
     }
     

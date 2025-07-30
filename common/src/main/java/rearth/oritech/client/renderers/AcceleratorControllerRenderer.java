@@ -31,7 +31,7 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
     }
     
     @Override
-    public boolean rendersOutsideBoundingBox(AcceleratorControllerBlockEntity blockEntity) {
+    public boolean shouldRenderOffScreen(AcceleratorControllerBlockEntity blockEntity) {
         return true;
     }
     @Override

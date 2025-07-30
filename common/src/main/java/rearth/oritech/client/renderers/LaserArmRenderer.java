@@ -52,7 +52,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
     }
     
     @Override
-    public boolean rendersOutsideBoundingBox(T blockEntity) {
+    public boolean shouldRenderOffScreen(T blockEntity) {
         return true;
     }
     
