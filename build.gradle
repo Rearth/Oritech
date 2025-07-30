@@ -114,10 +114,20 @@ subprojects {
 
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
+
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
     }
 
-    tasks.withType(JavaCompile).configureEach {
-        it.options.release = 21
+    tasks {
+        withType(GenerateModuleMetadata).configureEach {
+            enabled = false
+        }
+        withType(JavaCompile).configureEach {
+            options.encoding = "UTF-8"
+            options.release = 21
+        }
     }
 
     // Configure Maven publishing.
