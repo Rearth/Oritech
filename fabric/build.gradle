@@ -70,7 +70,7 @@ dependencies {
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
         case "emi": modRuntimeOnly "dev.emi:emi-fabric:${emi_version}"; break
         case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:16.0.754"; break
-        case "jei": modRuntimeOnly "mezz.jei:jei-1.21.1-fabric:${jei_version}"
+        case "jei": modRuntimeOnly "mezz.jei:jei-1.21.1-fabric:${jei_version}"; break
         case "disabled": break
         default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, JEI, or disabled.")
     }
