@@ -17,10 +17,10 @@ wiki {
     }
 }
 
-task runDatagenNeoforge(type: GradleBuild) {
-    buildFile = 'neoforgedatagen/build.gradle'
-    tasks = ['runData']
-}
+//task runDatagenNeoforge(type: GradleBuild) {
+//    buildFile = 'neoforgedatagen/build.gradle'
+//    tasks = ['runData']
+//}
 
 architectury {
     minecraft = project.minecraft_version
@@ -42,12 +42,12 @@ subprojects {
         archivesName = "$rootProject.archives_name-$project.name"
     }
 
-    loom {
-        runs.configureEach {
-            vmArg("-Dmixin.env.remapRefMap=true")
-            vmArg("-Dmixin.env.refMapRemappingFile=${projectDir}/build/createSrgToMcp/output.srg")
-        }
-    }
+//    loom {
+//        runs.configureEach {
+//            vmArg("-Dmixin.env.remapRefMap=true")
+//            vmArg("-Dmixin.env.refMapRemappingFile=${projectDir}/build/createSrgToMcp/output.srg")
+//        }
+//    }
 
 
     repositories {
