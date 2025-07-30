@@ -1,5 +1,6 @@
 package rearth.oritech.init.compat.jei;
 
+import java.util.List;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableAnimated;
@@ -9,10 +10,10 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -29,7 +30,7 @@ public class OritechJeiLaserRecipe implements IRecipeCategory<OritechRecipe> {
     public final IDrawableStatic background;
     public final IDrawableStatic laserBackground;
     
-    public static final Identifier LASER_RECIPE_OVERLAY = Oritech.id("textures/gui/modular/laser_recipe_background_jei.png");
+    public static final ResourceLocation LASER_RECIPE_OVERLAY = Oritech.id("textures/gui/modular/laser_recipe_background_jei.png");
     
     public OritechJeiLaserRecipe(IGuiHelper helper) {
         this.type = RecipeContent.LASER;
@@ -49,8 +50,8 @@ public class OritechJeiLaserRecipe implements IRecipeCategory<OritechRecipe> {
     }
     
     @Override
-    public @NotNull Text getTitle() {
-        return Text.translatable("emi.category.oritech." + type.getIdentifier().getPath());
+    public @NotNull Component getTitle() {
+        return Component.translatable("emi.category.oritech." + type.getIdentifier().getPath());
     }
     
     @Override
@@ -69,7 +70,7 @@ public class OritechJeiLaserRecipe implements IRecipeCategory<OritechRecipe> {
     }
     
     @Override
-    public void draw(OritechRecipe recipe, IRecipeSlotsView recipeSlotsView, DrawContext guiGraphics, double mouseX, double mouseY) {
+    public void draw(OritechRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         
         arrow.draw(guiGraphics, 105, 15);
         laserBackground.draw(guiGraphics, 10, 5);

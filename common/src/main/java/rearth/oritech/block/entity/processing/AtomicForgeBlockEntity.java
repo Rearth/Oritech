@@ -1,12 +1,5 @@
 package rearth.oritech.block.entity.processing;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
@@ -20,6 +13,13 @@ import rearth.oritech.util.InventorySlotAssignment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
@@ -48,7 +48,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    protected Optional<RecipeEntry<OritechRecipe>> getRecipe() {
+    protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
         var result = super.getRecipe();
         
         // also adjust energy storage when getting recipe
@@ -111,7 +111,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.ATOMIC_FORGE_SCREEN;
     }
     
@@ -145,7 +145,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
-        buf.writeBlockPos(pos);
+    public void saveExtraData(FriendlyByteBuf buf) {
+        buf.writeBlockPos(worldPosition);
     }
 }

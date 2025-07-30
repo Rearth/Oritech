@@ -2,23 +2,26 @@ package rearth.oritech.block.blocks.storage;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import java.util.List;
+import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.init.BlockContent;
@@ -26,38 +29,38 @@ import rearth.oritech.init.BlockEntitiesContent;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
-public class UnstableContainerBlock extends Block implements BlockEntityProvider {
+public class UnstableContainerBlock extends Block implements EntityBlock {
     
-    public static final BooleanProperty SETUP_DONE = BooleanProperty.of("setup");
+    public static final BooleanProperty SETUP_DONE = BooleanProperty.create("setup");
     
-    public UnstableContainerBlock(Settings settings) {
+    public UnstableContainerBlock(Properties settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(ASSEMBLED, false).with(SETUP_DONE, false));
+        registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false).setValue(SETUP_DONE, false));
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED);
         builder.add(SETUP_DONE);
     }
     
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.ENTITYBLOCK_ANIMATED;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
     
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new UnstableContainerBlockEntity(pos, state);
     }
     
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         
-        super.onPlaced(world, pos, state, placer, itemStack);
+        super.setPlacedBy(world, pos, state, placer, itemStack);
         
-        if (world.isClient) {
+        if (world.isClientSide) {
             return;
         }
         
@@ -67,14 +70,14 @@ public class UnstableContainerBlock extends Block implements BlockEntityProvider
         var corePositions = machine.getCorePositions();
         
         for (var coreOffset : corePositions) {
-            var coreWorldPos = pos.add(coreOffset);
+            var coreWorldPos = pos.offset(coreOffset);
             var coreState = world.getBlockState(coreWorldPos);
             if (!coreState.isAir()) {
-                var breakingPlayer = placer instanceof PlayerEntity ? (PlayerEntity) placer : null;
-                coreState.getBlock().onBreak(world, coreWorldPos, coreState, breakingPlayer);
-                world.breakBlock(coreWorldPos, true, placer, 1);
+                var breakingPlayer = placer instanceof Player ? (Player) placer : null;
+                coreState.getBlock().playerWillDestroy(world, coreWorldPos, coreState, breakingPlayer);
+                world.destroyBlock(coreWorldPos, true, placer, 1);
             }
-            world.setBlockState(coreWorldPos, BlockContent.MACHINE_CORE_HIDDEN.getDefaultState());
+            world.setBlockAndUpdate(coreWorldPos, BlockContent.MACHINE_CORE_HIDDEN.defaultBlockState());
         }
         
         machine.initMultiblock(state);
@@ -82,20 +85,20 @@ public class UnstableContainerBlock extends Block implements BlockEntityProvider
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClient) {
+        if (!world.isClientSide) {
             var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
+                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

@@ -1,13 +1,12 @@
 package rearth.oritech.api.attachment;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.util.Identifier;
-
 import java.util.function.Supplier;
+import net.minecraft.resources.ResourceLocation;
 
 public interface Attachment<A> {
     
-    Identifier identifier();
+    ResourceLocation identifier();
     
     Codec<A> persistenceCodec();
     

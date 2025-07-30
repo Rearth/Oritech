@@ -1,12 +1,5 @@
 package rearth.oritech.block.base.entity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.SyncField;
@@ -14,6 +7,13 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.ArrayList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class ExpandableMultiblockEnergyStorageBlockEntity extends ExpandableEnergyStorageBlockEntity implements MultiblockMachineController {
     
@@ -27,14 +27,14 @@ public abstract class ExpandableMultiblockEnergyStorageBlockEntity extends Expan
     }
     
     @Override
-    public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         addMultiblockToNbt(nbt);
     }
     
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         loadMultiblockNbtData(nbt);
     }
     
@@ -70,12 +70,12 @@ public abstract class ExpandableMultiblockEnergyStorageBlockEntity extends Expan
     
     @Override
     public BlockPos getPosForMultiblock() {
-        return pos;
+        return worldPosition;
     }
     
     @Override
-    public World getWorldForMultiblock() {
-        return world;
+    public Level getWorldForMultiblock() {
+        return level;
     }
     
     @Override

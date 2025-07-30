@@ -1,11 +1,11 @@
 package rearth.oritech.api.item.containers;
 
-import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.item.ItemApi;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import net.minecraft.world.item.ItemStack;
 
 public class DelegatingInventoryStorage implements ItemApi.InventoryStorage {
     

@@ -1,13 +1,14 @@
 package rearth.oritech.api.fluid;
 
+import J;
 import dev.architectury.fluid.FluidStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.fluid.containers.DelegatingFluidStorage;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 
 public class FluidApi {
     

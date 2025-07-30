@@ -1,9 +1,9 @@
 package rearth.oritech.api.energy.containers;
 
-import net.minecraft.item.ItemStack;
 import rearth.oritech.api.energy.EnergyApi;
 
 import java.util.function.Consumer;
+import net.minecraft.world.item.ItemStack;
 
 public class SimpleEnergyItemStorage extends SimpleEnergyStorage {
     

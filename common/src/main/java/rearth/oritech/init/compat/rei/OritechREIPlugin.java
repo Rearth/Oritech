@@ -8,7 +8,7 @@ import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.item.ItemConvertible;
+import net.minecraft.world.level.ItemLike;
 import rearth.oritech.block.entity.generators.BioGeneratorEntity;
 import rearth.oritech.block.entity.generators.FuelGeneratorEntity;
 import rearth.oritech.block.entity.generators.LavaGeneratorEntity;
@@ -102,12 +102,12 @@ public class OritechREIPlugin implements REIClientPlugin {
         registry.registerDraggableStackVisitor(new ReiItemFilterDraggableStackVisitor());
     }
 
-    private void registerOritechCategory(CategoryRegistry registry, OritechRecipeType recipeType, ItemConvertible machineIcon, BiFunction<OritechRecipeType, ItemConvertible, ? extends DisplayCategory<Display>> screenType) {
+    private void registerOritechCategory(CategoryRegistry registry, OritechRecipeType recipeType, ItemLike machineIcon, BiFunction<OritechRecipeType, ItemLike, ? extends DisplayCategory<Display>> screenType) {
         var oriCategory = screenType.apply(recipeType, machineIcon);
         registry.add(oriCategory);
     }
     
-    private void registerOriWorkstation(CategoryRegistry registry, OritechRecipeType recipeType, ItemConvertible machine) {
+    private void registerOriWorkstation(CategoryRegistry registry, OritechRecipeType recipeType, ItemLike machine) {
         registry.addWorkstations(CategoryIdentifier.of(recipeType.getIdentifier()), EntryStacks.of(machine));
     }
     

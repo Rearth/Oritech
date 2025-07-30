@@ -1,15 +1,15 @@
 package rearth.oritech.block.entity.storage;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEntity implements ComparatorOutputProvider {
 
@@ -49,7 +49,7 @@ public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEnti
     }
 
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         energyStorage.amount = (long) (Integer.MAX_VALUE * 0.9f);
         super.serverTick(world, pos, state, blockEntity);
     }

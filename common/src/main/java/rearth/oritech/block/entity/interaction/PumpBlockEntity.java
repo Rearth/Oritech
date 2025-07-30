@@ -1,21 +1,8 @@
 package rearth.oritech.block.entity.interaction;
 
+import Z;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
@@ -37,6 +24,22 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.Vec3;
 
 public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity {
     
@@ -47,7 +50,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     private final AnimationController<PumpBlockEntity> animationController = getAnimationController();
     
-    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
+    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::setChanged);
     
     private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(1000, 0, 20_000);
     private boolean initialized = false;
@@ -65,8 +68,8 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         fluidStorage.writeNbt(nbt, "");
         nbt.putBoolean("initialized", initialized);
         nbt.putLong("energy", energyStorage.getAmount());
@@ -76,18 +79,18 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         initialized = nbt.getBoolean("initialized");
         fluidStorage.readNbt(nbt, "");
         energyStorage.setAmount(nbt.getLong("energy"));
-        pendingLiquidPositions = Arrays.stream(nbt.getLongArray("pendingTargets")).mapToObj(BlockPos::fromLong).collect(Collectors.toCollection(ArrayDeque::new));
+        pendingLiquidPositions = Arrays.stream(nbt.getLongArray("pendingTargets")).mapToObj(BlockPos::of).collect(Collectors.toCollection(ArrayDeque::new));
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if ((initialized && pendingLiquidPositions.isEmpty() && world.getTime() % 62 == 0) || (!initialized && toolheadLowered && !searchActive && world.getTime() % 62 == 0)) {
+        if ((initialized && pendingLiquidPositions.isEmpty() && world.getGameTime() % 62 == 0) || (!initialized && toolheadLowered && !searchActive && world.getGameTime() % 62 == 0)) {
             // reset
             initialized = false;
             toolheadLowered = false;
@@ -100,64 +103,64 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
             return;
         }
         
-        if (world.getTime() % PUMP_RATE == 0 && hasEnoughEnergy() && world.getReceivedRedstonePower(pos) <= 0) {
+        if (world.getGameTime() % PUMP_RATE == 0 && hasEnoughEnergy() && world.getBestNeighborSignal(pos) <= 0) {
             
             if (pendingLiquidPositions.isEmpty() || tankIsFull()) return;
             
             var targetBlock = pendingLiquidPositions.peekLast();
             
-            if (!world.getBlockState(targetBlock).getFluidState().isStill()) {
+            if (!world.getBlockState(targetBlock).getFluidState().isSource()) {
                 pendingLiquidPositions.pollLast();
                 return;
             }
             
             var targetState = world.getFluidState(targetBlock);
-            if (!targetState.getFluid().matchesType(Fluids.WATER)) {
+            if (!targetState.getType().isSame(Fluids.WATER)) {
                 drainSourceBlock(targetBlock);
                 pendingLiquidPositions.pollLast();
             }
             
             addLiquidToTank(targetState);
             useEnergy();
-            this.markDirty();
-            lastWorkTime = world.getTime();
+            this.setChanged();
+            lastWorkTime = world.getGameTime();
             
             
-            var targetPos = pos.toCenterPos().addRandom(world.random, 0.5f);
-            var targetType = targetState.getParticle();
+            var targetPos = pos.getCenter().offsetRandom(world.random, 0.5f);
+            var targetType = targetState.getDripParticle();
             
-            if (targetType != null && world instanceof ServerWorld serverWorld)
-                serverWorld.spawnParticles(targetType, targetPos.getX(), targetPos.getY(), targetPos.getZ(), 1, 0, 0, 0, 1);
+            if (targetType != null && world instanceof ServerLevel serverWorld)
+                serverWorld.sendParticles(targetType, targetPos.x(), targetPos.y(), targetPos.z(), 1, 0, 0, 0, 1);
         }
         
     }
     
     private boolean isBusy() {
-        return world.getTime() - lastWorkTime < 40;
+        return level.getGameTime() - lastWorkTime < 40;
     }
     
-    public void onUsed(PlayerEntity player) {
+    public void onUsed(Player player) {
         
-        var message = Text.translatable("message.oritech.pump.starting");
+        var message = Component.translatable("message.oritech.pump.starting");
         if (!initialized) {
             if (!toolheadLowered) {
-                message = Text.translatable("message.oritech.pump.extending");
+                message = Component.translatable("message.oritech.pump.extending");
             } else if (searchActive) {
-                message = Text.translatable("message.oritech.pump.initializing");
+                message = Component.translatable("message.oritech.pump.initializing");
             } else {
-                message = Text.translatable("message.oritech.pump.no_fluids");
+                message = Component.translatable("message.oritech.pump.no_fluids");
             }
         } else if (isBusy()) {
-            message = Text.translatable("message.oritech.pump.busy");
+            message = Component.translatable("message.oritech.pump.busy");
         } else if (!hasEnoughEnergy()) {
-            message = Text.translatable("message.oritech.pump.low_energy");
+            message = Component.translatable("message.oritech.pump.low_energy");
         } else if (pendingLiquidPositions.isEmpty()) {
-            message = Text.translatable("message.oritech.pump.pump_finished");
+            message = Component.translatable("message.oritech.pump.pump_finished");
         } else if (tankIsFull()) {
-            message = Text.translatable("message.oritech.pump.full");
+            message = Component.translatable("message.oritech.pump.full");
         }
         
-        player.sendMessage(message, true);
+        player.displayClientMessage(message, true);
     }
     
     private boolean hasEnoughEnergy() {
@@ -173,11 +176,11 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     private void addLiquidToTank(FluidState targetState) {
-        fluidStorage.insert(FluidStack.create(targetState.getFluid(), FluidStackHooks.bucketAmount()), false);
+        fluidStorage.insert(FluidStack.create(targetState.getType(), FluidStackHooks.bucketAmount()), false);
     }
     
     private void drainSourceBlock(BlockPos targetBlock) {
-        world.setBlockState(targetBlock, Blocks.AIR.getDefaultState());
+        level.setBlockAndUpdate(targetBlock, Blocks.AIR.defaultBlockState());
     }
     
     private void progressStartup() {
@@ -192,12 +195,12 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         // mark startup as completed
         
         if (toolheadPosition == null) {
-            toolheadPosition = pos;
+            toolheadPosition = worldPosition;
         }
         
         if (!toolheadLowered) {
             
-            if (world.getTime() % 10 != 0)
+            if (level.getGameTime() % 10 != 0)
                 moveToolheadDown();
             
             return;
@@ -214,35 +217,35 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
     private void moveToolheadDown() {
         toolheadLowered = checkToolheadEnd(toolheadPosition);
         if (toolheadLowered) {
-            startLiquidSearch(toolheadPosition.down());
+            startLiquidSearch(toolheadPosition.below());
             return;
         }
         
-        toolheadPosition = toolheadPosition.down();
-        world.setBlockState(toolheadPosition, BlockContent.PUMP_TRUNK_BLOCK.getDefaultState());
+        toolheadPosition = toolheadPosition.below();
+        level.setBlockAndUpdate(toolheadPosition, BlockContent.PUMP_TRUNK_BLOCK.defaultBlockState());
     }
     
     private boolean checkToolheadEnd(BlockPos newPosition) {
         
-        var posBelow = newPosition.down();
-        var stateBelow = world.getBlockState(posBelow);
+        var posBelow = newPosition.below();
+        var stateBelow = level.getBlockState(posBelow);
         var blockBelow = stateBelow.getBlock();
         
-        var isAirOrTrunk = stateBelow.isReplaceable() || blockBelow.equals(BlockContent.PUMP_TRUNK_BLOCK);
-        var isStillFluid = stateBelow.getFluidState().isStill();
+        var isAirOrTrunk = stateBelow.canBeReplaced() || blockBelow.equals(BlockContent.PUMP_TRUNK_BLOCK);
+        var isStillFluid = stateBelow.getFluidState().isSource();
         
         return isStillFluid || !isAirOrTrunk;
     }
     
     private void startLiquidSearch(BlockPos start) {
         
-        var state = world.getFluidState(start);
-        if (!state.isStill()) return;
+        var state = level.getFluidState(start);
+        if (!state.isSource()) return;
         
-        searchInstance = new FloodFillSearch(start, world);
+        searchInstance = new FloodFillSearch(start, level);
         searchActive = true;
         
-        Oritech.LOGGER.debug("starting search at: " + start + " " + state.getFluid() + " " + state.isStill());
+        Oritech.LOGGER.debug("starting search at: " + start + " " + state.getType() + " " + state.isSource());
     }
     
     private void finishSearch() {
@@ -287,9 +290,9 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         final HashSet<BlockPos> checkedPositions = new HashSet<>();
         final HashSet<BlockPos> nextTargets = new HashSet<>();
         final Deque<BlockPos> foundTargets = new ArrayDeque<>();
-        final World world;
+        final Level world;
         
-        public FloodFillSearch(BlockPos startPosition, World world) {
+        public FloodFillSearch(BlockPos startPosition, Level world) {
             this.world = world;
             nextTargets.add(startPosition);
         }
@@ -319,7 +322,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         }
         
         private boolean checkForEarlyStop(BlockPos target) {
-            return world.getFluidState(target).getFluid().matchesType(Fluids.WATER);
+            return world.getFluidState(target).getType().isSame(Fluids.WATER);
         }
         
         private boolean cutoffSearch() {
@@ -328,7 +331,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         
         private boolean isValidTarget(BlockPos target) {
             var state = world.getFluidState(target);
-            return state.isStill();
+            return state.isSource();
         }
         
         private void addNeighborsToQueue(BlockPos self) {
@@ -342,7 +345,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         
         // returns all neighboring positions except up
         private List<BlockPos> getNeighbors(BlockPos pos) {
-            return List.of(pos.down(), pos.north(), pos.east(), pos.south(), pos.west());
+            return List.of(pos.below(), pos.north(), pos.east(), pos.south(), pos.west());
         }
         
     }

@@ -3,26 +3,27 @@ package rearth.oritech.block.entity.interaction;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
@@ -60,6 +61,10 @@ import java.util.Objects;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
+import I;
+import J;
+import Z;
+
 public class DronePortEntity extends NetworkedBlockEntity
   implements ItemApi.BlockProvider, FluidApi.BlockProvider, EnergyApi.BlockProvider,
                GeoBlockEntity, MultiblockMachineController, MachineAddonController, ExtendedMenuProvider,
@@ -75,22 +80,22 @@ public class DronePortEntity extends NetworkedBlockEntity
     
     // storage
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(1024 * 32, 10000, 0, this::markDirty);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(1024 * 32, 10000, 0, this::setChanged);
     
-    public final DronePortItemInventory inventory = new DronePortItemInventory(15, this::markDirty);
+    public final DronePortItemInventory inventory = new DronePortItemInventory(15, this::setChanged);
     
     @SyncField(SyncType.GUI_TICK)
-    public final DronePortFluidStorage fluidStorage = new DronePortFluidStorage(128 * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final DronePortFluidStorage fluidStorage = new DronePortFluidStorage(128 * FluidStackHooks.bucketAmount(), this::setChanged);
     
     // not persisted, only to assign targets
-    protected final SimpleInventory cardInventory = new SimpleInventory(2) {
+    protected final SimpleContainer cardInventory = new SimpleContainer(2) {
         @Override
-        public void markDirty() {
-            DronePortEntity.this.markDirty();
+        public void setChanged() {
+            DronePortEntity.this.setChanged();
         }
         
         @Override
-        public boolean canInsert(ItemStack stack) {
+        public boolean canAddItem(ItemStack stack) {
             return stack.getItem() instanceof LaserTargetDesignator;
         }
     };
@@ -133,13 +138,13 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         checkPositionCard();
         
         if (incomingPacket != null)
             checkIncomingAnimation();
         
-        if (world.getTime() % 20 == 0) {
+        if (world.getGameTime() % 20 == 0) {
             if (incomingPacket != null) {
                 tryReceivePacket();
             } else if (canSend()) {
@@ -150,25 +155,25 @@ public class DronePortEntity extends NetworkedBlockEntity
     
     private void checkPositionCard() {
         
-        var source = cardInventory.getHeldStacks().get(0);
-        if (source.getItem() instanceof LaserTargetDesignator && source.contains(ComponentContent.TARGET_POSITION.get())) {
+        var source = cardInventory.getItems().get(0);
+        if (source.getItem() instanceof LaserTargetDesignator && source.has(ComponentContent.TARGET_POSITION.get())) {
             var target = source.get(ComponentContent.TARGET_POSITION.get());
             setTargetFromDesignator(target);
         } else {
             return;
         }
         
-        cardInventory.getHeldStacks().set(1, source);
-        cardInventory.getHeldStacks().set(0, ItemStack.EMPTY);
-        cardInventory.markDirty();
-        this.markDirty();
+        cardInventory.getItems().set(1, source);
+        cardInventory.getItems().set(0, ItemStack.EMPTY);
+        cardInventory.setChanged();
+        this.setChanged();
         
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.getHeldStacks(), false, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
+        ContainerHelper.saveAllItems(nbt, inventory.getHeldStacks(), false, registryLookup);
         addMultiblockToNbt(nbt);
         writeAddonToNbt(nbt);
         fluidStorage.writeNbt(nbt, "");
@@ -180,15 +185,15 @@ public class DronePortEntity extends NetworkedBlockEntity
             nbt.putLong("target_position", targetPosition.asLong());
         }
         
-        var cardCompound = new NbtCompound();
-        Inventories.writeNbt(cardCompound, cardInventory.getHeldStacks(), false, registryLookup);
+        var cardCompound = new CompoundTag();
+        ContainerHelper.saveAllItems(cardCompound, cardInventory.getItems(), false, registryLookup);
         nbt.put("cards", cardCompound);
         
         if (incomingPacket != null) {
-            var compound = new NbtCompound();
-            DefaultedList<ItemStack> list = DefaultedList.ofSize(incomingPacket.transferredStacks.size());
+            var compound = new CompoundTag();
+            NonNullList<ItemStack> list = NonNullList.createWithCapacity(incomingPacket.transferredStacks.size());
             list.addAll(incomingPacket.transferredStacks);
-            Inventories.writeNbt(compound, list, false, registryLookup);
+            ContainerHelper.saveAllItems(compound, list, false, registryLookup);
             nbt.put("incoming", compound);
             FluidStack.CODEC.encodeStart(NbtOps.INSTANCE, incomingPacket.movedFluid).result().ifPresent(tag -> nbt.put("fluidmoving", tag));
             nbt.putLong("incomingTime", incomingPacket.arrivesAt);
@@ -198,9 +203,9 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        Inventories.readNbt(nbt, inventory.getHeldStacks(), registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
+        ContainerHelper.loadAllItems(nbt, inventory.getHeldStacks(), registryLookup);
         loadMultiblockNbtData(nbt);
         loadAddonNbtData(nbt);
         fluidStorage.readNbt(nbt, "");
@@ -208,13 +213,13 @@ public class DronePortEntity extends NetworkedBlockEntity
         hasFluidAddon = nbt.getBoolean("has_fluid_addon");
         disabledViaRedstone = nbt.getBoolean("disabled_via_redstone");
         energyStorage.amount = nbt.getLong("energy_stored");
-        targetPosition = BlockPos.fromLong(nbt.getLong("target_position"));
+        targetPosition = BlockPos.of(nbt.getLong("target_position"));
         
-        Inventories.readNbt(nbt.getCompound("cards"), cardInventory.getHeldStacks(), registryLookup);
+        ContainerHelper.loadAllItems(nbt.getCompound("cards"), cardInventory.getItems(), registryLookup);
         
         if (nbt.contains("incoming")) {
-            DefaultedList<ItemStack> list = DefaultedList.ofSize(15, ItemStack.EMPTY);
-            Inventories.readNbt(nbt.getCompound("incoming"), list, registryLookup);
+            NonNullList<ItemStack> list = NonNullList.withSize(15, ItemStack.EMPTY);
+            ContainerHelper.loadAllItems(nbt.getCompound("incoming"), list, registryLookup);
             var fluid = FluidStack.CODEC.parse(NbtOps.INSTANCE, nbt.get("fluidmoving")).result().orElse(FluidStack.empty());
             var arrivalTime = nbt.getLong("incomingTime");
             incomingPacket = new DroneTransferData(list, fluid, arrivalTime);
@@ -226,10 +231,10 @@ public class DronePortEntity extends NetworkedBlockEntity
         MachineAddonController.super.initAddons();
         
         // Trigger block updates for pipes to connect
-        world.updateNeighbors(pos, getCachedState().getBlock());
+        level.blockUpdated(worldPosition, getBlockState().getBlock());
         for (Vec3i corePosition : getCorePositions()) {
             var worldPos = new BlockPos(Geometry.offsetToWorldPosition(getFacingForMultiblock(), corePosition, getPosForAddon()));
-            world.updateNeighbors(worldPos, world.getBlockState(worldPos).getBlock());
+            level.blockUpdated(worldPos, level.getBlockState(worldPos).getBlock());
         }
     }
     
@@ -247,13 +252,13 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
     
     private void checkIncomingAnimation() {
-        if (world.getTime() == incomingPacket.arrivesAt - landTime) {
+        if (level.getGameTime() == incomingPacket.arrivesAt - landTime) {
             triggerNetworkReceiveAnimation();
         }
     }
     
     private void tryReceivePacket() {
-        var hasArrived = world.getTime() - incomingPacket.arrivesAt > 0;
+        var hasArrived = level.getGameTime() - incomingPacket.arrivesAt > 0;
         if (!hasArrived) return;
         
         Oritech.LOGGER.debug("receiving drone package: " + incomingPacket);
@@ -266,7 +271,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         }
         
         if (totalInserted != totalToInsert) {
-            Oritech.LOGGER.warn("Something weird has happened with drone port item storage. Caused at: " + pos);
+            Oritech.LOGGER.warn("Something weird has happened with drone port item storage. Caused at: " + worldPosition);
             return;
         }
         
@@ -276,23 +281,23 @@ public class DronePortEntity extends NetworkedBlockEntity
         
         receivingPackage = false;
         incomingPacket = null;
-        markDirty();
+        setChanged();
     }
     
     private void sendDrone() {
-        var targetPort = (DronePortEntity) world.getBlockEntity(targetPosition);
-        var arriveTime = world.getTime() + takeOffTime + landTime;
+        var targetPort = (DronePortEntity) level.getBlockEntity(targetPosition);
+        var arriveTime = level.getGameTime() + takeOffTime + landTime;
         var data = new DroneTransferData(inventory.getHeldStacks().stream().filter(stack -> !stack.isEmpty()).toList(), fluidStorage.getStack(), arriveTime);
         targetPort.setIncomingPacket(data);
         
-        inventory.clear();
+        inventory.clearContent();
         fluidStorage.setStack(FluidStack.empty());
-        lastSentAt = world.getTime();
+        lastSentAt = level.getGameTime();
         energyStorage.amount -= calculateEnergyUsage();
         
         triggerNetworkSendAnimation();
-        targetPort.markDirty();
-        this.markDirty();
+        targetPort.setChanged();
+        this.setChanged();
         
         Oritech.LOGGER.debug("sending drone package: " + data);
     }
@@ -319,7 +324,7 @@ public class DronePortEntity extends NetworkedBlockEntity
      * @return true if drone is sending a package
      */
     public boolean isSendingDrone() {
-        var diff = world.getTime() - lastSentAt;
+        var diff = level.getGameTime() - lastSentAt;
         return diff < takeOffTime;
     }
     
@@ -327,7 +332,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         
         if (disabledViaRedstone || targetPosition == null || (inventory.isEmpty() && fluidStorage.getAmount() == 0) || energyStorage.amount < calculateEnergyUsage() || incomingPacket != null)
             return false;
-        var targetEntity = world.getBlockEntity(targetPosition);
+        var targetEntity = level.getBlockEntity(targetPosition);
         if (!(targetEntity instanceof DronePortEntity targetPort) || targetPort.disabledViaRedstone || targetPort.getIncomingPacket() != null || !targetPort.canAcceptPayload(inventory.getHeldStacks(), fluidStorage.getStack()))
             return false;
         
@@ -337,7 +342,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     
     private long calculateEnergyUsage() {
         if (targetPosition == null) return baseEnergyUsage;
-        var distance = pos.getManhattanDistance(targetPosition);
+        var distance = worldPosition.distManhattan(targetPosition);
         return (long) Math.sqrt(distance) * 50 + baseEnergyUsage;
     }
     
@@ -352,20 +357,20 @@ public class DronePortEntity extends NetworkedBlockEntity
     public boolean setTargetFromDesignator(BlockPos targetPos) {
         
         // if target is coreblock, adjust it to point to controller if connected
-        var targetState = Objects.requireNonNull(world).getBlockState(targetPos);
-        if (targetState.getBlock() instanceof MachineCoreBlock && targetState.get(MachineCoreBlock.USED)) {
-            var coreEntity = (MachineCoreEntity) world.getBlockEntity(targetPos);
+        var targetState = Objects.requireNonNull(level).getBlockState(targetPos);
+        if (targetState.getBlock() instanceof MachineCoreBlock && targetState.getValue(MachineCoreBlock.USED)) {
+            var coreEntity = (MachineCoreEntity) level.getBlockEntity(targetPos);
             var controllerPos = Objects.requireNonNull(coreEntity).getControllerPos();
             if (controllerPos != null) targetPos = controllerPos;
         }
         
-        var distance = targetPos.getManhattanDistance(pos);
+        var distance = targetPos.distManhattan(worldPosition);
         if (distance < 50) {
             statusMessage = "message.oritech.drone.invalid_distance";
             return false;
         }
         
-        if (world.getBlockState(targetPos).getBlock() instanceof DronePortBlock) {
+        if (level.getBlockState(targetPos).getBlock() instanceof DronePortBlock) {
             // store position
             this.targetPosition = targetPos;
             statusMessage = "message.oritech.drone.target_set";
@@ -406,17 +411,17 @@ public class DronePortEntity extends NetworkedBlockEntity
     
     @Override
     public Direction getFacingForMultiblock() {
-        return Objects.requireNonNull(world).getBlockState(getPos()).get(Properties.HORIZONTAL_FACING).getOpposite();
+        return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite();
     }
     
     @Override
     public BlockPos getPosForAddon() {
-        return pos;
+        return worldPosition;
     }
     
     @Override
-    public World getWorldForAddon() {
-        return world;
+    public Level getWorldForAddon() {
+        return level;
     }
     
     @Override
@@ -493,7 +498,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     
     @Override
     public Direction getFacingForAddon() {
-        return Objects.requireNonNull(world).getBlockState(getPos()).get(Properties.HORIZONTAL_FACING);
+        return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
     
     @Override
@@ -509,7 +514,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     @Override
     public void setBaseAddonData(BaseAddonData data) {
         this.addonData = data;
-        this.markDirty();
+        this.setChanged();
     }
     
     public DroneTransferData getIncomingPacket() {
@@ -521,7 +526,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
     
     public boolean isActive(BlockState state) {
-        return state.get(ASSEMBLED);
+        return state.getValue(ASSEMBLED);
     }
     
     @Override
@@ -536,7 +541,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "machine", 0, state -> {
             if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
-                var targetAnim = isActive(getCachedState()) ? MachineBlockEntity.IDLE : MachineBlockEntity.PACKAGED;
+                var targetAnim = isActive(getBlockState()) ? MachineBlockEntity.IDLE : MachineBlockEntity.PACKAGED;
                 state.resetCurrentAnimation();
                 return state.setAndContinue(targetAnim);
             } else {
@@ -565,7 +570,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         if (inventory.getHeldStacks().size() <= slot)
             return hasFluidAddon ? ComparatorOutputProvider.getFluidStorageComparatorOutput(fluidStorage) : 0;
         
-        var stack = inventory.getStack(slot);
+        var stack = inventory.getItem(slot);
         if (stack.isEmpty()) return
                                hasFluidAddon ? ComparatorOutputProvider.getFluidStorageComparatorOutput(fluidStorage) : 0;
         
@@ -577,9 +582,9 @@ public class DronePortEntity extends NetworkedBlockEntity
     @Override
     public int getComparatorProgress() {
         if (isSendingDrone()) {
-            return (int) (((world.getTime() - lastSentAt) / (float) takeOffTime) * 15);
+            return (int) (((level.getGameTime() - lastSentAt) / (float) takeOffTime) * 15);
         } else if (incomingPacket != null) {
-            return (int) ((totalFlightTime + (world.getTime() - incomingPacket.arrivesAt)) / (float) (totalFlightTime) * 15);
+            return (int) ((totalFlightTime + (level.getGameTime() - incomingPacket.arrivesAt)) / (float) (totalFlightTime) * 15);
         } else {
             return 0;
         }
@@ -613,19 +618,19 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
+    public void saveExtraData(FriendlyByteBuf buf) {
         sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(pos);
+        buf.writeBlockPos(worldPosition);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.of("");
+    public Component getDisplayName() {
+        return Component.nullToEmpty("");
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new DroneScreenHandler(syncId, playerInventory, this);
     }
     
@@ -668,12 +673,12 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public Inventory getDisplayedInventory() {
+    public Container getDisplayedInventory() {
         return inventory;
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.DRONE_SCREEN;
     }
     
@@ -687,7 +692,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         return false;
     }
     
-    public SimpleInventory getCardInventory() {
+    public SimpleContainer getCardInventory() {
         return cardInventory;
     }
     
@@ -697,12 +702,12 @@ public class DronePortEntity extends NetworkedBlockEntity
     
     @Override
     public BlockPos getPosForMultiblock() {
-        return pos;
+        return worldPosition;
     }
     
     @Override
-    public World getWorldForMultiblock() {
-        return world;
+    public Level getWorldForMultiblock() {
+        return level;
     }
     
     public record DroneTransferData(List<ItemStack> transferredStacks, FluidStack movedFluid, long arrivesAt) {

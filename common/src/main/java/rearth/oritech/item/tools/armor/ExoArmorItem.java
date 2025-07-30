@@ -1,28 +1,5 @@
 package rearth.oritech.item.tools.armor;
 
-import net.minecraft.client.render.entity.model.BipedEntityModel;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.type.AttributeModifierSlot;
-import net.minecraft.component.type.AttributeModifiersComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -39,52 +16,72 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 
 public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandler {
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
-    public ExoArmorItem(RegistryEntry<ArmorMaterial> material, Type type, Settings settings) {
+    public ExoArmorItem(Holder<ArmorMaterial> material, Type type, Properties settings) {
         super(material, type, settings);
     }
     
     @Override
-    public ComponentMap getComponents() {
-        return super.getComponents();
+    public DataComponentMap components() {
+        return super.components();
     }
     
     @Override
-    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+    public boolean isValidRepairItem(ItemStack stack, ItemStack ingredient) {
         return false;
     }
     
     @Override
-    public boolean isItemBarVisible(ItemStack stack) {
+    public boolean isBarVisible(ItemStack stack) {
         return false;
     }
     
     @Override
-    public AttributeModifiersComponent getAttributeModifiers() {
-        var slotType = this.getSlotType();
-        if (slotType != EquipmentSlot.LEGS) return super.getAttributeModifiers();
+    public ItemAttributeModifiers getDefaultAttributeModifiers() {
+        var slotType = this.getEquipmentSlot();
+        if (slotType != EquipmentSlot.LEGS) return super.getDefaultAttributeModifiers();
         
-        return super.getAttributeModifiers()
-                 .with(EntityAttributes.GENERIC_MOVEMENT_SPEED, new EntityAttributeModifier(Oritech.id("exo_move_speed"), 0.2, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE), AttributeModifierSlot.LEGS)
-                 .with(EntityAttributes.GENERIC_FLYING_SPEED, new EntityAttributeModifier(Oritech.id("exo_fly_speed"), 0.2, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE), AttributeModifierSlot.LEGS);
+        return super.getDefaultAttributeModifiers()
+                 .withModifierAdded(Attributes.MOVEMENT_SPEED, new AttributeModifier(Oritech.id("exo_move_speed"), 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.LEGS)
+                 .withModifierAdded(Attributes.FLYING_SPEED, new AttributeModifier(Oritech.id("exo_fly_speed"), 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.LEGS);
     }
     
     @Override
-    public void onEquipped(PlayerEntity playerEntity, ItemStack stack) {
+    public void onEquipped(Player playerEntity, ItemStack stack) {
         
-        if (this.getSlotType() == EquipmentSlot.HEAD)
-            playerEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false, false));
+        if (this.getEquipmentSlot() == EquipmentSlot.HEAD)
+            playerEntity.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false, false));
     }
     
     @Override
-    public void onUnequipped(PlayerEntity playerEntity, ItemStack stack) {
+    public void onUnequipped(Player playerEntity, ItemStack stack) {
         
-        if (this.getSlotType() == EquipmentSlot.HEAD)
-            playerEntity.removeStatusEffect(StatusEffects.NIGHT_VISION);
+        if (this.getEquipmentSlot() == EquipmentSlot.HEAD)
+            playerEntity.removeEffect(MobEffects.NIGHT_VISION);
     }
     
     @Override
@@ -93,7 +90,7 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
             private GeoArmorRenderer<?> renderer;
             
             @Override
-            public @Nullable <T extends LivingEntity> BipedEntityModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable BipedEntityModel<T> original) {
+            public @Nullable <T extends LivingEntity> HumanoidModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable HumanoidModel<T> original) {
                 
                 if (this.renderer == null)
                     this.renderer = new ExosuitArmorRenderer(getModel(), Oritech.id("armor/exo_armor"));
@@ -103,7 +100,7 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
         });
     }
     
-    public Identifier getModel() {
+    public ResourceLocation getModel() {
         return Oritech.id("armor/exo_armor");
     }
     
@@ -118,8 +115,8 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
-        tooltip.add(Text.translatable("tooltip.oritech." + Registries.ITEM.getId(stack.getItem()).getPath()).formatted(Formatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+        super.appendHoverText(stack, context, tooltip, type);
+        tooltip.add(Component.translatable("tooltip.oritech." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()).withStyle(ChatFormatting.GRAY));
     }
 }

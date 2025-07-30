@@ -1,40 +1,40 @@
 package rearth.oritech.item.tools.harvesting;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Items;
-import net.minecraft.item.ToolMaterial;
-import net.minecraft.item.ToolMaterials;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Block;
 
-public class PromethiumToolMaterial implements ToolMaterial {
+public class PromethiumToolMaterial implements Tier {
     @Override
-    public int getDurability() {
+    public int getUses() {
         return 10000;
     }
     
     @Override
-    public float getMiningSpeedMultiplier() {
+    public float getSpeed() {
         return 24f;
     }
     
     @Override
-    public float getAttackDamage() {
+    public float getAttackDamageBonus() {
         return 5.0f;
     }
     
     @Override
-    public TagKey<Block> getInverseTag() {
-        return ToolMaterials.NETHERITE.getInverseTag();
+    public TagKey<Block> getIncorrectBlocksForDrops() {
+        return Tiers.NETHERITE.getIncorrectBlocksForDrops();
     }
     
     @Override
-    public int getEnchantability() {
+    public int getEnchantmentValue() {
         return 28;
     }
     
     @Override
     public Ingredient getRepairIngredient() {
-        return Ingredient.ofItems(Items.NETHERITE_INGOT);
+        return Ingredient.of(Items.NETHERITE_INGOT);
     }
 }

@@ -2,22 +2,22 @@ package rearth.oritech.util.registry;
 
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import rearth.oritech.Oritech;
 
 import java.lang.reflect.Field;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 
 public interface ArchitecturyRecipeRegistryContainer extends ArchitecturyRegistryContainer<RecipeType<?>> {
     
-    DeferredRegister<RecipeSerializer<?>> SERIALIZER_REGISTRY = DeferredRegister.create(Oritech.MOD_ID, RegistryKeys.RECIPE_SERIALIZER);
+    DeferredRegister<RecipeSerializer<?>> SERIALIZER_REGISTRY = DeferredRegister.create(Oritech.MOD_ID, Registries.RECIPE_SERIALIZER);
     
     @Override
-    default RegistryKey<Registry<RecipeType<?>>> getRegistryType() {
-        return RegistryKeys.RECIPE_TYPE;
+    default ResourceKey<Registry<RecipeType<?>>> getRegistryType() {
+        return Registries.RECIPE_TYPE;
     }
     
     @SuppressWarnings("unchecked")

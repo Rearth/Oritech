@@ -1,12 +1,12 @@
 package rearth.oritech.block.blocks.generators;
 
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.base.block.UpgradableMachineBlock;
 import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
 
 public class BasicGeneratorBlock extends UpgradableMachineBlock {
-    public BasicGeneratorBlock(Settings settings) {
+    public BasicGeneratorBlock(Properties settings) {
         super(settings);
     }
     

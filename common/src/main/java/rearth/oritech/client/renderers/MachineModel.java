@@ -1,6 +1,6 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import rearth.oritech.Oritech;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.model.DefaultedBlockGeoModel;

@@ -1,10 +1,5 @@
 package rearth.oritech.block.entity.processing;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -16,6 +11,12 @@ import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class AssemblerBlockEntity extends MultiblockMachineEntity {
     
@@ -57,18 +58,18 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
     protected void useEnergy() {
         super.useEnergy();
         
-        if (world.random.nextFloat() > 0.4) return;
+        if (level.random.nextFloat() > 0.4) return;
         // emit particles
         var facing = getFacing();
-        var offsetLocal = Geometry.rotatePosition(new Vec3d(0, 0.6, 0.5), facing);
-        var emitPosition = Vec3d.ofCenter(pos).add(offsetLocal);
+        var offsetLocal = Geometry.rotatePosition(new Vec3(0, 0.6, 0.5), facing);
+        var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        ParticleContent.ASSEMBLER_WORKING.spawn(world, emitPosition, 1);
+        ParticleContent.ASSEMBLER_WORKING.spawn(level, emitPosition, 1);
         
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.ASSEMBLER_SCREEN;
     }
     

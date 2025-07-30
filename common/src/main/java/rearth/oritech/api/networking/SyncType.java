@@ -1,20 +1,20 @@
 package rearth.oritech.api.networking;
 
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 
 public enum SyncType {
     
     INITIAL, TICK, SPARSE_TICK, GUI_TICK, GUI_OPEN;
     
-    public static PacketCodec<RegistryByteBuf, SyncType> PACKET_CODEC = new PacketCodec<>() {
+    public static StreamCodec<RegistryFriendlyByteBuf, SyncType> PACKET_CODEC = new StreamCodec<>() {
         @Override
-        public SyncType decode(RegistryByteBuf buf) {
+        public SyncType decode(RegistryFriendlyByteBuf buf) {
             return SyncType.values()[buf.readUnsignedShort()];
         }
         
         @Override
-        public void encode(RegistryByteBuf buf, SyncType value) {
+        public void encode(RegistryFriendlyByteBuf buf, SyncType value) {
             buf.writeShort(value.ordinal());
         }
     };

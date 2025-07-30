@@ -1,28 +1,29 @@
 package rearth.oritech.item.tools.armor;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 public class JetpackExoArmorItem extends BackstorageExoArmorItem implements BaseJetpackItem {
-    public JetpackExoArmorItem(RegistryEntry<ArmorMaterial> material, Type type, Item.Settings settings) {
+    public JetpackExoArmorItem(Holder<ArmorMaterial> material, Type type, Item.Properties settings) {
         super(material, type, settings);
     }
     
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         
-        if (world.isClient) {
+        if (world.isClientSide) {
             tickJetpack(stack, entity, world);
         } else {
             super.inventoryTick(stack, world, entity, slot, selected);
@@ -30,28 +31,28 @@ public class JetpackExoArmorItem extends BackstorageExoArmorItem implements Base
     }
     
     @Override
-    public Identifier getModel() {
+    public ResourceLocation getModel() {
         return Oritech.id("armor/exo_armor_jetpack");
     }
     
     @Override
-    public int getItemBarColor(ItemStack stack) {
+    public int getBarColor(ItemStack stack) {
         return getJetpackBarColor(stack);
     }
     
     @Override
-    public int getItemBarStep(ItemStack stack) {
+    public int getBarWidth(ItemStack stack) {
         return getJetpackBarStep(stack);
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        var hint = Text.translatable("tooltip.oritech.jetpack_usage").formatted(Formatting.GRAY, Formatting.ITALIC);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+        var hint = Component.translatable("tooltip.oritech.jetpack_usage").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
         tooltip.add(hint);
-        hint = Text.translatable("tooltip.oritech.jetpack_usage2").formatted(Formatting.GRAY, Formatting.ITALIC);
+        hint = Component.translatable("tooltip.oritech.jetpack_usage2").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
         tooltip.add(hint);
         
-        super.appendTooltip(stack, context, tooltip, type);
+        super.appendHoverText(stack, context, tooltip, type);
         addJetpackTooltip(stack, tooltip, false);
     }
     

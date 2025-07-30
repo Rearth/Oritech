@@ -7,53 +7,53 @@ import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.EndecRecipeSerializer;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.util.FluidIngredient;
 
 import java.util.List;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeType;
 
 public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> implements RecipeType<OritechRecipe> {
     
     public static final Endec<FluidStack> FLUID_STACK_ENDEC = StructEndecBuilder.of(
-        MinecraftEndecs.ofRegistry(Registries.FLUID).fieldOf("fluid", FluidStack::getFluid),
+        MinecraftEndecs.ofRegistry(BuiltInRegistries.FLUID).fieldOf("fluid", FluidStack::getFluid),
         Endec.LONG.optionalFieldOf("amount", FluidStack::getAmount, FluidStack.bucketAmount()),
         FluidStack::create);
     
     public static final Endec<OritechRecipe> ORI_RECIPE_ENDEC = StructEndecBuilder.of(
       Endec.INT.optionalFieldOf("time", OritechRecipe::getTime, 60),
-      CodecUtils.toEndec(Ingredient.DISALLOW_EMPTY_CODEC).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
+      CodecUtils.toEndec(Ingredient.CODEC_NONEMPTY).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
       MinecraftEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
-      MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
+      MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) BuiltInRegistries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
       FluidIngredient.FLUID_INGREDIENT_ENDEC.optionalFieldOf("fluidInput", OritechRecipe::getFluidInput, FluidIngredient.EMPTY),
       FLUID_STACK_ENDEC.listOf().optionalFieldOf("fluidOutputs", OritechRecipe::getFluidOutputs, List.of()),
       OritechRecipe::new
     );
     
-    public static final PacketCodec<RegistryByteBuf, OritechRecipe> PACKET_CODEC = PacketCodec.tuple(
-      PacketCodecs.INTEGER, OritechRecipe::getTime,
-      Ingredient.PACKET_CODEC.collect(PacketCodecs.toList()), OritechRecipe::getInputs,
-      ItemStack.OPTIONAL_LIST_PACKET_CODEC, OritechRecipe::getResults,
-      Identifier.PACKET_CODEC.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier), OritechRecipe::getOriType,
+    public static final StreamCodec<RegistryFriendlyByteBuf, OritechRecipe> PACKET_CODEC = StreamCodec.composite(
+      ByteBufCodecs.INT, OritechRecipe::getTime,
+      Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::getInputs,
+      ItemStack.OPTIONAL_LIST_STREAM_CODEC, OritechRecipe::getResults,
+      ResourceLocation.STREAM_CODEC.map(identifier1 -> (OritechRecipeType) BuiltInRegistries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier), OritechRecipe::getOriType,
       FluidIngredient.PACKET_CODEC, OritechRecipe::getFluidInput,
-      NetworkManager.FLUID_STACK_STREAM_CODEC.collect(PacketCodecs.toList()), OritechRecipe::getFluidOutputs,
+      NetworkManager.FLUID_STACK_STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::getFluidOutputs,
       OritechRecipe::new
     );
     
-    private final Identifier identifier;
+    private final ResourceLocation identifier;
     
-    public Identifier getIdentifier() {
+    public ResourceLocation getIdentifier() {
         return identifier;
     }
     
-    public OritechRecipeType(Identifier identifier) {
+    public OritechRecipeType(ResourceLocation identifier) {
         super((StructEndec<OritechRecipe>) ORI_RECIPE_ENDEC);
         this.identifier = identifier;
     }

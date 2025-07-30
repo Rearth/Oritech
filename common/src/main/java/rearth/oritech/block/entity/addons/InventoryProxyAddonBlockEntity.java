@@ -1,19 +1,6 @@
 package rearth.oritech.block.entity.addons;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
@@ -21,10 +8,24 @@ import rearth.oritech.api.item.containers.DelegatingInventoryStorage;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.InventoryProxyScreenHandler;
+import rearth.oritech.client.ui.InventoryProxyScreenHandler.InvProxyData;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements ItemApi.BlockProvider, ExtendedMenuProvider {
     
@@ -62,7 +63,7 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     
     private ItemApi.InventoryStorage getTargetItemStorage() {
         
-        var isUsed = this.getCachedState().get(MachineAddonBlock.ADDON_USED);
+        var isUsed = this.getBlockState().getValue(MachineAddonBlock.ADDON_USED);
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
@@ -71,7 +72,7 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     }
     
     private boolean isConnected() {
-        var isUsed = this.getCachedState().get(MachineAddonBlock.ADDON_USED);
+        var isUsed = this.getBlockState().getValue(MachineAddonBlock.ADDON_USED);
         return isUsed && getCachedController() != null;
     }
     
@@ -80,24 +81,24 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
         if (cachedController != null)
             return cachedController;
         
-        cachedController = (MachineAddonController) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
+        cachedController = (MachineAddonController) Objects.requireNonNull(level).getBlockEntity(getControllerPos());
         return cachedController;
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
-        var data = new InventoryProxyScreenHandler.InvProxyData(pos, getControllerPos(), targetSlot);
+    public void saveExtraData(FriendlyByteBuf buf) {
+        var data = new InventoryProxyScreenHandler.InvProxyData(worldPosition, getControllerPos(), targetSlot);
         InventoryProxyScreenHandler.InvProxyData.PACKET_CODEC.encode(buf, data);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.translatable("title.oritech.inventory_proxy");
+    public Component getDisplayName() {
+        return Component.translatable("title.oritech.inventory_proxy");
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new InventoryProxyScreenHandler(syncId, playerInventory, this, getCachedController().getScreenProvider(), targetSlot);
     }
     
@@ -106,14 +107,14 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         nbt.putInt("target_slot", targetSlot);
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         targetSlot = nbt.getInt("target_slot");
     }
     
@@ -122,17 +123,17 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
         return inventory;
     }
     
-    public static void receiveSlotSelection(InventoryProxySlotSelectorPacket packet, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
-        if (player.getWorld().getBlockEntity(packet.position) instanceof InventoryProxyAddonBlockEntity addonBlock)
+    public static void receiveSlotSelection(InventoryProxySlotSelectorPacket packet, Player player, RegistryAccess dynamicRegistryManager) {
+        if (player.level().getBlockEntity(packet.position) instanceof InventoryProxyAddonBlockEntity addonBlock)
             addonBlock.setTargetSlot(packet.slot);
     }
     
-    public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) implements CustomPayload {
+    public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) implements CustomPacketPayload {
         
-        public static final CustomPayload.Id<InventoryProxySlotSelectorPacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("proxy_slot_sel"));
+        public static final CustomPacketPayload.Type<InventoryProxySlotSelectorPacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("proxy_slot_sel"));
         
         @Override
-        public Id<? extends CustomPayload> getId() {
+        public Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;
         }
     }

@@ -1,15 +1,5 @@
 package rearth.oritech.block.blocks.pipes.energy;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
@@ -20,20 +10,31 @@ import rearth.oritech.init.BlockContent;
 
 import static rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock.SUPERCONDUCTOR_DATA;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+
 public class SuperConductorConnectionBlock extends GenericPipeConnectionBlock {
     
-    public SuperConductorConnectionBlock(Settings settings) {
+    public SuperConductorConnectionBlock(Properties settings) {
         super(settings);
     }
     
     @Override
-    public TriFunction<World, BlockPos, Direction, Boolean> apiValidationFunction() {
+    public TriFunction<Level, BlockPos, Direction, Boolean> apiValidationFunction() {
         return ((world, pos, direction) -> EnergyApi.BLOCK.find(world, pos, direction) != null);
     }
     
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new EnergyPipeInterfaceEntity(pos, state);
     }
     
@@ -44,12 +45,12 @@ public class SuperConductorConnectionBlock extends GenericPipeConnectionBlock {
     
     @Override
     public BlockState getConnectionBlock() {
-        return BlockContent.SUPERCONDUCTOR_CONNECTION.getDefaultState();
+        return BlockContent.SUPERCONDUCTOR_CONNECTION.defaultBlockState();
     }
     
     @Override
     public BlockState getNormalBlock() {
-        return BlockContent.SUPERCONDUCTOR.getDefaultState();
+        return BlockContent.SUPERCONDUCTOR.defaultBlockState();
     }
     
     @Override
@@ -68,34 +69,34 @@ public class SuperConductorConnectionBlock extends GenericPipeConnectionBlock {
     }
     
     @Override
-    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
-        return SUPERCONDUCTOR_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level world) {
+        return SUPERCONDUCTOR_DATA.computeIfAbsent(world.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 
 	public static class FramedSuperConductorConnectionBlock extends SuperConductorConnectionBlock {
 
-		public FramedSuperConductorConnectionBlock(Settings settings) {
+		public FramedSuperConductorConnectionBlock(Properties settings) {
 			super(settings);
 		}
 
 		@Override
-		public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-			return VoxelShapes.fullCube();
+		public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+			return Shapes.block();
 		}
 
 		@Override
-		public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-			return state.getOutlineShape(world, pos);
+		public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+			return state.getShape(world, pos);
 		}
 
 		@Override
 		public BlockState getNormalBlock() {
-			return BlockContent.FRAMED_SUPERCONDUCTOR.getDefaultState();
+			return BlockContent.FRAMED_SUPERCONDUCTOR.defaultBlockState();
 		}
 
 		@Override
 		public BlockState getConnectionBlock() {
-			return BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION.getDefaultState();
+			return BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION.defaultBlockState();
 		}
 	}
 }

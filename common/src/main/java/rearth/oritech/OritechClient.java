@@ -1,15 +1,17 @@
 package rearth.oritech;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientRawInputEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import org.lwjgl.glfw.GLFW;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
+import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
@@ -19,7 +21,7 @@ import rearth.oritech.item.tools.util.Helpers;
 
 public final class OritechClient {
     
-    public static final KeyBinding AUGMENT_SELECTOR = new KeyBinding("key.oritech.augment_screen", GLFW.GLFW_KEY_G, "key.categories.misc");
+    public static final KeyMapping AUGMENT_SELECTOR = new KeyMapping("key.oritech.augment_screen", GLFW.GLFW_KEY_G, "key.categories.misc");
     
     public static AugmentSelectionScreen activeScreen = null;
     
@@ -38,14 +40,14 @@ public final class OritechClient {
         // used for augment UI
         ClientTickEvent.CLIENT_PRE.register(client -> {
             
-            if (PlayerAugments.allAugments.isEmpty() && client.world != null)
-                PlayerAugments.loadAllAugments(client.world.getRecipeManager());
+            if (PlayerAugments.allAugments.isEmpty() && client.level != null)
+                PlayerAugments.loadAllAugments(client.level.getRecipeManager());
             
-            if (AUGMENT_SELECTOR.wasPressed() && activeScreen == null) {
+            if (AUGMENT_SELECTOR.consumeClick() && activeScreen == null) {
                 activeScreen = new AugmentSelectionScreen();
                 client.setScreen(activeScreen);
-            } else if (activeScreen != null && !InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), AUGMENT_SELECTOR.boundKey.getCode())) {
-                activeScreen.close();
+            } else if (activeScreen != null && !InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), AUGMENT_SELECTOR.key.getValue())) {
+                activeScreen.onClose();
             }
         });
         
@@ -61,7 +63,7 @@ public final class OritechClient {
         
         // send mining laser use events to server
         ClientTickEvent.CLIENT_PRE.register(client -> {
-            if (client.player != null && client.player.getMainHandStack().getItem() instanceof PortableLaserItem && laserActive) {
+            if (client.player != null && client.player.getMainHandItem().getItem() instanceof PortableLaserItem && laserActive) {
                 NetworkManager.sendToServer(new PortableLaserItem.LaserPlayerUsePacket());
             } else {
                 laserActive = false;
@@ -76,8 +78,8 @@ public final class OritechClient {
     }
     
     // returns true if the event is cancelled
-    public static boolean handleMouseClicked(MinecraftClient  client, int button, int action, int mods) {
-        if (client.player != null && client.player.getMainHandStack().getItem() instanceof PortableLaserItem && button == 0 && client.currentScreen == null) {
+    public static boolean handleMouseClicked(Minecraft  client, int button, int action, int mods) {
+        if (client.player != null && client.player.getMainHandItem().getItem() instanceof PortableLaserItem && button == 0 && client.screen == null) {
             laserActive = action == 1; // activate laser on mouse down
             return action == 1;
         }

@@ -1,6 +1,6 @@
 package rearth.oritech.api.recipe;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class LavaGeneratorRecipeBuilder extends OritechRecipeBuilder {
@@ -14,7 +14,7 @@ public class LavaGeneratorRecipeBuilder extends OritechRecipeBuilder {
     }
 
     @Override
-    public void validate(Identifier id) throws IllegalStateException {
+    public void validate(ResourceLocation id) throws IllegalStateException {
         if (fluidInput == null || fluidInput.isEmpty())
             throw new IllegalStateException("fluid input required for recipe " + id + " (type " + type + ")");
     }

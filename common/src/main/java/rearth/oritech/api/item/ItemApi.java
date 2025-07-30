@@ -1,7 +1,7 @@
 package rearth.oritech.api.item;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 
 public class ItemApi {
     

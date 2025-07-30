@@ -1,30 +1,12 @@
 package rearth.oritech.block.entity.pipes;
 
+import I;
+import Z;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.ItemApi.InventoryStorage;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -32,30 +14,52 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.pipes.item.ItemFilterBlock;
 import rearth.oritech.client.ui.ItemFilterScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
-
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemApi.BlockProvider, ExtendedMenuProvider {
     
-    public final FilterBlockInventory inventory = new FilterBlockInventory(1, this::markDirty);
+    public final FilterBlockInventory inventory = new FilterBlockInventory(1, this::setChanged);
     
     @SyncField(SyncType.GUI_OPEN)
     protected FilterData filterSettings = new FilterData(false, true, false, new HashMap<>());
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
+        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putBoolean("whitelist", filterSettings.useWhitelist);
         nbt.putBoolean("useNbt", filterSettings.useNbt);
         nbt.putBoolean("useComponents", filterSettings.useComponents);
         
         var filterItems = filterSettings.items.values();
-        var itemsNbtList = new NbtList();
+        var itemsNbtList = new ListTag();
         
         for (var item : filterItems) {
-            var data = item.encode(registryLookup);
+            var data = item.save(registryLookup);
             itemsNbtList.add(data);
         }
         
@@ -63,19 +67,19 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
+        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         
         var whiteList = nbt.getBoolean("whitelist");
         var useNbt = nbt.getBoolean("useNbt");
         var useComponents = nbt.getBoolean("useComponents");
         
-        var list = nbt.getList("filterItems", NbtElement.COMPOUND_TYPE);
+        var list = nbt.getList("filterItems", Tag.TAG_COMPOUND);
         var itemsList = new HashMap<Integer, ItemStack>();
         for (int i = 0; i < list.size(); i++) {
             var data = list.get(i);
-            var stack = ItemStack.fromNbt(registryLookup, data).orElse(ItemStack.EMPTY);
+            var stack = ItemStack.parse(registryLookup, data).orElse(ItemStack.EMPTY);
             
             itemsList.put(i, stack);
         }
@@ -95,30 +99,30 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
+    public void saveExtraData(FriendlyByteBuf buf) {
         sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(pos);
+        buf.writeBlockPos(worldPosition);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.of("");
+    public Component getDisplayName() {
+        return Component.nullToEmpty("");
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new ItemFilterScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         // if non-empty and inventory in target, move it
         if (inventory.isEmpty()) return;
         
-        var targetDirection = getCachedState().get(ItemFilterBlock.TARGET_DIR);
-        var targetPos = pos.add(targetDirection.getVector());
+        var targetDirection = getBlockState().getValue(ItemFilterBlock.TARGET_DIR);
+        var targetPos = pos.offset(targetDirection.getNormal());
         
         // todo caching
         var targetInv = ItemApi.BLOCK.find(world, targetPos, targetDirection);
@@ -126,7 +130,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
         
         var firstItem = inventory.heldStacks.getFirst();
         var inserted = targetInv.insert(firstItem.copy(), false);
-        firstItem.decrement(inserted);
+        firstItem.shrink(inserted);
         
     }
     
@@ -136,17 +140,17 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     
     public void setFilterSettings(FilterData filterSettings) {
         this.filterSettings = filterSettings;
-        this.markDirty();
+        this.setChanged();
     }
     
     @Override
-    public void markDirty() {
-        if (this.world != null)
-            world.markDirty(pos);
+    public void setChanged() {
+        if (this.level != null)
+            level.blockEntityChanged(worldPosition);
     }
     
-    public static void handleClientUpdate(ItemFilterPayload message, PlayerEntity player, DynamicRegistryManager registryAccess) {
-        var blockEntity = player.getWorld().getBlockEntity(message.pos(), BlockEntitiesContent.ITEM_FILTER_ENTITY);
+    public static void handleClientUpdate(ItemFilterPayload message, Player player, RegistryAccess registryAccess) {
+        var blockEntity = player.level().getBlockEntity(message.pos(), BlockEntitiesContent.ITEM_FILTER_ENTITY);
         if (blockEntity.isPresent()) {
             blockEntity.get().setFilterSettings(message.data);
         }
@@ -156,27 +160,27 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     // items is a map of position index (in the filter GUI) to filtered item stack
     public record FilterData(boolean useNbt, boolean useWhitelist, boolean useComponents, Map<Integer, ItemStack> items) {
         
-        public static PacketCodec<RegistryByteBuf, FilterData> PACKET_CODEC = PacketCodec.tuple(
-          PacketCodecs.BOOL, FilterData::useNbt,
-          PacketCodecs.BOOL, FilterData::useWhitelist,
-          PacketCodecs.BOOL, FilterData::useComponents,
-          PacketCodecs.map(HashMap::new, PacketCodecs.INTEGER, ItemStack.PACKET_CODEC), FilterData::items,
+        public static StreamCodec<RegistryFriendlyByteBuf, FilterData> PACKET_CODEC = StreamCodec.composite(
+          ByteBufCodecs.BOOL, FilterData::useNbt,
+          ByteBufCodecs.BOOL, FilterData::useWhitelist,
+          ByteBufCodecs.BOOL, FilterData::useComponents,
+          ByteBufCodecs.map(HashMap::new, ByteBufCodecs.INT, ItemStack.STREAM_CODEC), FilterData::items,
           FilterData::new
         );
         
     }
     
     // used to send data to server
-    public record ItemFilterPayload(BlockPos pos, FilterData data) implements CustomPayload {
+    public record ItemFilterPayload(BlockPos pos, FilterData data) implements CustomPacketPayload {
         @Override
-        public Id<? extends CustomPayload> getId() {
+        public Type<? extends CustomPacketPayload> type() {
             return FILTER_PACKET_ID;
         }
         
-        public static final CustomPayload.Id<ItemFilterPayload> FILTER_PACKET_ID = new CustomPayload.Id<>(Oritech.id("filter"));
+        public static final CustomPacketPayload.Type<ItemFilterPayload> FILTER_PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("filter"));
         
-        public static final PacketCodec<RegistryByteBuf, ItemFilterPayload> PACKET_CODEC = PacketCodec.tuple(
-          BlockPos.PACKET_CODEC, ItemFilterPayload::pos,
+        public static final StreamCodec<RegistryFriendlyByteBuf, ItemFilterPayload> PACKET_CODEC = StreamCodec.composite(
+          BlockPos.STREAM_CODEC, ItemFilterPayload::pos,
           FilterData.PACKET_CODEC, ItemFilterPayload::data,
           ItemFilterPayload::new
         );
@@ -200,7 +204,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
                 if (!matchesType) continue;
                 
                 if (checkComponents) {
-                    var componentsMatch = stack.getComponentChanges().equals(filterItem.getComponentChanges());
+                    var componentsMatch = stack.getComponentsPatch().equals(filterItem.getComponentsPatch());
                     if (!componentsMatch) {
                         break;
                     }
@@ -209,13 +213,13 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
                 if (checkNbt) {
                     // check if both have nbt, if so compare them
                     // if not both check if neither has nbt, and type matches
-                    if (stack.contains(DataComponentTypes.CUSTOM_DATA) && filterItem.contains(DataComponentTypes.CUSTOM_DATA)) {
-                        var match = stack.get(DataComponentTypes.CUSTOM_DATA).equals(filterItem.get(DataComponentTypes.CUSTOM_DATA));
+                    if (stack.has(DataComponents.CUSTOM_DATA) && filterItem.has(DataComponents.CUSTOM_DATA)) {
+                        var match = stack.get(DataComponents.CUSTOM_DATA).equals(filterItem.get(DataComponents.CUSTOM_DATA));
                         if (match) {
                             matchesFilterItems = true;
                             break;
                         }
-                    } else if (!stack.contains(DataComponentTypes.CUSTOM_DATA) && !filterItem.contains(DataComponentTypes.CUSTOM_DATA)) {
+                    } else if (!stack.has(DataComponents.CUSTOM_DATA) && !filterItem.has(DataComponents.CUSTOM_DATA)) {
                         matchesFilterItems = true;
                         break;
                     }

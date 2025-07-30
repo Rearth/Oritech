@@ -1,64 +1,67 @@
 package rearth.oritech.block.blocks.pipes;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import rearth.oritech.block.entity.pipes.ExtractablePipeInterfaceEntity;
+import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity.PipeNetworkData;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.SoundContent;
-
+import I;
+import Z;
 import java.util.HashSet;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 
 public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnectionBlock {
     
     public static final int EXTRACT = 2;
     
     // 0 = no connection, 1 = normal connection, 2 = extractable connection
-    public static final IntProperty NORTH = IntProperty.of("north", 0, 2);
-    public static final IntProperty EAST = IntProperty.of("east", 0, 2);
-    public static final IntProperty SOUTH = IntProperty.of("south", 0, 2);
-    public static final IntProperty WEST = IntProperty.of("west", 0, 2);
-    public static final IntProperty UP = IntProperty.of("up", 0, 2);
-    public static final IntProperty DOWN = IntProperty.of("down", 0, 2);
+    public static final IntegerProperty NORTH = IntegerProperty.create("north", 0, 2);
+    public static final IntegerProperty EAST = IntegerProperty.create("east", 0, 2);
+    public static final IntegerProperty SOUTH = IntegerProperty.create("south", 0, 2);
+    public static final IntegerProperty WEST = IntegerProperty.create("west", 0, 2);
+    public static final IntegerProperty UP = IntegerProperty.create("up", 0, 2);
+    public static final IntegerProperty DOWN = IntegerProperty.create("down", 0, 2);
     
-    public ExtractablePipeConnectionBlock(Settings settings) {
+    public ExtractablePipeConnectionBlock(Properties settings) {
         super(settings);
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (player.isHolding(ItemContent.WRENCH)) return ActionResult.PASS;
-        if (world.isClient) return ActionResult.SUCCESS;
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (player.isHolding(ItemContent.WRENCH)) return InteractionResult.PASS;
+        if (world.isClientSide) return InteractionResult.SUCCESS;
         
         var interactDir = getInteractDirection(state, pos, player);
         if (!hasMachineInDirection(interactDir, world, pos, apiValidationFunction()))
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         
         var property = directionToProperty(interactDir);
-        var connection = state.get(property);
-        world.setBlockState(pos, state.with(property, connection != EXTRACT ? EXTRACT : CONNECTION), Block.FORCE_STATE, 0);
+        var connection = state.getValue(property);
+        world.setBlock(pos, state.setValue(property, connection != EXTRACT ? EXTRACT : CONNECTION), Block.UPDATE_KNOWN_SHAPE, 0);
         
-        world.playSound(null, pos, SoundEvents.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.BLOCKS, 0.9f, 1.2f);
+        world.playSound(null, pos, SoundEvents.BAMBOO_WOOD_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.9f, 1.2f);
         
         // Invalidate cache
         invalidateTargetCache(world, pos);
         
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
     
     public boolean hasExtractingSide(BlockState state) {
-        for (var direction : DIRECTIONS) {
+        for (var direction : UPDATE_SHAPE_ORDER) {
             var property = directionToProperty(direction);
-            if (state.get(property) == EXTRACT) return true;
+            if (state.getValue(property) == EXTRACT) return true;
         }
         
         return false;
@@ -70,7 +73,7 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
      * @param world the world
      * @param pos   the position
      */
-    protected void invalidateTargetCache(World world, BlockPos pos) {
+    protected void invalidateTargetCache(Level world, BlockPos pos) {
         var data = getNetworkData(world);
         var network = data.pipeNetworkLinks.getOrDefault(pos, null);
         if (network != null) {
@@ -79,7 +82,7 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
             // Invalidate all pipe connection nodes in the network
             for (var pipeInterface : data.pipeNetworkInterfaces.get(network)) {
                 // Skip node if already checked (node has multiple interface connections)
-                var pipePos = pipeInterface.getLeft().offset(pipeInterface.getRight());
+                var pipePos = pipeInterface.getA().relative(pipeInterface.getB());
                 if (checked.contains(pipePos)) continue;
                 
                 checked.add(pipePos);
@@ -91,25 +94,25 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
     }
     
     @Override
-    public BlockState addConnectionStates(BlockState state, World world, BlockPos pos, boolean createConnection) {
+    public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, boolean createConnection) {
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
             var connection = shouldConnect(state, direction, pos, world, createConnection);
             
-            if (connection && state.get(property) == EXTRACT) continue; // don't override extractable connections
-            state = state.with(property, connection ? CONNECTION : NO_CONNECTION);
+            if (connection && state.getValue(property) == EXTRACT) continue; // don't override extractable connections
+            state = state.setValue(property, connection ? CONNECTION : NO_CONNECTION);
         }
         
         return addStraightState(state);
     }
     
     @Override
-    public BlockState addConnectionStates(BlockState state, World world, BlockPos pos, Direction createDirection) {
+    public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, Direction createDirection) {
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
             var connection = shouldConnect(state, direction, pos, world, direction.equals(createDirection));
             var newValue = connection ? isSideExtractable(state, direction) ? EXTRACT : CONNECTION : NO_CONNECTION;
-            state = state.with(property, newValue);
+            state = state.setValue(property, newValue);
         }
         return addStraightState(state);
     }
@@ -141,32 +144,32 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
     }
     
     @Override
-    public IntProperty getNorthProperty() {
+    public IntegerProperty getNorthProperty() {
         return NORTH;
     }
     
     @Override
-    public IntProperty getEastProperty() {
+    public IntegerProperty getEastProperty() {
         return EAST;
     }
     
     @Override
-    public IntProperty getSouthProperty() {
+    public IntegerProperty getSouthProperty() {
         return SOUTH;
     }
     
     @Override
-    public IntProperty getWestProperty() {
+    public IntegerProperty getWestProperty() {
         return WEST;
     }
     
     @Override
-    public IntProperty getUpProperty() {
+    public IntegerProperty getUpProperty() {
         return UP;
     }
     
     @Override
-    public IntProperty getDownProperty() {
+    public IntegerProperty getDownProperty() {
         return DOWN;
     }
 }

@@ -1,18 +1,21 @@
 package rearth.oritech.init.compat.rei;
 
+import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.drag.DraggableStack;
 import me.shedaniel.rei.api.client.gui.drag.DraggableStackVisitor;
 import me.shedaniel.rei.api.client.gui.drag.DraggedAcceptorResult;
 import me.shedaniel.rei.api.client.gui.drag.DraggingContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.ItemStack;
 import rearth.oritech.client.ui.ItemFilterScreen;
 
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static rearth.oritech.client.ui.ItemFilterScreen.FILTER_SIZE;
+
+import io.wispforest.owo.ui.container.FlowLayout;
 
 public class ReiItemFilterDraggableStackVisitor implements DraggableStackVisitor<ItemFilterScreen> {
 

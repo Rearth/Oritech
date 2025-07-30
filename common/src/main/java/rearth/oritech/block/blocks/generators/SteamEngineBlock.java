@@ -1,21 +1,5 @@
 package rearth.oritech.block.blocks.generators;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.block.MultiblockMachine;
@@ -25,16 +9,33 @@ import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class SteamEngineBlock extends MultiblockMachine {
-    public SteamEngineBlock(Settings settings) {
+    public SteamEngineBlock(Properties settings) {
         super(settings);
     }
     
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return Objects.requireNonNull(super.getPlacementState(ctx)).with(Properties.HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
     
     @Override
@@ -43,34 +44,34 @@ public class SteamEngineBlock extends MultiblockMachine {
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         
         if (Screen.hasControlDown()) {
-            tooltip.add(Text.translatable("tooltip.oritech.steam_engine").formatted(Formatting.GRAY));
-            tooltip.add(Text.translatable("tooltip.oritech.steam_engine.1").formatted(Formatting.GRAY));
-            tooltip.add(Text.translatable("tooltip.oritech.steam_engine.2").formatted(Formatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.oritech.steam_engine").withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.oritech.steam_engine.1").withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.oritech.steam_engine.2").withStyle(ChatFormatting.GRAY));
         }
         
-        super.appendTooltip(stack, context, tooltip, options);
+        super.appendHoverText(stack, context, tooltip, options);
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClient) {
+        if (!world.isClientSide) {
             
             var entity = world.getBlockEntity(pos, BlockEntitiesContent.STEAM_ENGINE_ENTITY);
             if (entity.isPresent() && entity.get().inSlaveMode()) {
                 // working in slave mode. Don't open UI, just highlight controller
-                player.sendMessage(Text.translatable("message.oritech.steamengine.controller_link"));
-                ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3d.of(entity.get().master.getPos()));
-                return ActionResult.SUCCESS;
+                player.sendSystemMessage(Component.translatable("message.oritech.steamengine.controller_link"));
+                ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3.atLowerCornerOf(entity.get().master.getBlockPos()));
+                return InteractionResult.SUCCESS;
             }
             
             
             
         }
         
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 }

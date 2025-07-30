@@ -1,7 +1,7 @@
 package rearth.oritech.block.blocks.reactor;
 
 public class ReactorReflectorBlock extends BaseReactorBlock {
-    public ReactorReflectorBlock(Settings settings) {
+    public ReactorReflectorBlock(Properties settings) {
         super(settings);
     }
 }

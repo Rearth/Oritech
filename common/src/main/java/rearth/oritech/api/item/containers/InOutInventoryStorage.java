@@ -1,6 +1,6 @@
 package rearth.oritech.api.item.containers;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import rearth.oritech.util.InventorySlotAssignment;
 
 public class InOutInventoryStorage extends SimpleInventoryStorage {

@@ -6,10 +6,6 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiStack;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.recipe.RecipeManager;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.generators.BioGeneratorEntity;
 import rearth.oritech.block.entity.generators.FuelGeneratorEntity;
@@ -25,6 +21,11 @@ import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 @EmiEntrypoint
 public class OritechEMIPlugin implements EmiPlugin {
@@ -65,26 +66,26 @@ public class OritechEMIPlugin implements EmiPlugin {
         registry.addDragDropHandler(ItemFilterScreen.class, new EmiItemFilterDragDropHandler());
     }
     
-    private void registerOritechCategory(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType, ItemConvertible machine,  Class<? extends MachineBlockEntity> screenProviderSource) {
+    private void registerOritechCategory(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType, ItemLike machine,  Class<? extends MachineBlockEntity> screenProviderSource) {
         var icon = EmiStack.of(machine);
         var category = new EmiRecipeCategory(recipeType.getIdentifier(), icon);
         
         registry.addCategory(category);
         registry.addWorkstation(category, icon);
         
-        var blockState = Blocks.STONE.getDefaultState();
+        var blockState = Blocks.STONE.defaultBlockState();
         if (machine instanceof Block blockItem)
-            blockState = blockItem.getDefaultState();
+            blockState = blockItem.defaultBlockState();
         var finalBlockState = blockState;
         
-        manager.listAllOfType(recipeType)
+        manager.getAllRecipesFor(recipeType)
           .stream()
           .map(entry -> new OritechEMIRecipe(entry, category, screenProviderSource, finalBlockState))
           .forEach(registry::addRecipe);
         
     }
     
-    private void registerCustom(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType, ItemConvertible machine, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment assignments) {
+    private void registerCustom(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType, ItemLike machine, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment assignments) {
         
         var icon = EmiStack.of(machine);
         var category = new EmiRecipeCategory(recipeType.getIdentifier(), icon);
@@ -92,7 +93,7 @@ public class OritechEMIPlugin implements EmiPlugin {
         registry.addCategory(category);
         registry.addWorkstation(category, icon);
         
-        manager.listAllOfType(recipeType)
+        manager.getAllRecipesFor(recipeType)
           .stream()
           .map(entry -> new OritechEMIRecipe(entry, category, true, slots, assignments))
           .forEach(registry::addRecipe);
@@ -109,7 +110,7 @@ public class OritechEMIPlugin implements EmiPlugin {
         registry.addCategory(category);
         registry.addWorkstation(category, icon);
         
-        manager.listAllOfType(recipeType)
+        manager.getAllRecipesFor(recipeType)
           .stream()
           .map(entry -> new OritechEMIParticleCollisionRecipe(entry, category))
           .forEach(registry::addRecipe);
@@ -126,7 +127,7 @@ public class OritechEMIPlugin implements EmiPlugin {
         registry.addCategory(category);
         registry.addWorkstation(category, icon);
         
-        manager.listAllOfType(recipeType)
+        manager.getAllRecipesFor(recipeType)
           .stream()
           .map(entry -> new OritechEmiLaserRecipe(entry, category))
           .forEach(registry::addRecipe);

@@ -9,18 +9,18 @@ import dev.architectury.platform.Platform;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import io.wispforest.owo.ui.core.Color;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FluidBlock;
-import net.minecraft.fluid.FlowableFluid;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.registry.RegistryKeys;
 import rearth.oritech.Oritech;
 
 import java.util.List;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.Fluid;
 
 public class FluidContent {
     
@@ -200,115 +200,115 @@ public class FluidContent {
                                                                                   .flowingTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
                                                                                   .color(new Color(0.453f, 0.195f, 0.648f).argb());
     
-    public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(Oritech.MOD_ID, RegistryKeys.FLUID);
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Oritech.MOD_ID, RegistryKeys.BLOCK);
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Oritech.MOD_ID, RegistryKeys.ITEM);
+    public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(Oritech.MOD_ID, Registries.FLUID);
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Oritech.MOD_ID, Registries.BLOCK);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Oritech.MOD_ID, Registries.ITEM);
     
     public static final List<ArchitecturyFluidAttributes> FLUID_ATTRIBUTES = Platform.isModLoaded("productivemetalworks")
                                                                                ? List.of(OIL_ATTRIBUTES, FUEL_ATTRIBUTES, BIOFUEL_ATTRIBUTES, STEAM_ATTRIBUTES, DIESEL_ATTRIBUTES, HEAVY_OIL_ATTRIBUTES, NAPHTHA_ATTRIBUTES, SULFURIC_ACID_ATTRIBUTES, SILICON_WASH_ATTRIBUTES, MINERAL_SLURRY_ATTRIBUTES, SHEOL_FIRE_ATTRIBUTES, STRANGE_MATTER_ATTRIBUTES, MOLTEN_ADAMANT_ATTRIBUTES, MOLTEN_BIOSTEEL_ATTRIBUTES, MOLTEN_DURATIUM_ATTRIBUTES, MOLTEN_ENERGITE_ATTRIBUTES, MOLTEN_FLUXITE_ATTRIBUTES)
                                                                                : List.of(OIL_ATTRIBUTES, FUEL_ATTRIBUTES, BIOFUEL_ATTRIBUTES, STEAM_ATTRIBUTES, DIESEL_ATTRIBUTES, HEAVY_OIL_ATTRIBUTES, NAPHTHA_ATTRIBUTES, SULFURIC_ACID_ATTRIBUTES, SILICON_WASH_ATTRIBUTES, MINERAL_SLURRY_ATTRIBUTES, SHEOL_FIRE_ATTRIBUTES, STRANGE_MATTER_ATTRIBUTES);
     
     // oil
-    public static final RegistrySupplier<FlowableFluid> STILL_OIL = FLUIDS.register("still_oil", () -> new ArchitecturyFlowingFluid.Source(OIL_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_OIL = FLUIDS.register("flowing_oil", () -> new ArchitecturyFlowingFluid.Flowing(OIL_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_OIL_BLOCK = BLOCKS.register("still_oil_block", () -> new ArchitecturyLiquidBlock(STILL_OIL, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_OIL_BUCKET = ITEMS.register("still_oil_bucket", () -> new ArchitecturyBucketItem(STILL_OIL, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowingFluid> STILL_OIL = FLUIDS.register("still_oil", () -> new ArchitecturyFlowingFluid.Source(OIL_ATTRIBUTES));
+    public static final RegistrySupplier<FlowingFluid> FLOWING_OIL = FLUIDS.register("flowing_oil", () -> new ArchitecturyFlowingFluid.Flowing(OIL_ATTRIBUTES));
+    public static final RegistrySupplier<LiquidBlock> STILL_OIL_BLOCK = BLOCKS.register("still_oil_block", () -> new ArchitecturyLiquidBlock(STILL_OIL, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<Item> STILL_OIL_BUCKET = ITEMS.register("still_oil_bucket", () -> new ArchitecturyBucketItem(STILL_OIL, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // fuel
-    public static final RegistrySupplier<FlowableFluid> STILL_FUEL = FLUIDS.register("still_fuel", () -> new ArchitecturyFlowingFluid.Source(FUEL_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_FUEL = FLUIDS.register("flowing_fuel", () -> new ArchitecturyFlowingFluid.Flowing(FUEL_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_FUEL_BLOCK = BLOCKS.register("still_fuel_block", () -> new ArchitecturyLiquidBlock(STILL_FUEL, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_FUEL_BUCKET = ITEMS.register("still_fuel_bucket", () -> new ArchitecturyBucketItem(STILL_FUEL, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowingFluid> STILL_FUEL = FLUIDS.register("still_fuel", () -> new ArchitecturyFlowingFluid.Source(FUEL_ATTRIBUTES));
+    public static final RegistrySupplier<FlowingFluid> FLOWING_FUEL = FLUIDS.register("flowing_fuel", () -> new ArchitecturyFlowingFluid.Flowing(FUEL_ATTRIBUTES));
+    public static final RegistrySupplier<LiquidBlock> STILL_FUEL_BLOCK = BLOCKS.register("still_fuel_block", () -> new ArchitecturyLiquidBlock(STILL_FUEL, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<Item> STILL_FUEL_BUCKET = ITEMS.register("still_fuel_bucket", () -> new ArchitecturyBucketItem(STILL_FUEL, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // biofuel
-    public static final RegistrySupplier<FlowableFluid> STILL_BIOFUEL = FLUIDS.register("still_biofuel", () -> new ArchitecturyFlowingFluid.Source(BIOFUEL_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_BIOFUEL = FLUIDS.register("flowing_biofuel", () -> new ArchitecturyFlowingFluid.Flowing(BIOFUEL_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_BIOFUEL_BLOCK = BLOCKS.register("still_biofuel_block", () -> new ArchitecturyLiquidBlock(STILL_BIOFUEL, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_BIOFUEL_BUCKET = ITEMS.register("still_biofuel_bucket", () -> new ArchitecturyBucketItem(STILL_BIOFUEL, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowingFluid> STILL_BIOFUEL = FLUIDS.register("still_biofuel", () -> new ArchitecturyFlowingFluid.Source(BIOFUEL_ATTRIBUTES));
+    public static final RegistrySupplier<FlowingFluid> FLOWING_BIOFUEL = FLUIDS.register("flowing_biofuel", () -> new ArchitecturyFlowingFluid.Flowing(BIOFUEL_ATTRIBUTES));
+    public static final RegistrySupplier<LiquidBlock> STILL_BIOFUEL_BLOCK = BLOCKS.register("still_biofuel_block", () -> new ArchitecturyLiquidBlock(STILL_BIOFUEL, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<Item> STILL_BIOFUEL_BUCKET = ITEMS.register("still_biofuel_bucket", () -> new ArchitecturyBucketItem(STILL_BIOFUEL, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // steam
-    public static final RegistrySupplier<FlowableFluid> STILL_STEAM = FLUIDS.register("still_steam", () -> new ArchitecturyFlowingFluid.Source(STEAM_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_STEAM = FLUIDS.register("flowing_steam", () -> new ArchitecturyFlowingFluid.Flowing(STEAM_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_STEAM_BLOCK = BLOCKS.register("still_steam_block", () -> new ArchitecturyLiquidBlock(STILL_STEAM, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_STEAM_BUCKET = ITEMS.register("still_steam_bucket", () -> new ArchitecturyBucketItem(STILL_STEAM, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowingFluid> STILL_STEAM = FLUIDS.register("still_steam", () -> new ArchitecturyFlowingFluid.Source(STEAM_ATTRIBUTES));
+    public static final RegistrySupplier<FlowingFluid> FLOWING_STEAM = FLUIDS.register("flowing_steam", () -> new ArchitecturyFlowingFluid.Flowing(STEAM_ATTRIBUTES));
+    public static final RegistrySupplier<LiquidBlock> STILL_STEAM_BLOCK = BLOCKS.register("still_steam_block", () -> new ArchitecturyLiquidBlock(STILL_STEAM, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<Item> STILL_STEAM_BUCKET = ITEMS.register("still_steam_bucket", () -> new ArchitecturyBucketItem(STILL_STEAM, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // heavy oil
-    public static final RegistrySupplier<FlowableFluid> STILL_HEAVY_OIL = FLUIDS.register("still_heavy_oil", () -> new ArchitecturyFlowingFluid.Source(HEAVY_OIL_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_HEAVY_OIL = FLUIDS.register("flowing_heavy_oil", () -> new ArchitecturyFlowingFluid.Flowing(HEAVY_OIL_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_HEAVY_OIL_BLOCK = BLOCKS.register("still_heavy_oil_block", () -> new ArchitecturyLiquidBlock(STILL_HEAVY_OIL, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_HEAVY_OIL_BUCKET = ITEMS.register("still_heavy_oil_bucket", () -> new ArchitecturyBucketItem(STILL_HEAVY_OIL, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowingFluid> STILL_HEAVY_OIL = FLUIDS.register("still_heavy_oil", () -> new ArchitecturyFlowingFluid.Source(HEAVY_OIL_ATTRIBUTES));
+    public static final RegistrySupplier<FlowingFluid> FLOWING_HEAVY_OIL = FLUIDS.register("flowing_heavy_oil", () -> new ArchitecturyFlowingFluid.Flowing(HEAVY_OIL_ATTRIBUTES));
+    public static final RegistrySupplier<LiquidBlock> STILL_HEAVY_OIL_BLOCK = BLOCKS.register("still_heavy_oil_block", () -> new ArchitecturyLiquidBlock(STILL_HEAVY_OIL, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<Item> STILL_HEAVY_OIL_BUCKET = ITEMS.register("still_heavy_oil_bucket", () -> new ArchitecturyBucketItem(STILL_HEAVY_OIL, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // diesel
-    public static final RegistrySupplier<FlowableFluid> STILL_DIESEL = FLUIDS.register("still_diesel", () -> new ArchitecturyFlowingFluid.Source(DIESEL_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_DIESEL = FLUIDS.register("flowing_diesel", () -> new ArchitecturyFlowingFluid.Flowing(DIESEL_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_DIESEL_BLOCK = BLOCKS.register("still_diesel_block", () -> new ArchitecturyLiquidBlock(STILL_DIESEL, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_DIESEL_BUCKET = ITEMS.register("still_diesel_bucket", () -> new ArchitecturyBucketItem(STILL_DIESEL, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowingFluid> STILL_DIESEL = FLUIDS.register("still_diesel", () -> new ArchitecturyFlowingFluid.Source(DIESEL_ATTRIBUTES));
+    public static final RegistrySupplier<FlowingFluid> FLOWING_DIESEL = FLUIDS.register("flowing_diesel", () -> new ArchitecturyFlowingFluid.Flowing(DIESEL_ATTRIBUTES));
+    public static final RegistrySupplier<LiquidBlock> STILL_DIESEL_BLOCK = BLOCKS.register("still_diesel_block", () -> new ArchitecturyLiquidBlock(STILL_DIESEL, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<Item> STILL_DIESEL_BUCKET = ITEMS.register("still_diesel_bucket", () -> new ArchitecturyBucketItem(STILL_DIESEL, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // naphtha
-    public static final RegistrySupplier<FlowableFluid> STILL_NAPHTHA = FLUIDS.register("still_naphtha", () -> new ArchitecturyFlowingFluid.Source(NAPHTHA_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_NAPHTHA = FLUIDS.register("flowing_naphtha", () -> new ArchitecturyFlowingFluid.Flowing(NAPHTHA_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_NAPHTHA_BLOCK = BLOCKS.register("still_naphtha_block", () -> new ArchitecturyLiquidBlock(STILL_NAPHTHA, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_NAPHTHA_BUCKET = ITEMS.register("still_naphtha_bucket", () -> new ArchitecturyBucketItem(STILL_NAPHTHA, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowingFluid> STILL_NAPHTHA = FLUIDS.register("still_naphtha", () -> new ArchitecturyFlowingFluid.Source(NAPHTHA_ATTRIBUTES));
+    public static final RegistrySupplier<FlowingFluid> FLOWING_NAPHTHA = FLUIDS.register("flowing_naphtha", () -> new ArchitecturyFlowingFluid.Flowing(NAPHTHA_ATTRIBUTES));
+    public static final RegistrySupplier<LiquidBlock> STILL_NAPHTHA_BLOCK = BLOCKS.register("still_naphtha_block", () -> new ArchitecturyLiquidBlock(STILL_NAPHTHA, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<Item> STILL_NAPHTHA_BUCKET = ITEMS.register("still_naphtha_bucket", () -> new ArchitecturyBucketItem(STILL_NAPHTHA, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // sulfuric acid
-    public static final RegistrySupplier<FlowableFluid> STILL_SULFURIC_ACID = FLUIDS.register("still_sulfuric_acid", () -> new ArchitecturyFlowingFluid.Source(SULFURIC_ACID_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_SULFURIC_ACID = FLUIDS.register("flowing_sulfuric_acid", () -> new ArchitecturyFlowingFluid.Flowing(SULFURIC_ACID_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_SULFURIC_ACID_BLOCK = BLOCKS.register("still_sulfuric_acid_block", () -> new ArchitecturyLiquidBlock(STILL_SULFURIC_ACID, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_SULFURIC_ACID_BUCKET = ITEMS.register("still_sulfuric_acid_bucket", () -> new ArchitecturyBucketItem(STILL_SULFURIC_ACID, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowingFluid> STILL_SULFURIC_ACID = FLUIDS.register("still_sulfuric_acid", () -> new ArchitecturyFlowingFluid.Source(SULFURIC_ACID_ATTRIBUTES));
+    public static final RegistrySupplier<FlowingFluid> FLOWING_SULFURIC_ACID = FLUIDS.register("flowing_sulfuric_acid", () -> new ArchitecturyFlowingFluid.Flowing(SULFURIC_ACID_ATTRIBUTES));
+    public static final RegistrySupplier<LiquidBlock> STILL_SULFURIC_ACID_BLOCK = BLOCKS.register("still_sulfuric_acid_block", () -> new ArchitecturyLiquidBlock(STILL_SULFURIC_ACID, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<Item> STILL_SULFURIC_ACID_BUCKET = ITEMS.register("still_sulfuric_acid_bucket", () -> new ArchitecturyBucketItem(STILL_SULFURIC_ACID, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // silicon wash
-    public static final RegistrySupplier<FlowableFluid> STILL_SILICON_WASH = FLUIDS.register("still_silicon_wash", () -> new ArchitecturyFlowingFluid.Source(SILICON_WASH_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_SILICON_WASH = FLUIDS.register("flowing_silicon_wash", () -> new ArchitecturyFlowingFluid.Flowing(SILICON_WASH_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_SILICON_WASH_BLOCK = BLOCKS.register("still_silicon_wash_block", () -> new ArchitecturyLiquidBlock(STILL_SILICON_WASH, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_SILICON_WASH_BUCKET = ITEMS.register("still_silicon_wash_bucket", () -> new ArchitecturyBucketItem(STILL_SILICON_WASH, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowingFluid> STILL_SILICON_WASH = FLUIDS.register("still_silicon_wash", () -> new ArchitecturyFlowingFluid.Source(SILICON_WASH_ATTRIBUTES));
+    public static final RegistrySupplier<FlowingFluid> FLOWING_SILICON_WASH = FLUIDS.register("flowing_silicon_wash", () -> new ArchitecturyFlowingFluid.Flowing(SILICON_WASH_ATTRIBUTES));
+    public static final RegistrySupplier<LiquidBlock> STILL_SILICON_WASH_BLOCK = BLOCKS.register("still_silicon_wash_block", () -> new ArchitecturyLiquidBlock(STILL_SILICON_WASH, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<Item> STILL_SILICON_WASH_BUCKET = ITEMS.register("still_silicon_wash_bucket", () -> new ArchitecturyBucketItem(STILL_SILICON_WASH, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // mineral slurry
-    public static final RegistrySupplier<FlowableFluid> STILL_MINERAL_SLURRY = FLUIDS.register("still_mineral_slurry", () -> new ArchitecturyFlowingFluid.Source(MINERAL_SLURRY_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_MINERAL_SLURRY = FLUIDS.register("flowing_mineral_slurry", () -> new ArchitecturyFlowingFluid.Flowing(MINERAL_SLURRY_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_MINERAL_SLURRY_BLOCK = BLOCKS.register("still_mineral_slurry_block", () -> new ArchitecturyLiquidBlock(STILL_MINERAL_SLURRY, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_MINERAL_SLURRY_BUCKET = ITEMS.register("still_mineral_slurry_bucket", () -> new ArchitecturyBucketItem(STILL_MINERAL_SLURRY, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowingFluid> STILL_MINERAL_SLURRY = FLUIDS.register("still_mineral_slurry", () -> new ArchitecturyFlowingFluid.Source(MINERAL_SLURRY_ATTRIBUTES));
+    public static final RegistrySupplier<FlowingFluid> FLOWING_MINERAL_SLURRY = FLUIDS.register("flowing_mineral_slurry", () -> new ArchitecturyFlowingFluid.Flowing(MINERAL_SLURRY_ATTRIBUTES));
+    public static final RegistrySupplier<LiquidBlock> STILL_MINERAL_SLURRY_BLOCK = BLOCKS.register("still_mineral_slurry_block", () -> new ArchitecturyLiquidBlock(STILL_MINERAL_SLURRY, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<Item> STILL_MINERAL_SLURRY_BUCKET = ITEMS.register("still_mineral_slurry_bucket", () -> new ArchitecturyBucketItem(STILL_MINERAL_SLURRY, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // sheol fire
-    public static final RegistrySupplier<FlowableFluid> STILL_SHEOL_FIRE = FLUIDS.register("still_sheol_fire", () -> new ArchitecturyFlowingFluid.Source(SHEOL_FIRE_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_SHEOL_FIRE = FLUIDS.register("flowing_sheol_fire", () -> new ArchitecturyFlowingFluid.Flowing(SHEOL_FIRE_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_SHEOL_FIRE_BLOCK = BLOCKS.register("still_sheol_fire_block", () -> new ArchitecturyLiquidBlock(STILL_SHEOL_FIRE, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_SHEOL_FIRE_BUCKET = ITEMS.register("still_sheol_fire_bucket", () -> new ArchitecturyBucketItem(STILL_SHEOL_FIRE, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowingFluid> STILL_SHEOL_FIRE = FLUIDS.register("still_sheol_fire", () -> new ArchitecturyFlowingFluid.Source(SHEOL_FIRE_ATTRIBUTES));
+    public static final RegistrySupplier<FlowingFluid> FLOWING_SHEOL_FIRE = FLUIDS.register("flowing_sheol_fire", () -> new ArchitecturyFlowingFluid.Flowing(SHEOL_FIRE_ATTRIBUTES));
+    public static final RegistrySupplier<LiquidBlock> STILL_SHEOL_FIRE_BLOCK = BLOCKS.register("still_sheol_fire_block", () -> new ArchitecturyLiquidBlock(STILL_SHEOL_FIRE, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<Item> STILL_SHEOL_FIRE_BUCKET = ITEMS.register("still_sheol_fire_bucket", () -> new ArchitecturyBucketItem(STILL_SHEOL_FIRE, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // strange matter
-    public static final RegistrySupplier<FlowableFluid> STILL_STRANGE_MATTER = FLUIDS.register("still_strange_matter", () -> new ArchitecturyFlowingFluid.Source(STRANGE_MATTER_ATTRIBUTES));
-    public static final RegistrySupplier<FlowableFluid> FLOWING_STRANGE_MATTER = FLUIDS.register("flowing_strange_matter", () -> new ArchitecturyFlowingFluid.Flowing(STRANGE_MATTER_ATTRIBUTES));
-    public static final RegistrySupplier<FluidBlock> STILL_STRANGE_MATTER_BLOCK = BLOCKS.register("still_strange_matter_block", () -> new ArchitecturyLiquidBlock(STILL_STRANGE_MATTER, AbstractBlock.Settings.copy(Blocks.WATER)));
-    public static final RegistrySupplier<Item> STILL_STRANGE_MATTER_BUCKET = ITEMS.register("still_strange_matter_bucket", () -> new ArchitecturyBucketItem(STILL_STRANGE_MATTER, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final RegistrySupplier<FlowingFluid> STILL_STRANGE_MATTER = FLUIDS.register("still_strange_matter", () -> new ArchitecturyFlowingFluid.Source(STRANGE_MATTER_ATTRIBUTES));
+    public static final RegistrySupplier<FlowingFluid> FLOWING_STRANGE_MATTER = FLUIDS.register("flowing_strange_matter", () -> new ArchitecturyFlowingFluid.Flowing(STRANGE_MATTER_ATTRIBUTES));
+    public static final RegistrySupplier<LiquidBlock> STILL_STRANGE_MATTER_BLOCK = BLOCKS.register("still_strange_matter_block", () -> new ArchitecturyLiquidBlock(STILL_STRANGE_MATTER, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<Item> STILL_STRANGE_MATTER_BUCKET = ITEMS.register("still_strange_matter_bucket", () -> new ArchitecturyBucketItem(STILL_STRANGE_MATTER, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // adamant
-    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_ADAMANT = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_adamant", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_ADAMANT_ATTRIBUTES)) : null;
-    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_ADAMANT = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_adamant", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_ADAMANT_ATTRIBUTES)) : null;
-    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_ADAMANT_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_adamant_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_ADAMANT, AbstractBlock.Settings.copy(Blocks.WATER))) : null;
-    public static final RegistrySupplier<Item> STILL_MOLTEN_ADAMANT_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_adamant_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_ADAMANT, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET))) : null;
+    public static final RegistrySupplier<FlowingFluid> STILL_MOLTEN_ADAMANT = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_adamant", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_ADAMANT_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FlowingFluid> FLOWING_MOLTEN_ADAMANT = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_adamant", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_ADAMANT_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<LiquidBlock> STILL_MOLTEN_ADAMANT_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_adamant_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_ADAMANT, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))) : null;
+    public static final RegistrySupplier<Item> STILL_MOLTEN_ADAMANT_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_adamant_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_ADAMANT, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET))) : null;
     
     // biosteel
-    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_BIOSTEEL = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_biosteel", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_BIOSTEEL_ATTRIBUTES)) : null;
-    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_BIOSTEEL = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_biosteel", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_BIOSTEEL_ATTRIBUTES)) : null;
-    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_BIOSTEEL_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_biosteel_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_BIOSTEEL, AbstractBlock.Settings.copy(Blocks.WATER))) : null;
-    public static final RegistrySupplier<Item> STILL_MOLTEN_BIOSTEEL_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_biosteel_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_BIOSTEEL, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET))) : null;
+    public static final RegistrySupplier<FlowingFluid> STILL_MOLTEN_BIOSTEEL = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_biosteel", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_BIOSTEEL_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FlowingFluid> FLOWING_MOLTEN_BIOSTEEL = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_biosteel", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_BIOSTEEL_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<LiquidBlock> STILL_MOLTEN_BIOSTEEL_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_biosteel_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_BIOSTEEL, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))) : null;
+    public static final RegistrySupplier<Item> STILL_MOLTEN_BIOSTEEL_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_biosteel_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_BIOSTEEL, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET))) : null;
     
     // duratium
-    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_DURATIUM = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_duratium", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_DURATIUM_ATTRIBUTES)) : null;
-    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_DURATIUM = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_duratium", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_DURATIUM_ATTRIBUTES)) : null;
-    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_DURATIUM_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_duratium_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_DURATIUM, AbstractBlock.Settings.copy(Blocks.WATER))) : null;
-    public static final RegistrySupplier<Item> STILL_MOLTEN_DURATIUM_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_duratium_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_DURATIUM, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET))) : null;
+    public static final RegistrySupplier<FlowingFluid> STILL_MOLTEN_DURATIUM = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_duratium", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_DURATIUM_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FlowingFluid> FLOWING_MOLTEN_DURATIUM = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_duratium", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_DURATIUM_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<LiquidBlock> STILL_MOLTEN_DURATIUM_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_duratium_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_DURATIUM, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))) : null;
+    public static final RegistrySupplier<Item> STILL_MOLTEN_DURATIUM_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_duratium_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_DURATIUM, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET))) : null;
     
     // energite
-    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_ENERGITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_energite", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_ENERGITE_ATTRIBUTES)) : null;
-    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_ENERGITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_energite", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_ENERGITE_ATTRIBUTES)) : null;
-    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_ENERGITE_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_energite_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_ENERGITE, AbstractBlock.Settings.copy(Blocks.WATER))) : null;
-    public static final RegistrySupplier<Item> STILL_MOLTEN_ENERGITE_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_energite_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_ENERGITE, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET))) : null;
+    public static final RegistrySupplier<FlowingFluid> STILL_MOLTEN_ENERGITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_energite", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_ENERGITE_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FlowingFluid> FLOWING_MOLTEN_ENERGITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_energite", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_ENERGITE_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<LiquidBlock> STILL_MOLTEN_ENERGITE_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_energite_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_ENERGITE, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))) : null;
+    public static final RegistrySupplier<Item> STILL_MOLTEN_ENERGITE_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_energite_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_ENERGITE, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET))) : null;
     
     // fluxite
-    public static final RegistrySupplier<FlowableFluid> STILL_MOLTEN_FLUXITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_fluxite", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_FLUXITE_ATTRIBUTES)) : null;
-    public static final RegistrySupplier<FlowableFluid> FLOWING_MOLTEN_FLUXITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_fluxite", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_FLUXITE_ATTRIBUTES)) : null;
-    public static final RegistrySupplier<FluidBlock> STILL_MOLTEN_FLUXITE_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_fluxite_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_FLUXITE, AbstractBlock.Settings.copy(Blocks.WATER))) : null;
-    public static final RegistrySupplier<Item> STILL_MOLTEN_FLUXITE_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_fluxite_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_FLUXITE, new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET))) : null;
+    public static final RegistrySupplier<FlowingFluid> STILL_MOLTEN_FLUXITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_fluxite", () -> new ArchitecturyFlowingFluid.Source(MOLTEN_FLUXITE_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<FlowingFluid> FLOWING_MOLTEN_FLUXITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_fluxite", () -> new ArchitecturyFlowingFluid.Flowing(MOLTEN_FLUXITE_ATTRIBUTES)) : null;
+    public static final RegistrySupplier<LiquidBlock> STILL_MOLTEN_FLUXITE_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_fluxite_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_FLUXITE, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))) : null;
+    public static final RegistrySupplier<Item> STILL_MOLTEN_FLUXITE_BUCKET = Platform.isModLoaded("productivemetalworks") ? ITEMS.register("still_molten_fluxite_bucket", () -> new ArchitecturyBucketItem(STILL_MOLTEN_FLUXITE, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET))) : null;
     
     public static void registerFluids() {
         FLUIDS.register();

@@ -1,10 +1,10 @@
 package rearth.oritech.api.energy;
 
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.Item;
 import rearth.oritech.util.StackContext;
 
 import java.util.function.Supplier;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.world.item.Item;
 
 public interface ItemEnergyApi {
     
@@ -12,6 +12,6 @@ public interface ItemEnergyApi {
     
     EnergyApi.EnergyStorage find(StackContext stack);
     
-    ComponentType<Long> getEnergyComponent();
+    DataComponentType<Long> getEnergyComponent();
     
 }

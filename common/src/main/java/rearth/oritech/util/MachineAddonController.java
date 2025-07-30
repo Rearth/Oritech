@@ -1,20 +1,24 @@
 package rearth.oritech.util;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
+import rearth.oritech.block.blocks.addons.MachineAddonBlock.AddonSettings;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
-
+import F;
+import I;
+import J;
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface MachineAddonController {
     
@@ -26,7 +30,7 @@ public interface MachineAddonController {
     
     BlockPos getPosForAddon();
     
-    World getWorldForAddon();
+    Level getWorldForAddon();
     
     Direction getFacingForAddon();
     
@@ -74,8 +78,8 @@ public interface MachineAddonController {
             if (foundAddons.stream().noneMatch(newAddon -> newAddon.pos().equals(addon))) {
                 var state = Objects.requireNonNull(getWorldForAddon()).getBlockState(addon);
                 if (state.getBlock() instanceof MachineAddonBlock) {
-                    getWorldForAddon().setBlockState(addon, state.with(MachineAddonBlock.ADDON_USED, false));
-                    getWorldForAddon().updateNeighborsAlways(addon, state.getBlock());
+                    getWorldForAddon().setBlockAndUpdate(addon, state.setValue(MachineAddonBlock.ADDON_USED, false));
+                    getWorldForAddon().updateNeighborsAt(addon, state.getBlock());
                 }
             }
         }
@@ -91,8 +95,8 @@ public interface MachineAddonController {
         for (var addon : getConnectedAddons()) {
             var state = Objects.requireNonNull(getWorldForAddon()).getBlockState(addon);
             if (state.getBlock() instanceof MachineAddonBlock) {
-                getWorldForAddon().setBlockState(addon, state.with(MachineAddonBlock.ADDON_USED, false));
-                getWorldForAddon().updateNeighborsAlways(addon, state.getBlock());
+                getWorldForAddon().setBlockAndUpdate(addon, state.setValue(MachineAddonBlock.ADDON_USED, false));
+                getWorldForAddon().updateNeighborsAt(addon, state.getBlock());
             }
         }
         
@@ -163,7 +167,7 @@ public interface MachineAddonController {
                 }
                 
                 // if the candidate is in use with another controller
-                if (candidate.get(MachineAddonBlock.ADDON_USED) && !candidateAddonEntity.getControllerPos().equals(pos)) {
+                if (candidate.getValue(MachineAddonBlock.ADDON_USED) && !candidateAddonEntity.getControllerPos().equals(pos)) {
                     openSlots.add(candidatePos);
                     continue;
                 }
@@ -257,11 +261,11 @@ public interface MachineAddonController {
         
         for (var addon : addons) {
             var newState = addon.state()
-                             .with(MachineAddonBlock.ADDON_USED, true);
+                             .setValue(MachineAddonBlock.ADDON_USED, true);
             // Set controller before setting block state, otherwise the addon will think
             // it's not connected to a machine the first time neighbor blocks are being updated.
             addon.addonEntity().setControllerPos(pos);
-            world.setBlockState(addon.pos(), newState);
+            world.setBlockAndUpdate(addon.pos(), newState);
         }
     }
     
@@ -274,7 +278,7 @@ public interface MachineAddonController {
         energyStorage.amount = Math.min(energyStorage.amount, energyStorage.capacity);
     }
     
-    default void writeAddonToNbt(NbtCompound nbt) {
+    default void writeAddonToNbt(CompoundTag nbt) {
         var data = getBaseAddonData();
         nbt.putFloat("speed", data.speed);
         nbt.putFloat("efficiency", data.efficiency);
@@ -282,9 +286,9 @@ public interface MachineAddonController {
         nbt.putLong("energyBonusTransfer", data.energyBonusTransfer);
         nbt.putInt("extraChambers", data.extraChambers);
         
-        var posList = new NbtList();
+        var posList = new ListTag();
         for (var pos : getConnectedAddons()) {
-            var posTag = new NbtCompound();
+            var posTag = new CompoundTag();
             posTag.putInt("x", pos.getX());
             posTag.putInt("y", pos.getY());
             posTag.putInt("z", pos.getZ());
@@ -293,15 +297,15 @@ public interface MachineAddonController {
         nbt.put("connectedAddons", posList);
     }
     
-    default void loadAddonNbtData(NbtCompound nbt) {
+    default void loadAddonNbtData(CompoundTag nbt) {
         var data = new BaseAddonData(nbt.getFloat("speed"), nbt.getFloat("efficiency"), nbt.getLong("energyBonusCapacity"), nbt.getLong("energyBonusTransfer"), nbt.getInt("extraChambers"));
         setBaseAddonData(data);
         
-        var posList = nbt.getList("connectedAddons", NbtElement.COMPOUND_TYPE);
+        var posList = nbt.getList("connectedAddons", Tag.TAG_COMPOUND);
         var connectedAddons = getConnectedAddons();
         
         for (var posTag : posList) {
-            var posCompound = (NbtCompound) posTag;
+            var posCompound = (CompoundTag) posTag;
             var x = posCompound.getInt("x");
             var y = posCompound.getInt("y");
             var z = posCompound.getInt("z");
@@ -312,12 +316,12 @@ public interface MachineAddonController {
     
     private static Set<BlockPos> getNeighbors(BlockPos pos) {
         return Set.of(
-          pos.add(-1, 0, 0),
-          pos.add(1, 0, 0),
-          pos.add(0, 0, -1),
-          pos.add(0, 0, 1),
-          pos.add(0, -1, 0),
-          pos.add(0, 1, 0)
+          pos.offset(-1, 0, 0),
+          pos.offset(1, 0, 0),
+          pos.offset(0, 0, -1),
+          pos.offset(0, 0, 1),
+          pos.offset(0, -1, 0),
+          pos.offset(0, 1, 0)
         );
     }
     

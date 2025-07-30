@@ -1,9 +1,5 @@
 package rearth.oritech.block.entity.processing;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -13,6 +9,10 @@ import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class FoundryBlockEntity extends MultiblockMachineEntity {
     
@@ -49,7 +49,7 @@ public class FoundryBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.FOUNDRY_SCREEN;
     }
     

@@ -1,7 +1,7 @@
 package rearth.oritech.api.attachment;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 
 public abstract class AttachmentApi {
     

@@ -1,51 +1,51 @@
 package rearth.oritech.client.init;
 
 import dev.architectury.registry.menu.MenuRegistry;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.inventory.MenuType;
 import rearth.oritech.client.ui.*;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
-public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerType<?>> {
+public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
     
-    public static final ScreenHandlerType<BasicMachineScreenHandler> TREEFELLER_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
-    public static final ScreenHandlerType<BasicMachineScreenHandler> ATOMIC_FORGE_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
-    public static final ScreenHandlerType<BasicMachineScreenHandler> TANK_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
-    public static final ScreenHandlerType<BasicMachineScreenHandler> CHARGER_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
-    public static final ScreenHandlerType<BasicMachineScreenHandler> FUEL_PORT_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
-    public static final ScreenHandlerType<BasicMachineScreenHandler> AUGMENTER_INV_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
+    public static final MenuType<BasicMachineScreenHandler> TREEFELLER_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
+    public static final MenuType<BasicMachineScreenHandler> ATOMIC_FORGE_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
+    public static final MenuType<BasicMachineScreenHandler> TANK_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
+    public static final MenuType<BasicMachineScreenHandler> CHARGER_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
+    public static final MenuType<BasicMachineScreenHandler> FUEL_PORT_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
+    public static final MenuType<BasicMachineScreenHandler> AUGMENTER_INV_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
     
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> LASER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> PULVERIZER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> GRINDER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> ASSEMBLER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> FOUNDRY_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> COOLER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> STORAGE_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> POWERED_FURNACE_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> BIO_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> BASIC_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> LAVA_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> FUEL_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> STEAM_ENGINE_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> DESTROYER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> PLACER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final ScreenHandlerType<UpgradableMachineScreenHandler> FERTILIZER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> LASER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> PULVERIZER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> GRINDER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> ASSEMBLER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> FOUNDRY_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> COOLER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> STORAGE_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> POWERED_FURNACE_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> BIO_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> BASIC_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> LAVA_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> FUEL_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> STEAM_ENGINE_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> DESTROYER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> PLACER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> FERTILIZER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
     
-    public static final ScreenHandlerType<ReactorScreenHandler> REACTOR_SCREEN = MenuRegistry.ofExtended((ReactorScreenHandler::new));
-    public static final ScreenHandlerType<CatalystScreenHandler> CATALYST_SCREEN = MenuRegistry.ofExtended((CatalystScreenHandler::new));
-    public static final ScreenHandlerType<EnchanterScreenHandler> ENCHANTER_SCREEN = MenuRegistry.ofExtended((EnchanterScreenHandler::new));
-    public static final ScreenHandlerType<AcceleratorScreenHandler> ACCELERATOR_SCREEN = MenuRegistry.ofExtended((AcceleratorScreenHandler::new));
-    public static final ScreenHandlerType<ItemFilterScreenHandler> ITEM_FILTER_SCREEN = MenuRegistry.ofExtended((ItemFilterScreenHandler::new));
-    public static final ScreenHandlerType<PlayerModifierScreenHandler> MODIFIER_SCREEN = MenuRegistry.ofExtended((PlayerModifierScreenHandler::new));
-    public static final ScreenHandlerType<RedstoneAddonScreenHandler> REDSTONE_ADDON_SCREEN = MenuRegistry.ofExtended((RedstoneAddonScreenHandler::new));
-    public static final ScreenHandlerType<RefineryScreenHandler> REFINERY_SCREEN = MenuRegistry.ofExtended((RefineryScreenHandler::new));
+    public static final MenuType<ReactorScreenHandler> REACTOR_SCREEN = MenuRegistry.ofExtended((ReactorScreenHandler::new));
+    public static final MenuType<CatalystScreenHandler> CATALYST_SCREEN = MenuRegistry.ofExtended((CatalystScreenHandler::new));
+    public static final MenuType<EnchanterScreenHandler> ENCHANTER_SCREEN = MenuRegistry.ofExtended((EnchanterScreenHandler::new));
+    public static final MenuType<AcceleratorScreenHandler> ACCELERATOR_SCREEN = MenuRegistry.ofExtended((AcceleratorScreenHandler::new));
+    public static final MenuType<ItemFilterScreenHandler> ITEM_FILTER_SCREEN = MenuRegistry.ofExtended((ItemFilterScreenHandler::new));
+    public static final MenuType<PlayerModifierScreenHandler> MODIFIER_SCREEN = MenuRegistry.ofExtended((PlayerModifierScreenHandler::new));
+    public static final MenuType<RedstoneAddonScreenHandler> REDSTONE_ADDON_SCREEN = MenuRegistry.ofExtended((RedstoneAddonScreenHandler::new));
+    public static final MenuType<RefineryScreenHandler> REFINERY_SCREEN = MenuRegistry.ofExtended((RefineryScreenHandler::new));
     
-    public static final ScreenHandlerType<DroneScreenHandler> DRONE_SCREEN = MenuRegistry.ofExtended((DroneScreenHandler::new));
-    public static final ScreenHandlerType<CentrifugeScreenHandler> CENTRIFUGE_SCREEN = MenuRegistry.ofExtended((CentrifugeScreenHandler::new));
-    public static final ScreenHandlerType<InventoryProxyScreenHandler> INVENTORY_PROXY_SCREEN = MenuRegistry.ofExtended((InventoryProxyScreenHandler::new));
+    public static final MenuType<DroneScreenHandler> DRONE_SCREEN = MenuRegistry.ofExtended((DroneScreenHandler::new));
+    public static final MenuType<CentrifugeScreenHandler> CENTRIFUGE_SCREEN = MenuRegistry.ofExtended((CentrifugeScreenHandler::new));
+    public static final MenuType<InventoryProxyScreenHandler> INVENTORY_PROXY_SCREEN = MenuRegistry.ofExtended((InventoryProxyScreenHandler::new));
     
     public static void registerScreens() {
         MenuRegistry.registerScreenFactory(TREEFELLER_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
@@ -87,12 +87,12 @@ public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerTy
     
     @Override
     @SuppressWarnings("unchecked")
-    public Class<ScreenHandlerType<?>> getTargetFieldType() {
-        return (Class<ScreenHandlerType<?>>) (Object) ScreenHandlerType.class;
+    public Class<MenuType<?>> getTargetFieldType() {
+        return (Class<MenuType<?>>) (Object) MenuType.class;
     }
     
     @Override
-    public RegistryKey<Registry<ScreenHandlerType<?>>> getRegistryType() {
-        return RegistryKeys.SCREEN_HANDLER;
+    public ResourceKey<Registry<MenuType<?>>> getRegistryType() {
+        return Registries.MENU;
     }
 }

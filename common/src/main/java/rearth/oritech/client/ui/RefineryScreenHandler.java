@@ -1,12 +1,12 @@
 package rearth.oritech.client.ui;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.PacketByteBuf;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.entity.processing.RefineryBlockEntity;
 
 import java.util.Objects;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class RefineryScreenHandler extends UpgradableMachineScreenHandler {
     
@@ -15,11 +15,11 @@ public class RefineryScreenHandler extends UpgradableMachineScreenHandler {
     protected FluidApi.SingleSlotStorage outputBContainer;
     protected FluidApi.SingleSlotStorage outputCContainer;
     
-    public RefineryScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
+    public RefineryScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
     }
     
-    public RefineryScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
+    public RefineryScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(syncId, playerInventory, blockEntity);
         
         if (!(blockEntity instanceof RefineryBlockEntity refineryEntity)) {

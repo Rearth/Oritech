@@ -1,26 +1,26 @@
 package rearth.oritech.block.blocks.processing;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.Properties;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.entity.processing.PoweredFurnaceBlockEntity;
 
-public class PoweredFurnaceBlock extends MultiblockMachine implements BlockEntityProvider {
+public class PoweredFurnaceBlock extends MultiblockMachine implements EntityBlock {
     
-    public PoweredFurnaceBlock(Settings settings) {
+    public PoweredFurnaceBlock(Properties settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(Properties.LIT, false));
+        registerDefaultState(defaultBlockState().setValue(BlockStateProperties.LIT, false));
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
-        builder.add(Properties.LIT);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(BlockStateProperties.LIT);
     }
     
     @Override

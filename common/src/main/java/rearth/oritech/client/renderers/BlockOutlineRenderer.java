@@ -1,23 +1,29 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.util.math.*;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
@@ -31,20 +37,24 @@ import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MultiblockMachineController;
-
+import I;
+import Z;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BlockOutlineRenderer {
-    public static void render(ClientWorld world, Camera camera, MatrixStack matrixStack, VertexConsumerProvider consumer) {
+    public static void render(ClientLevel world, Camera camera, PoseStack matrixStack, MultiBufferSource consumer) {
         if (world == null) return;
         
-        var client = MinecraftClient.getInstance();
+        var client = Minecraft.getInstance();
         var player = client.player;
-        if (player == null || player.isSneaking()) return;
-        if (client.crosshairTarget == null || client.crosshairTarget.getType() != HitResult.Type.BLOCK) return;
+        if (player == null || player.isShiftKeyDown()) return;
+        if (client.hitResult == null || client.hitResult.getType() != HitResult.Type.BLOCK) return;
         
-        var itemStack = player.getMainHandStack();
-        var blockPos = ((BlockHitResult) client.crosshairTarget).getBlockPos();
+        var itemStack = player.getMainHandItem();
+        var blockPos = ((BlockHitResult) client.hitResult).getBlockPos();
         
         if (Oritech.CONFIG.showMachinePreview()) {
             renderBlockPlacementPreviewOutline(world, camera, matrixStack, consumer, itemStack, player, blockPos);
@@ -54,7 +64,7 @@ public class BlockOutlineRenderer {
         renderPromethiumPickaxeOutline(world, camera, matrixStack, consumer, itemStack, player, blockPos);
     }
     
-    private static void renderBlockPlacementPreviewOutline(ClientWorld world, Camera camera, MatrixStack matrixStack, VertexConsumerProvider consumer, ItemStack itemStack, ClientPlayerEntity player, BlockPos blockPos) {
+    private static void renderBlockPlacementPreviewOutline(ClientLevel world, Camera camera, PoseStack matrixStack, MultiBufferSource consumer, ItemStack itemStack, LocalPlayer player, BlockPos blockPos) {
         
         var hasBlockItem = itemStack.getItem() instanceof BlockItem || itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER);
         
@@ -62,19 +72,19 @@ public class BlockOutlineRenderer {
         
         var block = itemStack.getItem() instanceof BlockItem ? ((BlockItem) itemStack.getItem()).getBlock() : BlockContent.UNSTABLE_CONTAINER;
         
-        if (!(block instanceof BlockEntityProvider entityProvider) || !block.getDefaultState().contains(MultiblockMachine.ASSEMBLED))
+        if (!(block instanceof EntityBlock entityProvider) || !block.defaultBlockState().hasProperty(MultiblockMachine.ASSEMBLED))
             return;
         
-        var machinePos = blockPos.add(((BlockHitResult) player.client.crosshairTarget).getSide().getVector());
+        var machinePos = blockPos.offset(((BlockHitResult) player.minecraft.hitResult).getDirection().getNormal());
         if (itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER))
             machinePos = blockPos;
-        var placementState = block.getPlacementState(new ItemPlacementContext(player, player.preferredHand, itemStack, (BlockHitResult) player.client.crosshairTarget));
-        var entity = entityProvider.createBlockEntity(machinePos, placementState);
+        var placementState = block.getStateForPlacement(new BlockPlaceContext(player, player.swingingArm, itemStack, (BlockHitResult) player.minecraft.hitResult));
+        var entity = entityProvider.newBlockEntity(machinePos, placementState);
         if (!(entity instanceof MultiblockMachineController multiblockController)) return;
         
         if (itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER)) {
             var blockState = world.getBlockState(machinePos);
-            var isValid = blockState.isIn(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW) || blockState.isIn(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM) || blockState.isIn(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH);
+            var isValid = blockState.is(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW) || blockState.is(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM) || blockState.is(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH);
             if (!isValid) return;
         }
         
@@ -82,9 +92,9 @@ public class BlockOutlineRenderer {
         var machineFacing = getFacingFromState(placementState);
         
         if (block instanceof LargeStorageBlock) {    // the large block is weird
-            machineFacing = player.getHorizontalFacing().getOpposite();
+            machineFacing = player.getDirection().getOpposite();
         } else if (block instanceof AugmentResearchStationBlock) {
-            machineFacing = player.getFacing();
+            machineFacing = player.getNearestViewDirection();
         } else if (!(block instanceof MultiblockMachine || block instanceof RefineryModuleBlock)) {
             machineFacing = machineFacing.getOpposite();
         }
@@ -92,117 +102,117 @@ public class BlockOutlineRenderer {
         var fullList = new ArrayList<>(coreOffsets);
         fullList.add(Vec3i.ZERO);
         
-        matrixStack.push();
-        var cameraPos = camera.getPos();
-        matrixStack.translate(-cameraPos.getX(), -cameraPos.getY(), -cameraPos.getZ());
+        matrixStack.pushPose();
+        var cameraPos = camera.getPosition();
+        matrixStack.translate(-cameraPos.x(), -cameraPos.y(), -cameraPos.z());
         matrixStack.translate(0.005f, 0.005f, 0.005f); // slight offset to avoid z fighting
         
-        var shape = VoxelShapes.fullCube();
+        var shape = Shapes.block();
         for (var coreOffset : fullList) {
             var fixedOffset = new Vec3i(coreOffset.getX(), coreOffset.getY(), coreOffset.getZ());
             var worldOffset = Geometry.offsetToWorldPosition(machineFacing, fixedOffset, machinePos);
-            shape = VoxelShapes.union(shape, VoxelShapes.cuboid(worldOffset.getX(), worldOffset.getY(), worldOffset.getZ(), worldOffset.getX() + 1, worldOffset.getY() + 1, worldOffset.getZ() + 1));
+            shape = Shapes.or(shape, Shapes.box(worldOffset.getX(), worldOffset.getY(), worldOffset.getZ(), worldOffset.getX() + 1, worldOffset.getY() + 1, worldOffset.getZ() + 1));
         }
         
-        WorldRenderer.drawCuboidShapeOutline(matrixStack, consumer.getBuffer(RenderLayer.getLines()), shape, 0, 0, 0, 1f, 1f, 1f, 0.7F);
-        matrixStack.pop();
+        LevelRenderer.renderShape(matrixStack, consumer.getBuffer(RenderType.lines()), shape, 0, 0, 0, 1f, 1f, 1f, 0.7F);
+        matrixStack.popPose();
         
     }
     
     private static Direction getFacingFromState(BlockState state) {
-        if (state.contains(Properties.HORIZONTAL_FACING)) {
-            return state.get(Properties.HORIZONTAL_FACING);
-        } else if (state.contains(Properties.FACING)) {
-            return state.get(Properties.FACING);
-        } else if (state.contains(SmallStorageBlock.TARGET_DIR)) {
-            return state.get(SmallStorageBlock.TARGET_DIR);
+        if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
+            return state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        } else if (state.hasProperty(BlockStateProperties.FACING)) {
+            return state.getValue(BlockStateProperties.FACING);
+        } else if (state.hasProperty(SmallStorageBlock.TARGET_DIR)) {
+            return state.getValue(SmallStorageBlock.TARGET_DIR);
         }
         
         return Direction.NORTH;
     }
     
-    private static void renderPromethiumPickaxeOutline(ClientWorld world, Camera camera, MatrixStack matrixStack, VertexConsumerProvider consumer, ItemStack itemStack, ClientPlayerEntity player, BlockPos blockPos) {
-        if (!itemStack.isOf(ToolsContent.PROMETHIUM_PICKAXE)) return;
+    private static void renderPromethiumPickaxeOutline(ClientLevel world, Camera camera, PoseStack matrixStack, MultiBufferSource consumer, ItemStack itemStack, LocalPlayer player, BlockPos blockPos) {
+        if (!itemStack.is(ToolsContent.PROMETHIUM_PICKAXE)) return;
         
         var offsetBlocks = PromethiumPickaxeItem.getOffsetBlocks(world, player, blockPos);
         
-        matrixStack.push();
-        var cameraPos = camera.getPos();
-        matrixStack.translate(-cameraPos.getX(), -cameraPos.getY(), -cameraPos.getZ());
+        matrixStack.pushPose();
+        var cameraPos = camera.getPosition();
+        matrixStack.translate(-cameraPos.x(), -cameraPos.y(), -cameraPos.z());
         
         for (var offsetPos : offsetBlocks) {
             var offsetState = world.getBlockState(offsetPos);
-            var renderShape = offsetState.getOutlineShape(world, offsetPos);
+            var renderShape = offsetState.getShape(world, offsetPos);
             
-            matrixStack.push();
+            matrixStack.pushPose();
             matrixStack.translate(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ());
-            WorldRenderer.drawCuboidShapeOutline(matrixStack, consumer.getBuffer(RenderLayer.getLines()), renderShape, 0, 0, 0, 0.0F, 0.0F, 0.0F, 0.35F);
-            matrixStack.pop();
+            LevelRenderer.renderShape(matrixStack, consumer.getBuffer(RenderType.lines()), renderShape, 0, 0, 0, 0.0F, 0.0F, 0.0F, 0.35F);
+            matrixStack.popPose();
         }
         
-        matrixStack.pop();
+        matrixStack.popPose();
     }
     
-    private static void renderParticlePlacementHelper(ClientWorld world, Camera camera, MatrixStack matrixStack, VertexConsumerProvider consumer, ItemStack itemStack, ClientPlayerEntity player, BlockPos blockPos) {
+    private static void renderParticlePlacementHelper(ClientLevel world, Camera camera, PoseStack matrixStack, MultiBufferSource consumer, ItemStack itemStack, LocalPlayer player, BlockPos blockPos) {
         
-        var isRing = itemStack.isOf(BlockContent.ACCELERATOR_RING.asItem());
-        var isMotor = itemStack.isOf(BlockContent.ACCELERATOR_MOTOR.asItem());
+        var isRing = itemStack.is(BlockContent.ACCELERATOR_RING.asItem());
+        var isMotor = itemStack.is(BlockContent.ACCELERATOR_MOTOR.asItem());
         
         if (!isRing && !isMotor) return;
         
-        assert player.client.crosshairTarget != null;
+        assert player.minecraft.hitResult != null;
         
-        var facing = player.getHorizontalFacing();
-        var cameraPos = camera.getPos();
-        var blockHit = (BlockHitResult) player.client.crosshairTarget;
-        var targetPos = Vec3d.of(blockHit.getBlockPos().add(blockHit.getSide().getVector()));
+        var facing = player.getDirection();
+        var cameraPos = camera.getPosition();
+        var blockHit = (BlockHitResult) player.minecraft.hitResult;
+        var targetPos = Vec3.atLowerCornerOf(blockHit.getBlockPos().offset(blockHit.getDirection().getNormal()));
         
         if (isMotor)
-            facing = facing.rotateYClockwise();
+            facing = facing.getClockWise();
         
-        var shape = VoxelShapes.cuboid(7/16f, 7/16f, 0, 9/16f, 9/16f, 1f);
-        var halfShape = VoxelShapes.cuboid(4/16f, 7/16f, 0.8, 6/16f, 9/16f, 1.3f);
-        var halfShapeLeft = VoxelShapes.cuboid(8/16f, 7/16f, 0.3, 10/16f, 9/16f, 0.8f);
+        var shape = Shapes.box(7/16f, 7/16f, 0, 9/16f, 9/16f, 1f);
+        var halfShape = Shapes.box(4/16f, 7/16f, 0.8, 6/16f, 9/16f, 1.3f);
+        var halfShapeLeft = Shapes.box(8/16f, 7/16f, 0.3, 10/16f, 9/16f, 0.8f);
         
-        matrixStack.push();
+        matrixStack.pushPose();
         
-        matrixStack.translate(-cameraPos.getX(), -cameraPos.getY(), -cameraPos.getZ());
+        matrixStack.translate(-cameraPos.x(), -cameraPos.y(), -cameraPos.z());
         matrixStack.translate(targetPos.x, targetPos.y, targetPos.z);
         matrixStack.translate(0.005f, 0.005f, 0.005f); // slight offset to avoid z fighting
         
         var rotationY = 0;
-        var extraOffset = Vec3d.ZERO;
+        var extraOffset = Vec3.ZERO;
         if (facing.equals(Direction.WEST)) {
             rotationY = 90;
-            extraOffset = new Vec3d(0, 0, 1);
+            extraOffset = new Vec3(0, 0, 1);
         }
         if (facing.equals(Direction.SOUTH)) {
             rotationY = 180;
-            extraOffset = new Vec3d(1, 0, 1);
+            extraOffset = new Vec3(1, 0, 1);
         }
         if (facing.equals(Direction.EAST)) {
             rotationY = 270;
-            extraOffset = new Vec3d(1, 0, 0);
+            extraOffset = new Vec3(1, 0, 0);
         }
         
         
         matrixStack.translate(extraOffset.x, extraOffset.y, extraOffset.z);
-        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotationY));
+        matrixStack.mulPose(Axis.YP.rotationDegrees(rotationY));
         
-        WorldRenderer.drawCuboidShapeOutline(matrixStack, consumer.getBuffer(RenderLayer.getLines()), shape, 0, 0, 0, 1F, 1.0F, 1.0F, 1F);
+        LevelRenderer.renderShape(matrixStack, consumer.getBuffer(RenderType.lines()), shape, 0, 0, 0, 1F, 1.0F, 1.0F, 1F);
         
         if (isRing) {
-            matrixStack.push();
-            matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(30));
-            WorldRenderer.drawCuboidShapeOutline(matrixStack, consumer.getBuffer(RenderLayer.getLines()), halfShape, 0, 0, 0, 1F, 1.0F, 1.0F, 1F);
-            matrixStack.pop();
+            matrixStack.pushPose();
+            matrixStack.mulPose(Axis.YP.rotationDegrees(30));
+            LevelRenderer.renderShape(matrixStack, consumer.getBuffer(RenderType.lines()), halfShape, 0, 0, 0, 1F, 1.0F, 1.0F, 1F);
+            matrixStack.popPose();
             
-            matrixStack.push();
-            matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-30));
-            WorldRenderer.drawCuboidShapeOutline(matrixStack, consumer.getBuffer(RenderLayer.getLines()), halfShapeLeft, 0, 0, 0, 1F, 1.0F, 1.0F, 1F);
-            matrixStack.pop();
+            matrixStack.pushPose();
+            matrixStack.mulPose(Axis.YP.rotationDegrees(-30));
+            LevelRenderer.renderShape(matrixStack, consumer.getBuffer(RenderType.lines()), halfShapeLeft, 0, 0, 0, 1F, 1.0F, 1.0F, 1F);
+            matrixStack.popPose();
         }
         
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 }

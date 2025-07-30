@@ -1,23 +1,13 @@
 package rearth.oritech.block.base.entity;
 
+import F;
+import I;
+import J;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -29,7 +19,22 @@ import rearth.oritech.init.recipes.OritechRecipe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 
 public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBlockEntity {
     
@@ -41,7 +46,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     @SyncField(SyncType.GUI_OPEN)
     public boolean isProducingSteam = false;
     @SyncField(SyncType.GUI_TICK)
-    public final SimpleInOutFluidStorage boilerStorage = new SimpleInOutFluidStorage(8 * FluidStackHooks.bucketAmount(), this::markDirty) {
+    public final SimpleInOutFluidStorage boilerStorage = new SimpleInOutFluidStorage(8 * FluidStackHooks.bucketAmount(), this::setChanged) {
         @Override
         public long insert(FluidStack toInsert, boolean simulate) {
             if (!boilerAcceptsInput(toInsert.getFluid())) return 0L;
@@ -56,13 +61,13 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         // check remaining burn time
         // if burn time is zero, try to consume item thus adding burn time
         // if burn time is remaining, use up one tick of it
         
-        if (world.isClient || !isActive(state) || disabledViaRedstone) return;
+        if (world.isClientSide || !isActive(state) || disabledViaRedstone) return;
         
         // progress var is used as remaining burn time
         if (progress > 0) {
@@ -70,12 +75,12 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
                 
                 progress--;
                 produceEnergy();
-                lastWorkedAt = world.getTime();
+                lastWorkedAt = world.getGameTime();
                 
                 if (progress == 0) {
                     burningFinished();
                 }
-                markDirty();
+                setChanged();
             }
         } else if (canFitEnergy()) {
             // try consume new item
@@ -106,11 +111,11 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             
             // remove inputs
             for (int i = 0; i < activeRecipe.getInputs().size(); i++) {
-                var taken = Inventories.splitStack(getInputView(), i, 1);  // amount is not configurable, because ingredient doesn't parse amount in recipe
+                var taken = ContainerHelper.removeItem(getInputView(), i, 1);  // amount is not configurable, because ingredient doesn't parse amount in recipe
             }
             pendingOutputs = activeRecipe.getResults();
             
-            markDirty();
+            setChanged();
             
         }
     }
@@ -140,7 +145,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         super.getAdditionalStatFromAddon(addonBlock);
         if (addonBlock.state().getBlock() == BlockContent.STEAM_BOILER_ADDON) {
             isProducingSteam = true;
-            world.updateNeighborsAlways(addonBlock.pos(), addonBlock.state().getBlock());
+            level.updateNeighborsAt(addonBlock.pos(), addonBlock.state().getBlock());
         }
     }
     
@@ -172,7 +177,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             produced *= Oritech.CONFIG.generators.steamEngineData.rfToSteamRatio();
             produced *= SteamEngineEntity.STEAM_AMOUNT_MULTIPLIER;
             
-            var extracted = boilerStorage.getInputContainer().extract(FluidStack.create(Fluids.WATER.getStill(), Math.round(produced)), false);
+            var extracted = boilerStorage.getInputContainer().extract(FluidStack.create(Fluids.WATER.getSource(), Math.round(produced)), false);
             boilerStorage.getOutputContainer().insert(FluidStack.create(SteamEngineEntity.getUsedSteamFluid(), extracted), false);
         } else {
             energyStorage.amount += produced;
@@ -186,36 +191,36 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         nbt.putInt("storedBurn", currentMaxBurnTime);
         boilerStorage.writeNbt(nbt, "");
         nbt.putBoolean("steamAddon", isProducingSteam);
         
-        var resList = new NbtList();
+        var resList = new ListTag();
         for (var stack : pendingOutputs) {
-            var data = stack.encode(registryLookup);
+            var data = stack.save(registryLookup);
             resList.add(data);
         }
         nbt.put("pendingResults", resList);
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         currentMaxBurnTime = nbt.getInt("storedBurn");
         boilerStorage.readNbt(nbt, "");
         isProducingSteam = nbt.getBoolean("steamAddon");
         
-        var storedResults = nbt.getList("pendingResults", NbtElement.COMPOUND_TYPE);
+        var storedResults = nbt.getList("pendingResults", Tag.TAG_COMPOUND);
         for (var elem : storedResults) {
-            var compound = (NbtCompound) elem;
-            var stack = ItemStack.fromNbt(registryLookup, compound).get();
+            var compound = (CompoundTag) elem;
+            var stack = ItemStack.parse(registryLookup, compound).get();
             pendingOutputs.add(stack);
         }
     }
     
-    protected abstract Set<Pair<BlockPos, Direction>> getOutputTargets(BlockPos pos, World world);
+    protected abstract Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level world);
     
     protected void outputEnergy() {
         if (energyStorage.getAmount() <= 0) return;
@@ -223,14 +228,14 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         var moved = 0L;
         
         // todo caching for targets? Used to be BlockApiCache.create()
-        for (var target : getOutputTargets(pos, world)) {
-            var candidate = EnergyApi.BLOCK.find(world, target.getLeft(), target.getRight());
+        for (var target : getOutputTargets(worldPosition, level)) {
+            var candidate = EnergyApi.BLOCK.find(level, target.getA(), target.getB());
             if (candidate != null)
                 moved += EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }
         
         if (moved > 0)
-            this.markDirty();
+            this.setChanged();
         
     }
     

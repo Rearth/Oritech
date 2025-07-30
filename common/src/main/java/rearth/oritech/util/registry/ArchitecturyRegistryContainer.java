@@ -4,15 +4,14 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import io.wispforest.owo.registration.reflect.FieldProcessingSubject;
 import io.wispforest.owo.util.ReflectionUtils;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-
 import java.lang.reflect.Field;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 
 @SuppressWarnings({"UnstableApiUsage"})
 public interface ArchitecturyRegistryContainer<T> extends FieldProcessingSubject<T> {
     
-    RegistryKey<Registry<T>> getRegistryType();
+    ResourceKey<Registry<T>> getRegistryType();
     
     default void postProcessField(String namespace, T value, String identifier, Field field, RegistrySupplier<T> supplier) {}
     

@@ -1,10 +1,10 @@
 package rearth.oritech.block.blocks.reactor;
 
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 import rearth.oritech.init.BlockContent;
 
 public class ReactorAbsorberBlock extends BaseReactorBlock {
-    public ReactorAbsorberBlock(Settings settings) {
+    public ReactorAbsorberBlock(Properties settings) {
         super(settings);
     }
     

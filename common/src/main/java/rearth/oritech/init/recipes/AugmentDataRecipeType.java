@@ -6,15 +6,15 @@ import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.EndecRecipeSerializer;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeType;
 import rearth.oritech.util.SizedIngredient;
 
 public class AugmentDataRecipeType extends EndecRecipeSerializer<AugmentDataRecipe> implements RecipeType<AugmentDataRecipe> {
     
     public static final Endec<AugmentDataRecipe> AUGMENT_DATA_RECIPE_ENDEC = StructEndecBuilder.of(
-      MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (AugmentDataRecipeType) Registries.RECIPE_TYPE.get(identifier1), AugmentDataRecipeType::getIdentifier).fieldOf("type", AugmentDataRecipe::getOriType),
+      MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (AugmentDataRecipeType) BuiltInRegistries.RECIPE_TYPE.get(identifier1), AugmentDataRecipeType::getIdentifier).fieldOf("type", AugmentDataRecipe::getOriType),
       Endec.BOOLEAN.fieldOf("toggleable", AugmentDataRecipe::isToggleable),
       CodecUtils.toEndec(SizedIngredient.CODEC.codec()).listOf().fieldOf("researchCost", AugmentDataRecipe::getResearchCost),
       CodecUtils.toEndec(SizedIngredient.CODEC.codec()).listOf().fieldOf("applyCost", AugmentDataRecipe::getApplyCost),
@@ -28,13 +28,13 @@ public class AugmentDataRecipeType extends EndecRecipeSerializer<AugmentDataReci
       AugmentDataRecipe::new
     );
     
-    private final Identifier identifier;
+    private final ResourceLocation identifier;
     
-    public Identifier getIdentifier() {
+    public ResourceLocation getIdentifier() {
         return identifier;
     }
     
-    public AugmentDataRecipeType(Identifier identifier) {
+    public AugmentDataRecipeType(ResourceLocation identifier) {
         super((StructEndec<AugmentDataRecipe>) AUGMENT_DATA_RECIPE_ENDEC);
         this.identifier = identifier;
     }

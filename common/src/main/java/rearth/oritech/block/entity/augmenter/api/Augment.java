@@ -2,9 +2,6 @@ package rearth.oritech.block.entity.augmenter.api;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.Attachment;
 import rearth.oritech.api.attachment.AttachmentApi;
@@ -15,24 +12,27 @@ import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 // all events / methods here are called just on the server (except for refreshClient()). However the augments are also present and loaded
 // on the client with all their data and recipe.
 public abstract class Augment {
     
-    public static final Attachment<Map<Identifier, AugmentState>> ACTIVE_AUGMENTS_DATA = new Attachment<>() {
+    public static final Attachment<Map<ResourceLocation, AugmentState>> ACTIVE_AUGMENTS_DATA = new Attachment<>() {
         @Override
-        public Identifier identifier() {
+        public ResourceLocation identifier() {
             return Oritech.id("playeraugments");
         }
         
         @Override
-        public Codec<Map<Identifier, AugmentState>> persistenceCodec() {
-            return Codec.unboundedMap(Identifier.CODEC, AugmentState.CODEC);
+        public Codec<Map<ResourceLocation, AugmentState>> persistenceCodec() {
+            return Codec.unboundedMap(ResourceLocation.CODEC, AugmentState.CODEC);
         }
         
         @Override
-        public Supplier<Map<Identifier, AugmentState>> initializer() {
+        public Supplier<Map<ResourceLocation, AugmentState>> initializer() {
             return HashMap::new;
         }
     };
@@ -42,21 +42,21 @@ public abstract class Augment {
         AttachmentApi.register(CustomAugmentsCollection.PORTAL_TARGET_TYPE);
     }
     
-    public final Identifier id;
+    public final ResourceLocation id;
     public final boolean toggleable;
     
-    protected Augment(Identifier id, boolean toggleable) {
+    protected Augment(ResourceLocation id, boolean toggleable) {
         this.id = id;
         this.toggleable = toggleable;
     }
     
-    public boolean isInstalled(PlayerEntity player) {
+    public boolean isInstalled(Player player) {
         var data = AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA);
         var state = data.getOrDefault(id, AugmentState.NOT_INSTALLED);
         return !state.equals(AugmentState.NOT_INSTALLED);
     }
     
-    public void installToPlayer(PlayerEntity player) {
+    public void installToPlayer(Player player) {
         var data = new HashMap<>(AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA));
         data.put(id, AugmentState.ENABLED);
         AttachmentApi.setAttachment(player, ACTIVE_AUGMENTS_DATA, data);
@@ -65,7 +65,7 @@ public abstract class Augment {
         activate(player);
     }
     
-    public void removeFromPlayer(PlayerEntity player) {
+    public void removeFromPlayer(Player player) {
         var data = new HashMap<>(AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA));
         data.put(id, AugmentState.NOT_INSTALLED);
         AttachmentApi.setAttachment(player, ACTIVE_AUGMENTS_DATA, data);
@@ -74,13 +74,13 @@ public abstract class Augment {
         deactivate(player);
     }
     
-    public boolean isEnabled(PlayerEntity player) {
+    public boolean isEnabled(Player player) {
         var data = AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA);
         var state = data.getOrDefault(id, AugmentState.NOT_INSTALLED);
         return state.equals(AugmentState.ENABLED);
     }
     
-    public void toggle(PlayerEntity player) {
+    public void toggle(Player player) {
         var data = new HashMap<>(AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA));
         var state = data.getOrDefault(id, AugmentState.NOT_INSTALLED);
         if (state.equals(AugmentState.ENABLED)) {
@@ -96,19 +96,19 @@ public abstract class Augment {
     }
     
     // this is called once when the augment is installed / enabled
-    public abstract void activate(PlayerEntity player);
+    public abstract void activate(Player player);
     
     // this is called when the augment is removed / disabled
-    public abstract void deactivate(PlayerEntity player);
+    public abstract void deactivate(Player player);
     
     // this is called every N ticks while the augment is enabled
-    public abstract void refreshServer(PlayerEntity player);
+    public abstract void refreshServer(Player player);
     
-    public void refreshClient(PlayerEntity player) {
+    public void refreshClient(Player player) {
     }
     
-    public void syncToClient(PlayerEntity player, Map<Identifier, AugmentState> data) {
-        NetworkManager.sendPlayerHandle(new PlayerAugments.AugmentPlayerStatePacket(data), (ServerPlayerEntity) player);
+    public void syncToClient(Player player, Map<ResourceLocation, AugmentState> data) {
+        NetworkManager.sendPlayerHandle(new PlayerAugments.AugmentPlayerStatePacket(data), (ServerPlayer) player);
     }
     
     public abstract int refreshInterval();

@@ -1,15 +1,5 @@
 package rearth.oritech.block.entity.processing;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.SmeltingRecipe;
-import net.minecraft.recipe.input.SingleStackRecipeInput;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
@@ -20,9 +10,21 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
-
+import Z;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.item.crafting.SmeltingRecipe;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 
 public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     
@@ -53,35 +55,35 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         if (!isActive(state)) return;
         
-        var recipeCandidate = world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, getFurnaceInput(), world);
+        var recipeCandidate = world.getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), world);
         
-        if (recipeCandidate.isPresent() && canAddToSlot(recipeCandidate.get().value().getResult(world.getRegistryManager()), inventory.heldStacks.get(1))) {
+        if (recipeCandidate.isPresent() && canAddToSlot(recipeCandidate.get().value().getResultItem(world.registryAccess()), inventory.heldStacks.get(1))) {
             if (hasEnoughEnergy()) {
                 
                 var activeRecipe = recipeCandidate.get().value();
                 useEnergy();
                 progress++;
-                lastWorkedAt = world.getTime();
+                lastWorkedAt = world.getGameTime();
                 
                 if (world.random.nextFloat() > 0.8)
-                    ParticleContent.FURNACE_BURNING.spawn(world, Vec3d.of(pos), 1);
+                    ParticleContent.FURNACE_BURNING.spawn(world, Vec3.atLowerCornerOf(pos), 1);
                 
                 if (furnaceCraftingFinished(activeRecipe)) {
                     craftFurnaceItem(activeRecipe);
                     
                     for (int i = 0; i < this.getBaseAddonData().extraChambers(); i++) {
-                        if (!canAddToSlot(recipeCandidate.get().value().getResult(world.getRegistryManager()), inventory.heldStacks.get(1)) || inventory.heldStacks.get(0).isEmpty()) break;
+                        if (!canAddToSlot(recipeCandidate.get().value().getResultItem(world.registryAccess()), inventory.heldStacks.get(1)) || inventory.heldStacks.get(0).isEmpty()) break;
                         craftFurnaceItem(activeRecipe);
                     }
                     
                     resetProgress();
                 }
                 
-                markDirty();
+                setChanged();
                 
             }
         } else {
@@ -89,31 +91,31 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
             if (progress > 0) resetProgress();
         }
         
-        if (world.getTime() % 18 == 0)
+        if (world.getGameTime() % 18 == 0)
             updateFurnaceState(state);
         
     }
     
     private void updateFurnaceState(BlockState state) {
-        var wasLit = state.get(Properties.LIT);
+        var wasLit = state.getValue(BlockStateProperties.LIT);
         var isLit = isActivelyWorking();
         
         if (wasLit != isLit) {
-            world.setBlockState(pos, state.with(Properties.LIT, isLit));
+            level.setBlockAndUpdate(worldPosition, state.setValue(BlockStateProperties.LIT, isLit));
         }
         
     }
     
     private void craftFurnaceItem(SmeltingRecipe activeRecipe) {
-        var result = activeRecipe.getResult(world.getRegistryManager());
+        var result = activeRecipe.getResultItem(level.registryAccess());
         var outSlot = inventory.heldStacks.get(1);
         var inSlot = inventory.heldStacks.get(0);
         
-        inSlot.decrement(1);
+        inSlot.shrink(1);
         if (outSlot.isEmpty()) {
             inventory.heldStacks.set(1, result.copy());
         } else {
-            outSlot.increment(result.getCount());
+            outSlot.grow(result.getCount());
         }
         
     }
@@ -122,8 +124,8 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
         return progress >= activeRecipe.getCookingTime() * getSpeedMultiplier();
     }
     
-    private SingleStackRecipeInput getFurnaceInput() {
-        return new SingleStackRecipeInput(getInputView().get(0));
+    private SingleRecipeInput getFurnaceInput() {
+        return new SingleRecipeInput(getInputView().get(0));
     }
     
     @SuppressWarnings("OptionalIsPresent")
@@ -131,7 +133,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     public float getProgress() {
         if (progress == 0) return 0;
         
-        var recipeCandidate = Objects.requireNonNull(world).getRecipeManager().getFirstMatch(RecipeType.SMELTING, getFurnaceInput(), world);
+        var recipeCandidate = Objects.requireNonNull(level).getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), level);
         if (recipeCandidate.isPresent()) {
             return (float) progress / getRecipeDuration();
         }
@@ -142,7 +144,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     @SuppressWarnings("OptionalIsPresent")
     @Override
     protected int getRecipeDuration() {
-        var recipeCandidate = Objects.requireNonNull(world).getRecipeManager().getFirstMatch(RecipeType.SMELTING, getFurnaceInput(), world);
+        var recipeCandidate = Objects.requireNonNull(level).getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), level);
         if (recipeCandidate.isPresent()) {
             return (int) (recipeCandidate.get().value().getCookingTime() * getSpeedMultiplier());
         }
@@ -173,7 +175,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.POWERED_FURNACE_SCREEN;
     }
     

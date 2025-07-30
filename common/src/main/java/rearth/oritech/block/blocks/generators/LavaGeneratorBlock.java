@@ -1,12 +1,12 @@
 package rearth.oritech.block.blocks.generators;
 
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.entity.generators.LavaGeneratorEntity;
 
 public class LavaGeneratorBlock extends MultiblockMachine {
-    public LavaGeneratorBlock(Settings settings) {
+    public LavaGeneratorBlock(Properties settings) {
         super(settings);
     }
     

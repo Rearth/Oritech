@@ -1,20 +1,8 @@
 package rearth.oritech.block.base.entity;
 
+import F;
+import I;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -30,14 +18,29 @@ import rearth.oritech.util.ScreenProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity
   implements ItemApi.BlockProvider, EnergyApi.BlockProvider, ExtendedMenuProvider, ScreenProvider, MachineAddonController, RedstoneAddonBlockEntity.RedstoneControllable {
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, this::markDirty);
+    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, this::setChanged);
     
-    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(getInventorySize(), this::markDirty);
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(getInventorySize(), this::setChanged);
     
     @SyncField({SyncType.GUI_OPEN})
     private final List<BlockPos> connectedAddons = new ArrayList<>();
@@ -73,9 +76,9 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
+        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         energyStorage.amount = nbt.getLong("energy_stored");
         disabledViaRedstone = nbt.getBoolean("oritech.redstone");
         
@@ -84,9 +87,9 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
+        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putLong("energy_stored", energyStorage.amount);
         nbt.putBoolean("oritech.redstone", disabledViaRedstone);
         writeAddonToNbt(nbt);
@@ -105,29 +108,29 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public BlockPos getPosForAddon() {
-        return getPos();
+        return getBlockPos();
     }
     
     @Override
-    public World getWorldForAddon() {
-        return getWorld();
+    public Level getWorldForAddon() {
+        return getLevel();
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
+    public void saveExtraData(FriendlyByteBuf buf) {
         sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(pos);
+        buf.writeBlockPos(worldPosition);
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.of("");
+    public Component getDisplayName() {
+        return Component.nullToEmpty("");
     }
     
     @Override
@@ -172,7 +175,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public Inventory getDisplayedInventory() {
+    public Container getDisplayedInventory() {
         return inventory;
     }
     
@@ -228,11 +231,11 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     @Override
     public void setBaseAddonData(BaseAddonData data) {
         this.addonData = data;
-        this.markDirty();
+        this.setChanged();
     }
     
     public boolean isActivelyWorking() {
-        return world.getTime() - lastWorkedAt < 5;
+        return level.getGameTime() - lastWorkedAt < 5;
     }
     
     @Override
@@ -244,10 +247,10 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     public int getComparatorSlotAmount(int slot) {
         if (inventory.heldStacks.size() <= slot) return 0;
         
-        var stack = inventory.getStack(slot);
+        var stack = inventory.getItem(slot);
         if (stack.isEmpty()) return 0;
         
-        return (int) ((stack.getCount() / (float) stack.getMaxCount()) * 15);
+        return (int) ((stack.getCount() / (float) stack.getMaxStackSize()) * 15);
     }
     
     @Override

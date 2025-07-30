@@ -1,28 +1,9 @@
 package rearth.oritech.block.entity.interaction;
 
+import I;
+import J;
+import Z;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -49,6 +30,28 @@ import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class TreefellerBlockEntity extends NetworkedBlockEntity implements BlockEntityTicker<NetworkedBlockEntity>, GeoBlockEntity, EnergyApi.BlockProvider, ItemApi.BlockProvider, ExtendedMenuProvider, ScreenProvider {
     
@@ -61,9 +64,9 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
     private long lastWorkedAt = 0;
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 4000, 0, this::markDirty);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 4000, 0, this::setChanged);
     
-    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(6, this::markDirty) {
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(6, this::setChanged) {
         
         @Override
         public boolean supportsInsertion() {
@@ -77,78 +80,78 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (energyStorage.amount >= LOG_COST) {
-            if (pendingBlocks.isEmpty() && world.getTime() % 20 == 0) {
+            if (pendingBlocks.isEmpty() && world.getGameTime() % 20 == 0) {
                 findTarget();
             }
             
             for (int i = 0; i < 6 && !pendingBlocks.isEmpty(); i++) {
                 var candidate = pendingBlocks.peekLast();
                 var candidateState = world.getBlockState(candidate);
-                var isLog = candidateState.isIn(TagContent.CUTTER_LOGS_MINEABLE);
+                var isLog = candidateState.is(TagContent.CUTTER_LOGS_MINEABLE);
 
                 var energyCost = isLog ? LOG_COST : LEAF_COST;
                 if (energyCost > energyStorage.amount) break;
                 
                 var actionResult = breakTreeBlock(candidateState, candidate);
-                if (actionResult == ActionResult.FAIL) break;
+                if (actionResult == InteractionResult.FAIL) break;
                 pendingBlocks.pollLast();
-                if (actionResult == ActionResult.PASS) continue;
-                lastWorkedAt = world.getTime();
+                if (actionResult == InteractionResult.PASS) continue;
+                lastWorkedAt = world.getGameTime();
 
                 energyStorage.amount -= energyCost;
-                markDirty();
+                setChanged();
                 
                 if (isLog) break; // only harvest 1 log, but multiple leaves
             }
         }
         
-        if (world.getTime() % 10 == 0) {
-            var idleTicks = world.getTime() - lastWorkedAt;
+        if (world.getGameTime() % 10 == 0) {
+            var idleTicks = world.getGameTime() - lastWorkedAt;
             var isWorking = idleTicks < 20;
             var animName = isWorking ? "work" : "idle";
             playWorkAnimation(animName);
         }
     }
     
-    private ActionResult breakTreeBlock(BlockState candidateState, BlockPos candidate) {
-        if (!candidateState.isIn(TagContent.CUTTER_LOGS_MINEABLE) && !candidateState.isIn(TagContent.CUTTER_LEAVES_MINEABLE)) return ActionResult.PASS;
+    private InteractionResult breakTreeBlock(BlockState candidateState, BlockPos candidate) {
+        if (!candidateState.is(TagContent.CUTTER_LOGS_MINEABLE) && !candidateState.is(TagContent.CUTTER_LEAVES_MINEABLE)) return InteractionResult.PASS;
         
-        var dropped = net.minecraft.block.Block.getDroppedStacks(candidateState, (ServerWorld) world, candidate, null);
-        if (dropped.stream().anyMatch((itemStack) -> !(itemStack.isEmpty() || canInsert(itemStack)))) return ActionResult.FAIL;
+        var dropped = net.minecraft.world.level.block.Block.getDrops(candidateState, (ServerLevel) level, candidate, null);
+        if (dropped.stream().anyMatch((itemStack) -> !(itemStack.isEmpty() || canInsert(itemStack)))) return InteractionResult.FAIL;
 
-        world.addBlockBreakParticles(candidate, candidateState);
-        if (world.getTime() % 2 == 0)
-            world.playSound(null, candidate, candidateState.getSoundGroup().getBreakSound(), SoundCategory.BLOCKS, 0.5f, 1f);
-        world.setBlockState(candidate, Blocks.AIR.getDefaultState());
+        level.addDestroyBlockEffect(candidate, candidateState);
+        if (level.getGameTime() % 2 == 0)
+            level.playSound(null, candidate, candidateState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.5f, 1f);
+        level.setBlockAndUpdate(candidate, Blocks.AIR.defaultBlockState());
         
         dropped.forEach(stack -> inventory.insert(stack, false));
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     private boolean canInsert(ItemStack stack) {
         return inventory.heldStacks.stream().anyMatch((itemStack) -> 
-            itemStack.isEmpty() || (ItemStack.areItemsAndComponentsEqual(itemStack, stack) && itemStack.getCount() + stack.getCount() <= itemStack.getMaxCount())
+            itemStack.isEmpty() || (ItemStack.isSameItemSameComponents(itemStack, stack) && itemStack.getCount() + stack.getCount() <= itemStack.getMaxStackSize())
         );
      }
     
     public void findTarget() {
         
-        var state = getCachedState();
-        var facing = state.get(Properties.HORIZONTAL_FACING);
+        var state = getBlockState();
+        var facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
         var offset = Geometry.rotatePosition(new Vec3i(1, 0, 0), facing);
-        var frontBlock = pos.add(offset);
+        var frontBlock = worldPosition.offset(offset);
         
-        var res = getTreeBlocks(frontBlock, world);
+        var res = getTreeBlocks(frontBlock, level);
         pendingBlocks.addAll(res);
         
     }
     
-    public static Deque<BlockPos> getTreeBlocks(BlockPos startPos, World world) {
+    public static Deque<BlockPos> getTreeBlocks(BlockPos startPos, Level world) {
         
         var startState = world.getBlockState(startPos);
-        if (!startState.isIn(TagContent.CUTTER_LOGS_MINEABLE)) return new ArrayDeque<>();
+        if (!startState.is(TagContent.CUTTER_LOGS_MINEABLE)) return new ArrayDeque<>();
         
         var checkedPositions = new HashSet<BlockPos>();
         var foundPositions = new ArrayDeque<BlockPos>();
@@ -170,8 +173,8 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
             var candidateState = world.getBlockState(candidate);
             checkedPositions.add(candidate);
             
-            var isLog = candidateState.isIn(TagContent.CUTTER_LOGS_MINEABLE);
-            var isValidLeaf = candidateState.isIn(TagContent.CUTTER_LEAVES_MINEABLE) && !candidateState.getOrEmpty(Properties.PERSISTENT).orElse(false);
+            var isLog = candidateState.is(TagContent.CUTTER_LOGS_MINEABLE);
+            var isValidLeaf = candidateState.is(TagContent.CUTTER_LEAVES_MINEABLE) && !candidateState.getOptionalValue(BlockStateProperties.PERSISTENT).orElse(false);
             
             if (!isLog && !isValidLeaf) continue;
             
@@ -180,7 +183,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
                 isValid = isInLogRange(candidate, foundLogs, 3);
             } else {
                 // Give a default of 1 for "leaf" blocks without a DISTANCE_1_7 property (like shroomlights)
-                var range = candidateState.getOrEmpty(Properties.DISTANCE_1_7).orElse(1);
+                var range = candidateState.getOptionalValue(BlockStateProperties.DISTANCE).orElse(1);
                 isValid = isInLogRange(candidate, foundLogs, range + 2);
             }
             
@@ -202,29 +205,29 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
     }
     
     private static boolean isInLogRange(BlockPos pos, Set<BlockPos> logs, int maxDist) {
-        return logs.stream().anyMatch(elem -> elem.getManhattanDistance(pos) <= maxDist);
+        return logs.stream().anyMatch(elem -> elem.distManhattan(pos) <= maxDist);
     }
     
     private static List<BlockPos> getNeighbors(BlockPos input) {
         List<BlockPos> neighbors = new ArrayList<>();
-        for (BlockPos pos : BlockPos.iterateOutwards(input, 1, 1, 1)) {
+        for (BlockPos pos : BlockPos.withinManhattan(input, 1, 1, 1)) {
             // Without toImmutable, all of the elements in the collected list end up being the same BlockPos
-            neighbors.add(pos.toImmutable());
+            neighbors.add(pos.immutable());
         }
         return neighbors;
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
+        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putLong("energy_stored", energyStorage.amount);
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
+        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         energyStorage.amount = nbt.getLong("energy_stored");
     }
     
@@ -254,7 +257,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
     @Override
     public List<GuiSlot> getGuiSlots() {
         var list = new ArrayList<GuiSlot>();
-        for (int i = 0; i < inventory.size(); i++) {
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
             list.add(new GuiSlot(i, 40 + i * 19, 25, true));
         }
         return list;
@@ -286,23 +289,23 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
     }
     
     @Override
-    public Inventory getDisplayedInventory() {
+    public Container getDisplayedInventory() {
         return inventory;
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.TREEFELLER_SCREEN;
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.of("");
+    public Component getDisplayName() {
+        return Component.nullToEmpty("");
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new BasicMachineScreenHandler(syncId, playerInventory, this);
     }
     
@@ -311,8 +314,8 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
+    public void saveExtraData(FriendlyByteBuf buf) {
         this.sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(pos);
+        buf.writeBlockPos(worldPosition);
     }
 }

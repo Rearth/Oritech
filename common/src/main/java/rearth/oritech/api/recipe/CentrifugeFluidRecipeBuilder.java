@@ -1,6 +1,6 @@
 package rearth.oritech.api.recipe;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class CentrifugeFluidRecipeBuilder extends OritechRecipeBuilder {
@@ -15,7 +15,7 @@ public class CentrifugeFluidRecipeBuilder extends OritechRecipeBuilder {
     }
 
     @Override
-    public void validate(Identifier id) throws IllegalStateException {
+    public void validate(ResourceLocation id) throws IllegalStateException {
         if (inputs != null && inputs.size() > 1)
             throw new IllegalStateException("too many inputs for recipe " + id + " (type " + type + ")");
         if ((fluidInput == null || fluidInput.isEmpty()))

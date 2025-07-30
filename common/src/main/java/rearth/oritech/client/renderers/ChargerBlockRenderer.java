@@ -1,35 +1,36 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import rearth.oritech.block.entity.interaction.ChargerBlockEntity;
 
 public class ChargerBlockRenderer implements BlockEntityRenderer<ChargerBlockEntity> {
     
     @Override
-    public void render(ChargerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(ChargerBlockEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
         
-        var inputStack = entity.inventory.getStack(0);
+        var inputStack = entity.inventory.getItem(0);
         if (inputStack.isEmpty()) return;
         
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(0.5f, 8/16f, 0.5f);
         
-        MinecraftClient.getInstance().getItemRenderer().renderItem(
+        Minecraft.getInstance().getItemRenderer().renderStatic(
           inputStack,
-          ModelTransformationMode.GROUND,
+          ItemDisplayContext.GROUND,
           light,
           overlay,
           matrices,
           vertexConsumers,
-          entity.getWorld(),
+          entity.getLevel(),
           0
         );
         
-        matrices.pop();
+        matrices.popPose();
         
     }
 }

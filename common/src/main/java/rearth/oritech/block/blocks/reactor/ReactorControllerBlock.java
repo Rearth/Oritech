@@ -2,49 +2,49 @@ package rearth.oritech.block.blocks.reactor;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
 
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
 
-public class ReactorControllerBlock extends BaseReactorBlock implements BlockEntityProvider {
-    public ReactorControllerBlock(Settings settings) {
+public class ReactorControllerBlock extends BaseReactorBlock implements EntityBlock {
+    public ReactorControllerBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH));
+        this.registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
-        builder.add(Properties.HORIZONTAL_FACING);
-    }
-    
-    @Nullable
-    @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return Objects.requireNonNull(super.getPlacementState(ctx)).with(Properties.HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
     
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
+    }
+    
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ReactorControllerBlockEntity(pos, state);
     }
     
@@ -56,7 +56,7 @@ public class ReactorControllerBlock extends BaseReactorBlock implements BlockEnt
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
@@ -64,22 +64,22 @@ public class ReactorControllerBlock extends BaseReactorBlock implements BlockEnt
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClient && world.getBlockEntity(pos) instanceof ReactorControllerBlockEntity reactorController) {
+        if (!world.isClientSide && world.getBlockEntity(pos) instanceof ReactorControllerBlockEntity reactorController) {
             reactorController.init(player);
             
-            if (world.getTime() < reactorController.disabledUntil) {
-                player.sendMessage(Text.translatable("text.oritech.reactor.cooldown"));
-                return ActionResult.SUCCESS;
+            if (world.getGameTime() < reactorController.disabledUntil) {
+                player.sendSystemMessage(Component.translatable("text.oritech.reactor.cooldown"));
+                return InteractionResult.SUCCESS;
             }
             
             if (reactorController.active) {
                 var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
+                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
             }
         }
         
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 }

@@ -2,14 +2,15 @@ package rearth.oritech.init.compat.emi;
 
 import dev.emi.emi.api.EmiDragDropHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
-import net.minecraft.client.gui.DrawContext;
+import io.wispforest.owo.ui.container.FlowLayout;
+import net.minecraft.client.gui.GuiGraphics;
 import rearth.oritech.client.ui.ItemFilterScreen;
 
 import static rearth.oritech.client.ui.ItemFilterScreen.FILTER_SIZE;
 
 public class EmiItemFilterDragDropHandler implements EmiDragDropHandler<ItemFilterScreen> {
     @Override
-    public void render(ItemFilterScreen screen, EmiIngredient dragged, DrawContext draw, int mouseX, int mouseY, float delta) {
+    public void render(ItemFilterScreen screen, EmiIngredient dragged, GuiGraphics draw, int mouseX, int mouseY, float delta) {
         for (int i = 0; i < FILTER_SIZE; i++) {
             var container = screen.getItemContainer(i);
             draw.fill(container.x(), container.y(), container.x() + container.width(), container.y() + container.height(), 0x8822BB33);

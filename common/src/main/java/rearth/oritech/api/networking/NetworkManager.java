@@ -1,28 +1,14 @@
 package rearth.oritech.api.networking;
 
+import ;
+import D;
+import I;
+import Z;
 import com.mojang.serialization.Codec;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,56 +35,75 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class NetworkManager {
     
-    private static final Map<Type, PacketCodec<? extends ByteBuf, ?>> AUTO_CODECS = new HashMap<>();
+    private static final Map<Type, StreamCodec<? extends ByteBuf, ?>> AUTO_CODECS = new HashMap<>();
     private static final Map<Integer, List<Field>> CACHED_FIELDS = new HashMap<Integer, List<Field>>();
     
     // these two are basically copies of the architectury built-in fluid stack codecs, but using the OPTIONAL_STREAM_CODEC to allow for empty fluid stacks
     public static Codec<FluidStack> FLUID_STACK_CODEC;
-    public static PacketCodec<RegistryByteBuf, FluidStack> FLUID_STACK_STREAM_CODEC;
+    public static StreamCodec<RegistryFriendlyByteBuf, FluidStack> FLUID_STACK_STREAM_CODEC;
     
     @ExpectPlatform
-    public static void sendBlockHandle(BlockEntity blockEntity, CustomPayload message) {
+    public static void sendBlockHandle(BlockEntity blockEntity, CustomPacketPayload message) {
         throw new AssertionError();
     }
     
     @ExpectPlatform
-    public static void sendPlayerHandle(CustomPayload message, ServerPlayerEntity player) {
+    public static void sendPlayerHandle(CustomPacketPayload message, ServerPlayer player) {
         throw new AssertionError();
     }
     
     @ExpectPlatform
-    public static void sendToServer(CustomPayload message) {
+    public static void sendToServer(CustomPacketPayload message) {
         throw new AssertionError();
     }
     
     @ExpectPlatform
-    public static <T extends CustomPayload> void registerToClient(CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> packetCodec, TriConsumer<T, World, DynamicRegistryManager> consumer) {
+    public static <T extends CustomPacketPayload> void registerToClient(CustomPacketPayload.Type<T> id, StreamCodec<RegistryFriendlyByteBuf, T> packetCodec, TriConsumer<T, Level, RegistryAccess> consumer) {
         throw new AssertionError();
     }
     
     @ExpectPlatform
-    public static <T extends CustomPayload> void registerToServer(CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> packetCodec, TriConsumer<T, PlayerEntity, DynamicRegistryManager> consumer) {
+    public static <T extends CustomPacketPayload> void registerToServer(CustomPacketPayload.Type<T> id, StreamCodec<RegistryFriendlyByteBuf, T> packetCodec, TriConsumer<T, Player, RegistryAccess> consumer) {
         throw new AssertionError();
     }
     
     public static void registerDefaultCodecs() {
         
-        registerCodec(PacketCodecs.INTEGER, Integer.class, int.class);
-        registerCodec(PacketCodecs.VAR_LONG, Long.class, long.class);
-        registerCodec(PacketCodecs.FLOAT, Float.class, float.class);
-        registerCodec(PacketCodecs.BOOL, Boolean.class, boolean.class);
-        registerCodec(PacketCodecs.DOUBLE, Double.class, double.class);
-        registerCodec(PacketCodecs.BYTE, Byte.class, byte.class);
-        registerCodec(PacketCodecs.SHORT, Short.class, short.class);
-        registerCodec(PacketCodecs.STRING, String.class);
-        registerCodec(Identifier.PACKET_CODEC, Identifier.class);
-        registerCodec(BlockPos.PACKET_CODEC, BlockPos.class);
-        registerCodec(ItemStack.OPTIONAL_PACKET_CODEC, ItemStack.class);
+        registerCodec(ByteBufCodecs.INT, Integer.class, int.class);
+        registerCodec(ByteBufCodecs.VAR_LONG, Long.class, long.class);
+        registerCodec(ByteBufCodecs.FLOAT, Float.class, float.class);
+        registerCodec(ByteBufCodecs.BOOL, Boolean.class, boolean.class);
+        registerCodec(ByteBufCodecs.DOUBLE, Double.class, double.class);
+        registerCodec(ByteBufCodecs.BYTE, Byte.class, byte.class);
+        registerCodec(ByteBufCodecs.SHORT, Short.class, short.class);
+        registerCodec(ByteBufCodecs.STRING_UTF8, String.class);
+        registerCodec(ResourceLocation.STREAM_CODEC, ResourceLocation.class);
+        registerCodec(BlockPos.STREAM_CODEC, BlockPos.class);
+        registerCodec(ItemStack.OPTIONAL_STREAM_CODEC, ItemStack.class);
         registerCodec(VEC2I_PACKED_CODEC, Vector2i.class);
-        registerCodec(VEC3D_PACKET_CODEC, Vec3d.class);
+        registerCodec(VEC3D_PACKET_CODEC, Vec3.class);
         registerCodec(SIMPLE_BLOCK_STATE_PACKET_CODEC, BlockState.class);
         registerCodec(FLUID_STACK_STREAM_CODEC, FluidStack.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
@@ -108,7 +113,7 @@ public class NetworkManager {
         
     }
     
-    public static <T> void registerCodec(PacketCodec<? extends ByteBuf, T> codec, Type... classes) {
+    public static <T> void registerCodec(StreamCodec<? extends ByteBuf, T> codec, Type... classes) {
         for (var clazz : classes)
             AUTO_CODECS.put(clazz, codec);
     }
@@ -140,10 +145,10 @@ public class NetworkManager {
         registerToClient(PlayerAugments.AugmentPlayerStatePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerStatePacket.class), PlayerAugments::receiveAugmentState);
     }
     
-    public static void receiveMessage(MessagePayload message, World world, DynamicRegistryManager registryAccess) {
-        var receivedBuf = new RegistryByteBuf(Unpooled.wrappedBuffer(message.message), registryAccess);
+    public static void receiveMessage(MessagePayload message, Level world, RegistryAccess registryAccess) {
+        var receivedBuf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(message.message), registryAccess);
         var receiverEntity = world.getBlockEntity(message.pos);
-        var receiverType = registryAccess.get(RegistryKeys.BLOCK_ENTITY_TYPE).get(message.targetEntityType);
+        var receiverType = registryAccess.registryOrThrow(Registries.BLOCK_ENTITY_TYPE).get(message.targetEntityType);
         if (receiverEntity != null && receiverType != null && receiverType.equals(receiverEntity.getType())) {
             decodeFields(receiverEntity, message.syncType, receivedBuf, world);
             if (receiverEntity instanceof NetworkedEventHandler networkedBlock) {
@@ -156,7 +161,7 @@ public class NetworkManager {
     
     // returns the number of encoded fields
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static int encodeFields(Object target, SyncType type, ByteBuf byteBuf, @Nullable World world) {
+    public static int encodeFields(Object target, SyncType type, ByteBuf byteBuf, @Nullable Level world) {
         
         var fields = getCachedFields(target, type);
         
@@ -194,7 +199,7 @@ public class NetworkManager {
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void decodeFields(Object target, SyncType type, ByteBuf byteBuf, World world) {
+    public static void decodeFields(Object target, SyncType type, ByteBuf byteBuf, Level world) {
         
         var fields = getCachedFields(target, type);
         
@@ -264,7 +269,7 @@ public class NetworkManager {
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static PacketCodec getAutoCodec(Class<?> type) {
+    public static StreamCodec getAutoCodec(Class<?> type) {
         
         // try to create codec for records
         if (!AUTO_CODECS.containsKey(type)) {
@@ -289,28 +294,28 @@ public class NetworkManager {
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static PacketCodec getAutoCodec(Field field) {
+    public static StreamCodec getAutoCodec(Field field) {
         var listType = getListType(field.getGenericType());
         if (listType.isPresent()) {
             var listTypeCodec = getAutoCodec((Class<?>) listType.get());
-            return listTypeCodec.collect(PacketCodecs.toList());
+            return listTypeCodec.apply(ByteBufCodecs.list());
         }
         var setType = getSetType(field.getGenericType());
         if (setType.isPresent()) {
             var setTypeCodec = getAutoCodec((Class<?>) setType.get());
-            return setTypeCodec.collect(toSet());
+            return setTypeCodec.apply(toSet());
         }
         var mapType = getMapType(field.getGenericType());
         if (mapType.isPresent()) {
-            var keyCodec = getAutoCodec((Class<?>) mapType.get().getLeft());
-            var valueCodec = getAutoCodec((Class<?>) mapType.get().getRight());
+            var keyCodec = getAutoCodec((Class<?>) mapType.get().getA());
+            var valueCodec = getAutoCodec((Class<?>) mapType.get().getB());
             
             if (keyCodec == null)
                 Oritech.LOGGER.error("Unable to get codec for map key type: {}", field.getType());
             if (valueCodec == null)
                 Oritech.LOGGER.error("Unable to get codec for map value type: {}", field.getType());
             
-            return PacketCodecs.map(HashMap::new, keyCodec, valueCodec);
+            return ByteBufCodecs.map(HashMap::new, keyCodec, valueCodec);
         }
         
         return getAutoCodec(field.getType());
@@ -339,12 +344,12 @@ public class NetworkManager {
     }
     
     // Method for checking if a given type is a Map and for retrieving its type parameters
-    public static Optional<Pair<Type, Type>> getMapType(Type type) {
+    public static Optional<Tuple<Type, Type>> getMapType(Type type) {
         if (type instanceof ParameterizedType pType) {
             var rawType = (Class<?>) pType.getRawType();
             if (rawType instanceof Class && Map.class.isAssignableFrom(rawType)) {
                 var typeArgs = pType.getActualTypeArguments();
-                return Optional.of(new Pair<>(typeArgs[0], typeArgs[1]));
+                return Optional.of(new Tuple<>(typeArgs[0], typeArgs[1]));
             }
         }
         return Optional.empty();
@@ -359,70 +364,70 @@ public class NetworkManager {
         return false;
     }
     
-    public record MessagePayload(BlockPos pos, Identifier targetEntityType, SyncType syncType,
-                                 byte[] message) implements CustomPayload {
+    public record MessagePayload(BlockPos pos, ResourceLocation targetEntityType, SyncType syncType,
+                                 byte[] message) implements CustomPacketPayload {
         @Override
-        public Id<? extends CustomPayload> getId() {
+        public net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
             return GENERIC_PACKET_ID;
         }
         
-        public static final CustomPayload.Id<MessagePayload> GENERIC_PACKET_ID = new CustomPayload.Id<>(Oritech.id("generic"));
+        public static final CustomPacketPayload.Type<MessagePayload> GENERIC_PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("generic"));
         
-        public static final PacketCodec<RegistryByteBuf, MessagePayload> PACKET_CODEC = new PacketCodec<>() {
+        public static final StreamCodec<RegistryFriendlyByteBuf, MessagePayload> PACKET_CODEC = new StreamCodec<>() {
             @Override
-            public MessagePayload decode(RegistryByteBuf buf) {
-                return new MessagePayload(BlockPos.PACKET_CODEC.decode(buf), Identifier.PACKET_CODEC.decode(buf), SyncType.PACKET_CODEC.decode(buf), PacketCodecs.BYTE_ARRAY.decode(buf));
+            public MessagePayload decode(RegistryFriendlyByteBuf buf) {
+                return new MessagePayload(BlockPos.STREAM_CODEC.decode(buf), ResourceLocation.STREAM_CODEC.decode(buf), SyncType.PACKET_CODEC.decode(buf), ByteBufCodecs.BYTE_ARRAY.decode(buf));
             }
             
             @Override
-            public void encode(RegistryByteBuf buf, MessagePayload value) {
-                BlockPos.PACKET_CODEC.encode(buf, value.pos);
-                Identifier.PACKET_CODEC.encode(buf, value.targetEntityType);
+            public void encode(RegistryFriendlyByteBuf buf, MessagePayload value) {
+                BlockPos.STREAM_CODEC.encode(buf, value.pos);
+                ResourceLocation.STREAM_CODEC.encode(buf, value.targetEntityType);
                 SyncType.PACKET_CODEC.encode(buf, value.syncType);
-                PacketCodecs.BYTE_ARRAY.encode(buf, value.message);
+                ByteBufCodecs.BYTE_ARRAY.encode(buf, value.message);
             }
         };
     }
     
-    static <B extends ByteBuf, V> PacketCodec.ResultFunction<B, V, Set<V>> toSet() {
-        return (codec) -> PacketCodecs.collection(HashSet::new, codec);
+    static <B extends ByteBuf, V> StreamCodec.CodecOperation<B, V, Set<V>> toSet() {
+        return (codec) -> ByteBufCodecs.collection(HashSet::new, codec);
     }
     
     // transmits only the block type, with the default block state. Custom properties are not sent.
-    public static PacketCodec<RegistryByteBuf, BlockState> SIMPLE_BLOCK_STATE_PACKET_CODEC = new PacketCodec<>() {
+    public static StreamCodec<RegistryFriendlyByteBuf, BlockState> SIMPLE_BLOCK_STATE_PACKET_CODEC = new StreamCodec<>() {
         @Override
-        public BlockState decode(RegistryByteBuf buf) {
-            return Registries.BLOCK.get(Identifier.PACKET_CODEC.decode(buf)).getDefaultState();
+        public BlockState decode(RegistryFriendlyByteBuf buf) {
+            return BuiltInRegistries.BLOCK.get(ResourceLocation.STREAM_CODEC.decode(buf)).defaultBlockState();
         }
         
         @Override
-        public void encode(RegistryByteBuf buf, BlockState value) {
-            Identifier.PACKET_CODEC.encode(buf, Registries.BLOCK.getId(value.getBlock()));
+        public void encode(RegistryFriendlyByteBuf buf, BlockState value) {
+            ResourceLocation.STREAM_CODEC.encode(buf, BuiltInRegistries.BLOCK.getKey(value.getBlock()));
         }
     };
     
-    public static PacketCodec<RegistryByteBuf, Vector2i> VEC2I_PACKED_CODEC = PacketCodec.tuple(
-      PacketCodecs.INTEGER, Vector2i::x,
-      PacketCodecs.INTEGER, Vector2i::y,
+    public static StreamCodec<RegistryFriendlyByteBuf, Vector2i> VEC2I_PACKED_CODEC = StreamCodec.composite(
+      ByteBufCodecs.INT, Vector2i::x,
+      ByteBufCodecs.INT, Vector2i::y,
       Vector2i::new
     );
     
     @SuppressWarnings("unchecked")
-    public static <K, V> PacketCodec<RegistryByteBuf, HashMap<K, V>> createMapCodec(Class<K> keyType, Class<V> valueType) {
-        return PacketCodecs.map(HashMap::new, getAutoCodec(keyType), getAutoCodec(valueType));
+    public static <K, V> StreamCodec<RegistryFriendlyByteBuf, HashMap<K, V>> createMapCodec(Class<K> keyType, Class<V> valueType) {
+        return ByteBufCodecs.map(HashMap::new, getAutoCodec(keyType), getAutoCodec(valueType));
     }
     
-    public static PacketCodec<RegistryByteBuf, Vec3d> VEC3D_PACKET_CODEC = new PacketCodec<>() {
+    public static StreamCodec<RegistryFriendlyByteBuf, Vec3> VEC3D_PACKET_CODEC = new StreamCodec<>() {
         @Override
-        public Vec3d decode(RegistryByteBuf buf) {
+        public Vec3 decode(RegistryFriendlyByteBuf buf) {
             var x = buf.readDouble();
             var y = buf.readDouble();
             var z = buf.readDouble();
-            return new Vec3d(x, y, z);
+            return new Vec3(x, y, z);
         }
         
         @Override
-        public void encode(RegistryByteBuf buf, Vec3d value) {
+        public void encode(RegistryFriendlyByteBuf buf, Vec3 value) {
             buf.writeDouble(value.x);
             buf.writeDouble(value.y);
             buf.writeDouble(value.z);

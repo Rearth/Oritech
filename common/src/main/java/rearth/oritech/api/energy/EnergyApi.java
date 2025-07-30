@@ -1,7 +1,8 @@
 package rearth.oritech.api.energy;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Direction;
+import J;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 
 public class EnergyApi {
     

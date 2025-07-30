@@ -2,9 +2,14 @@ package rearth.oritech.mixin;
 
 
 import net.minecraft.entity.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Attackable;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,28 +21,28 @@ import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity implements Attackable {
     
-    public LivingEntityMixin(EntityType<?> type, World world) {
+    public LivingEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
     
     @Override
-    public ItemEntity dropStack(ItemStack stack) {
-        return dropStack(stack, 0.0F);
+    public ItemEntity spawnAtLocation(ItemStack stack) {
+        return spawnAtLocation(stack, 0.0F);
     }
     
     @SuppressWarnings("resource")
     @Override
-    public ItemEntity dropStack(ItemStack stack, float yOffset) {
+    public ItemEntity spawnAtLocation(ItemStack stack, float yOffset) {
         LivingEntity thisEntity = (LivingEntity) (Object) this;
         LivingEntity attacker = thisEntity.getLastAttacker();
         
-        if (stack.isEmpty() || thisEntity.getWorld().isClient) return null;
+        if (stack.isEmpty() || thisEntity.level().isClientSide) return null;
         
         if (!thisEntity.isAlive() && oritech$isLaser(attacker)) {
-            ((PlayerEntity)attacker).giveItemStack(stack);
+            ((Player)attacker).addItem(stack);
             return null;
         }
-        return super.dropStack(stack, yOffset);
+        return super.spawnAtLocation(stack, yOffset);
     }
     
     @Inject(method = "dropXp(Lnet/minecraft/entity/Entity;)V", at = @At(value = "HEAD"), cancellable = true)
@@ -48,6 +53,6 @@ public abstract class LivingEntityMixin extends Entity implements Attackable {
     
     @Unique
     private boolean oritech$isLaser(Entity attacker) {
-        return attacker instanceof PlayerEntity player && player.getGameProfile().getName().equals(LaserArmBlockEntity.LASER_PLAYER_NAME);
+        return attacker instanceof Player player && player.getGameProfile().getName().equals(LaserArmBlockEntity.LASER_PLAYER_NAME);
     }
 }

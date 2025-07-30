@@ -1,12 +1,5 @@
 package rearth.oritech.block.entity.generators;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -17,6 +10,13 @@ import rearth.oritech.init.recipes.RecipeContent;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     public LavaGeneratorEntity(BlockPos pos, BlockState state) {
@@ -24,19 +24,19 @@ public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    protected Set<Pair<BlockPos, Direction>> getOutputTargets(BlockPos pos, World world) {
+    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level world) {
         
-        var res = new HashSet<Pair<BlockPos, Direction>>();
-        res.add(new Pair<>(pos.up(2), Direction.DOWN));
-        res.add(new Pair<>(pos.down(), Direction.DOWN));
-        res.add(new Pair<>(pos.east(), Direction.WEST));
-        res.add(new Pair<>(pos.east().up(), Direction.WEST));
-        res.add(new Pair<>(pos.south(), Direction.NORTH));
-        res.add(new Pair<>(pos.south().up(), Direction.NORTH));
-        res.add(new Pair<>(pos.west(), Direction.EAST));
-        res.add(new Pair<>(pos.west().up(), Direction.EAST));
-        res.add(new Pair<>(pos.north(), Direction.SOUTH));
-        res.add(new Pair<>(pos.north().up(), Direction.SOUTH));
+        var res = new HashSet<Tuple<BlockPos, Direction>>();
+        res.add(new Tuple<>(pos.above(2), Direction.DOWN));
+        res.add(new Tuple<>(pos.below(), Direction.DOWN));
+        res.add(new Tuple<>(pos.east(), Direction.WEST));
+        res.add(new Tuple<>(pos.east().above(), Direction.WEST));
+        res.add(new Tuple<>(pos.south(), Direction.NORTH));
+        res.add(new Tuple<>(pos.south().above(), Direction.NORTH));
+        res.add(new Tuple<>(pos.west(), Direction.EAST));
+        res.add(new Tuple<>(pos.west().above(), Direction.EAST));
+        res.add(new Tuple<>(pos.north(), Direction.SOUTH));
+        res.add(new Tuple<>(pos.north().above(), Direction.SOUTH));
         
         return res;
         
@@ -48,7 +48,7 @@ public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.LAVA_GENERATOR_SCREEN;
     }
     

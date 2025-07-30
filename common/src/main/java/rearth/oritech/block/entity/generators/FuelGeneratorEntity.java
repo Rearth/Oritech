@@ -1,12 +1,5 @@
 package rearth.oritech.block.entity.generators;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -18,6 +11,13 @@ import rearth.oritech.util.Geometry;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     public FuelGeneratorEntity(BlockPos pos, BlockState state) {
@@ -25,7 +25,7 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    protected Set<Pair<BlockPos, Direction>> getOutputTargets(BlockPos pos, World world) {
+    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level world) {
         
         // because facing blocks make rotations and relative offsets a nightmare...
         var posA = new Vec3i(1, 0, -1);
@@ -37,12 +37,12 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
         var worldPosB = (BlockPos) Geometry.offsetToWorldPosition(facing, posB, pos);
         var offset = worldPosA.subtract(coreWorldPosA);
         
-        var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
+        var direction = Direction.fromDelta(offset.getX(), offset.getY(), offset.getZ());
         
-        var res = new HashSet<Pair<BlockPos, Direction>>();
+        var res = new HashSet<Tuple<BlockPos, Direction>>();
         
-        res.add(new Pair<>(worldPosA, direction));
-        res.add(new Pair<>(worldPosB, direction));
+        res.add(new Tuple<>(worldPosA, direction));
+        res.add(new Tuple<>(worldPosB, direction));
         
         return res;
         
@@ -54,7 +54,7 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.FUEL_GENERATOR_SCREEN;
     }
     

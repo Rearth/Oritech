@@ -1,8 +1,5 @@
 package rearth.oritech.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraft.item.BlockItem;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -14,13 +11,16 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.Block;
 
 public class OritechGeoItem extends BlockItem implements GeoItem {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private final float scale;
     private final String name;
     
-    public OritechGeoItem(Block block, Settings settings, float scale, String name) {
+    public OritechGeoItem(Block block, Properties settings, float scale, String name) {
         super(block, settings);
         this.scale = scale;
         this.name = name;
@@ -33,7 +33,7 @@ public class OritechGeoItem extends BlockItem implements GeoItem {
             GeoItemRenderer<OritechGeoItem> renderer = null;
             
             @Override
-            public @Nullable BuiltinModelItemRenderer getGeoItemRenderer() {
+            public @Nullable BlockEntityWithoutLevelRenderer getGeoItemRenderer() {
                 if (this.renderer == null)
                     this.renderer = new GeoItemRenderer<>(new DefaultedBlockGeoModel<>(Oritech.id("models/" + name)));
                 

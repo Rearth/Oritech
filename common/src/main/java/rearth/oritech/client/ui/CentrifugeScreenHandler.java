@@ -1,23 +1,23 @@
 package rearth.oritech.client.ui;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.PacketByteBuf;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 
 import java.util.Objects;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class CentrifugeScreenHandler extends UpgradableMachineScreenHandler {
     
     public final FluidApi.SingleSlotStorage inputTank;
     
-    public CentrifugeScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
+    public CentrifugeScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
     }
     
-    public CentrifugeScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
+    public CentrifugeScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(syncId, playerInventory, blockEntity);
         
         if (!(blockEntity instanceof CentrifugeBlockEntity centrifugeEntity)) {

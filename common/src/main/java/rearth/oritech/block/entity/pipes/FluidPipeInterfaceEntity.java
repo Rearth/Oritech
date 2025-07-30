@@ -1,16 +1,14 @@
 package rearth.oritech.block.entity.pipes;
 
+import I;
+import J;
+import Z;
 import com.google.common.collect.Streams;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi.FluidStorage;
 import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeConnectionBlock;
@@ -20,7 +18,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     
@@ -34,17 +39,17 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
+    public void tick(Level world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
         var block = (ExtractablePipeConnectionBlock) state.getBlock();
-        if (world.isClient || !block.isExtractable(state)) return;
+        if (world.isClientSide || !block.isExtractable(state)) return;
         
         var boosted = isBoostAvailable();
         
         // boosted pipe works every tick, otherwise only every N tick
-        if (world.getTime() % TRANSFER_PERIOD != 0 && !boosted)
+        if (world.getGameTime() % TRANSFER_PERIOD != 0 && !boosted)
             return;
         
-        var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
+        var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(world.dimension().location(), new PipeNetworkData());
         var transferAmount = boosted ? MAX_TRANSFER_RATE * 100 : MAX_TRANSFER_RATE;
         
         // try to get fluid to transfer
@@ -55,11 +60,11 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
         for (var sourcePos : sources) {
             var offset = pos.subtract(sourcePos);
-            var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
+            var direction = Direction.fromDelta(offset.getX(), offset.getY(), offset.getZ());
             if (!block.isSideExtractable(state, direction.getOpposite())) continue;
             
             var sourceBlock = world.getBlockState(sourcePos);
-            if (sourceBlock.isIn(BlockTags.CAULDRONS))
+            if (sourceBlock.is(BlockTags.CAULDRONS))
                 transferAmount = (int) FluidStackHooks.bucketAmount();
             
             var sourceContainer = FluidApi.BLOCK.find(world, sourcePos, sourceBlock, null, direction);
@@ -90,7 +95,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         var targets = findNetworkTargets(pos, data);
         
         if (targets == null) {
-            System.err.println("Yeah your pipe network likely is too long. At: " + this.getPos());
+            System.err.println("Yeah your pipe network likely is too long. At: " + this.getBlockPos());
             return;
         }
         
@@ -99,15 +104,15 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         if (netHash != filteredTargetsNetHash || filteredFluidTargetsCached == null) {
             filteredFluidTargetsCached = targets.stream()
                                            .filter(target -> {
-                                               var direction = target.getRight();
-                                               var pipePos = target.getLeft().add(direction.getVector());
+                                               var direction = target.getB();
+                                               var pipePos = target.getA().offset(direction.getNormal());
                                                var pipeState = world.getBlockState(pipePos);
                                                if (!(pipeState.getBlock() instanceof FluidPipeConnectionBlock fluidBlock))
                                                    return true;   // edge case, this should never happen
-                                               var extracting = fluidBlock.isSideExtractable(pipeState, target.getRight().getOpposite());
+                                               var extracting = fluidBlock.isSideExtractable(pipeState, target.getB().getOpposite());
                                                return !extracting;
                                            })
-                                           .map(target -> FluidApi.BLOCK.find(world, target.getLeft(), target.getRight()))
+                                           .map(target -> FluidApi.BLOCK.find(world, target.getA(), target.getB()))
                                            .filter(obj -> Objects.nonNull(obj) && obj.supportsInsertion())
                                            .collect(Collectors.toList());
             

@@ -1,16 +1,17 @@
 package rearth.oritech.init;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityType;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.biome.Biome;
 import rearth.oritech.Oritech;
 
 import static rearth.oritech.util.TagUtils.*;
+
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 
 public class TagContent {
     
@@ -81,7 +82,7 @@ public class TagContent {
     public static final TagKey<Item> BIOMASS_BLOCK = cItemTag("fuels/block/bio");
 
     // frame support
-    public static final TagKey<Block> MACHINE_FRAME_SUPPORT = TagKey.of(RegistryKeys.BLOCK, Oritech.id("frame_support"));
+    public static final TagKey<Block> MACHINE_FRAME_SUPPORT = TagKey.create(Registries.BLOCK, Oritech.id("frame_support"));
 
     // silicon
     public static final TagKey<Item> SILICON = cItemTag("silicon");
@@ -102,7 +103,7 @@ public class TagContent {
     // c stuff
     public static final TagKey<Block> CONVENTIONAL_ORES = cBlockTag("ores");
     public static final TagKey<Item> CONVENTIONAL_FERTILIZER = cItemTag("fertilizers");
-    public static final TagKey<Biome> CONVENTIONAL_COLD = TagKey.of(RegistryKeys.BIOME, Identifier.of("c", "is_cold"));
+    public static final TagKey<Biome> CONVENTIONAL_COLD = TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("c", "is_cold"));
     
     // reactor
     public static final TagKey<Block> REACTOR_WALL_BLOCKS = oritechBlockTag("reactor_wall_blocks");
@@ -124,9 +125,9 @@ public class TagContent {
     public static final TagKey<Item> RAW_PINK_DYE = cItemTag("raw_materials/dyes/pink");
     
     // spawner blacklist
-    public static final TagKey<EntityType<?>> SPAWNER_BLACKLIST = TagKey.of(RegistryKeys.ENTITY_TYPE, Oritech.id("spawner_blacklist"));
+    public static final TagKey<EntityType<?>> SPAWNER_BLACKLIST = TagKey.create(Registries.ENTITY_TYPE, Oritech.id("spawner_blacklist"));
     
-    public static final TagKey<Block> BLACK_HOLE_BLACKLIST = TagKey.of(RegistryKeys.BLOCK, Oritech.id("blackhole_blacklist"));
+    public static final TagKey<Block> BLACK_HOLE_BLACKLIST = TagKey.create(Registries.BLOCK, Oritech.id("blackhole_blacklist"));
     
     // unstable container contents
     public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_LOW = oritechBlockTag("unstable_container/low");

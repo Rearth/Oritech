@@ -3,16 +3,6 @@ package rearth.oritech.init.recipes;
 import com.mojang.datafixers.util.Either;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.impl.ReflectiveEndecBuilder;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.input.RecipeInput;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.block.entity.augmenter.api.CustomAugmentsCollection;
@@ -21,6 +11,16 @@ import rearth.oritech.block.entity.augmenter.api.ModifierAugment;
 import rearth.oritech.util.SizedIngredient;
 
 import java.util.List;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 
 public class AugmentDataRecipe implements Recipe<RecipeInput> {
     
@@ -29,8 +29,8 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
     
     private final List<SizedIngredient> researchCost;
     private final List<SizedIngredient> applyCost;
-    private final List<Identifier> requirements;
-    private final Identifier requiredStation;
+    private final List<ResourceLocation> requirements;
+    private final ResourceLocation requiredStation;
     private final int uiX;
     private final int uiY;
     private final int time;
@@ -47,8 +47,8 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
       boolean toggleable,
       List<SizedIngredient> researchCost,
       List<SizedIngredient> applyCost,
-      List<Identifier> requirements,
-      Identifier requiredStation,
+      List<ResourceLocation> requirements,
+      ResourceLocation requiredStation,
       int uiX,
       int uiY,
       int time,
@@ -75,8 +75,8 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
       boolean toggleable,
       List<SizedIngredient> researchCost,
       List<SizedIngredient> applyCost,
-      List<Identifier> requirements,
-      Identifier requiredStation,
+      List<ResourceLocation> requirements,
+      ResourceLocation requiredStation,
       int uiX,
       int uiY,
       int time,
@@ -101,22 +101,22 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
     }
     
     @Override
-    public boolean matches(RecipeInput input, World world) {
+    public boolean matches(RecipeInput input, Level world) {
         throw new UnsupportedOperationException();
     }
     
     @Override
-    public ItemStack craft(RecipeInput input, RegistryWrapper.WrapperLookup lookup) {
+    public ItemStack assemble(RecipeInput input, HolderLookup.Provider lookup) {
         return ItemStack.EMPTY;
     }
     
     @Override
-    public boolean fits(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return false;
     }
     
     @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registriesLookup) {
+    public ItemStack getResultItem(HolderLookup.Provider registriesLookup) {
         return ItemStack.EMPTY;
     }
     
@@ -138,7 +138,7 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
         return toggleable;
     }
     
-    public Augment createAugment(Identifier recipeId) {
+    public Augment createAugment(ResourceLocation recipeId) {
         if (customAugmentDefinition != null) {
             var customId = customAugmentDefinition.customAugmentId;
             return CustomAugmentsCollection.getById(customId);
@@ -146,13 +146,13 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
             return new EffectAugment(
               recipeId,
               this.toggleable,
-              Registries.STATUS_EFFECT.getEntry(effectDefinition.potionEffectId).orElseThrow(),
+              BuiltInRegistries.MOB_EFFECT.getHolder(effectDefinition.potionEffectId).orElseThrow(),
               effectDefinition.effectStrength);
         } else if (modifierDefinition != null) {
             return new ModifierAugment(
               recipeId,
-              Registries.ATTRIBUTE.getEntry(modifierDefinition.entityAttributeId).orElseThrow(),
-              EntityAttributeModifier.Operation.ID_TO_VALUE.apply(modifierDefinition.attributeOperationType()),
+              BuiltInRegistries.ATTRIBUTE.getHolder(modifierDefinition.entityAttributeId).orElseThrow(),
+              AttributeModifier.Operation.BY_ID.apply(modifierDefinition.attributeOperationType()),
               modifierDefinition.amount(),
               this.toggleable);
         } else {
@@ -176,11 +176,11 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
         return time;
     }
     
-    public Identifier getRequiredStation() {
+    public ResourceLocation getRequiredStation() {
         return requiredStation;
     }
     
-    public List<Identifier> getRequirements() {
+    public List<ResourceLocation> getRequirements() {
         return requirements;
     }
     
@@ -217,17 +217,17 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
     }
     
     // used to apply an effect, similar to potion effects
-    public record EffectDefinition(Identifier potionEffectId, int effectStrength) {
+    public record EffectDefinition(ResourceLocation potionEffectId, int effectStrength) {
         public static Endec<EffectDefinition> ENDEC = ReflectiveEndecBuilder.SHARED_INSTANCE.get(EffectDefinition.class);
     }
     
     // apply a stat modification. The attributeOperationType type can be either "add_value=0", "add_multiplied_base=1" or "add_multiplied_total=2"
-    public record ModifierDefinition(Identifier entityAttributeId, int attributeOperationType, float amount) {
+    public record ModifierDefinition(ResourceLocation entityAttributeId, int attributeOperationType, float amount) {
         public static Endec<ModifierDefinition> ENDEC = ReflectiveEndecBuilder.SHARED_INSTANCE.get(ModifierDefinition.class);
     }
     
     // apply a custom modification, that implements custom functionality.
-    public record CustomAugmentDefinition(Identifier customAugmentId) {
+    public record CustomAugmentDefinition(ResourceLocation customAugmentId) {
         public static Endec<CustomAugmentDefinition> ENDEC = ReflectiveEndecBuilder.SHARED_INSTANCE.get(CustomAugmentDefinition.class);
     }
     

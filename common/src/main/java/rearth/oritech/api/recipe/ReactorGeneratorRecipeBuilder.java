@@ -1,6 +1,6 @@
 package rearth.oritech.api.recipe;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class ReactorGeneratorRecipeBuilder extends OritechRecipeBuilder {
@@ -14,7 +14,7 @@ public class ReactorGeneratorRecipeBuilder extends OritechRecipeBuilder {
     }
 
     @Override
-    public void validate(Identifier id) throws IllegalStateException {
+    public void validate(ResourceLocation id) throws IllegalStateException {
         if (inputs == null || inputs.isEmpty())
             throw new IllegalStateException("Input required for recipe " + id + " (type " + type + ")");
     }

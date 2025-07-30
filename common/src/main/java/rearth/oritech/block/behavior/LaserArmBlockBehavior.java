@@ -1,14 +1,16 @@
 package rearth.oritech.block.behavior;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import J;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
@@ -26,7 +28,7 @@ public class LaserArmBlockBehavior {
     /**
      * Perform laser behavior on block
      */
-    public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
+    public boolean fireAtBlock(Level world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
         if (laserEntity.hasCropFilterAddon && DestroyerBlockEntity.isImmatureCrop(blockState))
             return false;
         
@@ -39,11 +41,11 @@ public class LaserArmBlockBehavior {
             return transferPowerBehavior.fireAtBlock(world, laserEntity, block, blockPos, blockState, blockEntity);
         
         // an unregistered budding block, attempt to energize it
-        if (blockState.isIn(TagContent.LASER_ACCELERATED))
+        if (blockState.is(TagContent.LASER_ACCELERATED))
             return energizeBuddingBehavior.fireAtBlock(world, laserEntity, block, blockPos, blockState, blockEntity);
         
         // passes through, stop targetting this block
-        if (blockState.isIn(TagContent.LASER_PASSTHROUGH))
+        if (blockState.is(TagContent.LASER_PASSTHROUGH))
             return false;
         
         laserEntity.addBlockBreakProgress(laserEntity.energyRequiredToFire());
@@ -55,7 +57,7 @@ public class LaserArmBlockBehavior {
     public static void registerDefaults() {
         noop = new LaserArmBlockBehavior() {
             @Override
-            public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
+            public boolean fireAtBlock(Level world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
                 // don't do anything, and don't keep targetting this block
                 return false;
             }
@@ -65,7 +67,7 @@ public class LaserArmBlockBehavior {
         
         transferPowerBehavior = new LaserArmBlockBehavior() {
             @Override
-            public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
+            public boolean fireAtBlock(Level world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
                 var storageCandidate = EnergyApi.BLOCK.find(world, blockPos, blockState, blockEntity, null);
                 
                 if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockProvider energyProvider)
@@ -105,15 +107,15 @@ public class LaserArmBlockBehavior {
         
         energizeBuddingBehavior = new LaserArmBlockBehavior() {
             @Override
-            public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
+            public boolean fireAtBlock(Level world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
                 
-                if (world.getTime() % 40 == 0) {    // periodically reset target
+                if (world.getGameTime() % 40 == 0) {    // periodically reset target
                     return false;
                 }
-                if (blockState.isAir() || blockState.getFluidState().isStill()) return false;
+                if (blockState.isAir() || blockState.getFluidState().isSource()) return false;
                 
-                blockState.randomTick((ServerWorld) world, blockPos, world.random);
-                ParticleContent.ACCELERATING.spawn(world, Vec3d.of(blockPos));
+                blockState.randomTick((ServerLevel) world, blockPos, world.random);
+                ParticleContent.ACCELERATING.spawn(world, Vec3.atLowerCornerOf(blockPos));
                 
                 return true;
             }

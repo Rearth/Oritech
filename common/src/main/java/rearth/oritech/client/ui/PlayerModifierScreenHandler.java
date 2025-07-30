@@ -1,62 +1,62 @@
 package rearth.oritech.client.ui;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockContent;
 
-public class PlayerModifierScreenHandler extends ScreenHandler {
+public class PlayerModifierScreenHandler extends AbstractContainerMenu {
     
     @NotNull
     protected final BlockPos blockPos;
     
-    public final PlayerEntity player;
+    public final Player player;
     
     protected final BlockState machineBlock;
     public final AugmentApplicationEntity blockEntity;
     
-    public PlayerModifierScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, inventory.player.getWorld().getBlockEntity(buf.readBlockPos()));
+    public PlayerModifierScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
+        this(syncId, inventory, inventory.player.level().getBlockEntity(buf.readBlockPos()));
     }
     
     // on server, also called from client constructor
-    public PlayerModifierScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
+    public PlayerModifierScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(ModScreens.MODIFIER_SCREEN, syncId);
         
         if (blockEntity == null) {
-            blockPos = BlockPos.ORIGIN;
+            blockPos = BlockPos.ZERO;
             player = playerInventory.player;
-            machineBlock = BlockContent.AUGMENT_APPLICATION_BLOCK.getDefaultState();
+            machineBlock = BlockContent.AUGMENT_APPLICATION_BLOCK.defaultBlockState();
             this.blockEntity = null;
             return;
         }
         
-        this.blockPos = blockEntity.getPos();
+        this.blockPos = blockEntity.getBlockPos();
         this.player = playerInventory.player;
         
-        this.machineBlock = blockEntity.getCachedState();
+        this.machineBlock = blockEntity.getBlockState();
         this.blockEntity = (AugmentApplicationEntity) blockEntity;
         
-        if (blockEntity.getWorld().isClient)
+        if (blockEntity.getLevel().isClientSide)
             this.blockEntity.loadAvailableStations(this.player);    // this should yield the same result on the client, so instead of syncing them we just call it on the client again
         
     }
     
     @Override
-    public ItemStack quickMove(PlayerEntity player, int invSlot) {
+    public ItemStack quickMoveStack(Player player, int invSlot) {
         return ItemStack.EMPTY;
     }
     
-    public boolean canUse(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         return true;
     }
     
@@ -65,8 +65,8 @@ public class PlayerModifierScreenHandler extends ScreenHandler {
     }
     
     @Override
-    public void sendContentUpdates() {
-        super.sendContentUpdates();
+    public void broadcastChanges() {
+        super.broadcastChanges();
         blockEntity.sendUpdate(SyncType.GUI_TICK);
     }
 }

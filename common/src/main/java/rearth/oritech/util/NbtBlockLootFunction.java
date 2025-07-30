@@ -2,12 +2,6 @@ package rearth.oritech.util;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.condition.LootCondition;
-import net.minecraft.loot.context.LootContext;
-import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.loot.function.ConditionalLootFunction;
-import net.minecraft.loot.function.LootFunctionType;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
@@ -15,17 +9,24 @@ import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.init.LootContent;
 
 import java.util.List;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
-public class NbtBlockLootFunction extends ConditionalLootFunction {
+public class NbtBlockLootFunction extends LootItemConditionalFunction {
     public static final String NAME = "nbt_block_loot";
     
-    public NbtBlockLootFunction(List<LootCondition> conditions) {
+    public NbtBlockLootFunction(List<LootItemCondition> conditions) {
         super(conditions);
     }
     
     @Override
-    public ItemStack process(ItemStack stack, LootContext context) {
-        var blockEntity = context.get(LootContextParameters.BLOCK_ENTITY);
+    public ItemStack run(ItemStack stack, LootContext context) {
+        var blockEntity = context.getParamOrNull(LootContextParams.BLOCK_ENTITY);
         
         if (blockEntity instanceof SmallTankEntity tankEntity && tankEntity.fluidStorage.getAmount() > 0) {
             stack.set(FluidApi.ITEM.getFluidComponent(), tankEntity.fluidStorage.getStack());
@@ -37,14 +38,14 @@ public class NbtBlockLootFunction extends ConditionalLootFunction {
     }
     
     @Override
-    public LootFunctionType<NbtBlockLootFunction> getType() {
+    public LootItemFunctionType<NbtBlockLootFunction> getType() {
         return LootContent.NBT_BLOCK_LOOT_FUNCTION;
     }
     
-    public static Builder<?> builder() {
-        return ConditionalLootFunction.builder(NbtBlockLootFunction::new);
+    public static net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction.Builder<?> builder() {
+        return LootItemConditionalFunction.simpleBuilder(NbtBlockLootFunction::new);
     }
     
     public static final MapCodec<NbtBlockLootFunction> CODEC = RecordCodecBuilder.mapCodec(
-      instance -> ConditionalLootFunction.addConditionsField(instance).apply(instance, NbtBlockLootFunction::new));
+      instance -> LootItemConditionalFunction.commonFields(instance).apply(instance, NbtBlockLootFunction::new));
 }

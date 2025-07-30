@@ -1,24 +1,24 @@
 package rearth.oritech.init;
 
-import net.minecraft.loot.function.LootFunctionType;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import rearth.oritech.util.NbtBlockLootFunction;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
-public class LootContent implements ArchitecturyRegistryContainer<LootFunctionType<?>> {
+public class LootContent implements ArchitecturyRegistryContainer<LootItemFunctionType<?>> {
     
-    public static final LootFunctionType<NbtBlockLootFunction> NBT_BLOCK_LOOT_FUNCTION = new LootFunctionType<>(NbtBlockLootFunction.CODEC);
+    public static final LootItemFunctionType<NbtBlockLootFunction> NBT_BLOCK_LOOT_FUNCTION = new LootItemFunctionType<>(NbtBlockLootFunction.CODEC);
     
     @Override
-    public RegistryKey<Registry<LootFunctionType<?>>> getRegistryType() {
-        return RegistryKeys.LOOT_FUNCTION_TYPE;
+    public ResourceKey<Registry<LootItemFunctionType<?>>> getRegistryType() {
+        return Registries.LOOT_FUNCTION_TYPE;
     }
     
     @SuppressWarnings("unchecked")
     @Override
-    public Class<LootFunctionType<?>> getTargetFieldType() {
-        return (Class<LootFunctionType<?>>) (Object) LootFunctionType.class;
+    public Class<LootItemFunctionType<?>> getTargetFieldType() {
+        return (Class<LootItemFunctionType<?>>) (Object) LootItemFunctionType.class;
     }
 }

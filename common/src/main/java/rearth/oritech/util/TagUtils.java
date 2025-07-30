@@ -1,11 +1,11 @@
 package rearth.oritech.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import rearth.oritech.Oritech;
 
 public class TagUtils {
@@ -32,7 +32,7 @@ public class TagUtils {
     }
 
     public static TagKey<Item> itemTag(String namespace, String path) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(namespace, path));
+        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(namespace, path));
     }
 
     public static TagKey<Item> cItemTag(String path) {
@@ -40,15 +40,15 @@ public class TagUtils {
     }
 
     public static TagKey<Block> cBlockTag(String path) {
-        return TagKey.of(RegistryKeys.BLOCK, Identifier.of(C_TAG_NAMESPACE, path));
+        return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(C_TAG_NAMESPACE, path));
     }
 
     public static TagKey<Item> oritechItemTag(String path) {
-        return TagKey.of(RegistryKeys.ITEM, Oritech.id(path));
+        return TagKey.create(Registries.ITEM, Oritech.id(path));
     }
 
     public static TagKey<Block> oritechBlockTag(String path) {
-        return TagKey.of(RegistryKeys.BLOCK, Oritech.id(path));
+        return TagKey.create(Registries.BLOCK, Oritech.id(path));
     }
 
     public static TagKey<Fluid> cFluidTag(String path) {
@@ -56,7 +56,7 @@ public class TagUtils {
     }
 
     public static TagKey<Fluid> fluidTag(String namespace, String path) {        
-        return TagKey.of(RegistryKeys.FLUID, Identifier.of(namespace, path));
+        return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(namespace, path));
     }
 
     public static TagKey<Fluid> oritechFluidTag(String path) {

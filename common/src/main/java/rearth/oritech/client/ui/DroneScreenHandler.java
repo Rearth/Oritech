@@ -1,26 +1,26 @@
 package rearth.oritech.client.ui;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.slot.Slot;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.DronePortEntity;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 
 import java.util.Objects;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class DroneScreenHandler extends UpgradableMachineScreenHandler {
     
-    private final SimpleInventory cardInventory;
+    private final SimpleContainer cardInventory;
     
-    public DroneScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
+    public DroneScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
     }
     
-    public DroneScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
+    public DroneScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(syncId, playerInventory, blockEntity);
 
         if (!(blockEntity instanceof DronePortEntity dronePortEntity)) {
@@ -30,7 +30,7 @@ public class DroneScreenHandler extends UpgradableMachineScreenHandler {
         }
         
         cardInventory = dronePortEntity.getCardInventory();
-        cardInventory.onOpen(playerInventory.player);
+        cardInventory.startOpen(playerInventory.player);
         addCardSlots();
     }
     

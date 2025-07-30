@@ -1,25 +1,34 @@
 package rearth.oritech.client.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.wispforest.owo.ui.base.BaseComponent;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.ItemComponent;
+import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.GridLayout;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
-
+import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity.FilterData;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.ITEM_SLOT;
+
+import I;
+import Z;
 
 public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilterScreenHandler> {
 
@@ -31,7 +40,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     private final FlowLayout[] gridContainers = new FlowLayout[FILTER_SIZE];
     private Map<Integer, ItemStack> cachedItems;
     
-    public ItemFilterScreen(ItemFilterScreenHandler handler, PlayerInventory inventory, Text title) {
+    public ItemFilterScreen(ItemFilterScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
     
@@ -42,7 +51,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     
     public void updateItemFilters() {
         
-        cachedItems = handler.blockEntity.getFilterSettings().items();
+        cachedItems = menu.blockEntity.getFilterSettings().items();
         Oritech.LOGGER.debug("loading item filters: " + cachedItems);
         
         for (int i = 0; i < FILTER_SIZE; i++) {
@@ -68,19 +77,19 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     }
     
     private void updateButtons() {
-        var data = handler.blockEntity.getFilterSettings();
+        var data = menu.blockEntity.getFilterSettings();
         
         var textWhitelistTooltip = data.useWhitelist() ?
-                                     Text.translatable("tooltip.oritech.item_filter.whitelist")
-                                     : Text.translatable("tooltip.oritech.item_filter.blacklist");
+                                     Component.translatable("tooltip.oritech.item_filter.whitelist")
+                                     : Component.translatable("tooltip.oritech.item_filter.blacklist");
         
         var textNbtTooltip = data.useNbt() ?
-                                     Text.translatable("tooltip.oritech.item_filter.nbt")
-                                     : Text.translatable("tooltip.oritech.item_filter.no_nbt");
+                                     Component.translatable("tooltip.oritech.item_filter.nbt")
+                                     : Component.translatable("tooltip.oritech.item_filter.no_nbt");
         
         var textNbtComponent = data.useComponents() ?
-                                     Text.translatable("tooltip.oritech.item_filter.component")
-                                     : Text.translatable("tooltip.oritech.item_filter.no_component");
+                                     Component.translatable("tooltip.oritech.item_filter.component")
+                                     : Component.translatable("tooltip.oritech.item_filter.no_component");
         
         whiteListButton.tooltip(textWhitelistTooltip);
         nbtButton.tooltip(textNbtTooltip);
@@ -123,21 +132,21 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         var buttonWidth = 60;
         
         // sorry to whoever is reading this for this cursed section
-        whiteListButton = Components.button(Text.literal("            ").append(Text.translatable("title.oritech.item_filter.whitelist").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleWhitelist());
+        whiteListButton = Components.button(Component.literal("            ").append(Component.translatable("title.oritech.item_filter.whitelist").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleWhitelist());
         whiteListButton.horizontalSizing(Sizing.fixed(buttonWidth));
-        whiteListButton.renderer(createToggleRenderer(ignored -> ItemFilterScreen.this.handler.blockEntity.getFilterSettings().useWhitelist()));
+        whiteListButton.renderer(createToggleRenderer(ignored -> ItemFilterScreen.this.menu.blockEntity.getFilterSettings().useWhitelist()));
         whiteListButton.textShadow(false);
         overlay.child(whiteListButton.positioning(Positioning.absolute(83, 18)));
         
-        nbtButton = Components.button(Text.literal("      ").append(Text.translatable("title.oritech.item_filter.nbt").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleNbt());
+        nbtButton = Components.button(Component.literal("      ").append(Component.translatable("title.oritech.item_filter.nbt").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleNbt());
         nbtButton.horizontalSizing(Sizing.fixed(buttonWidth));
-        nbtButton.renderer(createToggleRenderer(ignored -> ItemFilterScreen.this.handler.blockEntity.getFilterSettings().useNbt()));
+        nbtButton.renderer(createToggleRenderer(ignored -> ItemFilterScreen.this.menu.blockEntity.getFilterSettings().useNbt()));
         nbtButton.textShadow(false);
         overlay.child(nbtButton.positioning(Positioning.absolute(83, 38)));
         
-        componentButton = Components.button(Text.literal("                ").append(Text.translatable("title.oritech.item_filter.component").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleComponent());
+        componentButton = Components.button(Component.literal("                ").append(Component.translatable("title.oritech.item_filter.component").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleComponent());
         componentButton.horizontalSizing(Sizing.fixed(buttonWidth));
-        componentButton.renderer(createToggleRenderer(ignored -> ItemFilterScreen.this.handler.blockEntity.getFilterSettings().useComponents()));
+        componentButton.renderer(createToggleRenderer(ignored -> ItemFilterScreen.this.menu.blockEntity.getFilterSettings().useComponents()));
         componentButton.textShadow(false);
         overlay.child(componentButton.positioning(Positioning.absolute(83, 58)));
         
@@ -159,13 +168,13 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
             var isOn = activeSupplier.test(button);
             var normalTexture = isOn ? Oritech.id("textures/gui/modular/toggle_on.png") : Oritech.id("textures/gui/modular/toggle_off.png");
             var hoverTexture = isOn ? Oritech.id("textures/gui/modular/toggle_on_hover.png") : Oritech.id("textures/gui/modular/toggle_off_hover.png");
-            owoUIDrawContext.drawTexture(button.isHovered() ? hoverTexture : normalTexture, button.x(), button.y(), 30, 16, 0, 0, 30, 16, 30, 16);
+            owoUIDrawContext.blit(button.isHovered() ? hoverTexture : normalTexture, button.x(), button.y(), 30, 16, 0, 0, 30, 16, 30, 16);
         };
     }
     
     
     private void addTitle(FlowLayout overlay) {
-        var blockTitle = handler.blockEntity.getCachedState().getBlock().getName();
+        var blockTitle = menu.blockEntity.getBlockState().getBlock().getName();
         var label = Components.label(blockTitle);
         label.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
         label.sizing(Sizing.fixed(176), Sizing.content(2));
@@ -175,12 +184,12 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     }
     
     private void sendUpdateToServer() {
-        NetworkManager.sendToServer(new ItemFilterBlockEntity.ItemFilterPayload(handler.blockPos, handler.blockEntity.getFilterSettings()));
+        NetworkManager.sendToServer(new ItemFilterBlockEntity.ItemFilterPayload(menu.blockPos, menu.blockEntity.getFilterSettings()));
     }
     
     private void toggleWhitelist() {
         
-        var data = handler.blockEntity.getFilterSettings();
+        var data = menu.blockEntity.getFilterSettings();
         var whitelist = data.useWhitelist();
         var newWhitelist = !whitelist;
         var newData = new ItemFilterBlockEntity.FilterData(data.useNbt(), newWhitelist, data.useComponents(), data.items());
@@ -192,7 +201,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     
     private void toggleNbt() {
         
-        var data = handler.blockEntity.getFilterSettings();
+        var data = menu.blockEntity.getFilterSettings();
         var nbt = data.useNbt();
         var newNbt = !nbt;
         var newData = new ItemFilterBlockEntity.FilterData(newNbt, data.useWhitelist(), data.useComponents(), data.items());
@@ -204,7 +213,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     
     private void toggleComponent() {
         
-        var data = handler.blockEntity.getFilterSettings();
+        var data = menu.blockEntity.getFilterSettings();
         var component = data.useComponents();
         var nbt = data.useNbt();
         var newComponent = !component;
@@ -218,7 +227,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     }
     
     private boolean onItemFrameBackgroundClicked(FlowLayout slotContainer, int x, int y) {
-        return acceptItemStack(slotContainer, this.handler.getCursorStack(), y * 4 + x);
+        return acceptItemStack(slotContainer, this.menu.getCarried(), y * 4 + x);
     }
 
     public boolean acceptItemStack(ItemStack itemStack, int index) {
@@ -232,7 +241,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
 
         if (itemStack.isEmpty()) {
 
-            var oldData = handler.blockEntity.getFilterSettings();
+            var oldData = menu.blockEntity.getFilterSettings();
             var itemFilters = new HashMap<>(oldData.items());
             itemFilters.remove(index);
             var newData = new ItemFilterBlockEntity.FilterData(oldData.useNbt(), oldData.useWhitelist(), oldData.useComponents(), itemFilters);
@@ -245,7 +254,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         var displayStack = new ItemStack(itemStack.getItem(), 1);
 
         if (itemStack.getComponents() != null)
-            displayStack.applyComponentsFrom(itemStack.getComponents());
+            displayStack.applyComponents(itemStack.getComponents());
 
         var itemComponent = Components.item(displayStack);
         itemComponent.positioning(Positioning.absolute(1, 1));
@@ -253,7 +262,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         itemComponent.setTooltipFromStack(true);
         slotContainer.child(itemComponent);
 
-        var oldData = handler.blockEntity.getFilterSettings();
+        var oldData = menu.blockEntity.getFilterSettings();
         var itemFilters = new HashMap<>(oldData.items());
         itemFilters.put(index, displayStack);
         var newData = new ItemFilterBlockEntity.FilterData(oldData.useNbt(), oldData.useWhitelist(), oldData.useComponents(), itemFilters);
@@ -270,7 +279,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     }
 
     private void updateFilterSettings(ItemFilterBlockEntity.FilterData filterData) {
-        handler.blockEntity.setFilterSettings(filterData);
+        menu.blockEntity.setFilterSettings(filterData);
         cachedItems = filterData.items();
     }
 }

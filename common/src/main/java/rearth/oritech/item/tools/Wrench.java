@@ -1,36 +1,37 @@
 package rearth.oritech.item.tools;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.component.type.ToolComponent;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.SoundContent;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.Tool;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 public class Wrench extends Item {
     
     public static int ACTION_COOLDOWN = 8;
     
-    public Wrench(Settings settings) {
+    public Wrench(Properties settings) {
         super(settings);
     }
     
-    public static ToolComponent createToolComponent() {
-        return new ToolComponent(List.of(
-          ToolComponent.Rule.ofAlwaysDropping(List.of(
+    public static Tool createToolComponent() {
+        return new Tool(List.of(
+          Tool.Rule.minesAndDrops(List.of(
             BlockContent.ENERGY_PIPE,
             BlockContent.SUPERCONDUCTOR,
             BlockContent.FLUID_PIPE,
@@ -59,9 +60,9 @@ public class Wrench extends Item {
     }
     
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        var stack = user.getStackInHand(hand);
-        return useWrench(stack, user, hand) ? TypedActionResult.success(stack) : TypedActionResult.fail(stack);
+    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+        var stack = user.getItemInHand(hand);
+        return useWrench(stack, user, hand) ? InteractionResultHolder.success(stack) : InteractionResultHolder.fail(stack);
     }
     
     /**
@@ -70,14 +71,14 @@ public class Wrench extends Item {
      * @param item   The wrench item
      * @param player The player using the wrench
      */
-    protected boolean useWrench(ItemStack item, PlayerEntity player, Hand hand) {
-        if (player.getItemCooldownManager().isCoolingDown(this)) return false;
-        player.getItemCooldownManager().set(this, ACTION_COOLDOWN);
+    protected boolean useWrench(ItemStack item, Player player, InteractionHand hand) {
+        if (player.getCooldowns().isOnCooldown(this)) return false;
+        player.getCooldowns().addCooldown(this, ACTION_COOLDOWN);
         
-        if (!(player instanceof ServerPlayerEntity)) return false;
+        if (!(player instanceof ServerPlayer)) return false;
         
-        var world = player.getWorld();
-        var result = raycast(world, player, RaycastContext.FluidHandling.NONE);
+        var world = player.level();
+        var result = getPlayerPOVHitResult(world, player, ClipContext.Fluid.NONE);
         if (result.getType() != HitResult.Type.BLOCK) return false;
         
         var blockPos = result.getBlockPos();
@@ -85,20 +86,20 @@ public class Wrench extends Item {
         if (blockState.getBlock() instanceof Wrenchable wrenchable) {
             // Wrench used on a wrenchable block
             var resultAction = wrenchable.onWrenchUse(blockState, world, blockPos, player, hand);
-            if (resultAction == ActionResult.SUCCESS) {
+            if (resultAction == InteractionResult.SUCCESS) {
                 onUsed(item, player, hand);
                 return true;
             }
         } else {
             // Wrench used on block
-            var direction = result.getSide();
-            var neighborPos = blockPos.offset(direction);
+            var direction = result.getDirection();
+            var neighborPos = blockPos.relative(direction);
             var neighborState = world.getBlockState(neighborPos);
             
             // If the neighbor block is wrenchable, call the onWrenchUseNeighbor method
             if (neighborState.getBlock() instanceof Wrenchable wrenchable) {
                 var resultAction = wrenchable.onWrenchUseNeighbor(neighborState, blockState, world, neighborPos, blockPos, direction, player, hand);
-                if (resultAction == ActionResult.SUCCESS) {
+                if (resultAction == InteractionResult.SUCCESS) {
                     onUsed(item, player, hand);
                     return true;
                 }
@@ -108,12 +109,12 @@ public class Wrench extends Item {
         return false;
     }
     
-    protected void onUsed(ItemStack item, PlayerEntity player, Hand hand) {
-        playSound(player.getWorld(), player);
+    protected void onUsed(ItemStack item, Player player, InteractionHand hand) {
+        playSound(player.level(), player);
     }
     
-    protected void playSound(World world, PlayerEntity player) {
-        world.playSound(null, player.getBlockPos(), SoundContent.WRENCH_TURN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+    protected void playSound(Level world, Player player) {
+        world.playSound(null, player.blockPosition(), SoundContent.WRENCH_TURN, SoundSource.PLAYERS, 1.0f, 1.0f);
     }
     
     /**
@@ -129,7 +130,7 @@ public class Wrench extends Item {
          * @param player the player using the wrench
          * @return the result of the wrench use
          */
-        ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand);
+        InteractionResult onWrenchUse(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand);
         
         /**
          * Called when a wrench is used on a neighbor block
@@ -144,6 +145,6 @@ public class Wrench extends Item {
          * @param hand          The hand the wrench is being used in
          * @return the result of the wrench use
          */
-        ActionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, World world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, PlayerEntity player, Hand hand);
+        InteractionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, Level world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, Player player, InteractionHand hand);
     }
 }

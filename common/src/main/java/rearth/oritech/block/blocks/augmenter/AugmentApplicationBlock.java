@@ -3,36 +3,43 @@ package rearth.oritech.block.blocks.augmenter;
 import com.mojang.serialization.MapCodec;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
+import net.minecraft.ChatFormatting;
 import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.enums.BlockFace;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Pair;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.AttachFace;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.OritechClient;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
@@ -48,43 +55,49 @@ import java.util.Set;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-public class AugmentApplicationBlock extends HorizontalFacingBlock implements BlockEntityProvider {
+import ;
+import D;
+import I;
+import J;
+import Z;
+
+public class AugmentApplicationBlock extends HorizontalDirectionalBlock implements EntityBlock {
     
     private final VoxelShape[] HITBOXES = computeShapes();
-    private final HashMap<PlayerEntity, Long> lastContact = new HashMap<>();
+    private final HashMap<Player, Long> lastContact = new HashMap<>();
     
-    public static Pair<Long, PlayerEntity> lastTeleportedPlayer;    // used to skip inv opening if a player just teleported in
+    public static Tuple<Long, Player> lastTeleportedPlayer;    // used to skip inv opening if a player just teleported in
     
-    public AugmentApplicationBlock(Settings settings) {
+    public AugmentApplicationBlock(Properties settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH).with(ASSEMBLED, false));
+        registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH).setValue(ASSEMBLED, false));
     }
     
     @Override
-    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         
-        if (!state.get(ASSEMBLED)) {
-            return super.getOutlineShape(state, world, pos, context);
+        if (!state.getValue(ASSEMBLED)) {
+            return super.getShape(state, world, pos, context);
         }
         
-        var facing = state.get(Properties.HORIZONTAL_FACING);
+        var facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
         return HITBOXES[facing.ordinal()];
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(Properties.HORIZONTAL_FACING, ASSEMBLED);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(BlockStateProperties.HORIZONTAL_FACING, ASSEMBLED);
     }
     
     private VoxelShape[] computeShapes() {
         
         var result = new VoxelShape[6];
         
-        for (var facing : Properties.HORIZONTAL_FACING.getValues()) {
+        for (var facing : BlockStateProperties.HORIZONTAL_FACING.getPossibleValues()) {
             
-            result[facing.ordinal()] = VoxelShapes.union(
-              Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0, 0, 1, 2 / 16f, 1), facing, BlockFace.FLOOR),
-              Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 3 / 16f, 14 / 16f, 1f, 1f, 1f), facing, BlockFace.FLOOR)
+            result[facing.ordinal()] = Shapes.or(
+              Geometry.rotateVoxelShape(Shapes.box(0, 0, 0, 1, 2 / 16f, 1), facing, AttachFace.FLOOR),
+              Geometry.rotateVoxelShape(Shapes.box(0, 3 / 16f, 14 / 16f, 1f, 1f, 1f), facing, AttachFace.FLOOR)
             );
         }
         
@@ -94,43 +107,43 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
     
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return Objects.requireNonNull(super.getPlacementState(ctx)).with(Properties.HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
     
     @Override
-    protected BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.ENTITYBLOCK_ANIMATED;
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
     
     @Override
-    protected MapCodec<? extends HorizontalFacingBlock> getCodec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;
     }
     
     @Override
-    protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
         
-        if (world.isClient || !state.get(ASSEMBLED)) return;
+        if (world.isClientSide || !state.getValue(ASSEMBLED)) return;
         
-        if (!(entity instanceof PlayerEntity player)) return;
+        if (!(entity instanceof Player player)) return;
         
         if (lastTeleportedPlayer != null) {
-            var age = world.getTime() - lastTeleportedPlayer.getLeft();
+            var age = world.getGameTime() - lastTeleportedPlayer.getA();
             if (age < 20) {
                 return;
             }
         }
         
-        var centerPos = pos.toBottomCenterPos().add(0, 0.2, 0);
+        var centerPos = pos.getBottomCenter().add(0, 0.2, 0);
         
-        var dist = entity.getPos().distanceTo(centerPos);
+        var dist = entity.position().distanceTo(centerPos);
         
         if (dist < 0.45) {
             
-            var ageWithoutContact = world.getTime() - lastContact.getOrDefault(player, 0L);
+            var ageWithoutContact = world.getGameTime() - lastContact.getOrDefault(player, 0L);
             
-            var time = world.getTime();
+            var time = world.getGameTime();
             lastContact.put(player, time);
             
             if (ageWithoutContact > 15) {
@@ -140,52 +153,52 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
                     blockEntity.loadAvailableStations(player);
                     
                     var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
-                    MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
+                    MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
                 }
             }
         }
         
     }
     
-    private boolean lockPlayer(PlayerEntity player, Vec3d lockPos, BlockState state) {
+    private boolean lockPlayer(Player player, Vec3 lockPos, BlockState state) {
         
-        var maxVelocity = Math.max(Math.max(Math.abs(player.getVelocity().x), Math.abs(player.getVelocity().y)), Math.abs(player.getVelocity().z));
+        var maxVelocity = Math.max(Math.max(Math.abs(player.getDeltaMovement().x), Math.abs(player.getDeltaMovement().y)), Math.abs(player.getDeltaMovement().z));
         
-        if (maxVelocity < 0.01 || player.currentScreenHandler instanceof PlayerModifierScreenHandler) return false;
+        if (maxVelocity < 0.01 || player.containerMenu instanceof PlayerModifierScreenHandler) return false;
         
-        player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ITEM_AXE_STRIP, SoundCategory.BLOCKS);
+        player.level().playSound(null, player.blockPosition(), SoundEvents.AXE_STRIP, SoundSource.BLOCKS);
         
-        var facing = state.get(Properties.HORIZONTAL_FACING);
+        var facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
         var rotation = switch (facing) {
             case NORTH -> 180;
             case WEST -> 90;
             case EAST -> -90;
             default -> 0;
         };
-        player.setVelocity(Vec3d.ZERO);
-        player.teleport((ServerWorld) player.getWorld(), lockPos.x, lockPos.y, lockPos.z, Set.of(), rotation, 0);
+        player.setDeltaMovement(Vec3.ZERO);
+        player.teleportTo((ServerLevel) player.level(), lockPos.x, lockPos.y, lockPos.z, Set.of(), rotation, 0);
         
-        var dist = player.getPos().distanceTo(lockPos);
+        var dist = player.position().distanceTo(lockPos);
         
         return dist < 0.1;
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (world.isClient)
-            return ActionResult.SUCCESS;
+        if (world.isClientSide)
+            return InteractionResult.SUCCESS;
         
         var entity = world.getBlockEntity(pos);
         if (!(entity instanceof AugmentApplicationEntity modifierEntity)) {
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         
-        var wasAssembled = state.get(ASSEMBLED);
+        var wasAssembled = state.getValue(ASSEMBLED);
         
         if (!wasAssembled) {
             var corePlaced = modifierEntity.tryPlaceNextCore(player);
-            if (corePlaced) return ActionResult.SUCCESS;
+            if (corePlaced) return InteractionResult.SUCCESS;
         }
         
         var isAssembled = modifierEntity.initMultiblock(state);
@@ -193,27 +206,27 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
         // first time created
         if (isAssembled && !wasAssembled) {
             modifierEntity.triggerSetupAnimation();
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         
         if (!isAssembled) {
-            player.sendMessage(Text.translatable("message.oritech.machine.missing_core"));
-            return ActionResult.SUCCESS;
+            player.sendSystemMessage(Component.translatable("message.oritech.machine.missing_core"));
+            return InteractionResult.SUCCESS;
         }
         
         var blockEntity = (AugmentApplicationEntity) world.getBlockEntity(pos);
         blockEntity.loadAvailableStations(player);
         
         var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
-        MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
+        MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
     
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClient()) {
+        if (!world.isClientSide()) {
             
             var entity = world.getBlockEntity(pos);
             
@@ -223,27 +236,27 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
                 for (var heldStack : stacks) {
                     if (!heldStack.isEmpty()) {
                         var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
-                        world.spawnEntity(itemEntity);
+                        world.addFreshEntity(itemEntity);
                     }
                 }
                 
                 storageBlock.inventory.heldStacks.clear();
-                storageBlock.inventory.markDirty();
+                storageBlock.inventory.setChanged();
             }
         }
         
-        return super.onBreak(world, pos, state, player);
+        return super.playerWillDestroy(world, pos, state, player);
     }
     
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new AugmentApplicationEntity(pos, state);
     }
     
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
@@ -251,11 +264,11 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
-        super.appendTooltip(stack, context, tooltip, options);
-        var hotkey = OritechClient.AUGMENT_SELECTOR.boundKey.getLocalizedText();
-        tooltip.add(Text.translatable("tooltip.oritech.augmenter.1").formatted(Formatting.GRAY));
-        tooltip.add(Text.translatable("tooltip.oritech.augmenter.2", hotkey.getLiteralString()).formatted(Formatting.GRAY));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+        super.appendHoverText(stack, context, tooltip, options);
+        var hotkey = OritechClient.AUGMENT_SELECTOR.key.getDisplayName();
+        tooltip.add(Component.translatable("tooltip.oritech.augmenter.1").withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("tooltip.oritech.augmenter.2", hotkey.tryCollapseToString()).withStyle(ChatFormatting.GRAY));
         addMachineTooltip(tooltip, this, this);
     }
 }

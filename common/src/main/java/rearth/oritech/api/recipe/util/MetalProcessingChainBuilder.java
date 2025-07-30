@@ -3,19 +3,19 @@ package rearth.oritech.api.recipe.util;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
-import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.registry.tag.TagKey;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.*;
 import rearth.oritech.init.FluidContent;
 
 import java.util.Arrays;
 import java.util.List;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.material.Fluids;
 
 public class MetalProcessingChainBuilder {
     private String metalName;
@@ -69,11 +69,11 @@ public class MetalProcessingChainBuilder {
     }
     
     public MetalProcessingChainBuilder ore(TagKey<Item> oreTag) {
-        return ore(Ingredient.fromTag(oreTag));
+        return ore(Ingredient.of(oreTag));
     }
     
-    public MetalProcessingChainBuilder ore(ItemConvertible ore) {
-        return ore(Ingredient.ofItems(ore));
+    public MetalProcessingChainBuilder ore(ItemLike ore) {
+        return ore(Ingredient.of(ore));
     }
     
     public MetalProcessingChainBuilder rawOre(Ingredient rawOreIngredient, Item rawOre) {
@@ -83,11 +83,11 @@ public class MetalProcessingChainBuilder {
     }
     
     public MetalProcessingChainBuilder rawOre(TagKey<Item> rawOreTag, Item rawOre) {
-        return rawOre(Ingredient.fromTag(rawOreTag), rawOre);
+        return rawOre(Ingredient.of(rawOreTag), rawOre);
     }
     
     public MetalProcessingChainBuilder rawOre(Item rawOre) {
-        return rawOre(Ingredient.ofItems(rawOre), rawOre);
+        return rawOre(Ingredient.of(rawOre), rawOre);
     }
     
     public MetalProcessingChainBuilder rawOreByproduct(Item byproduct) {
@@ -102,11 +102,11 @@ public class MetalProcessingChainBuilder {
     }
     
     public MetalProcessingChainBuilder ingot(TagKey<Item> ingotTag, Item ingot) {
-        return ingot(Ingredient.fromTag(ingotTag), ingot);
+        return ingot(Ingredient.of(ingotTag), ingot);
     }
     
     public MetalProcessingChainBuilder ingot(Item ingot) {
-        return ingot(Ingredient.ofItems(ingot), ingot);
+        return ingot(Ingredient.of(ingot), ingot);
     }
     
     public MetalProcessingChainBuilder nugget(Ingredient nuggetIngredient, Item nugget) {
@@ -116,11 +116,11 @@ public class MetalProcessingChainBuilder {
     }
     
     public MetalProcessingChainBuilder nugget(TagKey<Item> nuggetTag, Item nugget) {
-        return nugget(Ingredient.fromTag(nuggetTag), nugget);
+        return nugget(Ingredient.of(nuggetTag), nugget);
     }
     
     public MetalProcessingChainBuilder nugget(Item nugget) {
-        return nugget(Ingredient.ofItems(nugget), nugget);
+        return nugget(Ingredient.of(nugget), nugget);
     }
     
     public MetalProcessingChainBuilder clump(Ingredient clumpIngredient, Item clump) {
@@ -130,11 +130,11 @@ public class MetalProcessingChainBuilder {
     }
     
     public MetalProcessingChainBuilder clump(TagKey<Item> clumpTag, Item clump) {
-        return clump(Ingredient.fromTag(clumpTag), clump);
+        return clump(Ingredient.of(clumpTag), clump);
     }
     
     public MetalProcessingChainBuilder clump(Item clump) {
-        return clump(Ingredient.ofItems(clump), clump);
+        return clump(Ingredient.of(clump), clump);
     }
     
     public MetalProcessingChainBuilder smallClump(Item smallClump) {
@@ -184,11 +184,11 @@ public class MetalProcessingChainBuilder {
     }
     
     public MetalProcessingChainBuilder gem(TagKey<Item> gemTag, Item gem) {
-        return gem(Ingredient.fromTag(gemTag), gem);
+        return gem(Ingredient.of(gemTag), gem);
     }
     
     public MetalProcessingChainBuilder gem(Item gem) {
-        return gem(Ingredient.ofItems(gem), gem);
+        return gem(Ingredient.of(gem), gem);
     }
     
     public MetalProcessingChainBuilder gemCatalyst(Ingredient gemCatalyst) {
@@ -197,11 +197,11 @@ public class MetalProcessingChainBuilder {
     }
     
     public MetalProcessingChainBuilder gemCatalyst(TagKey<Item> gemCatalyst) {
-        return gemCatalyst(Ingredient.fromTag(gemCatalyst));
+        return gemCatalyst(Ingredient.of(gemCatalyst));
     }
     
     public MetalProcessingChainBuilder gemCatalyst(Item gemCatalyst) {
-        return gemCatalyst(Ingredient.ofItems(gemCatalyst));
+        return gemCatalyst(Ingredient.of(gemCatalyst));
     }
     
     public MetalProcessingChainBuilder timeMultiplier(float timeMultiplier) {
@@ -234,7 +234,7 @@ public class MetalProcessingChainBuilder {
             throw new IllegalStateException("either centrifugeResult or gemItem is required if clump is provided for metal processing chain " + path);
     }
     
-    public void export(RecipeExporter exporter) {
+    public void export(RecipeOutput exporter) {
         validate(resourcePath + "ore/" + metalName);
         
         // ore block -> raw ores
@@ -322,22 +322,22 @@ public class MetalProcessingChainBuilder {
         // This should be fine, because any mod that adds ores, dusts, etc. will provide their own smelting/blasting recipes
         if (vanillaProcessing) {
             if (dustItem != null) {
-                OritechRecipeGenerator.offerSmelting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
-                OritechRecipeGenerator.offerBlasting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
-                OritechRecipeGenerator.offerCompactingRecipe(exporter, RecipeCategory.MISC, dustItem, smallDustItem);
+                OritechRecipeGenerator.oreSmelting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
+                OritechRecipeGenerator.oreBlasting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
+                OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, dustItem, smallDustItem);
             }
             if (smallDustItem != null) {
-                OritechRecipeGenerator.offerSmelting(exporter, List.of(smallDustItem), RecipeCategory.MISC, nuggetItem, 0.5f, 50, Oritech.MOD_ID);
-                OritechRecipeGenerator.offerBlasting(exporter, List.of(smallDustItem), RecipeCategory.MISC, nuggetItem, 0.5f, 25, Oritech.MOD_ID);
+                OritechRecipeGenerator.oreSmelting(exporter, List.of(smallDustItem), RecipeCategory.MISC, nuggetItem, 0.5f, 50, Oritech.MOD_ID);
+                OritechRecipeGenerator.oreBlasting(exporter, List.of(smallDustItem), RecipeCategory.MISC, nuggetItem, 0.5f, 25, Oritech.MOD_ID);
             }
             if (gemItem != null) {
-                OritechRecipeGenerator.offerSmelting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
-                OritechRecipeGenerator.offerBlasting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
+                OritechRecipeGenerator.oreSmelting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
+                OritechRecipeGenerator.oreBlasting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
             }
             if (clumpItem != null && smallClumpItem != null)
-                OritechRecipeGenerator.offerCompactingRecipe(exporter, RecipeCategory.MISC, clumpItem, smallClumpItem);
+                OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, clumpItem, smallClumpItem);
             if (nuggetItem != null && !skipCompactingRecipes)    // to avoid duplicate vanilla nugget -> item recipes
-                OritechRecipeGenerator.offerCompactingRecipe(exporter, RecipeCategory.MISC, ingotItem, nuggetItem);
+                OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, ingotItem, nuggetItem);
         }
     }
     

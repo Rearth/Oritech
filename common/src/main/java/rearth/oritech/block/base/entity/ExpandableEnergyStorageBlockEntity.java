@@ -1,27 +1,10 @@
 package rearth.oritech.block.base.entity;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.state.property.Property;
-import net.minecraft.text.Text;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
@@ -39,6 +22,25 @@ import rearth.oritech.util.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 
 public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockEntity implements EnergyApi.BlockProvider, ItemApi.BlockProvider, MachineAddonController,
                                                                                           ScreenProvider, ExtendedMenuProvider {
@@ -56,11 +58,11 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     @SyncField(SyncType.GUI_TICK)
     public DynamicStatisticEnergyStorage.EnergyStatistics currentStats;
     
-    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(1, this::markDirty);
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(1, this::setChanged);
     
     //own storage
     @SyncField(SyncType.GUI_TICK)
-    public final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
+    public final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::setChanged);
     
     private final EnergyApi.EnergyStorage outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
@@ -91,10 +93,10 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        if (world.isClient) return;
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        if (world.isClientSide) return;
         
-        energyStorage.tick((int) world.getTime());
+        energyStorage.tick((int) world.getGameTime());
         
         if (!redstonePowered)
             outputEnergy();
@@ -105,7 +107,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     private void inputFromCrystal() {
         if (energyStorage.amount >= energyStorage.capacity || inventory.isEmpty()) return;
         
-        if (!inventory.getStack(0).getItem().equals(ItemContent.OVERCHARGED_CRYSTAL)) return;
+        if (!inventory.getItem(0).getItem().equals(ItemContent.OVERCHARGED_CRYSTAL)) return;
         
         energyStorage.amount = Math.min(energyStorage.capacity, energyStorage.amount + Oritech.CONFIG.overchargedCrystalChargeRate());
     }
@@ -116,8 +118,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
         chargeItems();
         
         // todo caching for targets? Used to be BlockApiCache.create()
-        var target = getOutputPosition(pos, getFacing());
-        var candidate = EnergyApi.BLOCK.find(world, target.getRight(), target.getLeft().getOpposite());
+        var target = getOutputPosition(worldPosition, getFacing());
+        var candidate = EnergyApi.BLOCK.find(level, target.getB(), target.getA().getOpposite());
         if (candidate != null && candidate.supportsInsertion()) {
             EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }
@@ -135,37 +137,37 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
         }
     }
     
-    public static Pair<Direction, BlockPos> getOutputPosition(BlockPos pos, Direction facing) {
+    public static Tuple<Direction, BlockPos> getOutputPosition(BlockPos pos, Direction facing) {
         var blockInFront = (BlockPos) Geometry.offsetToWorldPosition(facing, new Vec3i(-1, 0, 0), pos);
         var worldOffset = blockInFront.subtract(pos);
-        var direction = Direction.fromVector(worldOffset.getX(), worldOffset.getY(), worldOffset.getZ());
+        var direction = Direction.fromDelta(worldOffset.getX(), worldOffset.getY(), worldOffset.getZ());
         
-        return new Pair<>(direction, blockInFront);
+        return new Tuple<>(direction, blockInFront);
     }
     
     @Override
-    public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         writeAddonToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putBoolean("redstone", redstonePowered);
     }
     
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         loadAddonNbtData(nbt);
         updateEnergyContainer();
         energyStorage.amount = nbt.getLong("energy_stored");
-        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         redstonePowered = nbt.getBoolean("redstone");
     }
     
     @Override
     public void preNetworkUpdate(SyncType type) {
         super.preNetworkUpdate(type);
-        currentStats = energyStorage.getCurrentStatistics(world.getTime());
+        currentStats = energyStorage.getCurrentStatistics(level.getGameTime());
     }
     
     @Override
@@ -174,7 +176,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     }
     
     public Direction getFacing() {
-        return getCachedState().get(SmallStorageBlock.TARGET_DIR);
+        return getBlockState().getValue(SmallStorageBlock.TARGET_DIR);
     }
     
     
@@ -203,7 +205,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     
     @Override
     public Direction getFacingForAddon() {
-        var facing = Objects.requireNonNull(world).getBlockState(getPos()).get(SmallStorageBlock.TARGET_DIR);
+        var facing = Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(SmallStorageBlock.TARGET_DIR);
         
         if (facing.equals(Direction.UP) || facing.equals(Direction.DOWN))
             return Direction.NORTH;
@@ -251,19 +253,19 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     public abstract long getDefaultExtractionRate();
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
+    public void saveExtraData(FriendlyByteBuf buf) {
         sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(pos);
+        buf.writeBlockPos(worldPosition);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.literal("");
+    public Component getDisplayName() {
+        return Component.literal("");
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
     }
     
@@ -285,12 +287,12 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     
     @Override
     public BlockPos getPosForAddon() {
-        return getPos();
+        return getBlockPos();
     }
     
     @Override
-    public World getWorldForAddon() {
-        return getWorld();
+    public Level getWorldForAddon() {
+        return getLevel();
     }
     
     @Override
@@ -304,12 +306,12 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     }
     
     @Override
-    public Inventory getDisplayedInventory() {
+    public Container getDisplayedInventory() {
         return inventory;
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.STORAGE_SCREEN;
     }
     
@@ -335,7 +337,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     @Override
     public int receivedRedstoneSignal() {
         if (redstonePowered) return 15;
-        return world.getReceivedRedstonePower(pos);
+        return level.getBestNeighborSignal(worldPosition);
     }
     
     @Override

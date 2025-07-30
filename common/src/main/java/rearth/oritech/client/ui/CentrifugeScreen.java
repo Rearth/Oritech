@@ -1,8 +1,8 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.ui.container.FlowLayout;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.util.ScreenProvider;
 
@@ -11,7 +11,7 @@ public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHa
     
     private static final ScreenProvider.BarConfiguration inputConfig = new ScreenProvider.BarConfiguration(28, 6, 21, 74);
     
-    public CentrifugeScreen(CentrifugeScreenHandler handler, PlayerInventory inventory, Text title) {
+    public CentrifugeScreen(CentrifugeScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
         
         if (((CentrifugeBlockEntity) handler.blockEntity).hasFluidAddon) {
@@ -34,11 +34,11 @@ public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHa
     }
     
     @Override
-    protected void handledScreenTick() {
+    protected void containerTick() {
         
         if (inFluidDisplay != null)
             updateFluidDisplay(inFluidDisplay);
         
-        super.handledScreenTick();
+        super.containerTick();
     }
 }

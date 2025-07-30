@@ -1,24 +1,15 @@
 package rearth.oritech.block.entity.generators;
 
+import F;
+import I;
+import J;
+import Z;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.platform.Platform;
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi.SingleSlotStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
@@ -36,7 +27,22 @@ import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.Vec3;
 
 // progress is abused to sync active speed.
 public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements FluidApi.BlockProvider {
@@ -76,13 +82,13 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (world.isClient || !isActive(state)) return;
+        if (world.isClientSide || !isActive(state)) return;
         
         var slaved = inSlaveMode();
         var hasInput = !boilerStorage.getInStack().isEmpty();
-        if (world.getTime() % 80 == 0 && !slaved && hasInput)
+        if (world.getGameTime() % 80 == 0 && !slaved && hasInput)
             setupMaster();
         
         if (!slaved && hasInput) tickMaster();
@@ -107,7 +113,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         
         // if not recipe is currently set, or it does not match the steam tank, search for a recipe
         if (currentRecipe == OritechRecipe.DUMMY || !currentRecipe.getFluidInput().matchesFluid(steamTank.getStack())) {
-            var candidate = FluidMultiblockGeneratorBlockEntity.getRecipe(steamTank, world, getOwnRecipeType());
+            var candidate = FluidMultiblockGeneratorBlockEntity.getRecipe(steamTank, level, getOwnRecipeType());
             candidate.ifPresent(recipe -> currentRecipe = recipe.value());
             if (candidate.isEmpty()) return;
             currentRecipe = candidate.get().value();
@@ -129,14 +135,14 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         energyStorage.insertIgnoringLimit((long) energyProduced, false);
         
         spawnParticles();
-        lastWorkedAt = world.getTime();
+        lastWorkedAt = level.getGameTime();
         
         // used for animation speed
         progress = (int) (speed * 100f);
         
         // order/data: speed, efficiency, rf produced, steam consumed, slave count
-        clientStats = new SteamEngineSyncPacket(pos, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
-        this.markDirty();
+        clientStats = new SteamEngineSyncPacket(worldPosition, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
+        this.setChanged();
         
     }
     
@@ -149,8 +155,8 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         
         if (wasWorking) {
             spawnParticles();
-            this.lastWorkedAt = world.getTime();
-            this.markDirty();
+            this.lastWorkedAt = level.getGameTime();
+            this.setChanged();
         }
         
         // used for animation speed
@@ -163,21 +169,21 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         for (int direction = -1; direction <= 1; direction++) {
             if (direction == 0) continue;
             for (int i = 1; i <= MAX_CHAIN_SIZE; i++) {
-                var checkPos = new BlockPos(Geometry.offsetToWorldPosition(getFacing(), new Vec3i(i * direction, 0, 0), pos));
+                var checkPos = new BlockPos(Geometry.offsetToWorldPosition(getFacing(), new Vec3i(i * direction, 0, 0), worldPosition));
                 
-                var coreCandidate = world.getBlockEntity(checkPos, BlockEntitiesContent.MACHINE_CORE_ENTITY);
+                var coreCandidate = level.getBlockEntity(checkPos, BlockEntitiesContent.MACHINE_CORE_ENTITY);
                 if (coreCandidate.isPresent() && coreCandidate.get().getCachedController() != null)
                     checkPos = coreCandidate.get().getControllerPos();
                 
-                var candidate = world.getBlockEntity(checkPos, BlockEntitiesContent.STEAM_ENGINE_ENTITY);
-                if (candidate.isEmpty() || !candidate.get().isActive(candidate.get().getCachedState())) {
+                var candidate = level.getBlockEntity(checkPos, BlockEntitiesContent.STEAM_ENGINE_ENTITY);
+                if (candidate.isEmpty() || !candidate.get().isActive(candidate.get().getBlockState())) {
                     break;
                 } else if (!candidate.get().boilerStorage.getInStack().isEmpty()) {
                     break;
                 } else {
                     var slave = candidate.get();
                     slaves.add(slave);
-                    slave.masterHeartbeat = world.getTime();
+                    slave.masterHeartbeat = level.getGameTime();
                     slave.master = this;
                 }
             }
@@ -185,7 +191,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     public boolean inSlaveMode() {
-        var heartbeatAge = world.getTime() - masterHeartbeat;
+        var heartbeatAge = level.getGameTime() - masterHeartbeat;
         return heartbeatAge <= 100 && master != null && !master.isRemoved();
     }
     
@@ -195,13 +201,13 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     private void spawnParticles() {
-        if (world.random.nextFloat() > 0.5) return;
+        if (level.random.nextFloat() > 0.5) return;
         // emit particles
         var facing = getFacing();
-        var offsetLocal = Geometry.rotatePosition(new Vec3d(0, 0, -0.5), facing);
-        var emitPosition = Vec3d.ofCenter(pos).add(offsetLocal);
+        var offsetLocal = Geometry.rotatePosition(new Vec3(0, 0, -0.5), facing);
+        var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        ParticleContent.STEAM_ENGINE_WORKING.spawn(world, emitPosition, 1);
+        ParticleContent.STEAM_ENGINE_WORKING.spawn(level, emitPosition, 1);
     }
     
     private float getSteamEnergyEfficiency(float x) {
@@ -210,8 +216,8 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
     }
     
     private float getSteamProcessingSpeed(FluidApi.SingleSlotStorage usedTank) {
@@ -246,7 +252,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.STEAM_ENGINE_SCREEN;
     }
     
@@ -266,9 +272,9 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    protected Set<Pair<BlockPos, Direction>> getOutputTargets(BlockPos pos, World world) {
+    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level world) {
         
-        var res = new HashSet<Pair<BlockPos, Direction>>();
+        var res = new HashSet<Tuple<BlockPos, Direction>>();
         
         var facing = getFacingForAddon();
         var posA = new Vec3i(0, 0, 1); // front
@@ -284,12 +290,12 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         var worldPosE = (BlockPos) Geometry.offsetToWorldPosition(facing, posE, pos);
         var worldPosF = (BlockPos) Geometry.offsetToWorldPosition(facing, posF, pos);
         
-        res.add(new Pair<>(worldPosA, Geometry.fromVector(Geometry.getForward(facing))));
-        res.add(new Pair<>(worldPosB, Geometry.fromVector(Geometry.getLeft(facing))));
-        res.add(new Pair<>(worldPosC, Geometry.fromVector(Geometry.getRight(facing))));
-        res.add(new Pair<>(worldPosD, Geometry.fromVector(Geometry.getLeft(facing))));
-        res.add(new Pair<>(worldPosE, Geometry.fromVector(Geometry.getRight(facing))));
-        res.add(new Pair<>(worldPosF, Geometry.fromVector(Geometry.getBackward(facing))));
+        res.add(new Tuple<>(worldPosA, Geometry.fromVector(Geometry.getForward(facing))));
+        res.add(new Tuple<>(worldPosB, Geometry.fromVector(Geometry.getLeft(facing))));
+        res.add(new Tuple<>(worldPosC, Geometry.fromVector(Geometry.getRight(facing))));
+        res.add(new Tuple<>(worldPosD, Geometry.fromVector(Geometry.getLeft(facing))));
+        res.add(new Tuple<>(worldPosE, Geometry.fromVector(Geometry.getRight(facing))));
+        res.add(new Tuple<>(worldPosF, Geometry.fromVector(Geometry.getBackward(facing))));
         
         return res;
         
@@ -326,7 +332,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     public static Fluid getUsedSteamFluid() {
         if (USED_STEAM_FLUID == null) {
-            USED_STEAM_FLUID = Registries.FLUID.get(Identifier.of(Oritech.CONFIG.generators.steamId()));
+            USED_STEAM_FLUID = BuiltInRegistries.FLUID.get(ResourceLocation.parse(Oritech.CONFIG.generators.steamId()));
         }
         
         return USED_STEAM_FLUID;

@@ -4,20 +4,20 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.registry.EmiRecipeFiller;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.Identifier;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class EmiTransferHandler<S extends BasicMachineScreenHandler> implements StandardRecipeHandler<S> {
     
-    private final Identifier categoryId;
+    private final ResourceLocation categoryId;
     
-    public EmiTransferHandler(Identifier categoryId) {
+    public EmiTransferHandler(ResourceLocation categoryId) {
         this.categoryId = categoryId;
     }
     
@@ -64,7 +64,7 @@ public class EmiTransferHandler<S extends BasicMachineScreenHandler> implements 
     public boolean canCraft(EmiRecipe recipe, EmiCraftContext<S> context) {
         
         var handler = context.getScreenHandler();
-        if (getCraftingSlots(handler).stream().anyMatch(slot -> slot.hasStack() && !slot.getStack().isEmpty())) // check if a non-empty slot is present
+        if (getCraftingSlots(handler).stream().anyMatch(slot -> slot.hasItem() && !slot.getItem().isEmpty())) // check if a non-empty slot is present
             return false;
         
         return StandardRecipeHandler.super.canCraft(recipe, context);

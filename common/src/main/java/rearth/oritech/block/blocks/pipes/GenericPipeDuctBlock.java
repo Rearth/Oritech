@@ -1,34 +1,34 @@
 package rearth.oritech.block.blocks.pipes;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.World;
 import org.apache.commons.lang3.function.TriFunction;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.item.tools.Wrench;
 
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements Wrench.Wrenchable {
 
-	public GenericPipeDuctBlock(Settings settings) {
+	public GenericPipeDuctBlock(Properties settings) {
 		super(settings);
 	}
 
 	@Override
 	protected VoxelShape getShape(BlockState state) {
-		return VoxelShapes.fullCube();
+		return Shapes.block();
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements 
 	}
 
 	@Override
-	public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+	public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
 		if (oldState.getBlock().equals(state.getBlock())) return;
 
 		updateNeighbors(world, pos, true);
@@ -46,18 +46,18 @@ public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements 
 	}
 
 	@Override
-	public void updateNeighbors(World world, BlockPos pos, boolean neighborToggled) {
+	public void updateNeighbors(Level world, BlockPos pos, boolean neighborToggled) {
 		for (var direction : Direction.values()) {
-			var neighborPos = pos.offset(direction);
+			var neighborPos = pos.relative(direction);
 			var neighborState = world.getBlockState(neighborPos);
 			// Only update pipes
 			if (neighborState.getBlock() instanceof AbstractPipeBlock pipeBlock) {
 				var updatedState = pipeBlock.addConnectionStates(neighborState, world, neighborPos, neighborToggled);
-				world.setBlockState(neighborPos, updatedState);
+				world.setBlockAndUpdate(neighborPos, updatedState);
 
 				// Update network data if the state was changed
 				if (!neighborState.equals(updatedState)) {
-					boolean interfaceBlock = updatedState.isOf(getConnectionBlock().getBlock());
+					boolean interfaceBlock = updatedState.is(getConnectionBlock().getBlock());
 					//if (neighborToggled)
 						//GenericPipeInterfaceEntity.addNode(world, neighborPos, interfaceBlock, updatedState, getNetworkData(world));
 				}
@@ -66,12 +66,12 @@ public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements 
 	}
 
 	@Override
-	public BlockState addConnectionStates(BlockState state, World world, BlockPos pos, boolean createConnection) {
+	public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, boolean createConnection) {
 		return state;
 	}
 
 	@Override
-	public BlockState addConnectionStates(BlockState state, World world, BlockPos pos, Direction createDirection) {
+	public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, Direction createDirection) {
 		return state;
 	}
 
@@ -81,13 +81,13 @@ public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements 
 	}
 
 	@Override
-	public boolean shouldConnect(BlockState current, Direction direction, BlockPos currentPos, World world, boolean createConnection) {
+	public boolean shouldConnect(BlockState current, Direction direction, BlockPos currentPos, Level world, boolean createConnection) {
 		return true;
 	}
 
 	@Override
-	public boolean isConnectingInDirection(BlockState current, Direction direction, BlockPos currentPos, World world, boolean createConnection) {
-		var neighborPos = currentPos.offset(direction);
+	public boolean isConnectingInDirection(BlockState current, Direction direction, BlockPos currentPos, Level world, boolean createConnection) {
+		var neighborPos = currentPos.relative(direction);
 		var neighborState = world.getBlockState(neighborPos);
 		if (neighborState.isAir()) {
 			return false;
@@ -101,34 +101,34 @@ public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements 
 	}
 
 	@Override
-	public TriFunction<World, BlockPos, Direction, Boolean> apiValidationFunction() {
+	public TriFunction<Level, BlockPos, Direction, Boolean> apiValidationFunction() {
 		return ((world, pos, direction) -> false);
 	}
 
 	@Override
-	protected void onBlockRemoved(BlockPos pos, BlockState oldState, World world) {
+	protected void onBlockRemoved(BlockPos pos, BlockState oldState, Level world) {
 		updateNeighbors(world, pos, false);
 		GenericPipeInterfaceEntity.removeNode(world, pos, false, oldState, getNetworkData(world));
 	}
 
 	@Override
-	public ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand) {
-		if (player.isSneaking()) {
-			world.breakBlock(pos, true, player);
-			return ActionResult.SUCCESS;
+	public InteractionResult onWrenchUse(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand) {
+		if (player.isShiftKeyDown()) {
+			world.destroyBlock(pos, true, player);
+			return InteractionResult.SUCCESS;
 		}
 
-		return ActionResult.PASS;
+		return InteractionResult.PASS;
 	}
 	
 	@Override
-	public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
-		super.appendTooltip(stack, context, tooltip, options);
-		tooltip.add(Text.translatable("tooltip.oritech.pipe_duct_warning").formatted(Formatting.GRAY, Formatting.ITALIC));
+	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+		super.appendHoverText(stack, context, tooltip, options);
+		tooltip.add(Component.translatable("tooltip.oritech.pipe_duct_warning").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
 	}
 	
 	@Override
-	public ActionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, World world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, PlayerEntity player, Hand hand) {
-		return ActionResult.PASS;
+	public InteractionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, Level world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, Player player, InteractionHand hand) {
+		return InteractionResult.PASS;
 	}
 }
