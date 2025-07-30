@@ -24,22 +24,22 @@ public class AlloyForgeryRecipeGenerator {
     private static void offerAFAlloyRecipe(RecipeOutput exporter, TagKey<Item> inputA, Item inputB, Item result, int resultCount, int minForgeTier, int fuelPerTick, String suffix) {
         AlloyForgeryRecipeBuilder.create(result)
             .input(inputA, 1)
-            .unlockedBy("has_" + inputA.location().toDebugFileName(), RecipeGenerator.has(inputA))
             .input(inputB, 1)
-            .unlockedBy(RecipeGenerator.getHasName(inputB), RecipeGenerator.has(inputB))
             .setMinimumForgeTier(minForgeTier)
             .setFuelPerTick(fuelPerTick)
+            .unlockedBy("has_" + inputA.location().toDebugFileName(), RecipeGenerator.has(inputA))
+            .unlockedBy(RecipeGenerator.getHasName(inputB), RecipeGenerator.has(inputB))
             .save(exporter, Oritech.id("compat/alloyforgery/") + suffix);
     }
 
     private static void offerAFAlloyRecipe(RecipeOutput exporter, TagKey<Item> inputA, TagKey<Item> inputB, Item result, int resultCount, int minForgeTier, int fuelPerTick, String suffix) {
         AlloyForgeryRecipeBuilder.create(result)
             .input(inputA, 1)
-            .unlockedBy("has_" + inputA.location().toDebugFileName(), RecipeGenerator.has(inputA))
             .input(inputB, 1)
-            .unlockedBy("has_" + inputB.location().toDebugFileName(), RecipeGenerator.has(inputB))
             .setMinimumForgeTier(minForgeTier)
             .setFuelPerTick(fuelPerTick)
+            .unlockedBy("has_" + inputA.location().toDebugFileName(), RecipeGenerator.has(inputA))
+            .unlockedBy("has_" + inputB.location().toDebugFileName(), RecipeGenerator.has(inputB))
             .save(exporter, Oritech.id("compat/alloyforgery/") + suffix);
     }
 }
