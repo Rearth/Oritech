@@ -114,7 +114,6 @@ remapJar {
 }
 
 tasks.remapJar {
-    injectAccessWidener = true
     atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 }
 
