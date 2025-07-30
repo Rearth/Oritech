@@ -4,10 +4,9 @@ import java.util.Map;
 
 import com.google.common.collect.MapMaker;
 import com.mojang.authlib.GameProfile;
-
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 
@@ -16,22 +15,22 @@ import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 // the only difference between this and the Fabric Impl is the platform's version of FakePlayer that is being extended.
 public class FakeMachinePlayerImpl extends FakePlayer {
     private static final Map<FakeMachinePlayerKey, FakePlayer> fakeMachinePlayers = new MapMaker().weakValues().makeMap();
-    private record FakeMachinePlayerKey (ServerWorld world, GameProfile profile) {}
+    private record FakeMachinePlayerKey (ServerLevel world, GameProfile profile) {}
     
     private final SimpleInventoryStorage inventory;
 
-    private FakeMachinePlayerImpl(ServerWorld world, GameProfile profile, SimpleInventoryStorage inventory) {
+    private FakeMachinePlayerImpl(ServerLevel world, GameProfile profile, SimpleInventoryStorage inventory) {
         super(world, profile);
         this.inventory = inventory;
     }
 
-    public static ServerPlayerEntity create(ServerWorld world, GameProfile profile, SimpleInventoryStorage inventory) {
+    public static ServerPlayer create(ServerLevel world, GameProfile profile, SimpleInventoryStorage inventory) {
         FakeMachinePlayerKey key = new FakeMachinePlayerKey(world, profile);
         return fakeMachinePlayers.computeIfAbsent(key, k -> new FakeMachinePlayerImpl(k.world(), k.profile(), inventory));
 	}
 
     @Override
-    public boolean giveItemStack(ItemStack itemStack) {
+    public boolean addItem(ItemStack itemStack) {
         this.inventory.insert(itemStack, false);
         return true;
     }

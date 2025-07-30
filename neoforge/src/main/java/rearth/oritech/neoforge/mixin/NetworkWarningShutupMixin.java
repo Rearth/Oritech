@@ -1,6 +1,6 @@
 package rearth.oritech.neoforge.mixin;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.registration.NetworkRegistry;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,7 +24,7 @@ public class NetworkWarningShutupMixin {
       remap = false
     )
     private static void oritech_disableNetworkingWarning(Logger logger, String format, Object arg1) {
-        if (arg1 instanceof Identifier id && id.equals(Oritech.id("particles"))) {
+        if (arg1 instanceof ResourceLocation id && id.equals(Oritech.id("particles"))) {
             // nothing done here
         } else {
             logger.warn("No registration for payload {}; refusing to decode.", arg1);

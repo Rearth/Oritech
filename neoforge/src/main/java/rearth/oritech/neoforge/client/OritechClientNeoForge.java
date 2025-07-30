@@ -1,13 +1,15 @@
 package rearth.oritech.neoforge.client;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import Z;
+import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.Map.Entry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -48,18 +50,18 @@ public class OritechClientNeoForge {
         @SubscribeEvent
         public static void onWorldRender(RenderLevelStageEvent event) {
             if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
-                OreFinderRenderer.doRender(event.getPoseStack(), event.getCamera(), MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers());
+                OreFinderRenderer.doRender(event.getPoseStack(), event.getCamera(), Minecraft.getInstance().renderBuffers().bufferSource());
             }
         }
         
         @SubscribeEvent
         public static void onOutlineRender(RenderHighlightEvent.Block event) {
-            BlockOutlineRenderer.render(MinecraftClient.getInstance().world, event.getCamera(), event.getPoseStack(), event.getMultiBufferSource());
+            BlockOutlineRenderer.render(Minecraft.getInstance().level, event.getCamera(), event.getPoseStack(), event.getMultiBufferSource());
         }
         
         @SubscribeEvent
         public static void onMouseLaserInput(InputEvent.MouseButton.Pre event) {
-            var client = MinecraftClient.getInstance();
+            var client = Minecraft.getInstance();
             var handled = OritechClient.handleMouseClicked(client, event.getButton(), event.getAction(), event.getModifiers());
             if (handled) event.setCanceled(true);
             
@@ -75,7 +77,7 @@ public class OritechClientNeoForge {
             event.registerEntityRenderer(EntitiesContent.PORTAL_ENTITY, PortalEntityRenderer::new);
             
             for (var entry : ModRenderers.RENDER_LAYERS.entrySet()) {
-                RenderLayers.setRenderLayer(entry.getKey(), entry.getValue());
+                ItemBlockRenderTypes.setRenderLayer(entry.getKey(), entry.getValue());
             }
         }
         
@@ -84,12 +86,12 @@ public class OritechClientNeoForge {
             
             FluidContent.FLUID_ATTRIBUTES.forEach(attribute -> event.registerFluidType(new IClientFluidTypeExtensions() {
                 @Override
-                public @NotNull Identifier getStillTexture() {
+                public @NotNull ResourceLocation getStillTexture() {
                     return attribute.getSourceTexture();
                 }
                 
                 @Override
-                public @NotNull Identifier getFlowingTexture() {
+                public @NotNull ResourceLocation getFlowingTexture() {
                     return attribute.getFlowingTexture();
                 }
                 
@@ -106,17 +108,17 @@ public class OritechClientNeoForge {
         
     }
     
-    private static class TankItemRenderer extends BuiltinModelItemRenderer {
+    private static class TankItemRenderer extends BlockEntityWithoutLevelRenderer {
         
         private final SmallTankItemRenderer itemRenderer;
         
-        public TankItemRenderer(Identifier modelId) {
-            super(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+        public TankItemRenderer(ResourceLocation modelId) {
+            super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
             this.itemRenderer = new SmallTankItemRenderer(modelId);
         }
         
         @Override
-        public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        public void renderByItem(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
             // super.render(stack, mode, matrices, vertexConsumers, light, overlay);
             itemRenderer.render(stack, mode, matrices, vertexConsumers, light, overlay);
         }
@@ -125,12 +127,12 @@ public class OritechClientNeoForge {
     private static class TankItemExtensions implements IClientItemExtensions {
         private final TankItemRenderer renderer;
         
-        private TankItemExtensions(Identifier modelId) {
+        private TankItemExtensions(ResourceLocation modelId) {
             this.renderer = new TankItemRenderer(modelId);
         }
         
         @Override
-        public @NotNull BuiltinModelItemRenderer getCustomRenderer() {
+        public @NotNull BlockEntityWithoutLevelRenderer getCustomRenderer() {
             return renderer;
         }
     }

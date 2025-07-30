@@ -1,8 +1,8 @@
 package rearth.oritech.neoforge.mixin;
 
-import net.minecraft.client.render.entity.feature.ElytraFeatureRenderer;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.renderer.entity.layers.ElytraLayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +13,7 @@ import rearth.oritech.item.tools.armor.JetpackElytraItem;
 import rearth.oritech.item.tools.armor.JetpackExoElytraItem;
 
 @OnlyIn(Dist.CLIENT)
-@Mixin(ElytraFeatureRenderer.class)
+@Mixin(ElytraLayer.class)
 public class ElytraFeatureRendererMixin {
     
     @Inject(
