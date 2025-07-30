@@ -3,7 +3,7 @@ package rearth.oritech.fabricgen.datagen;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalFluidTags;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
+import net.minecraft.core.HolderLookup.Provider;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.TagContent;
@@ -14,12 +14,12 @@ import java.util.concurrent.CompletableFuture;
 
 public class FluidTagGenerator extends FabricTagProvider.FluidTagProvider {
     
-    public FluidTagGenerator(FabricDataOutput output, CompletableFuture<WrapperLookup> completableFuture) {
+    public FluidTagGenerator(FabricDataOutput output, CompletableFuture<Provider> completableFuture) {
         super(output, completableFuture);
     }
     
     @Override
-    protected void configure(WrapperLookup wrapperLookup) {
+    protected void addTags(Provider wrapperLookup) {
         
         // this is disabled and manually placed in the fabric instance, as it's only needed there
         // add custom fluids to water tag for basic fluid physics
@@ -34,21 +34,21 @@ public class FluidTagGenerator extends FabricTagProvider.FluidTagProvider {
 //            .addOptional(Oritech.id("flowing_molten_energite")).addOptional(Oritech.id("still_molten_energite"))
 //            .addOptional(Oritech.id("flowing_molten_fluxite")).addOptional(Oritech.id("still_molten_fluxite"));
         
-        getOrCreateTagBuilder(cFluidTag("biodiesel")).add(FluidContent.STILL_BIOFUEL.get());
-        getOrCreateTagBuilder(cFluidTag("high_power_biodiesel")).add(FluidContent.STILL_FUEL.get());
+        tag(cFluidTag("biodiesel")).add(FluidContent.STILL_BIOFUEL.get());
+        tag(cFluidTag("high_power_biodiesel")).add(FluidContent.STILL_FUEL.get());
         
-        getOrCreateTagBuilder(ConventionalFluidTags.GASEOUS)
+        tag(ConventionalFluidTags.GASEOUS)
             .add(FluidContent.FLOWING_STEAM.get()).add(FluidContent.STILL_STEAM.get());
-        getOrCreateTagBuilder(cFluidTag("steam"))
+        tag(cFluidTag("steam"))
             .add(FluidContent.FLOWING_STEAM.get()).add(FluidContent.STILL_STEAM.get());
         
-        getOrCreateTagBuilder(TagContent.OIL)
+        tag(TagContent.OIL)
             .add(FluidContent.STILL_OIL.get());
         
-        getOrCreateTagBuilder(TagContent.BIOFUEL)
+        tag(TagContent.BIOFUEL)
             .add(FluidContent.STILL_BIOFUEL.get());
         
-        getOrCreateTagBuilder(TagContent.TURBOFUEL)
+        tag(TagContent.TURBOFUEL)
             .add(FluidContent.STILL_FUEL.get());
     }
 }

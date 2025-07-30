@@ -1,7 +1,7 @@
 package rearth.oritech.fabric;
 
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import rearth.oritech.util.StackContext;
 
 public class ItemStackStorage extends SingleStackStorage {

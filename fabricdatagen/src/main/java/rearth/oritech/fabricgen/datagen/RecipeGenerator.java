@@ -9,9 +9,8 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.impl.resource.conditions.conditions.AllModsLoadedResourceCondition;
 import net.fabricmc.fabric.impl.resource.conditions.conditions.TagsPopulatedResourceCondition;
-import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.recipes.RecipeOutput;
 import nourl.mythicmetals.MythicMetals;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
@@ -28,18 +27,18 @@ import wraith.alloyforgery.AlloyForgery;
 
 public class RecipeGenerator extends FabricRecipeProvider {
     private final FabricDataOutput output;
-    private final CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture;
+    private final CompletableFuture<HolderLookup.Provider> registriesFuture;
     
-    public RecipeGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+    public RecipeGenerator(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
         super(output, registriesFuture);
         this.output = output;
         this.registriesFuture = registriesFuture;
     }
     
     @Override
-    public void generate(RecipeExporter exporter) {
+    public void buildRecipes(RecipeOutput exporter) {
         var oritechRecipes = new OritechRecipeGenerator(output, registriesFuture);
-        oritechRecipes.generate(exporter);
+        oritechRecipes.buildRecipes(exporter);
         
         // Fabric mod compat generation
         AlloyForgeryRecipeGenerator.generateRecipes(this.withConditions(exporter, new AllModsLoadedResourceCondition(List.of(AlloyForgery.MOD_ID))));

@@ -1,5 +1,6 @@
 package rearth.oritech.fabric;
 
+import J;
 import com.google.common.collect.Streams;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.fabric.FluidStackHooksFabric;
@@ -10,21 +11,21 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.Item;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.StackContext;
 import rearth.oritech.api.fluid.BlockFluidApi;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi.FluidStorage;
 import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.api.fluid.containers.DelegatingFluidStorage;
 import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
@@ -71,7 +72,7 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     }
     
     @Override
-    public FluidApi.FluidStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public FluidApi.FluidStorage find(Level world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         var candidate = net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.find(world, pos, state, entity, direction);
         
         return switch (candidate) {
@@ -84,7 +85,7 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     }
     
     @Override
-    public FluidApi.FluidStorage find(World world, BlockPos pos, @Nullable Direction direction) {
+    public FluidApi.FluidStorage find(Level world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
     }
     

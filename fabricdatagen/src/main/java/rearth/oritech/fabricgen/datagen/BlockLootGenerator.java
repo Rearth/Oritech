@@ -2,26 +2,26 @@ package rearth.oritech.fabricgen.datagen;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CropBlock;
-import net.minecraft.data.server.loottable.BlockLootTableGenerator;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.Item;
-import net.minecraft.loot.LootPool;
-import net.minecraft.loot.LootTable;
-import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
-import net.minecraft.loot.condition.LootCondition;
-import net.minecraft.loot.condition.TableBonusLootCondition;
-import net.minecraft.loot.entry.ItemEntry;
-import net.minecraft.loot.entry.LeafEntry;
-import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
-import net.minecraft.predicate.StatePredicate;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Identifier;
+import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.loot.BlockLootSubProvider;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
+import net.minecraft.world.level.storage.loot.predicates.BonusLevelTableCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.NbtBlockLootFunction;
@@ -30,9 +30,9 @@ import java.util.concurrent.CompletableFuture;
 
 public class BlockLootGenerator extends FabricBlockLootTableProvider {
     
-    public static final RegistryKey<LootTable> JUNGLE_LEAVES_LOOT = RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.ofVanilla("jungle_leaves"));
+    public static final ResourceKey<LootTable> JUNGLE_LEAVES_LOOT = ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.withDefaultNamespace("jungle_leaves"));
     
-    public BlockLootGenerator(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
+    public BlockLootGenerator(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
         super(dataOutput, registryLookup);
     }
     
@@ -46,44 +46,44 @@ public class BlockLootGenerator extends FabricBlockLootTableProvider {
         addOreDrop(BlockContent.URANIUM_CRYSTAL, ItemContent.RAW_URANIUM);
         
         for (var block : BlockContent.autoRegisteredDrops) {
-            addDrop(block);
+            dropSelf(block);
         }
         
-        addDrop(BlockContent.ITEM_PIPE_CONNECTION, BlockContent.ITEM_PIPE);
-        addDrop(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION, BlockContent.TRANSPARENT_ITEM_PIPE);
-        addDrop(BlockContent.FLUID_PIPE_CONNECTION, BlockContent.FLUID_PIPE);
-        addDrop(BlockContent.ENERGY_PIPE_CONNECTION, BlockContent.ENERGY_PIPE);
-        addDrop(BlockContent.SUPERCONDUCTOR_CONNECTION, BlockContent.SUPERCONDUCTOR);
-        addDrop(BlockContent.SUPERCONDUCTOR_CONNECTION, BlockContent.SUPERCONDUCTOR);
+        dropOther(BlockContent.ITEM_PIPE_CONNECTION, BlockContent.ITEM_PIPE);
+        dropOther(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION, BlockContent.TRANSPARENT_ITEM_PIPE);
+        dropOther(BlockContent.FLUID_PIPE_CONNECTION, BlockContent.FLUID_PIPE);
+        dropOther(BlockContent.ENERGY_PIPE_CONNECTION, BlockContent.ENERGY_PIPE);
+        dropOther(BlockContent.SUPERCONDUCTOR_CONNECTION, BlockContent.SUPERCONDUCTOR);
+        dropOther(BlockContent.SUPERCONDUCTOR_CONNECTION, BlockContent.SUPERCONDUCTOR);
         
-        addDrop(BlockContent.FRAMED_ITEM_PIPE_CONNECTION, BlockContent.FRAMED_ITEM_PIPE);
-        addDrop(BlockContent.FRAMED_FLUID_PIPE_CONNECTION, BlockContent.FRAMED_FLUID_PIPE);
-        addDrop(BlockContent.FRAMED_ENERGY_PIPE_CONNECTION, BlockContent.FRAMED_ENERGY_PIPE);
-        addDrop(BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION, BlockContent.FRAMED_SUPERCONDUCTOR);
+        dropOther(BlockContent.FRAMED_ITEM_PIPE_CONNECTION, BlockContent.FRAMED_ITEM_PIPE);
+        dropOther(BlockContent.FRAMED_FLUID_PIPE_CONNECTION, BlockContent.FRAMED_FLUID_PIPE);
+        dropOther(BlockContent.FRAMED_ENERGY_PIPE_CONNECTION, BlockContent.FRAMED_ENERGY_PIPE);
+        dropOther(BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION, BlockContent.FRAMED_SUPERCONDUCTOR);
         
         addCustomDataDrop(BlockContent.SMALL_TANK_BLOCK);
         addCustomDataDrop(BlockContent.CREATIVE_TANK_BLOCK);
         addCustomDataDrop(BlockContent.SMALL_STORAGE_BLOCK);
         addCustomDataDrop(BlockContent.CREATIVE_STORAGE_BLOCK);
         
-        LootCondition.Builder cropDropBuilder = BlockStatePropertyLootCondition.builder(BlockContent.WITHER_CROP_BLOCK)
-                                                  .properties(StatePredicate.Builder.create().exactMatch(CropBlock.AGE, 7));
-        addDrop(BlockContent.WITHER_CROP_BLOCK, cropDrops(BlockContent.WITHER_CROP_BLOCK, Blocks.TWISTING_VINES_PLANT.asItem(), BlockContent.WITHER_CROP_BLOCK.asItem(), cropDropBuilder));
+        LootItemCondition.Builder cropDropBuilder = LootItemBlockStatePropertyCondition.hasBlockStateProperties(BlockContent.WITHER_CROP_BLOCK)
+                                                  .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(CropBlock.AGE, 7));
+        add(BlockContent.WITHER_CROP_BLOCK, createCropDrops(BlockContent.WITHER_CROP_BLOCK, Blocks.TWISTING_VINES_PLANT.asItem(), BlockContent.WITHER_CROP_BLOCK.asItem(), cropDropBuilder));
         
-        RegistryWrapper.Impl<Enchantment> impl = this.registryLookup.getWrapperOrThrow(RegistryKeys.ENCHANTMENT);
+        HolderLookup.RegistryLookup<Enchantment> impl = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
         // similar to BlockLootTableGenerator.oakLeavesDrops()
-        addDrop(Blocks.JUNGLE_LEAVES, this.leavesDrops(Blocks.JUNGLE_LEAVES, Blocks.JUNGLE_SAPLING, BlockLootTableGenerator.SAPLING_DROP_CHANCE).pool(LootPool.builder().rolls(ConstantLootNumberProvider.create(1.0F)).conditionally(this.createWithoutShearsOrSilkTouchCondition()).with(((LeafEntry.Builder) this.addSurvivesExplosionCondition(Blocks.JUNGLE_LEAVES, ItemEntry.builder(ItemContent.BANANA))).conditionally(TableBonusLootCondition.builder(impl.getOrThrow(Enchantments.FORTUNE), new float[]{0.005F, 0.0055555557F, 0.00625F, 0.008333334F, 0.025F})))));
+        add(Blocks.JUNGLE_LEAVES, this.createLeavesDrops(Blocks.JUNGLE_LEAVES, Blocks.JUNGLE_SAPLING, BlockLootSubProvider.NORMAL_LEAVES_SAPLING_CHANCES).withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).when(this.doesNotHaveShearsOrSilkTouch()).add(((LootPoolSingletonContainer.Builder) this.applyExplosionCondition(Blocks.JUNGLE_LEAVES, LootItem.lootTableItem(ItemContent.BANANA))).when(BonusLevelTableCondition.bonusLevelFlatChance(impl.getOrThrow(Enchantments.FORTUNE), new float[]{0.005F, 0.0055555557F, 0.00625F, 0.008333334F, 0.025F})))));
     }
     
     private void addOreDrop(Block block, Item item) {
-        addDrop(block, oreDrops(block, item));
+        add(block, createOreDrop(block, item));
     }
     
     private void addCustomDataDrop(Block block) {
         // similar to shulkerBoxDrops
-        addDrop(block, LootTable.builder().pool(
-          (LootPool.Builder) this.addSurvivesExplosionCondition(block, LootPool.builder()
-                                                                         .rolls(ConstantLootNumberProvider.create(1.0F))
-                                                                         .with(ItemEntry.builder(block).apply(NbtBlockLootFunction.builder())))));
+        add(block, LootTable.lootTable().withPool(
+          (LootPool.Builder) this.applyExplosionCondition(block, LootPool.lootPool()
+                                                                         .setRolls(ConstantValue.exactly(1.0F))
+                                                                         .add(LootItem.lootTableItem(block).apply(NbtBlockLootFunction.builder())))));
     }
 }

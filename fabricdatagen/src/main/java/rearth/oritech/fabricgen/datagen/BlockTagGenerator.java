@@ -3,11 +3,11 @@ package rearth.oritech.fabricgen.datagen;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.TagContent;
 
@@ -20,14 +20,14 @@ import static rearth.oritech.util.TagUtils.getStorageBlockyTag;
 
 public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
     
-    public BlockTagGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+    public BlockTagGenerator(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
         super(output, registriesFuture);
     }
     
     @Override
-    protected void configure(RegistryWrapper.WrapperLookup arg) {
+    protected void addTags(HolderLookup.Provider arg) {
         
-        var pickaxeBuilder = getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE);
+        var pickaxeBuilder = tag(BlockTags.MINEABLE_WITH_PICKAXE);
         
         // sort auto registered drops before writing to pickaxe.json to keep pickaxe.json
         // from being changed every time datagen is run.
@@ -59,51 +59,51 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .add(BlockContent.URANIUM_CRYSTAL)
           .add(BlockContent.ENDSTONE_PLATINUM_ORE);
         
-        getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
+        tag(BlockTags.MINEABLE_WITH_AXE)
           .add(BlockContent.ITEM_PIPE)
           .add(BlockContent.TRANSPARENT_ITEM_PIPE)
           .add(BlockContent.ITEM_PIPE_CONNECTION)
           .add(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION);
         
-        getOrCreateTagBuilder(ConventionalBlockTags.ORES)
+        tag(ConventionalBlockTags.ORES)
           .add(BlockContent.NICKEL_ORE)
           .add(BlockContent.DEEPSLATE_NICKEL_ORE)
           .add(BlockContent.DEEPSLATE_PLATINUM_ORE)
           .add(BlockContent.DEEPSLATE_URANIUM_ORE)
           .add(BlockContent.ENDSTONE_PLATINUM_ORE);
         
-        getOrCreateTagBuilder(cBlockTag("ores_in_ground/stone"))
+        tag(cBlockTag("ores_in_ground/stone"))
           .add(BlockContent.NICKEL_ORE);
 
-        getOrCreateTagBuilder(cBlockTag("ores_in_ground/deepslate"))
+        tag(cBlockTag("ores_in_ground/deepslate"))
           .add(BlockContent.DEEPSLATE_NICKEL_ORE)
           .add(BlockContent.DEEPSLATE_PLATINUM_ORE)
           .add(BlockContent.DEEPSLATE_URANIUM_ORE);
         
-        getOrCreateTagBuilder(cBlockTag("ores_in_ground/end_stone"))
+        tag(cBlockTag("ores_in_ground/end_stone"))
           .add(BlockContent.ENDSTONE_PLATINUM_ORE);
         
-        getOrCreateTagBuilder(BlockTags.NEEDS_STONE_TOOL)
+        tag(BlockTags.NEEDS_STONE_TOOL)
           .add(BlockContent.NICKEL_ORE)
           .add(BlockContent.DEEPSLATE_NICKEL_ORE);
         
-        getOrCreateTagBuilder(BlockTags.NEEDS_IRON_TOOL)
+        tag(BlockTags.NEEDS_IRON_TOOL)
           .add(BlockContent.DEEPSLATE_PLATINUM_ORE)
           .add(BlockContent.DEEPSLATE_URANIUM_ORE)
           .add(BlockContent.ENDSTONE_PLATINUM_ORE);
         
-        getOrCreateTagBuilder(TagContent.NICKEL_ORE_BLOCKS)
+        tag(TagContent.NICKEL_ORE_BLOCKS)
           .add(BlockContent.NICKEL_ORE, BlockContent.DEEPSLATE_NICKEL_ORE);
-        getOrCreateTagBuilder(TagContent.PLATINUM_ORE_BLOCKS)
+        tag(TagContent.PLATINUM_ORE_BLOCKS)
           .add(BlockContent.DEEPSLATE_PLATINUM_ORE, BlockContent.ENDSTONE_PLATINUM_ORE);
-        getOrCreateTagBuilder(TagContent.URANIUM_ORE_BLOCKS)
+        tag(TagContent.URANIUM_ORE_BLOCKS)
           .add(BlockContent.DEEPSLATE_URANIUM_ORE);
         
-        getOrCreateTagBuilder(TagContent.DRILL_MINEABLE)
-          .addOptionalTag(BlockTags.PICKAXE_MINEABLE)
-          .addOptionalTag(BlockTags.SHOVEL_MINEABLE);
+        tag(TagContent.DRILL_MINEABLE)
+          .addOptionalTag(BlockTags.MINEABLE_WITH_PICKAXE)
+          .addOptionalTag(BlockTags.MINEABLE_WITH_SHOVEL);
         
-        getOrCreateTagBuilder(TagContent.RESOURCE_NODES)
+        tag(TagContent.RESOURCE_NODES)
           .add(BlockContent.RESOURCE_NODE_COPPER)
           .add(BlockContent.RESOURCE_NODE_IRON)
           .add(BlockContent.RESOURCE_NODE_NICKEL)
@@ -116,35 +116,35 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .add(BlockContent.RESOURCE_NODE_URANIUM)
           .add(BlockContent.RESOURCE_NODE_PLATINUM);
         
-        getOrCreateTagBuilder(TagContent.LASER_PASSTHROUGH)
+        tag(TagContent.LASER_PASSTHROUGH)
           .forceAddTag(ConventionalBlockTags.GLASS_BLOCKS)
           .forceAddTag(ConventionalBlockTags.GLASS_PANES)
           .forceAddTag(ConventionalBlockTags.BUDS);
-        getOrCreateTagBuilder(ConventionalBlockTags.BUDS)
-          .addOptional(Identifier.of("clutter", "small_onyx_bud"))
-          .addOptional(Identifier.of("clutter", "medium_onyx_bud"))
-          .addOptional(Identifier.of("clutter", "large_onyx_bud"));
+        tag(ConventionalBlockTags.BUDS)
+          .addOptional(ResourceLocation.fromNamespaceAndPath("clutter", "small_onyx_bud"))
+          .addOptional(ResourceLocation.fromNamespaceAndPath("clutter", "medium_onyx_bud"))
+          .addOptional(ResourceLocation.fromNamespaceAndPath("clutter", "large_onyx_bud"));
         
-        getOrCreateTagBuilder(TagContent.LASER_ACCELERATED)
+        tag(TagContent.LASER_ACCELERATED)
           .forceAddTag(ConventionalBlockTags.BUDDING_BLOCKS);
-        getOrCreateTagBuilder(ConventionalBlockTags.BUDDING_BLOCKS)
-          .addOptional(Identifier.of("clutter", "budding_onyx"));
+        tag(ConventionalBlockTags.BUDDING_BLOCKS)
+          .addOptional(ResourceLocation.fromNamespaceAndPath("clutter", "budding_onyx"));
 
-        getOrCreateTagBuilder(TagContent.CUTTER_LOGS_MINEABLE)
+        tag(TagContent.CUTTER_LOGS_MINEABLE)
         // using forceAddTag because the datagen wasn't recognizing the vanilla LOGS, LEAVES, and WART_BLOCKS tags
         // even though they should absolutely be there
           .forceAddTag(BlockTags.LOGS)
           .add(Blocks.MANGROVE_ROOTS)
           .add(Blocks.MUSHROOM_STEM);
         
-        getOrCreateTagBuilder(TagContent.CUTTER_LEAVES_MINEABLE)
+        tag(TagContent.CUTTER_LEAVES_MINEABLE)
           .forceAddTag(BlockTags.LEAVES)
           .forceAddTag(BlockTags.WART_BLOCKS)
           .add(Blocks.SHROOMLIGHT)
           .add(Blocks.RED_MUSHROOM_BLOCK)
           .add(Blocks.BROWN_MUSHROOM_BLOCK);
         
-        getOrCreateTagBuilder(TagContent.REACTOR_WALL_BLOCKS)
+        tag(TagContent.REACTOR_WALL_BLOCKS)
           .add(BlockContent.REACTOR_WALL)
           .add(BlockContent.REACTOR_ABSORBER_PORT)
           .add(BlockContent.REACTOR_ENERGY_PORT)
@@ -152,66 +152,66 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .add(BlockContent.REACTOR_REDSTONE_PORT)
           .add(BlockContent.REACTOR_CONTROLLER);
         
-        getOrCreateTagBuilder(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW)
+        tag(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW)
           .add(Blocks.REDSTONE_BLOCK)
           .add(Blocks.TNT)
           .add(BlockContent.FLUXITE_BLOCK);
         
-        getOrCreateTagBuilder(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM)
+        tag(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM)
           .add(Blocks.DRAGON_EGG)
           .add(BlockContent.LOW_YIELD_NUKE)
           .add(BlockContent.NUKE);
         
-        getOrCreateTagBuilder(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH)
+        tag(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH)
           .add(BlockContent.BLACK_HOLE_BLOCK);
 
-        getOrCreateTagBuilder(TagContent.MACHINE_FRAME_SUPPORT)
+        tag(TagContent.MACHINE_FRAME_SUPPORT)
           .add(BlockContent.METAL_BEAM_BLOCK);
 
-        getOrCreateTagBuilder(TagContent.BLACK_HOLE_BLACKLIST)
+        tag(TagContent.BLACK_HOLE_BLACKLIST)
           .add(BlockContent.BLOCK_PLACER_HEAD); // just a dummy so packdevs can find the tag easier
         
         // storage block tags
-        getOrCreateTagBuilder(getStorageBlockyTag("steel"))
+        tag(getStorageBlockyTag("steel"))
           .add(BlockContent.STEEL_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("energite"))
+        tag(getStorageBlockyTag("energite"))
           .add(BlockContent.ENERGITE_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("nickel"))
+        tag(getStorageBlockyTag("nickel"))
           .add(BlockContent.NICKEL_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("biosteel"))
+        tag(getStorageBlockyTag("biosteel"))
           .add(BlockContent.BIOSTEEL_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("platinum"))
+        tag(getStorageBlockyTag("platinum"))
           .add(BlockContent.PLATINUM_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("adamant"))
+        tag(getStorageBlockyTag("adamant"))
           .add(BlockContent.ADAMANT_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("electrum"))
+        tag(getStorageBlockyTag("electrum"))
           .add(BlockContent.ELECTRUM_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("duratium"))
+        tag(getStorageBlockyTag("duratium"))
           .add(BlockContent.DURATIUM_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("biomass"))
+        tag(getStorageBlockyTag("biomass"))
           .add(BlockContent.BIOMASS_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("plastic"))
+        tag(getStorageBlockyTag("plastic"))
           .add(BlockContent.PLASTIC_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("fluxite"))
+        tag(getStorageBlockyTag("fluxite"))
           .add(BlockContent.FLUXITE_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("silicon"))
+        tag(getStorageBlockyTag("silicon"))
           .add(BlockContent.SILICON_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("raw_nickel"))
+        tag(getStorageBlockyTag("raw_nickel"))
           .add(BlockContent.RAW_NICKEL_BLOCK);
         
-        getOrCreateTagBuilder(getStorageBlockyTag("raw_platinum"))
+        tag(getStorageBlockyTag("raw_platinum"))
           .add(BlockContent.RAW_PLATINUM_BLOCK);
     }
 }

@@ -5,14 +5,14 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.util.StackContext;
 import rearth.oritech.api.energy.BlockEnergyApi;
@@ -20,7 +20,7 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.ItemEnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 import team.reborn.energy.api.EnergyStorage;
-
+import J;
 import java.util.function.Supplier;
 
 public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
@@ -32,13 +32,13 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     }
     
     @Override
-    public void registerForItem(Supplier<net.minecraft.item.Item> itemSupplier) {
+    public void registerForItem(Supplier<net.minecraft.world.item.Item> itemSupplier) {
         team.reborn.energy.api.EnergyStorage.ITEM.registerForItems((stack, context) ->
                                               ContainerStorageWrapper.of(((EnergyApi.ItemProvider) stack.getItem()).getEnergyStorage(stack), context, stack), itemSupplier.get());
     }
     
     @Override
-    public ComponentType<Long> getEnergyComponent() {
+    public DataComponentType<Long> getEnergyComponent() {
         return team.reborn.energy.api.EnergyStorage.ENERGY_COMPONENT;
     }
     
@@ -53,7 +53,7 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     }
     
     @Override
-    public EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public EnergyApi.EnergyStorage find(Level world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         var candidate = team.reborn.energy.api.EnergyStorage.SIDED.find(world, pos, state, entity, direction);
         if (candidate == null) return null;
         if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
@@ -61,7 +61,7 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     }
     
     @Override
-    public EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable Direction direction) {
+    public EnergyApi.EnergyStorage find(Level world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
     }
     

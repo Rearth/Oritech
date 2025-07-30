@@ -8,11 +8,11 @@ import me.jddev0.ep.recipe.IngredientWithCount;
 import me.jddev0.ep.recipe.OutputItemStackWithPercentages;
 import me.jddev0.ep.registry.tags.CommonItemTags;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.BlockContent;
@@ -25,7 +25,7 @@ import static rearth.oritech.util.TagUtils.cItemTag;
 public class EnergizedPowerRecipeGenerator {
     private static final String PATH = "compat/energizedpower/";
 
-    public static void generateRecipes(RecipeExporter exporter) {
+    public static void generateRecipes(RecipeOutput exporter) {
         addOritechAlloys(exporter);
         addEPMetalProcessingRecipes(exporter);
         addOritechAssemblerRecipes(exporter);
@@ -33,7 +33,7 @@ public class EnergizedPowerRecipeGenerator {
         addOritechOreFiltrationRecipes(exporter);
     }
 
-    public static void addOritechAlloys(RecipeExporter exporter) {
+    public static void addOritechAlloys(RecipeOutput exporter) {
         offerEPAlloyFurnaceRecipe(exporter, new IngredientWithCount[]{
                 new IngredientWithCount(of(TagContent.NICKEL_INGOTS), 1),
                 new IngredientWithCount(of(ConventionalItemTags.DIAMOND_GEMS), 1)},
@@ -76,7 +76,7 @@ public class EnergizedPowerRecipeGenerator {
             new ItemStack(ItemContent.STEEL_INGOT), 500, "steel_with_dust");
     }
 
-    public static void addEPMetalProcessingRecipes(RecipeExporter exporter) {
+    public static void addEPMetalProcessingRecipes(RecipeOutput exporter) {
         MetalProcessingChainBuilder.build("tin").resourcePath(PATH)
             .ore(CommonItemTags.ORES_TIN)
             .rawOre(CommonItemTags.RAW_MATERIALS_TIN, EPItems.RAW_TIN).rawOreByproduct(Items.RAW_GOLD)
@@ -86,7 +86,7 @@ public class EnergizedPowerRecipeGenerator {
             .export(exporter);
     }
 
-    public static void addOritechAssemblerRecipes(RecipeExporter exporter) {
+    public static void addOritechAssemblerRecipes(RecipeOutput exporter) {
         offerEPAssemblingMachineRecipe(exporter,
             new IngredientWithCount[]{
                 new IngredientWithCount(of(Items.HONEYCOMB), 1),
@@ -208,7 +208,7 @@ public class EnergizedPowerRecipeGenerator {
             new ItemStack(BlockContent.SUPERCONDUCTOR.asItem()), "superconductor");
     }
 
-    public static void addOritechOreFiltrationRecipes(RecipeExporter exporter) {
+    public static void addOritechOreFiltrationRecipes(RecipeOutput exporter) {
         offerEPOreFiltrationRecipe(exporter,
             new OutputItemStackWithPercentages(new ItemStack(EPItems.STONE_PEBBLE), new double[]{0.33}),
             new OutputItemStackWithPercentages(new ItemStack(ItemContent.RAW_NICKEL), new double[]{0.05}), "nickel");
@@ -217,20 +217,20 @@ public class EnergizedPowerRecipeGenerator {
             new OutputItemStackWithPercentages(new ItemStack(ItemContent.RAW_PLATINUM), new double[]{0.005}), "platinum");
     }
 
-    private static void offerEPAlloyFurnaceRecipe(RecipeExporter exporter, IngredientWithCount[] inputs, ItemStack output, int ticks, String suffix) {
+    private static void offerEPAlloyFurnaceRecipe(RecipeOutput exporter, IngredientWithCount[] inputs, ItemStack output, int ticks, String suffix) {
         // Items.EMPTY would be better, but exporter is rejecting that. 0% chance of dropping iron ingot should be fine.
         var secondary = new OutputItemStackWithPercentages(new ItemStack(Items.IRON_INGOT), new double[0]);
         var recipe = new AlloyFurnaceRecipe(output, secondary, inputs, ticks);
         exporter.accept(Oritech.id(PATH + "/alloyfurnace/" + suffix), recipe, null);
     }
 
-    private static void offerEPAssemblingMachineRecipe(RecipeExporter exporter, IngredientWithCount[] inputs, ItemStack output, String suffix) {
+    private static void offerEPAssemblingMachineRecipe(RecipeOutput exporter, IngredientWithCount[] inputs, ItemStack output, String suffix) {
         var recipe = new AssemblingMachineRecipe(output, inputs);
         exporter.accept(Oritech.id(PATH + "/assemblingmachine/" + suffix), recipe, null);
     }
 
-    private static void offerEPOreFiltrationRecipe(RecipeExporter exporter, OutputItemStackWithPercentages output, OutputItemStackWithPercentages secondaryOutput, String suffix) {
-        var recipe = new FiltrationPlantRecipe(output, secondaryOutput, Registries.ITEM.getId(output.output().getItem()));
+    private static void offerEPOreFiltrationRecipe(RecipeOutput exporter, OutputItemStackWithPercentages output, OutputItemStackWithPercentages secondaryOutput, String suffix) {
+        var recipe = new FiltrationPlantRecipe(output, secondaryOutput, BuiltInRegistries.ITEM.getKey(output.output().getItem()));
         exporter.accept(Oritech.id(PATH + "/filtrationplant/" + suffix), recipe, null);
     }   
 }

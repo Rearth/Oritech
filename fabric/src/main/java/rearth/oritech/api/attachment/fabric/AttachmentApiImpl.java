@@ -2,8 +2,8 @@ package rearth.oritech.api.attachment.fabric;
 
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.Attachment;
 
@@ -13,7 +13,7 @@ import java.util.Map;
 @SuppressWarnings({"UnstableApiUsage", "unchecked"})
 public class AttachmentApiImpl {
     
-    private static final Map<Identifier, AttachmentType<?>> registeredTypes = new HashMap<>();
+    private static final Map<ResourceLocation, AttachmentType<?>> registeredTypes = new HashMap<>();
     
     public static <T> void register(Attachment<T> attachment) {
         

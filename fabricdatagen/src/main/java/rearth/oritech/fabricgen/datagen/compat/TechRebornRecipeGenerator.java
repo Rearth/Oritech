@@ -1,15 +1,16 @@
 package rearth.oritech.fabricgen.datagen.compat;
 
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
-import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.book.RecipeCategory;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.BioGeneratorRecipeBuilder;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
@@ -37,7 +38,7 @@ import java.util.List;
 public class TechRebornRecipeGenerator {
     private static final String PATH = "compat/techreborn/";
     
-    public static void generateRecipes(RecipeExporter exporter) {
+    public static void generateRecipes(RecipeOutput exporter) {
         addPlantballPolymer(exporter);
         addCraftRecipes(exporter);
         addOritechAlloys(exporter);
@@ -50,57 +51,57 @@ public class TechRebornRecipeGenerator {
         addDistillation(exporter);
     }
 
-    public static void addPlantballPolymer(RecipeExporter exporter) {
+    public static void addPlantballPolymer(RecipeOutput exporter) {
         CentrifugeFluidRecipeBuilder.build().input(TRContent.Parts.COMPRESSED_PLANTBALL.item).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, PATH + "biopolymer");
     }
     
-    public static void addCraftRecipes(RecipeExporter exporter) {
+    public static void addCraftRecipes(RecipeOutput exporter) {
         var output = TRContent.Parts.CARBON_MESH.asItem();
-        var shapelessBuilder = ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, 1).input(Ingredient.fromTag(TagContent.CARBON_FIBRE)).input(Ingredient.fromTag(TagContent.CARBON_FIBRE));
-        shapelessBuilder.criterion(RecipeGenerator.hasItem(output), RecipeGenerator.conditionsFromItem(output)).offerTo(exporter, Oritech.id(PATH + RecipeGenerator.getItemPath(output)));
+        var shapelessBuilder = ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, output, 1).requires(Ingredient.of(TagContent.CARBON_FIBRE)).requires(Ingredient.of(TagContent.CARBON_FIBRE));
+        shapelessBuilder.unlockedBy(RecipeGenerator.getHasName(output), RecipeGenerator.has(output)).save(exporter, Oritech.id(PATH + RecipeGenerator.getItemName(output)));
         
         output = TRContent.Machine.LAMP_INCANDESCENT.asItem();
-        var shapedBuilder = ShapedRecipeJsonBuilder.create(RecipeCategory.DECORATIONS, output, 1).input('G', ConventionalItemTags.GLASS_PANES_COLORLESS).input('C', TRContent.Cables.COPPER).input('F', TagContent.CARBON_FIBRE).pattern("GGG").pattern("CFC").pattern("GGG");
-        shapedBuilder.criterion(RecipeGenerator.hasItem(output), RecipeGenerator.conditionsFromItem(output)).offerTo(exporter, Oritech.id(PATH + RecipeGenerator.getItemPath(output)));
+        var shapedBuilder = ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, output, 1).define('G', ConventionalItemTags.GLASS_PANES_COLORLESS).define('C', TRContent.Cables.COPPER).define('F', TagContent.CARBON_FIBRE).pattern("GGG").pattern("CFC").pattern("GGG");
+        shapedBuilder.unlockedBy(RecipeGenerator.getHasName(output), RecipeGenerator.has(output)).save(exporter, Oritech.id(PATH + RecipeGenerator.getItemName(output)));
     }
     
-    public static void addOritechAlloys(RecipeExporter exporter) {
-        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_INGOTS)), new SizedIngredient(1, Ingredient.ofItems(Items.DIAMOND)), new ItemStack(ItemContent.ADAMANT_INGOT.asItem()), 6, 200, "adamant");
-        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.ofItems(Items.IRON_INGOT)), new SizedIngredient(1, Ingredient.ofItems(ItemContent.RAW_BIOPOLYMER.asItem())), new ItemStack(ItemContent.BIOSTEEL_INGOT.asItem()), 6, 200, "biosteel");
-        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.fromTag(TagContent.PLATINUM_INGOTS)), new SizedIngredient(1, Ingredient.ofItems(Items.NETHERITE_INGOT)), new ItemStack(ItemContent.DURATIUM_INGOT), 60, 200, "duratium");
-        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.ofItems(Items.GOLD_INGOT)), new SizedIngredient(1, Ingredient.ofItems(Items.REDSTONE)), new ItemStack(ItemContent.ELECTRUM_INGOT.asItem()), 6, 200, "oritech_electrum");
-        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_INGOTS)), new SizedIngredient(1, Ingredient.ofItems(ItemContent.FLUXITE.asItem())), new ItemStack(ItemContent.ENERGITE_INGOT.asItem()), 6, 200, "energite");
-        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.ofItems(ItemContent.COPPER_GEM.asItem())), new SizedIngredient(1, Ingredient.ofItems(ItemContent.COPPER_GEM.asItem())), new ItemStack(Items.COPPER_INGOT, 4), 6, 200, "copper_gems");
-        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.ofItems(ItemContent.IRON_GEM.asItem())), new SizedIngredient(1, Ingredient.ofItems(ItemContent.IRON_GEM.asItem())), new ItemStack(Items.IRON_INGOT, 4), 6, 200, "iron_gems");
-        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.ofItems(ItemContent.NICKEL_GEM.asItem())), new SizedIngredient(1, Ingredient.ofItems(ItemContent.NICKEL_GEM.asItem())), new ItemStack(ItemContent.NICKEL_INGOT, 4), 6, 200, "nickel_gems");
-        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.ofItems(ItemContent.PLATINUM_GEM.asItem())), new SizedIngredient(1, Ingredient.ofItems(ItemContent.PLATINUM_GEM.asItem())), new ItemStack(ItemContent.PLATINUM_INGOT, 4), 6, 200, "platinum_gems");
+    public static void addOritechAlloys(RecipeOutput exporter) {
+        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.of(TagContent.NICKEL_INGOTS)), new SizedIngredient(1, Ingredient.of(Items.DIAMOND)), new ItemStack(ItemContent.ADAMANT_INGOT.asItem()), 6, 200, "adamant");
+        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.of(Items.IRON_INGOT)), new SizedIngredient(1, Ingredient.of(ItemContent.RAW_BIOPOLYMER.asItem())), new ItemStack(ItemContent.BIOSTEEL_INGOT.asItem()), 6, 200, "biosteel");
+        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.of(TagContent.PLATINUM_INGOTS)), new SizedIngredient(1, Ingredient.of(Items.NETHERITE_INGOT)), new ItemStack(ItemContent.DURATIUM_INGOT), 60, 200, "duratium");
+        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.of(Items.GOLD_INGOT)), new SizedIngredient(1, Ingredient.of(Items.REDSTONE)), new ItemStack(ItemContent.ELECTRUM_INGOT.asItem()), 6, 200, "oritech_electrum");
+        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.of(TagContent.NICKEL_INGOTS)), new SizedIngredient(1, Ingredient.of(ItemContent.FLUXITE.asItem())), new ItemStack(ItemContent.ENERGITE_INGOT.asItem()), 6, 200, "energite");
+        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.of(ItemContent.COPPER_GEM.asItem())), new SizedIngredient(1, Ingredient.of(ItemContent.COPPER_GEM.asItem())), new ItemStack(Items.COPPER_INGOT, 4), 6, 200, "copper_gems");
+        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.of(ItemContent.IRON_GEM.asItem())), new SizedIngredient(1, Ingredient.of(ItemContent.IRON_GEM.asItem())), new ItemStack(Items.IRON_INGOT, 4), 6, 200, "iron_gems");
+        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.of(ItemContent.NICKEL_GEM.asItem())), new SizedIngredient(1, Ingredient.of(ItemContent.NICKEL_GEM.asItem())), new ItemStack(ItemContent.NICKEL_INGOT, 4), 6, 200, "nickel_gems");
+        offerTRAlloySmelterRecipe(exporter, new SizedIngredient(1, Ingredient.of(ItemContent.PLATINUM_GEM.asItem())), new SizedIngredient(1, Ingredient.of(ItemContent.PLATINUM_GEM.asItem())), new ItemStack(ItemContent.PLATINUM_INGOT, 4), 6, 200, "platinum_gems");
     }
     
-    public static void addTechRebornAlloys(RecipeExporter exporter) {
+    public static void addTechRebornAlloys(RecipeOutput exporter) {
         FoundryRecipeBuilder.build().input(ConventionalItemTags.IRON_INGOTS).input(TagContent.NICKEL_INGOTS).result(TRContent.Ingots.INVAR.asItem(), 2).export(exporter, PATH + "invar");
         FoundryRecipeBuilder.build().input(ConventionalItemTags.GOLD_INGOTS).input(TRContent.Ingots.SILVER.asTag()).result(TRContent.Ingots.ELECTRUM.asItem(), 2).export(exporter, PATH + "electrum");
         FoundryRecipeBuilder.build().input(ConventionalItemTags.COPPER_INGOTS).input(TRContent.Ingots.TIN.asTag()).result(TRContent.Ingots.BRONZE.asItem(), 2).export(exporter, PATH +  "bronze");
         FoundryRecipeBuilder.build().input(ConventionalItemTags.COPPER_INGOTS).input(TRContent.Ingots.ZINC.asTag()).result(TRContent.Ingots.BRASS.asItem(), 2).export(exporter, PATH + "brass");
     }
     
-    public static void addOritechGrinderRecipes(RecipeExporter exporter) {
-        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_ORES)), new ItemStack(ItemContent.RAW_NICKEL, 2), 5, 200, "nickel_ore");
-        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_RAW_MATERIALS)), new ItemStack(ItemContent.NICKEL_DUST), 5, 200, "raw_nickel");
-        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.ofItems(ItemContent.ADAMANT_INGOT)), new ItemStack(ItemContent.ADAMANT_DUST), 5, 200, "adamant_ingot");
-        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.ofItems(ItemContent.BIOSTEEL_INGOT)), new ItemStack(ItemContent.BIOSTEEL_DUST), 5, 200, "biosteel_ingot");
-        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.ofItems(ItemContent.DURATIUM_INGOT)), new ItemStack(ItemContent.DURATIUM_DUST), 5, 200, "duratium_ingot");
-        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.ofItems(ItemContent.ELECTRUM_INGOT)), new ItemStack(ItemContent.ELECTRUM_DUST), 5, 200, "electrum_ingot");
-        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.ofItems(ItemContent.ENERGITE_INGOT)), new ItemStack(ItemContent.ENERGITE_DUST), 5, 200, "energite_ingot");
+    public static void addOritechGrinderRecipes(RecipeOutput exporter) {
+        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.of(TagContent.NICKEL_ORES)), new ItemStack(ItemContent.RAW_NICKEL, 2), 5, 200, "nickel_ore");
+        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.of(TagContent.NICKEL_RAW_MATERIALS)), new ItemStack(ItemContent.NICKEL_DUST), 5, 200, "raw_nickel");
+        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.of(ItemContent.ADAMANT_INGOT)), new ItemStack(ItemContent.ADAMANT_DUST), 5, 200, "adamant_ingot");
+        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.of(ItemContent.BIOSTEEL_INGOT)), new ItemStack(ItemContent.BIOSTEEL_DUST), 5, 200, "biosteel_ingot");
+        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.of(ItemContent.DURATIUM_INGOT)), new ItemStack(ItemContent.DURATIUM_DUST), 5, 200, "duratium_ingot");
+        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.of(ItemContent.ELECTRUM_INGOT)), new ItemStack(ItemContent.ELECTRUM_DUST), 5, 200, "electrum_ingot");
+        offerTRGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.of(ItemContent.ENERGITE_INGOT)), new ItemStack(ItemContent.ENERGITE_DUST), 5, 200, "energite_ingot");
     }
     
-    public static void addOritechIndustrialGrinderRecipes(RecipeExporter exporter) {
-        offerTRIndustrialGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_ORES)), List.of(new ItemStack(ItemContent.RAW_NICKEL, 2), new ItemStack(ItemContent.RAW_PLATINUM)), 5, 200, new FluidInstance(Fluids.WATER, FluidValue.BUCKET), "nickel_ore");
-        offerTRIndustrialGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.fromTag(TagContent.NICKEL_RAW_MATERIALS)), List.of(new ItemStack(ItemContent.NICKEL_DUST), new ItemStack(ItemContent.SMALL_NICKEL_DUST, 3), new ItemStack(ItemContent.SMALL_PLATINUM_DUST, 2)), 5, 200, new FluidInstance(Fluids.WATER, FluidValue.BUCKET), "nickel");
-        offerTRIndustrialGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.fromTag(TagContent.PLATINUM_ORES)), List.of(new ItemStack(ItemContent.RAW_PLATINUM, 2)), 5, 200, new FluidInstance(Fluids.WATER, FluidValue.BUCKET), "platinum_ore");
-        offerTRIndustrialGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.fromTag(TagContent.PLATINUM_RAW_MATERIALS)), List.of(new ItemStack(ItemContent.PLATINUM_DUST), new ItemStack(ItemContent.SMALL_PLATINUM_DUST, 3)), 5, 200, new FluidInstance(Fluids.WATER, FluidValue.BUCKET), "platinum");
+    public static void addOritechIndustrialGrinderRecipes(RecipeOutput exporter) {
+        offerTRIndustrialGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.of(TagContent.NICKEL_ORES)), List.of(new ItemStack(ItemContent.RAW_NICKEL, 2), new ItemStack(ItemContent.RAW_PLATINUM)), 5, 200, new FluidInstance(Fluids.WATER, FluidValue.BUCKET), "nickel_ore");
+        offerTRIndustrialGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.of(TagContent.NICKEL_RAW_MATERIALS)), List.of(new ItemStack(ItemContent.NICKEL_DUST), new ItemStack(ItemContent.SMALL_NICKEL_DUST, 3), new ItemStack(ItemContent.SMALL_PLATINUM_DUST, 2)), 5, 200, new FluidInstance(Fluids.WATER, FluidValue.BUCKET), "nickel");
+        offerTRIndustrialGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.of(TagContent.PLATINUM_ORES)), List.of(new ItemStack(ItemContent.RAW_PLATINUM, 2)), 5, 200, new FluidInstance(Fluids.WATER, FluidValue.BUCKET), "platinum_ore");
+        offerTRIndustrialGrinderRecipe(exporter, new SizedIngredient(1, Ingredient.of(TagContent.PLATINUM_RAW_MATERIALS)), List.of(new ItemStack(ItemContent.PLATINUM_DUST), new ItemStack(ItemContent.SMALL_PLATINUM_DUST, 3)), 5, 200, new FluidInstance(Fluids.WATER, FluidValue.BUCKET), "platinum");
     }
     
-    public static void addTechRebornPulverizerRecipes(RecipeExporter exporter) {
+    public static void addTechRebornPulverizerRecipes(RecipeOutput exporter) {
         PulverizerRecipeBuilder.build().input(TRContent.Ingots.ALUMINUM.asTag()).result(TRContent.Ingots.ALUMINUM.getDust().asItem()).export(exporter, PATH + "aluminum");
         PulverizerRecipeBuilder.build().input(TRContent.Ores.BAUXITE.asTag()).result(TRContent.Dusts.BAUXITE.asItem()).export(exporter, PATH + "bauxite");
         PulverizerRecipeBuilder.build().input(TRContent.Ingots.BRASS.asTag()).result(TRContent.Ingots.BRASS.getDust().asItem()).export(exporter, PATH + "brass");
@@ -127,7 +128,7 @@ public class TechRebornRecipeGenerator {
         PulverizerRecipeBuilder.build().input(TRContent.Ores.SPHALERITE.asTag()).result(TRContent.Dusts.SPHALERITE.asItem()).export(exporter, PATH + "sphalerite");
     }
     
-    public static void addTechRebornFragmentRecipes(RecipeExporter exporter) {
+    public static void addTechRebornFragmentRecipes(RecipeOutput exporter) {
         GrinderRecipeBuilder.build().input(TRContent.Ores.SODALITE.asTag()).result(TRContent.Dusts.SODALITE.asItem(), 12).result(TRContent.Dusts.ALUMINUM.asItem(), 3).export(exporter, PATH + "sodalite_ore");
         GrinderRecipeBuilder.build().input(TRContent.Ores.SPHALERITE.asTag()).result(TRContent.Dusts.SPHALERITE.asItem(), 6).result(TRContent.Dusts.ZINC.asItem()).result(TRContent.SmallDusts.YELLOW_GARNET.asItem()).export(exporter, PATH + "sphalerite_ore");
         GrinderRecipeBuilder.build().input(TRContent.Ores.PERIDOT.asTag()).result(TRContent.Gems.PERIDOT.asItem()).result(TRContent.SmallDusts.PERIDOT.asItem(), 6).result(TRContent.SmallDusts.EMERALD.asItem(), 2).export(exporter, PATH + "peridot_ore");
@@ -145,13 +146,13 @@ public class TechRebornRecipeGenerator {
         GrinderRecipeBuilder.build().input(TRContent.Ores.TUNGSTEN.asTag()).result(TRContent.RawMetals.TUNGSTEN.asItem(), 2).result(Items.IRON_NUGGET, 7).result(TRContent.SmallDusts.MANGANESE.asItem(), 3).export(exporter, PATH + "tungsten_ore");
     }
 
-    public static void addOritechFuels(RecipeExporter exporter) {
+    public static void addOritechFuels(RecipeOutput exporter) {
         offerTRFluidGeneratorRecipe(exporter, 1000, FluidContent.STILL_OIL.get(), "oil");
         offerTRFluidGeneratorRecipe(exporter, 1000, FluidContent.STILL_BIOFUEL.get(), "biofuel");
         offerTRFluidGeneratorRecipe(exporter, 5000, FluidContent.STILL_FUEL.get(), "fuel");
     }
     
-    public static void addTechRebornFuels(RecipeExporter exporter) {
+    public static void addTechRebornFuels(RecipeOutput exporter) {
         BioGeneratorRecipeBuilder.build().input(TRContent.Parts.COMPRESSED_PLANTBALL.item).timeInSeconds(140).export(exporter, PATH + "compressedplantball");
         
         FuelGeneratorRecipeBuilder.build().fluidInput(ModFluids.OIL.getFluid(), 0.1f).timeInSeconds(3).export(exporter, PATH + "oil");
@@ -161,7 +162,7 @@ public class TechRebornRecipeGenerator {
         FuelGeneratorRecipeBuilder.build().fluidInput(ModFluids.NITRO_DIESEL.getFluid(), 0.1f).timeInSeconds(16).export(exporter, PATH + "nitrodiesel");
     }
     
-    public static void addDistillation(RecipeExporter exporter) {
+    public static void addDistillation(RecipeOutput exporter) {
         exporter.accept(Oritech.id(PATH + "distillation/oil"), new RebornRecipe.Default(ModRecipes.DISTILLATION_TOWER, List.of(cellIngredient(Fluids.EMPTY, 16), cellIngredient(FluidContent.STILL_OIL.get(), 16)), List.of(cellStack(ModFluids.DIESEL, 16), cellStack(ModFluids.SULFURIC_ACID, 15), cellStack(ModFluids.GLYCERYL, 1)), 20, 400), null);
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(ModFluids.OIL.getFluid()).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, PATH + "fuel");
     }
@@ -175,22 +176,22 @@ public class TechRebornRecipeGenerator {
     }
     
     private static SizedIngredient cellIngredient(Fluid fluid, int count) {
-        return new SizedIngredient(count, Ingredient.ofStacks(cellStack(fluid, count)));
+        return new SizedIngredient(count, Ingredient.of(cellStack(fluid, count)));
     }
     
-    public static void offerTRAlloySmelterRecipe(RecipeExporter exporter, SizedIngredient A, SizedIngredient B, ItemStack output, int power, int time, String suffix) {
+    public static void offerTRAlloySmelterRecipe(RecipeOutput exporter, SizedIngredient A, SizedIngredient B, ItemStack output, int power, int time, String suffix) {
         exporter.accept(Oritech.id(PATH + "alloysmelter/" + suffix), new RebornRecipe.Default(ModRecipes.ALLOY_SMELTER, List.of(A, B), List.of(output), power, time), null);
     }
 
-    public static void offerTRFluidGeneratorRecipe(RecipeExporter exporter, int power, Fluid fluid, String suffix) {
+    public static void offerTRFluidGeneratorRecipe(RecipeOutput exporter, int power, Fluid fluid, String suffix) {
         exporter.accept(Oritech.id(PATH + "fluidgenerator/" + suffix), new FluidGeneratorRecipe(ModRecipes.SEMI_FLUID_GENERATOR, power, fluid), null);
     }
     
-    public static void offerTRGrinderRecipe(RecipeExporter exporter, SizedIngredient input, ItemStack output, int power, int time, String suffix) {
+    public static void offerTRGrinderRecipe(RecipeOutput exporter, SizedIngredient input, ItemStack output, int power, int time, String suffix) {
         exporter.accept(Oritech.id(PATH + "grinder/" + suffix), new RebornRecipe.Default(ModRecipes.GRINDER, List.of(input), List.of(output), power, time), null);
     }
     
-    public static void offerTRIndustrialGrinderRecipe(RecipeExporter exporter, SizedIngredient input, List<ItemStack> outputs, int power, int time, FluidInstance fluid, String suffix) {
+    public static void offerTRIndustrialGrinderRecipe(RecipeOutput exporter, SizedIngredient input, List<ItemStack> outputs, int power, int time, FluidInstance fluid, String suffix) {
         exporter.accept(Oritech.id(PATH + "industrial_grinder/" + suffix), new IndustrialGrinderRecipe(ModRecipes.INDUSTRIAL_GRINDER, List.of(input), outputs, power, time, fluid), null);
     }
 }
