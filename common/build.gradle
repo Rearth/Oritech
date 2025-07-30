@@ -56,7 +56,7 @@ sourceSets {
 }
 
 tasks.withType(AbstractCopyTask).configureEach {
-    setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 tasks.named('processResources') {
