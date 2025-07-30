@@ -1,134 +1,76 @@
 plugins {
-    id 'dev.architectury.loom' version '1.9-SNAPSHOT' apply false
     id 'architectury-plugin' version '3.4-SNAPSHOT'
+    id 'dev.architectury.loom' version '1.10-SNAPSHOT' apply false
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
     id 'org.sinytra.wiki.toolkit' version '0.1.16'
-    id "me.modmuss50.mod-publish-plugin" version "0.8.0"
+    id "me.modmuss50.mod-publish-plugin" version "0.8.0" apply false
 }
 
-wiki {
-    docs {
-        oritech {
-            // The path to the folder containing the documentation metadata file (sinytra-wiki.json)
-            root = file('docs')
-            exportedAssetNamespaces = ['oritech']
-            wikiAccessToken = System.getenv('WIKI_TOKEN')
-        }
+architectury {
+    minecraft = minecraft_version
+}
+
+// all projects including the root project
+allprojects {
+    apply plugin: 'java'
+    
+    java {
+        withSourcesJar()
+        toolchain.languageVersion = JavaLanguageVersion.of(21)
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
-//task runDatagenNeoforge(type: GradleBuild) {
-//    buildFile = 'neoforgedatagen/build.gradle'
-//    tasks = ['runData']
-//}
-
-architectury {
-    minecraft = project.minecraft_version
-}
-
-allprojects {
-    group = rootProject.maven_group
-    version = rootProject.mod_version
-}
-
+// all projects but the root project
 subprojects {
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
-    apply plugin: 'me.modmuss50.mod-publish-plugin'
-
+    
     base {
-        // Set up a suffixed format for the mod jar names, e.g. `example-fabric`.
-        archivesName = "$rootProject.archives_name-$project.name"
+        archivesName = "$archives_name-$project.name"
     }
 
-    loom.silentMojangMappingsLicense()
-
-//    loom {
-//        runs.configureEach {
-//            vmArg("-Dmixin.env.remapRefMap=true")
-//            vmArg("-Dmixin.env.refMapRemappingFile=${projectDir}/build/createSrgToMcp/output.srg")
-//        }
-//    }
-
-
-    repositories {
-        maven {
-            name = 'Owo'
-            url 'https://maven.wispforest.io/releases/'
-        }
-
-        maven {
-            name = 'GeckoLib'
-            url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
-        }
-        maven {
-            name = 'REI'
-            url "https://maven.shedaniel.me/"
-        }
-
-        maven { // EMI
-            name = 'TerraformersMC'
-            url 'https://maven.terraformersmc.com/'
-        }
-
-        maven { // jade
-            name = 'CurseMaven'
-            url "https://beta.cursemaven.com"
-        }
-
-        maven { // FFAPI
-            name = "Sinytra"
-            url "https://maven.su5ed.dev/releases"
-        }
-
-        maven { // JEI
-            name = "Jared's maven"
-            url = "https://maven.blamejared.com/"
-        }
-
-        maven { // for athena/CSL
-            name = 'teamresourceful'
-            url "https://maven.teamresourceful.com/repository/maven-public/"
-        }
-
-        // create:
-        maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
-        maven { url = "https://maven.createmod.net" }   // create + ponder + flywheel?
-
-    }
-
-    dependencies {
-        minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
-        mappings loom.layered {
-            officialMojangMappings()
-            parchment("org.parchmentmc.data:parchment-$rootProject.minecraft_version:$parchment_mappings@zip")
-//            it.mappings("net.fabricmc:yarn:$rootProject.yarn_mappings:v2")
-//            it.mappings("dev.architectury:yarn-mappings-patch-neoforge:$rootProject.yarn_mappings_patch_neoforge_version")
-        }
-    }
-
-    java {
-        // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-        // if it is present.
-        // If you remove this line, sources will not be generated.
-        withSourcesJar()
-
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
-        }
+    loom {
+        silentMojangMappingsLicense()
+        mixin.useLegacyMixinAp = false
     }
 
     tasks {
-        withType(GenerateModuleMetadata).configureEach {
-            enabled = false
-        }
         withType(JavaCompile).configureEach {
             options.encoding = "UTF-8"
             options.release = 21
+        }
+        withType(GenerateModuleMetadata).configureEach {
+            enabled = false
+        }
+    }
+    
+    repositories {
+        // owo-lib
+        maven { url 'https://maven.wispforest.io/releases/' }
+        // GeckoLib
+        maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+        // REI
+        maven { url "https://maven.shedaniel.me/" }
+        // EMI
+        maven { url 'https://maven.terraformersmc.com/' }
+        // Jade
+        maven { url "https://beta.cursemaven.com" }
+        // FFAPI
+        maven { url "https://maven.su5ed.dev/releases" }
+        // JEI
+        maven { url = "https://maven.blamejared.com/" }
+        // Athena (CTM)
+        maven { url "https://maven.teamresourceful.com/repository/maven-public/" }
+    }
+
+    dependencies {
+        minecraft "net.minecraft:minecraft:$minecraft_version"
+        mappings loom.layered {
+            officialMojangMappings()
+            parchment("org.parchmentmc.data:parchment-$minecraft_version:$parchment_mappings@zip")
         }
     }
 
@@ -147,6 +89,88 @@ subprojects {
             // Notice: This block does NOT have the same function as the block in the top level.
             // The repositories here will be used for publishing your artifact, not for
             // retrieving dependencies.
+        }
+    }
+}
+
+// only loader projects
+subprojects {
+    if (project.path == ":common") {
+        return
+    }
+
+    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'me.modmuss50.mod-publish-plugin'
+
+    loom {
+        /**
+         * "main" matches the default mod name
+         * since `compileOnly()` is being used in Architectury, the local mods for the
+         * loaders need to be set up too
+         * otherwise, they won't recognize :common.
+         */
+        mods {
+            main {
+                sourceSet sourceSets.main
+                sourceSet project(":common").sourceSets.main
+            }
+        }
+    }
+
+    def shadowCommon = configurations.create('shadowCommon')
+    configurations {
+        common
+        shadowCommon
+        compileClasspath.extendsFrom common
+        runtimeClasspath.extendsFrom common
+    }
+
+    components.java.withVariantsFromConfiguration(configurations.shadowRuntimeElements) {
+        skip()
+    }
+
+    tasks {
+        shadowJar {
+            exclude "architectury.common.json"
+            configurations = [shadowCommon]
+            archiveClassifier = "dev-shadow"
+        }
+
+        remapJar {
+            inputFile = shadowJar.archiveFile
+            dependsOn shadowJar
+            archiveClassifier = null
+            injectAccessWidener = true
+        }
+
+        jar {
+            archiveClassifier = "dev"
+        }
+
+        sourcesJar {
+            def commonSources = project(":common").tasks.sourcesJar
+            dependsOn commonSources
+            from commonSources.archiveFile.map { zipTree(it) }
+            archiveClassifier = "sources"
+        }
+
+        processResources {
+            inputs.property 'version', project.version
+            filesMatching(['META-INF/neoforge.mods.toml', "fabric.mod.json"]) {
+                expand version: version
+            }
+        }
+    }
+}
+
+// sinytra wiki
+wiki {
+    docs {
+        oritech {
+            // path to the folder containing metadata file (sinytra-wiki.json)
+            root = file('docs')
+            exportedAssetNamespaces = ['oritech']
+            wikiAccessToken = System.getenv('WIKI_TOKEN')
         }
     }
 }

@@ -1,69 +1,69 @@
 architectury {
-    common rootProject.enabled_platforms.split(',')
+    common enabled_platforms.split(',')
 }
 
-loom.accessWidenerPath.set(file("src/main/resources/oritech.accesswidener"))
+loom.accessWidenerPath.set(file("src/main/resources/${archives_name}.accesswidener"))
 
 dependencies {
-    // We depend on Fabric Loader here to use the Fabric @Environment annotations,
-    // which get remapped to the correct annotations on each platform.
-    // Do NOT use other classes from Fabric Loader.
-    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+    /**
+     * loader
+     * required here for the @Environment annotations and the mixin dependencies
+     * do NOT use other classes from the Fabric loader
+     */
+    modImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"
 
-    // Architectury API. This is optional, and you can comment it out if you don't need it.
-    modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
+    // Architectury API
+    modImplementation "dev.architectury:architectury:$architectury_api_version"
 
-    // owo lib (or owo-lib-neoforge)
-    modImplementation "io.wispforest:owo-lib:${owo_version}"
-    annotationProcessor modImplementation("io.wispforest:owo-lib:${owo_version}")
+    // owo-lib
+    modImplementation "io.wispforest:owo-lib:$owo_version"
+    annotationProcessor "io.wispforest:owo-lib:$owo_version"
 
-    // geckolib
-    modImplementation "software.bernie.geckolib:geckolib-fabric-1.21.1:4.6.6"
+    // GeckoLib
+    modImplementation "software.bernie.geckolib:geckolib-common-$minecraft_version:$geckolib_version"
 
     // EMI
-    // modCompileOnly "dev.emi:emi-xplat-intermediary:${emi_version}:api"
-    modCompileOnly "dev.emi:emi-fabric:${emi_version}"
+    modCompileOnly "dev.emi:emi-xplat-intermediary:${emi_version}"
 
     // REI
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:16.0.754"
+    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:$rei_version"
 
     // JEI
     modCompileOnly "mezz.jei:jei-${minecraft_version}-common-api-intermediary:${jei_version}"
 
-    // JADE (needed for addon)
+    // Jade (needed for addon)
     modImplementation "curse.maven:jade-324717:5639994"
 
-    // oracle index
+    // Oracle Index
     modCompileOnly "curse.maven:oracle-index-1206582:6538216"
-
 }
 
-sourceSets {
-    main {
-        resources.srcDir "src/main/generated"
-        resources.exclude ".cache"
-        // exclude recipes from common because they're loader specific
-        resources.exclude "**/recipe"
-    }
-    fabric {
-        // make recipes available to fabric build
-        resources {
-            srcDir "src/main/generated"
-            include "**/recipe/**"
-        }
-        output.resourcesDir = "data"
-    }
-}
+//sourceSets {
+//    main {
+//        resources.srcDir "src/main/generated"
+//        resources.exclude ".cache"
+//        // exclude recipes from common because they're loader specific
+//        resources.exclude "**/recipe"
+//    }
+//    fabric {
+//        // make recipes available to fabric build
+//        resources {
+//            srcDir "src/main/generated"
+//            include "**/recipe/**"
+//        }
+//        output.resourcesDir = "data"
+//    }
+//}
 
-tasks.withType(AbstractCopyTask).configureEach {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
+//tasks.withType(AbstractCopyTask).configureEach {
+//    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//}
 
 tasks.named('processResources') {
 
     from("$rootDir/docs") {
         into "assets/oracle_index/books/oritech"
-        exclude '.assets/item/**'   // items are rendered ingame as actual item components, no need to include them here
+        exclude '.assets/item/**' // items are rendered in-game as actual item components, no need to include them here
     }
 
     doLast {
