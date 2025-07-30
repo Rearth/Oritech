@@ -1,7 +1,6 @@
 package rearth.oritech.neoforge.mixin;
 
 
-import net.minecraft.entity.*;
 import net.minecraft.world.entity.Attackable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;

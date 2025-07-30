@@ -4,7 +4,6 @@ import dev.architectury.core.fluid.ArchitecturyFluidAttributes;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.core.Direction;
-import net.minecraft.data.client.*;
 import net.minecraft.data.models.BlockModelGenerators;
 import net.minecraft.data.models.BlockModelGenerators.BlockFamilyProvider;
 import net.minecraft.data.models.ItemModelGenerators;
