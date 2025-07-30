@@ -7,10 +7,10 @@
     "LaserRenderBoundsMixin",
     "AcceleratorRenderBoundsMixin",
     "MachineGantryRenderBoundsMixin",
-    "ElytraFeatureRendererMixin"
+    "ElytraLayerMixin"
   ],
   "mixins": [
-    "ServerPlayerEntityMixin",
+    "ServerPlayerMixin",
     "LivingEntityMixin",
     "NetworkWarningShutupMixin"
   ],

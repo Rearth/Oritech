@@ -42,7 +42,7 @@ public abstract class LivingEntityMixin extends Entity implements Attackable {
         return super.spawnAtLocation(stack, yOffset);
     }
     
-    @Inject(method = "dropXp(Lnet/minecraft/entity/Entity;)V", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "dropExperience", at = @At(value = "HEAD"), cancellable = true)
     private void disableXpForLaser(Entity attacker, CallbackInfo ci) {
         if (oritech$isLaser(attacker))
             ci.cancel();

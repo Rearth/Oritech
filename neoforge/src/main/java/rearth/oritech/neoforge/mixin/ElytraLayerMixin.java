@@ -14,10 +14,10 @@ import rearth.oritech.item.tools.armor.JetpackExoElytraItem;
 
 @OnlyIn(Dist.CLIENT)
 @Mixin(ElytraLayer.class)
-public class ElytraFeatureRendererMixin {
+public class ElytraLayerMixin {
     
     @Inject(
-      method = "shouldRender(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/LivingEntity;)Z",
+      method = "shouldRender",
       at = @At("HEAD"),
       cancellable = true
     )

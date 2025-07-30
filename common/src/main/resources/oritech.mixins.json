@@ -4,11 +4,11 @@
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
   "client": [
-    "ElytraFeatureRendererMixin"
+    "ElytraLayerMixin"
   ],
   "mixins": [
     "LivingEntityMixin",
-    "ServerPlayerEntityMixin"
+    "ServerPlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

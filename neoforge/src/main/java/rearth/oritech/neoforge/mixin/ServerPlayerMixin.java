@@ -1,7 +1,6 @@
 package rearth.oritech.neoforge.mixin;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -9,13 +8,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import rearth.oritech.Oritech;
 
 @Mixin(ServerPlayer.class)
-public class ServerPlayerEntityMixin {
+public class ServerPlayerMixin {
     
     @Inject(
-      method = "copyFrom",
+      method = "restoreFrom",
       at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/server/network/ServerPlayerEntity;setHealth(F)V"
+        target = "Lnet/minecraft/server/level/ServerPlayer;setHealth(F)V"
       )
     )
     private void onCopyFrom(ServerPlayer oldPlayer, boolean alive, CallbackInfo ci) {
