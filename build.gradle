@@ -42,6 +42,8 @@ subprojects {
         archivesName = "$rootProject.archives_name-$project.name"
     }
 
+    loom.silentMojangMappingsLicense()
+
 //    loom {
 //        runs.configureEach {
 //            vmArg("-Dmixin.env.remapRefMap=true")
