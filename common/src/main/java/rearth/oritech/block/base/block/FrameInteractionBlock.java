@@ -37,7 +37,6 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-import Z;
 
 public abstract class FrameInteractionBlock extends HorizontalDirectionalBlock implements EntityBlock {
     

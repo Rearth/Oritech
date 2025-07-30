@@ -1,8 +1,5 @@
 package rearth.oritech.block.entity.interaction;
 
-import I;
-import J;
-import Z;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;

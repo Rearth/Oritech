@@ -7,9 +7,6 @@ import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.model.DefaultedBlockGeoModel;
-import F;
-import I;
-import J;
 import java.util.HashMap;
 import net.minecraft.util.Tuple;
 

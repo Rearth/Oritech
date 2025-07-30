@@ -27,8 +27,6 @@ import net.minecraft.world.item.ItemStack;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.ITEM_SLOT;
 
-import I;
-import Z;
 
 public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilterScreenHandler> {
 

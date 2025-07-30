@@ -26,7 +26,6 @@ import net.minecraft.world.entity.player.Inventory;
 import static rearth.oritech.client.ui.BasicMachineScreen.ORITECH_PANEL;
 import static rearth.oritech.client.ui.BasicMachineScreen.getItemFrame;
 
-import ;
 
 public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, RedstoneAddonScreenHandler> {
     

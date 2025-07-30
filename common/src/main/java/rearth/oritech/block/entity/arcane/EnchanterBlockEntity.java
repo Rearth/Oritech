@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.arcane;
 
-import I;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.wispforest.owo.util.VectorRandomUtils;
 import org.jetbrains.annotations.NotNull;

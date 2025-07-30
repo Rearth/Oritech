@@ -1,6 +1,5 @@
 package rearth.oritech.block.blocks.storage;
 
-import J;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;

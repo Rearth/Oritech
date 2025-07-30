@@ -1,7 +1,5 @@
 package rearth.oritech.init.world.features.resourcenode;
 
-import I;
-import Z;
 import com.mojang.serialization.Codec;
 import rearth.oritech.Oritech;
 

@@ -1,7 +1,5 @@
 package rearth.oritech.block.blocks.processing;
 
-import D;
-import Z;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.damagesource.DamageSource;

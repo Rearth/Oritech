@@ -1,7 +1,5 @@
 package rearth.oritech.client.ui;
 
-import I;
-import J;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.FlowLayout;

@@ -1,9 +1,5 @@
 package rearth.oritech.client.ui;
 
-import F;
-import I;
-import J;
-import Z;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.component.ItemComponent;

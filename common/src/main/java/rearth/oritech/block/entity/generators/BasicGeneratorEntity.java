@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.generators;
 
-import I;
 import dev.architectury.registry.fuel.FuelRegistry;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;

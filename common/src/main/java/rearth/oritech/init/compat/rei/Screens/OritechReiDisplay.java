@@ -41,8 +41,6 @@ import java.util.StringJoiner;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 
-import I;
-import J;
 
 public class OritechReiDisplay implements DisplayCategory<Display> {
     

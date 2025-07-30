@@ -1,6 +1,5 @@
 package rearth.oritech.api.item.containers;
 
-import I;
 import io.netty.buffer.ByteBuf;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.SyncType;

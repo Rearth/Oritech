@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.storage;
 
-import J;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;

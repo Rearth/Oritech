@@ -24,8 +24,6 @@ import net.minecraft.world.level.Level;
 
 import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
 
-import I;
-import Z;
 
 public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEnergyItem {
     

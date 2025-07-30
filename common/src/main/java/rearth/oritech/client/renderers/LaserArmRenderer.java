@@ -7,7 +7,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.*;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
@@ -35,8 +34,6 @@ import static net.minecraft.client.renderer.RenderStateShard.VIEW_OFFSET_Z_LAYER
 import static net.minecraft.core.Direction.*;
 import static net.minecraft.core.Direction.DOWN;
 
-import D;
-import F;
 
 public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
     public LaserArmRenderer(String modelPath) {

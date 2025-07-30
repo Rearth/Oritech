@@ -1,6 +1,5 @@
 package rearth.oritech.block.behavior;
 
-import J;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;

@@ -14,8 +14,6 @@ import net.minecraft.network.codec.StreamCodec;
 
 import static rearth.oritech.api.networking.NetworkManager.getAutoCodec;
 
-import ;
-import S;
 
 public class ReflectiveCodecBuilder {
     

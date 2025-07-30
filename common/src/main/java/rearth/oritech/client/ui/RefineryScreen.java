@@ -1,6 +1,5 @@
 package rearth.oritech.client.ui;
 
-import I;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.container.FlowLayout;

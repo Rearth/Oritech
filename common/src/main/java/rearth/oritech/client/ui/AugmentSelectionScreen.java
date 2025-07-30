@@ -1,9 +1,5 @@
 package rearth.oritech.client.ui;
 
-import D;
-import F;
-import I;
-import Z;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.wispforest.owo.ui.base.BaseOwoScreen;

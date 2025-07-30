@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.accelerator;
 
-import J;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;

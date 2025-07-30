@@ -38,11 +38,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.ORITECH_PANEL;
 
-import F;
-import I;
-import J;
-import S;
-import Z;
 
 public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScreenHandler> {
     

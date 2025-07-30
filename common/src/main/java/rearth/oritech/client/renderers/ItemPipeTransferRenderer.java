@@ -2,9 +2,6 @@ package rearth.oritech.client.renderers;
 
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity.RenderStackData;
-import D;
-import F;
-import I;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import java.util.HashSet;

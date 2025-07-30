@@ -20,7 +20,6 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.ItemEnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 import team.reborn.energy.api.EnergyStorage;
-import J;
 import java.util.function.Supplier;
 
 public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {

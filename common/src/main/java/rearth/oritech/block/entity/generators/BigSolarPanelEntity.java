@@ -32,9 +32,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
-import I;
-import J;
-import Z;
 
 public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements MultiblockMachineController, GeoBlockEntity {
     

@@ -24,9 +24,6 @@ import java.util.stream.Collectors;
 
 import static rearth.oritech.block.blocks.pipes.GenericPipeBlock.NO_CONNECTION;
 
-import ;
-import I;
-import Z;
 
 public abstract class GenericPipeInterfaceEntity extends BlockEntity implements BlockEntityTicker<GenericPipeInterfaceEntity> {
     

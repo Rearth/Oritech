@@ -4,8 +4,6 @@ import rearth.oritech.block.entity.pipes.ExtractablePipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity.PipeNetworkData;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.SoundContent;
-import I;
-import Z;
 import java.util.HashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

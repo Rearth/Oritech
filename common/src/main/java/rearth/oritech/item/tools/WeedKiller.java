@@ -1,7 +1,6 @@
 package rearth.oritech.item.tools;
 
 import rearth.oritech.client.init.ParticleContent;
-import I;
 import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.List;

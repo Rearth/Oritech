@@ -1,7 +1,5 @@
 package rearth.oritech.init.world.features.oil;
 
-import D;
-import I;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;

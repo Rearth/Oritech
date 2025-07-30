@@ -4,8 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.TreefellerBlockEntity;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
-import F;
-import Z;
 import java.util.Deque;
 import java.util.List;
 import net.minecraft.ChatFormatting;

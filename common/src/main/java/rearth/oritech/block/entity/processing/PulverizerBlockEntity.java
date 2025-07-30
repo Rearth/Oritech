@@ -8,8 +8,6 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
-import D;
-import Z;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;

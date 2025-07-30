@@ -1,6 +1,5 @@
 package rearth.oritech.api.fluid;
 
-import J;
 import dev.architectury.fluid.FluidStack;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.fluid.containers.DelegatingFluidStorage;

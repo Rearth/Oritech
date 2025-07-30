@@ -1,6 +1,5 @@
 package rearth.oritech;
 
-import OritechConfig;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import dev.architectury.event.events.common.LifecycleEvent;

@@ -14,8 +14,6 @@ import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.model.DefaultedBlockGeoModel;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
-import F;
-import Z;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

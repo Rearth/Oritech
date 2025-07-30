@@ -9,7 +9,6 @@ import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ScreenProvider;
-import I;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

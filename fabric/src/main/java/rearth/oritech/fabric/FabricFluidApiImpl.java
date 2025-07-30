@@ -1,6 +1,5 @@
 package rearth.oritech.fabric;
 
-import J;
 import com.google.common.collect.Streams;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.fabric.FluidStackHooksFabric;

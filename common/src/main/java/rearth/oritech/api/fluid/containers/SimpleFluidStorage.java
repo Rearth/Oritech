@@ -1,6 +1,5 @@
 package rearth.oritech.api.fluid.containers;
 
-import J;
 import dev.architectury.fluid.FluidStack;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.component.DataComponentPatch;

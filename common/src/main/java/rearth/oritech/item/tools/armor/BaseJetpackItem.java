@@ -30,11 +30,6 @@ import net.minecraft.world.phys.Vec3;
 
 import static rearth.oritech.item.tools.harvesting.ChainsawItem.BAR_STEP_COUNT;
 
-import D;
-import F;
-import I;
-import J;
-import Z;
 
 public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvider {
     

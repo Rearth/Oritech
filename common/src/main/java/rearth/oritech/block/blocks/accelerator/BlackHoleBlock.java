@@ -1,7 +1,6 @@
 package rearth.oritech.block.blocks.accelerator;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.block.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;

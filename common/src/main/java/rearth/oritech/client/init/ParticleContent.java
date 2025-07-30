@@ -1,6 +1,5 @@
 package rearth.oritech.client.init;
 
-import I;
 import io.wispforest.owo.particles.ClientParticles;
 import io.wispforest.owo.particles.systems.ParticleSystem;
 import io.wispforest.owo.particles.systems.ParticleSystemController;

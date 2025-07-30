@@ -27,7 +27,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-import Z;
 
 public class BigSolarPanelBlock extends PassiveGeneratorBlock {
     

@@ -24,9 +24,6 @@ import net.minecraft.world.level.material.Fluid;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 
-import I;
-import J;
-import Z;
 
 public class OritechEMIRecipe extends BasicEmiRecipe {
     

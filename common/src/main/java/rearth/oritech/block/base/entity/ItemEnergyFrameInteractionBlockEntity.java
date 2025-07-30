@@ -1,7 +1,5 @@
 package rearth.oritech.block.base.entity;
 
-import F;
-import I;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;

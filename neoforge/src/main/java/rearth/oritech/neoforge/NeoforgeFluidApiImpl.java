@@ -1,7 +1,5 @@
 package rearth.oritech.neoforge;
 
-import I;
-import J;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
 import net.minecraft.core.BlockPos;

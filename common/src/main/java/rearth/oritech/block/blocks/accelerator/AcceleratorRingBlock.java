@@ -2,8 +2,6 @@ package rearth.oritech.block.blocks.accelerator;
 
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
-import I;
-import Z;
 import java.util.List;
 import java.util.Objects;
 import net.minecraft.ChatFormatting;

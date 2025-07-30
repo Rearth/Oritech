@@ -17,9 +17,6 @@ import net.minecraft.world.phys.Vec3;
 
 import static rearth.oritech.client.renderers.LaserArmRenderer.CUSTOM_LINES;
 
-import D;
-import F;
-import I;
 
 public class AcceleratorControllerRenderer implements BlockEntityRenderer<AcceleratorControllerBlockEntity> {
     

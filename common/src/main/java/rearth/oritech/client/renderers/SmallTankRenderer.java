@@ -1,8 +1,5 @@
 package rearth.oritech.client.renderers;
 
-import ;
-import F;
-import I;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.VertexConsumer;

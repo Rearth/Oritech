@@ -35,8 +35,6 @@ import java.util.List;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 
-import I;
-import J;
 
 public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> {
     

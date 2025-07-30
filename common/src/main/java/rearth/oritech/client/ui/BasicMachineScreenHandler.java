@@ -1,6 +1,5 @@
 package rearth.oritech.client.ui;
 
-import I;
 import io.wispforest.owo.client.screens.SlotGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

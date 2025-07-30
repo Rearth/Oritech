@@ -1,8 +1,5 @@
 package rearth.oritech.block.entity.augmenter.api;
 
-import D;
-import I;
-import Z;
 import com.mojang.serialization.Codec;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.Attachment;

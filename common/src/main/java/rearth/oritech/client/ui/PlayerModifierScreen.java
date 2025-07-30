@@ -49,11 +49,6 @@ import net.minecraft.world.level.block.Block;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.*;
 
-import D;
-import F;
-import I;
-import J;
-import Z;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 

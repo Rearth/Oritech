@@ -4,7 +4,6 @@ import com.mojang.serialization.MapCodec;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.ChatFormatting;
-import net.minecraft.block.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -55,11 +54,6 @@ import java.util.Set;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-import ;
-import D;
-import I;
-import J;
-import Z;
 
 public class AugmentApplicationBlock extends HorizontalDirectionalBlock implements EntityBlock {
     

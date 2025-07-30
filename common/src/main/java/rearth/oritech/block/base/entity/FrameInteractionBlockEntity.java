@@ -28,8 +28,6 @@ import net.minecraft.world.phys.Vec3;
 
 import static rearth.oritech.util.Geometry.*;
 
-import I;
-import Z;
 
 public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     

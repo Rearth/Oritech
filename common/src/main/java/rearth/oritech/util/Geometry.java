@@ -12,8 +12,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import static net.minecraft.core.Direction.*;
 
-import D;
-import I;
 
 public class Geometry {
     

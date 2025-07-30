@@ -1,7 +1,5 @@
 package rearth.oritech.init.world.features.uranium;
 
-import I;
-import Z;
 import com.mojang.serialization.Codec;
 import org.joml.Vector2d;
 import rearth.oritech.init.BlockContent;

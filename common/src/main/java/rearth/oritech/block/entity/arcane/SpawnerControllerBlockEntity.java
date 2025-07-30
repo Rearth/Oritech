@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.arcane;
 
-import F;
-import I;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;

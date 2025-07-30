@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.reactor;
 
-import F;
-import I;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.netty.buffer.Unpooled;
 import org.jetbrains.annotations.Nullable;

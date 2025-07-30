@@ -13,7 +13,6 @@ import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
-import I;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;

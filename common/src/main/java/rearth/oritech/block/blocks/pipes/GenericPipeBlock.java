@@ -2,8 +2,6 @@ package rearth.oritech.block.blocks.pipes;
 
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.item.tools.Wrench;
-import D;
-import Z;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

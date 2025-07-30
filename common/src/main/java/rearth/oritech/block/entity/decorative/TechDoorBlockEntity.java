@@ -9,7 +9,6 @@ import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
-import J;
 import java.util.Timer;
 import java.util.TimerTask;
 import net.minecraft.core.BlockPos;
