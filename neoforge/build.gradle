@@ -38,6 +38,8 @@ repositories {
     maven { url = 'https://maven.rover656.dev/releases' }
     // GrandPower
     maven { url "https://modmaven.dev/" }
+    // Registrate
+    maven { url = "https://mvn.devos.one/snapshots" }
 }
 
 dependencies {
@@ -92,14 +94,20 @@ dependencies {
     modDataRuntimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
     // Create
     modDataImplementation "curse.maven:create-328085:$create_version_id"
+    modDataImplementation "com.tterrag.registrate:Registrate:$registrate_version"
     // EnderIO
     modDataImplementation "com.enderio:enderio-base:$enderio_version"
     modDataImplementation("com.enderio:enderio-machines:$enderio_version") { transitive = false }
+    // Energized Power
+    modDataImplementation "curse.maven:energized-power-782147:$energized_power_neo_version_id"
     // Immersive Engineering
     modDataImplementation "curse.maven:immersive-engineering-231951:$immersive_engineering_version_id"
     // Industrial Foregoing
     modDataImplementation "curse.maven:industrial-foregoing-266515:$industrial_foregoing_version_id"
     modDataImplementation "curse.maven:titanium-287342:$titanium_version_id"
+    // Mekanism
+    modDataImplementation "mekanism:Mekanism:$mekanism_version"
+    modDataImplementation "mekanism:Mekanism:$mekanism_version:generators"
     // PneumaticCraft: Repressurized
     modDataImplementation "curse.maven:pneumaticcraft-repressurized-281849:$pneumaticcraft_version_id"
     // Powah!

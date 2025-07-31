@@ -14,3 +14,5 @@ accessible field net/minecraft/server/network/ServerGamePacketListenerImpl above
 accessible method net/minecraft/client/renderer/LevelRenderer renderShape (Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/phys/shapes/VoxelShape;DDDFFFF)V
 accessible method net/minecraft/client/renderer/blockentity/BlockEntityRenderers register (Lnet/minecraft/world/level/block/entity/BlockEntityType;Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider;)V
 accessible method net/minecraft/data/recipes/RecipeProvider threeByThreePacker (Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/data/recipes/RecipeCategory;Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/level/ItemLike;)V
+accessible method net/minecraft/data/recipes/RecipeProvider getHasName (Lnet/minecraft/world/level/ItemLike;)Ljava/lang/String;
+accessible method net/minecraft/data/recipes/RecipeProvider has (Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/advancements/Criterion;

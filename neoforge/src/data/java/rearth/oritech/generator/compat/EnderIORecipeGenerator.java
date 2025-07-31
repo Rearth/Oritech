@@ -60,7 +60,7 @@ public class EnderIORecipeGenerator {
                 BlockContent.FLUID_PIPE.asItem(), 6,
                 Ingredient.of(conduitBinder),
                 Ingredient.of(Tags.Items.INGOTS_COPPER))
-            .unlockedBy(provider.getHasName(conduitBinder), provider.has(conduitBinder))
+            .unlockedBy(RecipeProvider.getHasName(conduitBinder), RecipeProvider.has(conduitBinder))
             .save(exporter, Oritech.id(PATH + "crafting/fluidpipe"));
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, BlockContent.PUMP_BLOCK.asItem(), 1)
             .define('s', Ingredient.of(conduitBinder))
@@ -70,7 +70,7 @@ public class EnderIORecipeGenerator {
             .pattern("fff")
             .pattern("fcf")
             .pattern("sbs")
-            .unlockedBy(provider.getHasName(conduitBinder), provider.has(conduitBinder)).save(exporter, Oritech.id(PATH + "crafting/pump"));
+            .unlockedBy(provider.getHasName(conduitBinder), RecipeProvider.has(conduitBinder)).save(exporter, Oritech.id(PATH + "crafting/pump"));
     }
 
     private static void addFireCrafting(RecipeOutput exporter) {
