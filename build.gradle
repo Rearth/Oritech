@@ -182,6 +182,10 @@ subprojects {
                 expand version: version
             }
         }
+
+        withType(AbstractCopyTask).configureEach {
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        }
     }
 }
 
