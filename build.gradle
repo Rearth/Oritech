@@ -102,6 +102,22 @@ subprojects {
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: 'me.modmuss50.mod-publish-plugin'
 
+    sourceSets {
+        main {
+            resources {
+                srcDir(file("src/generated/resources"))
+                exclude("**/.cache")
+            }
+        }
+
+        create("data") {
+            compileClasspath += sourceSets.main.output
+            runtimeClasspath += sourceSets.main.output
+            compileClasspath += sourceSets.main.compileClasspath
+            runtimeClasspath += sourceSets.main.runtimeClasspath
+        }
+    }
+    
     loom {
         /**
          * "main" matches the default mod name
@@ -115,6 +131,8 @@ subprojects {
                 sourceSet project(":common").sourceSets.main
             }
         }
+        
+        createRemapConfigurations(sourceSets.data)
     }
 
     def shadowCommon = configurations.create('shadowCommon')
