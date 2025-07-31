@@ -109,7 +109,7 @@ subprojects {
     sourceSets {
         main {
             resources {
-                srcDir(file("src/generated/resources"))
+                srcDir(file("src/main/generated"))
                 exclude("**/.cache")
             }
         }

@@ -17,7 +17,7 @@ loom {
             source("data")
 
             programArgs("--all", "--mod", archives_name)
-            programArgs("--output", file("src/generated/resources").absolutePath)
+            programArgs("--output", file("src/main/generated").absolutePath)
             programArgs("--existing", project(":common").file("src/main/resources").absolutePath)
             programArgs("--existing", file("src/main/resources").absolutePath)
 
