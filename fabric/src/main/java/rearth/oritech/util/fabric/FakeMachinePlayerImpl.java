@@ -15,7 +15,7 @@ import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 
 // the only difference between this and the Neoforge Impl is the platform's version of FakePlayer that is being extended.
 public class FakeMachinePlayerImpl extends FakePlayer {
-    private static final Map<FakeMachinePlayerKey, FakePlayer> fakeMachinePlayers = new MapMaker().weakValues().makeMap();
+    private static final Map<FakeMachinePlayerKey, FakePlayer> FAKE_MACHINE_PLAYERS = new MapMaker().weakValues().makeMap();
     private record FakeMachinePlayerKey (ServerLevel world, GameProfile profile) {}
     
     private final SimpleInventoryStorage inventory;
@@ -27,7 +27,7 @@ public class FakeMachinePlayerImpl extends FakePlayer {
 
     public static ServerPlayer create(ServerLevel world, GameProfile profile, SimpleInventoryStorage inventory) {
         FakeMachinePlayerKey key = new FakeMachinePlayerKey(world, profile);
-        return fakeMachinePlayers.computeIfAbsent(key, k -> new FakeMachinePlayerImpl(k.world(), k.profile(), inventory));
+        return FAKE_MACHINE_PLAYERS.computeIfAbsent(key, k -> new FakeMachinePlayerImpl(k.world(), k.profile(), inventory));
 	}
 
     @Override

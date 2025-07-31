@@ -2,7 +2,6 @@ package rearth.oritech.api.networking;
 
 import com.mojang.serialization.Codec;
 import dev.architectury.fluid.FluidStack;
-import dev.architectury.injectables.annotations.ExpectPlatform;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -10,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
+import rearth.oritech.OritechPlatform;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
@@ -47,7 +47,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -60,29 +59,24 @@ public class NetworkManager {
     public static Codec<FluidStack> FLUID_STACK_CODEC;
     public static StreamCodec<RegistryFriendlyByteBuf, FluidStack> FLUID_STACK_STREAM_CODEC;
     
-    @ExpectPlatform
     public static void sendBlockHandle(BlockEntity blockEntity, CustomPacketPayload message) {
-        throw new AssertionError();
+        OritechPlatform.INSTANCE.sendBlockHandle(blockEntity, message);
     }
     
-    @ExpectPlatform
     public static void sendPlayerHandle(CustomPacketPayload message, ServerPlayer player) {
-        throw new AssertionError();
+        OritechPlatform.INSTANCE.sendPlayerHandle(message, player);
     }
     
-    @ExpectPlatform
     public static void sendToServer(CustomPacketPayload message) {
-        throw new AssertionError();
+        OritechPlatform.INSTANCE.sendToServer(message);
     }
     
-    @ExpectPlatform
     public static <T extends CustomPacketPayload> void registerToClient(CustomPacketPayload.Type<T> id, StreamCodec<RegistryFriendlyByteBuf, T> packetCodec, TriConsumer<T, Level, RegistryAccess> consumer) {
-        throw new AssertionError();
+        OritechPlatform.INSTANCE.registerToClient(id, packetCodec, consumer);
     }
     
-    @ExpectPlatform
     public static <T extends CustomPacketPayload> void registerToServer(CustomPacketPayload.Type<T> id, StreamCodec<RegistryFriendlyByteBuf, T> packetCodec, TriConsumer<T, Player, RegistryAccess> consumer) {
-        throw new AssertionError();
+        OritechPlatform.INSTANCE.registerToServer(id, packetCodec, consumer);
     }
     
     public static void registerDefaultCodecs() {

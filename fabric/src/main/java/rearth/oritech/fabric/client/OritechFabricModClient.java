@@ -13,12 +13,12 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
-import rearth.oritech.api.networking.fabric.NetworkManagerImpl;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.PortalEntityRenderer;
 import rearth.oritech.client.renderers.SmallTankItemRenderer;
+import rearth.oritech.fabric.OritechPlatformFabric;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
@@ -46,11 +46,11 @@ public final class OritechFabricModClient implements ClientModInitializer {
         
         EntityRendererRegistry.register(EntitiesContent.PORTAL_ENTITY, PortalEntityRenderer::new);
         
-        for (var runnable : NetworkManagerImpl.PENDING_S2C_INITS) {
+        for (var runnable : OritechPlatformFabric.PENDING_S2C_INITS) {
             runnable.run();
         }
         
-        NetworkManagerImpl.PENDING_S2C_INITS.clear();
+        OritechPlatformFabric.PENDING_S2C_INITS.clear();
     }
     
     private static boolean renderBlockOutline(WorldRenderContext worldRenderContext, WorldRenderContext.BlockOutlineContext blockOutlineContext) {

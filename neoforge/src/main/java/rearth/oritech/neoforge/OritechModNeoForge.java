@@ -27,7 +27,6 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.NetworkManager;
-import rearth.oritech.api.networking.neoforge.NetworkManagerImpl;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 
 @Mod(Oritech.MOD_ID)
@@ -120,15 +119,15 @@ public final class OritechModNeoForge {
         public void register(final RegisterPayloadHandlersEvent event) {
             var registrar = event.registrar("1");
             
-            for (var toInit : NetworkManagerImpl.PENDING_S2C_INITS) {
+            for (var toInit : OritechPlatformNeoForge.PENDING_S2C_INITS) {
                 toInit.accept(registrar);
             }
-            NetworkManagerImpl.PENDING_S2C_INITS.clear();
+            OritechPlatformNeoForge.PENDING_S2C_INITS.clear();
             
-            for (var toInit : NetworkManagerImpl.PENDING_C2S_INITS) {
+            for (var toInit : OritechPlatformNeoForge.PENDING_C2S_INITS) {
                 toInit.accept(registrar);
             }
-            NetworkManagerImpl.PENDING_C2S_INITS.clear();
+            OritechPlatformNeoForge.PENDING_C2S_INITS.clear();
             
         }
         
