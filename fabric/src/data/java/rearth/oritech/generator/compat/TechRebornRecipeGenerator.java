@@ -1,11 +1,10 @@
-package rearth.oritech.fabricgen.datagen.compat;
+package rearth.oritech.generator.compat;
 
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -18,7 +17,7 @@ import rearth.oritech.api.recipe.FoundryRecipeBuilder;
 import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
 import rearth.oritech.api.recipe.GrinderRecipeBuilder;
 import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
-import rearth.oritech.fabricgen.datagen.RecipeGenerator;
+import rearth.oritech.generator.RecipeGenerator;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;

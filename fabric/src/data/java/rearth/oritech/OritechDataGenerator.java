@@ -1,9 +1,8 @@
-package rearth.oritech.fabricgen;
+package rearth.oritech;
 
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator.Pack;
-import rearth.oritech.fabricgen.datagen.*;
+import rearth.oritech.generator.*;
 
 public class OritechDataGenerator implements DataGeneratorEntrypoint {
 	@Override

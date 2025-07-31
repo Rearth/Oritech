@@ -1,11 +1,10 @@
-package rearth.oritech.fabricgen.datagen.compat;
+package rearth.oritech.generator.compat;
 
 import io.wispforest.owo.util.ReflectionUtils;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import nourl.mythicmetals.MythicMetals;
 import nourl.mythicmetals.item.ItemSet;

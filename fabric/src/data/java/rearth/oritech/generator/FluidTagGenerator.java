@@ -1,10 +1,9 @@
-package rearth.oritech.fabricgen.datagen;
+package rearth.oritech.generator;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalFluidTags;
 import net.minecraft.core.HolderLookup.Provider;
-import rearth.oritech.Oritech;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.TagContent;
 

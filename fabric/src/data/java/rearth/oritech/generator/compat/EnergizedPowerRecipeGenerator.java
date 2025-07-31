@@ -1,4 +1,4 @@
-package rearth.oritech.fabricgen.datagen.compat;
+package rearth.oritech.generator.compat;
 
 import me.jddev0.ep.item.EPItems;
 import me.jddev0.ep.recipe.AlloyFurnaceRecipe;

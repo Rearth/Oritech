@@ -1,4 +1,4 @@
-package rearth.oritech.fabricgen.datagen.compat;
+package rearth.oritech.generator.compat;
 
 import net.emilsg.clutter.block.ModBlocks;
 import net.emilsg.clutter.item.ModItems;

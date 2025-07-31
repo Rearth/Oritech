@@ -1,4 +1,4 @@
-package rearth.oritech.fabricgen.datagen;
+package rearth.oritech.generator;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;

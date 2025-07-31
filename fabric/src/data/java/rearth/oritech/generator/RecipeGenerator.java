@@ -1,4 +1,4 @@
-package rearth.oritech.fabricgen.datagen;
+package rearth.oritech.generator;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -8,20 +8,15 @@ import net.emilsg.clutter.Clutter;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.impl.resource.conditions.conditions.AllModsLoadedResourceCondition;
-import net.fabricmc.fabric.impl.resource.conditions.conditions.TagsPopulatedResourceCondition;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.recipes.RecipeOutput;
 import nourl.mythicmetals.MythicMetals;
-import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
-import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
 import rearth.oritech.api.recipe.OritechRecipeGenerator;
-import rearth.oritech.fabricgen.datagen.compat.AlloyForgeryRecipeGenerator;
-import rearth.oritech.fabricgen.datagen.compat.ClutterRecipeGenerator;
-import rearth.oritech.fabricgen.datagen.compat.EnergizedPowerRecipeGenerator;
-import rearth.oritech.fabricgen.datagen.compat.MythicMetalsRecipeGenerator;
-import rearth.oritech.fabricgen.datagen.compat.TechRebornRecipeGenerator;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.TagContent;
+import rearth.oritech.generator.compat.AlloyForgeryRecipeGenerator;
+import rearth.oritech.generator.compat.ClutterRecipeGenerator;
+import rearth.oritech.generator.compat.EnergizedPowerRecipeGenerator;
+import rearth.oritech.generator.compat.MythicMetalsRecipeGenerator;
+import rearth.oritech.generator.compat.TechRebornRecipeGenerator;
 import techreborn.TechReborn;
 import wraith.alloyforgery.AlloyForgery;
 

@@ -1,11 +1,11 @@
-package rearth.oritech.fabricgen.datagen.compat;
+package rearth.oritech.generator.compat;
 
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import rearth.oritech.Oritech;
-import rearth.oritech.fabricgen.datagen.RecipeGenerator;
+import rearth.oritech.generator.RecipeGenerator;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 import wraith.alloyforgery.data.builders.AlloyForgeryRecipeBuilder;

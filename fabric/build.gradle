@@ -9,6 +9,26 @@ architectury {
 
 loom {
     accessWidenerPath.set(project(":common").loom.accessWidenerPath)
+
+    runs {
+        create("data") {
+            client()
+            name("Minecraft Data")
+            source("data")
+
+            property("fabric-api.datagen")
+            property("fabric-api.datagen.modid", "$archives_name-data")
+            property("fabric-api.datagen.output-dir", file("src/generated/resources").absolutePath)
+            property("fabric-api.datagen.strict-validation")
+        }
+    }
+}
+
+repositories {
+    // Additional Entity Attributes (Mythic Metals dependency)
+    maven { url = 'https://api.modrinth.com/maven/' }
+    // Cardinal Components (Mythic Metals dependency)
+    maven { url = 'https://maven.ladysnake.org/releases' }
 }
 
 dependencies {
@@ -23,28 +43,21 @@ dependencies {
 
     // Architectury API
     modImplementation "dev.architectury:architectury-fabric:$architectury_api_version"
-
-    // Energy API
-    include modApi("teamreborn:energy:$reborn_energy_version") { transitive = false }
-
-    // owo-lib
-    modImplementation "io.wispforest:owo-lib:$owo_version"
-
-    // GeckoLib
-    modImplementation "software.bernie.geckolib:geckolib-fabric-$minecraft_version:$geckolib_version"
-
     // Athena (CTM)
     modRuntimeOnly "earth.terrarium.athena:athena-fabric-1.21:4.0.0"
-
+    // Energy API
+    include modApi("teamreborn:energy:$reborn_energy_version") { transitive = false }
+    // GeckoLib
+    modImplementation "software.bernie.geckolib:geckolib-fabric-$minecraft_version:$geckolib_version"
     // Jade
     modImplementation "curse.maven:jade-324717:5639994"
-
     // Mod Menu
     modImplementation "com.terraformersmc:modmenu:11.0.3"
-
     // Oracle Index
     modRuntimeOnly "curse.maven:oracle-index-1206582:6538216"
     implementation "org.jsoup:jsoup:1.17.2"
+    // owo-lib
+    modImplementation "io.wispforest:owo-lib:$owo_version"
 
     // recipe viewer runtime
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
@@ -52,14 +65,28 @@ dependencies {
         case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"; break
         case "jei": modRuntimeOnly "mezz.jei:jei-$minecraft_version-fabric:$jei_version"; break
         case "disabled": break
-        default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, JEI, or disabled.")
+        default: println("Unknown recipe viewer specified: $recipe_viewer. Must be EMI, REI, JEI, or disabled.")
     }
 
-    // compat mods for ingame testing
-    modImplementation "curse.maven:techreborn-233564:5608205"
+    // in-game testing
     modImplementation "curse.maven:reborncore-237903:5608204"
-    modImplementation "curse.maven:tags-viewer-1119728:5807898"
     modImplementation "curse.maven:simple-conveyor-belts-1292980:6721806"
+    modImplementation "curse.maven:tags-viewer-1119728:5807898"
+    modImplementation "curse.maven:techreborn-233564:5608205"
+    
+    // datagen
+    // Alloy Forgery
+    modDataImplementation "curse.maven:alloy-forgery-438718:$alloy_forgery_version_id"
+    // Clutter
+    modDataImplementation "curse.maven:clutter-826060:$clutter_version_id"
+    modDataRuntimeOnly("com.terraformersmc.terraform-api:terraform-wood-api-v1:$project.terraform_wood_api_version") { transitive = false }
+    // Energized Power
+    modDataImplementation "curse.maven:energized-power-782147:$energized_power_version_id"
+    // Mythic Metals
+    modDataImplementation "curse.maven:mythicmetals-410127:$mythic_metals_version_id"
+    modDataRuntimeOnly("org.ladysnake.cardinal-components-api:cardinal-components-base:$cardinal_components_version") { transitive = false }
+    modDataRuntimeOnly("org.ladysnake.cardinal-components-api:cardinal-components-entity:$cardinal_components_version") { transitive = false }
+    modDataRuntimeOnly "maven.modrinth:additionalentityattributes:$additional_entity_attributes_version"
 }
 
 publishMods {
