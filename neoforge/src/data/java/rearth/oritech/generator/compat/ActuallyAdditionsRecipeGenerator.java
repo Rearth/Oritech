@@ -1,11 +1,10 @@
-package rearth.oritech.neoforgegen.datagen.compat;
+package rearth.oritech.generator.compat;
 
 import de.ellpeck.actuallyadditions.mod.crafting.LiquidFuelRecipe;
 import de.ellpeck.actuallyadditions.mod.crafting.PressingRecipe;
 import de.ellpeck.actuallyadditions.mod.fluids.InitFluids;
 import de.ellpeck.actuallyadditions.mod.items.ActuallyItems;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.fluids.FluidStack;
 import rearth.oritech.Oritech;

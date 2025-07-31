@@ -1,4 +1,4 @@
-package rearth.oritech.neoforgegen.datagen.compat;
+package rearth.oritech.generator.compat;
 
 import me.desht.pneumaticcraft.common.registry.ModFluids;
 import me.desht.pneumaticcraft.common.registry.ModItems;
@@ -8,7 +8,6 @@ import net.neoforged.neoforge.common.Tags;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.api.recipe.CoolerRecipeBuilder;
 import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;
-import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.ItemContent;
 

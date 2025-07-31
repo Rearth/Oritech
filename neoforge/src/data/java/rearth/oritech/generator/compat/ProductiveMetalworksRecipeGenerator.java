@@ -1,4 +1,4 @@
-package rearth.oritech.neoforgegen.datagen.compat;
+package rearth.oritech.generator.compat;
 
 import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 
@@ -9,13 +9,9 @@ import cy.jdkdigital.productivemetalworks.datagen.recipe.FluidAlloyingRecipeBuil
 import cy.jdkdigital.productivemetalworks.datagen.recipe.ItemCastingRecipeBuilder;
 import cy.jdkdigital.productivemetalworks.datagen.recipe.ItemMeltingRecipeBuilder;
 import cy.jdkdigital.productivemetalworks.registry.MetalworksRegistrator;
-import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;

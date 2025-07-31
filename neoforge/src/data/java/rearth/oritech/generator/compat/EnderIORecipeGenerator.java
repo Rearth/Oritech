@@ -1,4 +1,4 @@
-package rearth.oritech.neoforgegen.datagen.compat;
+package rearth.oritech.generator.compat;
 
 import static rearth.oritech.api.recipe.util.RecipeHelpers.createInsulatedCableRecipe;
 
@@ -25,7 +25,7 @@ import rearth.oritech.api.recipe.FoundryRecipeBuilder;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.neoforgegen.datagen.loot.FireCraftingLootProvider;
+import rearth.oritech.generator.loot.FireCraftingLootProvider;
 
 public class EnderIORecipeGenerator {
     private static final String PATH = "compat/enderio/";

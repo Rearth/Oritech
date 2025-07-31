@@ -1,8 +1,6 @@
-package rearth.oritech.neoforgegen.datagen.compat;
+package rearth.oritech.generator.compat;
 
 import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
-
-import java.util.List;
 
 import mekanism.api.datagen.recipe.builder.ItemStackChemicalToItemStackRecipeBuilder;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
@@ -13,10 +11,8 @@ import mekanism.common.resource.ResourceType;
 import mekanism.common.resource.ore.OreType;
 import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import rearth.oritech.Oritech;

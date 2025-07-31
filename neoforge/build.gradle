@@ -9,18 +9,35 @@ architectury {
 
 loom {
     accessWidenerPath.set(project(":common").loom.accessWidenerPath)
+
+    runs {
+        create("data") {
+            data()
+            name("Minecraft Data")
+            source("data")
+
+            programArgs("--all", "--mod", archives_name)
+            programArgs("--output", file("src/generated/resources").absolutePath)
+            programArgs("--existing", project(":common").file("src/main/resources").absolutePath)
+            programArgs("--existing", file("src/main/resources").absolutePath)
+
+            mods {
+                create(archives_name) {
+                    sourceSet("main")
+                    sourceSet("data")
+                }
+            }
+        }
+    }
 }
 
 repositories {
     // NeoForge
     maven { url = 'https://maven.neoforged.net/releases' }
+    // EnderIO
+    maven { url = 'https://maven.rover656.dev/releases' }
     // GrandPower
-    maven {
-        url "https://modmaven.dev/"
-        content {
-            includeGroup "dev.technici4n"
-        }
-    }
+    maven { url "https://modmaven.dev/" }
 }
 
 dependencies {
@@ -33,43 +50,63 @@ dependencies {
 
     // Architectury API
     modImplementation "dev.architectury:architectury-neoforge:$architectury_api_version"
-
+    // Athena (CTM)
+    modRuntimeOnly "earth.terrarium.athena:athena-neoforge-1.21:4.0.0"
+    // GeckoLib
+    modImplementation "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
     // GrandPower
     include modApi("dev.technici4n:GrandPower:3.0.2")
-
+    // Jade
+    modImplementation "curse.maven:jade-324717:5846105"
     // owo-lib
-    modImplementation "io.wispforest:owo-lib-neoforge:${owo_neo_version}"
+    modImplementation "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     forgeRuntimeLibrary(include(api("io.wispforest:endec:0.1.8")))
     forgeRuntimeLibrary(include(api("io.wispforest.endec:netty:0.1.4")))
     forgeRuntimeLibrary(include(api("io.wispforest.endec:gson:0.1.5")))
     forgeRuntimeLibrary(include(api("io.wispforest.endec:jankson:0.1.5")))
     forgeRuntimeLibrary(include(api("blue.endless:jankson:1.2.2")))
-
-    // GeckoLib
-    modImplementation "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
-
-    // Athena (CTM)
-    modRuntimeOnly "earth.terrarium.athena:athena-neoforge-1.21:4.0.0"
-    
-    // Jade
-    modImplementation "curse.maven:jade-324717:5846105"
-
     // REI
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
 
     // recipe viewer runtime
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
-        case "emi": modRuntimeOnly "dev.emi:emi-neoforge:${emi_version}"; break
+        case "emi": modRuntimeOnly "dev.emi:emi-neoforge:$emi_version"; break
         case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"; break
-        case "jei": modRuntimeOnly "mezz.jei:jei-$minecraft_version-neoforge:${jei_version}"; break
+        case "jei": modRuntimeOnly "mezz.jei:jei-$minecraft_version-neoforge:$jei_version"; break
         case "disabled": break
-        default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, JEI, or disabled.")
+        default: println("Unknown recipe viewer specified: $recipe_viewer. Must be EMI, REI, JEI, or disabled.")
     }
 
-    // compat mods for ingame testing
+    // in-game testing
+    modRuntimeOnly "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
+    modRuntimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
     modRuntimeOnly "curse.maven:mekanism-268560:5680395"
-    modRuntimeOnly "curse.maven:applied-energistics-2-223794:6087880"
     modRuntimeOnly "curse.maven:spark-361579:5759671"
+    
+    // datagen
+    // Actually Additions
+    modDataImplementation "curse.maven:actually-additions-228404:$actually_additions_version_id"
+    modDataRuntimeOnly "curse.maven:curios-309927:$curios_version_id"
+    // Applied Energistics 2
+    modDataImplementation "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
+    modDataRuntimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
+    // Create
+    modDataImplementation "curse.maven:create-328085:$create_version_id"
+    // EnderIO
+    modDataImplementation "com.enderio:enderio-base:$enderio_version"
+    modDataImplementation("com.enderio:enderio-machines:$enderio_version") { transitive = false }
+    // Immersive Engineering
+    modDataImplementation "curse.maven:immersive-engineering-231951:$immersive_engineering_version_id"
+    // Industrial Foregoing
+    modDataImplementation "curse.maven:industrial-foregoing-266515:$industrial_foregoing_version_id"
+    modDataImplementation "curse.maven:titanium-287342:$titanium_version_id"
+    // PneumaticCraft: Repressurized
+    modDataImplementation "curse.maven:pneumaticcraft-repressurized-281849:$pneumaticcraft_version_id"
+    // Powah!
+    modDataImplementation "curse.maven:powah-rearchitected-633483:$powah_version_id"
+    modDataRuntimeOnly "me.shedaniel.cloth:cloth-config-neoforge:$cloth_config_version"
+    // Productive Metalworks
+    modDataImplementation "curse.maven:productive-metalworks-1184570:$productive_metalworks_version_id"
 }
 
 publishMods {

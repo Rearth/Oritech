@@ -1,4 +1,4 @@
-package rearth.oritech.neoforgegen.datagen.compat;
+package rearth.oritech.generator.compat;
 
 import java.util.List;
 

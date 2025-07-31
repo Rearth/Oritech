@@ -1,9 +1,8 @@
-package rearth.oritech.neoforgegen.datagen.compat;
+package rearth.oritech.generator.compat;
 
 import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 
 import com.buuz135.industrial.module.ModuleCore;
-import dev.architectury.fluid.FluidStack;
 import net.minecraft.data.recipes.RecipeOutput;
 import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.api.recipe.FuelGeneratorRecipeBuilder;

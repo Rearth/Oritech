@@ -1,8 +1,7 @@
-package rearth.oritech.neoforgegen.datagen;
+package rearth.oritech.generator;
 
 import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import appeng.api.ids.AEConstants;
@@ -20,8 +19,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import owmii.powah.Powah;
@@ -30,18 +27,18 @@ import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.api.recipe.OritechRecipeGenerator;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.neoforgegen.datagen.compat.ActuallyAdditionsRecipeGenerator;
-import rearth.oritech.neoforgegen.datagen.compat.AppliedEnergistics2RecipeGenerator;
-import rearth.oritech.neoforgegen.datagen.compat.CreateRecipeGenerator;
-import rearth.oritech.neoforgegen.datagen.compat.EnderIORecipeGenerator;
-import rearth.oritech.neoforgegen.datagen.compat.EnergizedPowerRecipeGenerator;
-import rearth.oritech.neoforgegen.datagen.compat.ImmersiveEngineeringRecipeGenerator;
-import rearth.oritech.neoforgegen.datagen.compat.IndustrialForegoingRecipeGenerator;
-import rearth.oritech.neoforgegen.datagen.compat.MekanismRecipeGenerator;
-import rearth.oritech.neoforgegen.datagen.compat.MekanismGeneratorsRecipeGenerator;
-import rearth.oritech.neoforgegen.datagen.compat.PneumaticcraftRecipeGenerator;
-import rearth.oritech.neoforgegen.datagen.compat.PowahRecipeGenerator;
-import rearth.oritech.neoforgegen.datagen.compat.ProductiveMetalworksRecipeGenerator;
+import rearth.oritech.generator.compat.ActuallyAdditionsRecipeGenerator;
+import rearth.oritech.generator.compat.AppliedEnergistics2RecipeGenerator;
+import rearth.oritech.generator.compat.CreateRecipeGenerator;
+import rearth.oritech.generator.compat.EnderIORecipeGenerator;
+import rearth.oritech.generator.compat.EnergizedPowerRecipeGenerator;
+import rearth.oritech.generator.compat.ImmersiveEngineeringRecipeGenerator;
+import rearth.oritech.generator.compat.IndustrialForegoingRecipeGenerator;
+import rearth.oritech.generator.compat.MekanismRecipeGenerator;
+import rearth.oritech.generator.compat.MekanismGeneratorsRecipeGenerator;
+import rearth.oritech.generator.compat.PneumaticcraftRecipeGenerator;
+import rearth.oritech.generator.compat.PowahRecipeGenerator;
+import rearth.oritech.generator.compat.ProductiveMetalworksRecipeGenerator;
 
 public class RecipeGenerator extends RecipeProvider implements IConditionBuilder {
     PackOutput packOutput;

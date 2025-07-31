@@ -1,6 +1,5 @@
-package rearth.oritech.neoforgegen.datagen.compat;
+package rearth.oritech.generator.compat;
 
-import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
 import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
 import mekanism.generators.common.registries.GeneratorsFluids;
 import net.minecraft.data.recipes.RecipeOutput;

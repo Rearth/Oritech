@@ -1,4 +1,4 @@
-package rearth.oritech.neoforgegen.datagen.loot;
+package rearth.oritech.generator.loot;
 
 import com.enderio.base.api.EnderIO;
 import com.enderio.base.common.init.EIOItems;
@@ -11,12 +11,10 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.ItemContent;
 
-import java.util.List;
 import java.util.function.BiConsumer;
 
 public class FireCraftingLootProvider implements LootTableSubProvider {
