@@ -38,27 +38,6 @@ dependencies {
     modCompileOnly "curse.maven:oracle-index-1206582:6538216"
 }
 
-//sourceSets {
-//    main {
-//        resources.srcDir "src/main/generated"
-//        resources.exclude ".cache"
-//        // exclude recipes from common because they're loader specific
-//        resources.exclude "**/recipe"
-//    }
-//    fabric {
-//        // make recipes available to fabric build
-//        resources {
-//            srcDir "src/main/generated"
-//            include "**/recipe/**"
-//        }
-//        output.resourcesDir = "data"
-//    }
-//}
-
-//tasks.withType(AbstractCopyTask).configureEach {
-//    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//}
-
 tasks.named('processResources') {
 
     from("$rootDir/docs") {

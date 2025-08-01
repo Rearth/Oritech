@@ -18,8 +18,7 @@ loom {
 
             property("fabric-api.datagen")
             property("fabric-api.datagen.modid", "$archives_name-data")
-            property("fabric-api.datagen.output-dir", file("src/main/generated").absolutePath)
-            property("fabric-api.datagen.strict-validation")
+            property("fabric-api.datagen.output-dir", project(":common").file("src/main/generated").absolutePath)
         }
     }
 }

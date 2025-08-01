@@ -21,6 +21,7 @@
   ],
   "min_forge_tier": 1,
   "output": {
+    "components": {},
     "count": 1,
     "item": "oritech:adamant_ingot"
   },

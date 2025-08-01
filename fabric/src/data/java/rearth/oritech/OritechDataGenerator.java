@@ -2,6 +2,7 @@ package rearth.oritech;
 
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.generator.*;
 
 public class OritechDataGenerator implements DataGeneratorEntrypoint {
@@ -17,5 +18,10 @@ public class OritechDataGenerator implements DataGeneratorEntrypoint {
 		pack.addProvider(RecipeGenerator::new);
 		pack.addProvider(AdvancementGenerator::new);
 		pack.addProvider(EntityTagGenerator::new);
+	}
+	
+	@Override
+	public @Nullable String getEffectiveModId() {
+		return Oritech.MOD_ID;
 	}
 }
