@@ -304,7 +304,7 @@
   "tooltip.oritech.portable_laser.4": "",
   "tooltip.oritech.portable_laser.5": "Works with most pickaxe enchantments, unbreaking, and sharpness.",
   "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
-  "tooltip.oritech.portable_laser.status.shot_mining_error": "No shot fired, mining mode is enabled.",
+  "tooltip.oritech.portable_laser.status.shot_mining_error": "Nenhum tiro disparado, modo mineração ativado.",
   "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
   "tooltip.oritech.capture_item_desc_1": [
     {
@@ -651,7 +651,7 @@
   "block.oritech.tech_door": "Porta Industrial",
   "block.oritech.tech_door_hinge": "Porta Industrial",
   "block.oritech.metal_beam_block": "Viga de Suporte Industrial",
-  "block.oritech.metal_girder_block": "Industrial Support Girder",
+  "block.oritech.metal_girder_block": "Viga de Suporte Industrial",
   "block.oritech.machine_plating_block": "Revestimento Reforçado de Cobre",
   "block.oritech.machine_plating_slab": "Slab de Revestimento Reforçado de Cobre",
   "block.oritech.machine_plating_stairs": "Escadas de Revestimento Reforçado de Cobre",
