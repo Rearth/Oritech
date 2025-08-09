@@ -452,7 +452,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     
     public boolean canPassThrough(BlockState state, BlockPos blockPos) {
         // When targetting entities, don't let grass, vines, small mushrooms, pressure plates, etc. get in the way of the laser
-        return state.isAir() || state.getFluidState().isStill() || state.isIn(TagContent.LASER_PASSTHROUGH) || (hunterAddons > 0 && !state.isSolidBlock(world, blockPos));
+        return state.isAir() || !state.getFluidState().isEmpty() || state.isIn(TagContent.LASER_PASSTHROUGH) || (hunterAddons > 0 && !state.isSolidBlock(world, blockPos));
     }
     
     @Override

@@ -55,7 +55,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
         
         for (var candidate : BlockPos.iterateOutwards(pos, pullRange, pullRange, pullRange)) {
             var candidateState = world.getBlockState(candidate);
-            if (candidate.equals(pos) || candidateState.isAir() || candidateState.isIn(TagContent.BLACK_HOLE_BLACKLIST) || candidateState.getFluidState().isStill() || candidateState.getBlock().equals(Blocks.MOVING_PISTON) || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK))
+            if (candidate.equals(pos) || candidateState.isAir() || candidateState.isIn(TagContent.BLACK_HOLE_BLACKLIST) || !candidateState.getFluidState().isEmpty() || candidateState.getBlock().equals(Blocks.MOVING_PISTON) || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK))
                 continue;
             
             currentlyPullingFrom = candidate;
@@ -152,7 +152,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
     
     private static boolean canPassThrough(BlockState state, BlockPos blockPos) {
         // When targetting entities, don't let grass, vines, small mushrooms, pressure plates, etc. get in the way of the laser
-        return state.isAir() || state.getFluidState().isStill() || state.isIn(TagContent.LASER_PASSTHROUGH) || state.getBlock() instanceof AcceleratorPassthroughBlock;
+        return state.isAir() || !state.getFluidState().isEmpty() || state.isIn(TagContent.LASER_PASSTHROUGH) || state.getBlock() instanceof AcceleratorPassthroughBlock;
     }
     
     @Override

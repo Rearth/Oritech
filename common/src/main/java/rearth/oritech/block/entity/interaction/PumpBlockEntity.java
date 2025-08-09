@@ -105,7 +105,8 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
             if (pendingLiquidPositions.isEmpty() || tankIsFull()) return;
             
             var targetBlock = pendingLiquidPositions.peekLast();
-            
+
+            // Only drain the source (still) fluid, so it doesn't keep pumping infinitely
             if (!world.getBlockState(targetBlock).getFluidState().isStill()) {
                 pendingLiquidPositions.pollLast();
                 return;
@@ -229,20 +230,20 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         var blockBelow = stateBelow.getBlock();
         
         var isAirOrTrunk = stateBelow.isReplaceable() || blockBelow.equals(BlockContent.PUMP_TRUNK_BLOCK);
-        var isStillFluid = stateBelow.getFluidState().isStill();
+        var isFluid = !stateBelow.getFluidState().isEmpty();
         
-        return isStillFluid || !isAirOrTrunk;
+        return isFluid || !isAirOrTrunk;
     }
     
     private void startLiquidSearch(BlockPos start) {
         
         var state = world.getFluidState(start);
-        if (!state.isStill()) return;
+        if (state.isEmpty()) return;
         
         searchInstance = new FloodFillSearch(start, world);
         searchActive = true;
         
-        Oritech.LOGGER.debug("starting search at: " + start + " " + state.getFluid() + " " + state.isStill());
+        Oritech.LOGGER.debug("starting search at: " + start + " " + state.getFluid() + " " + !state.isEmpty());
     }
     
     private void finishSearch() {
@@ -328,7 +329,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         
         private boolean isValidTarget(BlockPos target) {
             var state = world.getFluidState(target);
-            return state.isStill();
+            return !state.isEmpty();
         }
         
         private void addNeighborsToQueue(BlockPos self) {

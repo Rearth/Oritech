@@ -88,7 +88,7 @@ public class WeedKiller extends Item {
     
     private boolean isWeedBlock(BlockPos pos, World world) {
         var state = world.getBlockState(pos);
-        if (state.isAir() || state.getFluidState().isStill()) return false;
+        if (state.isAir() || !state.getFluidState().isEmpty()) return false;
         return state.isReplaceable() || state.isIn(BlockTags.FLOWERS);
     }
 }

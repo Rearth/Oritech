@@ -210,7 +210,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
             var targetBlock = targetState.getBlock();
             var targetHardness = targetBlock.getBlastResistance();
 
-            if (targetBlock instanceof NuclearExplosionBlock || targetState.isAir() && !targetState.getFluidState().isStill() || targetState.getHardness(world, pos) < 0)
+            if (targetBlock instanceof NuclearExplosionBlock || targetState.isAir() || targetState.getHardness(world, pos) < 0)
                 continue;
 
             // skip too hard blocks (except for the first few)
