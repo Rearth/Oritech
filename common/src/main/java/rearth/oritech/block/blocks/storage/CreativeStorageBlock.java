@@ -46,7 +46,9 @@ public class CreativeStorageBlock extends Block implements BlockEntityProvider {
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return Objects.requireNonNull(super.getPlacementState(ctx)).with(TARGET_DIR, ctx.getPlayerLookDirection().getOpposite());
+        var direction = ctx.getPlayerLookDirection().getOpposite();
+        if (ctx.getPlayer().isSneaking()) direction = direction.getOpposite();
+        return Objects.requireNonNull(super.getPlacementState(ctx)).with(TARGET_DIR, direction);
     }
     
     @Override
