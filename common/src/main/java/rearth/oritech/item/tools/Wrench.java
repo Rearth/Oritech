@@ -79,19 +79,19 @@ public class Wrench extends Item {
         var world = player.getWorld();
         var result = raycast(world, player, RaycastContext.FluidHandling.NONE);
         if (result.getType() != HitResult.Type.BLOCK) return false;
-        
+
+        var direction = result.getSide();
         var blockPos = result.getBlockPos();
         var blockState = world.getBlockState(blockPos);
         if (blockState.getBlock() instanceof Wrenchable wrenchable) {
             // Wrench used on a wrenchable block
-            var resultAction = wrenchable.onWrenchUse(blockState, world, blockPos, player, hand);
+            var resultAction = wrenchable.onWrenchUse(blockState, world, blockPos, direction, player, hand);
             if (resultAction == ActionResult.SUCCESS) {
                 onUsed(item, player, hand);
                 return true;
             }
         } else {
             // Wrench used on block
-            var direction = result.getSide();
             var neighborPos = blockPos.offset(direction);
             var neighborState = world.getBlockState(neighborPos);
             
@@ -126,10 +126,11 @@ public class Wrench extends Item {
          * @param state  the block state
          * @param world  the world
          * @param pos    the block position
+         * @param face   the face of the block that was clicked
          * @param player the player using the wrench
          * @return the result of the wrench use
          */
-        ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand);
+        ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, Direction face, PlayerEntity player, Hand hand);
         
         /**
          * Called when a wrench is used on a neighbor block

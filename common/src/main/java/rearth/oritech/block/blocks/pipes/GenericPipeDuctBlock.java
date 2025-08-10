@@ -112,7 +112,7 @@ public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements 
 	}
 
 	@Override
-	public ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand) {
+	public ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, Direction face, PlayerEntity player, Hand hand) {
 		if (player.isSneaking()) {
 			world.breakBlock(pos, true, player);
 			return ActionResult.SUCCESS;
