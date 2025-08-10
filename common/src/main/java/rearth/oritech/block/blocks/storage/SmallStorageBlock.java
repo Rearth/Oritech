@@ -22,6 +22,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -33,6 +34,7 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.item.tools.Wrench;
 import rearth.oritech.util.ComparatorOutputProvider;
 import rearth.oritech.util.MachineAddonController;
 
@@ -41,7 +43,7 @@ import java.util.Objects;
 
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-public class SmallStorageBlock extends Block implements BlockEntityProvider {
+public class SmallStorageBlock extends Block implements BlockEntityProvider, Wrench.Wrenchable {
     
     public static final DirectionProperty TARGET_DIR = DirectionProperty.of("target_dir");
     
@@ -184,7 +186,19 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
         
         return super.onBreak(world, pos, state, player);
     }
-    
+
+    @Override
+    public ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, Direction face, PlayerEntity player, Hand hand) {
+        var direction = state.get(TARGET_DIR) == face ? face.getOpposite() : face;
+        world.setBlockState(pos, state.with(TARGET_DIR, direction));
+        return ActionResult.SUCCESS;
+    }
+
+    @Override
+    public ActionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, World world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, PlayerEntity player, Hand hand) {
+        return ActionResult.PASS;
+    }
+
     @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         super.appendTooltip(stack, context, tooltip, options);

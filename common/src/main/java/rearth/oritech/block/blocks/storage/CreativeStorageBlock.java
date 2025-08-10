@@ -18,12 +18,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.storage.CreativeStorageBlockEntity;
+import rearth.oritech.item.tools.Wrench;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +33,7 @@ import java.util.Objects;
 import static rearth.oritech.block.blocks.storage.SmallStorageBlock.TARGET_DIR;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-public class CreativeStorageBlock extends Block implements BlockEntityProvider {
+public class CreativeStorageBlock extends Block implements BlockEntityProvider, Wrench.Wrenchable {
     
     public CreativeStorageBlock(Settings settings) {
         super(settings);
@@ -81,7 +83,19 @@ public class CreativeStorageBlock extends Block implements BlockEntityProvider {
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
+    @Override
+    public ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, Direction face, PlayerEntity player, Hand hand) {
+        var direction = state.get(TARGET_DIR) == face ? face.getOpposite() : face;
+        world.setBlockState(pos, state.with(TARGET_DIR, direction));
+        return ActionResult.SUCCESS;
+    }
+
+    @Override
+    public ActionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, World world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, PlayerEntity player, Hand hand) {
+        return ActionResult.PASS;
+    }
+
     @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         super.appendTooltip(stack, context, tooltip, options);
