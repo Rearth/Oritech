@@ -12,7 +12,7 @@ public class SimpleCraftingInventory implements RecipeInput {
 
     public SimpleCraftingInventory(ItemStack ... items) {
         this.size = items.length;
-        this.items = NonNullList.withSize(size, ItemStack.EMPTY);
+        this.items = NonNullList.of(ItemStack.EMPTY, items);
     }
 
     @Override
