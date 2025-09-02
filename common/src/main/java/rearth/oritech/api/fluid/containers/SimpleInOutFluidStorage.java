@@ -145,11 +145,6 @@ public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implement
     
     @Override
     public FluidApi.FluidStorage getStorageForDirection(@Nullable Direction direction) {
-        
-        if (direction == null) return this;
-        
-        if (direction.equals(Direction.UP)) return inputContainer;
-        if (direction.equals(Direction.DOWN)) return outputContainer;
         return this;
     }
     
