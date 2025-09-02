@@ -256,6 +256,6 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     @Override
     public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
         if (!hasFluidAddon) return null;
-        return fluidContainer.getStorageForDirection(direction);
+        return fluidContainer;
     }
 }

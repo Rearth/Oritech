@@ -83,7 +83,7 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         return switch (candidate) {
             case null -> null;
             case SingleSlotContainerStorageWrapper wrapper -> wrapper.container;
-            case MultiSlotStorageWrapper wrapper -> wrapper.container.getStorageForDirection(direction);
+            case MultiSlotStorageWrapper wrapper -> wrapper.container;
             default -> new NeoforgeStorageWrapper(candidate);
         };
     }

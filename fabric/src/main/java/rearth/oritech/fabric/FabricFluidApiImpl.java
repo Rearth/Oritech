@@ -77,7 +77,7 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         return switch (candidate) {
             case null -> null;
             case SingleSlotContainerStorageWrapper wrapper -> wrapper.container;
-            case MultiSlotWrapper wrapper -> wrapper.storage.getStorageForDirection(direction);
+            case MultiSlotWrapper wrapper -> wrapper.storage;
             case DelegatedContainerStorageWrapper wrapper -> wrapper.storage;
             default -> new FabricStorageWrapper(candidate, null);
         };
