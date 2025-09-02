@@ -20,6 +20,7 @@ import io.wispforest.owo.ui.util.SpriteUtilInvoker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -31,6 +32,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
 import net.minecraft.world.level.material.Fluid;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import rearth.oracle.Oracle;
@@ -334,8 +336,31 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         var activeMode = menu.screenData.getInventoryInputMode();
         var modeName = activeMode.name().toLowerCase();
         
+        if (activeMode.equals(InventoryInputMode.SIDED) && menu.blockEntity instanceof MachineBlockEntity machineBlock) {
+            var tooltip = Component.translatable("tooltip.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName));
+            var assignment = machineBlock.getSlotAssignments();
+            for (var direction : Direction.values()) {
+                var key = "tooltip.oritech.mode_sided_slot_number";
+                if (direction.equals(Direction.DOWN))
+                    key = "tooltip.oritech.mode_sided_bottom";
+                if (direction.equals(Direction.UP))
+                    key = "tooltip.oritech.mode_sided_top";
+                
+                var horizontalOrdinal = 0;
+                if (direction.equals(Direction.EAST)) horizontalOrdinal = 1;
+                if (direction.equals(Direction.SOUTH)) horizontalOrdinal = 2;
+                if (direction.equals(Direction.WEST)) horizontalOrdinal = 3;
+                var inputSlotIndex = assignment.inputStart() + horizontalOrdinal % assignment.inputCount();
+                
+                tooltip = tooltip.append(Component.translatable(key, StringUtils.capitalize(direction.toString()), inputSlotIndex));
+            }
+            cycleInputButton.tooltip(tooltip);
+        } else {
+            cycleInputButton.tooltip(Component.translatable("tooltip.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)));
+        }
         cycleInputButton.setMessage(Component.translatable("button.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)).withColor(GRAY_TEXT_COLOR));
-        cycleInputButton.tooltip(Component.translatable("tooltip.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)));
+        cycleInputButton.setMessage(Component.translatable("button.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)).withColor(GRAY_TEXT_COLOR));
+        
     }
     
     private io.wispforest.owo.ui.core.Component buildExtensionPanel() {

@@ -1,30 +1,6 @@
 package rearth.oritech.block.base.entity;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
-import rearth.oritech.api.networking.NetworkedBlockEntity;
-import rearth.oritech.api.networking.SyncField;
-import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
-import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.util.*;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.*;
-import software.bernie.geckolib.util.GeckoLibUtil;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -40,13 +16,34 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.DelegatingInventoryStorage;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
+import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.util.*;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.util.GeckoLibUtil;
+
+import java.util.*;
 
 public abstract class MachineBlockEntity extends NetworkedBlockEntity
   implements ExtendedMenuProvider, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
@@ -76,6 +73,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     // own storages
     public final FilteringInventory inventory = new FilteringInventory(getInventorySize(), this::setChanged, getSlotAssignments());
+    private final Map<Direction, ItemApi.InventoryStorage> sidedInventories = new HashMap<>(); // only for sided input mode
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::setChanged, this.canEnergyStorageChangeWhileGUIOpen());
     
@@ -398,6 +396,9 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
                 inventoryInputMode = InventoryInputMode.FILL_EVENLY;
                 break;
             case FILL_EVENLY:
+                inventoryInputMode = InventoryInputMode.SIDED;
+                break;
+            case SIDED:
                 inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
                 break;
         }
@@ -453,6 +454,9 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     @Override
     public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        if (inventoryInputMode.equals(InventoryInputMode.SIDED)) {
+            return sidedInventories.computeIfAbsent(direction, this::getDirectedStorage);
+        }
         return inventory;
     }
     
@@ -497,6 +501,71 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             machineBlock.cycleInputMode();
     }
     
+    public ItemApi.InventoryStorage getDirectedStorage(Direction direction) {
+        
+        var slots = getSlotAssignments();
+        if (slots.inputCount() <= 1) return inventory;
+        
+        if (direction == null) return inventory;
+        
+        // input only, disable output
+        if (direction.equals(Direction.UP)) {
+            return new DelegatingInventoryStorage(inventory, () -> true) {
+                @Override
+                public int extract(ItemStack extracted, boolean simulate) {
+                    return 0;
+                }
+                
+                @Override
+                public int extractFromSlot(ItemStack extracted, int slot, boolean simulate) {
+                    return 0;
+                }
+                
+                @Override
+                public boolean supportsExtraction() {
+                    return false;
+                }
+            };
+        } else if (direction.equals(Direction.DOWN)) {
+            return new DelegatingInventoryStorage(inventory, () -> true) {
+                @Override
+                public int insert(ItemStack inserted, boolean simulate) {
+                    return 0;
+                }
+                
+                @Override
+                public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
+                    return 0;
+                }
+                
+                @Override
+                public boolean supportsInsertion() {
+                    return false;
+                }
+            };
+        } else {
+            // north = 0, east = 1, ...
+            var horizontalOrdinal = 0;
+            if (direction.equals(Direction.EAST)) horizontalOrdinal = 1;
+            if (direction.equals(Direction.SOUTH)) horizontalOrdinal = 2;
+            if (direction.equals(Direction.WEST)) horizontalOrdinal = 3;
+            var inputSlotIndex = slots.inputStart() + horizontalOrdinal % slots.inputCount();
+            
+            return new DelegatingInventoryStorage(inventory, () -> true) {
+                @Override
+                public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
+                    if (slot != inputSlotIndex) return 0;
+                    return super.insertToSlot(inserted, slot, simulate);
+                }
+                
+                @Override
+                public int insert(ItemStack inserted, boolean simulate) {
+                    return insertToSlot(inserted, inputSlotIndex, simulate);
+                }
+            };
+        }
+    }
+    
     public class FilteringInventory extends InOutInventoryStorage {
         
         public FilteringInventory(int size, Runnable onUpdate, InventorySlotAssignment slotAssignment) {
@@ -516,7 +585,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
                 var lowestSlotCount = Integer.MAX_VALUE;
                 for (int i = getSlotAssignments().inputStart(); i < getSlotAssignments().inputStart() + getSlotAssignments().inputCount(); i++) {
                     var content = this.getItem(i);
-                    if (!content.isEmpty() && !content.getItem().equals(toInsert.getItem())) continue;    // skip slots containing other items
+                    if (!content.isEmpty() && !content.getItem().equals(toInsert.getItem()))
+                        continue;    // skip slots containing other items
                     if (content.getCount() < lowestSlotCount) {
                         lowestSlotCount = content.getCount();
                         lowestSlot = i;
