@@ -17,12 +17,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -38,7 +33,6 @@ import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.addons.EnergyAcceptorAddonBlockEntity;
-import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MachineAddonController;
@@ -90,9 +84,9 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
         
         if (addonSettings.needsSupport()) {
             this.registerDefaultState(defaultBlockState()
-                                   .setValue(ADDON_USED, false)
-                                   .setValue(FACING, Direction.NORTH)
-                                   .setValue(FACE, AttachFace.FLOOR)
+                                        .setValue(ADDON_USED, false)
+                                        .setValue(FACING, Direction.NORTH)
+                                        .setValue(FACE, AttachFace.FLOOR)
             );
         } else {
             this.registerDefaultState(defaultBlockState().setValue(ADDON_USED, false));
@@ -298,7 +292,7 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
                 tooltip.add(Component.translatable("tooltip.oritech.addon_redstone_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.MACHINE_PROCESSING_ADDON)
                 tooltip.add(Component.translatable("tooltip.oritech.processing_addon_desc").withStyle(ChatFormatting.GRAY));
-            if(blockType == BlockContent.MACHINE_SILK_TOUCH_ADDON)
+            if (blockType == BlockContent.MACHINE_SILK_TOUCH_ADDON)
                 tooltip.add(Component.translatable("tooltip.oritech.addon_silk_touch_desc").withStyle(ChatFormatting.GRAY));
             
             if (addonSettings.extender()) {
@@ -365,7 +359,7 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
                   Geometry.rotateVoxelShape(Shapes.box(0.5625, 0.125, 0.8125, 0.75, 0.4375, 0.9375), facing, face),
                   Geometry.rotateVoxelShape(Shapes.box(0.125, 0.125, 0.125, 0.375, 0.25, 0.875), facing, face));
                 MACHINE_EFFICIENCY_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
-                  Geometry.rotateVoxelShape(Shapes.box(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.25, 0, 0.25, 0.75, 0.125, 0.75), facing, face),
                   Geometry.rotateVoxelShape(Shapes.box(0.25, 0.125, 0.1875, 0.75, 0.4375, 0.8125), facing, face),
                   Geometry.rotateVoxelShape(Shapes.box(0.75, 0.125, 0.125, 0.875, 0.5, 0.875), facing, face),
                   Geometry.rotateVoxelShape(Shapes.box(0.125, 0.125, 0.125, 0.25, 0.5, 0.875), facing, face));
@@ -376,17 +370,18 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
                   Geometry.rotateVoxelShape(Shapes.box(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
                   Geometry.rotateVoxelShape(Shapes.box(0.1875, 0.125, 0.1875, 0.875, 1, 0.75), facing, face));
                 MACHINE_FLUID_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
-                  Geometry.rotateVoxelShape(Shapes.box(0.125, 0, 0.125, 0.875, 0.125, 0.875), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.3125, 0.000625, 0.25, 0.6875, 0.125625, 0.75), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.25, 0.00125, 0.3125, 0.75, 0.12625, 0.6875), facing, face),
                   Geometry.rotateVoxelShape(Shapes.box(0.0625, 0.3125, 0.1875, 0.375, 0.625, 0.5625), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.625, 0.3125, 0.1875, 1, 0.625, 0.5625), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.5, 0.6875, 0.5625, 1, 0.8125), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.375, 0.6875, 0.875, 0.5, 0.8125), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.75, 0.375, 0.5625, 0.875, 0.5, 0.6875), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.46875, 0.125, 0.71875, 0.59375, 0.375, 0.78125), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.734375, 0.125, 0.625, 0.859375, 0.375, 0.8125), facing, face), // angled post
-                  Geometry.rotateVoxelShape(Shapes.box(0.125, 0.125, 0.25, 0.3125, 0.3125, 0.5), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.5625, 0.3125, 0.1875, 0.9375, 0.625, 0.5625), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.3125, 0.5, 0.625, 0.4375, 1, 0.75), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.3125, 0.375, 0.625, 0.75, 0.5, 0.75), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.625, 0.375, 0.5, 0.75, 0.5, 0.625), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.34375, 0.125, 0.65625, 0.46875, 0.375, 0.71875), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.671875, 0.125, 0.625, 0.734375, 0.375, 0.75), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.1875, 0.125, 0.25, 0.375, 0.3125, 0.5), facing, face),
                   Geometry.rotateVoxelShape(Shapes.box(0.375, 0.375, 0.25, 0.625, 0.5625, 0.5), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.6875, 0.125, 0.25, 0.875, 0.3125, 0.5), facing, face));
+                  Geometry.rotateVoxelShape(Shapes.box(0.5625, 0.125, 0.25, 0.75, 0.3125, 0.5), facing, face));
                 MACHINE_INVENTORY_PROXY_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
                   Geometry.rotateVoxelShape(Shapes.box(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
                   Geometry.rotateVoxelShape(Shapes.box(0.125, 0.125, 0.125, 0.875, 0.875, 0.875), facing, face),
@@ -420,16 +415,16 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
                   Geometry.rotateVoxelShape(Shapes.box(0.625, 0.125, 0.1875, 0.75, 0.25, 0.3125), facing, face),
                   Geometry.rotateVoxelShape(Shapes.box(0.625, 0.125, 0.5, 0.75, 0.25, 0.625), facing, face));
                 MACHINE_SPEED_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
-                  Geometry.rotateVoxelShape(Shapes.box(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.3125, 0.125, 0.6875, 0.8125, 0.25, 0.8125), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.1875, 0.125, 0.1875, 0.3125, 0.25, 0.8125), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.125, 0.125, 0.3125, 0.1875, 0.25, 0.4375), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.125, 0.125, 0.5625, 0.1875, 0.25, 0.6875), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.5625, 0.125, 0.8125, 0.6875, 0.25, 0.875), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.3125, 0.125, 0.8125, 0.4375, 0.25, 0.875), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.3125, 0.125, 0.25, 0.75, 0.1875, 0.6875), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.1875, 0.375, 0.625, 0.625, 0.5625), facing, face),
-                  Geometry.rotateVoxelShape(Shapes.box(0.375, 0.1875, 0.4375, 0.6875, 0.5625, 0.5), facing, face));
+                  Geometry.rotateVoxelShape(Shapes.box(0.25, 0, 0.25, 0.75, 0.125, 0.75), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.375, 0.125, 0.625, 0.875, 0.25, 0.75), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.25, 0.125, 0.125, 0.375, 0.25, 0.75), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.1875, 0.125, 0.25, 0.25, 0.25, 0.375), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.1875, 0.125, 0.5, 0.25, 0.25, 0.625), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.625, 0.125, 0.75, 0.75, 0.25, 0.8125), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.375, 0.125, 0.75, 0.5, 0.25, 0.8125), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.375, 0.125, 0.1875, 0.8125, 0.1875, 0.625), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.5, 0.1875, 0.3125, 0.6875, 0.625, 0.5), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.1875, 0.375, 0.75, 0.5625, 0.4375), facing, face));
                 STEAM_BOILER_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
                   Geometry.rotateVoxelShape(Shapes.box(0.125, 0, 0.125, 0.875, 0.125, 0.875), facing, face),
                   Geometry.rotateVoxelShape(Shapes.box(0.125, 0.125, 0.3125, 0.25, 0.25, 0.4375), facing, face),
