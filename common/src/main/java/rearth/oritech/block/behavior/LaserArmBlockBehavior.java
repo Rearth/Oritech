@@ -14,6 +14,7 @@ import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.entity.processing.AtomicForgeBlockEntity;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
@@ -86,6 +87,10 @@ public class LaserArmBlockBehavior {
                     if (inserted > 0 && inserted <= transferCapacity) {
                         dynamicStorage.insertIgnoringLimit(transferCapacity, false);
                         dynamicStorage.update();
+                        
+                        if (blockEntity instanceof AtomicForgeBlockEntity atomicForgeBlock)
+                            atomicForgeBlock.lastWorkedAt = world.getGameTime();
+                        
                         return true;
                     }
                     return false;
