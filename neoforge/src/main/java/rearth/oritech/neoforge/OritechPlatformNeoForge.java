@@ -2,6 +2,7 @@ package rearth.oritech.neoforge;
 
 import com.google.auto.service.AutoService;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -130,5 +131,10 @@ public class OritechPlatformNeoForge implements OritechPlatform {
     @Override
     public ServerPlayer create(ServerLevel world, GameProfile profile, SimpleInventoryStorage inventory) {
         return FakeMachinePlayerImpl.create(world, profile, inventory);
+    }
+    
+    @Override
+    public void resetCapabilities(ServerLevel world, BlockPos pos) {
+        world.invalidateCapabilities(pos);
     }
 }

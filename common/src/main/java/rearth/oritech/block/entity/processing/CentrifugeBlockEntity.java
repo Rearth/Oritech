@@ -2,8 +2,10 @@ package rearth.oritech.block.entity.processing;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
+import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.OritechPlatform;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.api.networking.SyncField;
@@ -162,19 +164,27 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     @Override
     public void initAddons(BlockPos brokenAddon) {
+        
+        var hadAddon = hasFluidAddon;
         hasFluidAddon = false;
         super.initAddons(brokenAddon);
         
-        // reset cache of core above
-        var coreCandidate = level.getBlockEntity(worldPosition.above(), BlockEntitiesContent.MACHINE_CORE_ENTITY);
-        if (coreCandidate.isPresent()) {
-            var core = coreCandidate.get();
-            core.resetCaches();
+        if (hasFluidAddon != hadAddon && level instanceof ServerLevel serverLevel) {
+            
+            // reset cache of core above
+            var coreCandidate = level.getBlockEntity(worldPosition.above(), BlockEntitiesContent.MACHINE_CORE_ENTITY);
+            if (coreCandidate.isPresent()) {
+                var core = coreCandidate.get();
+                core.resetCaches();
+            }
+            
+            OritechPlatform.INSTANCE.resetCapabilities(serverLevel, worldPosition);
+            OritechPlatform.INSTANCE.resetCapabilities(serverLevel, worldPosition.above());
+            
+            // trigger block update to allow pipes to connect/disconnect
+            level.blockUpdated(worldPosition, getBlockState().getBlock());
+            level.blockUpdated(worldPosition.above(), level.getBlockState(worldPosition.above()).getBlock());
         }
-        
-        // trigger block update to allow pipes to connect/disconnect
-        level.blockUpdated(worldPosition, getBlockState().getBlock());
-        level.blockUpdated(worldPosition.above(), level.getBlockState(worldPosition.above()).getBlock());
     }
     
     @Override

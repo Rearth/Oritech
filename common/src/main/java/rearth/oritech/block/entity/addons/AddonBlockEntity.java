@@ -1,5 +1,7 @@
 package rearth.oritech.block.entity.addons;
 
+import net.minecraft.server.level.ServerLevel;
+import rearth.oritech.OritechPlatform;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MachineAddonProvider;
@@ -35,6 +37,8 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
     
     @Override
     public void setControllerPos(BlockPos pos) {
+        if (!controllerPos.equals(pos) && level instanceof ServerLevel serverLevel)
+            OritechPlatform.INSTANCE.resetCapabilities(serverLevel, pos);
         controllerPos = pos;
     }
     

@@ -1,6 +1,7 @@
 package rearth.oritech;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -24,7 +25,6 @@ public interface OritechPlatform {
         .orElseThrow(() -> new IllegalStateException("Failed to load platform service."));
 
     // Network
-    
     void sendBlockHandle(BlockEntity blockEntity, CustomPacketPayload message);
 
     void sendPlayerHandle(CustomPacketPayload message, ServerPlayer player);
@@ -36,7 +36,6 @@ public interface OritechPlatform {
     <T extends CustomPacketPayload> void registerToServer(CustomPacketPayload.Type<T> id, StreamCodec<RegistryFriendlyByteBuf, T> packetCodec, TriConsumer<T, Player, RegistryAccess> consumer);
     
     // Attachment
-
     <T> void register(Attachment<T> attachment);
 
     <T> boolean hasAttachment(LivingEntity entity, Attachment<T> attachment);
@@ -48,6 +47,7 @@ public interface OritechPlatform {
     <T> void removeAttachment(LivingEntity entity, Attachment<T> attachment);
 
     // FakeMachinePlayer
-
     ServerPlayer create(ServerLevel world, GameProfile profile, SimpleInventoryStorage inventory);
+    
+    void resetCapabilities(ServerLevel world, BlockPos pos);
 }

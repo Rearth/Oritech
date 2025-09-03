@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -139,5 +140,10 @@ public class OritechPlatformFabric implements OritechPlatform {
     @Override
     public ServerPlayer create(ServerLevel world, GameProfile profile, SimpleInventoryStorage inventory) {
         return FakeMachinePlayerImpl.create(world, profile, inventory);
+    }
+    
+    @Override
+    public void resetCapabilities(ServerLevel world, BlockPos pos) {
+        // nothing to do on fabric
     }
 }
