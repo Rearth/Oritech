@@ -143,6 +143,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         updateNeighbors(world, pos, false);
     }
     
+    // also known as 'getStateForNeighborUpdate'
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor worldAccess, BlockPos pos, BlockPos neighborPos) {
         var world = (Level) worldAccess;

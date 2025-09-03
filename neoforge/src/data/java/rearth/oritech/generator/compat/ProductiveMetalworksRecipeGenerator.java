@@ -58,30 +58,30 @@ public class ProductiveMetalworksRecipeGenerator {
         // adamant
         ItemMeltingRecipeBuilder.of(of(ItemContent.ADAMANT_INGOT), new FluidStack(FluidContent.STILL_MOLTEN_ADAMANT.get(), 90)).save(exporter, Oritech.id("compat/productivemetalworks/melting/ingot/adamant"));
         ItemMeltingRecipeBuilder.of(of(ItemContent.ADAMANT_DUST), new FluidStack(FluidContent.STILL_MOLTEN_ADAMANT.get(), 90)).save(exporter, Oritech.id("compat/productivemetalworks/melting/dust/adamant"));
-        ItemMeltingRecipeBuilder.of(of(BlockContent.ADAMANT_BLOCK.asItem()), new FluidStack(FluidContent.STILL_MOLTEN_ADAMANT.get(), 890)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/adamant"));
+        ItemMeltingRecipeBuilder.of(of(BlockContent.ADAMANT_BLOCK.asItem()), new FluidStack(FluidContent.STILL_MOLTEN_ADAMANT.get(), 810)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/adamant"));
         
         // biosteel
         ItemMeltingRecipeBuilder.of(of(ItemContent.BIOSTEEL_INGOT), new FluidStack(FluidContent.STILL_MOLTEN_BIOSTEEL.get(), 90)).save(exporter, Oritech.id("compat/productivemetalworks/melting/ingot/biosteel"));
         ItemMeltingRecipeBuilder.of(of(ItemContent.BIOSTEEL_DUST), new FluidStack(FluidContent.STILL_MOLTEN_BIOSTEEL.get(), 90)).save(exporter, Oritech.id("compat/productivemetalworks/melting/dust/biosteel"));
-        ItemMeltingRecipeBuilder.of(of(BlockContent.BIOSTEEL_BLOCK.asItem()), new FluidStack(FluidContent.STILL_MOLTEN_BIOSTEEL.get(), 890)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/biosteel"));
+        ItemMeltingRecipeBuilder.of(of(BlockContent.BIOSTEEL_BLOCK.asItem()), new FluidStack(FluidContent.STILL_MOLTEN_BIOSTEEL.get(), 810)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/biosteel"));
 
         // duratium
         ItemMeltingRecipeBuilder.of(of(ItemContent.DURATIUM_INGOT), new FluidStack(FluidContent.STILL_MOLTEN_DURATIUM.get(), 90)).save(exporter, Oritech.id("compat/productivemetalworks/melting/ingot/duratium"));
         ItemMeltingRecipeBuilder.of(of(ItemContent.DURATIUM_DUST), new FluidStack(FluidContent.STILL_MOLTEN_DURATIUM.get(), 90)).save(exporter, Oritech.id("compat/productivemetalworks/melting/dust/duratium"));
-        ItemMeltingRecipeBuilder.of(of(BlockContent.DURATIUM_BLOCK.asItem()), new FluidStack(FluidContent.STILL_MOLTEN_DURATIUM.get(), 890)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/duratium"));
+        ItemMeltingRecipeBuilder.of(of(BlockContent.DURATIUM_BLOCK.asItem()), new FluidStack(FluidContent.STILL_MOLTEN_DURATIUM.get(), 810)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/duratium"));
 
         // energite
         ItemMeltingRecipeBuilder.of(of(ItemContent.ENERGITE_INGOT), new FluidStack(FluidContent.STILL_MOLTEN_ENERGITE.get(), 90)).save(exporter, Oritech.id("compat/productivemetalworks/melting/ingot/energite"));
         ItemMeltingRecipeBuilder.of(of(ItemContent.ENERGITE_DUST), new FluidStack(FluidContent.STILL_MOLTEN_ENERGITE.get(), 90)).save(exporter, Oritech.id("compat/productivemetalworks/melting/dust/energite"));
-        ItemMeltingRecipeBuilder.of(of(BlockContent.ENERGITE_BLOCK.asItem()), new FluidStack(FluidContent.STILL_MOLTEN_ENERGITE.get(), 890)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/energite"));
+        ItemMeltingRecipeBuilder.of(of(BlockContent.ENERGITE_BLOCK.asItem()), new FluidStack(FluidContent.STILL_MOLTEN_ENERGITE.get(), 810)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/energite"));
 
         // fluxite
         ItemMeltingRecipeBuilder.of(of(ItemContent.FLUXITE), new FluidStack(FluidContent.STILL_MOLTEN_FLUXITE.get(), 100)).save(exporter, Oritech.id("compat/productivemetalworks/melting/gem/fluxite"));
-        ItemMeltingRecipeBuilder.of(of(BlockContent.FLUXITE_BLOCK.asItem()), new FluidStack(FluidContent.STILL_MOLTEN_FLUXITE.get(), 900)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/fluxite"));
+        ItemMeltingRecipeBuilder.of(of(BlockContent.FLUXITE_BLOCK.asItem()), new FluidStack(FluidContent.STILL_MOLTEN_FLUXITE.get(), 1000)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/fluxite"));
 
         // biomass
         ItemMeltingRecipeBuilder.of(of(TagContent.BIOMASS), new FluidStack(FluidContent.STILL_BIOFUEL.get(), 100)).save(exporter, Oritech.id("compat/productivemetalworks/melting/glob/bio"));
-        ItemMeltingRecipeBuilder.of(of(TagContent.BIOMASS_BLOCK), new FluidStack(FluidContent.STILL_BIOFUEL.get(), 900)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/bio"));
+        ItemMeltingRecipeBuilder.of(of(TagContent.BIOMASS_BLOCK), new FluidStack(FluidContent.STILL_BIOFUEL.get(), 1000)).save(exporter, Oritech.id("compat/productivemetalworks/melting/block/bio"));
     }
 
     private static void addFluidAlloyingRecipes(RecipeOutput exporter) {
@@ -129,7 +129,7 @@ public class ProductiveMetalworksRecipeGenerator {
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/nugget/nickel"));
         ItemCastingRecipeBuilder.of(of(MetalworksRegistrator.CAST_INGOT.get()), new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_NICKEL.get()), 90), new ItemStack(ItemContent.NICKEL_INGOT), false)
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/ingot/nickel"));
-        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_NICKEL.get()), 900), new ItemStack(BlockContent.NICKEL_BLOCK.asItem()))
+        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_NICKEL.get()), 810), new ItemStack(BlockContent.NICKEL_BLOCK.asItem()))
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/block/nickel"));
 
         // platinum
@@ -137,36 +137,36 @@ public class ProductiveMetalworksRecipeGenerator {
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/nugget/platinum"));
         ItemCastingRecipeBuilder.of(of(MetalworksRegistrator.CAST_INGOT.get()), new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_PLATINUM.get()), 90), new ItemStack(ItemContent.PLATINUM_INGOT), false)
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/ingot/platinum"));
-        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_NICKEL.get()), 900), new ItemStack(BlockContent.NICKEL_BLOCK.asItem()))
+        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_NICKEL.get()), 810), new ItemStack(BlockContent.NICKEL_BLOCK.asItem()))
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/block/platinum"));
         
         // biosteel
         ItemCastingRecipeBuilder.of(of(MetalworksRegistrator.CAST_INGOT.get()), new SizedFluidIngredient(FluidIngredient.of(FluidContent.STILL_MOLTEN_BIOSTEEL.get()), 90), new ItemStack(ItemContent.BIOSTEEL_INGOT), false)
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/ingot/biosteel"));
-        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(FluidContent.STILL_MOLTEN_BIOSTEEL.get()), 900), new ItemStack(BlockContent.BIOSTEEL_BLOCK.asItem()))
+        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(FluidContent.STILL_MOLTEN_BIOSTEEL.get()), 810), new ItemStack(BlockContent.BIOSTEEL_BLOCK.asItem()))
                                  .save(exporter, Oritech.id("compat/productivemetalworks/casting/block/biosteel"));
         // steel
         ItemCastingRecipeBuilder.of(of(MetalworksRegistrator.CAST_INGOT.get()), new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_STEEL.get()), 90), new ItemStack(ItemContent.STEEL_INGOT), false)
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/ingot/steel"));
-        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_STEEL.get()), 900), new ItemStack(BlockContent.STEEL_BLOCK.asItem()))
+        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_STEEL.get()), 810), new ItemStack(BlockContent.STEEL_BLOCK.asItem()))
                                  .save(exporter, Oritech.id("compat/productivemetalworks/casting/block/steel"));
         
         // duratium
         ItemCastingRecipeBuilder.of(of(MetalworksRegistrator.CAST_INGOT.get()), new SizedFluidIngredient(FluidIngredient.of(FluidContent.STILL_MOLTEN_DURATIUM.get()), 90), new ItemStack(ItemContent.DURATIUM_INGOT), false)
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/ingot/duratium"));
-        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(FluidContent.STILL_MOLTEN_DURATIUM.get()), 900), new ItemStack(BlockContent.DURATIUM_BLOCK.asItem()))
+        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(FluidContent.STILL_MOLTEN_DURATIUM.get()), 810), new ItemStack(BlockContent.DURATIUM_BLOCK.asItem()))
                                  .save(exporter, Oritech.id("compat/productivemetalworks/casting/block/duratium"));
 
         // electrum
         ItemCastingRecipeBuilder.of(of(MetalworksRegistrator.CAST_INGOT.get()), new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_ELECTRUM.get()), 90), new ItemStack(ItemContent.ELECTRUM_INGOT), false)
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/ingot/electrum"));
-        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_ELECTRUM.get()), 900), new ItemStack(BlockContent.ELECTRUM_BLOCK.asItem()))
+        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_ELECTRUM.get()), 810), new ItemStack(BlockContent.ELECTRUM_BLOCK.asItem()))
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/block/electrum"));
         
         // energite
         ItemCastingRecipeBuilder.of(of(MetalworksRegistrator.CAST_INGOT.get()), new SizedFluidIngredient(FluidIngredient.of(FluidContent.STILL_MOLTEN_ENERGITE.get()), 90), new ItemStack(ItemContent.ENERGITE_INGOT), false)
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/ingot/energite"));
-        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(FluidContent.STILL_MOLTEN_ENERGITE.get()), 900), new ItemStack(BlockContent.ENERGITE_BLOCK.asItem()))
+        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(FluidContent.STILL_MOLTEN_ENERGITE.get()), 810), new ItemStack(BlockContent.ENERGITE_BLOCK.asItem()))
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/block/energite"));
         
         // fluxite

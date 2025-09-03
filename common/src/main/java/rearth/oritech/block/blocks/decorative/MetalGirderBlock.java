@@ -18,7 +18,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.BlockContent;
 
-// todo translation, recipe
 public class MetalGirderBlock extends HorizontalDirectionalBlock {
     
     public static final BooleanProperty HEADING = BooleanProperty.create("heading");

@@ -9,7 +9,7 @@
   "cast": [],
   "consume_cast": false,
   "fluid": {
-    "amount": 900,
+    "amount": 810,
     "fluid": "oritech:still_molten_energite"
   },
   "result": {
