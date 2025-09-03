@@ -170,8 +170,8 @@ public interface MachineAddonController {
                 }
                 
                 // if non-layered mode, check if we have too many extenders already
-                if (addonBlock.getAddonSettings().extender()) {
-                    if (foundExtenders < (maxIterationCount - 1) && !useLayered) {
+                if (addonBlock.getAddonSettings().extender() && !useLayered) {
+                    if (foundExtenders < (maxIterationCount - 1)) {
                         foundExtenders++;
                     } else {
                         continue;
