@@ -55,6 +55,7 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     @Override
     public EnergyApi.EnergyStorage find(StackContext stack) {
+        if (stack.getValue().getCount() > 1) return null;
         var candidate = stack.getValue().getCapability(ILongEnergyStorage.ITEM);
         if (candidate == null) return null;
         if (candidate instanceof ContainerStorageWrapper wrapper && wrapper.container instanceof SimpleEnergyItemStorage itemStorage) return itemStorage.withCallback(ignored -> stack.sync());

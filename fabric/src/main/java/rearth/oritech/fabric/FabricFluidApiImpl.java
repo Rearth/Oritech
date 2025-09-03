@@ -90,6 +90,7 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     
     @Override
     public FluidApi.FluidStorage find(StackContext stack) {
+        if (stack.getValue().getCount() > 1) return null;
         var context = ContainerItemContext.ofSingleSlot(new ItemStackStorage(stack));
         var candidate = net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.ITEM.find(stack.getValue(), context);
         if (candidate == null) return null;

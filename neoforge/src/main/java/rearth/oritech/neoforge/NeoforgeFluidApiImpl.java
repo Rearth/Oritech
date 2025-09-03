@@ -95,6 +95,7 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     
     @Override
     public FluidApi.FluidStorage find(StackContext stack) {
+        if (stack.getValue().getCount() > 1) return null;
         var candidate = stack.getValue().getCapability(Capabilities.FluidHandler.ITEM);
         if (candidate == null) return null;
         if (candidate instanceof SingleSlotContainerStorageWrapper wrapper && wrapper.container instanceof SimpleItemFluidStorage itemContainer) return itemContainer.withCallback(ignored -> stack.sync());

@@ -1,19 +1,7 @@
 package rearth.oritech.block.blocks.storage;
 
-import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.FluidApi.FluidStorage;
-import rearth.oritech.block.entity.storage.SmallTankEntity;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.util.ComparatorOutputProvider;
-import rearth.oritech.util.StackContext;
-
-import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
@@ -40,6 +28,16 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.block.entity.storage.SmallTankEntity;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.util.ComparatorOutputProvider;
+import rearth.oritech.util.StackContext;
+
+import java.util.List;
 
 public class SmallFluidTank extends Block implements EntityBlock {
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
@@ -80,7 +78,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
         
         if (!world.isClientSide) {
             var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
             
         }
         
@@ -129,12 +127,15 @@ public class SmallFluidTank extends Block implements EntityBlock {
         return super.useItemOn(stack, state, world, pos, player, hand, hit);
     }
     
-    protected List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+    @Override
+    protected @NotNull List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         var droppedStacks = super.getDrops(state, builder);
         
         var blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
-        if (blockEntity instanceof SmallTankEntity tankEntity)
+        if (blockEntity instanceof SmallTankEntity tankEntity) {
             droppedStacks.addAll(tankEntity.inventory.getHeldStacks());
+            tankEntity.inventory.clearContent();
+        }
         
         return droppedStacks;
     }

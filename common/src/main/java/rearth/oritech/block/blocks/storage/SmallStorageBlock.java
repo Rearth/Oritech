@@ -120,13 +120,16 @@ public class SmallStorageBlock extends Block implements EntityBlock {
         
         return InteractionResult.SUCCESS;
     }
-
+    
+    @Override
     protected List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         var droppedStacks = super.getDrops(state, builder);
 
         var blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
-        if (blockEntity instanceof SmallStorageBlockEntity storageEntity)
+        if (blockEntity instanceof SmallStorageBlockEntity storageEntity) {
             droppedStacks.addAll(storageEntity.inventory.getHeldStacks());
+            storageEntity.inventory.clearContent();
+        }
 
         return droppedStacks;
     }

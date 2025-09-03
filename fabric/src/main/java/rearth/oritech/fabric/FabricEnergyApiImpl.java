@@ -43,6 +43,7 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     @Override
     public EnergyApi.EnergyStorage find(StackContext stack) {
+        if (stack.getValue().getCount() > 1) return null;
         var context = ContainerItemContext.ofSingleSlot(new ItemStackStorage(stack));
         var candidate = team.reborn.energy.api.EnergyStorage.ITEM.find(stack.getValue(), context);
         if (candidate == null) return null;
