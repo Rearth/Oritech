@@ -100,8 +100,7 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
     }
     
     private static void onBlockRemoved(Level world, BlockPos pos) {
-        if (!world.isClientSide) {
-            var entity = (MachineBlockEntity) world.getBlockEntity(pos);
+        if (!world.isClientSide && world.getBlockEntity(pos) instanceof MachineBlockEntity entity) {
             var stacks = entity.inventory.heldStacks;
             for (var stack : stacks) {
                 if (!stack.isEmpty()) {
