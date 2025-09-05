@@ -1,5 +1,6 @@
 plugins {
     id 'com.github.johnrengelman.shadow'
+    id 'lol.bai.explosion' version '0.3.1'
 }
 
 architectury {
@@ -11,6 +12,7 @@ loom {
     accessWidenerPath.set(project(":common").loom.accessWidenerPath)
 
     runs {
+        // datagen run config for NeoForge recipes
         create("data") {
             data()
             name("Minecraft Data")
@@ -18,13 +20,14 @@ loom {
 
             programArgs("--all", "--mod", archives_name)
             programArgs("--output", file("src/main/generated").absolutePath)
-            programArgs("--existing", project(":common").file("src/main/resources").absolutePath)
-            programArgs("--existing", file("src/main/resources").absolutePath)
+            // no existing resources needed if only recipes are generated
+            // programArgs("--existing", project(":common").file("src/main/resources").absolutePath)
+            // programArgs("--existing", file("src/main/resources").absolutePath)
 
             mods {
                 create(archives_name) {
-                    sourceSet("main")
-                    sourceSet("data")
+                    sourceSets.main
+                    sourceSets.data
                 }
             }
         }
@@ -36,6 +39,8 @@ repositories {
     maven { url = 'https://maven.neoforged.net/releases' }
     // EnderIO
     maven { url = 'https://maven.rover656.dev/releases' }
+    // Explosion
+    maven { url "https://maven2.bai.lol" }
     // GrandPower
     maven { url "https://modmaven.dev/" }
     // Registrate
@@ -84,7 +89,7 @@ dependencies {
     modRuntimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
     modRuntimeOnly "curse.maven:mekanism-268560:5680395"
     modRuntimeOnly "curse.maven:spark-361579:5759671"
-    
+
     // datagen
     // Actually Additions
     modDataImplementation "curse.maven:actually-additions-228404:$actually_additions_version_id"
@@ -92,29 +97,29 @@ dependencies {
     // Applied Energistics 2
     modDataImplementation "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
     modDataRuntimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
-    // Create
-    modDataImplementation "curse.maven:create-328085:$create_version_id"
-    modDataImplementation "com.tterrag.registrate:Registrate:$registrate_version"
+    // Create (with Explosion to load JiJ dependencies)
+    modDataImplementation explosion.neoforge("curse.maven:create-328085:$create_version_id")
     // EnderIO
     modDataImplementation "com.enderio:enderio-base:$enderio_version"
     modDataImplementation("com.enderio:enderio-machines:$enderio_version") { transitive = false }
     // Energized Power
     modDataImplementation "curse.maven:energized-power-782147:$energized_power_neo_version_id"
-    // Immersive Engineering
-    modDataImplementation "curse.maven:immersive-engineering-231951:$immersive_engineering_version_id"
+    // Immersive Engineering (with Explosion to load JiJ dependencies)
+    modDataImplementation("blusunrize.immersiveengineering:ImmersiveEngineering:$minecraft_version-12.4.2-194")
+    //    modDataImplementation explosion.neoforge("curse.maven:immersive-engineering-231951:$immersive_engineering_version_id")
     // Industrial Foregoing
     modDataImplementation "curse.maven:industrial-foregoing-266515:$industrial_foregoing_version_id"
     modDataImplementation "curse.maven:titanium-287342:$titanium_version_id"
     // Mekanism
-    modDataImplementation "mekanism:Mekanism:$mekanism_version"
-    modDataImplementation "mekanism:Mekanism:$mekanism_version:generators"
+    modDataImplementation "curse.maven:mekanism-268560:6486993"
+    modDataImplementation "curse.maven:mekanism-generators-268566:6486996"
     // PneumaticCraft: Repressurized
     modDataImplementation "curse.maven:pneumaticcraft-repressurized-281849:$pneumaticcraft_version_id"
     // Powah!
     modDataImplementation "curse.maven:powah-rearchitected-633483:$powah_version_id"
     modDataRuntimeOnly "me.shedaniel.cloth:cloth-config-neoforge:$cloth_config_version"
-    // Productive Metalworks
-    modDataImplementation "curse.maven:productive-metalworks-1184570:$productive_metalworks_version_id"
+    // Productive Metalworks (with Explosion to load JiJ dependencies)
+    modDataImplementation explosion.neoforge("curse.maven:productive-metalworks-1184570:$productive_metalworks_version_id")
 }
 
 publishMods {

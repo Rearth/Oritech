@@ -2,16 +2,13 @@
   "required": true,
   "package": "rearth.oritech.neoforge.mixin",
   "compatibilityLevel": "JAVA_21",
-  "minVersion": "0.8",
+  "minVersion": "0.8.5",
   "client": [
-    "LaserRenderBoundsMixin",
     "AcceleratorRenderBoundsMixin",
-    "MachineGantryRenderBoundsMixin",
-    "ElytraLayerMixin"
+    "LaserRenderBoundsMixin",
+    "MachineGantryRenderBoundsMixin"
   ],
   "mixins": [
-    "ServerPlayerMixin",
-    "LivingEntityMixin",
     "NetworkWarningShutupMixin"
   ],
   "injectors": {

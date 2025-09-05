@@ -13,7 +13,7 @@ architectury {
 // all projects including the root project
 allprojects {
     apply plugin: 'java'
-    
+
     java {
         withSourcesJar()
         toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -27,14 +27,14 @@ subprojects {
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
-    
+
     base {
         archivesName = "$archives_name-$project.name"
     }
 
     loom {
         silentMojangMappingsLicense()
-        mixin.useLegacyMixinAp = false
+        //        mixin.useLegacyMixinAp = false
     }
 
     tasks {
@@ -46,7 +46,7 @@ subprojects {
             enabled = false
         }
     }
-    
+
     repositories {
         // owo-lib
         maven { url 'https://maven.wispforest.io/releases/' }
@@ -72,7 +72,7 @@ subprojects {
             officialMojangMappings()
             parchment("org.parchmentmc.data:parchment-$minecraft_version:$parchment_mappings@zip")
         }
-        
+
         // Auto Services
         compileOnly "com.google.auto.service:auto-service:$autoServiceVersion"
         annotationProcessor "com.google.auto.service:auto-service:$autoServiceVersion"
@@ -105,7 +105,7 @@ subprojects {
 
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: 'me.modmuss50.mod-publish-plugin'
-    
+
     sourceSets {
         main {
             resources {
@@ -121,7 +121,7 @@ subprojects {
             runtimeClasspath += sourceSets.main.runtimeClasspath
         }
     }
-    
+
     loom {
         /**
          * "main" matches the default mod name
@@ -135,7 +135,7 @@ subprojects {
                 sourceSet project(":common").sourceSets.main
             }
         }
-        
+
         createRemapConfigurations(sourceSets.data)
     }
 
