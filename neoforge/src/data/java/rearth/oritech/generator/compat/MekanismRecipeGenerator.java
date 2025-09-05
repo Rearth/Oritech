@@ -153,8 +153,8 @@ public class MekanismRecipeGenerator {
     }
 
     private static void addMekInfusing(RecipeOutput exporter) {
-        ItemStackChemicalToItemStackRecipeBuilder.metallurgicInfusing(IngredientCreatorAccess.item().from(TagContent.NICKEL_INGOTS), IngredientCreatorAccess.chemicalStack().from(MekanismChemicals.DIAMOND, 10), new ItemStack(ItemContent.ADAMANT_DUST), false).build(exporter, Oritech.id("compat/mekanism/infusing/adamant_dust"));
-        ItemStackChemicalToItemStackRecipeBuilder.metallurgicInfusing(IngredientCreatorAccess.item().from(Tags.Items.INGOTS_IRON), IngredientCreatorAccess.chemicalStack().from(MekanismChemicals.BIO, 10), new ItemStack(ItemContent.BIOSTEEL_DUST), false).build(exporter, Oritech.id("compat/mekanism/infusing/biosteel_dust"));
-        ItemStackChemicalToItemStackRecipeBuilder.metallurgicInfusing(IngredientCreatorAccess.item().from(Tags.Items.INGOTS_GOLD), IngredientCreatorAccess.chemicalStack().from(MekanismChemicals.REDSTONE, 10), new ItemStack(ItemContent.ELECTRUM_DUST), false).build(exporter, Oritech.id("compat/mekanism/infusing/electrum_dust"));
+        ItemStackChemicalToItemStackRecipeBuilder.metallurgicInfusing(IngredientCreatorAccess.item().from(TagContent.NICKEL_INGOTS), IngredientCreatorAccess.chemicalStack().from(MekanismChemicals.DIAMOND.asStack(10)), new ItemStack(ItemContent.ADAMANT_DUST), false).build(exporter, Oritech.id("compat/mekanism/infusing/adamant_dust"));
+        ItemStackChemicalToItemStackRecipeBuilder.metallurgicInfusing(IngredientCreatorAccess.item().from(Tags.Items.INGOTS_IRON), IngredientCreatorAccess.chemicalStack().from(MekanismChemicals.BIO.asStack(10)), new ItemStack(ItemContent.BIOSTEEL_DUST), false).build(exporter, Oritech.id("compat/mekanism/infusing/biosteel_dust"));
+        ItemStackChemicalToItemStackRecipeBuilder.metallurgicInfusing(IngredientCreatorAccess.item().from(Tags.Items.INGOTS_GOLD), IngredientCreatorAccess.chemicalStack().from(MekanismChemicals.REDSTONE.asStack(10)), new ItemStack(ItemContent.ELECTRUM_DUST), false).build(exporter, Oritech.id("compat/mekanism/infusing/electrum_dust"));
     }
 }

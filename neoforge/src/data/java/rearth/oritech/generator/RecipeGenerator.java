@@ -52,7 +52,7 @@ public class RecipeGenerator extends RecipeProvider implements IConditionBuilder
     }
 
     @Override
-    protected void buildRecipes(RecipeOutput exporter) {
+    public void buildRecipes(RecipeOutput exporter) {
         var oritechRecipes = new OritechRecipeGenerator(packOutput, registries);
         // runs OritechRecipeGenerator.generate(), but it's named differently here due to mapping differences
         oritechRecipes.buildRecipes(exporter);

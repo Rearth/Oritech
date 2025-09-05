@@ -9,7 +9,7 @@ public class MekanismGeneratorsRecipeGenerator {
     private static String PATH = "compat/mekanism/";
     public static void generateRecipes(RecipeOutput exporter) {
         FuelGeneratorRecipeBuilder.build()
-            .fluidInput(GeneratorsFluids.BIOETHANOL.getFluidStack(100).getFluid(), 0.1f)
+            .fluidInput(GeneratorsFluids.BIOETHANOL.asStack(100).getFluid(), 0.1f)
             .timeInSeconds(3)
             .export(exporter, PATH + "bioethanol");
     }    
