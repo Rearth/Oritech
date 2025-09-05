@@ -1,15 +1,8 @@
 plugins {
-    id 'com.github.johnrengelman.shadow'
-}
-
-architectury {
-    platformSetupLoomIde()
-    fabric()
+    id 'fabric-loom'
 }
 
 loom {
-    accessWidenerPath.set(project(":common").loom.accessWidenerPath)
-
     runs {
         create("data") {
             client()
@@ -17,28 +10,33 @@ loom {
             source("data")
 
             property("fabric-api.datagen")
-            property("fabric-api.datagen.modid", "$archives_name-data")
+            property("fabric-api.datagen.modid", "$mod_id-data")
             property("fabric-api.datagen.output-dir", project(":common").file("src/main/generated").absolutePath)
         }
     }
+
+    accessWidenerPath.set(file("src/main/resources/${mod_id}.accesswidener"))
+
+    mixin {
+        defaultRefmapName.set("${mod_id}.refmap.json")
+    }
+
+    createRemapConfigurations(sourceSets.data)
 }
 
-repositories {
-    // Additional Entity Attributes (Mythic Metals dependency)
-    maven { url = 'https://api.modrinth.com/maven/' }
-    // Cardinal Components (Mythic Metals dependency)
-    maven { url = 'https://maven.ladysnake.org/releases' }
-}
 
 dependencies {
-    // Fabric
+    // Minecraft
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_mappings}@zip")
+    }
+
+    // Fabric Loader
     modImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"
     // Fabric API
     modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_api_version"
-
-    // Common
-    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
-    shadowCommon(project(path: ':common', configuration: 'transformProductionNeoForge')) { transitive false }
 
     // Architectury API
     modImplementation "dev.architectury:architectury-fabric:$architectury_api_version"
@@ -72,7 +70,7 @@ dependencies {
     modImplementation "curse.maven:simple-conveyor-belts-1292980:6721806"
     modImplementation "curse.maven:tags-viewer-1119728:5807898"
     modImplementation "curse.maven:techreborn-233564:5608205"
-    
+
     // datagen
     // Alloy Forgery
     modDataImplementation "curse.maven:alloy-forgery-438718:$alloy_forgery_version_id"

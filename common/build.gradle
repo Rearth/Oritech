@@ -1,41 +1,63 @@
-architectury {
-    common enabled_platforms.split(',')
+plugins {
+    id 'net.neoforged.moddev'
 }
 
-loom.accessWidenerPath.set(file("src/main/resources/${archives_name}.accesswidener"))
+neoForge {
+    neoFormVersion = "$minecraft_version-$neoform_version"
+    parchment {
+        minecraftVersion = minecraft_version
+        mappingsVersion = parchment_mappings
+    }
+    //    accessTransformers.from(file('src/main/resources/META-INF/accesstransformer.cfg').absolutePath)
+}
+
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}
 
 dependencies {
-    /**
-     * loader
-     * required here for the @Environment annotations and the mixin dependencies
-     * do NOT use other classes from the Fabric loader
-     */
-    modImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"
+    compileOnly 'org.spongepowered:mixin:0.8.5'
+    compileOnly 'io.github.llamalad7:mixinextras-common:0.3.5'
+    annotationProcessor 'io.github.llamalad7:mixinextras-common:0.3.5'
 
     // Architectury API
-    modImplementation "dev.architectury:architectury:$architectury_api_version"
+    implementation "dev.architectury:architectury-neoforge:$architectury_api_version"
 
     // owo-lib
-    modImplementation "io.wispforest:owo-lib:$owo_version"
-    annotationProcessor "io.wispforest:owo-lib:$owo_version"
+    compileOnly "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    annotationProcessor "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    accessTransformers "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    interfaceInjectionData "io.wispforest:owo-lib-neoforge:$owo_neo_version"
 
     // GeckoLib
-    modImplementation "software.bernie.geckolib:geckolib-common-$minecraft_version:$geckolib_version"
+    implementation "software.bernie.geckolib:geckolib-common-$minecraft_version:$geckolib_version"
 
     // EMI
-    modCompileOnly "dev.emi:emi-xplat-intermediary:${emi_version}"
+    compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
 
     // REI
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:$rei_version"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
 
     // JEI
-    modCompileOnly "mezz.jei:jei-${minecraft_version}-common-api-intermediary:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
 
     // Jade (needed for addon)
-    modImplementation "curse.maven:jade-324717:5639994"
-
+    implementation "curse.maven:jade-324717:6853386"
+    
     // Oracle Index
-    modCompileOnly "curse.maven:oracle-index-1206582:6538216"
+    compileOnly "curse.maven:oracle-index-1206582:6904573"
 }
 
 tasks.named('processResources') {

@@ -1,18 +1,17 @@
 plugins {
-    id 'architectury-plugin' version '3.4-SNAPSHOT'
-    id 'dev.architectury.loom' version '1.10-SNAPSHOT' apply false
-    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
-    id 'org.sinytra.wiki.toolkit' version '0.1.16'
+    id 'net.neoforged.moddev' version '2.0.107' apply false
+    id 'fabric-loom' version '1.9-SNAPSHOT' apply false
     id "me.modmuss50.mod-publish-plugin" version "0.8.0" apply false
-}
-
-architectury {
-    minecraft = minecraft_version
+    id 'org.sinytra.wiki.toolkit' version '0.1.16'
 }
 
 // all projects including the root project
 allprojects {
     apply plugin: 'java'
+
+    base {
+        archivesName = "$mod_id-$minecraft_version"
+    }
 
     java {
         withSourcesJar()
@@ -24,61 +23,53 @@ allprojects {
 
 // all projects but the root project
 subprojects {
-    apply plugin: 'dev.architectury.loom'
-    apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
 
-    base {
-        archivesName = "$archives_name-$project.name"
-    }
-
-    loom {
-        silentMojangMappingsLicense()
-        //        mixin.useLegacyMixinAp = false
-    }
-
-    tasks {
-        withType(JavaCompile).configureEach {
-            options.encoding = "UTF-8"
-            options.release = 21
-        }
-        withType(GenerateModuleMetadata).configureEach {
-            enabled = false
-        }
-    }
-
     repositories {
+        mavenCentral()
+        maven { url = "https://repo.spongepowered.org/repository/maven-public" }
+        // EnderIO
+        maven { url = 'https://maven.rover656.dev/releases' }
         // owo-lib
-        maven { url 'https://maven.wispforest.io/releases/' }
+        maven { url = 'https://maven.wispforest.io/releases/' }
         // GeckoLib
-        maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+        maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
         // REI
-        maven { url "https://maven.shedaniel.me/" }
+        maven { url = "https://maven.shedaniel.me/" }
         // EMI
-        maven { url 'https://maven.terraformersmc.com/' }
+        maven { url = 'https://maven.terraformersmc.com/' }
         // Jade
-        maven { url "https://beta.cursemaven.com" }
+        maven { url = "https://beta.cursemaven.com" }
         // FFAPI
-        maven { url "https://maven.su5ed.dev/releases" }
+        maven { url = "https://maven.su5ed.dev/releases" }
         // JEI
         maven { url = "https://maven.blamejared.com/" }
         // Athena (CTM)
-        maven { url "https://maven.teamresourceful.com/repository/maven-public/" }
+        maven { url = "https://maven.teamresourceful.com/repository/maven-public/" }
+        // Additional Entity Attributes (Mythic Metals dependency)
+        maven { url = 'https://api.modrinth.com/maven/' }
+        // Cardinal Components (Mythic Metals dependency)
+        maven { url = 'https://maven.ladysnake.org/releases' }
     }
 
     dependencies {
-        minecraft "net.minecraft:minecraft:$minecraft_version"
-        mappings loom.layered {
-            officialMojangMappings()
-            parchment("org.parchmentmc.data:parchment-$minecraft_version:$parchment_mappings@zip")
-        }
-
         // Auto Services
         compileOnly "com.google.auto.service:auto-service:$autoServiceVersion"
         annotationProcessor "com.google.auto.service:auto-service:$autoServiceVersion"
     }
 
-    // Configure Maven publishing.
+    ['apiElements', 'runtimeElements', 'sourcesElements'].each { variant ->
+        configurations."$variant".outgoing {
+            capability("$group:${base.archivesName.get()}:$version")
+            capability("$group:$mod_id-${project.name}-${minecraft_version}:$version")
+            capability("$group:$mod_id:$version")
+        }
+        publishing.publications.configureEach {
+            suppressPomMetadataWarningsFor(variant)
+        }
+    }
+
+    // configure Maven publishing
     publishing {
         publications {
             mavenJava(MavenPublication) {
@@ -86,13 +77,10 @@ subprojects {
                 from components.java
             }
         }
-
-        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
         repositories {
-            // Add repositories to publish to here.
-            // Notice: This block does NOT have the same function as the block in the top level.
-            // The repositories here will be used for publishing your artifact, not for
-            // retrieving dependencies.
+            maven {
+                url System.getenv('local_maven_url')
+            }
         }
     }
 }
@@ -103,8 +91,26 @@ subprojects {
         return
     }
 
-    apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: 'me.modmuss50.mod-publish-plugin'
+
+    configurations {
+        commonJava {
+            canBeResolved = true
+        }
+        commonResources {
+            canBeResolved = true
+        }
+    }
+
+    dependencies {
+        compileOnly(project(':common')) {
+            capabilities {
+                requireCapability "$group:$mod_id"
+            }
+        }
+        commonJava project(path: ':common', configuration: 'commonJava')
+        commonResources project(path: ':common', configuration: 'commonResources')
+    }
 
     sourceSets {
         main {
@@ -122,60 +128,7 @@ subprojects {
         }
     }
 
-    loom {
-        /**
-         * "main" matches the default mod name
-         * since `compileOnly()` is being used in Architectury, the local mods for the
-         * loaders need to be set up too
-         * otherwise, they won't recognize :common.
-         */
-        mods {
-            main {
-                sourceSet sourceSets.main
-                sourceSet project(":common").sourceSets.main
-            }
-        }
-
-        createRemapConfigurations(sourceSets.data)
-    }
-
-    def shadowCommon = configurations.create('shadowCommon')
-    configurations {
-        common
-        shadowCommon
-        compileClasspath.extendsFrom common
-        runtimeClasspath.extendsFrom common
-    }
-
-    components.java.withVariantsFromConfiguration(configurations.shadowRuntimeElements) {
-        skip()
-    }
-
     tasks {
-        shadowJar {
-            exclude "architectury.common.json"
-            configurations = [shadowCommon]
-            archiveClassifier = "dev-shadow"
-        }
-
-        remapJar {
-            inputFile = shadowJar.archiveFile
-            dependsOn shadowJar
-            archiveClassifier = null
-            injectAccessWidener = true
-        }
-
-        jar {
-            archiveClassifier = "dev"
-        }
-
-        sourcesJar {
-            def commonSources = project(":common").tasks.sourcesJar
-            dependsOn commonSources
-            from commonSources.archiveFile.map { zipTree(it) }
-            archiveClassifier = "sources"
-        }
-
         processResources {
             inputs.property 'version', project.version
             filesMatching(['META-INF/neoforge.mods.toml', "fabric.mod.json"]) {
@@ -183,9 +136,21 @@ subprojects {
             }
         }
 
-        withType(AbstractCopyTask).configureEach {
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        named('compileJava', JavaCompile) {
+            dependsOn(configurations.commonJava)
+            source(configurations.commonJava)
         }
+
+        named('sourcesJar', Jar) {
+            dependsOn(configurations.commonJava)
+            from(configurations.commonJava)
+            dependsOn(configurations.commonResources)
+            from(configurations.commonResources)
+        }
+
+        //        withType(AbstractCopyTask).configureEach {
+        //            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        //        }
     }
 }
 

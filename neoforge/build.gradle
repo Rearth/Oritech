@@ -1,163 +1,152 @@
 plugins {
-    id 'com.github.johnrengelman.shadow'
-    id 'lol.bai.explosion' version '0.3.1'
-}
-
-architectury {
-    platformSetupLoomIde()
-    neoForge()
-}
-
-loom {
-    accessWidenerPath.set(project(":common").loom.accessWidenerPath)
-
-    runs {
-        // datagen run config for NeoForge recipes
-        create("data") {
-            data()
-            name("Minecraft Data")
-            source("data")
-
-            programArgs("--all", "--mod", archives_name)
-            programArgs("--output", file("src/main/generated").absolutePath)
-            // no existing resources needed if only recipes are generated
-            // programArgs("--existing", project(":common").file("src/main/resources").absolutePath)
-            // programArgs("--existing", file("src/main/resources").absolutePath)
-
-            mods {
-                create(archives_name) {
-                    sourceSets.main
-                    sourceSets.data
-                }
-            }
-        }
-    }
-}
-
-repositories {
-    // NeoForge
-    maven { url = 'https://maven.neoforged.net/releases' }
-    // EnderIO
-    maven { url = 'https://maven.rover656.dev/releases' }
-    // Explosion
-    maven { url "https://maven2.bai.lol" }
-    // GrandPower
-    maven { url "https://modmaven.dev/" }
-    // Registrate
-    maven { url = "https://mvn.devos.one/snapshots" }
+    id 'net.neoforged.moddev'
 }
 
 dependencies {
-    // NeoForge
-    neoForge "net.neoforged:neoforge:$neoforge_version"
-
-    // Common
-    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
-    shadowCommon(project(path: ':common', configuration: 'transformProductionNeoForge')) { transitive false }
-
     // Architectury API
-    modImplementation "dev.architectury:architectury-neoforge:$architectury_api_version"
+    implementation "dev.architectury:architectury-neoforge:$architectury_api_version"
     // Athena (CTM)
-    modRuntimeOnly "earth.terrarium.athena:athena-neoforge-1.21:4.0.0"
+    runtimeOnly "earth.terrarium.athena:athena-neoforge-1.21:4.0.0"
     // GeckoLib
-    modImplementation "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
+    implementation "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
     // GrandPower
-    include modApi("dev.technici4n:GrandPower:3.0.2")
+    api("dev.technici4n:GrandPower:3.0.2") // TODO: jij
     // Jade
-    modImplementation "curse.maven:jade-324717:5846105"
+    implementation "curse.maven:jade-324717:5846105"
     // owo-lib
-    modImplementation "io.wispforest:owo-lib-neoforge:$owo_neo_version"
-    forgeRuntimeLibrary(include(api("io.wispforest:endec:0.1.8")))
-    forgeRuntimeLibrary(include(api("io.wispforest.endec:netty:0.1.4")))
-    forgeRuntimeLibrary(include(api("io.wispforest.endec:gson:0.1.5")))
-    forgeRuntimeLibrary(include(api("io.wispforest.endec:jankson:0.1.5")))
-    forgeRuntimeLibrary(include(api("blue.endless:jankson:1.2.2")))
+    implementation "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    accessTransformers "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    interfaceInjectionData "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    //    forgeRuntimeLibrary(include(api("io.wispforest:endec:0.1.8")))
+    //    forgeRuntimeLibrary(include(api("io.wispforest.endec:netty:0.1.4")))
+    //    forgeRuntimeLibrary(include(api("io.wispforest.endec:gson:0.1.5")))
+    //    forgeRuntimeLibrary(include(api("io.wispforest.endec:jankson:0.1.5")))
+    //    forgeRuntimeLibrary(include(api("blue.endless:jankson:1.2.2")))
     // REI
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
 
     // recipe viewer runtime
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
-        case "emi": modRuntimeOnly "dev.emi:emi-neoforge:$emi_version"; break
-        case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"; break
-        case "jei": modRuntimeOnly "mezz.jei:jei-$minecraft_version-neoforge:$jei_version"; break
+        case "emi": runtimeOnly "dev.emi:emi-neoforge:$emi_version"; break
+        case "rei": runtimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"; break
+        case "jei": runtimeOnly "mezz.jei:jei-$minecraft_version-neoforge:$jei_version"; break
         case "disabled": break
         default: println("Unknown recipe viewer specified: $recipe_viewer. Must be EMI, REI, JEI, or disabled.")
     }
 
     // in-game testing
-    modRuntimeOnly "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
-    modRuntimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
-    modRuntimeOnly "curse.maven:mekanism-268560:5680395"
-    modRuntimeOnly "curse.maven:spark-361579:5759671"
+    runtimeOnly "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
+    runtimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
+    runtimeOnly "curse.maven:mekanism-268560:5680395"
+    runtimeOnly "curse.maven:spark-361579:5759671"
 
     // datagen
     // Actually Additions
-    modDataImplementation "curse.maven:actually-additions-228404:$actually_additions_version_id"
-    modDataRuntimeOnly "curse.maven:curios-309927:$curios_version_id"
+    dataImplementation "curse.maven:actually-additions-228404:$actually_additions_version_id"
+    dataRuntimeOnly "curse.maven:curios-309927:$curios_version_id"
     // Applied Energistics 2
-    modDataImplementation "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
-    modDataRuntimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
+    dataImplementation "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
+    dataRuntimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
     // Create (with Explosion to load JiJ dependencies)
-    modDataImplementation explosion.neoforge("curse.maven:create-328085:$create_version_id")
+    dataImplementation "curse.maven:create-328085:$create_version_id"
     // EnderIO
-    modDataImplementation "com.enderio:enderio-base:$enderio_version"
-    modDataImplementation("com.enderio:enderio-machines:$enderio_version") { transitive = false }
+    dataImplementation "com.enderio:enderio-base:$enderio_version"
+    dataImplementation("com.enderio:enderio-machines:$enderio_version") { transitive = false }
     // Energized Power
-    modDataImplementation "curse.maven:energized-power-782147:$energized_power_neo_version_id"
+    dataImplementation "curse.maven:energized-power-782147:$energized_power_neo_version_id"
     // Immersive Engineering (with Explosion to load JiJ dependencies)
-    modDataImplementation("blusunrize.immersiveengineering:ImmersiveEngineering:$minecraft_version-12.4.2-194")
-    //    modDataImplementation explosion.neoforge("curse.maven:immersive-engineering-231951:$immersive_engineering_version_id")
+    dataImplementation "curse.maven:immersive-engineering-231951:$immersive_engineering_version_id"
     // Industrial Foregoing
-    modDataImplementation "curse.maven:industrial-foregoing-266515:$industrial_foregoing_version_id"
-    modDataImplementation "curse.maven:titanium-287342:$titanium_version_id"
+    dataImplementation "curse.maven:industrial-foregoing-266515:$industrial_foregoing_version_id"
+    dataImplementation "curse.maven:titanium-287342:$titanium_version_id"
     // Mekanism
-    modDataImplementation "curse.maven:mekanism-268560:6486993"
-    modDataImplementation "curse.maven:mekanism-generators-268566:6486996"
+    dataImplementation "curse.maven:mekanism-268560:6486993"
+    dataImplementation "curse.maven:mekanism-generators-268566:6486996"
     // PneumaticCraft: Repressurized
-    modDataImplementation "curse.maven:pneumaticcraft-repressurized-281849:$pneumaticcraft_version_id"
+    dataImplementation "curse.maven:pneumaticcraft-repressurized-281849:$pneumaticcraft_version_id"
     // Powah!
-    modDataImplementation "curse.maven:powah-rearchitected-633483:$powah_version_id"
-    modDataRuntimeOnly "me.shedaniel.cloth:cloth-config-neoforge:$cloth_config_version"
+    dataImplementation "curse.maven:powah-rearchitected-633483:$powah_version_id"
+    dataRuntimeOnly "me.shedaniel.cloth:cloth-config-neoforge:$cloth_config_version"
     // Productive Metalworks (with Explosion to load JiJ dependencies)
-    modDataImplementation explosion.neoforge("curse.maven:productive-metalworks-1184570:$productive_metalworks_version_id")
+    dataImplementation "curse.maven:productive-metalworks-1184570:$productive_metalworks_version_id"
 }
 
-publishMods {
-    file = remapJar.archiveFile
-    changelog = file("../CHANGELOG.MD").getText()
-    type = BETA
-    modLoaders.add("neoforge")
-
-    modrinth {
-        accessToken = providers.environmentVariable("MODRINTH_API_KEY")
-        projectId = "4sYI62kA"
-        minecraftVersions.add("1.21.1")
-        minecraftVersions.add("1.21")
-
-        requires("owo-lib")
-        requires("geckolib")
-        requires("athena-ctm")
-        requires("architectury-api")
-
-        announcementTitle = "Neoforge Version on Modrinth"
+neoForge {
+    version = neoforge_version
+    parchment {
+        minecraftVersion = minecraft_version
+        mappingsVersion = parchment_mappings
     }
 
-    curseforge {
-        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
-        projectId = "1030830"
-        minecraftVersions.add("1.21.1")
-        minecraftVersions.add("1.21")
+    //    accessTransformers.from(project(':common').file('src/main/resources/META-INF/accesstransformer.cfg').absolutePath)
 
-        requires("owo-lib")
-        requires("geckolib")
-        requires("athena")
-        requires("architectury-api")
+    runs {
+        // datagen run config for NeoForge recipes
+        data {
+            data()
+            //            name("Minecraft Data")
+            //            source("data")
 
-        javaVersions.add(JavaVersion.VERSION_21)
-        clientRequired = true
-        serverRequired = true
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/main/generated/').absolutePath, '--existing', file('src/main/resources/').absolutePath
 
-        projectSlug = "oritech"
-        announcementTitle = "Neoforge Version on CurseForge"
+            //            programArgs("--all", "--mod", mod_id)
+            //            programArgs("--output", file("src/main/generated").absolutePath)
+            // no existing resources needed if only recipes are generated
+            // programArgs("--existing", project(":common").file("src/main/resources").absolutePath)
+            // programArgs("--existing", file("src/main/resources").absolutePath)
+
+            //            mods {
+            //                create(archives_name) {
+            //                    sourceSets.main
+            //                    sourceSets.data
+            //                }
+            //            }
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
     }
 }
+
+//publishMods {
+//    file = remapJar.archiveFile
+//    changelog = file("../CHANGELOG.MD").getText()
+//    type = BETA
+//    modLoaders.add("neoforge")
+//
+//    modrinth {
+//        accessToken = providers.environmentVariable("MODRINTH_API_KEY")
+//        projectId = "4sYI62kA"
+//        minecraftVersions.add("1.21.1")
+//        minecraftVersions.add("1.21")
+//
+//        requires("owo-lib")
+//        requires("geckolib")
+//        requires("athena-ctm")
+//        requires("architectury-api")
+//
+//        announcementTitle = "Neoforge Version on Modrinth"
+//    }
+//
+//    curseforge {
+//        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+//        projectId = "1030830"
+//        minecraftVersions.add("1.21.1")
+//        minecraftVersions.add("1.21")
+//
+//        requires("owo-lib")
+//        requires("geckolib")
+//        requires("athena")
+//        requires("architectury-api")
+//
+//        javaVersions.add(JavaVersion.VERSION_21)
+//        clientRequired = true
+//        serverRequired = true
+//
+//        projectSlug = "oritech"
+//        announcementTitle = "Neoforge Version on CurseForge"
+//    }
+//}
