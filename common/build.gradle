@@ -8,7 +8,9 @@ neoForge {
         minecraftVersion = minecraft_version
         mappingsVersion = parchment_mappings
     }
-    //    accessTransformers.from(file('src/main/resources/META-INF/accesstransformer.cfg').absolutePath)
+
+    validateAccessTransformers = true
+    interfaceInjectionData.from file('src/main/resources/interfaces.json').absolutePath
 }
 
 configurations {

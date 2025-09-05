@@ -1,0 +1,14 @@
+{
+  "net/minecraft/world/entity/EntityType": [
+    "dev/architectury/extensions/injected/InjectedEntityTypeExtension"
+  ],
+  "net/minecraft/world/item/BucketItem": [
+    "dev/architectury/extensions/injected/InjectedBucketItemExtension"
+  ],
+  "net/minecraft/world/level/material/Fluid": [
+    "dev/architectury/extensions/injected/InjectedFluidExtension"
+  ],
+  "net/minecraft/world/level/block/LiquidBlock": [
+    "dev/architectury/extensions/injected/InjectedLiquidBlockExtension"
+  ]
+}
