@@ -38,7 +38,7 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> ext
     
     // this overrides a method from IBlockEntityRendererExtension on NF. Since this extension mixin is not available in common, we just declare the methode without\
     // the override annotation
-    public AABB getRenderBoundingBox(BlockEntity blockEntity) {
+    public AABB getRenderBoundingBox(T blockEntity) {
         return AABB.ofSize(blockEntity.getBlockPos().getCenter(), 6, 6, 6);
     }
     
