@@ -44,7 +44,7 @@ dependencies {
     interfaceInjectionData "io.wispforest:owo-lib-neoforge:$owo_neo_version"
 
     // GeckoLib
-    implementation "software.bernie.geckolib:geckolib-common-$minecraft_version:$geckolib_version"
+    implementation "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
 
     // EMI
     compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
