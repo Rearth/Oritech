@@ -73,7 +73,7 @@ subprojects {
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                artifactId = base.archivesName.get()
+                artifactId = "${base.archivesName.get()}-${project.name}"
                 from components.java
             }
         }
