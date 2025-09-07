@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "tag": "c:plates/plastic"
+    },
+    "r": {
+      "item": "oritech:energite_ingot"
+    }
+  },
+  "pattern": [
+    " c ",
+    " r ",
+    " r "
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:reactor_rod"
+  }
+}

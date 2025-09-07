@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "immersiveengineering"
+    }
+  ],
+  "type": "immersiveengineering:arc_furnace",
+  "additives": [
+    {
+      "tag": "c:gems/diamond"
+    }
+  ],
+  "energy": 51200,
+  "input": {
+    "tag": "c:ingots/nickel"
+  },
+  "results": [
+    {
+      "item": "oritech:adamant_ingot"
+    }
+  ],
+  "time": 100
+}

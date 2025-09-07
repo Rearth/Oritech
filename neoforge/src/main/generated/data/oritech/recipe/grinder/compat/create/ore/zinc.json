@@ -1,0 +1,37 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:mod_loaded",
+        "modid": "jaopca"
+      }
+    }
+  ],
+  "type": "oritech:grinder",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:ores/zinc"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "create:raw_zinc"
+    },
+    {
+      "count": 1,
+      "id": "minecraft:gunpowder"
+    }
+  ],
+  "time": 140
+}

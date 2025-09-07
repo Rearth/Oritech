@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "i": {
+      "item": "oritech:reactor_wall"
+    },
+    "o": {
+      "item": "minecraft:redstone_torch"
+    },
+    "r": {
+      "item": "oritech:processing_unit"
+    },
+    "t": {
+      "item": "minecraft:repeater"
+    }
+  },
+  "pattern": [
+    " t ",
+    "rrr",
+    "oio"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:reactor_redstone_port"
+  }
+}

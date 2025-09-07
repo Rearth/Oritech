@@ -1,0 +1,52 @@
+{
+  "type": "oritech:augment_data",
+  "applyCost": [
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:enderic_compound"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "tag": "c:storage_blocks/gold"
+      }
+    }
+  ],
+  "effect": {
+    "amount": 6.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.attack_damage"
+  },
+  "requiredStation": "oritech:arcane_augment_station",
+  "requirements": [
+    "oritech:augment/hpboostultra",
+    "oritech:augment/ultimatearmor"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:enderic_compound"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:fluxite"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "tag": "c:rods/blaze"
+      }
+    }
+  ],
+  "rfCost": 500000000,
+  "time": 2800,
+  "toggleable": false,
+  "uiX": 180,
+  "uiY": 50
+}

@@ -1,0 +1,20 @@
+{
+  "type": "oritech:pulverizer",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "minecraft:copper_ores"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "minecraft:raw_copper"
+    }
+  ],
+  "time": 120
+}

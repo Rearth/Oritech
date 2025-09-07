@@ -1,0 +1,23 @@
+{
+  "type": "oritech:particle_collision",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "item": "oritech:adamant_dust"
+    },
+    {
+      "item": "minecraft:netherrack"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:netherite_scrap"
+    }
+  ],
+  "time": 2500
+}

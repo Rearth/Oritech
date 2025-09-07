@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    {
+      "item": "oritech:copper_gem"
+    },
+    {
+      "item": "oritech:copper_gem"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "minecraft:copper_ingot"
+    }
+  ]
+}

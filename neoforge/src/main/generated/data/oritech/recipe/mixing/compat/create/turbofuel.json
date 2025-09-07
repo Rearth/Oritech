@@ -1,0 +1,25 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    {
+      "item": "oritech:fluxite"
+    },
+    {
+      "type": "fluid_stack",
+      "amount": 1000,
+      "fluid": "oritech:still_oil"
+    }
+  ],
+  "results": [
+    {
+      "amount": 1000,
+      "id": "oritech:still_fuel"
+    }
+  ]
+}

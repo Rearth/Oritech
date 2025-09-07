@@ -1,0 +1,26 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ae2"
+    }
+  ],
+  "type": "oritech:pulverizer",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "item": "ae2:sky_stone_block"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "ae2:sky_dust"
+    }
+  ],
+  "time": 120
+}

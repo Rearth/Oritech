@@ -1,0 +1,49 @@
+{
+  "type": "oritech:augment_data",
+  "applyCost": [
+    {
+      "count": 24,
+      "ingredient": {
+        "tag": "c:storage_blocks/lapis"
+      }
+    },
+    {
+      "count": 24,
+      "ingredient": {
+        "tag": "c:storage_blocks/redstone"
+      }
+    }
+  ],
+  "effect": {
+    "amount": 5.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.luck"
+  },
+  "requiredStation": "oritech:arcane_augment_station",
+  "requirements": [],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "tag": "c:ingots/electrum"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "tag": "c:storage_blocks/lapis"
+      }
+    },
+    {
+      "count": 24,
+      "ingredient": {
+        "tag": "c:storage_blocks/gold"
+      }
+    }
+  ],
+  "rfCost": 200000000,
+  "time": 1800,
+  "toggleable": false,
+  "uiX": 55,
+  "uiY": 30
+}

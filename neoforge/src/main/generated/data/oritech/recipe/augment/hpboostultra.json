@@ -1,0 +1,50 @@
+{
+  "type": "oritech:augment_data",
+  "applyCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:duratium_dust"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "tag": "c:storage_blocks/redstone"
+      }
+    }
+  ],
+  "effect": {
+    "amount": 10.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.max_health"
+  },
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:augment/ultimatearmor"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:energite_ingot"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:reinforced_carbon_sheet"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:nether_star"
+      }
+    }
+  ],
+  "rfCost": 200000000,
+  "time": 1600,
+  "toggleable": false,
+  "uiX": 165,
+  "uiY": 70
+}

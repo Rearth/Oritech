@@ -1,0 +1,23 @@
+{
+  "type": "oritech:particle_collision",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:ender_pearls"
+    },
+    {
+      "tag": "c:gems/amethyst"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:echo_shard"
+    }
+  ],
+  "time": 1000
+}

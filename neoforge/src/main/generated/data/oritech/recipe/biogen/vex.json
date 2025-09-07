@@ -1,0 +1,15 @@
+{
+  "type": "oritech:bio_generator",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "item": "oritech:unholy_intelligence"
+    }
+  ],
+  "results": [],
+  "time": 60000
+}

@@ -1,0 +1,51 @@
+{
+  "type": "oritech:augment_data",
+  "applyCost": [
+    {
+      "count": 32,
+      "ingredient": {
+        "tag": "c:silicon"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "tag": "c:storage_blocks/redstone"
+      }
+    }
+  ],
+  "effect": {
+    "amount": -0.5,
+    "attributeOperationType": 1,
+    "entityAttributeId": "minecraft:generic.scale"
+  },
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:augment/hpboost"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:silicon_wafer"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:processing_unit"
+      }
+    },
+    {
+      "count": 16,
+      "ingredient": {
+        "tag": "c:storage_blocks/gold"
+      }
+    }
+  ],
+  "rfCost": 50000000,
+  "time": 400,
+  "toggleable": true,
+  "uiX": 30,
+  "uiY": 90
+}

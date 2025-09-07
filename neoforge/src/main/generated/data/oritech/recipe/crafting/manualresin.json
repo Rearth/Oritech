@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "tag": "minecraft:sand"
+    },
+    "f": {
+      "item": "oritech:still_naphtha_bucket"
+    }
+  },
+  "pattern": [
+    "bb ",
+    "bf ",
+    "   "
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:polymer_resin"
+  }
+}

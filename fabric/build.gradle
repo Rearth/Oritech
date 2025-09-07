@@ -14,6 +14,31 @@ loom {
             ideConfigGenerated(true)
             name = 'fabric - Server'
         }
+        
+        // datagen run config for Common resources (models, block states, tags, etc.)
+        create("data_common") {
+            client()
+            ideConfigGenerated(true)
+            name = 'common - Data'
+            source("data")
+
+            property("fabric-api.datagen")
+            property("fabric-api.datagen.modid", "$mod_id-data")
+            property("fabric-api.datagen.output-dir", project(":common").file("src/main/generated").absolutePath)
+            property("oritech.datagen.loader", "common")
+        }
+        // datagen run config for Fabric recipes
+        create("data_fabric") {
+            client()
+            ideConfigGenerated(true)
+            name = 'fabric - Data'
+            source("data")
+
+            property("fabric-api.datagen")
+            property("fabric-api.datagen.modid", "$mod_id-data")
+            property("fabric-api.datagen.output-dir", file("src/main/generated").absolutePath)
+            property("oritech.datagen.loader", "fabric")
+        }
     }
 
     accessWidenerPath.set(file("src/main/resources/${mod_id}.accesswidener"))
@@ -67,6 +92,7 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:11.0.3"
     // owo-lib
     modImplementation "io.wispforest:owo-lib:$owo_version"
+    annotationProcessor "io.wispforest:owo-lib:$owo_version"
 
     /// recipe viewer runtime
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {

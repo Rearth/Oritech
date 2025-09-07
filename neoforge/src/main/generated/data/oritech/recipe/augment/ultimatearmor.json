@@ -1,0 +1,62 @@
+{
+  "type": "oritech:augment_data",
+  "applyCost": [
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:fluxite_block"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "oritech:overcharged_crystal"
+      }
+    },
+    {
+      "count": 16,
+      "ingredient": {
+        "tag": "c:obsidians/normal"
+      }
+    }
+  ],
+  "effect": {
+    "amount": 8.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.armor"
+  },
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:augment/betterarmor"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:fluxite"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:heisenberg_compensator"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:plutonium_pellet"
+      }
+    },
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "minecraft:nether_star"
+      }
+    }
+  ],
+  "rfCost": 500000000,
+  "time": 2400,
+  "toggleable": false,
+  "uiX": 155,
+  "uiY": 50
+}

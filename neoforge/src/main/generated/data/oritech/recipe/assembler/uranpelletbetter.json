@@ -1,0 +1,29 @@
+{
+  "type": "oritech:assembler",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "item": "oritech:uranium_gem"
+    },
+    {
+      "item": "oritech:uranium_gem"
+    },
+    {
+      "tag": "c:plates/plastic"
+    },
+    {
+      "item": "oritech:adamant_ingot"
+    }
+  ],
+  "results": [
+    {
+      "count": 3,
+      "id": "oritech:uranium_pellet"
+    }
+  ],
+  "time": 96
+}

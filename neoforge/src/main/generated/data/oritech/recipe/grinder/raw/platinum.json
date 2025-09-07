@@ -1,0 +1,28 @@
+{
+  "type": "oritech:grinder",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:raw_materials/platinum"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:platinum_clump"
+    },
+    {
+      "count": 3,
+      "id": "oritech:small_platinum_clump"
+    },
+    {
+      "count": 1,
+      "id": "oritech:fluxite"
+    }
+  ],
+  "time": 210
+}

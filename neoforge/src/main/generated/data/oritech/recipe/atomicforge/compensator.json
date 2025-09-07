@@ -1,0 +1,26 @@
+{
+  "type": "oritech:atomic_forge",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "item": "oritech:super_ai_chip"
+    },
+    {
+      "item": "oritech:adamant_ingot"
+    },
+    {
+      "item": "oritech:adamant_ingot"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:heisenberg_compensator"
+    }
+  ],
+  "time": 60
+}

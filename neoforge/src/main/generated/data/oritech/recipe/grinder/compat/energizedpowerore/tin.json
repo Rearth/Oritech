@@ -1,0 +1,37 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "energizedpower"
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:mod_loaded",
+        "modid": "jaopca"
+      }
+    }
+  ],
+  "type": "oritech:grinder",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:ores/tin"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "energizedpower:raw_tin"
+    },
+    {
+      "count": 1,
+      "id": "minecraft:raw_gold"
+    }
+  ],
+  "time": 140
+}

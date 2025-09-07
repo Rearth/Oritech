@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "a": {
+      "tag": "oritech:plating"
+    },
+    "c": {
+      "item": "oritech:duratium_ingot"
+    },
+    "e": {
+      "item": "oritech:machine_core_2"
+    }
+  },
+  "pattern": [
+    "eae",
+    "aca",
+    "eae"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:machine_extender"
+  }
+}

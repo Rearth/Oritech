@@ -1,0 +1,17 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "industrialforegoing"
+    }
+  ],
+  "type": "oritech:fuel_generator",
+  "fluidInput": {
+    "amount": 100,
+    "fluid": "industrialforegoing:biofuel"
+  },
+  "fluidOutputs": [],
+  "ingredients": [],
+  "results": [],
+  "time": 60
+}

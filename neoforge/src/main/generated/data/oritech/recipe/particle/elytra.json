@@ -1,0 +1,23 @@
+{
+  "type": "oritech:particle_collision",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:feathers"
+    },
+    {
+      "item": "minecraft:saddle"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:elytra"
+    }
+  ],
+  "time": 10000
+}

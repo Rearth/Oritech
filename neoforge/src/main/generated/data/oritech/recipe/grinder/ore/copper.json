@@ -1,0 +1,24 @@
+{
+  "type": "oritech:grinder",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "minecraft:copper_ores"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "minecraft:raw_copper"
+    },
+    {
+      "count": 1,
+      "id": "minecraft:raw_gold"
+    }
+  ],
+  "time": 140
+}

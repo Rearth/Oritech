@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "oritech:small_copper_dust"
+    },
+    {
+      "item": "oritech:small_copper_dust"
+    },
+    {
+      "item": "oritech:small_copper_dust"
+    },
+    {
+      "item": "oritech:small_copper_dust"
+    },
+    {
+      "item": "oritech:small_copper_dust"
+    },
+    {
+      "item": "oritech:small_copper_dust"
+    },
+    {
+      "item": "oritech:small_copper_dust"
+    },
+    {
+      "item": "oritech:small_copper_dust"
+    },
+    {
+      "item": "oritech:small_copper_dust"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:copper_dust"
+  }
+}

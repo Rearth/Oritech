@@ -27,7 +27,10 @@ subprojects {
 
     repositories {
         mavenCentral()
+        // Mixin
         maven { url = "https://repo.spongepowered.org/repository/maven-public" }
+        // Registrate
+        maven { url = "https://maven.ithundxr.dev/snapshots" }
         // EnderIO
         maven { url = 'https://maven.rover656.dev/releases' }
         // owo-lib

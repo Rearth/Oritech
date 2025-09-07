@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mekanism"
+    }
+  ],
+  "type": "mekanism:metallurgic_infusing",
+  "chemical_input": {
+    "amount": 10,
+    "chemical": "mekanism:diamond"
+  },
+  "item_input": {
+    "count": 1,
+    "tag": "c:ingots/nickel"
+  },
+  "output": {
+    "count": 1,
+    "id": "oritech:adamant_dust"
+  },
+  "per_tick_usage": false
+}

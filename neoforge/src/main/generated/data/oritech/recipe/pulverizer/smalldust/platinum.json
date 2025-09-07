@@ -1,0 +1,20 @@
+{
+  "type": "oritech:pulverizer",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:nuggets/platinum"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:small_platinum_dust"
+    }
+  ],
+  "time": 120
+}

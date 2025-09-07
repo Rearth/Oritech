@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "i": {
+      "item": "oritech:reactor_wall"
+    },
+    "o": {
+      "tag": "c:ingots/iron"
+    },
+    "r": {
+      "tag": "c:ingots/electrum"
+    },
+    "t": {
+      "item": "oritech:energy_pipe"
+    }
+  },
+  "pattern": [
+    " t ",
+    "rrr",
+    "oio"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:reactor_energy_port"
+  }
+}

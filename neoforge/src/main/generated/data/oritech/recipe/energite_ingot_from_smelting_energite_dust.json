@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 1.0,
+  "group": "oritech",
+  "ingredient": {
+    "item": "oritech:energite_dust"
+  },
+  "result": {
+    "count": 1,
+    "id": "oritech:energite_ingot"
+  }
+}

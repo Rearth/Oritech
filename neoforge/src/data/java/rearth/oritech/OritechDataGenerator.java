@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-@EventBusSubscriber(modid = "oritech_datagen", bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Oritech.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class OritechDataGenerator {
     
     @SubscribeEvent

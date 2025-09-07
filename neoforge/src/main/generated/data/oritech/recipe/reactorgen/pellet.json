@@ -1,0 +1,15 @@
+{
+  "type": "oritech:reactor",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "item": "oritech:uranium_pellet"
+    }
+  ],
+  "results": [],
+  "time": 4000
+}

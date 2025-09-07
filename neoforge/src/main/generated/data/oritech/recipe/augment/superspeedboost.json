@@ -1,0 +1,57 @@
+{
+  "type": "oritech:augment_data",
+  "applyCost": [
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:magnetic_coil"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "oritech:overcharged_crystal"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "tag": "c:dusts/electrum"
+      }
+    }
+  ],
+  "effect": {
+    "amount": 0.25,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.movement_speed"
+  },
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:augment/speedboost",
+    "oritech:augment/armor"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:energite_ingot"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:ion_thruster"
+      }
+    },
+    {
+      "count": 16,
+      "ingredient": {
+        "item": "oritech:flux_gate"
+      }
+    }
+  ],
+  "rfCost": 350000000,
+  "time": 1800,
+  "toggleable": true,
+  "uiX": 55,
+  "uiY": 50
+}

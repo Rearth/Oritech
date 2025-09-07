@@ -1,0 +1,26 @@
+{
+  "type": "oritech:atomic_forge",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "item": "oritech:processing_unit"
+    },
+    {
+      "item": "oritech:silicon_wafer"
+    },
+    {
+      "item": "oritech:silicon_wafer"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:advanced_computing_engine"
+    }
+  ],
+  "time": 5
+}

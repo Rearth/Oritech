@@ -1,0 +1,29 @@
+{
+  "type": "oritech:assembler",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:plates/plastic"
+    },
+    {
+      "tag": "c:ingots/electrum"
+    },
+    {
+      "tag": "c:ingots/electrum"
+    },
+    {
+      "tag": "c:ingots/steel"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:basic_battery"
+    }
+  ],
+  "time": 48
+}

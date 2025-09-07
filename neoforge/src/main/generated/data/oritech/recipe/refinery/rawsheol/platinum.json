@@ -1,0 +1,25 @@
+{
+  "type": "oritech:refinery",
+  "fluidInput": {
+    "amount": 250,
+    "fluid": "oritech:still_sheol_fire"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 100,
+      "fluid": "minecraft:lava"
+    }
+  ],
+  "ingredients": [
+    {
+      "tag": "c:raw_materials/platinum"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "oritech:platinum_clump"
+    }
+  ],
+  "time": 120
+}

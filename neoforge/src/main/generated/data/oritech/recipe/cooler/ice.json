@@ -1,0 +1,16 @@
+{
+  "type": "oritech:cooler",
+  "fluidInput": {
+    "amount": 1000,
+    "fluid": "minecraft:water"
+  },
+  "fluidOutputs": [],
+  "ingredients": [],
+  "results": [
+    {
+      "count": 3,
+      "id": "minecraft:ice"
+    }
+  ],
+  "time": 200
+}

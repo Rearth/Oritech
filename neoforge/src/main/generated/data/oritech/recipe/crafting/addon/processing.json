@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "tag": "oritech:plating"
+    },
+    "c": {
+      "item": "oritech:flux_gate"
+    },
+    "f": {
+      "item": "oritech:motor"
+    },
+    "m": {
+      "item": "oritech:super_ai_chip"
+    },
+    "s": {
+      "tag": "c:ingots/platinum"
+    }
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:machine_processing_addon"
+  }
+}

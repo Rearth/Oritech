@@ -1,0 +1,29 @@
+{
+  "type": "oritech:assembler",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:plates/plastic"
+    },
+    {
+      "tag": "c:carbon_fibre"
+    },
+    {
+      "tag": "c:ingots/electrum"
+    },
+    {
+      "tag": "c:dusts/redstone"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:processing_unit"
+    }
+  ],
+  "time": 96
+}

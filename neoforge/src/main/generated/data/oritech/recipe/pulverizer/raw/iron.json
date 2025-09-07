@@ -1,0 +1,24 @@
+{
+  "type": "oritech:pulverizer",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:raw_materials/iron"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:iron_dust"
+    },
+    {
+      "count": 3,
+      "id": "oritech:small_iron_dust"
+    }
+  ],
+  "time": 120
+}

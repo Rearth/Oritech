@@ -1,0 +1,26 @@
+{
+  "type": "oritech:atomic_forge",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:carbon_fibre"
+    },
+    {
+      "tag": "c:silicon"
+    },
+    {
+      "tag": "c:silicon"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:silicon_wafer"
+    }
+  ],
+  "time": 5
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "tag": "minecraft:planks"
+    },
+    "s": {
+      "item": "oritech:transparent_item_pipe"
+    }
+  },
+  "pattern": [
+    "sss",
+    "scs",
+    "sss"
+  ],
+  "result": {
+    "count": 8,
+    "id": "oritech:item_pipe"
+  }
+}

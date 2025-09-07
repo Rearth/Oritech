@@ -1,0 +1,16 @@
+{
+  "type": "oritech:cooler",
+  "fluidInput": {
+    "amount": 1000,
+    "fluid": "oritech:still_steam"
+  },
+  "fluidOutputs": [],
+  "ingredients": [],
+  "results": [
+    {
+      "count": 3,
+      "id": "minecraft:snow_block"
+    }
+  ],
+  "time": 200
+}

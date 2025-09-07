@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "oritech:motor"
+    },
+    "o": {
+      "tag": "c:carbon_fibre"
+    }
+  },
+  "pattern": [
+    " o ",
+    "oco",
+    " o "
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:reactor_vent"
+  }
+}

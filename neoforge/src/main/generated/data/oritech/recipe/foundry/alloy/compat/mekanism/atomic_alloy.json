@@ -1,0 +1,29 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mekanism"
+    }
+  ],
+  "type": "oritech:foundry",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "mekanism:alloys/reinforced"
+    },
+    {
+      "tag": "c:dusts/refined_obsidian"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "mekanism:alloy_atomic"
+    }
+  ],
+  "time": 120
+}

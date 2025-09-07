@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:mod_loaded",
+        "modid": "jaopca"
+      }
+    }
+  ],
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 1000,
+    "fluid": "minecraft:water"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:clumps/zinc"
+    }
+  ],
+  "results": [
+    {
+      "count": 18,
+      "id": "create:zinc_nugget"
+    }
+  ],
+  "time": 150
+}

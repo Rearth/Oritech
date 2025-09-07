@@ -1,0 +1,15 @@
+{
+  "type": "oritech:bio_generator",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:fuels/bio"
+    }
+  ],
+  "results": [],
+  "time": 500
+}

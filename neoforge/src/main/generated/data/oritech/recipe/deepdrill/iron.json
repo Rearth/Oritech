@@ -1,0 +1,20 @@
+{
+  "type": "oritech:deep_drill",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "item": "oritech:resource_node_iron"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:raw_iron"
+    }
+  ],
+  "time": 1
+}

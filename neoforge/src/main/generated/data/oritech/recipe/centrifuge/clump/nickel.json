@@ -1,0 +1,24 @@
+{
+  "type": "oritech:centrifuge",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "c:clumps/nickel"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:nickel_gem"
+    },
+    {
+      "count": 2,
+      "id": "oritech:small_platinum_dust"
+    }
+  ],
+  "time": 100
+}

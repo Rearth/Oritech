@@ -24,23 +24,17 @@ neoForge {
         // datagen run config for NeoForge recipes
         data {
             data()
-            //            name("Minecraft Data")
-            //            source("data")
+            sourceSet = sourceSets.data
 
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/main/generated/').absolutePath, '--existing', file('src/main/resources/').absolutePath
+            programArguments.addAll '--all', '--mod', mod_id, '--output', file('src/main/generated/').absolutePath
 
-            //            programArgs("--all", "--mod", mod_id)
-            //            programArgs("--output", file("src/main/generated").absolutePath)
-            // no existing resources needed if only recipes are generated
-            // programArgs("--existing", project(":common").file("src/main/resources").absolutePath)
-            // programArgs("--existing", file("src/main/resources").absolutePath)
-
-            //            mods {
-            //                create(archives_name) {
-            //                    sourceSets.main
-            //                    sourceSets.data
-            //                }
-            //            }
+            // load the data source set together with the main source set as one mod
+            mods {
+                "${mod_id}_datagen" {
+                    sourceSet sourceSets.main
+                    sourceSet sourceSets.data
+                }
+            }
         }
     }
 
@@ -77,6 +71,7 @@ dependencies {
     implementation "curse.maven:jade-324717:5846105"
     // owo-lib
     implementation "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    annotationProcessor "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     accessTransformers "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     interfaceInjectionData "io.wispforest:owo-lib-neoforge:$owo_neo_version"
 
@@ -103,14 +98,15 @@ dependencies {
     // Applied Energistics 2
     dataImplementation "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
     dataRuntimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
-    // Create (with Explosion to load JiJ dependencies)
+    // Create
     dataImplementation "curse.maven:create-328085:$create_version_id"
+    dataCompileOnly "com.tterrag.registrate:Registrate:MC1.21-1.3.0+67"
     // EnderIO
     dataImplementation "com.enderio:enderio-base:$enderio_version"
     dataImplementation("com.enderio:enderio-machines:$enderio_version") { transitive = false }
     // Energized Power
     dataImplementation "curse.maven:energized-power-782147:$energized_power_neo_version_id"
-    // Immersive Engineering (with Explosion to load JiJ dependencies)
+    // Immersive Engineering
     dataImplementation "curse.maven:immersive-engineering-231951:$immersive_engineering_version_id"
     // Industrial Foregoing
     dataImplementation "curse.maven:industrial-foregoing-266515:$industrial_foregoing_version_id"
@@ -123,7 +119,7 @@ dependencies {
     // Powah!
     dataImplementation "curse.maven:powah-rearchitected-633483:$powah_version_id"
     dataRuntimeOnly "me.shedaniel.cloth:cloth-config-neoforge:$cloth_config_version"
-    // Productive Metalworks (with Explosion to load JiJ dependencies)
+    // Productive Metalworks
     dataImplementation "curse.maven:productive-metalworks-1184570:$productive_metalworks_version_id"
 }
 

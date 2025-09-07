@@ -1,0 +1,20 @@
+{
+  "type": "oritech:pulverizer",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "oritech:recyclable/red_sand"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "minecraft:red_sand"
+    }
+  ],
+  "time": 120
+}

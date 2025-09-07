@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "oritech:superconductor"
+    },
+    "p": {
+      "tag": "oritech:plating"
+    },
+    "s": {
+      "item": "minecraft:stone"
+    }
+  },
+  "pattern": [
+    "csc",
+    "sps",
+    "csc"
+  ],
+  "result": {
+    "count": 4,
+    "id": "oritech:superconductor_duct_block"
+  }
+}

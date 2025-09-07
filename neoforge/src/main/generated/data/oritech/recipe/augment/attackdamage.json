@@ -1,0 +1,49 @@
+{
+  "type": "oritech:augment_data",
+  "applyCost": [
+    {
+      "count": 16,
+      "ingredient": {
+        "tag": "c:ingots/steel"
+      }
+    },
+    {
+      "count": 4,
+      "ingredient": {
+        "item": "oritech:duratium_ingot"
+      }
+    }
+  ],
+  "effect": {
+    "amount": 4.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.attack_damage"
+  },
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "tag": "c:ingots/steel"
+      }
+    },
+    {
+      "count": 48,
+      "ingredient": {
+        "tag": "c:gems/diamond"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:fluxite"
+      }
+    }
+  ],
+  "rfCost": 150000000,
+  "time": 1600,
+  "toggleable": false,
+  "uiX": 5,
+  "uiY": 10
+}

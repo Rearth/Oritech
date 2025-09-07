@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_carbon_plating_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:carbon_plating_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:crafting/carbon"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_carbon_plating_block"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:crafting/carbon"
+    ]
+  }
+}
