@@ -110,6 +110,7 @@ subprojects {
             capabilities {
                 requireCapability "$group:$mod_id"
             }
+            transitive = false
         }
         commonJava project(path: ':common', configuration: 'commonJava')
         commonResources project(path: ':common', configuration: 'commonResources')
