@@ -26,18 +26,32 @@ loom {
 
 
 dependencies {
+    /// common dependencies (needed to compile the common sources)
+
+    // EMI
+    modCompileOnly "dev.emi:emi-fabric:$emi_version"
+    // JEI
+    modCompileOnly "mezz.jei:jei-$minecraft_version-fabric:$jei_version"
+    // Oracle Index
+    modCompileOnly "curse.maven:oracle-index-1206582:6904576"
+    // REI
+    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"
+    
+    /// Game and Loader
+    
     // Minecraft
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered {
         officialMojangMappings()
         parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_mappings}@zip")
     }
-
     // Fabric Loader
     modImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"
     // Fabric API
     modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_api_version"
 
+    /// Fabric dependencies (needed to compile the Fabric sources)
+    
     // Architectury API
     modImplementation "dev.architectury:architectury-fabric:$architectury_api_version"
     // Athena (CTM)
@@ -50,13 +64,10 @@ dependencies {
     modImplementation "curse.maven:jade-324717:5639994"
     // Mod Menu
     modImplementation "com.terraformersmc:modmenu:11.0.3"
-    // Oracle Index
-    modRuntimeOnly "curse.maven:oracle-index-1206582:6538216"
-    implementation "org.jsoup:jsoup:1.17.2"
     // owo-lib
     modImplementation "io.wispforest:owo-lib:$owo_version"
 
-    // recipe viewer runtime
+    /// recipe viewer runtime
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
         case "emi": modRuntimeOnly "dev.emi:emi-fabric:$emi_version"; break
         case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"; break
@@ -65,13 +76,14 @@ dependencies {
         default: println("Unknown recipe viewer specified: $recipe_viewer. Must be EMI, REI, JEI, or disabled.")
     }
 
-    // in-game testing
+    /// in-game testing
     modImplementation "curse.maven:reborncore-237903:5608204"
     modImplementation "curse.maven:simple-conveyor-belts-1292980:6721806"
     modImplementation "curse.maven:tags-viewer-1119728:5807898"
     modImplementation "curse.maven:techreborn-233564:5608205"
 
-    // datagen
+    /// datagen dependencies (needed to compile the datagen sources)
+    
     // Alloy Forgery
     modDataImplementation "curse.maven:alloy-forgery-438718:$alloy_forgery_version_id"
     // Clutter
