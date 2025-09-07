@@ -130,6 +130,9 @@ subprojects {
 
     tasks {
         processResources {
+            dependsOn(configurations.commonResources)
+            from(configurations.commonResources)
+        
             inputs.property 'version', project.version
             filesMatching(['META-INF/neoforge.mods.toml', "fabric.mod.json"]) {
                 expand version: version
