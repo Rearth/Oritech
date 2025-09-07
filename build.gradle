@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'java'
 
     base {
-        archivesName = "$mod_id-$minecraft_version"
+        archivesName = "$mod_id-${project.name}-$minecraft_version-$version"
     }
 
     java {
