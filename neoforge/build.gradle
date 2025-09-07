@@ -14,6 +14,13 @@ neoForge {
     interfaceInjectionData.from project(':common').file('src/main/resources/interfaces.json').absolutePath
 
     runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+        
         // datagen run config for NeoForge recipes
         data {
             data()

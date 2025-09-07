@@ -4,14 +4,15 @@ plugins {
 
 loom {
     runs {
-        create("data") {
+        client {
             client()
-            name("Minecraft Data")
-            source("data")
-
-            property("fabric-api.datagen")
-            property("fabric-api.datagen.modid", "$mod_id-data")
-            property("fabric-api.datagen.output-dir", project(":common").file("src/main/generated").absolutePath)
+            ideConfigGenerated(true)
+            name = 'fabric - Client'
+        }
+        server {
+            server()
+            ideConfigGenerated(true)
+            name = 'fabric - Server'
         }
     }
 
