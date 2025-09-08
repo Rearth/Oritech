@@ -33,7 +33,6 @@ import java.util.function.Consumer;
 public class OritechPlatformNeoForge implements OritechPlatform {
 
     // Network
-
     public static final Queue<Consumer<PayloadRegistrar>> PENDING_S2C_INITS = new ArrayDeque<>();
     public static final Queue<Consumer<PayloadRegistrar>> PENDING_C2S_INITS = new ArrayDeque<>();
     

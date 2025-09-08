@@ -35,7 +35,6 @@ import java.util.Queue;
 public class OritechPlatformFabric implements OritechPlatform {
 
     // Network
-
     public static final Queue<Runnable> PENDING_S2C_INITS = new ArrayDeque<>();
     
     @Override
@@ -137,7 +136,6 @@ public class OritechPlatformFabric implements OritechPlatform {
     }
 
     // FakeMachinePlayer
-    
     @Override
     public ServerPlayer create(ServerLevel world, GameProfile profile, SimpleInventoryStorage inventory) {
         return FakeMachinePlayerImpl.create(world, profile, inventory);
