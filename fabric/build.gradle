@@ -25,6 +25,7 @@ loom {
             property("fabric-api.datagen")
             property("fabric-api.datagen.modid", "$mod_id-data")
             property("fabric-api.datagen.output-dir", project(":common").file("src/main/generated").absolutePath)
+            //property("fabric-api.datagen.strict-validation")
             property("oritech.datagen.loader", "common")
         }
         // datagen run config for Fabric recipes
@@ -37,6 +38,7 @@ loom {
             property("fabric-api.datagen")
             property("fabric-api.datagen.modid", "$mod_id-data")
             property("fabric-api.datagen.output-dir", file("src/main/generated").absolutePath)
+            //property("fabric-api.datagen.strict-validation")
             property("oritech.datagen.loader", "fabric")
         }
     }
@@ -50,67 +52,67 @@ loom {
     createRemapConfigurations(sourceSets.data)
 }
 
+repositories {
+    // Additional Entity Attributes (Mythic Metals dependency)
+    maven { url = 'https://api.modrinth.com/maven/' }
+    // Cardinal Components (Mythic Metals dependency)
+    maven { url = 'https://maven.ladysnake.org/releases' }
+}
 
 dependencies {
-    /// common dependencies (needed to compile the common sources)
-
-    // EMI
-    modCompileOnly "dev.emi:emi-fabric:$emi_version"
-    // JEI
-    modCompileOnly "mezz.jei:jei-$minecraft_version-fabric:$jei_version"
-    // Oracle Index
-    modCompileOnly "curse.maven:oracle-index-1206582:6904576"
-    // REI
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"
-    
-    /// Game and Loader
-    
     // Minecraft
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered {
         officialMojangMappings()
         parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_mappings}@zip")
     }
+    
     // Fabric Loader
     modImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"
     // Fabric API
     modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_api_version"
-
-    /// Fabric dependencies (needed to compile the Fabric sources)
     
     // Architectury API
-    modImplementation "dev.architectury:architectury-fabric:$architectury_api_version"
-    // Athena (CTM)
-    modRuntimeOnly "earth.terrarium.athena:athena-fabric-1.21:4.0.0"
+    modApi "dev.architectury:architectury-fabric:$architectury_api_version"
+    // EMI
+    modCompileOnly "dev.emi:emi-fabric:$emi_version"
     // Energy API
     include modApi("teamreborn:energy:$reborn_energy_version") { transitive = false }
     // GeckoLib
-    modImplementation "software.bernie.geckolib:geckolib-fabric-$minecraft_version:$geckolib_version"
+    modApi "software.bernie.geckolib:geckolib-fabric-$minecraft_version:$geckolib_version"
     // Jade
-    modImplementation "curse.maven:jade-324717:5639994"
-    // Mod Menu
-    modImplementation "com.terraformersmc:modmenu:11.0.3"
+    modCompileOnly "curse.maven:jade-324717:5639994"
+    // JEI
+    modCompileOnly("mezz.jei:jei-$minecraft_version-fabric:$jei_version") { transitive = false }
+    // Oracle Index
+    modCompileOnly "curse.maven:oracle-index-1206582:6904576"
     // owo-lib
-    modImplementation "io.wispforest:owo-lib:$owo_version"
+    modApi "io.wispforest:owo-lib:$owo_version"
     annotationProcessor "io.wispforest:owo-lib:$owo_version"
+    // REI
+    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"
 
-    /// recipe viewer runtime
+    /// runtime-only
+    
+    // recipe viewer
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
-        case "emi": modRuntimeOnly "dev.emi:emi-fabric:$emi_version"; break
-        case "rei": modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"; break
-        case "jei": modRuntimeOnly "mezz.jei:jei-$minecraft_version-fabric:$jei_version"; break
+        case "emi": modLocalRuntime "dev.emi:emi-fabric:$emi_version"; break
+        case "jei": modLocalRuntime "mezz.jei:jei-$minecraft_version-fabric:$jei_version"; break
+        case "rei": modLocalRuntime "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"; break
         case "disabled": break
         default: println("Unknown recipe viewer specified: $recipe_viewer. Must be EMI, REI, JEI, or disabled.")
     }
+    // Athena (CTM)
+    modRuntimeOnly "earth.terrarium.athena:athena-fabric-1.21:4.0.0"
+    // Mod Menu
+    modLocalRuntime "com.terraformersmc:modmenu:11.0.3"
+    // Simple Conveyor Belts
+    modLocalRuntime "curse.maven:simple-conveyor-belts-1292980:6721806"
+    // Tags Viewer
+    modLocalRuntime "curse.maven:tags-viewer-1119728:5807898"
 
-    /// in-game testing
-    modImplementation "curse.maven:reborncore-237903:5608204"
-    modImplementation "curse.maven:simple-conveyor-belts-1292980:6721806"
-    modImplementation "curse.maven:tags-viewer-1119728:5807898"
-    modImplementation "curse.maven:techreborn-233564:5608205"
+    /// datagen-only
 
-    /// datagen dependencies (needed to compile the datagen sources)
-    
     // Alloy Forgery
     modDataImplementation "curse.maven:alloy-forgery-438718:$alloy_forgery_version_id"
     // Clutter
@@ -123,6 +125,9 @@ dependencies {
     modDataRuntimeOnly("org.ladysnake.cardinal-components-api:cardinal-components-base:$cardinal_components_version") { transitive = false }
     modDataRuntimeOnly("org.ladysnake.cardinal-components-api:cardinal-components-entity:$cardinal_components_version") { transitive = false }
     modDataRuntimeOnly "maven.modrinth:additionalentityattributes:$additional_entity_attributes_version"
+    // Tech Reborn
+    modDataImplementation "curse.maven:techreborn-233564:5608205"
+    modDataImplementation "curse.maven:reborncore-237903:5608204"
 }
 
 publishMods {

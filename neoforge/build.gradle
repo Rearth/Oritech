@@ -45,53 +45,70 @@ neoForge {
     }
 }
 
-dependencies {
-    /// common dependencies (needed to compile the common sources)
+// create a runtime-only configuration that published to POM
+configurations {
+    localRuntime {
+        canBeConsumed = false
+        visible = false
+    }
 
+    named(sourceSets.main.runtimeClasspathConfigurationName) {
+        extendsFrom(configurations.localRuntime)
+    }
+}
+
+repositories {
+    // EnderIO
+    maven { url = 'https://maven.rover656.dev/releases' }
+    // Registrate
+    maven { url = "https://maven.ithundxr.dev/snapshots" }
+}
+
+dependencies {
+    // Architectury API
+    api "dev.architectury:architectury-neoforge:$architectury_api_version"
     // EMI
     compileOnly "dev.emi:emi-neoforge:${emi_version}"
+    // GeckoLib
+    api "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
+    // GrandPower
+    api jarJar("dev.technici4n:GrandPower:3.0.2") { transitive = false }
+    // Jade
+    compileOnly "curse.maven:jade-324717:5846105"
     // JEI
-    compileOnly "mezz.jei:jei-$minecraft_version-neoforge:$jei_version"
+    compileOnly("mezz.jei:jei-$minecraft_version-neoforge:$jei_version") { transitive = false }
     // Oracle Index
     compileOnly "curse.maven:oracle-index-1206582:6904573"
-    // REI
-    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
-    
-    /// NeoForge dependencies (needed to compile the NeoForge sources)
-    
-    // Architectury API
-    implementation "dev.architectury:architectury-neoforge:$architectury_api_version"
-    // Athena (CTM)
-    runtimeOnly "earth.terrarium.athena:athena-neoforge-1.21:4.0.0"
-    // GeckoLib
-    implementation "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
-    // GrandPower
-    api("dev.technici4n:GrandPower:3.0.2") // TODO: jij
-    // Jade
-    implementation "curse.maven:jade-324717:5846105"
     // owo-lib
-    implementation "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    api "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     annotationProcessor "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     accessTransformers "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     interfaceInjectionData "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    // REI
+    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
+    
+    /// runtime-only
 
-    /// recipe viewer runtime
+    // recipe viewer runtime
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
-        case "emi": runtimeOnly "dev.emi:emi-neoforge:$emi_version"; break
-        case "rei": runtimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"; break
-        case "jei": runtimeOnly "mezz.jei:jei-$minecraft_version-neoforge:$jei_version"; break
+        case "emi": localRuntime "dev.emi:emi-neoforge:$emi_version"; break
+        case "jei": localRuntime "mezz.jei:jei-$minecraft_version-neoforge:$jei_version"; break
+        case "rei": localRuntime "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"; break
         case "disabled": break
         default: println("Unknown recipe viewer specified: $recipe_viewer. Must be EMI, REI, JEI, or disabled.")
     }
+    // Athena (CTM)
+    runtimeOnly "earth.terrarium.athena:athena-neoforge-1.21:4.0.0"
+    // Applied Energistics 2
+    // localRuntime "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
+    // localRuntime "curse.maven:guideme-1173950:$guideme_version_id"
+    // Mekanism
+    // localRuntime "curse.maven:mekanism-268560:5680395"
+    // Spark
+    // localRuntime "curse.maven:spark-361579:5759671"
 
-    /// in-game testing
-    runtimeOnly "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
-    runtimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
-    runtimeOnly "curse.maven:mekanism-268560:5680395"
-    runtimeOnly "curse.maven:spark-361579:5759671"
+    /// datagen-only
 
-    /// datagen dependencies (needed to compile the datagen sources)
-    
     // Actually Additions
     dataImplementation "curse.maven:actually-additions-228404:$actually_additions_version_id"
     dataRuntimeOnly "curse.maven:curios-309927:$curios_version_id"

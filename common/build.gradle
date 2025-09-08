@@ -3,6 +3,7 @@ plugins {
 }
 
 neoForge {
+    // only apply NeoForm to use Vanilla mode (no loader)
     neoFormVersion = "$minecraft_version-$neoform_version"
     parchment {
         minecraftVersion = minecraft_version
@@ -30,40 +31,33 @@ artifacts {
 }
 
 dependencies {
+    // Architectury API
+    compileOnlyApi "dev.architectury:architectury-neoforge:$architectury_api_version"
+    // EMI
+    compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
+    // GeckoLib
+    compileOnlyApi "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
+    // Jade
+    compileOnly "curse.maven:jade-324717:6853386"
+    // JEI
+    compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}") { transitive = false }
+    // Mixin
     compileOnly 'org.spongepowered:mixin:0.8.5'
+    // Mixin Extras
     compileOnly 'io.github.llamalad7:mixinextras-common:0.3.5'
     annotationProcessor 'io.github.llamalad7:mixinextras-common:0.3.5'
-
-    // Architectury API
-    implementation "dev.architectury:architectury-neoforge:$architectury_api_version"
-
+    // Oracle Index
+    compileOnly "curse.maven:oracle-index-1206582:6904573"
     // owo-lib
-    compileOnly "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    compileOnlyApi "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     annotationProcessor "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     accessTransformers "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     interfaceInjectionData "io.wispforest:owo-lib-neoforge:$owo_neo_version"
-
-    // GeckoLib
-    implementation "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
-
-    // EMI
-    compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
-
     // REI
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
-
-    // JEI
-    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
-
-    // Jade (needed for addon)
-    implementation "curse.maven:jade-324717:6853386"
-    
-    // Oracle Index
-    compileOnly "curse.maven:oracle-index-1206582:6904573"
 }
 
 tasks.named('processResources') {
-
     from("$rootDir/docs") {
         into "assets/oracle_index/books/oritech"
         exclude '.assets/item/**' // items are rendered in-game as actual item components, no need to include them here

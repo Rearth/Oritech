@@ -27,32 +27,26 @@ subprojects {
 
     repositories {
         mavenCentral()
-        // Mixin
-        maven { url = "https://repo.spongepowered.org/repository/maven-public" }
-        // Registrate
-        maven { url = "https://maven.ithundxr.dev/snapshots" }
-        // EnderIO
-        maven { url = 'https://maven.rover656.dev/releases' }
-        // owo-lib
-        maven { url = 'https://maven.wispforest.io/releases/' }
-        // GeckoLib
-        maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
-        // REI
-        maven { url = "https://maven.shedaniel.me/" }
-        // EMI
-        maven { url = 'https://maven.terraformersmc.com/' }
-        // Jade
+        
+        // ModMaven
+        // mirrors a lot of commonly used Mavens
+        maven { url = "https://modmaven.dev" }
+        // CurseMaven
+        // Jade, Oracle Index
         maven { url = "https://beta.cursemaven.com" }
-        // FFAPI
-        maven { url = "https://maven.su5ed.dev/releases" }
-        // JEI
-        maven { url = "https://maven.blamejared.com/" }
+        
+        // Architectury API, REI
+        maven { url = "https://maven.architectury.dev/" }
         // Athena (CTM)
         maven { url = "https://maven.teamresourceful.com/repository/maven-public/" }
-        // Additional Entity Attributes (Mythic Metals dependency)
-        maven { url = 'https://api.modrinth.com/maven/' }
-        // Cardinal Components (Mythic Metals dependency)
-        maven { url = 'https://maven.ladysnake.org/releases' }
+        // EMI
+        maven { url = 'https://maven.terraformersmc.com/' }
+        // Forgified Fabric API
+        maven { url = "https://maven.su5ed.dev/releases" }
+        // GeckoLib
+        maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+        // owo-lib
+        maven { url = 'https://maven.wispforest.io/releases/' }
     }
 
     dependencies {
@@ -154,10 +148,6 @@ subprojects {
             dependsOn(configurations.commonResources)
             from(configurations.commonResources)
         }
-
-        //        withType(AbstractCopyTask).configureEach {
-        //            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        //        }
     }
 }
 
