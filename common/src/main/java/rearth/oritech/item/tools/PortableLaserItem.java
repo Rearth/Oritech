@@ -1,15 +1,16 @@
 package rearth.oritech.item.tools;
 
+import dev.architectury.platform.Platform;
+import dev.ftb.mods.ftbchunks.api.FTBChunksAPI;
+import dev.ftb.mods.ftbchunks.api.Protection;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -21,7 +22,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -31,7 +31,6 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -39,27 +38,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
-import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.PortableLaserRenderer;
-import rearth.oritech.client.renderers.PromethiumToolRenderer;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.TooltipHelper;
@@ -111,7 +101,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         if (world.isClientSide) {
             if (getStoredEnergy(stack) > energyUsed && !player.isShiftKeyDown() && !isMiningEnabled(stack))
                 lastSingleShot = world.getGameTime();
-                
+            
             return InteractionResultHolder.consume(stack);
         }
         
@@ -142,9 +132,16 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         Vec3 endPos;
         
         var hit = getPlayerTargetRay(player);
+        
         if (hit != null) {
-            world.explode(null, new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player),
-              null, hit.getLocation(), Oritech.CONFIG.portableLaserConfig.explosionStrength(), false, Level.ExplosionInteraction.MOB);
+            var canInteract = true;
+            if (Platform.isModLoaded("ftbchunks")) {
+                canInteract = !FTBChunksAPI.api().getManager().shouldPreventInteraction(player, hand, BlockPos.containing(hit.getLocation()), Protection.EDIT_AND_INTERACT_BLOCK, null);
+            }
+            
+            if (canInteract)
+                world.explode(null, new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player),
+                  null, hit.getLocation(), Oritech.CONFIG.portableLaserConfig.explosionStrength(), false, Level.ExplosionInteraction.MOB);
             
             endPos = hit.getLocation();
         } else {
@@ -154,7 +151,13 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         }
         
         if (hit instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
-            processEntityTarget(player, livingEntity,  20, stack, world);
+            var canInteract = true;
+            if (Platform.isModLoaded("ftbchunks")) {
+                canInteract = !FTBChunksAPI.api().getManager().shouldPreventInteraction(player, hand, BlockPos.containing(hit.getLocation()), Protection.INTERACT_ENTITY, livingEntity);
+            }
+            
+            if (canInteract)
+                processEntityTarget(player, livingEntity, 20, stack, world);
         }
         
         triggerAnim(player, GeoItem.getId(stack), "laser", "singleshot");
@@ -194,11 +197,24 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             var blockPos = blockHitResult.getBlockPos();
             var blockState = world.getBlockState(blockPos);
             if (blockState.isAir() || blockState.is(TagContent.LASER_PASSTHROUGH)) return;
-            processBlockBreaking(blockPos, blockState, world, player, stack, rfUsage);
+            
+            var canInteract = true;
+            if (Platform.isModLoaded("ftbchunks")) {
+                canInteract = !FTBChunksAPI.api().getManager().shouldPreventInteraction(player, InteractionHand.MAIN_HAND, BlockPos.containing(finalHit.getLocation()), Protection.EDIT_AND_INTERACT_BLOCK, null);
+            }
+            
+            if (canInteract)
+                processBlockBreaking(blockPos, blockState, world, player, stack, rfUsage);
         } else if (finalHit instanceof EntityHitResult entityHitResult) {
             var target = entityHitResult.getEntity();
             if (!(target instanceof LivingEntity livingEntity)) return;
-            processEntityTarget(player, livingEntity, Oritech.CONFIG.portableLaserConfig.damageBase(), stack, world);
+            var canInteract = true;
+            if (Platform.isModLoaded("ftbchunks")) {
+                canInteract = !FTBChunksAPI.api().getManager().shouldPreventInteraction(player, InteractionHand.MAIN_HAND, BlockPos.containing(finalHit.getLocation()), Protection.EDIT_AND_INTERACT_BLOCK, target);
+            }
+            
+            if (canInteract)
+                processEntityTarget(player, livingEntity, Oritech.CONFIG.portableLaserConfig.damageBase(), stack, world);
         }
         
         if (finalHit != null && finalHit.getType() != HitResult.Type.MISS && laserItem.isMiningEnabled(stack)) {
@@ -286,6 +302,11 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         var requiredBreakingEnergy = (int) (Math.sqrt(blockState.getDestroySpeed(world, blockPos)) * BLOCK_BREAK_ENERGY / Oritech.CONFIG.portableLaserConfig.blockBreakSpeed());
         var efficiencyLevel = getEnchantmentLevel(tool, Enchantments.EFFICIENCY);
         if (efficiencyLevel > 0) requiredBreakingEnergy = requiredBreakingEnergy / (efficiencyLevel + 1);
+        
+        var currentProgress = currentInvestedEnergy / (float) requiredBreakingEnergy;
+        if (world instanceof ServerLevel serverLevel)
+            serverLevel.destroyBlockProgress(0, blockPos, (int) (currentProgress * 10));
+        
         if (currentInvestedEnergy > requiredBreakingEnergy) {
             stats = new Tuple<>(blockPos, 0);
             finishBlockBreaking(blockPos, blockState, world, player, tool);

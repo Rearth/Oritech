@@ -1,5 +1,12 @@
 package rearth.oritech.block.entity.reactor;
 
+import dev.architectury.platform.Platform;
+import dev.ftb.mods.ftbchunks.api.FTBChunksAPI;
+import dev.ftb.mods.ftbchunks.api.Protection;
+import dev.ftb.mods.ftblibrary.math.ChunkDimPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.ChunkPos;
+import rearth.oritech.OritechPlatform;
 import rearth.oritech.block.blocks.reactor.NuclearExplosionBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
@@ -91,6 +98,11 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
             var targetBlock = level.getBlockState(target);
             var percentageDist = distSq / (maxDist * maxDist) * 8;
             var percentageVaried = percentageDist * (level.random.nextFloat() * 0.6 - 0.3 + 1);
+            
+            if (Platform.isModLoaded("ftbchunks")) {
+                var isClaimed = FTBChunksAPI.api().getManager().getChunk(new ChunkDimPos(level, target)) != null;
+                if (isClaimed) return;
+            }
 
             var replaced = false;
             var replacementState = Blocks.AIR.defaultBlockState();
@@ -216,8 +228,12 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
             if (targetHardness > power && hardBusters-- < 0) continue;
 
             usedPower += targetHardness;
-
-            // todo find all onBreak overrides in project and move to onBroken
+            
+            if (Platform.isModLoaded("ftbchunks")) {
+                var isClaimed = FTBChunksAPI.api().getManager().getChunk(new ChunkDimPos(level, target)) != null;
+                if (isClaimed) return 1000;
+            }
+            
             targetBlock.destroy(level, pos, targetState);
             level.setBlock(target, Blocks.AIR.defaultBlockState(), Block.UPDATE_SUPPRESS_DROPS | Block.UPDATE_CLIENTS, 0);
             removedBlocks.add(target.immutable());

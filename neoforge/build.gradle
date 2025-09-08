@@ -69,6 +69,9 @@ dependencies {
     api "dev.architectury:architectury-neoforge:$architectury_api_version"
     // EMI
     compileOnly "dev.emi:emi-neoforge:${emi_version}"
+    // FTB Chunks
+    compileOnly("dev.ftb.mods:ftb-chunks-neoforge:2101.1.10") { transitive = false }
+    compileOnly("dev.ftb.mods:ftb-library-neoforge:2101.1.19") { transitive = false }
     // GeckoLib
     api "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
     // GrandPower

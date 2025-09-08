@@ -52,6 +52,8 @@ subprojects {
         maven { url = 'https://maven.terraformersmc.com/' }
         // Forgified Fabric API
         maven { url = "https://maven.su5ed.dev/releases" }
+        // FTB Chunks
+        maven { url = "https://maven.ftb.dev/releases" }
         // GeckoLib
         maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
         // owo-lib
