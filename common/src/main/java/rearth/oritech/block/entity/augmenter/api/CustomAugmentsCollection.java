@@ -1,6 +1,8 @@
 package rearth.oritech.block.entity.augmenter.api;
 
 import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.Attachment;
 import rearth.oritech.api.attachment.AttachmentApi;
@@ -45,6 +47,11 @@ public class CustomAugmentsCollection {
         @Override
         public Codec<GlobalPos> persistenceCodec() {
             return GlobalPos.CODEC;
+        }
+        
+        @Override
+        public StreamCodec<ByteBuf, GlobalPos> networkCodec() {
+            return GlobalPos.STREAM_CODEC;
         }
         
         @Override

@@ -29,19 +29,7 @@ public class PlayerAugments {
         manager.getAllRecipesFor(RecipeContent.AUGMENT_DATA).forEach(recipe -> allAugments.put(recipe.id(), recipe.value().createAugment(recipe.id())));
     }
     
-    // called when a client connects to a server / changes world
-    public static void refreshPlayerAugments(Player player) {
-        NetworkManager.sendPlayerHandle(new AugmentPlayerStatePacket(AttachmentApi.getAttachmentValue(player, Augment.ACTIVE_AUGMENTS_DATA)), (ServerPlayer) player);
-        for (var augment : PlayerAugments.allAugments.values()) {
-            if (augment.isEnabled(player))
-                augment.refreshServer(player);
-        }
-    }
-    
     public static void serverTickAugments(ServerPlayer player) {
-        
-        if (player.level().getGameTime() % 80 == 0)
-            refreshPlayerAugments(player);
         
         for (var augment : allAugments.values()) {
             if (augment.isEnabled(player)) {
@@ -91,12 +79,6 @@ public class PlayerAugments {
         AugmentApplicationEntity.toggleAugmentForPlayer(packet.id, player);
     }
     
-    
-    public static void receiveAugmentState(PlayerAugments.AugmentPlayerStatePacket packet, Level world, RegistryAccess dynamicRegistryManager) {
-        if (world.isClientSide)
-            PlayerAugmentsClient.receiveAugmentState(packet.data);
-    }
-    
     public enum AugmentApplicatorOperation {
         RESEARCH, ADD, REMOVE, NONE, NEEDS_INIT
     }
@@ -134,16 +116,6 @@ public class PlayerAugments {
     public record AugmentPlayerTogglePacket(ResourceLocation id) implements CustomPacketPayload {
         
         public static final CustomPacketPayload.Type<AugmentPlayerTogglePacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("aug_toggle"));
-        
-        @Override
-        public Type<? extends CustomPacketPayload> type() {
-            return PACKET_ID;
-        }
-    }
-    
-    public record AugmentPlayerStatePacket(Map<ResourceLocation, Augment.AugmentState> data) implements CustomPacketPayload {
-        
-        public static final CustomPacketPayload.Type<AugmentPlayerStatePacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("aug_state"));
         
         @Override
         public Type<? extends CustomPacketPayload> type() {

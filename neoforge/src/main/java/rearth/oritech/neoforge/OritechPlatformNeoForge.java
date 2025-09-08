@@ -32,7 +32,7 @@ import java.util.function.Consumer;
 
 @AutoService(OritechPlatform.class)
 public class OritechPlatformNeoForge implements OritechPlatform {
-
+    
     // Network
     public static final Queue<Consumer<PayloadRegistrar>> PENDING_S2C_INITS = new ArrayDeque<>();
     public static final Queue<Consumer<PayloadRegistrar>> PENDING_C2S_INITS = new ArrayDeque<>();
@@ -41,51 +41,52 @@ public class OritechPlatformNeoForge implements OritechPlatform {
     public void sendBlockHandle(BlockEntity blockEntity, CustomPacketPayload message) {
         PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) blockEntity.getLevel(), new ChunkPos(blockEntity.getBlockPos()), message);
     }
-
+    
     @Override
     public void sendPlayerHandle(CustomPacketPayload message, ServerPlayer player) {
         PacketDistributor.sendToPlayer(player, message);
     }
-
+    
     @Override
     public void sendToServer(CustomPacketPayload message) {
         PacketDistributor.sendToServer(message);
     }
-
+    
     @Override
     public <T extends CustomPacketPayload> void registerToClient(
-        CustomPacketPayload.Type<T> id, StreamCodec<RegistryFriendlyByteBuf, T> packetCodec,
-        TriConsumer<T, Level, RegistryAccess> consumer
+      CustomPacketPayload.Type<T> id, StreamCodec<RegistryFriendlyByteBuf, T> packetCodec,
+      TriConsumer<T, Level, RegistryAccess> consumer
     ) {
         PENDING_S2C_INITS.add(payloadRegistrar -> {
-            payloadRegistrar.playToClient(id,packetCodec, (payload, context) -> consumer.accept(payload, context.player().level(), context.player().registryAccess()));
+            payloadRegistrar.playToClient(id, packetCodec, (payload, context) -> consumer.accept(payload, context.player().level(), context.player().registryAccess()));
         });
     }
-
+    
     @Override
     public <T extends CustomPacketPayload> void registerToServer(
-        CustomPacketPayload.Type<T> id, StreamCodec<RegistryFriendlyByteBuf, T> packetCodec,
-        TriConsumer<T, Player, RegistryAccess> consumer
+      CustomPacketPayload.Type<T> id, StreamCodec<RegistryFriendlyByteBuf, T> packetCodec,
+      TriConsumer<T, Player, RegistryAccess> consumer
     ) {
         PENDING_C2S_INITS.add(payloadRegistrar -> {
-            payloadRegistrar.playToServer(id,packetCodec, (payload, context) -> consumer.accept(payload, context.player(), context.player().registryAccess()));
+            payloadRegistrar.playToServer(id, packetCodec, (payload, context) -> consumer.accept(payload, context.player(), context.player().registryAccess()));
         });
     }
-
+    
     // Attachment
-
+    
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, Oritech.MOD_ID);
     
     @Override
     public <T> void register(Attachment<T> attachment) {
         ATTACHMENT_TYPES.register(attachment.identifier().getPath(), () ->
-            AttachmentType
-                .builder(attachment.initializer())
-                .serialize(attachment.persistenceCodec())
-                .copyOnDeath()
-                .build());
+                   AttachmentType
+                     .builder(attachment.initializer())
+                     .serialize(attachment.persistenceCodec())
+                     .sync(attachment.networkCodec())
+                     .copyOnDeath()
+                     .build());
     }
-
+    
     @Override
     public <T> boolean hasAttachment(LivingEntity entity, Attachment<T> attachment) {
         var type = ATTACHMENT_TYPES.getRegistry().get().get(attachment.identifier());
@@ -95,7 +96,7 @@ public class OritechPlatformNeoForge implements OritechPlatform {
         }
         return entity.hasData(type);
     }
-
+    
     @Override
     public <T> T getAttachmentValue(LivingEntity entity, Attachment<T> attachment) {
         var type = (AttachmentType<T>) ATTACHMENT_TYPES.getRegistry().get().get(attachment.identifier());
@@ -105,7 +106,7 @@ public class OritechPlatformNeoForge implements OritechPlatform {
         }
         return entity.getData(type);
     }
-
+    
     @Override
     public <T> void setAttachment(LivingEntity entity, Attachment<T> attachment, T value) {
         var type = (AttachmentType<T>) ATTACHMENT_TYPES.getRegistry().get().get(attachment.identifier());
@@ -115,7 +116,7 @@ public class OritechPlatformNeoForge implements OritechPlatform {
         }
         entity.setData(type, value);
     }
-
+    
     @Override
     public <T> void removeAttachment(LivingEntity entity, Attachment<T> attachment) {
         var type = ATTACHMENT_TYPES.getRegistry().get().get(attachment.identifier());
@@ -125,9 +126,9 @@ public class OritechPlatformNeoForge implements OritechPlatform {
         }
         entity.removeData(type);
     }
-
+    
     // FakeMachinePlayer
-
+    
     @Override
     public ServerPlayer create(ServerLevel world, GameProfile profile, SimpleInventoryStorage inventory) {
         return FakeMachinePlayerImpl.create(world, profile, inventory);

@@ -3,6 +3,7 @@ package rearth.oritech.fabric;
 import com.google.auto.service.AutoService;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -91,6 +92,7 @@ public class OritechPlatformFabric implements OritechPlatform {
             .copyOnDeath()
             .initializer(attachment.initializer())
             .persistent(attachment.persistenceCodec())
+            .syncWith(attachment.networkCodec(), AttachmentSyncPredicate.targetOnly())
             .buildAndRegister(attachment.identifier());
 
         REGISTERED_TYPES.put(attachment.identifier(), created);

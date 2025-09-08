@@ -69,11 +69,6 @@ public final class Oritech {
         TickEvent.SERVER_POST.register(elem -> AddonBlockEntity.completeInits());
         TickEvent.SERVER_POST.register(elem -> ElectricMaceItem.processLightningEvents(elem.overworld()));
         
-        // for player augment modifiers
-        PlayerEvent.PLAYER_JOIN.register(PlayerAugments::refreshPlayerAugments);
-        PlayerEvent.PLAYER_RESPAWN.register((player, inEnd, removalReason) -> PlayerAugments.refreshPlayerAugments(player));
-        PlayerEvent.CHANGE_DIMENSION.register((player, oldLevel, newLevel) -> PlayerAugments.refreshPlayerAugments(player));
-        
         // for player augment ticks
         TickEvent.SERVER_PRE.register(event -> event.getAllLevels().forEach(world -> world.players().forEach(PlayerAugments::serverTickAugments)));
         LOGGER.info("Oritech initialization complete");

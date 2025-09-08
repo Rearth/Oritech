@@ -132,7 +132,6 @@ public class NetworkManager {
         registerToClient(RedstoneAddonBlockEntity.RedstoneAddonClientUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonClientUpdate.class), RedstoneAddonBlockEntity::receiveOnClient);
         registerToClient(AcceleratorControllerBlockEntity.ParticleRenderTrail.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.ParticleRenderTrail.class), AcceleratorControllerBlockEntity::receiveTrail);
         registerToClient(AcceleratorControllerBlockEntity.LastEventPacket.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.LastEventPacket.class), AcceleratorControllerBlockEntity::receiveEvent);
-        registerToClient(PlayerAugments.AugmentPlayerStatePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerStatePacket.class), PlayerAugments::receiveAugmentState);
     }
     
     public static void receiveMessage(MessagePayload message, Level world, RegistryAccess registryAccess) {

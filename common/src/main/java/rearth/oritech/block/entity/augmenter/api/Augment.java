@@ -2,6 +2,10 @@ package rearth.oritech.block.entity.augmenter.api;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.Attachment;
 import rearth.oritech.api.attachment.AttachmentApi;
@@ -29,6 +33,12 @@ public abstract class Augment {
         @Override
         public Codec<Map<ResourceLocation, AugmentState>> persistenceCodec() {
             return Codec.unboundedMap(ResourceLocation.CODEC, AugmentState.CODEC);
+        }
+        
+        @SuppressWarnings("unchecked")
+        @Override
+        public StreamCodec<ByteBuf, Map<ResourceLocation, AugmentState>> networkCodec() {
+            return ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, NetworkManager.getAutoCodec(AugmentState.class));
         }
         
         @Override
@@ -60,7 +70,6 @@ public abstract class Augment {
         var data = new HashMap<>(AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA));
         data.put(id, AugmentState.ENABLED);
         AttachmentApi.setAttachment(player, ACTIVE_AUGMENTS_DATA, data);
-        syncToClient(player, data);
         
         activate(player);
     }
@@ -69,7 +78,6 @@ public abstract class Augment {
         var data = new HashMap<>(AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA));
         data.put(id, AugmentState.NOT_INSTALLED);
         AttachmentApi.setAttachment(player, ACTIVE_AUGMENTS_DATA, data);
-        syncToClient(player, data);
         
         deactivate(player);
     }
@@ -92,7 +100,6 @@ public abstract class Augment {
         }
         data.put(id, state);
         AttachmentApi.setAttachment(player, ACTIVE_AUGMENTS_DATA, data);
-        syncToClient(player, data);
     }
     
     // this is called once when the augment is installed / enabled
@@ -105,10 +112,6 @@ public abstract class Augment {
     public abstract void refreshServer(Player player);
     
     public void refreshClient(Player player) {
-    }
-    
-    public void syncToClient(Player player, Map<ResourceLocation, AugmentState> data) {
-        NetworkManager.sendPlayerHandle(new PlayerAugments.AugmentPlayerStatePacket(data), (ServerPlayer) player);
     }
     
     public abstract int refreshInterval();
