@@ -1,5 +1,8 @@
 package rearth.oritech.block.base.block;
 
+import net.minecraft.world.level.LevelAccessor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 
 import rearth.oritech.util.MachineAddonController;
@@ -72,30 +75,35 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        
-        if (!world.isClientSide() && state.getValue(ASSEMBLED)) {
-            
-            var entity = world.getBlockEntity(pos);
-            if (entity instanceof MultiblockMachineController machineEntity) {
-                machineEntity.onControllerBroken();
-            }
-        }
-        
+    public @NotNull BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+        resetMultiblock(state, world, pos);
         return super.playerWillDestroy(world, pos, state, player);
     }
     
     @Override
+    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
+        resetMultiblock(state, level, pos);
+        super.playerDestroy(level, player, pos, state, blockEntity, tool);
+    }
+    
+    @Override
+    public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
+        resetMultiblock(state, level, pos);
+        super.destroy(level, pos, state);
+    }
+    
+    @Override
     protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
-        
+        resetMultiblock(state, world, pos);
+        super.onExplosionHit(state, world, pos, explosion, stackMerger);
+    }
+    
+    private void resetMultiblock(BlockState state, LevelAccessor world, BlockPos pos) {
         if (!world.isClientSide() && state.getValue(ASSEMBLED)) {
-            
             var entity = world.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
         }
-        
-        super.onExplosionHit(state, world, pos, explosion, stackMerger);
     }
 }

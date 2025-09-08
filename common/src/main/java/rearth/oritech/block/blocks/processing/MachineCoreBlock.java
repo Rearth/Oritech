@@ -1,5 +1,16 @@
 package rearth.oritech.block.blocks.processing;
 
+import net.minecraft.world.level.LevelAccessor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.base.block.MachineBlock;
+import rearth.oritech.block.entity.MachineCoreEntity;
+import rearth.oritech.block.entity.interaction.DeepDrillEntity;
+import rearth.oritech.util.MultiblockMachineController;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -70,30 +81,40 @@ public class MachineCoreBlock extends Block implements EntityBlock {
     }
     
     @Override
+    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
+        onBlockRemoved(state, level, pos);
+        super.playerDestroy(level, player, pos, state, blockEntity, tool);
+    }
+    
+    @Override
+    public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
+        onBlockRemoved(state, level, pos);
+        super.destroy(level, pos, state);
+    }
+    
+    @Override
     protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
         onBlockRemoved(state, world, pos);
         super.onExplosionHit(state, world, pos, explosion, stackMerger);
     }
     
-    private static void onBlockRemoved(BlockState state, Level world, BlockPos pos) {
-        if (!world.isClientSide() && state.getValue(USED)) {
-            var controllerEntity = getControllerEntity(world, pos);
-            if (controllerEntity == null) return;
-            
-            if (controllerEntity instanceof MultiblockMachineController machineEntity) {
+    private static void onBlockRemoved(BlockState state, LevelAccessor world, BlockPos pos) {
+        if (!world.isClientSide() && state.getValue(USED) && world.getBlockEntity(pos) instanceof MachineCoreEntity coreEntity) {
+            var controllerPos = coreEntity.getControllerPos();
+            if (controllerPos != null && world.getBlockEntity(controllerPos) instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onCoreBroken(pos);
             }
         }
     }
     
     @NotNull
-    public static BlockPos getControllerPos(Level world, BlockPos pos) {
+    public static BlockPos getControllerPos(LevelAccessor world, BlockPos pos) {
         var coreEntity = (MachineCoreEntity) world.getBlockEntity(pos);
         return Objects.requireNonNull(coreEntity).getControllerPos();
     }
     
     @Nullable
-    public static BlockEntity getControllerEntity(Level world, BlockPos pos) {
+    public static BlockEntity getControllerEntity(LevelAccessor world, BlockPos pos) {
         return world.getBlockEntity(getControllerPos(world, pos));
     }
     
