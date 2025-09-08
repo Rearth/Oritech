@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'java'
 
     base {
-        archivesName = "$mod_id-${project.name}-$minecraft_version-$version"
+        archivesName = "$mod_id-${project.name}-$minecraft_version"
     }
 
     java {
@@ -24,6 +24,15 @@ allprojects {
 // all projects but the root project
 subprojects {
     apply plugin: 'maven-publish'
+
+    sourceSets {
+        main {
+            resources {
+                srcDir(file("src/main/generated"))
+                exclude("**/.cache")
+            }
+        }
+    }
 
     repositories {
         mavenCentral()
@@ -64,6 +73,10 @@ subprojects {
         publishing.publications.configureEach {
             suppressPomMetadataWarningsFor(variant)
         }
+    }
+
+    tasks.withType(AbstractCopyTask).configureEach {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 
     // configure Maven publishing
@@ -111,13 +124,6 @@ subprojects {
     }
 
     sourceSets {
-        main {
-            resources {
-                srcDir(file("src/main/generated"))
-                exclude("**/.cache")
-            }
-        }
-
         create("data") {
             compileClasspath += sourceSets.main.output
             runtimeClasspath += sourceSets.main.output
