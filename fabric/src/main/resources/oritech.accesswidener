@@ -16,3 +16,4 @@ accessible method net/minecraft/client/renderer/blockentity/BlockEntityRenderers
 accessible method net/minecraft/data/recipes/RecipeProvider threeByThreePacker (Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/data/recipes/RecipeCategory;Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/level/ItemLike;)V
 accessible method net/minecraft/data/recipes/RecipeProvider getHasName (Lnet/minecraft/world/level/ItemLike;)Ljava/lang/String;
 accessible method net/minecraft/data/recipes/RecipeProvider has (Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/advancements/Criterion;
+accessible method net/minecraft/client/renderer/block/ModelBlockRenderer renderModelFaceFlat (Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;IIZLcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;Ljava/util/List;Ljava/util/BitSet;)V
