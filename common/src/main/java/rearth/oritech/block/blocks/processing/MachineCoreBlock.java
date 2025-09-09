@@ -131,7 +131,7 @@ public class MachineCoreBlock extends Block implements EntityBlock {
                 player.sendSystemMessage(Component.translatable("message.oritech.deep_drill.ore_placement"));
                 return InteractionResult.SUCCESS;
             } else {
-                return controllerBlock.useWithoutItem(world, player, hit);
+                return controllerBlock.useWithoutItem(world, player, new BlockHitResult(hit.getLocation(), hit.getDirection(), controllerPos, hit.isInside()));
             }
         }
         
