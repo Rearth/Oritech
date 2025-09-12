@@ -37,6 +37,7 @@
   "mixins": [
     "oritech.mixins.json"
   ],
+  "accessWidener": "oritech.accesswidener",
   "depends": {
     "architectury": ">=13.0.2",
     "fabricloader": ">=0.15.11",
