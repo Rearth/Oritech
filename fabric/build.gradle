@@ -1,3 +1,6 @@
+import net.fabricmc.loom.task.RemapJarTask
+import net.fabricmc.loom.task.RemapSourcesJarTask
+
 plugins {
     id 'fabric-loom'
 }
@@ -175,3 +178,66 @@ publishMods {
     }
 }
 
+def commonIntermediaryJar = tasks.register('commonIntermediaryJar', RemapJarTask) {
+    dependsOn(tasks.named('jar', Jar))
+    
+    def commonJarTask = project(':common').tasks.named('jar', Jar).get()
+    commonJarTask.manifest {
+        attributes['Fabric-Loom-Remap'] = true
+    }
+    def commonJar = commonJarTask.archiveFile
+    def commonBaseArchivesName = project(':common').base.archivesName
+    inputFile.set(commonJar)
+    archiveBaseName = commonBaseArchivesName.get() + "-intermediary"
+
+    addNestedDependencies.set(false)
+    classpath.from()
+
+    // copy the refmap to the output JAR
+    doLast {
+        def fabricJar = tasks.named('jar', Jar).get().archiveFile.get().asFile
+        def outputJar = archiveFile.get().asFile
+
+        project.copy {
+            from zipTree(fabricJar)
+            into temporaryDir
+            include 'oritech.refmap.json'
+        }
+
+        if (file("${temporaryDir}/oritech.refmap.json").exists()) {
+            ant.zip(destfile: outputJar, update: true) {
+                fileset(dir: temporaryDir) {
+                    include(name: 'oritech.refmap.json')
+                }
+            }
+        }
+    }
+
+}
+
+def commonIntermediarySourcesJar = tasks.register('commonIntermediarySourcesJar', RemapSourcesJarTask) {
+    def commonSourcesJarTask = project(':common').tasks.named('sourcesJar', Jar).get()
+    commonSourcesJarTask.manifest {
+        attributes['Fabric-Loom-Remap'] = true
+    }
+    def commonSourcesJar = commonSourcesJarTask.archiveFile
+    def commonBaseArchivesName = project(':common').base.archivesName
+    inputFile.set(commonSourcesJar)
+    archiveBaseName = commonBaseArchivesName.get() + "-intermediary"
+    archiveClassifier.set("sources")
+}
+
+artifacts {
+    archives(commonIntermediaryJar)
+    archives(commonIntermediarySourcesJar)
+}
+
+publishing {
+    publications {
+        register("commonIntermediary", MavenPublication) {
+            artifactId = "${project(':common').base.archivesName.get()}-intermediary"
+            artifact(commonIntermediaryJar)
+            artifact(commonIntermediarySourcesJar)
+        }
+    }
+}
