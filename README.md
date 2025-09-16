@@ -95,6 +95,59 @@ The following translations are available:
 
 See the [open issues](https://github.com/rearth/Oritech/issues) for a list of proposed features (and known issues).
 
+## Depending on Oritech
+
+Release artifacts are published to the [BlameJared Maven repository](https://maven.blamejared.com/).
+
+```groovy
+repositories {
+    maven {
+        name = "BlameJared"
+        url = "https://maven.blamejared.com"
+    }
+}
+```
+
+### Common
+
+The common module is published with Mojang mappings. It can only be used in an environment that doesn't remap the code,
+such as [ModDevGradle](https://github.com/neoforged/ModDevGradle) in Vanilla mode.
+If you use [Architectury Loom](https://github.com/architectury/architectury-loom), make sure to use the `intermediary`
+artifact, so it can be properly remapped. This will also work with yarn mappings.
+
+```groovy
+dependencies {
+    // Mojmaps - ModDevGradle
+    implementation "rearth.oritech:oritech-common-<minecraft-version>:<oritech-version>"
+    // Intermediary - Architectury Loom
+    modImplementation "rearth.oritech:oritech-common-<minecraft-version>-intermediary:<oritech-version>"
+}
+```
+
+### Fabric
+
+The Fabric module is published in intermediary mappings.
+
+```groovy
+dependencies {
+    // Fabric Loom or Architectury Loom
+    modImplementation "rearth.oritech:oritech-fabric-<minecraft-version>:<oritech-version>"
+}
+```
+
+### NeoForge
+
+The NeoForge module is published in Mojang mappings. It is not possible to get an intermediary artifact for this module.
+You can use it with yarn mappings, but it will not be remapped and have clashing names. It's still possible to use
+common code, though.
+
+```groovy
+dependencies {
+    // ModDevGradle or Architectury Loom
+    implementation "rearth.oritech:oritech-neoforge-<minecraft-version>:<oritech-version>"
+}
+```
+
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any
