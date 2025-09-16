@@ -203,6 +203,7 @@ In detail, these are the following items that are from the above-mentioned sourc
 * The_Dvil, for creating the initial framed pipe concepts and models
 * Armen, for making pipes configurable, adding pipe ducts/framed variants, and a ton of additional stuff
 * VasariRulez, for improving compatibility of the enderic laser with AE2 quartz clusters
+* Relentless, for migrating the project to Mojang mappings and help with Maven publishing
 
 ## Sound Credits
  * Nuke Explosion: Atomic Explosion and Sub Rumble.wav by GowlerMusic -- https://freesound.org/s/265459/ -- License: Attribution 4.0
