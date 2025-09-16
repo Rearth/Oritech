@@ -1,39 +1,53 @@
-# Automatically build the project and run any configured tests for every push
-# and submitted pull request. This can help catch issues that only occur on
-# certain platforms or Java versions, and provides a first line of defence
-# against bad commits.
-
 name: build
-on: [pull_request, push]
+
+# only run on push to 1.21 for relevant files
+on:
+  push:
+    branches:
+      - "1.21"
+    tags-ignore:
+      - "**"
+    paths:
+      - "gradle/**"
+      - "**.java"
+      - "**.kts"
+      - "**.properties"
+      - "**/build.yml"
+  pull_request:
+    branches:
+      - "1.21"
+    paths:
+      - "gradle/**"
+      - "**.java"
+      - "**.kts"
+      - "**.properties"
+      - "**/build.yml"
+
+# cancel previous runs on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
-    strategy:
-      matrix:
-        # Use these Java versions
-        java: [
-          21,    # Current Java LTS
-        ]
-        # and run on both Linux and Windows
-        os: [ubuntu-22.04]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
-      - name: validate gradle wrapper
-        uses: gradle/wrapper-validation-action@v1
-      - name: setup jdk ${{ matrix.java }}
+      - name: setup jdk 21
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ matrix.java }}
+          java-version: '21'
           distribution: 'microsoft'
+      - name: setup gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-overwrite-existing: true
       - name: make gradle wrapper executable
-        if: ${{ runner.os != 'Windows' }}
         run: chmod +x ./gradlew
-      - name: build # the touch is a workaround because I have no idea how to properly configure the plugin to use the root path. It seems to work locally as expected
-        run: ./gradlew build
+      - name: build
+        run: ./gradlew build --stacktrace
       - name: capture build artifacts
-        if: ${{ runner.os == 'Linux' && matrix.java == '21' }} # Only upload artifacts built from latest java on one OS
         uses: actions/upload-artifact@v4
         with:
           name: Artifacts
