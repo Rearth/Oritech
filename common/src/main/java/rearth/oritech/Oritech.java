@@ -155,7 +155,6 @@ public final class Oritech {
             oldAttributeInstance.getModifiers().forEach(oldModifier -> {
                 var isAugment = oldModifier.id().getNamespace().equals(Oritech.MOD_ID);
                 if (!isAugment) return;
-                System.out.println(oldModifier.id());
 
                 var newInstance = newPlayer.getAttribute(oldAttributeInstance.getAttribute());
                 if (newInstance == null) return;
