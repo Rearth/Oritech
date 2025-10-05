@@ -10,6 +10,8 @@ import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rearth.oritech.api.networking.NetworkManager;
@@ -22,10 +24,10 @@ import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
-import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity.PipeNetworkData;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
@@ -72,6 +74,8 @@ public final class Oritech {
         // for player augment ticks
         TickEvent.SERVER_PRE.register(event -> event.getAllLevels().forEach(world -> world.players().forEach(PlayerAugments::serverTickAugments)));
         LOGGER.info("Oritech initialization complete");
+
+        PlayerEvent.PLAYER_CLONE.register(Oritech::copyAttributesOnClone);
     }
     
     // fabric only
@@ -141,6 +145,23 @@ public final class Oritech {
             var superConductorDataId = "superconductor_" + regKey.getNamespace() + "_" + regKey.getPath();
             var superConductorResult = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, superConductorDataId);
             SuperConductorBlock.SUPERCONDUCTOR_DATA.put(regKey, superConductorResult);
+        });
+    }
+
+    private static void copyAttributesOnClone(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean isNotDeath) {
+        if (!isNotDeath) return; // don't copy attributes on death (only copy on end portal teleport)
+
+        oldPlayer.getAttributes().getSyncableAttributes().forEach(oldAttributeInstance -> {
+            oldAttributeInstance.getModifiers().forEach(oldModifier -> {
+                var isAugment = oldModifier.id().getNamespace().equals(Oritech.MOD_ID);
+                if (!isAugment) return;
+                System.out.println(oldModifier.id());
+
+                var newInstance = newPlayer.getAttribute(oldAttributeInstance.getAttribute());
+                if (newInstance == null) return;
+                newInstance.addOrReplacePermanentModifier(oldModifier);
+
+            });
         });
     }
 }

@@ -5,8 +5,7 @@
   "minVersion": "0.8.5",
   "mixins": [
     "EntityLaserDropsMixin",
-    "EntityLaserDropsMixin$LivingEntityMixin",
-    "ServerPlayerMixin"
+    "EntityLaserDropsMixin$LivingEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
