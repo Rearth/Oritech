@@ -9,11 +9,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.util.FakePlayerMarker;
 
 // inspired by Fabric's FakePlayer and Neoforge's FakePlayerFactory
 
 // the only difference between this and the Fabric Impl is the platform's version of FakePlayer that is being extended.
-public class FakeMachinePlayerImpl extends FakePlayer {
+public class FakeMachinePlayerImpl extends FakePlayer implements FakePlayerMarker {
     private static final Map<FakeMachinePlayerKey, FakePlayer> FAKE_MACHINE_PLAYERS = new MapMaker().weakValues().makeMap();
     private record FakeMachinePlayerKey (ServerLevel world, GameProfile profile) {}
     

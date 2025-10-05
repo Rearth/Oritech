@@ -87,7 +87,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
   GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ExtendedMenuProvider,
     MultiblockMachineController, MachineAddonController, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
     
-    public static final String LASER_PLAYER_NAME = "oritech_laser";
+    private static final String LASER_PLAYER_NAME = "oritech_laser";
     public static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
     
     // storage

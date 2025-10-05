@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8.5",
   "mixins": [
-    "LivingEntityMixin",
+    "EntityLaserDropsMixin",
+    "EntityLaserDropsMixin$LivingEntityMixin",
     "ServerPlayerMixin"
   ],
   "injectors": {
