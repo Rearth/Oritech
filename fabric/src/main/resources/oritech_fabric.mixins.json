@@ -1,11 +1,10 @@
 {
   "required": true,
-  "package": "rearth.oritech.mixin",
+  "package": "rearth.oritech.fabric.mixin",
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8.5",
-  "mixins": [
-    "LivingEntityMixin",
-    "ServerPlayerMixin"
+  "client": [
+    "ElytraLayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

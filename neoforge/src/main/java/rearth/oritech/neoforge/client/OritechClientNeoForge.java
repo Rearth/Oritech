@@ -1,12 +1,16 @@
 package rearth.oritech.neoforge.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import java.util.Map.Entry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -18,7 +22,6 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RenderHighlightEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +34,6 @@ import rearth.oritech.client.renderers.PortalEntityRenderer;
 import rearth.oritech.client.renderers.SmallTankItemRenderer;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.EntitiesContent;
-import rearth.oritech.init.FluidContent;
 
 @Mod(value = Oritech.MOD_ID, dist = Dist.CLIENT)
 public class OritechClientNeoForge {
@@ -79,7 +81,23 @@ public class OritechClientNeoForge {
                 ItemBlockRenderTypes.setRenderLayer(entry.getKey(), entry.getValue());
             }
         }
-        
+
+        @SuppressWarnings({"rawtypes", "unchecked"}) // due to how the event and generics work we cannot compile-guarantee typing
+        @SubscribeEvent
+        public void addJetpackElytraLayer(EntityRenderersEvent.AddLayers event) {
+            // add to all player models
+            for (PlayerSkin.Model skin : event.getSkins())
+                if (event.getSkin(skin) instanceof PlayerRenderer pr)
+                    pr.addLayer(new OritechElytraLayer<>(pr, event.getEntityModels()));
+            // add to all humanoid entities (which have vanilla's elytra layer by default)
+            for (EntityType<?> entityType : event.getEntityTypes())
+                if (event.getRenderer(entityType) instanceof HumanoidMobRenderer<?,?> hmr)
+                    hmr.addLayer(new OritechElytraLayer(hmr, event.getEntityModels()));
+            // add to armor stands
+            if (event.getRenderer(EntityType.ARMOR_STAND) instanceof LivingEntityRenderer<?,?> ler)
+                ler.addLayer(new OritechElytraLayer(ler, event.getEntityModels()));
+        }
+
         @SubscribeEvent
         public void initializeClient(RegisterClientExtensionsEvent event) {
             

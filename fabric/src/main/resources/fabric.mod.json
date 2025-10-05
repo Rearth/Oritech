@@ -35,7 +35,8 @@
     ]
   },
   "mixins": [
-    "oritech.mixins.json"
+    "oritech.mixins.json",
+    "oritech_fabric.mixins.json"
   ],
   "accessWidener": "oritech.accesswidener",
   "depends": {
