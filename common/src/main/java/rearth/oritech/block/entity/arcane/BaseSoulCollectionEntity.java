@@ -4,6 +4,7 @@ import java.util.HashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -65,7 +66,7 @@ public abstract class BaseSoulCollectionEntity extends BlockEntity implements Ga
         
         @Override
         public boolean handleGameEvent(ServerLevel world, Holder<GameEvent> event, GameEvent.Context emitter, Vec3 emitterPos) {
-            if (event.is(GameEvent.ENTITY_DIE.key()) && canAcceptSoul() && !consumedEvents.contains(emitterPos)) {
+            if (event.is(GameEvent.ENTITY_DIE.key()) && emitter.sourceEntity() instanceof LivingEntity && canAcceptSoul() && !consumedEvents.contains(emitterPos)) {
                 onSoulIncoming(emitterPos);
                 consumedEvents.add(emitterPos);
                 return true;
