@@ -228,6 +228,7 @@
   "tooltip.oritech.addon_silk_touch_desc": "Застосовується Шовковий дотик до Руйнівника та Ендерного лазера.",
   "tooltip.oritech.processing_addon_desc": "Дозволяє обробляти додатковий екземпляр рецепту за цикл.",
   "tooltip.oritech.addon_fluid_desc": "Дозволяє обробку рідин. Застосовується до центрифуги та порту дронів.",
+  "tooltip.oritech.addon_burst_desc": "Allows the machine to operate in very fast bursts. Applicable to processing machines.",
   "tooltip.oritech.addon_acceptor_desc": "Дозволяє вставляти енергію до аддону замість самої машини.",
   "tooltip.oritech.addon_crop_desc": "Застосовується до руйнівника блоків та ендеричного лазера. Пропускає невирощені культури або тварин",
   "tooltip.oritech.addon_proxy_desc": "Дозволяє отримати доступ до певних слотів інвентарю",
@@ -537,6 +538,14 @@
   "tooltip.oritech.creative_tank": "Клацніть правою кнопкою миші з відром, щоб встановити, або порожнім, щоб спорожнити.",
   "tooltip.oritech.fuel_generator_block.extra": "Видає енергію лише через видимі порти з'єднувачів.",
   "block.oritech.banana_block": "Банановий блок",
+  "block.oritech.machine_burst_addon": "Burst Addon",
+  "block.oritech.machine_combi_addon": [
+    {
+      "text": "Heart of the Machine (Addon)",
+      "color": "#cc66ff"
+    }
+  ],
+  "block.oritech.shrinker_block": "Addon Splicer",
   "block.oritech.machine_frame_block": "Механічна рамка",
   "block.oritech.low_yield_nuke": "Пристрій для ядерного вибуху малої потужності",
   "block.oritech.low_yield_nuke.tooltip": "Поводитися з надзвичайною обережністю: Маленький, але могутній!",
@@ -683,7 +692,7 @@
   "block.oritech.nickel_plating_stairs": "Nickel Reinforced Plating Stairs",
   "block.oritech.nickel_plating_pressure_plate": "Натискна плита з нікелевої армованої обшивки",
   "block.oritech.industrial_glass_block": "Промислове скло",
-  "block.oritech.capacitor_addon_extender": "Доповнення енергетичної місткості",
+  "block.oritech.capacitor_addon_extender": "Power Bank Addon Extender",
   "block.oritech.treefeller_block": "Автопила",
   "block.oritech.steel_block": "Блок сталі",
   "block.oritech.energite_block": "Блок енергіту",
