@@ -228,6 +228,7 @@
   "tooltip.oritech.addon_silk_touch_desc": "为方块破坏器和末影激光应用精准采集。",
   "tooltip.oritech.processing_addon_desc": "允许每周期多处理一个配方实例。",
   "tooltip.oritech.addon_fluid_desc": "允许流体处理。可应用于离心机和无人机港。",
+  "tooltip.oritech.addon_burst_desc": "Allows the machine to operate in very fast bursts. Applicable to processing machines.",
   "tooltip.oritech.addon_acceptor_desc": "允许将能量输入插件而不是机器本身。",
   "tooltip.oritech.addon_crop_desc": "适用于方块破坏器和末影激光器。跳过未成熟的作物",
   "tooltip.oritech.addon_proxy_desc": "允许访问指定的物品栏",
@@ -537,6 +538,14 @@
   "tooltip.oritech.creative_tank": "使用任意流体桶右键以设置液体，空桶右键以清空。",
   "tooltip.oritech.fuel_generator_block.extra": "仅在可视连接端口输出能量。",
   "block.oritech.banana_block": "香蕉块",
+  "block.oritech.machine_burst_addon": "Burst Addon",
+  "block.oritech.machine_combi_addon": [
+    {
+      "text": "Heart of the Machine (Addon)",
+      "color": "#cc66ff"
+    }
+  ],
+  "block.oritech.shrinker_block": "Addon Splicer",
   "block.oritech.machine_frame_block": "机器框架",
   "block.oritech.low_yield_nuke": "低当量核爆炸装置",
   "block.oritech.low_yield_nuke.tooltip": "极度谨慎处理：小而强大！",
@@ -683,7 +692,7 @@
   "block.oritech.nickel_plating_stairs": "镍强化护板楼梯",
   "block.oritech.nickel_plating_pressure_plate": "镍强化护板压力板",
   "block.oritech.industrial_glass_block": "工业玻璃",
-  "block.oritech.capacitor_addon_extender": "储能扩展坞",
+  "block.oritech.capacitor_addon_extender": "Power Bank Addon Extender",
   "block.oritech.treefeller_block": "伐木器",
   "block.oritech.steel_block": "钢块",
   "block.oritech.energite_block": "辐镍晶块",
