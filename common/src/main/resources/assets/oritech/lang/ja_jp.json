@@ -228,6 +228,7 @@
   "tooltip.oritech.addon_silk_touch_desc": "ブロックデストロイヤーとエンダリックレーザーにシルクタッチを適用させます。",
   "tooltip.oritech.processing_addon_desc": "レシピ1回の処理サイクルで、並列処理をして同時に複数アイテムを処理できるようにさせます。",
   "tooltip.oritech.addon_fluid_desc": "遠心分離機とドローンポートに適用可能です。機械が流体を扱えるようにします。",
+  "tooltip.oritech.addon_burst_desc": "Allows the machine to operate in very fast bursts. Applicable to processing machines.",
   "tooltip.oritech.addon_acceptor_desc": "機械本体の代わりにこのアドオンにエネルギーを挿入できるようにします。",
   "tooltip.oritech.addon_crop_desc": "ブロックデストロイヤーとエンダリックレーザーに適用可能です。\n成長しきってない作物や動物をスキップします。",
   "tooltip.oritech.addon_proxy_desc": "指定したインベントリスロットへのアクセスを許可します。",
@@ -537,6 +538,14 @@
   "tooltip.oritech.creative_tank": "中身の入ったバケツを右クリックして設定する。空のバケツなら中身を空にします。",
   "tooltip.oritech.fuel_generator_block.extra": "エネルギーは見た目通りの接続ポートからのみ出力できます。",
   "block.oritech.banana_block": "バナナブロック",
+  "block.oritech.machine_burst_addon": "Burst Addon",
+  "block.oritech.machine_combi_addon": [
+    {
+      "text": "Heart of the Machine (Addon)",
+      "color": "#cc66ff"
+    }
+  ],
+  "block.oritech.shrinker_block": "Addon Splicer",
   "block.oritech.machine_frame_block": "マシンフレーム",
   "block.oritech.low_yield_nuke": "低出力核爆発装置",
   "block.oritech.low_yield_nuke.tooltip": "取り扱い注意：小さくても凶悪！",
@@ -683,7 +692,7 @@
   "block.oritech.nickel_plating_stairs": "ニッケル強化プレートの階段",
   "block.oritech.nickel_plating_pressure_plate": "ニッケル強化プレートの感圧板",
   "block.oritech.industrial_glass_block": "工業用ガラス",
-  "block.oritech.capacitor_addon_extender": "パワーバンクアドオン",
+  "block.oritech.capacitor_addon_extender": "Power Bank Addon Extender",
   "block.oritech.treefeller_block": "ツリーカッター",
   "block.oritech.steel_block": "スチールブロック",
   "block.oritech.energite_block": "エネルギナイトブロック",
