@@ -228,6 +228,7 @@
   "tooltip.oritech.addon_silk_touch_desc": "Applicable Silk Touch on Destroyer and Enderic Laser.",
   "tooltip.oritech.processing_addon_desc": "Allows an additional recipe instance to be processed per cycle.",
   "tooltip.oritech.addon_fluid_desc": "Allows fluid processing. Applicable to centrifuge and drone port.",
+  "tooltip.oritech.addon_burst_desc": "Allows the machine to operate in very fast bursts. Applicable to processing machines.",
   "tooltip.oritech.addon_acceptor_desc": "Allows energy to be inserted to the addon instead of the machine itself.",
   "tooltip.oritech.addon_crop_desc": "Dotyczy Block Destroyer i Enderic Laser. Pomija nieurosłe uprawy lub zwierzęta",
   "tooltip.oritech.addon_proxy_desc": "Umożliwia dostęp do określonych slotów magazynowych",
@@ -537,6 +538,14 @@
   "tooltip.oritech.creative_tank": "Kliknij prawym przyciskiem z wiadrem, aby ustawić lub pustym, aby opróżnić",
   "tooltip.oritech.fuel_generator_block.extra": "Outputs energy only at the visual connector ports.",
   "block.oritech.banana_block": "Blok Bananowy",
+  "block.oritech.machine_burst_addon": "Burst Addon",
+  "block.oritech.machine_combi_addon": [
+    {
+      "text": "Heart of the Machine (Addon)",
+      "color": "#cc66ff"
+    }
+  ],
+  "block.oritech.shrinker_block": "Addon Splicer",
   "block.oritech.machine_frame_block": "Rama Maszyny",
   "block.oritech.low_yield_nuke": "Low-Yield Nuclear Explosion Device",
   "block.oritech.low_yield_nuke.tooltip": "Handle with extreme caution: Small but mighty!",
@@ -683,7 +692,7 @@
   "block.oritech.nickel_plating_stairs": "Schody Wzmocnione Niklem",
   "block.oritech.nickel_plating_pressure_plate": "Nickel Reinforced Plating Pressure Plate",
   "block.oritech.industrial_glass_block": "Szkło Przemysłowe",
-  "block.oritech.capacitor_addon_extender": "Dodatek Przedłużający Power Bank",
+  "block.oritech.capacitor_addon_extender": "Power Bank Addon Extender",
   "block.oritech.treefeller_block": "Konstrukcja do Ścinania Drzew",
   "block.oritech.steel_block": "Blok Stali",
   "block.oritech.energite_block": "Blok Energitu",
