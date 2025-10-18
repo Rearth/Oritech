@@ -228,6 +228,7 @@
   "tooltip.oritech.addon_silk_touch_desc": "Aplica Toque Suave no Destruidor e no Laser Endérico.",
   "tooltip.oritech.processing_addon_desc": "Permite que uma instância de receita adicional seja processada por ciclo.",
   "tooltip.oritech.addon_fluid_desc": "Permite o processamento de fluidos. Aplicável à centrífuga e ao porto de drones.",
+  "tooltip.oritech.addon_burst_desc": "Allows the machine to operate in very fast bursts. Applicable to processing machines.",
   "tooltip.oritech.addon_acceptor_desc": "Permite que a energia seja inserida no addon em vez da própria máquina.",
   "tooltip.oritech.addon_crop_desc": "Aplicável ao Destruidor de Blocos e ao Laser Endérico. Ignora plantações não crescidas ou animais",
   "tooltip.oritech.addon_proxy_desc": "Permite acesso a espaços específicos do inventário",
@@ -537,6 +538,14 @@
   "tooltip.oritech.creative_tank": "Clique com o botão direito com um balde para definir ou com um vazio para esvaziar.",
   "tooltip.oritech.fuel_generator_block.extra": "Produz energia apenas nas portas de conexão visual.",
   "block.oritech.banana_block": "Bloco de Banana",
+  "block.oritech.machine_burst_addon": "Burst Addon",
+  "block.oritech.machine_combi_addon": [
+    {
+      "text": "Heart of the Machine (Addon)",
+      "color": "#cc66ff"
+    }
+  ],
+  "block.oritech.shrinker_block": "Addon Splicer",
   "block.oritech.machine_frame_block": "Estrutura de Máquina",
   "block.oritech.low_yield_nuke": "Dispositivo de Explosão Nuclear de Baixo Rendimento",
   "block.oritech.low_yield_nuke.tooltip": "Manuseie com extremo cuidado: Pequeno, mas poderoso!",
@@ -683,7 +692,7 @@
   "block.oritech.nickel_plating_stairs": "Escadas de Revestimento Reforçado de Níquel",
   "block.oritech.nickel_plating_pressure_plate": "Placa de Chapas de Pressão de Revestimento Reforçado de Níquel",
   "block.oritech.industrial_glass_block": "Vidro Industrial",
-  "block.oritech.capacitor_addon_extender": "Addon de Banco de Energia",
+  "block.oritech.capacitor_addon_extender": "Power Bank Addon Extender",
   "block.oritech.treefeller_block": "Cortador de Árvores",
   "block.oritech.steel_block": "Bloco de Aço",
   "block.oritech.energite_block": "Bloco de Energita",
