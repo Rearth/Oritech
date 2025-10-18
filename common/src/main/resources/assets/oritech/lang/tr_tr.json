@@ -228,6 +228,7 @@
   "tooltip.oritech.addon_silk_touch_desc": "Yok Edici ve Enderik Lazer üzerinde İpeksi Dokunuş uygulanabilir.",
   "tooltip.oritech.processing_addon_desc": "Döngü başına ek bir tarif örneğinin işlenmesine izin verir.",
   "tooltip.oritech.addon_fluid_desc": "Sıvı işlemeye izin verir. Santrifüj ve drone limanına uygulanabilir.",
+  "tooltip.oritech.addon_burst_desc": "Allows the machine to operate in very fast bursts. Applicable to processing machines.",
   "tooltip.oritech.addon_acceptor_desc": "Makinenin kendisi yerine eklentiye enerji eklenmesine izin verir.",
   "tooltip.oritech.addon_crop_desc": "Blok Yok Edici ve Enderik Lazere uygulanabilir. Yetiştirilmemiş mahsulleri veya hayvanları atlar",
   "tooltip.oritech.addon_proxy_desc": "Belirli envanter yuvalarına erişim sağlar",
@@ -537,6 +538,14 @@
   "tooltip.oritech.creative_tank": "Ayarlamak için bir kovaya veya boşaltmak için boş bir kovaya sağ tıklayın.",
   "tooltip.oritech.fuel_generator_block.extra": "Yalnızca görsel bağlantı noktalarında enerji çıkışı sağlar.",
   "block.oritech.banana_block": "Muz Bloğu",
+  "block.oritech.machine_burst_addon": "Burst Addon",
+  "block.oritech.machine_combi_addon": [
+    {
+      "text": "Heart of the Machine (Addon)",
+      "color": "#cc66ff"
+    }
+  ],
+  "block.oritech.shrinker_block": "Addon Splicer",
   "block.oritech.machine_frame_block": "Makine Şasisi",
   "block.oritech.low_yield_nuke": "Düşük-Verimli Nükleer Patlama Cihazı",
   "block.oritech.low_yield_nuke.tooltip": "Çok dikkatli kullanın: Küçük ama güçlü!",
@@ -683,7 +692,7 @@
   "block.oritech.nickel_plating_stairs": "Nikel Takviyeli Kaplama Merdiven",
   "block.oritech.nickel_plating_pressure_plate": "Nikel Takviyeli Kaplama Basınç Plakası",
   "block.oritech.industrial_glass_block": "Endüstriyel Cam",
-  "block.oritech.capacitor_addon_extender": "Güç Bankası Eklenti",
+  "block.oritech.capacitor_addon_extender": "Power Bank Addon Extender",
   "block.oritech.treefeller_block": "Ağaç Kesici",
   "block.oritech.steel_block": "Çelik Bloğu",
   "block.oritech.energite_block": "Enerjit Bloğu",
