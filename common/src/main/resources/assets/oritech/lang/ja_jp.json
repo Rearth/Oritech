@@ -189,6 +189,7 @@
   "tooltip.oritech.steam_engine.1": "連結動作が可能です。その場合は最初のエンジンのみ操作することができます。",
   "tooltip.oritech.steam_engine.2": "（例：最初のエンジンにのみ蒸気を挿入します）",
   "tooltip.oritech.item_filter": "インベントリに挿入するアイテムをフィルタリングするために使用します。",
+  "tooltip.oritech.item_filter_ftb": "Also supports filters from the FTB Filters mod.",
   "tooltip.oritech.machine_frame": "ご想像の通り、これの当たり判定や有効範囲を変えるオプションがあります。",
   "tooltip.oritech.machine_frame.1": "最大長： %sx%s ブロック。",
   "tooltip.oritech.particle_collector": "粒子衝突によって放出されたタキオンのエネルギーを集めます。",
