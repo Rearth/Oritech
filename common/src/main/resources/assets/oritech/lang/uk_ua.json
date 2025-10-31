@@ -189,6 +189,7 @@
   "tooltip.oritech.steam_engine.1": "будуючи кілька в ряд. Лише з першим двигуном потрібно",
   "tooltip.oritech.steam_engine.2": "взаємодіяти (наприклад, подавати пару тільки до першого двигуна).",
   "tooltip.oritech.item_filter": "Використовується для фільтрації елементів, які можна вставити в інвентар.",
+  "tooltip.oritech.item_filter_ftb": "Also supports filters from the FTB Filters mod.",
   "tooltip.oritech.machine_frame": "Так, є опція конфігурації для зміни габаритної рамки цього.",
   "tooltip.oritech.machine_frame.1": "Макс. довжина: %sx%s блоків.",
   "tooltip.oritech.particle_collector": "Збирає енергію тахіонів, що випромінюються при зіткненні частинок.",
