@@ -189,6 +189,7 @@
   "tooltip.oritech.steam_engine.1": "construindo vários em linha. Apenas o primeiro motor precisa ser",
   "tooltip.oritech.steam_engine.2": "interagido (ex: insira vapor apenas no primeiro motor).",
   "tooltip.oritech.item_filter": "Usado para filtrar quais itens podem ser inseridos em um inventário.",
+  "tooltip.oritech.item_filter_ftb": "Also supports filters from the FTB Filters mod.",
   "tooltip.oritech.machine_frame": "Sim, existe uma opção de configuração para alterar a caixa delimitadora disto.",
   "tooltip.oritech.machine_frame.1": "Comprimento Máximo: %sx%s blocos.",
   "tooltip.oritech.particle_collector": "Coleta a energia de táquions emitidos por colisões de partículas.",
