@@ -189,6 +189,7 @@
   "tooltip.oritech.steam_engine.1": "只需将多个并排放置。只有首个引擎需要",
   "tooltip.oritech.steam_engine.2": "进行交互（如，只需向此引擎输入蒸汽）。",
   "tooltip.oritech.item_filter": "用来过滤哪些物品能被插入一个物品栏。",
+  "tooltip.oritech.item_filter_ftb": "Also supports filters from the FTB Filters mod.",
   "tooltip.oritech.machine_frame": "是的，有个选项能更改它的轮廓箱。",
   "tooltip.oritech.machine_frame.1": "最大长度：%sx%s 方块。",
   "tooltip.oritech.particle_collector": "收集由粒子碰撞产生的速子能量。",
