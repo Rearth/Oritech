@@ -1135,6 +1135,8 @@
   "text.config.oritech-config.option.addonConfig.addonShrinkerRF": "Addon Splicer RF Storage",
   "text.config.oritech-config.option.additiveAddons": "Toplamsal Eklentiler",
   "text.config.oritech-config.option.additiveAddons.tooltip": "Eklenti bonuslarının toplamsal mı yoksa çarpımsal mı eklendiği.",
+  "text.config.oritech-config.option.blockBreakHardnessExponentialFactor": "Block breaking hardness exponential scaling factor",
+  "text.config.oritech-config.option.blockBreakHardnessExponentialFactor.tooltip": "Applies to the destroyer block and enderic laser. Lower = hardness has a lower effect on speed.",
   "text.config.oritech-config.option.layeredExtenders": "Katmanlı Genişleticiler",
   "text.config.oritech-config.option.layeredExtenders.tooltip": "Etkinleştirildiğinde, makine çekirdeği kalitesi kaç kat makine genişletici kullanılabileceğini belirler. Yanlışsa, sadece doğrudan miktarı belirler.",
   "text.config.oritech-config.category.laserArmConfig": "Lazer Kol Yapılandırması",
