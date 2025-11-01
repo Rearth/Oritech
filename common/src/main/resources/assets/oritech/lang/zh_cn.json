@@ -1135,6 +1135,8 @@
   "text.config.oritech-config.option.addonConfig.addonShrinkerRF": "Addon Splicer RF Storage",
   "text.config.oritech-config.option.additiveAddons": "加法叠加插件增益",
   "text.config.oritech-config.option.additiveAddons.tooltip": "设定插件奖励是加法叠加还是乘法叠加。",
+  "text.config.oritech-config.option.blockBreakHardnessExponentialFactor": "Block breaking hardness exponential scaling factor",
+  "text.config.oritech-config.option.blockBreakHardnessExponentialFactor.tooltip": "Applies to the destroyer block and enderic laser. Lower = hardness has a lower effect on speed.",
   "text.config.oritech-config.option.layeredExtenders": "分层扩展器",
   "text.config.oritech-config.option.layeredExtenders.tooltip": "启用后，机器品质决定了可连接的机器扩展坞层数，即扩展坞的最远曼哈顿距离。否则，直接决定连接数量。",
   "text.config.oritech-config.category.laserArmConfig": "激光臂设置",
