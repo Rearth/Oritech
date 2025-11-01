@@ -1135,6 +1135,8 @@
   "text.config.oritech-config.option.addonConfig.addonShrinkerRF": "Addon de Armazenamento RF do Cortador",
   "text.config.oritech-config.option.additiveAddons": "Addons Aditivos",
   "text.config.oritech-config.option.additiveAddons.tooltip": "Se os bônus dos addons são adicionados de forma aditiva ou multiplicativa.",
+  "text.config.oritech-config.option.blockBreakHardnessExponentialFactor": "Block breaking hardness exponential scaling factor",
+  "text.config.oritech-config.option.blockBreakHardnessExponentialFactor.tooltip": "Applies to the destroyer block and enderic laser. Lower = hardness has a lower effect on speed.",
   "text.config.oritech-config.option.layeredExtenders": "Extensores em Camadas",
   "text.config.oritech-config.option.layeredExtenders.tooltip": "Quando ativado, a qualidade do núcleo da máquina determina quantas camadas de extensores de máquina podem ser usadas. Se falso, é apenas a quantidade direta.",
   "text.config.oritech-config.category.laserArmConfig": "Configuração do Braço a Laser",
