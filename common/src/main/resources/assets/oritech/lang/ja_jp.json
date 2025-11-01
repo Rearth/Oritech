@@ -1135,6 +1135,8 @@
   "text.config.oritech-config.option.addonConfig.addonShrinkerRF": "アドオン結合機のRF容量",
   "text.config.oritech-config.option.additiveAddons": "アドオンの効果を加算式で処理",
   "text.config.oritech-config.option.additiveAddons.tooltip": "アドオンによる効果を加算式または乗算式に追加するかどうかの設定です。",
+  "text.config.oritech-config.option.blockBreakHardnessExponentialFactor": "Block breaking hardness exponential scaling factor",
+  "text.config.oritech-config.option.blockBreakHardnessExponentialFactor.tooltip": "Applies to the destroyer block and enderic laser. Lower = hardness has a lower effect on speed.",
   "text.config.oritech-config.option.layeredExtenders": "エクステンダーの階層化を許可",
   "text.config.oritech-config.option.layeredExtenders.tooltip": "この設定を有効にすると、マシンのコア品質に応じて、アドオンエクステンダーを置ける範囲（＝有効距離）が広がります。無効にすると、中心からのブロック数で制限されます。（例：設置しても中心から最大4ブロック分までしか機能しません。）",
   "text.config.oritech-config.category.laserArmConfig": "レーザーアーム設定",
