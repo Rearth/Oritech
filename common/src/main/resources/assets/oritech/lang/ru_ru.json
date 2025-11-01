@@ -1135,6 +1135,8 @@
   "text.config.oritech-config.option.addonConfig.addonShrinkerRF": "Addon Splicer RF Storage",
   "text.config.oritech-config.option.additiveAddons": "Аддитивные аддоны",
   "text.config.oritech-config.option.additiveAddons.tooltip": "Складываются ли бонусы аддонов или перемножаются.",
+  "text.config.oritech-config.option.blockBreakHardnessExponentialFactor": "Block breaking hardness exponential scaling factor",
+  "text.config.oritech-config.option.blockBreakHardnessExponentialFactor.tooltip": "Applies to the destroyer block and enderic laser. Lower = hardness has a lower effect on speed.",
   "text.config.oritech-config.option.layeredExtenders": "Многоуровневые расширители",
   "text.config.oritech-config.option.layeredExtenders.tooltip": "Если включено, качество ядра машины определяет, сколько слоёв расширителей можно использовать. Если выключено — просто количество.",
   "text.config.oritech-config.category.laserArmConfig": "Конфигурация лазерной руки",
