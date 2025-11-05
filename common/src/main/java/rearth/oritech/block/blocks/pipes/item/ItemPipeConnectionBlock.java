@@ -1,6 +1,7 @@
 package rearth.oritech.block.blocks.pipes.item;
 
 import org.apache.commons.lang3.function.TriFunction;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
@@ -48,7 +49,7 @@ public class ItemPipeConnectionBlock extends ExtractablePipeConnectionBlock {
     }
     
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         
         if (world.isClientSide || !hasExtractingSide(state) || state.getValue(HAS_MOTOR))
             return super.useItemOn(stack, state, world, pos, player, hand, hit);

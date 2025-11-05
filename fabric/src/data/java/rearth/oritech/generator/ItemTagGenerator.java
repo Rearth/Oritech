@@ -300,7 +300,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ToolsContent.ELECTRIC_MACE)
           .add(ItemContent.WRENCH);
         
-        getOrCreateTagBuilder(cItemTag("tools/wrench"))
+        getOrCreateTagBuilder(TagContent.WRENCHES)
           .add(ItemContent.WRENCH);
         
         getOrCreateTagBuilder(TagContent.REACTOR_COOLANT)

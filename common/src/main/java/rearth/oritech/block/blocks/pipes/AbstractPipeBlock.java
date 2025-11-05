@@ -10,6 +10,8 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.function.TriFunction;
@@ -49,7 +51,7 @@ public abstract class AbstractPipeBlock extends Block {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        var baseState = super.getStateForPlacement(ctx);
+        var baseState = addFluidState(super.getStateForPlacement(ctx), ctx.getClickedPos(), ctx.getLevel());
         return addConnectionStates(baseState, ctx.getLevel(), ctx.getClickedPos(), true);
     }
     
@@ -63,6 +65,10 @@ public abstract class AbstractPipeBlock extends Block {
             getNetworkData(world).machinePipeNeighbors.remove(neighborPos);
         
         return state;
+    }
+    
+    public BlockState addFluidState(BlockState state, BlockPos pos, Level level) {
+        return state.setValue(BlockStateProperties.WATERLOGGED, level.getFluidState(pos).is(Fluids.WATER));
     }
     
     @Override

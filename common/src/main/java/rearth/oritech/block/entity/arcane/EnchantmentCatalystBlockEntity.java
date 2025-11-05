@@ -196,6 +196,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         }
         
         this.networkDirty = true;
+        this.setChanged();
     }
     
     private void enchantInput() {
@@ -281,6 +282,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         var distance = (float) source.distanceTo(worldPosition.getCenter());
         collectedSouls++;
         networkDirty = true;
+        this.setChanged();
         
         var soulPath = worldPosition.getCenter().subtract(source);
         var animData = new ParticleContent.SoulParticleData(soulPath, (int) getSoulTravelDuration(distance));

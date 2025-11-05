@@ -29,6 +29,7 @@ public class Config {
     public AddonConfig addonConfig = new AddonConfig();
     public boolean additiveAddons = true;
     public boolean layeredExtenders = false;
+    public float blockBreakHardnessExponentialFactor = 0.5f;
     
     @SectionHeader("storageBlocks")
     @Nest

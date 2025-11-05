@@ -1,13 +1,6 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.client.screens.SlotGenerator;
-import org.jetbrains.annotations.NotNull;
-import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
-import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity.FilterData;
-import rearth.oritech.client.init.ModScreens;
-
-import java.util.HashMap;
-import java.util.Objects;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -16,6 +9,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.NotNull;
+import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
+import rearth.oritech.client.init.ModScreens;
+
+import java.util.HashMap;
+import java.util.Objects;
 
 public class ItemFilterScreenHandler extends AbstractContainerMenu {
     
@@ -46,6 +45,7 @@ public class ItemFilterScreenHandler extends AbstractContainerMenu {
         if (slotStack.isEmpty()) return ItemStack.EMPTY;
 
         var displayStack = new ItemStack(slotStack.getItem(), 1);
+        displayStack.applyComponents(slotStack.getComponents());
 
         var data = blockEntity.getFilterSettings();
         for (var item : data.items().values()) {

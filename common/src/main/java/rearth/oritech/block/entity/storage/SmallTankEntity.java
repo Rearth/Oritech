@@ -2,29 +2,9 @@ package rearth.oritech.block.entity.storage;
 
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.FluidApi.FluidStorage;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
-import rearth.oritech.api.networking.NetworkedBlockEntity;
-import rearth.oritech.api.networking.SyncField;
-import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.blocks.storage.SmallFluidTank;
-import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
-import rearth.oritech.init.BlockEntitiesContent;
-
-import rearth.oritech.util.*;
-
-import java.util.List;
-import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -38,6 +18,23 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.block.blocks.storage.SmallFluidTank;
+import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.util.*;
+
+import java.util.List;
+import java.util.Objects;
 
 public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, ItemApi.BlockProvider, ComparatorOutputProvider,
                                                                        ScreenProvider, ExtendedMenuProvider {
@@ -70,16 +67,6 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
         fluidStorage.readNbt(nbt, "");
         ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         setChanged();
-    }
-    
-    @Override
-    protected void collectImplicitComponents(DataComponentMap.Builder componentMapBuilder) {
-        super.collectImplicitComponents(componentMapBuilder);
-    }
-    
-    @Override
-    protected void applyImplicitComponents(DataComponentInput components) {
-        super.applyImplicitComponents(components);
     }
     
     @Override
@@ -195,7 +182,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     @Override
     public void setChanged() {
         super.setChanged();
-        if (level != null && getBlockState().getValue(SmallFluidTank.LIT) != isGlowingFluid()) {
+        if (level != null && !this.isRemoved() && getBlockState().getValue(SmallFluidTank.LIT) != isGlowingFluid()) {
             level.setBlockAndUpdate(getBlockPos(), getBlockState().setValue(SmallFluidTank.LIT, isGlowingFluid()));
         }
     }

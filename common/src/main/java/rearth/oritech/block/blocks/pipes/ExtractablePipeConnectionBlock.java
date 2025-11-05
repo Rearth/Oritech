@@ -93,6 +93,9 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
     
     @Override
     public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, boolean createConnection) {
+        
+        state = addFluidState(state, pos, world);
+        
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
             var connection = shouldConnect(state, direction, pos, world, createConnection);
@@ -106,6 +109,9 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
     
     @Override
     public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, Direction createDirection) {
+        
+        state = addFluidState(state, pos, world);
+        
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
             var connection = shouldConnect(state, direction, pos, world, direction.equals(createDirection));

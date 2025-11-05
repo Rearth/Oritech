@@ -262,7 +262,9 @@ public class AugmentApplicationBlock extends HorizontalDirectionalBlock implemen
         super.appendHoverText(stack, context, tooltip, options);
         var hotkey = OritechClient.AUGMENT_SELECTOR.key.getDisplayName();
         tooltip.add(Component.translatable("tooltip.oritech.augmenter.1").withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("tooltip.oritech.augmenter.2", hotkey.tryCollapseToString()).withStyle(ChatFormatting.GRAY));
+        
+        if (hotkey.tryCollapseToString() != null)
+            tooltip.add(Component.translatable("tooltip.oritech.augmenter.2", hotkey.tryCollapseToString()).withStyle(ChatFormatting.GRAY));
         addMachineTooltip(tooltip, this, this);
     }
 }

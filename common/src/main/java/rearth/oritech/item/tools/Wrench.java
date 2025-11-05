@@ -1,9 +1,5 @@
 package rearth.oritech.item.tools;
 
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.SoundContent;
-
-import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,8 +14,12 @@ import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.jetbrains.annotations.NotNull;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.SoundContent;
+
+import java.util.List;
 
 public class Wrench extends Item {
     
@@ -60,7 +60,7 @@ public class Wrench extends Item {
     }
     
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
         var stack = user.getItemInHand(hand);
         return useWrench(stack, user, hand) ? InteractionResultHolder.success(stack) : InteractionResultHolder.fail(stack);
     }

@@ -170,6 +170,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
         if (itemStack.has(FluidApi.ITEM.getFluidComponent())) {
             var tankEntity = (SmallTankEntity) world.getBlockEntity(pos);
             tankEntity.fluidStorage.setStack(itemStack.get(FluidApi.ITEM.getFluidComponent()).copy());
+            tankEntity.setChanged();
         }
     }
     

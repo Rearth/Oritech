@@ -178,8 +178,8 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
             if (isLog) {
                 isValid = isInLogRange(candidate, foundLogs, 3);
             } else {
-                // Give a default of 1 for "leaf" blocks without a DISTANCE_1_7 property (like shroomlights)
-                var range = candidateState.getOptionalValue(BlockStateProperties.DISTANCE).orElse(1);
+                // Give a default of 4 for "leaf" blocks without a DISTANCE_1_7 property (like shroomlights or mushrooms)
+                var range = candidateState.getOptionalValue(BlockStateProperties.DISTANCE).orElse(4);
                 isValid = isInLogRange(candidate, foundLogs, range + 2);
             }
             

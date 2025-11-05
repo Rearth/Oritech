@@ -1,29 +1,23 @@
 package rearth.oritech.client.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.wispforest.owo.ui.base.BaseComponent;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.ItemComponent;
-import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.container.GridLayout;
 import io.wispforest.owo.ui.core.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
-import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity.FilterData;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.ITEM_SLOT;
 
@@ -250,9 +244,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         }
 
         var displayStack = new ItemStack(itemStack.getItem(), 1);
-
-        if (itemStack.getComponents() != null)
-            displayStack.applyComponents(itemStack.getComponents());
+        displayStack.applyComponents(itemStack.getComponents());
 
         var itemComponent = Components.item(displayStack);
         itemComponent.positioning(Positioning.absolute(1, 1));

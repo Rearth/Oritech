@@ -1,5 +1,18 @@
 package rearth.oritech.block.base.entity;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -11,20 +24,6 @@ import rearth.oritech.util.Geometry;
 
 import java.util.HashMap;
 import java.util.Objects;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Tuple;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.phys.Vec3;
 
 import static rearth.oritech.util.Geometry.*;
 
@@ -250,6 +249,11 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
         lastWorkedAt = world.getGameTime();
     }
     
+    @Override
+    public int getTickUpdateInterval() {
+        return 1;
+    }
+    
     private boolean isBlockAvailable(BlockPos target) {
         if (!occupiedAreas.containsKey(areaMin)) {
             occupiedAreas.put(areaMin, new HashMap<>(1));
@@ -284,10 +288,16 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.saveAdditional(nbt, registryLookup);
         if (getBlockState().getValue(FrameInteractionBlock.HAS_FRAME) && areaMin != null) {
+            
             nbt.putLong("areaMin", areaMin.asLong());
             nbt.putLong("areaMax", areaMax.asLong());
-            nbt.putLong("currentTarget", currentTarget.asLong());
-            nbt.putLong("currentDirection", new BlockPos(currentDirection).asLong());
+            
+            if (currentTarget != null)
+                nbt.putLong("currentTarget", currentTarget.asLong());
+            
+            if (currentDirection != null)
+                nbt.putLong("currentDirection", new BlockPos(currentDirection).asLong());
+            
             nbt.putInt("progress", (int) currentProgress);
             nbt.putBoolean("moving", moving);
         }

@@ -1,12 +1,5 @@
 package rearth.oritech.block.blocks.pipes.item;
 
-import org.apache.commons.lang3.function.TriFunction;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
-import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
-import rearth.oritech.init.BlockContent;
-import java.util.HashMap;
-import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -23,6 +16,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.apache.commons.lang3.function.TriFunction;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
+import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
+import rearth.oritech.init.BlockContent;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class ItemPipeBlock extends GenericPipeBlock {
     
@@ -107,6 +108,7 @@ public class ItemPipeBlock extends GenericPipeBlock {
         public BlockState getConnectionBlock() {
             return BlockContent.FRAMED_ITEM_PIPE_CONNECTION.defaultBlockState();
         }
+        
     }
     
     public static class TransparentItemPipe extends ItemPipeBlock {

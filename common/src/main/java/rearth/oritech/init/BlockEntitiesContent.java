@@ -113,7 +113,6 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     @AssignSidedEnergy
     public static final BlockEntityType<DronePortEntity> DRONE_PORT_ENTITY = BlockEntityType.Builder.of(DronePortEntity::new, BlockContent.DRONE_PORT_BLOCK).build(null);
     
-    @AssignSidedInventory
     @AssignSidedFluid
     @AssignSidedEnergy
     public static final BlockEntityType<PumpBlockEntity> PUMP_BLOCK = BlockEntityType.Builder.of(PumpBlockEntity::new, BlockContent.PUMP_BLOCK).build(null);

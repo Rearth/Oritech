@@ -1,21 +1,7 @@
 package rearth.oritech.block.entity.pipes;
 
+import dev.architectury.platform.Platform;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.ItemApi.InventoryStorage;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
-import rearth.oritech.api.networking.NetworkedBlockEntity;
-import rearth.oritech.api.networking.SyncField;
-import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.blocks.pipes.item.ItemFilterBlock;
-import rearth.oritech.client.ui.ItemFilterScreenHandler;
-import rearth.oritech.init.BlockEntitiesContent;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -37,6 +23,19 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.block.blocks.pipes.item.ItemFilterBlock;
+import rearth.oritech.client.ui.ItemFilterScreenHandler;
+import rearth.oritech.init.BlockEntitiesContent;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemApi.BlockProvider, ExtendedMenuProvider {
     
@@ -198,6 +197,17 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
             var matchesFilterItems = false; // true if at least 1 item matches
             
             for (var filterItem : filterSettings.items.values()) {
+                
+                if (Platform.isModLoaded("ftbfiltersystem")) {
+                    var filterApi = dev.ftb.mods.ftbfiltersystem.api.FTBFilterSystemAPI.api();
+                    if (filterApi.isFilterItem(filterItem)) {
+                        if (filterApi.doesFilterMatch(filterItem, stack)) {
+                            matchesFilterItems = true;
+                            break;
+                        }
+                    }
+                }
+                
                 var matchesType = stack.getItem().equals(filterItem.getItem());
                 if (!matchesType) continue;
                 

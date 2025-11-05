@@ -1,11 +1,11 @@
 package rearth.oritech.block.blocks.pipes.item;
 
+import dev.architectury.platform.Platform;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -99,6 +99,12 @@ public class ItemFilterBlock extends Block implements EntityBlock {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         tooltip.add(Component.translatable("tooltip.oritech.item_filter").withStyle(ChatFormatting.GRAY));
+        
+        
+        if (Platform.isModLoaded("ftbfiltersystem")) {
+            tooltip.add(Component.translatable("tooltip.oritech.item_filter_ftb").withStyle(ChatFormatting.GRAY));
+        }
+        
         super.appendHoverText(stack, context, tooltip, options);
     }
 

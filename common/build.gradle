@@ -61,4 +61,7 @@ dependencies {
     interfaceInjectionData "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     // REI
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
+
+    // ftb filters
+    compileOnly "curse.maven:ftb-filter-system-943925:6899527"
 }

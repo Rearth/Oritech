@@ -100,6 +100,9 @@ dependencies {
     // REI
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"
 
+    modImplementation "curse.maven:ftb-filter-system-943925:6259287"
+    modImplementation "curse.maven:ftb-library-fabric-438495:6711325"
+
     /// runtime-only
     
     // recipe viewer

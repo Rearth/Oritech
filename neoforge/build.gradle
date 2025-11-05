@@ -97,6 +97,8 @@ dependencies {
     // This adds the ASM library to the runtime classpath for all runs (client, server, data)
     additionalRuntimeClasspath 'org.ow2.asm:asm-tree:9.8'
 
+    compileOnly "curse.maven:ftb-filter-system-943925:6899527"
+
     runtimeOnly "curse.maven:jade-324717:5846105"
 
     // recipe viewer runtime

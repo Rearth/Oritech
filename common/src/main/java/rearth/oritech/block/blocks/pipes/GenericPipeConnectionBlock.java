@@ -1,5 +1,8 @@
 package rearth.oritech.block.blocks.pipes;
 
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Fluids;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
@@ -46,9 +49,12 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     }
     
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
         var worldImp = (Level) world;
         if (worldImp.isClientSide) return state;
+        
+        if (state.getValue(BlockStateProperties.WATERLOGGED))
+            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         
         if (!hasNeighboringMachine(state, worldImp, pos, false)) {
             // remove stale machine -> neighboring pipes mapping
