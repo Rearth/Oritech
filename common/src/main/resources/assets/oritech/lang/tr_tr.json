@@ -1110,6 +1110,8 @@
   "text.config.oritech-config.option.generators.steamEngineData.steamToRfRatio": "Buhar Birimi Başına Enerji (buhar motorunda)",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnWaterFull": "Su tankı dolduğunda dur",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnWaterFull.tooltip": "Etkinleştirildiğinde, su tankı dolduğunda buhar motoru çalışmayı durduracaktır. Çalışması için dışarı pompalanması gerekir.",
+  "text.config.oritech-config.option.generators.steamEngineData.steamBoilerCapacityBuckets": "Steam Boiler Capacity (in buckets)",
+  "text.config.oritech-config.option.generators.steamEngineData.steamBoilerCapacityBuckets.tooltip": "Steam capacity of steam-boiler enabled generators and the steam engine.",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnEnergyFull": "Enerji deposu dolduğunda dur",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnEnergyFull.tooltip": "Etkinleştirildiğinde, enerji deposu dolduğunda buhar motoru çalışmayı durduracaktır.",
   "text.config.oritech-config.category.generators.fuelGeneratorData": "Yakıt Jeneratörü Verileri",

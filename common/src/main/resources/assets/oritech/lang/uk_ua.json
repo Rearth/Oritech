@@ -1110,6 +1110,8 @@
   "text.config.oritech-config.option.generators.steamEngineData.steamToRfRatio": "Енергія на одиницю пари (в паровому двигуні)",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnWaterFull": "Зупинити при повному баку води",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnWaterFull.tooltip": "При ввімкненні паровий двигун зупинить роботу, коли бак для води заповниться. Його потрібно викачати, щоб він функціонував.",
+  "text.config.oritech-config.option.generators.steamEngineData.steamBoilerCapacityBuckets": "Steam Boiler Capacity (in buckets)",
+  "text.config.oritech-config.option.generators.steamEngineData.steamBoilerCapacityBuckets.tooltip": "Steam capacity of steam-boiler enabled generators and the steam engine.",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnEnergyFull": "Зупинити при повному сховищі енергії",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnEnergyFull.tooltip": "При ввімкненні паровий двигун зупинить роботу, коли сховище енергії заповниться.",
   "text.config.oritech-config.category.generators.fuelGeneratorData": "Дані паливного генератора",

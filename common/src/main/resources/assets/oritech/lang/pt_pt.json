@@ -1110,6 +1110,8 @@
   "text.config.oritech-config.option.generators.steamEngineData.steamToRfRatio": "Energy Per Steam Unit (in the steam engine)",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnWaterFull": "Stop on full water tank",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnWaterFull.tooltip": "When enabled, the steam engine will stop working when the water tank is full. It needs to be pumped out to function.",
+  "text.config.oritech-config.option.generators.steamEngineData.steamBoilerCapacityBuckets": "Steam Boiler Capacity (in buckets)",
+  "text.config.oritech-config.option.generators.steamEngineData.steamBoilerCapacityBuckets.tooltip": "Steam capacity of steam-boiler enabled generators and the steam engine.",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnEnergyFull": "Stop on full energy storage",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnEnergyFull.tooltip": "When enabled, the steam engine will stop working when the energy storage is full.",
   "text.config.oritech-config.category.generators.fuelGeneratorData": "Fuel Generator Data",

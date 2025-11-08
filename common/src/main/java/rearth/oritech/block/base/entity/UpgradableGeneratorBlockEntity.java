@@ -43,7 +43,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     @SyncField(SyncType.GUI_OPEN)
     public boolean isProducingSteam = false;
     @SyncField(SyncType.GUI_TICK)
-    public final SimpleInOutFluidStorage boilerStorage = new SimpleInOutFluidStorage(8 * FluidStackHooks.bucketAmount(), this::setChanged) {
+    public final SimpleInOutFluidStorage boilerStorage = new SimpleInOutFluidStorage((long) (Oritech.CONFIG.generators.steamEngineData.steamBoilerCapacityBuckets() * FluidStackHooks.bucketAmount()), this::setChanged) {
         @Override
         public long insert(FluidStack toInsert, boolean simulate) {
             if (!boilerAcceptsInput(toInsert.getFluid())) return 0L;

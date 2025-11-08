@@ -1110,6 +1110,8 @@
   "text.config.oritech-config.option.generators.steamEngineData.steamToRfRatio": "能量每蒸汽单位（蒸汽机内转化）",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnWaterFull": "水箱满时停止",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnWaterFull.tooltip": "当启用时，蒸汽机将会在水罐已满时停止工作。需排出多余的水以继续工作。",
+  "text.config.oritech-config.option.generators.steamEngineData.steamBoilerCapacityBuckets": "Steam Boiler Capacity (in buckets)",
+  "text.config.oritech-config.option.generators.steamEngineData.steamBoilerCapacityBuckets.tooltip": "Steam capacity of steam-boiler enabled generators and the steam engine.",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnEnergyFull": "能量满载时停止",
   "text.config.oritech-config.option.generators.steamEngineData.stopOnEnergyFull.tooltip": "当启用时，蒸汽机将在内置能量存储已满时停止工作。",
   "text.config.oritech-config.category.generators.fuelGeneratorData": "燃料发电机数据",
