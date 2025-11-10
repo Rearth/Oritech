@@ -74,6 +74,7 @@ public class Config {
     @SectionHeader("worldGeneration")
     public boolean generateOresFabricOnly = true;
     public boolean easyFindFeatures = true;
+    public boolean generateResourceNodes = true;
     
     @SectionHeader("reactor")
     public boolean safeMode = false;

@@ -25,6 +25,11 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
     @Override
     public boolean place(FeaturePlaceContext<ResourceNodeFeatureConfig> context) {
 
+        // Check config to see if resource node generation is enabled
+        if (!Oritech.CONFIG.generateResourceNodes()) {
+            return false;
+        }
+
         var world = context.level();
         var origin = context.origin();
         

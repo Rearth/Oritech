@@ -39,23 +39,26 @@ public class FeatureContent implements ArchitecturyRegistryContainer<Feature<?>>
             }
         });
         
-        BiomeModifications.addProperties((context, mutable) -> {
-            if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
-                mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.TOP_LAYER_MODIFICATION, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("resource_node_common")));
-            }
-        });
-        
-        BiomeModifications.addProperties((context, mutable) -> {
-            if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
-                mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("resource_node_rare")));
-            }
-        });
-        
-        BiomeModifications.addProperties((context, mutable) -> {
-            if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
-                mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("resource_node_other")));
-            }
-        });
+        // resource nodes - only add if enabled in config
+        if (Oritech.CONFIG.generateResourceNodes()) {
+            BiomeModifications.addProperties((context, mutable) -> {
+                if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
+                    mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.TOP_LAYER_MODIFICATION, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("resource_node_common")));
+                }
+            });
+            
+            BiomeModifications.addProperties((context, mutable) -> {
+                if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
+                    mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("resource_node_rare")));
+                }
+            });
+            
+            BiomeModifications.addProperties((context, mutable) -> {
+                if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
+                    mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("resource_node_other")));
+                }
+            });
+        }
         
         // ores
         if (Oritech.CONFIG.generateOresFabricOnly()) {
