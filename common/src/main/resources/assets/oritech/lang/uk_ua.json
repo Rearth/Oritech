@@ -449,10 +449,10 @@
   "tooltip.oritech.item_pipe.3": [
     "Клацніть на нього ",
     {
-      "text": "предметом-двигуном",
+      "translate": "item.oritech.motor",
       "color": "#ff830e"
     },
-    ", щоб оновити трубу для вилучення з усіх слотів."
+    " item to upgrade the pipe to extract from all slots."
   ],
   "tooltip.oritech.item_pipe.4": "Поміщає в найближчий доступний інвентар.",
   "title.oritech.machine.addon_looting": "%d Мародерство",
