@@ -449,10 +449,10 @@
   "tooltip.oritech.item_pipe.3": [
     "すべてのスロットから取り出せるようにするには、",
     {
-      "text": "アイテムのモーター",
+      "translate": "item.oritech.motor",
       "color": "#ff830e"
     },
-    "を手に持ちクリックしてアップグレードします。"
+    " item to upgrade the pipe to extract from all slots."
   ],
   "tooltip.oritech.item_pipe.4": "最も近くにある使用可能なインベントリーに送ります。",
   "title.oritech.machine.addon_looting": "%d ドロップ増加",
@@ -1001,7 +1001,7 @@
   "text.oritech.accelerator.ui.waiting.0": "待機中.",
   "text.oritech.accelerator.ui.waiting.1": "待機中..",
   "text.oritech.accelerator.ui.waiting.2": "待機中...",
-  "text.oritech.accelerator.ui.waiting": "加速したいアイテムを挿入してください。",
+  "text.oritech.accelerator.ui.waiting": "加速させるアイテムを挿入",
   "text.oritech.accelerator.ui.error": "エラーが発生しました。",
   "text.oritech.accelerator.ui.nogate": "有効なリングが見つかりません",
   "text.oritech.accelerator.ui.nogate.more": "リングゲートは側面を\n向いている必要があります。",
