@@ -449,10 +449,10 @@
   "tooltip.oritech.item_pipe.3": [
     "Click it with a ",
     {
-      "text": "motor item",
+      "translate": "item.oritech.motor",
       "color": "#ff830e"
     },
-    " to upgrade the pipe to extract from all slots."
+    " item to upgrade the pipe to extract from all slots."
   ],
   "tooltip.oritech.item_pipe.4": "Deposits into the closest available inventory.",
   "title.oritech.machine.addon_looting": "%d Plünderung",
