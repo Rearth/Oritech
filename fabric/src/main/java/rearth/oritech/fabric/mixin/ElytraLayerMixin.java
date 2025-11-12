@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import rearth.oritech.item.tools.armor.JetpackElytraItem;
 import rearth.oritech.item.tools.armor.JetpackExoElytraItem;
-@Debug(export = true)
+
 @Mixin(value = ElytraLayer.class)
 public class ElytraLayerMixin {
 
