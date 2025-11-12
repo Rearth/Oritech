@@ -449,10 +449,10 @@
   "tooltip.oritech.item_pipe.3": [
     "Boruyu tüm yuvalardan çıkaracak şekilde yükseltmek için bir ",
     {
-      "text": "motor eşyası",
+      "translate": "item.oritech.motor",
       "color": "#ff830e"
     },
-    " ile tıklayın."
+    " item to upgrade the pipe to extract from all slots."
   ],
   "tooltip.oritech.item_pipe.4": "Mevcut en yakın envantere aktarılır.",
   "title.oritech.machine.addon_looting": "%d Ganimet",
