@@ -449,10 +449,10 @@
   "tooltip.oritech.item_pipe.3": [
     "使用 ",
     {
-      "text": "马达物品",
+      "translate": "item.oritech.motor",
       "color": "#ff830e"
     },
-    " 右键以将管道升级为从全部槽位提取物品。"
+    " item to upgrade the pipe to extract from all slots."
   ],
   "tooltip.oritech.item_pipe.4": "存入最近的可用物品栏。",
   "title.oritech.machine.addon_looting": "%d 掠夺",
