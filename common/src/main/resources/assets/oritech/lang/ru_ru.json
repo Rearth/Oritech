@@ -449,10 +449,10 @@
   "tooltip.oritech.item_pipe.3": [
     "Кликните ",
     {
-      "text": "мотором",
+      "translate": "item.oritech.motor",
       "color": "#ff830e"
     },
-    " чтобы улучшить трубу для извлечения из всех слотов."
+    " item to upgrade the pipe to extract from all slots."
   ],
   "tooltip.oritech.item_pipe.4": "Вкладывает в ближайший доступный инвентарь.",
   "title.oritech.machine.addon_looting": "Добыча %d",
