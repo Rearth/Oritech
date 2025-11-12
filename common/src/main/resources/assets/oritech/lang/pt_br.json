@@ -449,10 +449,10 @@
   "tooltip.oritech.item_pipe.3": [
     "Clique nele com um ",
     {
-      "text": "item motor",
+      "translate": "item.oritech.motor",
       "color": "#ff830e"
     },
-    " para aprimorar o tubo para extrair de todos os espaços."
+    " item to upgrade the pipe to extract from all slots."
   ],
   "tooltip.oritech.item_pipe.4": "Deposita no inventário disponível mais próximo.",
   "title.oritech.machine.addon_looting": "%d Pilhagem",
