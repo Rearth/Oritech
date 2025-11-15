@@ -452,7 +452,7 @@
       "translate": "item.oritech.motor",
       "color": "#ff830e"
     },
-    " item to upgrade the pipe to extract from all slots."
+    " Item para atualizar o tubo para extrair de todos os slots."
   ],
   "tooltip.oritech.item_pipe.4": "Deposita no inventário disponível mais próximo.",
   "title.oritech.machine.addon_looting": "%d Pilhagem",
