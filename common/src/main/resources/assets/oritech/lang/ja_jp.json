@@ -452,7 +452,7 @@
       "translate": "item.oritech.motor",
       "color": "#ff830e"
     },
-    " item to upgrade the pipe to extract from all slots."
+    "を手に持ちクリックしてアップグレードします。"
   ],
   "tooltip.oritech.item_pipe.4": "最も近くにある使用可能なインベントリーに送ります。",
   "title.oritech.machine.addon_looting": "%d ドロップ増加",
