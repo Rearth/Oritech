@@ -7,9 +7,11 @@ import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.TickEvent;
 import io.wispforest.endec.impl.ReflectiveEndecBuilder;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rearth.oritech.api.networking.NetworkManager;
@@ -25,6 +27,7 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
@@ -39,14 +42,14 @@ public final class Oritech {
     public static final Logger LOGGER = LoggerFactory.getLogger("oritech");
     public static final OritechConfig CONFIG = OritechConfig.createAndLoad();
     
-    public static final Multimap<Identifier, Runnable> EVENT_MAP = initEventMap();
+    public static final Multimap<ResourceLocation, Runnable> EVENT_MAP = initEventMap();
     
-    public static Identifier id(String path) {
-        return Identifier.of(MOD_ID, path);
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
     
     static {
-        ReflectiveEndecBuilder.SHARED_INSTANCE.register(MinecraftEndecs.IDENTIFIER, Identifier.class);
+        ReflectiveEndecBuilder.SHARED_INSTANCE.register(MinecraftEndecs.IDENTIFIER, ResourceLocation.class);
     }
     
     public static void initialize() {
@@ -66,15 +69,12 @@ public final class Oritech {
         // for particle collisions
         TickEvent.SERVER_POST.register(elem -> AcceleratorParticleLogic.onTickEnd());
         TickEvent.SERVER_POST.register(elem -> AddonBlockEntity.completeInits());
-        TickEvent.SERVER_POST.register(elem -> ElectricMaceItem.processLightningEvents(elem.getOverworld()));
+        TickEvent.SERVER_POST.register(elem -> ElectricMaceItem.processLightningEvents(elem.overworld()));
         
-        // for player augment modifiers
-        PlayerEvent.PLAYER_JOIN.register(PlayerAugments::refreshPlayerAugments);
-        PlayerEvent.PLAYER_RESPAWN.register((player, inEnd, removalReason) -> PlayerAugments.refreshPlayerAugments(player));
-        PlayerEvent.CHANGE_DIMENSION.register((player, oldLevel, newLevel) -> PlayerAugments.refreshPlayerAugments(player));
+        ComponentContent.COMPONENTS.register();
         
         // for player augment ticks
-        TickEvent.SERVER_PRE.register(event -> event.getWorlds().forEach(world -> world.getPlayers().forEach(PlayerAugments::serverTickAugments)));
+        TickEvent.SERVER_PRE.register(event -> event.getAllLevels().forEach(world -> world.players().forEach(PlayerAugments::serverTickAugments)));
         LOGGER.info("Oritech initialization complete");
     }
     
@@ -85,65 +85,64 @@ public final class Oritech {
         
         // fluids need to be first
         LOGGER.debug("Registering fluids");
-        EVENT_MAP.get(RegistryKeys.FLUID.getValue()).forEach(Runnable::run);
+        EVENT_MAP.get(Registries.FLUID.location()).forEach(Runnable::run);
         
         for (var type : EVENT_MAP.keySet()) {
-            if (type.equals(RegistryKeys.FLUID.getValue()) || type.equals(RegistryKeys.ITEM_GROUP.getValue())) continue;
+            if (type.equals(Registries.FLUID.location()) || type.equals(Registries.CREATIVE_MODE_TAB.location())) continue;
             EVENT_MAP.get(type).forEach(Runnable::run);
         }
         
         LOGGER.debug("Registering item groups");
-        EVENT_MAP.get(RegistryKeys.ITEM_GROUP.getValue()).forEach(Runnable::run);
+        EVENT_MAP.get(Registries.CREATIVE_MODE_TAB.location()).forEach(Runnable::run);
         LOGGER.info("Oritech registrations complete");
     }
     
-    public static Multimap<Identifier, Runnable> initEventMap() {
+    public static Multimap<ResourceLocation, Runnable> initEventMap() {
         
-        Multimap<Identifier, Runnable> res = ArrayListMultimap.create();
-        res.put(RegistryKeys.FLUID.getValue(), FluidContent::registerFluids);
-        res.put(RegistryKeys.BLOCK.getValue(), FluidContent::registerBlocks);
-        res.put(RegistryKeys.ITEM.getValue(), FluidContent::registerItems);
-        res.put(RegistryKeys.ITEM.getValue(), () -> ArchitecturyRegistryContainer.register(ItemContent.class, MOD_ID, false));
-        res.put(RegistryKeys.BLOCK.getValue(), () -> ArchitecturyRegistryContainer.register(BlockContent.class, MOD_ID, false));
-        res.put(RegistryKeys.ITEM.getValue(), ArchitecturyBlockRegistryContainer::finishItemRegister);
-        res.put(RegistryKeys.BLOCK_ENTITY_TYPE.getValue(), () -> ArchitecturyRegistryContainer.register(BlockEntitiesContent.class, MOD_ID, false));
-        res.put(RegistryKeys.SOUND_EVENT.getValue(), () -> ArchitecturyRegistryContainer.register(SoundContent.class, MOD_ID, false));
-        res.put(RegistryKeys.ITEM.getValue(), () -> ArchitecturyRegistryContainer.register(ToolsContent.class, MOD_ID, false));
-        res.put(RegistryKeys.DATA_COMPONENT_TYPE.getValue(), ComponentContent::registerComponents);
-        res.put(RegistryKeys.FEATURE.getValue(), () -> ArchitecturyRegistryContainer.register(FeatureContent.class, MOD_ID, false));
-        res.put(RegistryKeys.LOOT_FUNCTION_TYPE.getValue(), () -> ArchitecturyRegistryContainer.register(LootContent.class, MOD_ID, false));
-        res.put(RegistryKeys.ENTITY_TYPE.getValue(), () -> ArchitecturyRegistryContainer.register(EntitiesContent.class, MOD_ID, false));
-        res.put(RegistryKeys.ITEM.getValue(), ToolsContent::registerEventHandlers);
-        res.put(RegistryKeys.SCREEN_HANDLER.getValue(), () -> ArchitecturyRegistryContainer.register(ModScreens.class, MOD_ID, false));
-        res.put(RegistryKeys.RECIPE_TYPE.getValue(), () -> ArchitecturyRegistryContainer.register(RecipeContent.class, MOD_ID, false));
-        res.put(RegistryKeys.ITEM_GROUP.getValue(), () -> ArchitecturyRegistryContainer.register(ItemGroups.class, MOD_ID, false));
-        res.put(RegistryKeys.RECIPE_SERIALIZER.getValue(), ArchitecturyRecipeRegistryContainer::finishSerializerRegister);
-        res.put(RegistryKeys.LOOT_FUNCTION_TYPE.getValue(), FluidContent::registerItemsToGroups);
-        res.put(Identifier.of("neoforge", "attachment_types"), Augment::registerAttachmentTypes);   // this works just fine on fabric aswell, as they key is not really relevant there.
+        Multimap<ResourceLocation, Runnable> res = ArrayListMultimap.create();
+        res.put(Registries.FLUID.location(), FluidContent::registerFluids);
+        res.put(Registries.BLOCK.location(), FluidContent::registerBlocks);
+        res.put(Registries.ITEM.location(), FluidContent::registerItems);
+        res.put(Registries.ITEM.location(), () -> ArchitecturyRegistryContainer.register(ItemContent.class, MOD_ID, false));
+        res.put(Registries.BLOCK.location(), () -> ArchitecturyRegistryContainer.register(BlockContent.class, MOD_ID, false));
+        res.put(Registries.ITEM.location(), ArchitecturyBlockRegistryContainer::finishItemRegister);
+        res.put(Registries.BLOCK_ENTITY_TYPE.location(), () -> ArchitecturyRegistryContainer.register(BlockEntitiesContent.class, MOD_ID, false));
+        res.put(Registries.SOUND_EVENT.location(), () -> ArchitecturyRegistryContainer.register(SoundContent.class, MOD_ID, false));
+        res.put(Registries.ITEM.location(), () -> ArchitecturyRegistryContainer.register(ToolsContent.class, MOD_ID, false));
+        res.put(Registries.FEATURE.location(), () -> ArchitecturyRegistryContainer.register(FeatureContent.class, MOD_ID, false));
+        res.put(Registries.LOOT_FUNCTION_TYPE.location(), () -> ArchitecturyRegistryContainer.register(LootContent.class, MOD_ID, false));
+        res.put(Registries.ENTITY_TYPE.location(), () -> ArchitecturyRegistryContainer.register(EntitiesContent.class, MOD_ID, false));
+        res.put(Registries.ITEM.location(), ToolsContent::registerEventHandlers);
+        res.put(Registries.MENU.location(), () -> ArchitecturyRegistryContainer.register(ModScreens.class, MOD_ID, false));
+        res.put(Registries.RECIPE_TYPE.location(), () -> ArchitecturyRegistryContainer.register(RecipeContent.class, MOD_ID, false));
+        res.put(Registries.CREATIVE_MODE_TAB.location(), () -> ArchitecturyRegistryContainer.register(ItemGroups.class, MOD_ID, false));
+        res.put(Registries.RECIPE_SERIALIZER.location(), ArchitecturyRecipeRegistryContainer::finishSerializerRegister);
+        res.put(Registries.LOOT_FUNCTION_TYPE.location(), FluidContent::registerItemsToGroups);
+        res.put(ResourceLocation.fromNamespaceAndPath("neoforge", "attachment_types"), Augment::registerAttachmentTypes);   // this works just fine on fabric aswell, as they key is not really relevant there.
         
         return res;
     }
     
     private static void onServerStarted(MinecraftServer minecraftServer) {
-        minecraftServer.getWorlds().forEach(world -> {
-            if (world.isClient) return;
+        minecraftServer.getAllLevels().forEach(world -> {
+            if (world.isClientSide) return;
             
-            var regKey = world.getRegistryKey().getValue();
+            var regKey = world.dimension().location();
             
             var dataId = "energy_" + regKey.getNamespace() + "_" + regKey.getPath();
-            var result = world.getPersistentStateManager().getOrCreate(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, dataId);
+            var result = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, dataId);
             EnergyPipeBlock.ENERGY_PIPE_DATA.put(regKey, result);
             
             var fluidDataId = "fluid_" + regKey.getNamespace() + "_" + regKey.getPath();
-            var fluidResult = world.getPersistentStateManager().getOrCreate(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, fluidDataId);
+            var fluidResult = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, fluidDataId);
             FluidPipeBlock.FLUID_PIPE_DATA.put(regKey, fluidResult);
             
             var itemDataId = "item_" + regKey.getNamespace() + "_" + regKey.getPath();
-            var itemResult = world.getPersistentStateManager().getOrCreate(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, itemDataId);
+            var itemResult = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, itemDataId);
             ItemPipeBlock.ITEM_PIPE_DATA.put(regKey, itemResult);
             
             var superConductorDataId = "superconductor_" + regKey.getNamespace() + "_" + regKey.getPath();
-            var superConductorResult = world.getPersistentStateManager().getOrCreate(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, superConductorDataId);
+            var superConductorResult = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, superConductorDataId);
             SuperConductorBlock.SUPERCONDUCTOR_DATA.put(regKey, superConductorResult);
         });
     }

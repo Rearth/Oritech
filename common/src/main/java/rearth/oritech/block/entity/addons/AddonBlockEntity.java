@@ -1,16 +1,18 @@
 package rearth.oritech.block.entity.addons;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import rearth.oritech.OritechPlatform;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MachineAddonProvider;
 
 import java.util.HashSet;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class AddonBlockEntity extends BlockEntity implements MachineAddonProvider {
     
@@ -23,7 +25,7 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
         pendingInits.clear();
     }
     
-    private BlockPos controllerPos = BlockPos.ORIGIN;
+    private BlockPos controllerPos = BlockPos.ZERO;
     
     public AddonBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ADDON_ENTITY, pos, state);
@@ -35,6 +37,8 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
     
     @Override
     public void setControllerPos(BlockPos pos) {
+        if (!controllerPos.equals(pos) && level instanceof ServerLevel serverLevel)
+            OritechPlatform.INSTANCE.resetCapabilities(serverLevel, pos);
         controllerPos = pos;
     }
     
@@ -44,16 +48,16 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         nbt.putInt("controller_x", controllerPos.getX());
         nbt.putInt("controller_y", controllerPos.getY());
         nbt.putInt("controller_z", controllerPos.getZ());
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         controllerPos = new BlockPos(nbt.getInt("controller_x"), nbt.getInt("controller_y"), nbt.getInt("controller_z"));
     }
 }

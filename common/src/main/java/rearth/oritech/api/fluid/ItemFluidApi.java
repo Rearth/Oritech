@@ -2,18 +2,20 @@ package rearth.oritech.api.fluid;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.minecraft.component.ComponentType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.FluidApi.FluidStorage;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.StackContext;
 
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public interface ItemFluidApi {
     
@@ -21,11 +23,11 @@ public interface ItemFluidApi {
     
     FluidApi.FluidStorage find(StackContext stack);
     
-    default ComponentType<FluidStack> getFluidComponent() {
+    default DataComponentType<FluidStack> getFluidComponent() {
         return ComponentContent.STORED_FLUID.get();
     }
     
-    static boolean tryFluidBlockItemInteraction(ItemStack stack, World world, BlockPos pos, PlayerEntity player, Hand hand) {
+    static boolean tryFluidBlockItemInteraction(ItemStack stack, Level world, BlockPos pos, Player player, InteractionHand hand) {
         var blockEntity = world.getBlockEntity(pos);
         if (!(blockEntity instanceof FluidApi.BlockProvider tankEntity)) {
             return false;
@@ -38,12 +40,12 @@ public interface ItemFluidApi {
         
         var stackRef = new StackContext(usedStack, updated -> {
             if (stack.getCount() > 1) {
-                stack.decrement(1);
-                if (!player.getInventory().insertStack(updated)) {
-                    player.dropItem(updated, true);
+                stack.shrink(1);
+                if (!player.getInventory().add(updated)) {
+                    player.drop(updated, true);
                 }
             } else {
-                player.setStackInHand(hand, updated);
+                player.setItemInHand(hand, updated);
             }
         });
         
@@ -54,7 +56,7 @@ public interface ItemFluidApi {
         
         var fluidStorage = tankEntity.getFluidStorage(null);
         
-        if (!world.isClient) {
+        if (!world.isClientSide) {
             if (candidate.getContent().getFirst().isEmpty()) { // from tank to item
                 var moved = FluidApi.transferLastIncludingInputs(fluidStorage, candidate, FluidStackHooks.bucketAmount() * 8, false);
                 Oritech.LOGGER.debug("moved to item {} {}", moved, stackRef.getValue());

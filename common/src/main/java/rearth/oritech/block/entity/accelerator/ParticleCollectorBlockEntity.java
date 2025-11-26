@@ -1,17 +1,9 @@
 package rearth.oritech.block.entity.accelerator;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FacingBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.init.BlockEntitiesContent;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -24,9 +16,20 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import static rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity.getOutputPosition;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DirectionalBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.state.BlockState;
+
 public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEntityTicker<ParticleCollectorBlockEntity>, EnergyApi.BlockProvider, GeoBlockEntity {
     
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.collectorEnergyStorage(), 0, Oritech.CONFIG.collectorEnergyStorage(), this::markDirty);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.collectorEnergyStorage(), 0, Oritech.CONFIG.collectorEnergyStorage(), this::setChanged);
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     public static final RawAnimation WORK = RawAnimation.begin().thenPlayAndHold("collect");
@@ -55,8 +58,8 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, ParticleCollectorBlockEntity blockEntity) {
-        if (world.isClient) return;
+    public void tick(Level world, BlockPos pos, BlockState state, ParticleCollectorBlockEntity blockEntity) {
+        if (world.isClientSide) return;
         
         if (!setup) {
             triggerAnimation();
@@ -64,7 +67,7 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
         }
         
         // this feels a bit stupid, but oh well.
-        if (resetAnimAt < world.getTime()) {
+        if (resetAnimAt < world.getGameTime()) {
             triggerAnim("machine", "idle");
             resetAnimAt = Long.MAX_VALUE;
         }
@@ -72,22 +75,22 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
         if (energyStorage.amount <= 0) return;
         
         // output energy to back
-        var target = getOutputPosition(pos, getCachedState().get(FacingBlock.FACING).getOpposite());
-        var candidate = EnergyApi.BLOCK.find(world, target.getRight(), target.getLeft());
+        var target = getOutputPosition(pos, getBlockState().getValue(DirectionalBlock.FACING).getOpposite());
+        var candidate = EnergyApi.BLOCK.find(world, target.getB(), target.getA());
         if (candidate != null) {
             EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         nbt.putLong("energy", energyStorage.getAmount());
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         energyStorage.setAmount(nbt.getLong("energy"));
     }
     
@@ -100,7 +103,7 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
     
     public void triggerAnimation() {
         triggerAnim("machine", "work");
-        resetAnimAt = world.getTime() + 15;
+        resetAnimAt = level.getGameTime() + 15;
     }
     
     @Override

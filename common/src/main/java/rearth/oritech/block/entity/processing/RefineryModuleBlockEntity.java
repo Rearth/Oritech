@@ -1,14 +1,5 @@
 package rearth.oritech.block.entity.processing;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
@@ -25,6 +16,15 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
@@ -44,8 +44,8 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
     
     // fluid delegator
     private final DelegatingFluidStorage fluidStorage = new DelegatingFluidStorage(
-      () -> owningRefinery.getFluidStorageForModule(pos),
-      () -> isActive(getCachedState()) && owningRefinery != null);
+      () -> owningRefinery.getFluidStorageForModule(worldPosition),
+      () -> isActive(getBlockState()) && owningRefinery != null);
     
     
     public RefineryModuleBlockEntity(BlockPos pos, BlockState state) {
@@ -53,14 +53,14 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         addMultiblockToNbt(nbt);
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         loadMultiblockNbtData(nbt);
     }
     
@@ -77,18 +77,18 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
     
     @Override
     public Direction getFacingForMultiblock() {
-        var state = getCachedState();
-        return state.get(Properties.HORIZONTAL_FACING);
+        var state = getBlockState();
+        return state.getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
     
     @Override
     public BlockPos getPosForMultiblock() {
-        return pos;
+        return worldPosition;
     }
     
     @Override
-    public World getWorldForMultiblock() {
-        return world;
+    public Level getWorldForMultiblock() {
+        return level;
     }
     
     @Override
@@ -147,7 +147,7 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
                 }
             }
             
-            if (isActive(getCachedState())) {
+            if (isActive(getBlockState())) {
                 return state.setAndContinue(IDLE);
             } else {
                 return state.setAndContinue(PACKAGED);
@@ -156,7 +156,7 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
     }
     
     public boolean isActive(BlockState state) {
-        return state.get(ASSEMBLED);
+        return state.getValue(ASSEMBLED);
     }
     
     public void setOwningRefinery(RefineryBlockEntity owner) {

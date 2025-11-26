@@ -1,23 +1,24 @@
 package rearth.oritech.block.blocks.processing;
 
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageTypes;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.base.block.UpgradableMachineBlock;
 import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
 import rearth.oritech.init.BlockEntitiesContent;
 
-public class PulverizerBlock extends UpgradableMachineBlock implements BlockEntityProvider {
+public class PulverizerBlock extends UpgradableMachineBlock implements EntityBlock {
     
-    public PulverizerBlock(Settings settings) {
+    public PulverizerBlock(Properties settings) {
         super(settings);
     }
     
@@ -27,16 +28,16 @@ public class PulverizerBlock extends UpgradableMachineBlock implements BlockEnti
     }
     
     @Override
-    public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
+    public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
         
-        if (!world.isClient && entity instanceof LivingEntity livingEntity) {
-            var targetPos = pos.toCenterPos().add(0, 0.5f, 0);
-            var entityDist = entity.squaredDistanceTo(targetPos);
+        if (!world.isClientSide && entity instanceof LivingEntity livingEntity) {
+            var targetPos = pos.getCenter().add(0, 0.5f, 0);
+            var entityDist = entity.distanceToSqr(targetPos);
             if (entityDist > 0.7) return;
             var isWorking = world.getBlockEntity(pos, BlockEntitiesContent.PULVERIZER_ENTITY).get().progress > 0;
             if (isWorking)
-                livingEntity.damage(new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).getEntry(DamageTypes.CRAMMING).get()), 1f);
+                livingEntity.hurt(new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolder(DamageTypes.CRAMMING).get()), 1f);
         }
-        super.onSteppedOn(world, pos, state, entity);
+        super.stepOn(world, pos, state, entity);
     }
 }

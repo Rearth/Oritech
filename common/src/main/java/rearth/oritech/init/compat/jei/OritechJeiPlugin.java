@@ -7,10 +7,11 @@ import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.block.Block;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
@@ -36,7 +37,7 @@ import java.util.List;
 public class OritechJeiPlugin implements IModPlugin {
     
     @Override
-    public @NotNull Identifier getPluginUid() {
+    public @NotNull ResourceLocation getPluginUid() {
         return Oritech.id("jei_plugin");
     }
     
@@ -104,8 +105,8 @@ public class OritechJeiPlugin implements IModPlugin {
     
     public void registerRecipe(IRecipeRegistration registration, OritechRecipeType type) {
         // this feels incredibly hacky, but seems to be the way to go?
-        var world = MinecraftClient.getInstance().world;
-        var data = world.getRecipeManager().listAllOfType(type).stream().map(RecipeEntry::value).toList();
+        var world = Minecraft.getInstance().level;
+        var data = world.getRecipeManager().getAllRecipesFor(type).stream().map(RecipeHolder::value).toList();
         registration.addRecipes(RecipeType.create(type.getIdentifier().getNamespace(), type.getIdentifier().getPath(), OritechRecipe.class), data);
     }
     

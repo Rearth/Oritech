@@ -2,17 +2,6 @@ package rearth.oritech.item.tools.armor;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
 import rearth.oritech.api.networking.NetworkManager;
@@ -25,8 +14,22 @@ import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.Vec3;
 
 import static rearth.oritech.item.tools.harvesting.ChainsawItem.BAR_STEP_COUNT;
+
 
 public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvider {
     
@@ -38,20 +41,20 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
     
     default boolean requireTakeoff() {return true;}
     
-    default void tickJetpack(ItemStack stack, Entity entity, World world) {
+    default void tickJetpack(ItemStack stack, Entity entity, Level world) {
         
-        if (!(entity instanceof PlayerEntity player)) return;
+        if (!(entity instanceof Player player)) return;
         
-        var isEquipped = player.getEquippedStack(EquipmentSlot.CHEST).equals(stack);
+        var isEquipped = player.getItemBySlot(EquipmentSlot.CHEST).equals(stack);
         if (!isEquipped) return;
         
-        var client = MinecraftClient.getInstance();
+        var client = Minecraft.getInstance();
         
-        var up = client.options.jumpKey.isPressed();
-        var forward = client.options.forwardKey.isPressed();
-        var backward = client.options.backKey.isPressed();
-        var left = client.options.leftKey.isPressed();
-        var right = client.options.rightKey.isPressed();
+        var up = client.options.keyJump.isDown();
+        var forward = client.options.keyUp.isDown();
+        var backward = client.options.keyDown.isDown();
+        var left = client.options.keyLeft.isDown();
+        var right = client.options.keyRight.isDown();
         
         var horizontal = forward || backward || left || right;
         var upOnly = up && !horizontal;
@@ -61,7 +64,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         
         if (requireTakeoff() && !isJetpackStarted(player, world, up)) return;
         
-        if (!isActive || player.isOnGround() || player.isSubmergedInWater()) return;
+        if (!isActive || player.onGround() || player.isUnderWater()) return;
         
         var powerMultiplier = getSpeed();
         
@@ -85,34 +88,34 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
             processSideMotion(player, right, powerMultiplier);
         
         var fluidStack = getStoredFluid(stack);
-        var fluid = Registries.FLUID.getId(fluidStack.getFluid());
+        var fluid = BuiltInRegistries.FLUID.getKey(fluidStack.getFluid());
         
         // this will currently only for instances of this class
         NetworkManager.sendToServer(new JetpackItem.JetpackUsageUpdatePacket(getStoredEnergy(stack), fluid.toString(), fluidStack.getAmount()));
         
-        var playerForward = player.getRotationVecClient();
-        var playerRight = playerForward.normalize().rotateY(-90);
-        var particleCenter = player.getEyePos().add(0, -1.1, 0).subtract(playerForward.multiply(0.2f));
-        var particlePosA = particleCenter.add(playerRight.multiply(0.4f));
-        var particlePosB = particleCenter.add(playerRight.multiply(-0.4f));
+        var playerForward = player.getForward();
+        var playerRight = playerForward.normalize().yRot(-90);
+        var particleCenter = player.getEyePosition().add(0, -1.1, 0).subtract(playerForward.scale(0.2f));
+        var particlePosA = particleCenter.add(playerRight.scale(0.4f));
+        var particlePosB = particleCenter.add(playerRight.scale(-0.4f));
         
-        var direction = new Vec3d(0, -1, 0);
-        if (forward) direction = playerForward.normalize().multiply(-1).add(0, -1, 0);
+        var direction = new Vec3(0, -1, 0);
+        if (forward) direction = playerForward.normalize().scale(-1).add(0, -1, 0);
         
         ParticleContent.JETPACK_EXHAUST.spawn(world, particlePosA, direction);
         ParticleContent.JETPACK_EXHAUST.spawn(world, particlePosB, direction);
     }
     
-    private static boolean isJetpackStarted(PlayerEntity player, World world, boolean up) {
+    private static boolean isJetpackStarted(Player player, Level world, boolean up) {
         
-        var grounded = player.isOnGround() || player.isSubmergedInWater();
+        var grounded = player.onGround() || player.isUnderWater();
         
         if (grounded) {
-            JetpackItem.LAST_GROUND_CONTACT = world.getTime();
+            JetpackItem.LAST_GROUND_CONTACT = world.getGameTime();
             JetpackItem.PRESSED_SPACE = false;
             return false;
         } else {
-            var flightTime = world.getTime() - JetpackItem.LAST_GROUND_CONTACT;
+            var flightTime = world.getGameTime() - JetpackItem.LAST_GROUND_CONTACT;
             
             if (flightTime < 5) return false;
             if (up) JetpackItem.PRESSED_SPACE = true;
@@ -121,8 +124,8 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         }
     }
     
-    private static void processUpwardsMotion(PlayerEntity player, float powerMultiplier, boolean upOnly) {
-        var velocity = player.getMovement();
+    private static void processUpwardsMotion(Player player, float powerMultiplier, boolean upOnly) {
+        var velocity = player.getKnownMovement();
         
         var verticalMultiplier = LaserArmRenderer.lerp(powerMultiplier, 1, 0.6f);
         var power = 0.13f * verticalMultiplier;
@@ -133,44 +136,44 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         var speed = Math.max(velocity.y, 0.8);
         var addedVelocity = power / Math.pow(speed, dampeningFactor);
         
-        player.setVelocity(velocity.add(0, addedVelocity, 0));
+        player.setDeltaMovement(velocity.add(0, addedVelocity, 0));
     }
     
-    private static void processSideMotion(PlayerEntity player, boolean right, float powerMultiplier) {
+    private static void processSideMotion(Player player, boolean right, float powerMultiplier) {
         var modifier = right ? 1 : -1;  // either go full speed ahead, or slowly backwards
         var power = 0.04f * powerMultiplier;
         
         // get existing movement
-        var movement = player.getMovement();
-        var horizontalMovement = new Vec3d(movement.x, 0, movement.z);
+        var movement = player.getKnownMovement();
+        var horizontalMovement = new Vec3(movement.x, 0, movement.z);
         
         // get player facing
-        var playerForward = player.getRotationVecClient();
-        playerForward = new Vec3d(playerForward.x, 0, playerForward.z).normalize();
-        var playerRight = playerForward.rotateY(-90);
+        var playerForward = player.getForward();
+        playerForward = new Vec3(playerForward.x, 0, playerForward.z).normalize();
+        var playerRight = playerForward.yRot(-90);
         
         // apply forward / back
-        horizontalMovement = horizontalMovement.add(playerRight.multiply(modifier * power));
+        horizontalMovement = horizontalMovement.add(playerRight.scale(modifier * power));
         
-        player.setVelocity(horizontalMovement.x, movement.y, horizontalMovement.z);
+        player.setDeltaMovement(horizontalMovement.x, movement.y, horizontalMovement.z);
     }
     
-    private static void processForwardMotion(PlayerEntity player, boolean forward, float powerMultiplier) {
+    private static void processForwardMotion(Player player, boolean forward, float powerMultiplier) {
         var modifier = forward ? 1f : -0.4;  // either go full speed ahead, or slowly backwards
         var power = 0.06f * powerMultiplier;
         
         // get existing movement
-        var movement = player.getMovement();
-        var horizontalMovement = new Vec3d(movement.x, 0, movement.z);
+        var movement = player.getKnownMovement();
+        var horizontalMovement = new Vec3(movement.x, 0, movement.z);
         
         // get player facing
-        var playerForward = player.getRotationVecClient();
-        playerForward = new Vec3d(playerForward.x, 0, playerForward.z).normalize();
+        var playerForward = player.getForward();
+        playerForward = new Vec3(playerForward.x, 0, playerForward.z).normalize();
         
         // apply forward / back
-        horizontalMovement = horizontalMovement.add(playerForward.multiply(modifier * power));
+        horizontalMovement = horizontalMovement.add(playerForward.scale(modifier * power));
         
-        player.setVelocity(horizontalMovement.x, movement.y, horizontalMovement.z);
+        player.setDeltaMovement(horizontalMovement.x, movement.y, horizontalMovement.z);
     }
     
     default boolean tryUseFluid(ItemStack stack) {
@@ -186,13 +189,13 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         return stack.getOrDefault(ComponentContent.STORED_FLUID.get(), FluidStack.empty());
     }
     
-    default void addJetpackTooltip(ItemStack stack, List<Text> tooltip, boolean includeEnergy) {
+    default void addJetpackTooltip(ItemStack stack, List<Component> tooltip, boolean includeEnergy) {
         
-        var text = Text.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
-        if (includeEnergy) tooltip.add(text.formatted(Formatting.GOLD));
+        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
+        if (includeEnergy) tooltip.add(text.withStyle(ChatFormatting.GOLD));
         
         var container = getStoredFluid(stack);
-        var fluidText = Text.translatable("tooltip.oritech.jetpack_fuel", container.getAmount() * 1000 / FluidStackHooks.bucketAmount(), getFuelCapacity() * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(container).getString());
+        var fluidText = Component.translatable("tooltip.oritech.jetpack_fuel", container.getAmount() * 1000 / FluidStackHooks.bucketAmount(), getFuelCapacity() * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(container).getString());
         tooltip.add(fluidText);
     }
     
@@ -218,7 +221,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
     }
     
     default boolean isValidFuel(Fluid variant) {
-        return variant.matchesType(FluidContent.STILL_FUEL.get());
+        return variant.isSame(FluidContent.STILL_FUEL.get());
     }
     
     @Override

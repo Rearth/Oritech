@@ -3,10 +3,10 @@ package rearth.oritech.init.world.features.uranium;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.gen.feature.FeatureConfig;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
-public record UraniumPatchFeatureConfig(int number, Identifier blockId) implements FeatureConfig {
+public record UraniumPatchFeatureConfig(int number, ResourceLocation blockId) implements FeatureConfiguration {
     
     public static final Endec<UraniumPatchFeatureConfig> URANIUM_FEATURE_ENDEC = StructEndecBuilder.of(
       Endec.INT.fieldOf("number", UraniumPatchFeatureConfig::number),

@@ -1,19 +1,19 @@
 package rearth.oritech.block.entity.addons;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkManager;
@@ -35,8 +35,8 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, RedstoneAddonBlockEntity blockEntity) {
-        if (world.isClient || !isConnected() || activeMode == RedstoneMode.INPUT_CONTROL) return;
+    public void tick(Level world, BlockPos pos, BlockState state, RedstoneAddonBlockEntity blockEntity) {
+        if (world.isClientSide || !isConnected() || activeMode == RedstoneMode.INPUT_CONTROL) return;
         
         var lastOutput = currentOutput;
         
@@ -49,35 +49,35 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
         }
         
         if (currentOutput != lastOutput) {
-            this.markDirty();
+            this.setChanged();
         }
         
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         nbt.putInt("slot", monitoredSlot);
         nbt.putInt("mode", activeMode.ordinal());
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         monitoredSlot = nbt.getInt("slot");
         activeMode = RedstoneMode.values()[nbt.getInt("mode")];
     }
     
     public void sendDataToClient() {
-        NetworkManager.sendBlockHandle(this, new RedstoneAddonClientUpdate(pos, getControllerPos(), monitoredSlot, activeMode.ordinal(), currentOutput));
+        NetworkManager.sendBlockHandle(this, new RedstoneAddonClientUpdate(worldPosition, getControllerPos(), monitoredSlot, activeMode.ordinal(), currentOutput));
     }
     
     public void sendDataToServer() {
-        NetworkManager.sendToServer(new RedstoneAddonServerUpdate(pos, getControllerPos(), monitoredSlot, activeMode.ordinal(), currentOutput));
+        NetworkManager.sendToServer(new RedstoneAddonServerUpdate(worldPosition, getControllerPos(), monitoredSlot, activeMode.ordinal(), currentOutput));
     }
     
     private boolean isConnected() {
-        var isUsed = this.getCachedState().get(MachineAddonBlock.ADDON_USED);
+        var isUsed = this.getBlockState().getValue(MachineAddonBlock.ADDON_USED);
         return isUsed && getCachedController() != null;
     }
     
@@ -86,7 +86,7 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
         if (cachedController != null)
             return cachedController;
         
-        if (world.getBlockEntity(getControllerPos()) instanceof RedstoneControllable redstoneControllable) {
+        if (level.getBlockEntity(getControllerPos()) instanceof RedstoneControllable redstoneControllable) {
             cachedController = redstoneControllable;
         }
         
@@ -94,7 +94,7 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     }
     
     public void setRedstonePowered(boolean isPowered) {
-        this.markDirty();
+        this.setChanged();
         
         if (activeMode != RedstoneMode.INPUT_CONTROL) return;
         
@@ -109,30 +109,30 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
+    public void saveExtraData(FriendlyByteBuf buf) {
         sendDataToClient();
-        buf.writeBlockPos(pos);
+        buf.writeBlockPos(worldPosition);
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new RedstoneAddonScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.literal("");
+    public Component getDisplayName() {
+        return Component.literal("");
     }
     
-    public static void receiveOnServer(RedstoneAddonServerUpdate message, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
-        if (player.getWorld().getBlockEntity(message.position) instanceof RedstoneAddonBlockEntity addonEntity) {
+    public static void receiveOnServer(RedstoneAddonServerUpdate message, Player player, RegistryAccess dynamicRegistryManager) {
+        if (player.level().getBlockEntity(message.position) instanceof RedstoneAddonBlockEntity addonEntity) {
             addonEntity.activeMode = RedstoneMode.values()[message.targetMode()];
             addonEntity.monitoredSlot = message.targetSlot();
         }
     }
     
-    public static void receiveOnClient(RedstoneAddonClientUpdate message, World world, DynamicRegistryManager dynamicRegistryManager) {
+    public static void receiveOnClient(RedstoneAddonClientUpdate message, Level world, RegistryAccess dynamicRegistryManager) {
         if (world.getBlockEntity(message.position) instanceof RedstoneAddonBlockEntity addonEntity) {
             addonEntity.currentOutput = message.currentOutput();
             addonEntity.activeMode = RedstoneMode.values()[message.targetMode()];
@@ -163,22 +163,22 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     }
     
     // we need 2 here because Neoforge is annoying as always and doesnt let me register it in both directions
-    public record RedstoneAddonClientUpdate(BlockPos position, BlockPos controllerPos, int targetSlot, int targetMode, int currentOutput) implements CustomPayload {
+    public record RedstoneAddonClientUpdate(BlockPos position, BlockPos controllerPos, int targetSlot, int targetMode, int currentOutput) implements CustomPacketPayload {
         
-        public static final CustomPayload.Id<RedstoneAddonClientUpdate> PACKET_ID = new CustomPayload.Id<>(Oritech.id("redstoneaddonclient"));
+        public static final CustomPacketPayload.Type<RedstoneAddonClientUpdate> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("redstoneaddonclient"));
         
         @Override
-        public Id<? extends CustomPayload> getId() {
+        public Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;
         }
     }
     
-    public record RedstoneAddonServerUpdate(BlockPos position, BlockPos controllerPos, int targetSlot, int targetMode, int currentOutput) implements CustomPayload {
+    public record RedstoneAddonServerUpdate(BlockPos position, BlockPos controllerPos, int targetSlot, int targetMode, int currentOutput) implements CustomPacketPayload {
         
-        public static final CustomPayload.Id<RedstoneAddonServerUpdate> PACKET_ID = new CustomPayload.Id<>(Oritech.id("redstoneaddonserver"));
+        public static final CustomPacketPayload.Type<RedstoneAddonServerUpdate> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("redstoneaddonserver"));
         
         @Override
-        public Id<? extends CustomPayload> getId() {
+        public Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;
         }
     }

@@ -2,23 +2,6 @@ package rearth.oritech.block.entity.reactor;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.netty.buffer.Unpooled;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.InOutInventoryStorage;
@@ -36,10 +19,40 @@ import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.SimpleCraftingInventory;
 
 import java.util.List;
+import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuProvider, ScreenProvider, ItemApi.BlockProvider {
     
-    private final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::markDirty, new InventorySlotAssignment(0, 1, 1, 0));
+    private final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new InventorySlotAssignment(0, 1, 1, 0)) {
+        @Override
+        public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
+            
+            var craftingInv = new SimpleCraftingInventory(addedStack);
+            var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeContent.REACTOR, craftingInv, level);
+            if (recipeCandidate.isEmpty()) return 0;
+            
+            return super.insertToSlot(addedStack, slot, simulate);
+            
+        }
+    };
     
     @SyncField(SyncType.GUI_TICK)
     public int availableFuel;
@@ -51,23 +64,23 @@ public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuPr
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         
         nbt.putInt("available", availableFuel);
         nbt.putInt("capacity", currentFuelOriginalCapacity);
         
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         
         availableFuel = nbt.getInt("available");
         currentFuelOriginalCapacity = nbt.getInt("capacity");
         
-        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
     }
     
     // consumes remaining internal fuel when disabled, but will not consume new input items
@@ -80,48 +93,48 @@ public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuPr
         if (disabled) return false;
         
         // try consume input
-        var inputStack = inventory.getStack(0);
+        var inputStack = inventory.getItem(0);
         if (inputStack.isEmpty()) return false;
         
         var craftingInv = new SimpleCraftingInventory(inputStack);
-        var recipeCandidate = world.getRecipeManager().getFirstMatch(RecipeContent.REACTOR, craftingInv, world);
+        var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeContent.REACTOR, craftingInv, level);
         
         if (recipeCandidate.isEmpty()) return false;
         
         var capacity = recipeCandidate.get().value().getTime();
         currentFuelOriginalCapacity = capacity;
         availableFuel = capacity - amount;
-        inputStack.decrement(1);
+        inputStack.shrink(1);
         playLoadingSound();
         return true;
         
     }
     
     private void playLoadingSound() {
-        var variation = world.random.nextFloat() * 0.6f - 0.2f;
-        world.playSound(null, pos, SoundContent.REACTOR_LOADING, SoundCategory.BLOCKS, 0.5f, 0.8f + variation);
+        var variation = level.random.nextFloat() * 0.6f - 0.2f;
+        level.playSound(null, worldPosition, SoundContent.REACTOR_LOADING, SoundSource.BLOCKS, 0.5f, 0.8f + variation);
     }
     
     public void updateNetwork() {
-        var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
-        var fieldCount = NetworkManager.encodeFields(this, SyncType.GUI_TICK, usedBuf, world);
+        var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess());
+        var fieldCount = NetworkManager.encodeFields(this, SyncType.GUI_TICK, usedBuf, level);
         if (fieldCount == 0) return;
-        NetworkManager.sendBlockHandle(this, new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), SyncType.GUI_TICK, usedBuf.array()));
+        NetworkManager.sendBlockHandle(this, new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), SyncType.GUI_TICK, usedBuf.array()));
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
-        buf.writeBlockPos(pos);
+    public void saveExtraData(FriendlyByteBuf buf) {
+        buf.writeBlockPos(worldPosition);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.of("");
+    public Component getDisplayName() {
+        return Component.nullToEmpty("");
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new BasicMachineScreenHandler(syncId, playerInventory, this);
     }
     
@@ -156,12 +169,12 @@ public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuPr
     }
     
     @Override
-    public Inventory getDisplayedInventory() {
+    public Container getDisplayedInventory() {
         return inventory;
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.FUEL_PORT_SCREEN;
     }
     

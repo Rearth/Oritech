@@ -2,12 +2,12 @@ package rearth.oritech.api.fluid.containers;
 
 import dev.architectury.fluid.FluidStack;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.Direction;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.Tuple;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 // a specific storage for a generic "one input slot -> one output slot".
 // In is slot 0, out is slot 1.
-public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implements UpdatableField<Void, Pair<FluidStack, FluidStack>> {
+public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implements UpdatableField<Void, Tuple<FluidStack, FluidStack>> {
     
     private FluidStack contentIn;
     private FluidStack contentOut;
@@ -145,11 +145,6 @@ public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implement
     
     @Override
     public FluidApi.FluidStorage getStorageForDirection(@Nullable Direction direction) {
-        
-        if (direction == null) return this;
-        
-        if (direction.equals(Direction.UP)) return inputContainer;
-        if (direction.equals(Direction.DOWN)) return outputContainer;
         return this;
     }
     
@@ -176,12 +171,12 @@ public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implement
         return 2;
     }
     
-    public void writeNbt(NbtCompound nbt, String suffix) {
+    public void writeNbt(CompoundTag nbt, String suffix) {
         FluidStack.CODEC.encodeStart(NbtOps.INSTANCE, contentIn).result().ifPresent(tag -> nbt.put("fluidin" + suffix, tag));
         FluidStack.CODEC.encodeStart(NbtOps.INSTANCE, contentOut).result().ifPresent(tag -> nbt.put("fluidout" + suffix, tag));
     }
     
-    public void readNbt(NbtCompound nbt, String suffix) {
+    public void readNbt(CompoundTag nbt, String suffix) {
         contentIn = FluidStack.CODEC.parse(NbtOps.INSTANCE, nbt.get("fluidin" + suffix)).result().orElse(FluidStack.empty());
         contentOut = FluidStack.CODEC.parse(NbtOps.INSTANCE, nbt.get("fluidout" + suffix)).result().orElse(FluidStack.empty());
     }
@@ -243,8 +238,8 @@ public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implement
     }
     
     @Override
-    public Pair<FluidStack, FluidStack> getDeltaData() {
-        return new Pair<>(contentIn, contentOut);
+    public Tuple<FluidStack, FluidStack> getDeltaData() {
+        return new Tuple<>(contentIn, contentOut);
     }
     
     @Override
@@ -253,25 +248,25 @@ public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implement
     }
     
     @Override
-    public PacketCodec<? extends ByteBuf, Pair<FluidStack, FluidStack>> getDeltaCodec() {
-        return new PacketCodec<>() {
+    public StreamCodec<? extends ByteBuf, Tuple<FluidStack, FluidStack>> getDeltaCodec() {
+        return new StreamCodec<>() {
             @Override
-            public Pair<FluidStack, FluidStack> decode(ByteBuf buf) {
-                if (buf instanceof RegistryByteBuf registryByteBuf) {
+            public Tuple<FluidStack, FluidStack> decode(ByteBuf buf) {
+                if (buf instanceof RegistryFriendlyByteBuf registryByteBuf) {
                     var left = NetworkManager.FLUID_STACK_STREAM_CODEC.decode(registryByteBuf);
                     var right = NetworkManager.FLUID_STACK_STREAM_CODEC.decode(registryByteBuf);
-                    return new Pair<>(left, right);
+                    return new Tuple<>(left, right);
                 } else {
                     Oritech.LOGGER.error("Trying to decode storage data to non-registry buf! {}", buf);
-                    return new Pair<>(FluidStack.empty(), FluidStack.empty());
+                    return new Tuple<>(FluidStack.empty(), FluidStack.empty());
                 }
             }
             
             @Override
-            public void encode(ByteBuf buf, Pair<FluidStack, FluidStack> value) {
-                if (buf instanceof RegistryByteBuf registryByteBuf) {
-                    NetworkManager.FLUID_STACK_STREAM_CODEC.encode(registryByteBuf, value.getLeft());
-                    NetworkManager.FLUID_STACK_STREAM_CODEC.encode(registryByteBuf, value.getRight());
+            public void encode(ByteBuf buf, Tuple<FluidStack, FluidStack> value) {
+                if (buf instanceof RegistryFriendlyByteBuf registryByteBuf) {
+                    NetworkManager.FLUID_STACK_STREAM_CODEC.encode(registryByteBuf, value.getA());
+                    NetworkManager.FLUID_STACK_STREAM_CODEC.encode(registryByteBuf, value.getB());
                 } else {
                     Oritech.LOGGER.error("Trying to encode storage data to non-registry buf! {} in {}", buf, value);
                 }
@@ -280,7 +275,7 @@ public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implement
     }
     
     @Override
-    public PacketCodec<? extends ByteBuf, Void> getFullCodec() {
+    public StreamCodec<? extends ByteBuf, Void> getFullCodec() {
         return null;
     }
     
@@ -295,8 +290,8 @@ public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implement
     }
     
     @Override
-    public void handleDeltaUpdate(Pair<FluidStack, FluidStack> updatedData) {
-        this.contentIn = updatedData.getLeft();
-        this.contentOut = updatedData.getRight();
+    public void handleDeltaUpdate(Tuple<FluidStack, FluidStack> updatedData) {
+        this.contentIn = updatedData.getA();
+        this.contentOut = updatedData.getB();
     }
 }

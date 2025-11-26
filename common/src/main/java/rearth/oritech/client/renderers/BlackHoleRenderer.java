@@ -1,108 +1,108 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.world.phys.Vec3;
 import rearth.oritech.block.entity.accelerator.BlackHoleBlockEntity;
 import rearth.oritech.init.BlockContent;
 
 public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEntity> {
     
     @Override
-    public void render(BlackHoleBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(BlackHoleBlockEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
         
-        var time = entity.getWorld().getTime();
+        var time = entity.getLevel().getGameTime();
         // render block getting sucked in
         if (entity.currentlyPullingFrom != null && entity.currentlyPulling != null && entity.pullingStartedAt + entity.pullTime > time && !entity.currentlyPulling.isAir()) {
             
             var progress = (float) Math.pow((time + tickDelta - entity.pullingStartedAt) / (float) entity.pullTime, 1.3f);
-            var startPos = Vec3d.of(entity.currentlyPullingFrom);
-            var endPos = entity.getPos().toCenterPos();
+            var startPos = Vec3.atLowerCornerOf(entity.currentlyPullingFrom);
+            var endPos = entity.getBlockPos().getCenter();
             var renderedBlock = entity.currentlyPulling;
-            var offset = endPos.subtract(startPos).multiply(1 - progress);
+            var offset = endPos.subtract(startPos).scale(1 - progress);
             var rotationY = progress * entity.pullTime * 3;
             
-            matrices.push();
+            matrices.pushPose();
             matrices.translate(0.5, 0.5, 0.5);
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotationY));
+            matrices.mulPose(Axis.YP.rotationDegrees(rotationY));
             matrices.translate(-offset.x, -offset.y, -offset.z);
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotationY));
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotationY));
+            matrices.mulPose(Axis.XP.rotationDegrees(rotationY));
+            matrices.mulPose(Axis.ZP.rotationDegrees(rotationY));
             matrices.scale(1 - progress, 1 - progress, 1 - progress);
             
-            MinecraftClient.getInstance().getBlockRenderManager().renderBlock(
+            Minecraft.getInstance().getBlockRenderer().renderBatched(
               renderedBlock,
-              entity.getPos(),
-              entity.getWorld(),
+              entity.getBlockPos(),
+              entity.getLevel(),
               matrices,
-              vertexConsumers.getBuffer(RenderLayers.getBlockLayer(renderedBlock)),
+              vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(renderedBlock)),
               true,
-              entity.getWorld().random
+              entity.getLevel().random
             );
             
-            matrices.pop();
+            matrices.popPose();
             
         }
         
         renderBlackHole(entity, tickDelta, matrices, vertexConsumers);
     }
     
-    private static void renderBlackHole(BlackHoleBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers) {
-        var time = entity.getWorld().getTime() + tickDelta;
+    private static void renderBlackHole(BlackHoleBlockEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers) {
+        var time = entity.getLevel().getGameTime() + tickDelta;
         var rotationY = (time * 1.2f) % 360;
         var rotationX = Math.sin(time * 0.02) * 5;
         
-        matrices.push();
+        matrices.pushPose();
         
         matrices.translate(0.5f, 0.5f, 0.5f);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotationY));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) rotationX));
+        matrices.mulPose(Axis.YP.rotationDegrees(rotationY));
+        matrices.mulPose(Axis.XP.rotationDegrees((float) rotationX));
         matrices.translate(-0.5f, -0.5f, -0.5f);
         
-        MinecraftClient.getInstance().getBlockRenderManager().renderBlock(
-          BlockContent.BLACK_HOLE_INNER.getDefaultState(),
-          entity.getPos(),
-          entity.getWorld(),
+        Minecraft.getInstance().getBlockRenderer().renderBatched(
+          BlockContent.BLACK_HOLE_INNER.defaultBlockState(),
+          entity.getBlockPos(),
+          entity.getLevel(),
           matrices,
-          vertexConsumers.getBuffer(RenderLayer.getEndGateway()),
+          vertexConsumers.getBuffer(RenderType.endGateway()),
           true,
-          entity.getWorld().random
+          entity.getLevel().random
         );
         
-        MinecraftClient.getInstance().getBlockRenderManager().renderBlock(
-          BlockContent.BLACK_HOLE_MIDDLE.getDefaultState(),
-          entity.getPos(),
-          entity.getWorld(),
+        Minecraft.getInstance().getBlockRenderer().renderBatched(
+          BlockContent.BLACK_HOLE_MIDDLE.defaultBlockState(),
+          entity.getBlockPos(),
+          entity.getLevel(),
           matrices,
-          vertexConsumers.getBuffer(RenderLayers.getBlockLayer(BlockContent.BLACK_HOLE_MIDDLE.getDefaultState())),
+          vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(BlockContent.BLACK_HOLE_MIDDLE.defaultBlockState())),
           true,
-          entity.getWorld().random
+          entity.getLevel().random
         );
         
-        matrices.pop();
-        matrices.push();
+        matrices.popPose();
+        matrices.pushPose();
         
         matrices.translate(0.5f, 0.5f, 0.5f);
         rotationY = (time * 1.1f) % 360;
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotationY));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) rotationX));
+        matrices.mulPose(Axis.YP.rotationDegrees(rotationY));
+        matrices.mulPose(Axis.XP.rotationDegrees((float) rotationX));
         matrices.translate(-0.5f, -0.5f, -0.5f);
         
-        MinecraftClient.getInstance().getBlockRenderManager().renderBlock(
-          BlockContent.BLACK_HOLE_OUTER.getDefaultState(),
-          entity.getPos(),
-          entity.getWorld(),
+        Minecraft.getInstance().getBlockRenderer().renderBatched(
+          BlockContent.BLACK_HOLE_OUTER.defaultBlockState(),
+          entity.getBlockPos(),
+          entity.getLevel(),
           matrices,
-          vertexConsumers.getBuffer(RenderLayers.getBlockLayer(BlockContent.BLACK_HOLE_OUTER.getDefaultState())),
+          vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(BlockContent.BLACK_HOLE_OUTER.defaultBlockState())),
           true,
-          entity.getWorld().random
+          entity.getLevel().random
         );
         
-        matrices.pop();
+        matrices.popPose();
     }
 }

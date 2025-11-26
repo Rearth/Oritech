@@ -1,7 +1,7 @@
 package rearth.oritech.block.blocks.reactor;
 
 public class ReactorHeatVentBlock extends BaseReactorBlock {
-    public ReactorHeatVentBlock(Settings settings) {
+    public ReactorHeatVentBlock(Properties settings) {
         super(settings);
     }
     

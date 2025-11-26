@@ -3,22 +3,29 @@ package rearth.oritech.client.ui;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.DiscreteSliderComponent;
 import io.wispforest.owo.ui.component.LabelComponent;
+import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
+import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity.RedstoneControllable;
+import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity.RedstoneMode;
 import rearth.oritech.util.ScreenProvider;
-
+import rearth.oritech.util.ScreenProvider.ArrowConfiguration;
+import rearth.oritech.util.ScreenProvider.GuiSlot;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.player.Inventory;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.ORITECH_PANEL;
 import static rearth.oritech.client.ui.BasicMachineScreen.getItemFrame;
+
 
 public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, RedstoneAddonScreenHandler> {
     
@@ -28,7 +35,7 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
     private FlowLayout buttonContainer;
     private LabelComponent descriptionLabel;
     
-    public RedstoneAddonScreen(RedstoneAddonScreenHandler handler, PlayerInventory inventory, Text title) {
+    public RedstoneAddonScreen(RedstoneAddonScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
     
@@ -52,7 +59,7 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
         rootComponent.child(spacer);
         
         var modes = RedstoneAddonBlockEntity.RedstoneMode.values();
-        var activeMode = handler.blockEntity.activeMode;
+        var activeMode = menu.blockEntity.activeMode;
         
         activeLabel = Components.label(getModeText(activeMode));
         activeLabel.horizontalTextAlignment(HorizontalAlignment.CENTER);
@@ -84,7 +91,7 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
         activeLabel.text(getModeText(activeMode));
         descriptionLabel.text(getDescriptionText(activeMode));
         
-        handler.blockEntity.activeMode = activeMode;
+        menu.blockEntity.activeMode = activeMode;
         
         if (activeMode.equals(RedstoneAddonBlockEntity.RedstoneMode.OUTPUT_SLOT)) {
             overlay.verticalSizing().animate(250, Easing.CUBIC, Sizing.fixed(194)).forwards();
@@ -100,7 +107,7 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
     private void addSlotSelector() {
         removeSlotSelector();   // in case the user is moving really fast and the call order is messed up
         
-        var controller = handler.blockEntity.getCachedController();
+        var controller = menu.blockEntity.getCachedController();
         if (!(controller instanceof ScreenProvider screenProvider)) return;
         
         var slots = screenProvider.getGuiSlots();
@@ -110,12 +117,12 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
         // small separator line
         buttonContainer.child(Components.box(Sizing.fixed(160), Sizing.fixed(1)).color(new Color(0.1f, 0.1f, 0.1f)).positioning(Positioning.absolute(8, 0)));
         
-        var title = Components.label(Text.translatable("title.oritech.redstone_addon"));
+        var title = Components.label(Component.translatable("title.oritech.redstone_addon"));
         title.horizontalTextAlignment(HorizontalAlignment.CENTER);
         buttonContainer.child(title.positioning(Positioning.relative(50, 5)));
         
         for (var slot : slots) {
-            var button = Components.button(Text.literal(" "), elem -> {
+            var button = Components.button(Component.literal(" "), elem -> {
                 setActiveSlot(slot.index());
             });
             buttons.add(button);
@@ -123,7 +130,7 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
             buttonContainer.child(button.sizing(Sizing.fixed(10)).positioning(Positioning.absolute(slot.x() + 3, slot.y() + 3)));
         }
         
-        setActiveSlot(handler.blockEntity.monitoredSlot);
+        setActiveSlot(menu.blockEntity.monitoredSlot);
         
         if (screenProvider.showProgress()) {
             var arrowConfig = screenProvider.getIndicatorConfiguration();
@@ -148,20 +155,20 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
             button.active = i != slot;
         }
         
-        handler.blockEntity.monitoredSlot = slot;
+        menu.blockEntity.monitoredSlot = slot;
         triggerServerUpdate();
     }
     
-    private Text getModeText(RedstoneAddonBlockEntity.RedstoneMode mode) {
-        return Text.translatable("title.oritech.redstone_" + mode.toString().toLowerCase()).formatted(Formatting.BOLD, Formatting.DARK_GRAY);
+    private Component getModeText(RedstoneAddonBlockEntity.RedstoneMode mode) {
+        return Component.translatable("title.oritech.redstone_" + mode.toString().toLowerCase()).withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_GRAY);
     }
     
-    private Text getDescriptionText(RedstoneAddonBlockEntity.RedstoneMode mode) {
-        return Text.translatable("tooltip.oritech.redstone_" + mode.toString().toLowerCase()).formatted(Formatting.BLACK);
+    private Component getDescriptionText(RedstoneAddonBlockEntity.RedstoneMode mode) {
+        return Component.translatable("tooltip.oritech.redstone_" + mode.toString().toLowerCase()).withStyle(ChatFormatting.BLACK);
     }
     
     private void addTitle(FlowLayout overlay) {
-        var blockTitle = handler.blockEntity.getCachedState().getBlock().getName();
+        var blockTitle = menu.blockEntity.getBlockState().getBlock().getName();
         var label = Components.label(blockTitle);
         label.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
         label.sizing(Sizing.fixed(176), Sizing.content(2));
@@ -171,6 +178,6 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
     }
     
     private void triggerServerUpdate() {
-        handler.blockEntity.sendDataToServer();
+        menu.blockEntity.sendDataToServer();
     }
 }

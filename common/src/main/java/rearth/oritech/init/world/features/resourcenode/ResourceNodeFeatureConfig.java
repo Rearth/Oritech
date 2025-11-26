@@ -3,12 +3,11 @@ package rearth.oritech.init.world.features.resourcenode;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.gen.feature.FeatureConfig;
-
 import java.util.List;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
-public record ResourceNodeFeatureConfig(int nodeSize, int boulderRadius, List<Identifier> nodeOres, float nodeOreChance, List<Identifier> boulderOres, Identifier overlayBlock, int overlayHeight) implements FeatureConfig {
+public record ResourceNodeFeatureConfig(int nodeSize, int boulderRadius, List<ResourceLocation> nodeOres, float nodeOreChance, List<ResourceLocation> boulderOres, ResourceLocation overlayBlock, int overlayHeight) implements FeatureConfiguration {
     
     public static final Endec<ResourceNodeFeatureConfig> NODE_FEATURE_ENDEC = StructEndecBuilder.of(
       Endec.INT.fieldOf("nodeSize", ResourceNodeFeatureConfig::nodeSize),

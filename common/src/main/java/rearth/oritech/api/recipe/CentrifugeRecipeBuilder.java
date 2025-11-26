@@ -1,6 +1,6 @@
 package rearth.oritech.api.recipe;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class CentrifugeRecipeBuilder extends OritechRecipeBuilder {
@@ -15,7 +15,7 @@ public class CentrifugeRecipeBuilder extends OritechRecipeBuilder {
     }
 
     @Override
-    public void validate(Identifier id) throws IllegalStateException {
+    public void validate(ResourceLocation id) throws IllegalStateException {
         if ((inputs == null || inputs.isEmpty()) || (results == null || results.isEmpty()))
             throw new IllegalStateException("inputs and results are required for recipe " + id + " (type " + type + ")");
         if (inputs.size() > 1)

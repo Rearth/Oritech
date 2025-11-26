@@ -9,7 +9,7 @@
   "cast": [],
   "consume_cast": false,
   "fluid": {
-    "amount": 900,
+    "amount": 810,
     "fluid": "productivemetalworks:molten_electrum"
   },
   "result": {

@@ -1,23 +1,23 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.PortalEntity;
 import software.bernie.geckolib.model.GeoModel;
 
 public class PortalEntityModel extends GeoModel<PortalEntity> {
     @Override
-    public Identifier getModelResource(PortalEntity animatable) {
+    public ResourceLocation getModelResource(PortalEntity animatable) {
         return Oritech.id("geo/entity/portal.geo.json");
     }
     
     @Override
-    public Identifier getTextureResource(PortalEntity animatable) {
+    public ResourceLocation getTextureResource(PortalEntity animatable) {
         return Oritech.id("textures/entity/portal.png");
     }
     
     @Override
-    public Identifier getAnimationResource(PortalEntity animatable) {
+    public ResourceLocation getAnimationResource(PortalEntity animatable) {
         return Oritech.id("animations/entity/portal.animation.json");
     }
 }

@@ -1,10 +1,5 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2f;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
@@ -13,15 +8,19 @@ import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.model.DefaultedBlockGeoModel;
-
 import java.util.HashMap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 
 public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extends DefaultedBlockGeoModel<T> {
     
     private static final HashMap<Long, ModelRenderData> additionalData = new HashMap<>();
-    private static final HashMap<Long, Vec3d> drillOffsets = new HashMap<>();
+    private static final HashMap<Long, Vec3> drillOffsets = new HashMap<>();
     
-    private Vec3d lastActivePlayerPos = Vec3d.ZERO;
+    private Vec3 lastActivePlayerPos = Vec3.ZERO;
     
     public LaserArmModel(String subpath) {
         super(Oritech.id(subpath));
@@ -31,39 +30,39 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
         return additionalData.computeIfAbsent(id, s -> new ModelRenderData(0, 0, getAnimationProcessor().getBone("pivotX"), getAnimationProcessor().getBone("pivotY")));
     }
     
-    private Vec3d getOffsetByDrillId(long id, T laserEntity) {
+    private Vec3 getOffsetByDrillId(long id, T laserEntity) {
         return drillOffsets.computeIfAbsent(id, s -> {
-            var drillFacing = laserEntity.getWorld().getBlockState(laserEntity.getCurrentTarget()).get(Properties.HORIZONTAL_FACING);
-            return Geometry.rotatePosition(new Vec3d(1, 1.4, 0), drillFacing);
+            var drillFacing = laserEntity.getLevel().getBlockState(laserEntity.getCurrentTarget()).getValue(BlockStateProperties.HORIZONTAL_FACING);
+            return Geometry.rotatePosition(new Vec3(1, 1.4, 0), drillFacing);
         });
     }
     
     @Override
     public void setCustomAnimations(T laserEntity, long instanceId, AnimationState<T> animationState) {
         
-        Vec3d target;
+        Vec3 target;
         var isIdle = false;
-        if (laserEntity.getCurrentTarget() == null || laserEntity.getCurrentTarget().isWithinDistance(BlockPos.ORIGIN, 0.1f))  {
+        if (laserEntity.getCurrentTarget() == null || laserEntity.getCurrentTarget().closerThan(BlockPos.ZERO, 0.1f))  {
             target = getIdleTarget(laserEntity);
             isIdle = true;
         } else {
             target = laserEntity.getVisualTarget();
         }
         
-        if (target == null || target == Vec3d.ZERO) return;
+        if (target == null || target == Vec3.ZERO) return;
         
-        if (!isIdle && laserEntity.isTargetingDeepdrill(laserEntity.getWorld().getBlockState(laserEntity.getCurrentTarget()).getBlock())) {
+        if (!isIdle && laserEntity.isTargetingDeepdrill(laserEntity.getLevel().getBlockState(laserEntity.getCurrentTarget()).getBlock())) {
             var drillId = laserEntity.getCurrentTarget().asLong();
             var offset = getOffsetByDrillId(drillId, laserEntity);
             target = target.add(offset);
         }
         
         var ownPos = laserEntity.laserHead;
-        var facing = laserEntity.getCachedState().get(Properties.FACING);
+        var facing = laserEntity.getBlockState().getValue(BlockStateProperties.FACING);
         var offset = Geometry.worldToOffsetPosition(facing, target, ownPos);
         
         // thanks to: https://math.stackexchange.com/questions/878785/how-to-find-an-angle-in-range0-360-between-2-vectors
-        var offsetY = new Vector2f((float) offset.getX(), (float) offset.getY());
+        var offsetY = new Vector2f((float) offset.x(), (float) offset.y());
         var forwardY = new Vector2f(0, -1);
         if (facing == Direction.NORTH)
             forwardY = new Vector2f(0, 1);
@@ -75,7 +74,7 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
         
         // to create a 2d vector in a plane based on normal angleY
         var lengthY = offsetY.length();
-        var heightDiff = offset.getZ();
+        var heightDiff = offset.z();
         
         var offsetX = new Vector2f(lengthY, (float) heightDiff);
         var forwardX = new Vector2f(0, 1);
@@ -99,17 +98,17 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
         
     }
     
-    private Vec3d getIdleTarget(T entity) {
+    private Vec3 getIdleTarget(T entity) {
         
-        var offsetA = new Vec3d(0, Math.pow(Math.sin(entity.getWorld().getTime() / 40f), 3), 0);
-        var offsetB = new Vec3d(Math.pow(Math.sin(entity.getWorld().getTime() / 40f + 1.3f), 3), 0, 0);
+        var offsetA = new Vec3(0, Math.pow(Math.sin(entity.getLevel().getGameTime() / 40f), 3), 0);
+        var offsetB = new Vec3(Math.pow(Math.sin(entity.getLevel().getGameTime() / 40f + 1.3f), 3), 0, 0);
         
-        if (entity.getWorld().getRandom().nextFloat() > 0.9f) {
-             lastActivePlayerPos = MinecraftClient.getInstance().player.getEyePos();
+        if (entity.getLevel().getRandom().nextFloat() > 0.9f) {
+             lastActivePlayerPos = Minecraft.getInstance().player.getEyePosition();
         }
         
-        if (lastActivePlayerPos.equals(Vec3d.ZERO))
-            return Vec3d.ZERO;
+        if (lastActivePlayerPos.equals(Vec3.ZERO))
+            return Vec3.ZERO;
         
         // return lastActivePlayerPos;
         

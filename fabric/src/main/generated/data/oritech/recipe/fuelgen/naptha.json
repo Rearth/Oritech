@@ -1,0 +1,11 @@
+{
+  "type": "oritech:fuel_generator",
+  "fluidInput": {
+    "amount": 8100,
+    "fluid": "#c:naphtha"
+  },
+  "fluidOutputs": [],
+  "ingredients": [],
+  "results": [],
+  "time": 40
+}

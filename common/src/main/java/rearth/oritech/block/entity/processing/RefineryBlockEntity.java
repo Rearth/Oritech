@@ -2,25 +2,10 @@ package rearth.oritech.block.entity.processing;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi.SingleSlotStorage;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
@@ -41,16 +26,32 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class RefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
     // own storage is exposed through this multiblock, the other storages are exposed through the respective modules
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
-    public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(64 * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(64 * FluidStackHooks.bucketAmount(), this::setChanged);
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
-    public final SimpleFluidStorage nodeA = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleFluidStorage nodeA = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged);
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
-    public final SimpleFluidStorage nodeB = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleFluidStorage nodeB = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged);
     
     @SyncField(SyncType.GUI_OPEN)
     private int moduleCount;    // range 0-2
@@ -60,25 +61,25 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         super.serverTick(world, pos, state, blockEntity);
         
-        if (world.getTime() % 25 == 0) {
+        if (world.getGameTime() % 25 == 0) {
             refreshModules();
         }
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         ownStorage.writeNbt(nbt, "main");
         nodeA.writeNbt(nbt, "a");
         nodeB.writeNbt(nbt, "b");
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         ownStorage.readNbt(nbt, "main");
         nodeA.readNbt(nbt, "a");
         nodeB.readNbt(nbt, "b");
@@ -86,12 +87,12 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     
     private void refreshModules() {
         moduleCount = 0;
-        var startPos = pos.up(2);
+        var startPos = worldPosition.above(2);
         
         for (int i = 0; i <= 1; i++) {
-            var candidatePos = startPos.add(0, i, 0);
-            var candidate = world.getBlockEntity(candidatePos, BlockEntitiesContent.REFINERY_MODULE_ENTITY);
-            if (candidate.isEmpty() || !candidate.get().isActive(candidate.get().getCachedState())) break;
+            var candidatePos = startPos.offset(0, i, 0);
+            var candidate = level.getBlockEntity(candidatePos, BlockEntitiesContent.REFINERY_MODULE_ENTITY);
+            if (candidate.isEmpty() || !candidate.get().isActive(candidate.get().getBlockState())) break;
             
             moduleCount++;
             candidate.get().setOwningRefinery(this);
@@ -103,10 +104,10 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
     
     @Override
-    protected Optional<RecipeEntry<OritechRecipe>> getRecipe() {
+    protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
         
         // get recipes matching input items
-        var candidates = Objects.requireNonNull(world).getRecipeManager().getAllMatches(getOwnRecipeType(), getInputInventory(), world);
+        var candidates = Objects.requireNonNull(level).getRecipeManager().getRecipesFor(getOwnRecipeType(), getInputInventory(), level);
         // filter out recipes based on input tank. Have the ones with input items first.
         var fluidRecipe = candidates
                             .stream()
@@ -194,7 +195,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new RefineryScreenHandler(syncId, playerInventory, this);
     }
     
@@ -222,13 +223,13 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     protected void useEnergy() {
         super.useEnergy();
         
-        if (world.random.nextFloat() > 0.8) return;
+        if (level.random.nextFloat() > 0.8) return;
         // emit particles
         var facing = getFacing();
-        var offsetLocal = Geometry.rotatePosition(new Vec3d(0.3, 0.5, 0.3), facing);
-        var emitPosition = Vec3d.ofCenter(pos).add(offsetLocal);
+        var offsetLocal = Geometry.rotatePosition(new Vec3(0.3, 0.5, 0.3), facing);
+        var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        ParticleContent.COOLER_WORKING.spawn(world, emitPosition, 1);
+        ParticleContent.COOLER_WORKING.spawn(level, emitPosition, 1);
         
     }
     
@@ -245,7 +246,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.REFINERY_SCREEN;
     }
     
@@ -298,15 +299,15 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
     
     public FluidApi.FluidStorage getFluidStorageForModule(BlockPos modulePos) {
-        var yDist = modulePos.getY() - this.pos.getY();
+        var yDist = modulePos.getY() - this.worldPosition.getY();
         if (yDist == 2) return nodeA;
         if (yDist == 3) return nodeB;
         throw new IllegalStateException("Module needs to be either 1 or 2 blocks above");
     }
     
     @Override
-    public List<Pair<Text, Text>> getExtraExtensionLabels() {
-        return List.of(new Pair<>(Text.literal("\uD83D\uDCE6: " + moduleCount), Text.translatable("tooltip.oritech.refinery_module_count")));
+    public List<Tuple<Component, Component>> getExtraExtensionLabels() {
+        return List.of(new Tuple<>(Component.literal("\uD83D\uDCE6: " + moduleCount), Component.translatable("tooltip.oritech.refinery_module_count")));
     }
     
     public FluidApi.SingleSlotStorage getOutputStorage(int i) {

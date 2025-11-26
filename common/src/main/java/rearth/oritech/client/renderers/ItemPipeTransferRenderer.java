@@ -1,25 +1,27 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
-
+import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity.RenderStackData;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import java.util.HashSet;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
 public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInterfaceEntity> {
     
     @Override
-    public void render(ItemPipeInterfaceEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(ItemPipeInterfaceEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
         
         if (entity.activeStacks == null || entity.activeStacks.isEmpty()) return;
         
-        var time = entity.getWorld().getTime() + tickDelta;
+        var time = entity.getLevel().getGameTime() + tickDelta;
         var removedStacks = new HashSet<ItemPipeInterfaceEntity.RenderStackData>();
         
         for (var renderedStack : entity.activeStacks) {
@@ -37,45 +39,45 @@ public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInt
             var targetPathProgress = renderedStack.pathLength() * progress;
             var pathProgress = 0;
             var pathPosition = renderedStack.path().getFirst();
-            Vec3d targetPos = Vec3d.ZERO;
+            Vec3 targetPos = Vec3.ZERO;
             
             for (var segment : renderedStack.path()) {
-                var segmentDist = segment.getManhattanDistance(pathPosition);
+                var segmentDist = segment.distManhattan(pathPosition);
                 
                 if (pathProgress + segmentDist < targetPathProgress) {
                     pathProgress += segmentDist;
                     pathPosition = segment;
                 } else {    // reaching or overshooting target
                     var remainingDist = targetPathProgress - pathProgress;
-                    var targetOffset = Vec3d.of(segment.subtract(pathPosition)).normalize().multiply(remainingDist);
-                    targetPos = Vec3d.of(pathPosition).add(targetOffset);
+                    var targetOffset = Vec3.atLowerCornerOf(segment.subtract(pathPosition)).normalize().scale(remainingDist);
+                    targetPos = Vec3.atLowerCornerOf(pathPosition).add(targetOffset);
                     break;
                 }
                 
             }
             
-            var offset = targetPos.subtract(Vec3d.of(entity.getPos()));
+            var offset = targetPos.subtract(Vec3.atLowerCornerOf(entity.getBlockPos()));
             
-            matrices.push();
+            matrices.pushPose();
             matrices.translate(offset.x + 0.5, offset.y + 0.5, offset.z + 0.5);
             matrices.scale(0.4f, 0.4f, 0.4f);
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-140));
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-30));
+            matrices.mulPose(Axis.YP.rotationDegrees(-140));
+            matrices.mulPose(Axis.XP.rotationDegrees(-30));
             
             var renderedItem = renderedStack.rendered();
             
-            MinecraftClient.getInstance().getItemRenderer().renderItem(
+            Minecraft.getInstance().getItemRenderer().renderStatic(
               renderedItem,
-              ModelTransformationMode.GUI,
+              ItemDisplayContext.GUI,
               light,
-              OverlayTexture.DEFAULT_UV,
+              OverlayTexture.NO_OVERLAY,
               matrices,
               vertexConsumers,
-              entity.getWorld(),
+              entity.getLevel(),
               0
             );
             
-            matrices.pop();
+            matrices.popPose();
             
         }
         

@@ -1,8 +1,10 @@
 package rearth.oritech.init.compat.rei.Screens;
 
+import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import io.wispforest.owo.compat.rei.ReiUIAdapter;
 import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
@@ -14,28 +16,31 @@ import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
+import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.client.ui.BasicMachineScreen;
 import rearth.oritech.init.compat.rei.OritechDisplay;
 import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.util.FluidIngredient;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
-
+import rearth.oritech.util.ScreenProvider.GuiSlot;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.StringJoiner;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
+
 
 public class OritechReiDisplay implements DisplayCategory<Display> {
     
@@ -43,14 +48,14 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
     private final Boolean isGenerator;
     private final List<ScreenProvider.GuiSlot> slots;
     private final InventorySlotAssignment slotOffsets;
-    protected final ItemConvertible icon;
+    protected final ItemLike icon;
     private final ScreenProvider.ArrowConfiguration indicatorConfig;
     
-    public OritechReiDisplay(OritechRecipeType recipeType, Class<? extends MachineBlockEntity> screenProviderSource, ItemConvertible icon) {
+    public OritechReiDisplay(OritechRecipeType recipeType, Class<? extends MachineBlockEntity> screenProviderSource, ItemLike icon) {
         
-        var blockState = Blocks.STONE.getDefaultState();
+        var blockState = Blocks.STONE.defaultBlockState();
         if (icon instanceof Block blockItem)
-            blockState = blockItem.getDefaultState();
+            blockState = blockItem.defaultBlockState();
         var finalBlockState = blockState;
         
         this.recipeType = recipeType;
@@ -67,7 +72,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         this.icon = icon;
     }
     
-    public OritechReiDisplay(OritechRecipeType recipeType, ItemConvertible icon, boolean isGenerator, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment assignments) {
+    public OritechReiDisplay(OritechRecipeType recipeType, ItemLike icon, boolean isGenerator, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment assignments) {
         
         this.recipeType = recipeType;
         this.icon = icon;
@@ -138,7 +143,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         // data
         var duration = String.format("%.0f", display.getEntry().value().getTime() / 20f);
         root.child(
-          Components.label(Text.translatable("rei.title.oritech.cookingtime", duration, display.getEntry().value().getTime())).lineHeight(7)
+          Components.label(Component.translatable("rei.title.oritech.cookingtime", duration, display.getEntry().value().getTime())).lineHeight(7)
             .positioning(Positioning.relative(90, 100))
         );
         
@@ -150,8 +155,8 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             
             
             var text = fluidInput.amount() > 0
-                ? Text.translatable("tooltip.oritech.fluid_content", fluidInput.amount(), fluidInput.name())
-                : Text.translatable("tooltip.oritech.fluid_empty");
+                ? Component.translatable("tooltip.oritech.fluid_content", fluidInput.amount(), fluidInput.name())
+                : Component.translatable("tooltip.oritech.fluid_empty");
 
             if (fluidInput.hasTag()) {
                 var joiner = new StringJoiner(", ", "\n", "");
@@ -159,7 +164,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
                 for (var fluidStack : fluidInput.getFluidStacks()) {
                     joiner.add(fluidStack.getName().getString());
                 }
-                var fluidsText = MutableText.of(Text.of(Text.of(joiner.toString()).asTruncatedString(40)).getContent()).withColor(BasicMachineScreen.GRAY_TEXT_COLOR);
+                var fluidsText = MutableComponent.create(Component.nullToEmpty(Component.nullToEmpty(joiner.toString()).getString(40)).getContents()).withColor(BasicMachineScreen.GRAY_TEXT_COLOR);
                 text.append(fluidsText);
             }
 
@@ -180,8 +185,8 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
                 root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(fluidResult, new ScreenProvider.BarConfiguration(tankStartX + tankCount * 20 + 1, 5, 16, 50)));
                 
                 var text = amount > 0
-                             ? Text.translatable("tooltip.oritech.fluid_content", amount, FluidStackHooks.getName(fluidResult).getString())
-                             : Text.translatable("tooltip.oritech.fluid_empty");
+                             ? Component.translatable("tooltip.oritech.fluid_content", amount, FluidStackHooks.getName(fluidResult).getString())
+                             : Component.translatable("tooltip.oritech.fluid_empty");
                 var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
                 foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));
                 foreGround.positioning(Positioning.absolute(tankStartX + tankCount * 20, 4));
@@ -200,8 +205,8 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
     }
     
     @Override
-    public Text getTitle() {
-        return Text.translatable("rei.process." + recipeType.getIdentifier());
+    public Component getTitle() {
+        return Component.translatable("rei.process." + recipeType.getIdentifier());
     }
     
     @Override

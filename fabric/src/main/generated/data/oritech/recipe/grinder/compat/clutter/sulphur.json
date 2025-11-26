@@ -1,0 +1,28 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "clutter"
+      ]
+    }
+  ],
+  "type": "oritech:grinder",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "item": "clutter:sulphur_block"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "clutter:sulphur"
+    }
+  ],
+  "time": 60
+}

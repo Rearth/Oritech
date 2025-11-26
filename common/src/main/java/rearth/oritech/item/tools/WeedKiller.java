@@ -1,42 +1,42 @@
 package rearth.oritech.item.tools;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import rearth.oritech.client.init.ParticleContent;
-
 import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class WeedKiller extends Item {
-    public WeedKiller(Settings settings) {
+    public WeedKiller(Properties settings) {
         super(settings);
     }
     
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        if (context.getWorld().isClient())
-            return super.useOnBlock(context);
+    public InteractionResult useOn(UseOnContext context) {
+        if (context.getLevel().isClientSide())
+            return super.useOn(context);
         
-        var startPos = context.getBlockPos();
+        var startPos = context.getClickedPos();
         
-        new Thread(() -> doWeedKilling(context.getWorld(), startPos)).start();
+        new Thread(() -> doWeedKilling(context.getLevel(), startPos)).start();
         
-        context.getStack().decrementUnlessCreative(1, context.getPlayer());
+        context.getItemInHand().consume(1, context.getPlayer());
         
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
     
-    private void doWeedKilling(World world, BlockPos startPos) {
+    private void doWeedKilling(Level world, BlockPos startPos) {
         
         var maxRange = 20;
         var spreadRange = 3;
@@ -51,16 +51,16 @@ public class WeedKiller extends Item {
                 for (int y = -1; y <= 1; y++) {
                     for (int z = -spreadRange; z <= spreadRange; z++) {
                         
-                        var target = new BlockPos(candidate.add(x,y,z));
+                        var target = new BlockPos(candidate.offset(x,y,z));
                         
                         if (visited.contains(target)) continue;
-                        var distance = target.getManhattanDistance(startPos);
+                        var distance = target.distManhattan(startPos);
                         
                         if (isWeedBlock(target, world) && distance < maxRange) {
                             open.add(target);
-                            world.setBlockState(target, Blocks.AIR.getDefaultState());
+                            world.setBlockAndUpdate(target, Blocks.AIR.defaultBlockState());
                             
-                            ParticleContent.WEED_KILLER.spawn(world, target.toCenterPos(), new ParticleContent.LineData(candidate.toCenterPos(), target.toCenterPos()));
+                            ParticleContent.WEED_KILLER.spawn(world, target.getCenter(), new ParticleContent.LineData(candidate.getCenter(), target.getCenter()));
                             
                             try {
                                 Thread.sleep(50);
@@ -81,14 +81,14 @@ public class WeedKiller extends Item {
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
-        tooltip.add(Text.translatable("tooltip.oritech.weed_killer").formatted(Formatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+        super.appendHoverText(stack, context, tooltip, type);
+        tooltip.add(Component.translatable("tooltip.oritech.weed_killer").withStyle(ChatFormatting.GRAY));
     }
     
-    private boolean isWeedBlock(BlockPos pos, World world) {
+    private boolean isWeedBlock(BlockPos pos, Level world) {
         var state = world.getBlockState(pos);
-        if (state.isAir() || state.getFluidState().isStill()) return false;
-        return state.isReplaceable() || state.isIn(BlockTags.FLOWERS);
+        if (state.isAir() || state.getFluidState().isSource()) return false;
+        return state.canBeReplaced() || state.is(BlockTags.FLOWERS);
     }
 }

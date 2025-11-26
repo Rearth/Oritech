@@ -2,12 +2,12 @@ package rearth.oritech.api.fluid.containers;
 
 import dev.architectury.fluid.FluidStack;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.SyncType;
@@ -65,11 +65,11 @@ public class SimpleFluidStorage extends FluidApi.SingleSlotStorage implements Up
         return List.of(content);
     }
     
-    public void writeNbt(NbtCompound nbt, String suffix) {
+    public void writeNbt(CompoundTag nbt, String suffix) {
         FluidStack.CODEC.encodeStart(NbtOps.INSTANCE, content).result().ifPresent(tag -> nbt.put("fluid" + suffix, tag));
     }
     
-    public void readNbt(NbtCompound nbt, String suffix) {
+    public void readNbt(CompoundTag nbt, String suffix) {
         content = FluidStack.CODEC.parse(NbtOps.INSTANCE, nbt.get("fluid" + suffix)).result().orElse(FluidStack.empty());
     }
     
@@ -89,11 +89,11 @@ public class SimpleFluidStorage extends FluidApi.SingleSlotStorage implements Up
         return content.getFluid();
     }
     
-    public void setChanges(ComponentChanges data) {
+    public void setChanges(DataComponentPatch data) {
         content = FluidStack.create(getFluid(), getAmount(), data);
     }
     
-    public ComponentChanges getChanges() {
+    public DataComponentPatch getChanges() {
         return content.getPatch();
     }
     
@@ -133,12 +133,12 @@ public class SimpleFluidStorage extends FluidApi.SingleSlotStorage implements Up
     }
     
     @Override
-    public PacketCodec<? extends ByteBuf, FluidStack> getDeltaCodec() {
+    public StreamCodec<? extends ByteBuf, FluidStack> getDeltaCodec() {
         return NetworkManager.FLUID_STACK_STREAM_CODEC;
     }
     
     @Override
-    public PacketCodec<? extends ByteBuf, Void> getFullCodec() {
+    public StreamCodec<? extends ByteBuf, Void> getFullCodec() {
         return null;
     }
     

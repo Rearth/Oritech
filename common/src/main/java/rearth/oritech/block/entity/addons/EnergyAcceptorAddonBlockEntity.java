@@ -1,8 +1,5 @@
 package rearth.oritech.block.entity.addons;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
@@ -10,6 +7,9 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements EnergyApi.BlockProvider {
     private final DelegatingEnergyStorage delegatedStorage = new DelegatingEnergyStorage(this::getMainStorage, this::isConnected);
@@ -21,13 +21,13 @@ public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements 
     }
     
     private boolean isConnected() {
-        var isUsed = this.getCachedState().get(MachineAddonBlock.ADDON_USED);
+        var isUsed = this.getBlockState().getValue(MachineAddonBlock.ADDON_USED);
         return isUsed && getCachedController() != null;
     }
     
     private EnergyApi.EnergyStorage getMainStorage() {
         
-        var isUsed = this.getCachedState().get(MachineAddonBlock.ADDON_USED);
+        var isUsed = this.getBlockState().getValue(MachineAddonBlock.ADDON_USED);
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
@@ -39,7 +39,7 @@ public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements 
         if (cachedController != null)
             return cachedController;
         
-        cachedController = (MachineAddonController) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
+        cachedController = (MachineAddonController) Objects.requireNonNull(level).getBlockEntity(getControllerPos());
         return cachedController;
     }
     

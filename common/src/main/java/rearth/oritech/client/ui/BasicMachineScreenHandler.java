@@ -1,19 +1,6 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.client.screens.SlotGenerator;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerSyncHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
@@ -24,17 +11,29 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.util.ScreenProvider;
-
+import rearth.oritech.util.ScreenProvider.GuiSlot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
-public class BasicMachineScreenHandler extends ScreenHandler {
+public class BasicMachineScreenHandler extends AbstractContainerMenu {
     
     @NotNull
-    protected final PlayerInventory playerInventory;
+    protected final Inventory playerInventory;
     @NotNull
-    protected final Inventory inventory;
+    protected final Container inventory;
     @NotNull
     protected final EnergyApi.EnergyStorage energyStorage;
     
@@ -55,19 +54,19 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     public BlockEntity blockEntity;
     protected List<Integer> armorSlots;
     
-    public BasicMachineScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
+    public BasicMachineScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
+        this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
     }
     
     // on server, also called from client constructor
-    public BasicMachineScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
+    public BasicMachineScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(((ScreenProvider) blockEntity).getScreenHandlerType(), syncId);
         
         this.screenData = (ScreenProvider) blockEntity;
-        this.blockPos = blockEntity.getPos();
+        this.blockPos = blockEntity.getBlockPos();
         this.inventory = screenData.getDisplayedInventory();
         if (inventory != null)
-            inventory.onOpen(playerInventory.player);
+            inventory.startOpen(playerInventory.player);
         this.playerInventory = playerInventory;
         
         if (blockEntity instanceof EnergyApi.BlockProvider energyProvider) {
@@ -82,7 +81,7 @@ public class BasicMachineScreenHandler extends ScreenHandler {
             mainFluidContainer = null;
         }
         
-        this.machineBlock = blockEntity.getCachedState();
+        this.machineBlock = blockEntity.getBlockState();
         this.blockEntity = blockEntity;
         
         if (this.blockEntity instanceof UpgradableGeneratorBlockEntity generatorEntity && generatorEntity.isProducingSteam) {
@@ -114,16 +113,16 @@ public class BasicMachineScreenHandler extends ScreenHandler {
                 final var iteration = i;
                 var index = this.addSlot(new Slot(playerInventory, 36 + i, -20, i * 19) {
                     @Override
-                    public boolean canInsert(ItemStack stack) {
-                        if (iteration == 4) return super.canInsert(stack);  // offhand, to prevent dupes
+                    public boolean mayPlace(ItemStack stack) {
+                        if (iteration == 4) return super.mayPlace(stack);  // offhand, to prevent dupes
                         
                         if (stack.getItem() instanceof ArmorItem armorItem) {
-                            return super.canInsert(stack) && armorItem.getSlotType().getEntitySlotId() == iteration;
+                            return super.mayPlace(stack) && armorItem.getEquipmentSlot().getIndex() == iteration;
                         }
                         return false;
                     }
                 });
-                armorSlots.add(index.id);
+                armorSlots.add(index.index);
             }
         }
     }
@@ -137,27 +136,27 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     }
     
     @Override
-    public ItemStack quickMove(PlayerEntity player, int invSlot) {
+    public ItemStack quickMoveStack(Player player, int invSlot) {
         
         var newStack = ItemStack.EMPTY;
         
         var slot = this.slots.get(invSlot);
         
-        if (slot.hasStack()) {
-            var originalStack = slot.getStack();
+        if (slot.hasItem()) {
+            var originalStack = slot.getItem();
             newStack = originalStack.copy();
-            if (invSlot < this.inventory.size() || invSlot >= this.inventory.size() + 36) {  // second condition is for machines adding extra slots afterwards, which are treated as part of the machine
-                if (!this.insertItem(originalStack, getPlayerInvStartSlot(newStack), getPlayerInvEndSlot(newStack), true)) {
+            if (invSlot < this.inventory.getContainerSize() || invSlot >= this.inventory.getContainerSize() + 36) {  // second condition is for machines adding extra slots afterwards, which are treated as part of the machine
+                if (!this.moveItemStackTo(originalStack, getPlayerInvStartSlot(newStack), getPlayerInvEndSlot(newStack), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.insertItem(originalStack, getMachineInvStartSlot(newStack), getMachineInvEndSlot(newStack), false)) {
+            } else if (!this.moveItemStackTo(originalStack, getMachineInvStartSlot(newStack), getMachineInvEndSlot(newStack), false)) {
                 return ItemStack.EMPTY;
             }
             
             if (originalStack.isEmpty()) {
-                slot.setStack(ItemStack.EMPTY);
+                slot.setByPlayer(ItemStack.EMPTY);
             } else {
-                slot.markDirty();
+                slot.setChanged();
             }
         }
         
@@ -170,7 +169,7 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     // player equipment slots
     
     public int getPlayerInvStartSlot(ItemStack stack) {
-        return this.inventory.size();
+        return this.inventory.getContainerSize();
     }
     
     public int getPlayerInvEndSlot(ItemStack stack) {
@@ -186,12 +185,12 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     }
     
     public int getMachineInvEndSlot(ItemStack stack) {
-        return this.inventory.size();
+        return this.inventory.getContainerSize();
     }
     
     @Override
-    public boolean canUse(PlayerEntity player) {
-        return this.inventory.canPlayerUse(player);
+    public boolean stillValid(Player player) {
+        return this.inventory.stillValid(player);
     }
     
     public @NotNull BlockPos getBlockPos() {
@@ -203,11 +202,11 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     }
     
     @Override
-    public void sendContentUpdates() {
+    public void broadcastChanges() {
         
         if (blockEntity instanceof NetworkedBlockEntity networkedBlockEntity)
-            networkedBlockEntity.sendUpdate(SyncType.GUI_TICK, (ServerPlayerEntity) this.player());
+            networkedBlockEntity.sendUpdate(SyncType.GUI_TICK, (ServerPlayer) this.player());
         
-        super.sendContentUpdates();
+        super.broadcastChanges();
     }
 }

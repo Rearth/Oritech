@@ -3,8 +3,8 @@ package rearth.oritech.init.compat.jei;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import mezz.jei.api.ingredients.ITypedIngredient;
-import net.minecraft.client.util.math.Rect2i;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.client.ui.ItemFilterScreen;
 
@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static rearth.oritech.client.ui.ItemFilterScreen.FILTER_SIZE;
+
+import io.wispforest.owo.ui.container.FlowLayout;
 
 class JeiItemFilterGhostHandler implements IGhostIngredientHandler<ItemFilterScreen> {
 

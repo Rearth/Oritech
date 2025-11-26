@@ -3,19 +3,20 @@ package rearth.oritech.client.ui;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
-
-
+import rearth.oritech.util.ScreenProvider.GuiSlot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.player.Inventory;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.*;
 
@@ -23,7 +24,7 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
     
     private final List<ButtonComponent> buttons = new ArrayList<>();
     
-    public InventoryProxyScreen(InventoryProxyScreenHandler handler, PlayerInventory inventory, Text title) {
+    public InventoryProxyScreen(InventoryProxyScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
     
@@ -45,8 +46,8 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
         rootComponent.child(overlay.surface(ORITECH_PANEL));
         rootComponent.child(spacer);
         
-        for (var slot : Objects.requireNonNull(handler.controllerScreen).getGuiSlots()) {
-            var button = Components.button(Text.literal(" "), elem -> {
+        for (var slot : Objects.requireNonNull(menu.controllerScreen).getGuiSlots()) {
+            var button = Components.button(Component.literal(" "), elem -> {
                 setActiveSlot(slot.index());
             });
             button.renderer(ORITECH_BUTTON);
@@ -57,12 +58,12 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
         
         for (int i = 0; i < buttons.size(); i++) {
             var button = buttons.get(i);
-            button.active = i != handler.selectedSlot;
+            button.active = i != menu.selectedSlot;
         }
         
         addTitle(overlay);
         
-        var hint = Components.label(Text.translatable("tooltip.oritech.addon_proxy_select"));
+        var hint = Components.label(Component.translatable("tooltip.oritech.addon_proxy_select"));
         hint.horizontalTextAlignment(HorizontalAlignment.CENTER);
         hint.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
         hint.sizing(Sizing.fixed(176), Sizing.content(2));
@@ -70,7 +71,7 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
     }
     
     private void addTitle(FlowLayout overlay) {
-        var blockTitle = handler.addonEntity.getCachedState().getBlock().getName();
+        var blockTitle = menu.addonEntity.getBlockState().getBlock().getName();
         var label = Components.label(blockTitle);
         label.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
         label.sizing(Sizing.fixed(176), Sizing.content(2));
@@ -81,7 +82,7 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
     
     private void setActiveSlot(int slot) {
         
-        handler.selectedSlot = slot;
+        menu.selectedSlot = slot;
         
         for (int i = 0; i < buttons.size(); i++) {
             var button = buttons.get(i);
@@ -89,9 +90,9 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
         }
         
         // sync to client entity
-        handler.addonEntity.setTargetSlot(slot);
+        menu.addonEntity.setTargetSlot(slot);
         
         // sync to server entity
-        NetworkManager.sendToServer(new InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket(handler.blockPos, slot));
+        NetworkManager.sendToServer(new InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket(menu.blockPos, slot));
     }
 }

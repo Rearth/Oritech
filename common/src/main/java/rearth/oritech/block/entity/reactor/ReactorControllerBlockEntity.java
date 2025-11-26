@@ -1,29 +1,11 @@
 package rearth.oritech.block.entity.reactor;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -38,6 +20,24 @@ import rearth.oritech.init.SoundContent;
 import rearth.oritech.util.Geometry;
 
 import java.util.*;
+import java.util.Map.Entry;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ReactorControllerBlockEntity extends NetworkedBlockEntity implements EnergyApi.BlockProvider, ExtendedMenuProvider {
     
@@ -53,14 +53,14 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     private final HashMap<Vector2i, ReactorFuelPortEntity> fuelPorts = new HashMap<>();     // same grid, but contains a reference to the port at the ceiling
     private final HashMap<Vector2i, ReactorAbsorberPortEntity> absorberPorts = new HashMap<>(); // same
     private final HashMap<Vector2i, Integer> componentHeats = new HashMap<>();              // same grid, contains the current heat of the component
-    private final HashSet<Pair<BlockPos, Direction>> energyPorts = new HashSet<>();   // list of all energy port outputs (e.g. the targets to output to)
+    private final HashSet<Tuple<BlockPos, Direction>> energyPorts = new HashSet<>();   // list of all energy port outputs (e.g. the targets to output to)
     private final HashSet<BlockPos> redstonePorts = new HashSet<>();   // list of all redstone ports
     
     @SyncField(SyncType.GUI_TICK)
     public final HashMap<Vector2i, ComponentStatistics> componentStats = new HashMap<>(); // mainly for client displays, same grid
     
     @SyncField(SyncType.GUI_TICK)
-    public SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(0, Oritech.CONFIG.reactorMaxEnergyStored(), Oritech.CONFIG.reactorMaxEnergyStored(), this::markDirty);
+    public SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(0, Oritech.CONFIG.reactorMaxEnergyStored(), Oritech.CONFIG.reactorMaxEnergyStored(), this::setChanged);
     
     public boolean active = false;
     
@@ -87,7 +87,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     // absorbers remove fixed heat amount from all neighboring blocks
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         if (!active && doAutoInit) {
             doAutoInit = false;
@@ -141,7 +141,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
                     componentHeat += heatCreated;
                     
                     if (componentHeat > MAX_HEAT * 0.85) {
-                        playMeltdownAnimation(portEntity.getPos());
+                        playMeltdownAnimation(portEntity.getBlockPos());
                     }
                     
                 } else {
@@ -258,12 +258,12 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     }
     
     private boolean isDisabled() {
-        return world.getTime() < disabledUntil;
+        return level.getGameTime() < disabledUntil;
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         
         nbt.putLong("energy_stored", energyStorage.getAmount());
         nbt.putBoolean("was_active", active);
@@ -272,8 +272,8 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         
         energyStorage.setAmount(nbt.getLong("energy_stored"));
         doAutoInit = nbt.getBoolean("was_active");
@@ -281,22 +281,22 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     }
     
     private void playMeltdownAnimation(BlockPos port) {
-        ParticleContent.MELTDOWN_IMMINENT.spawn(world, port.toCenterPos().add(0, 0.3, 0), 5);
+        ParticleContent.MELTDOWN_IMMINENT.spawn(level, port.getCenter().add(0, 0.3, 0), 5);
     }
     
     private void playAmbientSound() {
         var soundDuration = 250;
         
-        if (world.getTime() % soundDuration == 0)
-            world.playSound(null, pos, SoundContent.REACTOR, SoundCategory.BLOCKS, 0.7f, 0.8f);
+        if (level.getGameTime() % soundDuration == 0)
+            level.playSound(null, worldPosition, SoundContent.REACTOR, SoundSource.BLOCKS, 0.7f, 0.8f);
     }
     
     
     private void playWarningSound() {
         var soundDuration = 50;
         
-        if (world.getTime() % soundDuration == 0)
-            world.playSound(null, pos, SoundContent.REACTOR_WARNING, SoundCategory.BLOCKS, 4f, 0.8f);
+        if (level.getGameTime() % soundDuration == 0)
+            level.playSound(null, worldPosition, SoundContent.REACTOR_WARNING, SoundSource.BLOCKS, 4f, 0.8f);
     }
     
     // strength is the amount of total active rods (e.g. activeRods * stackHeight)
@@ -314,19 +314,19 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
             spawnedBlock = BlockContent.REACTOR_EXPLOSION_LARGE;
         }
         
-        world.setBlockState(pos, spawnedBlock.getDefaultState());
+        level.setBlockAndUpdate(worldPosition, spawnedBlock.defaultBlockState());
     }
     
     private void disableReactor() {
-        this.disabledUntil = world.getTime() + Oritech.CONFIG.safeModeCooldown();
+        this.disabledUntil = level.getGameTime() + Oritech.CONFIG.safeModeCooldown();
     }
     
-    public void init(@Nullable PlayerEntity player) {
+    public void init(@Nullable Player player) {
         
         active = false;
         
         // find low and high corners of reactor
-        var cornerA = pos;
+        var cornerA = worldPosition;
         cornerA = expandWall(cornerA, new Vec3i(0, -1, 0), true);   // first go down through other wall blocks
         cornerA = expandWall(cornerA, new Vec3i(0, 0, -1));
         cornerA = expandWall(cornerA, new Vec3i(-1, 0, 0));
@@ -337,9 +337,9 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
         cornerB = expandWall(cornerB, new Vec3i(0, 0, 1));
         cornerB = expandWall(cornerB, new Vec3i(1, 0, 0));
         
-        if (cornerA == pos || cornerB == pos || cornerA == cornerB || onSameAxis(cornerA, cornerB)) {
+        if (cornerA == worldPosition || cornerB == worldPosition || cornerA == cornerB || onSameAxis(cornerA, cornerB)) {
             if (player != null)
-                player.sendMessage(Text.translatable("message.oritech.reactor_edge_invalid"));
+                player.sendSystemMessage(Component.translatable("message.oritech.reactor_edge_invalid"));
             return;
         }
         
@@ -352,21 +352,21 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
         redstonePorts.clear();
         
         // verify edges
-        var wallsValid = BlockPos.stream(cornerA, cornerB).allMatch(pos -> {
+        var wallsValid = BlockPos.betweenClosedStream(cornerA, cornerB).allMatch(pos -> {
             if (isAtEdgeOfBox(pos, finalCornerA, finalCornerB)) {
-                var block = world.getBlockState(pos).getBlock();
+                var block = level.getBlockState(pos).getBlock();
                 return block instanceof ReactorWallBlock;
             } else if (isOnWall(pos, finalCornerA, finalCornerB)) {
-                var state = world.getBlockState(pos);
+                var state = level.getBlockState(pos);
                 var block = state.getBlock();
                 
                 // load wall energy ports
                 if (block instanceof ReactorEnergyPortBlock) {
-                    var facing = state.get(Properties.FACING);
-                    var blockInFront = pos.add(Geometry.getForward(facing));
-                    energyPorts.add(new Pair<>(blockInFront, Direction.fromVector(Geometry.getBackward(facing).getX(), Geometry.getBackward(facing).getY(), Geometry.getBackward(facing).getZ())));
+                    var facing = state.getValue(BlockStateProperties.FACING);
+                    var blockInFront = pos.offset(Geometry.getForward(facing));
+                    energyPorts.add(new Tuple<>(blockInFront, Direction.fromDelta(Geometry.getBackward(facing).getX(), Geometry.getBackward(facing).getY(), Geometry.getBackward(facing).getZ())));
                 } else if (block instanceof ReactorRedstonePortBlock) {
-                    redstonePorts.add(pos.toImmutable());
+                    redstonePorts.add(pos.immutable());
                 }
                 
                 return !(block instanceof BaseReactorBlock reactorBlock) || reactorBlock.validForWalls();
@@ -377,13 +377,13 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
         
         if (!wallsValid) {
             if (player != null)
-                player.sendMessage(Text.translatable("message.oritech.reactor_wall_invalid"));
+                player.sendSystemMessage(Component.translatable("message.oritech.reactor_wall_invalid"));
             return;
         }
         
         // verify interior is identical in all layers
         var interiorHeight = cornerB.getY() - cornerA.getY() - 1;
-        var cornerAFlat = cornerA.add(1, 1, 1);
+        var cornerAFlat = cornerA.offset(1, 1, 1);
         var cornerBFlat = new BlockPos(cornerB.getX() - 1, cornerA.getY() + 1, cornerB.getZ() - 1);
         
         // these get loaded in the next step
@@ -391,31 +391,31 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
         absorberPorts.clear();
         reactorStackHeight = interiorHeight;
         
-        var interiorStackedRight = BlockPos.stream(cornerAFlat, cornerBFlat).allMatch(pos -> {
+        var interiorStackedRight = BlockPos.betweenClosedStream(cornerAFlat, cornerBFlat).allMatch(pos -> {
             
             var offset = pos.subtract(cornerAFlat);
             var localPos = new Vector2i(offset.getX(), offset.getZ());
             
-            var block = world.getBlockState(pos).getBlock();
+            var block = level.getBlockState(pos).getBlock();
             if (!(block instanceof BaseReactorBlock reactorBlock)) return true;
             
             for (int i = 1; i < interiorHeight; i++) {
-                var candidatePos = pos.add(0, i, 0);
-                var candidate = world.getBlockState(candidatePos);
+                var candidatePos = pos.offset(0, i, 0);
+                var candidate = level.getBlockState(candidatePos);
                 if (!candidate.getBlock().equals(block))
                     return false;
             }
             
             var requiredCeiling = reactorBlock.requiredStackCeiling();
             if (requiredCeiling != Blocks.AIR) {
-                var ceilingPos = pos.add(0, interiorHeight, 0);
-                var ceilingBlock = world.getBlockState(ceilingPos).getBlock();
+                var ceilingPos = pos.offset(0, interiorHeight, 0);
+                var ceilingBlock = level.getBlockState(ceilingPos).getBlock();
                 if (!requiredCeiling.equals(ceilingBlock)) return false;
                 
                 if (block instanceof ReactorRodBlock) {
-                    fuelPorts.put(localPos, (ReactorFuelPortEntity) world.getBlockEntity(ceilingPos));
+                    fuelPorts.put(localPos, (ReactorFuelPortEntity) level.getBlockEntity(ceilingPos));
                 } else if (block instanceof ReactorAbsorberBlock) {
-                    absorberPorts.put(localPos, (ReactorAbsorberPortEntity) world.getBlockEntity(ceilingPos));
+                    absorberPorts.put(localPos, (ReactorAbsorberPortEntity) level.getBlockEntity(ceilingPos));
                 }
                 
             }
@@ -427,7 +427,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
         
         if (!interiorStackedRight) {
             if (player != null)
-                player.sendMessage(Text.translatable("message.oritech.reactor_interior_issues"));
+                player.sendSystemMessage(Component.translatable("message.oritech.reactor_interior_issues"));
             return;
         }
         
@@ -438,17 +438,17 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     }
     
     private void setRodBlockState(Vector2i localPos, boolean on) {
-        if (world.getTime() % 10 != 0) return;
-        var stackTop = fuelPorts.get(localPos).getPos();
+        if (level.getGameTime() % 10 != 0) return;
+        var stackTop = fuelPorts.get(localPos).getBlockPos();
         
         for (int i = 1; i <= reactorStackHeight; i++) {
-            var candidatePos = stackTop.down(i);
-            var candidateState = world.getBlockState(candidatePos);
+            var candidatePos = stackTop.below(i);
+            var candidateState = level.getBlockState(candidatePos);
             if (!(candidateState.getBlock() instanceof ReactorRodBlock)) continue;
-            var oldLit = candidateState.get(Properties.LIT);
+            var oldLit = candidateState.getValue(BlockStateProperties.LIT);
             if (oldLit != on) {
                 // update only when changed
-                world.setBlockState(candidatePos, candidateState.with(Properties.LIT, on), Block.NOTIFY_LISTENERS, 0);
+                level.setBlock(candidatePos, candidateState.setValue(BlockStateProperties.LIT, on), Block.UPDATE_CLIENTS, 0);
             }
         }
     }
@@ -495,8 +495,8 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
         
         var result = from;
         for (int i = 1; i < MAX_SIZE; i++) {
-            var candidate = from.add(direction.multiply(i));
-            var candidateBlock = world.getBlockState(candidate).getBlock();
+            var candidate = from.offset(direction.multiply(i));
+            var candidateBlock = level.getBlockState(candidate).getBlock();
             
             if (!allReactorBlocks && !(candidateBlock instanceof ReactorWallBlock)) return result;
             if (allReactorBlocks && !(candidateBlock instanceof BaseReactorBlock)) return result;
@@ -513,12 +513,12 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
         disabledViaRedstone = false;
         
         for (var pos : redstonePorts) {
-            var state = world.getBlockState(pos);
+            var state = level.getBlockState(pos);
             if (!state.getBlock().equals(BlockContent.REACTOR_REDSTONE_PORT)) continue;
             
             var resOutput = 0;
             
-            var mode = state.get(ReactorRedstonePortBlock.PORT_MODE);
+            var mode = state.getValue(ReactorRedstonePortBlock.PORT_MODE);
             if (mode == 0 && hottestTemp > 0) {    // temp of hottest component
                 resOutput = (int) ((hottestTemp / (float) MAX_HEAT) * 15);
                 resOutput = Math.max(resOutput, 1);  // ensure at least level 1 if any component has heat
@@ -531,13 +531,13 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
             
             resOutput = Math.min(resOutput, 15);
             
-            var lastLevel = state.get(Properties.POWER);
+            var lastLevel = state.getValue(BlockStateProperties.POWER);
             if (lastLevel != resOutput) {
-                world.setBlockState(pos, state.with(Properties.POWER, resOutput));
-                world.markDirty(pos);
+                level.setBlockAndUpdate(pos, state.setValue(BlockStateProperties.POWER, resOutput));
+                level.blockEntityChanged(pos);
             }
             
-            if (world.isReceivingRedstonePower(pos)) {
+            if (level.hasNeighborSignal(pos)) {
                 disabledViaRedstone = true;
             }
             
@@ -554,7 +554,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
         Collections.shuffle(randomOrderedList);
         
         for (var candidateData : randomOrderedList) {
-            var candidate = EnergyApi.BLOCK.find(world, candidateData.getLeft(), candidateData.getRight());
+            var candidate = EnergyApi.BLOCK.find(level, candidateData.getA(), candidateData.getB());
             if (candidate == null) continue;
             var moved = EnergyApi.transfer(energyStorage, candidate, maxRatePerSlot, false);
             
@@ -574,20 +574,20 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.of("");
+    public Component getDisplayName() {
+        return Component.nullToEmpty("");
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new ReactorScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
+    public void saveExtraData(FriendlyByteBuf buf) {
         sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(pos);
+        buf.writeBlockPos(worldPosition);
     }
     
     public record ComponentStatistics(short receivedPulses, int storedHeat, short heatChanged) {

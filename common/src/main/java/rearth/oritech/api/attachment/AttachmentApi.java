@@ -1,9 +1,9 @@
 package rearth.oritech.api.attachment;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
+import rearth.oritech.OritechPlatform;
 
-public abstract class AttachmentApi {
+public interface AttachmentApi {
     
     /**
      * Registers an attachment type with the platform-specific APIs.
@@ -12,9 +12,8 @@ public abstract class AttachmentApi {
      * @param <T>       The type of the attachment.
      * @param attachment The attachment type to register.
      */
-    @ExpectPlatform
-    public static <T> void register(Attachment<T> attachment) {
-        throw new AssertionError();
+    static <T> void register(Attachment<T> attachment) {
+        OritechPlatform.INSTANCE.register(attachment);
     }
     
     /**
@@ -25,9 +24,8 @@ public abstract class AttachmentApi {
      * @param attachment The attachment to check for.
      * @return True if the attachment type is registered and attached to the entity, false otherwise.
      */
-    @ExpectPlatform
-    public static <T> boolean hasAttachment(LivingEntity entity, Attachment<T> attachment) {
-        throw new AssertionError();
+    static <T> boolean hasAttachment(LivingEntity entity, Attachment<T> attachment) {
+        return OritechPlatform.INSTANCE.hasAttachment(entity, attachment);
     }
     
     /**
@@ -39,9 +37,8 @@ public abstract class AttachmentApi {
      * @param attachment The attachment to retrieve.
      * @return The attachment value for the entity.
      */
-    @ExpectPlatform
-    public static <T> T getAttachmentValue(LivingEntity entity, Attachment<T> attachment) {
-        throw new AssertionError();
+    static <T> T getAttachmentValue(LivingEntity entity, Attachment<T> attachment) {
+        return OritechPlatform.INSTANCE.getAttachmentValue(entity, attachment);
     }
     
     /**
@@ -52,9 +49,8 @@ public abstract class AttachmentApi {
      * @param attachment The attachment to set.
      * @param value     The value to set for the attachment.
      */
-    @ExpectPlatform
-    public static <T> void setAttachment(LivingEntity entity, Attachment<T> attachment, T value) {
-        throw new AssertionError();
+    static <T> void setAttachment(LivingEntity entity, Attachment<T> attachment, T value) {
+        OritechPlatform.INSTANCE.setAttachment(entity, attachment, value);
     }
     
     /**
@@ -65,8 +61,7 @@ public abstract class AttachmentApi {
      * @param entity    The entity to remove the attachment from.
      * @param attachment The attachment to remove.
      */
-    @ExpectPlatform
-    public static <T> void removeAttachment(LivingEntity entity, Attachment<T> attachment) {
-        throw new AssertionError();
+    static <T> void removeAttachment(LivingEntity entity, Attachment<T> attachment) {
+        OritechPlatform.INSTANCE.removeAttachment(entity, attachment);
     }
 }

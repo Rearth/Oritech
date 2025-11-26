@@ -1,10 +1,10 @@
 package rearth.oritech.block.entity.accelerator;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 
@@ -20,11 +20,11 @@ public class AcceleratorSensorBlockEntity extends BlockEntity implements BlockEn
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, AcceleratorSensorBlockEntity blockEntity) {
-        if (world.isClient) return;
+    public void tick(Level world, BlockPos pos, BlockState state, AcceleratorSensorBlockEntity blockEntity) {
+        if (world.isClientSide) return;
         
         if (measuredSpeed != 0) {
-            var age = world.getTime() - measuredTime;
+            var age = world.getGameTime() - measuredTime;
             
             if (age > 3) {
                 measuredSpeed = 0;
@@ -34,13 +34,13 @@ public class AcceleratorSensorBlockEntity extends BlockEntity implements BlockEn
         
         if (dirty) {
             dirty = false;
-            world.updateComparators(pos, getCachedState().getBlock());
+            world.updateNeighbourForOutputSignal(pos, getBlockState().getBlock());
         }
     }
     
     public void measureParticle(AcceleratorParticleLogic.ActiveParticle particle) {
         this.measuredSpeed = particle.velocity;
-        this.measuredTime = world.getTime();
+        this.measuredTime = level.getGameTime();
         dirty = true;
     }
 

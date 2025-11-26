@@ -2,25 +2,28 @@ package rearth.oritech.block.entity.processing;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.OritechPlatform;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.CentrifugeScreenHandler;
 import rearth.oritech.init.BlockContent;
@@ -37,7 +40,7 @@ import java.util.Optional;
 public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
     @SyncField(SyncType.GUI_TICK)
-    public final SimpleInOutFluidStorage fluidContainer = new SimpleInOutFluidStorage(Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleInOutFluidStorage fluidContainer = new SimpleInOutFluidStorage(Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidStackHooks.bucketAmount(), this::setChanged);
     
     @SyncField(SyncType.GUI_OPEN)
     public boolean hasFluidAddon = false;
@@ -79,13 +82,13 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
     
     @Override
-    protected Optional<RecipeEntry<OritechRecipe>> getRecipe() {
+    protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
         
         if (!hasFluidAddon)
             return super.getRecipe();
         
         // get recipes matching input items
-        var candidates = Objects.requireNonNull(world).getRecipeManager().getAllMatches(getOwnRecipeType(), getInputInventory(), world);
+        var candidates = Objects.requireNonNull(level).getRecipeManager().getRecipesFor(getOwnRecipeType(), getInputInventory(), level);
         // filter out recipes based on input tank
         var fluidRecipe = candidates.stream().filter(candidate -> recipeInputMatchesTank(fluidContainer.getInStack(), candidate.value())).findAny();
         if (fluidRecipe.isPresent()) {
@@ -96,8 +99,8 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
     
     // this is provided as fallback for fluid centrifuges that may still process normal stuff
-    private Optional<RecipeEntry<OritechRecipe>> getNormalRecipe() {
-        return world.getRecipeManager().getFirstMatch(RecipeContent.CENTRIFUGE, getInputInventory(), world);
+    private Optional<RecipeHolder<OritechRecipe>> getNormalRecipe() {
+        return level.getRecipeManager().getRecipeFor(RecipeContent.CENTRIFUGE, getInputInventory(), level);
     }
     
     public static boolean recipeInputMatchesTank(FluidStack available, OritechRecipe recipe) {
@@ -147,7 +150,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON)) {
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasFluid()) {
             hasFluidAddon = true;
         }
     }
@@ -160,31 +163,39 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     @Override
     public void initAddons(BlockPos brokenAddon) {
+        
+        var hadAddon = hasFluidAddon;
         hasFluidAddon = false;
         super.initAddons(brokenAddon);
         
-        // reset cache of core above
-        var coreCandidate = world.getBlockEntity(pos.up(), BlockEntitiesContent.MACHINE_CORE_ENTITY);
-        if (coreCandidate.isPresent()) {
-            var core = coreCandidate.get();
-            core.resetCaches();
+        if (hasFluidAddon != hadAddon && level instanceof ServerLevel serverLevel) {
+            
+            // reset cache of core above
+            var coreCandidate = level.getBlockEntity(worldPosition.above(), BlockEntitiesContent.MACHINE_CORE_ENTITY);
+            if (coreCandidate.isPresent()) {
+                var core = coreCandidate.get();
+                core.resetCaches();
+            }
+            
+            OritechPlatform.INSTANCE.resetCapabilities(serverLevel, worldPosition);
+            OritechPlatform.INSTANCE.resetCapabilities(serverLevel, worldPosition.above());
+            
+            // trigger block update to allow pipes to connect/disconnect
+            level.blockUpdated(worldPosition, getBlockState().getBlock());
+            level.blockUpdated(worldPosition.above(), level.getBlockState(worldPosition.above()).getBlock());
         }
-        
-        // trigger block update to allow pipes to connect/disconnect
-        world.updateNeighbors(pos, getCachedState().getBlock());
-        world.updateNeighbors(pos.up(), world.getBlockState(pos.up()).getBlock());
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         nbt.putBoolean("fluidAddon", hasFluidAddon);
         fluidContainer.writeNbt(nbt, "");
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         
         hasFluidAddon = nbt.getBoolean("fluidAddon");
         fluidContainer.readNbt(nbt, "");
@@ -210,7 +221,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.CENTRIFUGE_SCREEN;
     }
     
@@ -242,7 +253,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new CentrifugeScreenHandler(syncId, playerInventory, this);
     }
     
@@ -254,6 +265,6 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     @Override
     public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
         if (!hasFluidAddon) return null;
-        return fluidContainer.getStorageForDirection(direction);
+        return fluidContainer;
     }
 }

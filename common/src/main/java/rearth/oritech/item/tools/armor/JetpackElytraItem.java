@@ -1,20 +1,5 @@
 package rearth.oritech.item.tools.armor;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.entity.model.BipedEntityModel;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
@@ -29,6 +14,22 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.GameEvent;
 
 // this item can store both energy and fluids
 // applicable fluids will be consumed first, and then energy
@@ -37,7 +38,7 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
-    public JetpackElytraItem(RegistryEntry<ArmorMaterial> material, Type type, Item.Settings settings) {
+    public JetpackElytraItem(Holder<ArmorMaterial> material, Type type, Item.Properties settings) {
         super(material, type, settings);
     }
     
@@ -47,10 +48,10 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     }
     
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
         
-        if (world.isClient && MinecraftClient.getInstance().player.isFallFlying()) {
+        if (world.isClientSide && Minecraft.getInstance().player.isFallFlying()) {
             tickJetpack(stack, entity, world);
         }
     }
@@ -59,8 +60,8 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
         if (!tickElytra) return true;
         
         int nextRoll = entity.getFallFlyingTicks() + 1;
-        if (!entity.getWorld().isClient && nextRoll % 10 == 0) {
-            entity.emitGameEvent(GameEvent.ELYTRA_GLIDE);
+        if (!entity.level().isClientSide && nextRoll % 10 == 0) {
+            entity.gameEvent(GameEvent.ELYTRA_GLIDE);
         }
         
         return true;
@@ -68,7 +69,7 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     
     // this overrides the IItemExtension methods in neoforge
     public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
-        return useCustomElytra(entity, entity.getEquippedStack(EquipmentSlot.CHEST), true);
+        return useCustomElytra(entity, entity.getItemBySlot(EquipmentSlot.CHEST), true);
     }
     
     public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
@@ -76,30 +77,30 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     }
     
     @Override
-    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+    public boolean isValidRepairItem(ItemStack stack, ItemStack ingredient) {
         return false;
     }
     
     @Override
-    public boolean isItemBarVisible(ItemStack stack) {
+    public boolean isBarVisible(ItemStack stack) {
         return true;
     }
     
     @Override
-    public int getItemBarColor(ItemStack stack) {
+    public int getBarColor(ItemStack stack) {
         return getJetpackBarColor(stack);
     }
     
     @Override
-    public int getItemBarStep(ItemStack stack) {
+    public int getBarWidth(ItemStack stack) {
         return getJetpackBarStep(stack);
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        var hint = Text.translatable("tooltip.oritech.jetpack_usage").formatted(Formatting.GRAY, Formatting.ITALIC);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+        var hint = Component.translatable("tooltip.oritech.jetpack_usage").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
         tooltip.add(hint);
-        hint = Text.translatable("tooltip.oritech.jetpack_usage2").formatted(Formatting.GRAY, Formatting.ITALIC);
+        hint = Component.translatable("tooltip.oritech.jetpack_usage2").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
         tooltip.add(hint);
         addJetpackTooltip(stack, tooltip, true);
     }
@@ -110,7 +111,7 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
             private GeoArmorRenderer<?> renderer;
             
             @Override
-            public @Nullable <T extends LivingEntity> BipedEntityModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable BipedEntityModel<T> original) {
+            public @Nullable <T extends LivingEntity> HumanoidModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable HumanoidModel<T> original) {
                 
                 if (this.renderer == null)
                     this.renderer = new ExosuitArmorRenderer(Oritech.id("armor/basic_jetpack"), Oritech.id("armor/basic_jetpack"));

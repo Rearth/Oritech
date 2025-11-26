@@ -1,17 +1,19 @@
 package rearth.oritech.neoforge;
 
+import com.google.auto.service.AutoService;
 import dev.technici4n.grandpower.api.ILongEnergyStorage;
 import dev.technici4n.grandpower.impl.NonLongWrapper;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.ComponentType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.item.BlockItemApi;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.StackContext;
 import rearth.oritech.api.energy.BlockEnergyApi;
@@ -23,10 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+@AutoService({BlockEnergyApi.class, ItemEnergyApi.class})
 public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     private final List<Supplier<BlockEntityType<?>>> registeredBlockEntities = new ArrayList<>();
-    private final List<Supplier<net.minecraft.item.Item>> registeredItems = new ArrayList<>();
+    private final List<Supplier<net.minecraft.world.item.Item>> registeredItems = new ArrayList<>();
     
     @Override
     public void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier) {
@@ -34,13 +37,13 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     }
     
     @Override
-    public void registerForItem(Supplier<net.minecraft.item.Item> itemSupplier) {
+    public void registerForItem(Supplier<net.minecraft.world.item.Item> itemSupplier) {
         registeredItems.add(itemSupplier);
     }
     
     @Override
-    public ComponentType<Long> getEnergyComponent() {
-        return ComponentContent.NEO_ENERGY_COMPONENT.get();
+    public DataComponentType<Long> getEnergyComponent() {
+        return OritechModNeoForge.EventHandler.NEO_ENERGY_COMPONENT.get();
     }
     
     public void registerEvent(RegisterCapabilitiesEvent event) {
@@ -55,6 +58,7 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     @Override
     public EnergyApi.EnergyStorage find(StackContext stack) {
+        if (stack.getValue().getCount() > 1) return null;
         var candidate = stack.getValue().getCapability(ILongEnergyStorage.ITEM);
         if (candidate == null) return null;
         if (candidate instanceof ContainerStorageWrapper wrapper && wrapper.container instanceof SimpleEnergyItemStorage itemStorage) return itemStorage.withCallback(ignored -> stack.sync());
@@ -62,7 +66,7 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     }
     
     @Override
-    public EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public EnergyApi.EnergyStorage find(Level world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         var candidate = world.getCapability(ILongEnergyStorage.BLOCK, pos, state, entity, direction);
         if (candidate == null) return null;
         if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
@@ -71,7 +75,7 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     }
     
     @Override
-    public EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable Direction direction) {
+    public EnergyApi.EnergyStorage find(Level world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
     }
     

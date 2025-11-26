@@ -1,28 +1,26 @@
 package rearth.oritech.api.recipe;
 
 import dev.architectury.fluid.FluidStack;
-import net.minecraft.block.Blocks;
-import net.minecraft.data.DataOutput;
-import net.minecraft.data.server.recipe.*;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.*;
-import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.recipes.*;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluids;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.block.entity.augmenter.api.CustomAugmentsCollection;
 import rearth.oritech.init.*;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -31,12 +29,12 @@ import static rearth.oritech.util.TagUtils.*;
 
 public class OritechRecipeGenerator extends RecipeProvider {
     
-    public OritechRecipeGenerator(DataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+    public OritechRecipeGenerator(PackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
         super(output, registriesFuture);
     }
     
     @Override
-    public void generate(RecipeExporter exporter) {
+    public void buildRecipes(RecipeOutput exporter) {
         
         addDeepDrillOres(exporter);
         addFuels(exporter);
@@ -60,7 +58,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         addAugmentRecipes(exporter);
     }
     
-    private void addVanillaAdditions(RecipeExporter exporter) {
+    private void addVanillaAdditions(RecipeOutput exporter) {
         
         // slimeball from honey and biomass
         AssemblerRecipeBuilder.build().input(Items.HONEYCOMB).input(TagContent.BIOMASS).input(TagContent.BIOMASS).input(TagContent.BIOMASS).result(Items.SLIME_BALL).timeMultiplier(0.8f).export(exporter, "slime");
@@ -89,7 +87,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // centrifuge dirt into clay
         CentrifugeFluidRecipeBuilder.build().input(ItemTags.DIRT).result(Items.CLAY).fluidInput(Fluids.WATER, 0.25f).export(exporter, "clay");
         // create dirt from sand + biomass
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, Items.DIRT, 2).input('s', ItemTags.SAND).input('b', TagContent.BIOMASS).pattern("sb").pattern("bs").criterion("has_biomass", conditionsFromTag(TagContent.BIOMASS)).offerTo(exporter, Oritech.id("dirt_from_sand_and_biomass"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Items.DIRT, 2).define('s', ItemTags.SAND).define('b', TagContent.BIOMASS).pattern("sb").pattern("bs").unlockedBy("has_biomass", has(TagContent.BIOMASS)).save(exporter, Oritech.id("dirt_from_sand_and_biomass"));
         // dripstone from dripstone block
         PulverizerRecipeBuilder.build().input(Items.DRIPSTONE_BLOCK).result(Items.POINTED_DRIPSTONE, 4).addToGrinder().export(exporter, "dripstone");
         // shroomlight from logs and 3 glowstone
@@ -116,7 +114,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_BIOMASS).result(ItemContent.BIOMASS).export(exporter, "recycle/biomass");
     }
     
-    private void addDyes(RecipeExporter exporter) {
+    private void addDyes(RecipeOutput exporter) {
         PulverizerRecipeBuilder.build().input(TagContent.RAW_WHITE_DYE).result(Items.WHITE_DYE).addToGrinder().export(exporter, "dyes/white");
         PulverizerRecipeBuilder.build().input(TagContent.RAW_LIGHT_GRAY_DYE).result(Items.LIGHT_GRAY_DYE).addToGrinder().export(exporter, "dyes/light_gray");
         PulverizerRecipeBuilder.build().input(TagContent.RAW_BLACK_DYE).result(Items.BLACK_DYE).addToGrinder().export(exporter, "dyes/black");
@@ -129,7 +127,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         PulverizerRecipeBuilder.build().input(TagContent.RAW_PINK_DYE).result(Items.PINK_DYE).addToGrinder().export(exporter, "dyes/pink");
     }
     
-    private void addDeepDrillOres(RecipeExporter exporter) {
+    private void addDeepDrillOres(RecipeOutput exporter) {
         DeepDrillRecipeBuilder.build().input(BlockContent.RESOURCE_NODE_REDSTONE).result(Items.REDSTONE).export(exporter, "redstone");
         DeepDrillRecipeBuilder.build().input(BlockContent.RESOURCE_NODE_LAPIS).result(Items.LAPIS_LAZULI).export(exporter, "lapis");
         DeepDrillRecipeBuilder.build().input(BlockContent.RESOURCE_NODE_IRON).result(Items.RAW_IRON).export(exporter, "iron");
@@ -143,7 +141,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         DeepDrillRecipeBuilder.build().input(BlockContent.RESOURCE_NODE_URANIUM).result(ItemContent.RAW_URANIUM).export(exporter, "uranium");
     }
     
-    private void addFuels(RecipeExporter exporter) {
+    private void addFuels(RecipeOutput exporter) {
         
         // bio
         BioGeneratorRecipeBuilder.build().input(TagContent.BIOMATTER).timeInSeconds(15).export(exporter, "rawbio");
@@ -159,15 +157,15 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // fuel
         FuelGeneratorRecipeBuilder.build().fluidInput(cFluidTag("oil"), 0.1f).timeInSeconds(1).export(exporter, "crude");
         FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_HEAVY_OIL.get(), 0.1f).timeInSeconds(2).export(exporter, "heavyoil");
-        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_DIESEL.get(), 0.1f).timeInSeconds(4).export(exporter, "diesel");
-        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_NAPHTHA.get(), 0.1f).timeInSeconds(2).export(exporter, "naptha");
+        FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.DIESEL, 0.1f).timeInSeconds(4).export(exporter, "diesel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.NAPHTHA, 0.1f).timeInSeconds(2).export(exporter, "naptha");
         FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.TURBOFUEL, 0.1f).timeInSeconds(16).export(exporter, "fuel");
         //steam
         // 32 fabric droplets / 32 neoforge mb (yes this will works, as we produce 2 millis per RF in the generator boilers, and then consume it at a 1:1 ratio)
         SteamGeneratorRecipeBuilder.build().specificFluidInput(FluidContent.STILL_STEAM.get(), 32).time(1).export(exporter, "steameng");
     }
     
-    private void addFluidProcessing(RecipeExporter exporter) {
+    private void addFluidProcessing(RecipeOutput exporter) {
         
         // crude oil processing
         RefineryRecipeBuilder.build()
@@ -198,7 +196,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // lava
         RefineryRecipeBuilder.build()
           .fluidInput(Fluids.LAVA)
-          .fluidOutput(FluidStack.create(FluidContent.STILL_STEAM.get(), 64_000))
+          .fluidOutput(FluidStack.create(FluidContent.STILL_STEAM.get(), 4_000))
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.1f)
           .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.2f)
           .export(exporter, "lava");
@@ -207,15 +205,15 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.ENDERIC_COMPOUND)
           .fluidInput(Fluids.LAVA)
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 1f)
-          .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.5f)
-          .fluidOutput(FluidContent.STILL_STRANGE_MATTER.get(), 0.2f)
+          .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.25f)
+          .fluidOutput(FluidContent.STILL_STRANGE_MATTER.get(), 0.1f)
           .timeMultiplier(1.6f)
           .export(exporter, "lavaalt");
         
         // biodiesel
         RefineryRecipeBuilder.build()
           .input(ItemContent.CLAY_CATALYST_BEADS)
-          .fluidInput(FluidContent.STILL_BIOFUEL.get())
+          .fluidInput(TagContent.BIOFUEL)
           .fluidOutput(FluidContent.STILL_DIESEL.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.2f)
           .export(exporter, "biodiesel");
@@ -224,7 +222,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         CentrifugeFluidRecipeBuilder
           .build()
           .input(ItemContent.FLUXITE)
-          .fluidInput(FluidContent.STILL_DIESEL.get())
+          .fluidInput(TagContent.DIESEL)
           .fluidOutput(FluidContent.STILL_FUEL.get())
           .export(exporter, "fuel");
         
@@ -240,13 +238,13 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // silicon wash from naphtha in centrifuge
         CentrifugeFluidRecipeBuilder.build()
           .input(TagContent.QUARTZ_DUSTS)
-          .fluidInput(FluidContent.STILL_NAPHTHA.get())
+          .fluidInput(TagContent.NAPHTHA)
           .fluidOutput(FluidContent.STILL_SILICON_WASH.get(), 1f)
           .export(exporter, "siliconwash");
         
         CentrifugeFluidRecipeBuilder.build()
           .input(Items.GRAVEL)
-          .fluidInput(FluidContent.STILL_NAPHTHA.get())
+          .fluidInput(TagContent.NAPHTHA)
           .fluidOutput(FluidContent.STILL_SILICON_WASH.get(), 0.05f)
           .timeMultiplier(1.6f)
           .export(exporter, "siliconwashbad");
@@ -257,21 +255,21 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // polymer resin from naphtha in centrifuge
         CentrifugeFluidRecipeBuilder.build()
           .input(ItemTags.SAND)
-          .fluidInput(FluidContent.STILL_NAPHTHA.get(), 0.1f)
+          .fluidInput(TagContent.NAPHTHA, 0.1f)
           .result(ItemContent.POLYMER_RESIN, 2)
           .export(exporter, "naptharesin");
         
         // basic battery in centrifuge with sulfuric acid
         CentrifugeFluidRecipeBuilder.build()
           .input(TagContent.STEEL_INGOTS)
-          .fluidInput(FluidContent.STILL_SULFURIC_ACID.get())
+          .fluidInput(TagContent.SULFURIC_ACID)
           .result(ItemContent.BASIC_BATTERY, 2)
           .export(exporter, "batteryacid");
         
         // adv battery in centrifuge with sulfuric acid
         CentrifugeFluidRecipeBuilder.build()
           .input(ItemContent.DUBIOS_CONTAINER)
-          .fluidInput(FluidContent.STILL_SULFURIC_ACID.get())
+          .fluidInput(TagContent.SULFURIC_ACID)
           .result(ItemContent.ADVANCED_BATTERY, 8)
           .timeMultiplier(2f)
           .export(exporter, "advbatteryacid");
@@ -303,7 +301,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // reinforced carbon sheeting
         RefineryRecipeBuilder.build()
           .input(ItemContent.CARBON_FIBRE_STRANDS)
-          .fluidInput(FluidContent.STILL_NAPHTHA.get(), 0.5f)
+          .fluidInput(TagContent.NAPHTHA, 0.5f)
           .result(ItemContent.REINFORCED_CARBON_SHEET)
           .timeMultiplier(3f)
           .export(exporter, "carbonsheet");
@@ -317,7 +315,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .export(exporter, "unholyai");
     }
     
-    private void addBiomass(RecipeExporter exporter) {
+    private void addBiomass(RecipeOutput exporter) {
         // biomass
         PulverizerRecipeBuilder.build().input(TagContent.BIOMATTER).result(ItemContent.BIOMASS).addToGrinder().export(exporter, "biobasic");
         PulverizerRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).result(ItemContent.BIOMASS, 16).addToGrinder().export(exporter, "packagedwheatbio");
@@ -325,7 +323,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         AssemblerRecipeBuilder.build().input(TagContent.BIOMASS).input(TagContent.BIOMASS).input(TagContent.BIOMASS).input(ItemTags.PLANKS).result(ItemContent.SOLID_BIOFUEL).timeMultiplier(0.8f).export(exporter, "solidbiofuel");
     }
     
-    private void addEquipment(RecipeExporter exporter) {
+    private void addEquipment(RecipeOutput exporter) {
         offerDrillRecipe(exporter, ToolsContent.HAND_DRILL, of(TagContent.STEEL_INGOTS), of(ItemContent.MOTOR), of(ItemContent.ENDERIC_COMPOUND), of(ItemContent.ADAMANT_INGOT), "handdrill");
         offerChainsawRecipe(exporter, ToolsContent.CHAINSAW, of(TagContent.STEEL_INGOTS), of(ItemContent.MOTOR), of(ItemContent.ENDERIC_COMPOUND), of(ItemContent.ADAMANT_INGOT), "chainsaw");
         offerAxeRecipe(exporter, ToolsContent.PROMETHIUM_AXE, of(ItemContent.PROMETHEUM_INGOT), of(BlockContent.DESTROYER_BLOCK.asItem()), "promaxe");
@@ -368,7 +366,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
     }
     
-    private void addDecorative(RecipeExporter exporter) {
+    private void addDecorative(RecipeOutput exporter) {
         // ceiling light
         offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.CEILING_LIGHT.asItem(), 6), of(Items.GLOWSTONE_DUST), of(TagContent.STEEL_INGOTS), "ceilightlight");
         // hanging light
@@ -380,7 +378,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // tech door
         offerDoorRecipe(exporter, BlockContent.TECH_DOOR.asItem(), of(TagContent.STEEL_INGOTS), "techdoor");
         // metal beam
-        offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.METAL_BEAM_BLOCK.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalbeams");
+        offerRotatedCableRecipe(exporter, new ItemStack(BlockContent.METAL_BEAM_BLOCK.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalbeams");
+        // metal girder
+        offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.METAL_GIRDER_BLOCK.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalgirder");
         // tech glass
         offerMachinePlatingRecipe(exporter, BlockContent.INDUSTRIAL_GLASS_BLOCK.asItem(), of(TagContent.STEEL_INGOTS), of(cItemTag("glass_blocks")), of(TagContent.MACHINE_PLATING), 4, "industrialglass");
         // machine plated stairs, slabs, pressure plates
@@ -397,7 +397,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerPressurePlateRecipe(exporter, BlockContent.NICKEL_PLATING_PRESSURE_PLATE.asItem(), of(BlockContent.NICKEL_PLATING_BLOCK.asItem()), "nickel");
     }
     
-    private void addMachines(RecipeExporter exporter) {
+    private void addMachines(RecipeOutput exporter) {
         // basic generator
         offerGeneratorRecipe(exporter, BlockContent.BASIC_GENERATOR_BLOCK.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(cItemTag("ingots/copper")), of(TagContent.NICKEL_INGOTS), "basicgen");
         // pulverizer
@@ -415,7 +415,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerParticleMotorRecipe(exporter, BlockContent.REFINERY_BLOCK.asItem(), of(BlockContent.REFINERY_MODULE_BLOCK.asItem()), of(ItemContent.MOTOR), of(Items.CAULDRON), of(cItemTag("ingots/steel")), "refinery");
         // refinery module
         offerGeneratorRecipe(exporter, BlockContent.REFINERY_MODULE_BLOCK.asItem(), of(BlockContent.SMALL_TANK_BLOCK.asItem()), of(Items.SLIME_BALL), of(BlockContent.METAL_BEAM_BLOCK), of(cItemTag("ingots/copper")), "refinerymodule");
-        offerGeneratorRecipe(exporter, BlockContent.REFINERY_MODULE_BLOCK.asItem(), of(BlockContent.SMALL_TANK_BLOCK.asItem()), of(ItemContent.SILICON), of(BlockContent.METAL_BEAM_BLOCK), of(cItemTag("ingots/copper")), "refinerymodulealt");
+        offerGeneratorRecipe(exporter, BlockContent.REFINERY_MODULE_BLOCK.asItem(), of(BlockContent.SMALL_TANK_BLOCK.asItem()), of(TagContent.SILICON), of(BlockContent.METAL_BEAM_BLOCK), of(cItemTag("ingots/copper")), "refinerymodulealt");
         // cooler
         offerGeneratorRecipe(exporter, BlockContent.COOLER_BLOCK.asItem(), of(Blocks.CAULDRON.asItem()), of(Blocks.ICE.asItem()), of(ItemContent.MOTOR), of(cItemTag("ingots/iron")), "cooler");
         // centrifuge
@@ -525,6 +525,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // withered rose
         offerMachineFrameRecipe(exporter, BlockContent.WITHER_CROP_BLOCK.asItem(), of(Items.WITHER_ROSE), of(ItemTags.FLOWERS), 1, "witherrose");
         
+        // shrinker
+        offerTankRecipe(exporter, BlockContent.SHRINKER_BLOCK.asItem(), of(ItemContent.DUBIOS_CONTAINER), of(FluidContent.STILL_STRANGE_MATTER_BUCKET.get()), of(BlockContent.SUPERCONDUCTOR), "shrinker");
+        
         // particle accelerator
         // motor
         offerParticleMotorRecipe(exporter, BlockContent.ACCELERATOR_MOTOR.asItem(), of(TagContent.ELECTRUM_INGOTS), of(BlockContent.SUPERCONDUCTOR.asItem()), of(ItemContent.DURATIUM_INGOT), of(ItemContent.ION_THRUSTER), "particlemotor");
@@ -542,6 +545,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerAtomicForgeRecipe(exporter, BlockContent.MACHINE_PROCESSING_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.SUPER_AI_CHIP), of(ItemContent.FLUX_GATE), of(TagContent.PLATINUM_INGOTS), of(ItemContent.MOTOR), "addon/processing");
         offerAtomicForgeRecipe(exporter, BlockContent.MACHINE_PROCESSING_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.UNHOLY_INTELLIGENCE), of(Items.COMPARATOR), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.MOTOR), "addon/processingalt");
         offerAtomicForgeRecipe(exporter, BlockContent.MACHINE_ULTIMATE_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.HEISENBERG_COMPENSATOR), of(BlockContent.MACHINE_SPEED_ADDON), of(BlockContent.MACHINE_EFFICIENCY_ADDON), of(ItemContent.OVERCHARGED_CRYSTAL), "addon/ultimate");
+        offerAtomicForgeRecipe(exporter, BlockContent.MACHINE_BURST_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(TagContent.ELECTRUM_INGOTS), of(BlockContent.METAL_GIRDER_BLOCK), of(TagContent.STEEL_INGOTS), of(Items.REDSTONE), "addon/burst");
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_EFFICIENCY_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(TagContent.CARBON_FIBRE), of(TagContent.ELECTRUM_INGOTS), of(TagContent.PLASTIC_PLATES), "addon/eff");
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_CAPACITOR_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.ENERGITE_INGOT), of(ItemContent.MAGNETIC_COIL), of(TagContent.PLASTIC_PLATES), "addon/capacitor");
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_ACCEPTOR_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.ENERGITE_INGOT), of(TagContent.PLASTIC_PLATES), "addon/acceptor");
@@ -583,7 +587,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
     }
     
-    private void addComponents(RecipeExporter exporter) {
+    private void addComponents(RecipeOutput exporter) {
         // coal stuff (including basic steel)
         CentrifugeRecipeBuilder.build().input(TagContent.COAL_DUSTS).result(ItemContent.CARBON_FIBRE_STRANDS).timeMultiplier(0.5f).export(exporter, "carbon");
         offerManualAlloyRecipe(exporter, ItemContent.STEEL_INGOT, of(cItemTag("ingots/iron")), of(ItemTags.COALS), "steel");
@@ -626,10 +630,10 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
         // silicon
         offerManualAlloyRecipe(exporter, ItemContent.RAW_SILICON, of(TagContent.QUARTZ_DUSTS), of(ItemTags.SAND), 3, "rawsilicon");
-        offerSmelting(exporter, List.of(ItemContent.RAW_SILICON), RecipeCategory.MISC, ItemContent.SILICON, 0.5f, 60, "siliconfurnace");
+        oreSmelting(exporter, List.of(ItemContent.RAW_SILICON), RecipeCategory.MISC, ItemContent.SILICON, 0.5f, 60, "siliconfurnace");
         
         // plastic
-        offer2x2CompactingRecipe(exporter, RecipeCategory.MISC, ItemContent.PACKED_WHEAT, Items.WHEAT);
+        twoByTwoPacker(exporter, RecipeCategory.MISC, ItemContent.PACKED_WHEAT, Items.WHEAT);
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.PACKED_WHEAT).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.SOLID_BIOFUEL).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_biomass");
         CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOMASS_BLOCK).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_bioblock");
@@ -638,8 +642,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).result(ItemContent.PLASTIC_SHEET, 2).fluidInput(FluidContent.STILL_MINERAL_SLURRY.get(), 0.25f).time(120).export(exporter, "plasticoilbetter");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.POLYMER_RESIN).result(ItemContent.PLASTIC_SHEET, 2).fluidInput(Fluids.WATER, 0.5f).time(40).export(exporter, "plasticbio");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.POLYMER_RESIN).result(ItemContent.PLASTIC_SHEET, 4).fluidInput(FluidContent.STILL_MINERAL_SLURRY.get(), 0.25f).time(40).export(exporter, "plasticbiobetter");
-        offerSmelting(exporter, List.of(ItemContent.POLYMER_RESIN), RecipeCategory.MISC, ItemContent.PLASTIC_SHEET, 0.5f, 10, "plastic_manual");
-        offerBlasting(exporter, List.of(ItemContent.POLYMER_RESIN), RecipeCategory.MISC, ItemContent.PLASTIC_SHEET, 0.5f, 10, "plastic_manual_blast");
+        oreSmelting(exporter, List.of(ItemContent.POLYMER_RESIN), RecipeCategory.MISC, ItemContent.PLASTIC_SHEET, 0.5f, 10, "plastic_manual");
+        oreBlasting(exporter, List.of(ItemContent.POLYMER_RESIN), RecipeCategory.MISC, ItemContent.PLASTIC_SHEET, 0.5f, 10, "plastic_manual_blast");
         
         // processing unit
         AssemblerRecipeBuilder.build().input(TagContent.PLASTIC_PLATES).input(TagContent.CARBON_FIBRE).input(TagContent.ELECTRUM_INGOTS).input(cItemTag("dusts/redstone")).result(ItemContent.PROCESSING_UNIT).timeMultiplier(0.8f).export(exporter, "processingunit");
@@ -681,7 +685,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         CoolerRecipeBuilder.build().fluidInput(Fluids.LAVA).result(Items.OBSIDIAN, 2).export(exporter, "obsidian");
     }
     
-    private void addCompactingRecipes(RecipeExporter exporter) {
+    private void addCompactingRecipes(RecipeOutput exporter) {
         addCompactingRecipe(exporter, BlockContent.STEEL_BLOCK, ItemContent.STEEL_INGOT, of(TagContent.STEEL_INGOTS), of(getStorageBlockTag("steel")));
         addCompactingRecipe(exporter, BlockContent.ENERGITE_BLOCK, ItemContent.ENERGITE_INGOT, of(getIngotTag("energite")), of(getStorageBlockTag("energite")));
         addCompactingRecipe(exporter, BlockContent.NICKEL_BLOCK, ItemContent.NICKEL_INGOT, of(getIngotTag("nickel")), of(getStorageBlockTag("nickel")));
@@ -701,28 +705,28 @@ public class OritechRecipeGenerator extends RecipeProvider {
 
     // offerSmelting, offerBlasting, and offerMultipleOptions copied from RecipeProvider, and altered to force Oritech id onto recipes
     // I don't really like this, but any other way I found to get these recipes to have the oritech namespace in Neoforge wasn't working.
-    public static void offerSmelting(RecipeExporter exporter, List<ItemConvertible> inputs, RecipeCategory category, ItemConvertible output, float experience, int cookingTime, String group) {
-      offerMultipleOptions(exporter, RecipeSerializer.SMELTING, SmeltingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_smelting");
+    public static void oreSmelting(RecipeOutput exporter, List<ItemLike> inputs, RecipeCategory category, ItemLike output, float experience, int cookingTime, String group) {
+      oreCooking(exporter, RecipeSerializer.SMELTING_RECIPE, SmeltingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_smelting");
     }
 
-    public static void offerBlasting(RecipeExporter exporter, List<ItemConvertible> inputs, RecipeCategory category, ItemConvertible output, float experience, int cookingTime, String group) {
-      offerMultipleOptions(exporter, RecipeSerializer.BLASTING, BlastingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_blasting");
+    public static void oreBlasting(RecipeOutput exporter, List<ItemLike> inputs, RecipeCategory category, ItemLike output, float experience, int cookingTime, String group) {
+      oreCooking(exporter, RecipeSerializer.BLASTING_RECIPE, BlastingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_blasting");
     }
 
-    public static <T extends AbstractCookingRecipe> void offerMultipleOptions(RecipeExporter exporter, RecipeSerializer<T> serializer, AbstractCookingRecipe.RecipeFactory<T> recipeFactory, List<ItemConvertible> inputs, RecipeCategory category, ItemConvertible output, float experience, int cookingTime, String group, String suffix) {
+    public static <T extends AbstractCookingRecipe> void oreCooking(RecipeOutput exporter, RecipeSerializer<T> serializer, AbstractCookingRecipe.Factory<T> recipeFactory, List<ItemLike> inputs, RecipeCategory category, ItemLike output, float experience, int cookingTime, String group, String suffix) {
         
         for (var itemConvertible : inputs) {
-            CookingRecipeJsonBuilder.create(Ingredient.ofItems(itemConvertible), category, output, experience, cookingTime, serializer, recipeFactory).group(group).criterion(hasItem(itemConvertible), conditionsFromItem(itemConvertible)).offerTo(exporter, Oritech.id(getItemPath(output) + suffix + "_" + getItemPath(itemConvertible)));
+            SimpleCookingRecipeBuilder.generic(Ingredient.of(itemConvertible), category, output, experience, cookingTime, serializer, recipeFactory).group(group).unlockedBy(getHasName(itemConvertible), has(itemConvertible)).save(exporter, Oritech.id(getItemName(output) + suffix + "_" + getItemName(itemConvertible)));
         }
     }
     
-    private void addOreChains(RecipeExporter exporter) {
+    private void addOreChains(RecipeOutput exporter) {
         
         // basic smelting for nickel + platinum
-        offerSmelting(exporter, List.of(ItemContent.RAW_NICKEL), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 1f, 200, "nickelsmelting");
-        offerSmelting(exporter, List.of(ItemContent.RAW_PLATINUM), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 1f, 200, "platinumsmelting");
-        offerBlasting(exporter, List.of(ItemContent.RAW_NICKEL), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 1f, 100, "nickelblasting");
-        offerBlasting(exporter, List.of(ItemContent.RAW_PLATINUM), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 1f, 100, "platinumblasting");
+        oreSmelting(exporter, List.of(ItemContent.RAW_NICKEL), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 1f, 200, "nickelsmelting");
+        oreSmelting(exporter, List.of(ItemContent.RAW_PLATINUM), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 1f, 200, "platinumsmelting");
+        oreBlasting(exporter, List.of(ItemContent.RAW_NICKEL), RecipeCategory.MISC, ItemContent.NICKEL_INGOT, 1f, 100, "nickelblasting");
+        oreBlasting(exporter, List.of(ItemContent.RAW_PLATINUM), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 1f, 100, "platinumblasting");
         
         // iron chain
         MetalProcessingChainBuilder.build("iron")
@@ -781,9 +785,10 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .timeMultiplier(1.5f)
           .vanillaProcessing()
           .export(exporter);
+        
     }
     
-    private void addAlloys(RecipeExporter exporter) {
+    private void addAlloys(RecipeOutput exporter) {
         FoundryRecipeBuilder.build().input(TagContent.PLATINUM_INGOTS).input(cItemTag("ingots/netherite")).result(ItemContent.DURATIUM_INGOT).export(exporter, "duratium");
         FoundryRecipeBuilder.build().input(cItemTag("ingots/gold")).input(cItemTag("dusts/redstone")).result(ItemContent.ELECTRUM_INGOT).export(exporter, "electrum");
         FoundryRecipeBuilder.build().input(cItemTag("gems/diamond")).input(TagContent.NICKEL_INGOTS).result(ItemContent.ADAMANT_INGOT).export(exporter, "adamant");
@@ -792,7 +797,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         AtomicForgeRecipeBuilder.build().input(TagContent.PLATINUM_INGOTS).input(ItemContent.REINFORCED_CARBON_SHEET).input(ItemContent.REINFORCED_CARBON_SHEET).result(ItemContent.DURATIUM_INGOT).export(exporter, "duratium");
     }
     
-    private void addParticleCollisions(RecipeExporter exporter) {
+    private void addParticleCollisions(RecipeOutput exporter) {
         // diamond from coal dust
         ParticleCollisionRecipeBuilder.build().input(TagContent.COAL_DUSTS).input(TagContent.COAL_DUSTS).result(Items.DIAMOND).time(500).export(exporter, "diamond");
         // overcharged crystal from fluxite and energite dust
@@ -815,7 +820,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         ParticleCollisionRecipeBuilder.build().input(Items.REINFORCED_DEEPSLATE).input(ItemContent.DURATIUM_DUST).result(Items.HEAVY_CORE).time(8000).export(exporter, "heavy_core");
     }
     
-    private void addDusts(RecipeExporter exporter) {
+    private void addDusts(RecipeOutput exporter) {
         addDustRecipe(exporter, of(ItemContent.BIOSTEEL_INGOT), ItemContent.BIOSTEEL_DUST, ItemContent.BIOSTEEL_INGOT, "biosteel");
         addDustRecipe(exporter, of(ItemContent.DURATIUM_INGOT), ItemContent.DURATIUM_DUST, ItemContent.DURATIUM_INGOT, "duratium");
         addDustRecipe(exporter, of(TagContent.ELECTRUM_INGOTS), ItemContent.ELECTRUM_DUST, ItemContent.ELECTRUM_INGOT, "electrum");
@@ -857,7 +862,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         GrinderRecipeBuilder.build().input(Items.ANCIENT_DEBRIS).result(Items.NETHERITE_SCRAP, 2).export(exporter, "netheritescrap");
     }
     
-    private void addUraniumProcessing(RecipeExporter exporter) {
+    private void addUraniumProcessing(RecipeOutput exporter) {
         // uranium order is:
         // raw ore -> dust/gem, dust -> gem, gem -> pellets
         
@@ -905,274 +910,246 @@ public class OritechRecipeGenerator extends RecipeProvider {
         addCompactingRecipe(exporter, ItemContent.PLUTONIUM_PELLET, ItemContent.SMALL_PLUTONIUM_PELLET, of(ItemContent.SMALL_PLUTONIUM_PELLET), of(ItemContent.PLUTONIUM_PELLET));
     }
     
-    private void addAugmentRecipes(RecipeExporter exporter) {
+    private void addAugmentRecipes(RecipeOutput exporter) {
         
-        var SIMPLE_AUGMENT_STATION_ID = Registries.BLOCK.getId(BlockContent.SIMPLE_AUGMENT_STATION);
-        var ADVANCED_AUGMENT_STATION_ID = Registries.BLOCK.getId(BlockContent.ADVANCED_AUGMENT_STATION);
-        var ARCANE_AUGMENT_STATION_ID = Registries.BLOCK.getId(BlockContent.ARCANE_AUGMENT_STATION);
+        var SIMPLE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.SIMPLE_AUGMENT_STATION);
+        var ADVANCED_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.ADVANCED_AUGMENT_STATION);
+        var ARCANE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.ARCANE_AUGMENT_STATION);
         
         AugmentRecipeBuilder.build()
           .researchCost(TagContent.MACHINE_PLATING, 64)
           .researchCost(TagContent.COAL_DUSTS, 32)
           .researchCost(ItemContent.BIOSTEEL_INGOT, 8)
-          .applyCost(TagContent.STEEL_INGOTS, 8)
-          .applyCost(cItemTag("ingots/iron"), 16)
+          .applyCost(TagContent.MACHINE_PLATING, 8)
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
           .uiX(5).uiY(70).time(400).rfCost(10_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_MAX_HEALTH, 6, EntityAttributeModifier.Operation.ADD_VALUE)
+          .modifierDefinition(Attributes.MAX_HEALTH, 6, AttributeModifier.Operation.ADD_VALUE)
           .export(exporter, "hpboost");
         
         AugmentRecipeBuilder.build()
           .researchCost(TagContent.CARBON_FIBRE, 32)
           .researchCost(ItemContent.BIOSTEEL_INGOT, 16)
-          .researchCost(cItemTag("gems/diamond"), 4)
+          .researchCost(Items.DIAMOND, 4)
           .applyCost(TagContent.CARBON_FIBRE, 8)
-          .applyCost(ItemContent.DURATIUM_INGOT, 4)
           .requirement(Oritech.id("augment/armor"))
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
           .uiX(80).uiY(70).time(800).rfCost(50_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_MAX_HEALTH, 4, EntityAttributeModifier.Operation.ADD_VALUE)
+          .modifierDefinition(Attributes.MAX_HEALTH, 4, AttributeModifier.Operation.ADD_VALUE)
           .export(exporter, "hpboostmore");
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.ENERGITE_INGOT, 64)
           .researchCost(ItemContent.REINFORCED_CARBON_SHEET, 32)
           .researchCost(Items.NETHER_STAR)
-          .applyCost(ItemContent.DURATIUM_DUST, 64)
-          .applyCost(cItemTag("storage_blocks/redstone"), 64)
+          .applyCost(ItemContent.ENERGITE_INGOT, 4)
           .requirement(Oritech.id("augment/ultimatearmor"))
           .requiredStation(ADVANCED_AUGMENT_STATION_ID)
           .uiX(165).uiY(70).time(1600).rfCost(200_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_MAX_HEALTH, 10, EntityAttributeModifier.Operation.ADD_VALUE)
+          .modifierDefinition(Attributes.MAX_HEALTH, 10, AttributeModifier.Operation.ADD_VALUE)
           .export(exporter, "hpboostultra");
         
         AugmentRecipeBuilder.build()
-          .researchCost(ItemContent.ADAMANT_INGOT, 64)
-          .researchCost(Items.NETHER_STAR, 8)
+          .researchCost(ItemContent.ADAMANT_INGOT, 32)
+          .researchCost(Items.NETHER_STAR, 4)
           .researchCost(ItemContent.URANIUM_PELLET, 64)
           .researchCost(BlockContent.FLUXITE_BLOCK, 64)
-          .applyCost(ItemContent.ADAMANT_INGOT, 32)
-          .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
-          .applyCost(ItemContent.FLUXITE, 64)
+          .applyCost(ItemContent.ADAMANT_INGOT, 4)
           .requirement(Oritech.id("augment/hpboostultra"))
           .requirement(Oritech.id("augment/gravity"))
           .requiredStation(ADVANCED_AUGMENT_STATION_ID)
           .uiX(205).uiY(40).time(2400).rfCost(500_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_MAX_HEALTH, 10, EntityAttributeModifier.Operation.ADD_VALUE)
+          .modifierDefinition(Attributes.MAX_HEALTH, 10, AttributeModifier.Operation.ADD_VALUE)
           .export(exporter, "hpboostultimate");
         
         AugmentRecipeBuilder.build()
-          .researchCost(ItemContent.MOTOR, 32)
-          .researchCost(ItemContent.BIOSTEEL_INGOT, 64)
-          .researchCost(cItemTag("dusts/redstone"), 32)
-          .applyCost(ItemContent.MOTOR, 16)
-          .applyCost(cItemTag("ingots/iron"), 32)
+          .researchCost(ItemContent.MOTOR, 16)
+          .researchCost(ItemContent.BIOSTEEL_INGOT, 32)
+          .researchCost(Items.REDSTONE, 64)
+          .applyCost(ItemContent.MOTOR, 4)
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
           .uiX(5).uiY(30).time(600).rfCost(30_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+          .modifierDefinition(Attributes.MOVEMENT_SPEED, 0.25f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
           .export(exporter, "speedboost");
         
         AugmentRecipeBuilder.build()
-          .researchCost(ItemContent.ENERGITE_INGOT, 64)
-          .researchCost(ItemContent.ION_THRUSTER, 32)
+          .researchCost(ItemContent.ENERGITE_INGOT, 32)
+          .researchCost(ItemContent.ION_THRUSTER, 16)
           .researchCost(ItemContent.FLUX_GATE, 16)
-          .applyCost(ItemContent.MAGNETIC_COIL, 32)
-          .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
-          .applyCost(TagContent.ELECTRUM_DUSTS, 64)
+          .applyCost(ItemContent.ENERGITE_INGOT, 4)
           .requirement(Oritech.id("augment/speedboost"))
           .requirement(Oritech.id("augment/armor"))
           .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-          .uiX(55).uiY(50).time(1800).rfCost(350_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25f, EntityAttributeModifier.Operation.ADD_VALUE)
+          .uiX(55).uiY(50).time(1800).rfCost(150_000_000)
+          .modifierDefinition(Attributes.MOVEMENT_SPEED, 0.25f, AttributeModifier.Operation.ADD_VALUE)
           .toggleable(true)
           .export(exporter, "superspeedboost");
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.MOTOR, 32)
           .researchCost(TagContent.STEEL_INGOTS, 64)
-          .researchCost(cItemTag("storage_blocks/iron"), 16)
-          .applyCost(ItemContent.MOTOR, 16)
-          .applyCost(cItemTag("ingots/iron"), 64)
+          .applyCost(ItemContent.MOTOR, 4)
           .requirement(Oritech.id("augment/superspeedboost"))
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
           .uiX(80).uiY(50).time(800).rfCost(75_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_STEP_HEIGHT, 0.6f, EntityAttributeModifier.Operation.ADD_VALUE)
+          .modifierDefinition(Attributes.STEP_HEIGHT, 0.6f, AttributeModifier.Operation.ADD_VALUE)
           .toggleable()
           .export(exporter, "stepassist");
         
         AugmentRecipeBuilder.build()
-          .researchCost(ItemContent.SILICON_WAFER, 64)
-          .researchCost(ItemContent.PROCESSING_UNIT, 32)
-          .researchCost(cItemTag("storage_blocks/gold"), 16)
-          .applyCost(TagContent.SILICON, 32)
-          .applyCost(cItemTag("storage_blocks/redstone"), 32)
+          .researchCost(Items.COPPER_INGOT, 64)
+          .researchCost(ItemContent.PROCESSING_UNIT, 8)
+          .researchCost(Items.GOLD_INGOT, 32)
+          .applyCost(TagContent.SILICON, 4)
           .requirement(Oritech.id("augment/hpboost"))
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-          .uiX(30).uiY(90).time(400).rfCost(50_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_SCALE, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+          .uiX(30).uiY(90).time(400).rfCost(20_000_000)
+          .modifierDefinition(Attributes.SCALE, -0.5f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
           .toggleable()
           .export(exporter, "dwarf");
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.RAW_BIOPOLYMER, 64)
           .researchCost(ItemContent.SMALL_URANIUM_DUST, 4)
-          .researchCost(TagContent.BIOMATTER, 64)
-          .applyCost(ItemContent.RAW_BIOPOLYMER, 32)
-          .applyCost(cItemTag("ingots/iron"), 64)
+          .applyCost(ItemContent.RAW_BIOPOLYMER, 8)
           .requirement(Oritech.id("augment/dwarf"))
           .requirement(Oritech.id("augment/armor"))
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-          .uiX(55).uiY(90).time(1600).rfCost(300_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_SCALE, 1f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+          .uiX(55).uiY(90).time(1600).rfCost(80_000_000)
+          .modifierDefinition(Attributes.SCALE, 1f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
           .toggleable()
           .export(exporter, "giant");
         
         AugmentRecipeBuilder.build()
           .researchCost(TagContent.STEEL_INGOTS, 64)
           .researchCost(ItemContent.DURATIUM_INGOT, 8)
-          .researchCost(cItemTag("gems/diamond"), 16)
+          .researchCost(Items.DIAMOND, 16)
           .applyCost(ItemContent.DURATIUM_INGOT, 4)
           .applyCost(cItemTag("ingots/iron"), 32)
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
           .uiX(30).uiY(50).time(800).rfCost(80_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_ARMOR, 4, EntityAttributeModifier.Operation.ADD_VALUE)
+          .modifierDefinition(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
           .export(exporter, "armor");
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.ENERGITE_INGOT, 64)
           .researchCost(ItemContent.MAGNETIC_COIL, 32)
-          .researchCost(cItemTag("gems/diamond"), 32)
-          .applyCost(ItemContent.MAGNETIC_COIL, 16)
-          .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
-          .applyCost(ItemContent.DURATIUM_INGOT, 8)
+          .researchCost(Items.DIAMOND, 8)
+          .applyCost(ItemContent.MAGNETIC_COIL, 4)
           .requirement(Oritech.id("augment/autofeeder"))
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-          .uiX(105).uiY(50).time(1600).rfCost(280_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_ARMOR, 6, EntityAttributeModifier.Operation.ADD_VALUE)
+          .uiX(105).uiY(50).time(1600).rfCost(180_000_000)
+          .modifierDefinition(Attributes.ARMOR, 6, AttributeModifier.Operation.ADD_VALUE)
           .export(exporter, "betterarmor");
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.FLUXITE, 64)
           .researchCost(ItemContent.HEISENBERG_COMPENSATOR, 32)
           .researchCost(ItemContent.PLUTONIUM_PELLET, 64)
-          .researchCost(Items.NETHER_STAR, 8)
-          .applyCost(BlockContent.FLUXITE_BLOCK, 32)
-          .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
-          .applyCost(cItemTag("obsidians/normal"), 16)
+          .researchCost(Items.NETHER_STAR, 4)
+          .applyCost(ItemContent.HEISENBERG_COMPENSATOR, 1)
           .requirement(Oritech.id("augment/betterarmor"))
           .requiredStation(ADVANCED_AUGMENT_STATION_ID)
           .uiX(155).uiY(50).time(2400).rfCost(500_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_ARMOR, 8, EntityAttributeModifier.Operation.ADD_VALUE)
+          .modifierDefinition(Attributes.ARMOR, 8, AttributeModifier.Operation.ADD_VALUE)
           .export(exporter, "ultimatearmor");
         
         AugmentRecipeBuilder.build()
-          .researchCost(ItemContent.MAGNETIC_COIL, 64)
+          .researchCost(ItemContent.MAGNETIC_COIL, 32)
           .researchCost(TagContent.ELECTRUM_INGOTS, 48)
-          .researchCost(cItemTag("storage_blocks/redstone"), 32)
-          .applyCost(ItemContent.MAGNETIC_COIL, 32)
-          .applyCost(cItemTag("storage_blocks/iron"), 64)
+          .researchCost(Items.ENDER_PEARL, 4)
+          .applyCost(ItemContent.MAGNETIC_COIL, 4)
           .requirement(Oritech.id("augment/blockreach"))
           .requiredStation(ADVANCED_AUGMENT_STATION_ID)
           .uiX(140).uiY(70).time(1600).rfCost(150_000_000)
-          .modifierDefinition(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+          .modifierDefinition(Attributes.ENTITY_INTERACTION_RANGE, 0.3f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
           .export(exporter, "weaponreach");
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.MOTOR, 64)
           .researchCost(TagContent.STEEL_INGOTS, 48)
-          .researchCost(cItemTag("storage_blocks/copper"), 32)
-          .applyCost(ItemContent.MOTOR, 32)
-          .applyCost(cItemTag("ingots/copper"), 64)
+          .researchCost(Items.ENDER_PEARL, 4)
+          .applyCost(ItemContent.MOTOR, 4)
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
           .uiX(115).uiY(90).time(900).rfCost(100_000_000)
-          .modifierDefinition(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+          .modifierDefinition(Attributes.BLOCK_INTERACTION_RANGE, 0.3f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
           .export(exporter, "blockreach");
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.ENDERIC_LENS, 64)
-          .researchCost(cItemTag("ender_pearls"), 16)
-          .researchCost(cItemTag("storage_blocks/diamond"), 16)
-          .applyCost(ItemContent.ENDERIC_LENS, 32)
-          .applyCost(cItemTag("obsidians/normal"), 64)
+          .researchCost(Items.ENDER_PEARL, 16)
+          .applyCost(ItemContent.ENDERIC_LENS, 4)
           .requirement(Oritech.id("augment/blockreach"))
           .requiredStation(ADVANCED_AUGMENT_STATION_ID)
           .uiX(140).uiY(90).time(800).rfCost(200_000_000)
-          .modifierDefinition(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+          .modifierDefinition(Attributes.BLOCK_INTERACTION_RANGE, 1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
           .toggleable()
           .export(exporter, "farblockreach");
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.MAGNETIC_COIL, 48)
-          .researchCost(Items.QUARTZ_BLOCK, 64)
+          .researchCost(Items.QUARTZ, 64)
           .researchCost(ItemContent.BASIC_BATTERY, 32)
-          .applyCost(Items.QUARTZ_BLOCK, 16)
-          .applyCost(cItemTag("ingots/iron"), 32)
+          .applyCost(ItemContent.MAGNETIC_COIL, 4)
           .requirement(Oritech.id("augment/attackdamage"))
           .requirement(Oritech.id("augment/speedboost"))
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-          .uiX(30).uiY(10).time(1200).rfCost(100_000_000)
-          .modifierDefinition(EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, 1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+          .uiX(30).uiY(10).time(1200).rfCost(50_000_000)
+          .modifierDefinition(Attributes.BLOCK_BREAK_SPEED, 1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
           .export(exporter, "miningspeed");
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.ENERGITE_INGOT, 64)
           .researchCost(ItemContent.FLUX_GATE, 48)
-          .researchCost(ItemContent.DURATIUM_INGOT, 64)
-          .applyCost(ItemContent.ENERGITE_INGOT, 32)
-          .applyCost(cItemTag("storage_blocks/redstone"), 64)
+          .researchCost(ItemContent.DURATIUM_INGOT, 8)
+          .applyCost(ItemContent.ENERGITE_INGOT, 4)
           .requirement(Oritech.id("augment/miningspeed"))
           .requirement(Oritech.id("augment/superspeedboost"))
           .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-          .uiX(80).uiY(10).time(2400).rfCost(450_000_000)
-          .modifierDefinition(EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, 1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+          .uiX(80).uiY(10).time(2400).rfCost(250_000_000)
+          .modifierDefinition(Attributes.BLOCK_BREAK_SPEED, 1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
           .toggleable()
           .export(exporter, "superminingspeed");
         
         AugmentRecipeBuilder.build()
-          .researchCost(TagContent.STEEL_INGOTS, 64)
-          .researchCost(cItemTag("gems/diamond"), 48)
-          .researchCost(ItemContent.FLUXITE, 32)
-          .applyCost(TagContent.STEEL_INGOTS, 16)
-          .applyCost(ItemContent.DURATIUM_INGOT, 4)
+          .researchCost(TagContent.STEEL_INGOTS, 32)
+          .researchCost(Items.DIAMOND, 8)
+          .researchCost(ItemContent.FLUXITE, 64)
+          .applyCost(TagContent.STEEL_INGOTS, 4)
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
           .uiX(5).uiY(10).time(1600).rfCost(150_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_ATTACK_DAMAGE, 4, EntityAttributeModifier.Operation.ADD_VALUE)
+          .modifierDefinition(Attributes.ATTACK_DAMAGE, 4, AttributeModifier.Operation.ADD_VALUE)
           .export(exporter, "attackdamage");
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.ENDERIC_COMPOUND, 64)
           .researchCost(ItemContent.FLUXITE, 64)
-          .researchCost(cItemTag("rods/blaze"), 32)
-          .applyCost(ItemContent.ENDERIC_COMPOUND, 32)
-          .applyCost(cItemTag("storage_blocks/gold"), 32)
+          .applyCost(ItemContent.ENDERIC_COMPOUND, 4)
           .requirement(Oritech.id("augment/hpboostultra"))
           .requirement(Oritech.id("augment/ultimatearmor"))
           .requiredStation(ARCANE_AUGMENT_STATION_ID)
           .uiX(180).uiY(50).time(2800).rfCost(500_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_ATTACK_DAMAGE, 6, EntityAttributeModifier.Operation.ADD_VALUE)
+          .modifierDefinition(Attributes.ATTACK_DAMAGE, 6, AttributeModifier.Operation.ADD_VALUE)
           .export(exporter, "superattackdamage");
         
         AugmentRecipeBuilder.build()
           .researchCost(TagContent.ELECTRUM_INGOTS, 64)
           .researchCost(cItemTag("storage_blocks/lapis"), 32)
           .researchCost(cItemTag("storage_blocks/gold"), 24)
-          .applyCost(cItemTag("storage_blocks/lapis"), 24)
-          .applyCost(cItemTag("storage_blocks/redstone"), 24)
+          .applyCost(Items.LAPIS_LAZULI, 16)
           .requiredStation(ARCANE_AUGMENT_STATION_ID)
           .uiX(55).uiY(30).time(1800).rfCost(200_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_LUCK, 5, EntityAttributeModifier.Operation.ADD_VALUE)
+          .modifierDefinition(Attributes.LUCK, 5, AttributeModifier.Operation.ADD_VALUE)
           .export(exporter, "luck");
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.MAGNETIC_COIL, 64)
           .researchCost(ItemContent.FLUXITE, 48)
           .researchCost(Items.PHANTOM_MEMBRANE, 8)
-          .applyCost(ItemContent.MAGNETIC_COIL, 32)
-          .applyCost(cItemTag("storage_blocks/iron"), 16)
+          .applyCost(ItemContent.MAGNETIC_COIL, 4)
           .requirement(Oritech.id("augment/flight"))
           .requiredStation(ARCANE_AUGMENT_STATION_ID)
-          .uiX(180).uiY(10).time(2200).rfCost(400_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_GRAVITY, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+          .uiX(180).uiY(10).time(2200).rfCost(300_000_000)
+          .modifierDefinition(Attributes.GRAVITY, -0.5f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
           .toggleable()
           .export(exporter, "gravity");
         
@@ -1181,8 +1158,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .researchCost(Items.WIND_CHARGE, 16)
           .researchCost(ItemContent.PROMETHEUM_INGOT, 16)
           .researchCost(ItemContent.PLUTONIUM_PELLET, 32)
-          .applyCost(ItemContent.FLUX_GATE, 32)
-          .applyCost(ItemContent.PLUTONIUM_PELLET, 8)
+          .applyCost(ItemContent.ION_THRUSTER, 4)
           .requirement(Oritech.id("augment/betterarmor"))
           .requirement(Oritech.id("augment/portal"))
           .requiredStation(ARCANE_AUGMENT_STATION_ID)
@@ -1192,25 +1168,23 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .export(exporter, "flight");
         
         AugmentRecipeBuilder.build()
-          .researchCost(Items.ENDER_EYE, 32)
-          .researchCost(ItemContent.ENDERIC_LENS, 8)
-          .researchCost(cItemTag("gems/diamond"), 8)
-          .applyCost(ItemContent.ENDERIC_LENS, 32)
-          .applyCost(Items.GLOWSTONE, 64)
+          .researchCost(Items.ENDER_EYE, 8)
+          .researchCost(ItemContent.ENDERIC_LENS, 16)
+          .researchCost(Items.DIAMOND, 8)
+          .applyCost(ItemContent.ENDERIC_LENS, 4)
           .requirement(Oritech.id("augment/orefinder"))
           .requiredStation(ARCANE_AUGMENT_STATION_ID)
           .uiX(155).uiY(10).time(3200).rfCost(100_000_000)
-          .effectDefinition(StatusEffects.INVISIBILITY, 0)
+          .effectDefinition(MobEffects.INVISIBILITY, 0)
           .toggleable()
           .export(exporter, "cloak");
         
         AugmentRecipeBuilder.build()
           .researchCost(cItemTag("ender_pearls"), 16)
-          .researchCost(cItemTag("obsidians/normal"), 48)
+          .researchCost(Items.OBSIDIAN, 64)
           .researchCost(ItemContent.UNHOLY_INTELLIGENCE)
           .researchCost(ItemContent.ADAMANT_INGOT, 32)
-          .applyCost(cItemTag("ender_pearls"), 8)
-          .applyCost(cItemTag("obsidians/crying"), 32)
+          .applyCost(cItemTag("ender_pearls"), 4)
           .requiredStation(ARCANE_AUGMENT_STATION_ID)
           .uiX(130).uiY(30).time(3000).rfCost(250_000_000)
           .customAugmentDefinition(CustomAugmentsCollection.portal.id)
@@ -1218,36 +1192,31 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .export(exporter, "portal");
         
         AugmentRecipeBuilder.build()
-          .researchCost(cItemTag("ingots/gold"), 64)
+          .researchCost(Items.GOLD_INGOT, 64)
           .researchCost(ItemContent.ENDERIC_LENS, 48)
-          .researchCost(Items.GLOWSTONE, 64)
-          .applyCost(ItemContent.ENDERIC_LENS, 4)
-          .applyCost(Items.GLOWSTONE, 8)
-          .applyCost(Items.REDSTONE_LAMP, 8)
+          .researchCost(Items.GLOWSTONE_DUST, 64)
+          .applyCost(Items.GLOWSTONE_DUST, 8)
           .requiredStation(ADVANCED_AUGMENT_STATION_ID)
           .uiX(105).uiY(30).time(2400).rfCost(50_000_000)
-          .effectDefinition(StatusEffects.NIGHT_VISION, 0)
+          .effectDefinition(MobEffects.NIGHT_VISION, 0)
           .toggleable()
           .export(exporter, "nightvision");
         
         AugmentRecipeBuilder.build()
-          .researchCost(Items.PRISMARINE_CRYSTALS, 64)
-          .researchCost(ItemContent.BIOSTEEL_INGOT, 48)
+          .researchCost(Items.PRISMARINE_CRYSTALS, 8)
+          .researchCost(ItemContent.BIOSTEEL_INGOT, 32)
           .researchCost(Items.HEART_OF_THE_SEA)
-          .applyCost(ItemContent.BIOSTEEL_INGOT, 32)
-          .applyCost(ItemTags.FISHES)
+          .applyCost(ItemContent.BIOSTEEL_INGOT, 4)
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
           .uiX(5).uiY(90).time(800).rfCost(50_000_000)
-          .effectDefinition(StatusEffects.WATER_BREATHING, 0)
+          .effectDefinition(MobEffects.WATER_BREATHING, 0)
           .export(exporter, "waterbreath");
         
         AugmentRecipeBuilder.build()
-          .researchCost(ItemContent.PROCESSING_UNIT, 64)
-          .researchCost(TagContent.BIOMATTER, 48)
+          .researchCost(ItemContent.PROCESSING_UNIT, 16)
+          .researchCost(TagContent.BIOMATTER, 64)
           .researchCost(Items.GOLDEN_CARROT, 64)
-          .applyCost(TagContent.BIOMATTER, 32)
-          .applyCost(BlockContent.ITEM_PIPE, 64)
-          .applyCost(Items.HOPPER, 8)
+          .applyCost(TagContent.BIOMATTER, 4)
           .requirement(Oritech.id("augment/armor"))
           .requirement(Oritech.id("augment/hpboostmore"))
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
@@ -1257,14 +1226,13 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .export(exporter, "autofeeder");
         
         AugmentRecipeBuilder.build()
-          .researchCost(ItemContent.MAGNETIC_COIL, 64)
-          .researchCost(ItemContent.ENERGITE_INGOT, 48)
+          .researchCost(ItemContent.MAGNETIC_COIL, 32)
+          .researchCost(ItemContent.ENERGITE_INGOT, 32)
           .researchCost(Items.LODESTONE, 2)
-          .applyCost(ItemContent.MAGNETIC_COIL, 32)
-          .applyCost(cItemTag("ingots/copper"), 64)
+          .applyCost(ItemContent.MAGNETIC_COIL, 4)
           .requirement(Oritech.id("augment/superminingspeed"))
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-          .uiX(105).uiY(10).time(2400).rfCost(400_000_000)
+          .uiX(105).uiY(10).time(2400).rfCost(300_000_000)
           .customAugmentDefinition(CustomAugmentsCollection.magnet.id)
           .toggleable()
           .export(exporter, "magnet");
@@ -1272,11 +1240,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.ENDERIC_LENS, 32)
           .researchCost(Items.SPYGLASS, 1)
-          .researchCost(ItemContent.OVERCHARGED_CRYSTAL)
-          .researchCost(ItemContent.PROMETHEUM_INGOT, 2)
+          .researchCost(ItemContent.PROMETHEUM_INGOT, 1)
           .researchCost(Items.SCULK_SENSOR, 1)
-          .applyCost(ItemContent.ENDERIC_LENS, 32)
-          .applyCost(Items.REDSTONE_TORCH, 64)
+          .applyCost(ItemContent.ENDERIC_LENS, 4)
           .requirement(Oritech.id("augment/nightvision"))
           .requirement(Oritech.id("augment/magnet"))
           .requiredStation(ARCANE_AUGMENT_STATION_ID)
@@ -1286,7 +1252,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .export(exporter, "orefinder");
     }
     
-    private void addReactorBlocks(RecipeExporter exporter) {
+    private void addReactorBlocks(RecipeOutput exporter) {
         
         // single rod
         offerRodRecipe(exporter, BlockContent.REACTOR_ROD.asItem(), of(TagContent.PLASTIC_PLATES), of(ItemContent.ENERGITE_INGOT), "singlerod");
@@ -1331,325 +1297,330 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerMachinePlatingRecipe(exporter, BlockContent.NUKE.asItem(), of(ItemContent.HEISENBERG_COMPENSATOR), of(ItemContent.PLUTONIUM_PELLET), of(Items.TNT), 1, "nukebetter");
     }
     
-    private void addReactorFuels(RecipeExporter exporter) {
+    private void addReactorFuels(RecipeOutput exporter) {
         ReactorGeneratorRecipeBuilder.build().input(ItemContent.SMALL_URANIUM_PELLET).time(400).export(exporter, "smallpellet");
         ReactorGeneratorRecipeBuilder.build().input(ItemContent.URANIUM_PELLET).time(4000).export(exporter, "pellet");
         ReactorGeneratorRecipeBuilder.build().input(ItemContent.SMALL_PLUTONIUM_PELLET).time(4000).export(exporter, "smallplutoniumpellet");
         ReactorGeneratorRecipeBuilder.build().input(ItemContent.PLUTONIUM_PELLET).time(40000).export(exporter, "plutoniumpellet");
     }
     
-    private void addLaserTransformations(RecipeExporter exporter) {
+    private void addLaserTransformations(RecipeOutput exporter) {
         LaserRecipeBuilder.build().input(Items.AMETHYST_CLUSTER).result(ItemContent.FLUXITE).export(exporter, "fluxite");
         LaserRecipeBuilder.build().input(BlockContent.URANIUM_CRYSTAL).result(ItemContent.PLUTONIUM_DUST).export(exporter, "plutoniumdust");
     }
     
-    private void addCompactingRecipe(RecipeExporter exporter, ItemConvertible resBlock, ItemConvertible resItem, Ingredient itemIng, Ingredient blockIng) {
-        ShapelessRecipeJsonBuilder
-          .create(RecipeCategory.MISC, resItem, 9)
-          .input(blockIng)
-          .criterion(hasItem(resBlock), conditionsFromItem(resBlock))
-          .offerTo(exporter, Oritech.id(RecipeProvider.getRecipeName(resBlock) + "blockinv"));
-        ShapedRecipeJsonBuilder
-          .create(RecipeCategory.MISC, resBlock)
-          .input('#', itemIng)
+    private void addCompactingRecipe(RecipeOutput exporter, ItemLike resBlock, ItemLike resItem, Ingredient itemIng, Ingredient blockIng) {
+        ShapelessRecipeBuilder
+          .shapeless(RecipeCategory.MISC, resItem, 9)
+          .requires(blockIng)
+          .unlockedBy(getHasName(resBlock), has(resBlock))
+          .save(exporter, Oritech.id(RecipeProvider.getSimpleRecipeName(resBlock) + "blockinv"));
+        ShapedRecipeBuilder
+          .shaped(RecipeCategory.MISC, resBlock)
+          .define('#', itemIng)
           .pattern("###")
           .pattern("###")
           .pattern("###")
-          .criterion(hasItem(resItem), conditionsFromItem(resItem))
-          .offerTo(exporter, Oritech.id(RecipeProvider.getRecipeName(resBlock) + "block"));
+          .unlockedBy(getHasName(resItem), has(resItem))
+          .save(exporter, Oritech.id(RecipeProvider.getSimpleRecipeName(resBlock) + "block"));
     }
     
     // crafting shapes
-    public void offerCableRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, String suffix) {
+    public void offerCableRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, String suffix) {
         var item = output.getItem();
-        createCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        createCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).unlockedBy(getHasName(item), has(item)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerInsulatedCableRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, Ingredient insulation, String suffix) {
+    public void offerInsulatedCableRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, Ingredient insulation, String suffix) {
         var item = output.getItem();
-        createInsulatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        createInsulatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerFramedCableRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, String suffix) {
+    public void offerRotatedCableRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, Ingredient insulation, String suffix) {
         var item = output.getItem();
-        createFramedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/frame_" + suffix));
+        createRotatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerCableFromFrameRecipe(RecipeExporter exporter, ItemStack output, Ingredient frame, String suffix) {
+    public void offerFramedCableRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, String suffix) {
         var item = output.getItem();
-        ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item, output.getCount()).input(frame).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/unframe_" + suffix));
+        createFramedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).unlockedBy(getHasName(item), has(item)).save(exporter, Oritech.id("crafting/frame_" + suffix));
     }
     
-    public void offerCableDuctRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, String suffix) {
+    public void offerCableFromFrameRecipe(RecipeOutput exporter, ItemStack output, Ingredient frame, String suffix) {
         var item = output.getItem();
-        createCableDuctRecipe(RecipeCategory.MISC, item, output.getCount(), input).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/duct_" + suffix));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item, output.getCount()).requires(frame).unlockedBy(getHasName(item), has(item)).save(exporter, Oritech.id("crafting/unframe_" + suffix));
     }
     
-    public void offerCableFromDuctRecipe(RecipeExporter exporter, ItemStack output, Ingredient duct, String suffix) {
+    public void offerCableDuctRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, String suffix) {
         var item = output.getItem();
-        ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item, output.getCount()).input(duct).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/unduct_" + suffix));
+        createCableDuctRecipe(RecipeCategory.MISC, item, output.getCount(), input).unlockedBy(getHasName(item), has(item)).save(exporter, Oritech.id("crafting/duct_" + suffix));
     }
     
-    public CraftingRecipeJsonBuilder createCableRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
-        return ShapedRecipeJsonBuilder.create(category, output, count).input('#', input).pattern("   ").pattern("###");
+    public void offerCableFromDuctRecipe(RecipeOutput exporter, ItemStack output, Ingredient duct, String suffix) {
+        var item = output.getItem();
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item, output.getCount()).requires(duct).unlockedBy(getHasName(item), has(item)).save(exporter, Oritech.id("crafting/unduct_" + suffix));
     }
     
-    public CraftingRecipeJsonBuilder createFramedCableRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
-        return ShapedRecipeJsonBuilder.create(category, output, count).input('c', input).input('p', Ingredient.fromTag(TagContent.MACHINE_PLATING)).pattern("ccc").pattern("cpc").pattern("ccc");
+    public RecipeBuilder createCableRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
+        return ShapedRecipeBuilder.shaped(category, output, count).define('#', input).pattern("   ").pattern("###");
     }
     
-    public CraftingRecipeJsonBuilder createCableDuctRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
-        return ShapedRecipeJsonBuilder.create(category, output, count).input('c', input).input('p', Ingredient.fromTag(TagContent.MACHINE_PLATING)).input('s', of(Blocks.STONE)).pattern("csc").pattern("sps").pattern("csc");
+    public RecipeBuilder createFramedCableRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
+        return ShapedRecipeBuilder.shaped(category, output, count).define('c', input).define('p', Ingredient.of(TagContent.MACHINE_PLATING)).pattern("ccc").pattern("cpc").pattern("ccc");
     }
     
-    public void offerMotorRecipe(RecipeExporter exporter, Item output, Ingredient shaft, Ingredient core, Ingredient wall, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', shaft).input('c', core).input('w', wall).pattern(" s ").pattern("wcw").pattern("wcw");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("motor/" + suffix));
+    public RecipeBuilder createCableDuctRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
+        return ShapedRecipeBuilder.shaped(category, output, count).define('c', input).define('p', Ingredient.of(TagContent.MACHINE_PLATING)).define('s', of(Blocks.STONE)).pattern("csc").pattern("sps").pattern("csc");
     }
     
-    public void offerManualAlloyRecipe(RecipeExporter exporter, Item output, Ingredient A, Ingredient B, String suffix) {
+    public void offerMotorRecipe(RecipeOutput exporter, Item output, Ingredient shaft, Ingredient core, Ingredient wall, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('s', shaft).define('c', core).define('w', wall).pattern(" s ").pattern("wcw").pattern("wcw");
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("motor/" + suffix));
+    }
+    
+    public void offerManualAlloyRecipe(RecipeOutput exporter, Item output, Ingredient A, Ingredient B, String suffix) {
         offerManualAlloyRecipe(exporter, output, A, B, 1, suffix);
     }
     
-    public void offerManualAlloyRecipe(RecipeExporter exporter, Item output, Ingredient A, Ingredient B, int count, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, count).input('a', A).input('b', B).pattern("aa ").pattern("bb ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/alloy/" + suffix));
+    public void offerManualAlloyRecipe(RecipeOutput exporter, Item output, Ingredient A, Ingredient B, int count, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, count).define('a', A).define('b', B).pattern("aa ").pattern("bb ");
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/alloy/" + suffix));
     }
     
-    public void offerGeneratorRecipe(RecipeExporter exporter, Item output, Ingredient base, Ingredient sides, Ingredient core, Ingredient frame, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', sides).input('c', core).input('f', frame).input('b', base)
+    public void offerGeneratorRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient sides, Ingredient core, Ingredient frame, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('s', sides).define('c', core).define('f', frame).define('b', base)
                         .pattern("fff")
                         .pattern("fcf")
                         .pattern("sbs");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerFurnaceRecipe(RecipeExporter exporter, Item output, Ingredient bottom, Ingredient botSides, Ingredient middleSides, Ingredient core, Ingredient top, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', botSides).input('c', core).input('f', top).input('b', bottom).input('m', middleSides)
+    public void offerFurnaceRecipe(RecipeOutput exporter, Item output, Ingredient bottom, Ingredient botSides, Ingredient middleSides, Ingredient core, Ingredient top, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('s', botSides).define('c', core).define('f', top).define('b', bottom).define('m', middleSides)
                         .pattern("fff")
                         .pattern("mcm")
                         .pattern("sbs");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerAtomicForgeRecipe(RecipeExporter exporter, Item output, Ingredient base, Ingredient middleSides, Ingredient core, Ingredient top, Ingredient frame, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', top).input('c', core).input('f', frame).input('b', base).input('m', middleSides)
+    public void offerAtomicForgeRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient middleSides, Ingredient core, Ingredient top, Ingredient frame, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('s', top).define('c', core).define('f', frame).define('b', base).define('m', middleSides)
                         .pattern("fsf")
                         .pattern("mcm")
                         .pattern("bbb");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerBatteryRecipe(RecipeExporter exporter, Item output, Ingredient inner, Ingredient sides, Ingredient top, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('t', top).input('c', inner).input('f', sides)
+    public void offerBatteryRecipe(RecipeOutput exporter, Item output, Ingredient inner, Ingredient sides, Ingredient top, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('t', top).define('c', inner).define('f', sides)
                         .pattern(" t ")
                         .pattern("fcf")
                         .pattern("fcf");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerMachineFrameRecipe(RecipeExporter exporter, Item output, Ingredient base, Ingredient alt, int count, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, count).input('s', base).input('c', alt)
+    public void offerMachineFrameRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient alt, int count, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, count).define('s', base).define('c', alt)
                         .pattern(" s ")
                         .pattern("csc")
                         .pattern(" s ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerMachineCoreRecipe(RecipeExporter exporter, Item output, Ingredient base, Ingredient alt, String suffix) {
+    public void offerMachineCoreRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient alt, String suffix) {
         offerMachineCoreRecipe(exporter, output, 1, base, alt, suffix);
     }
     
-    public void offerMachineCoreRecipe(RecipeExporter exporter, Item output, int count, Ingredient base, Ingredient alt, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, count).input('s', base).input('c', alt)
+    public void offerMachineCoreRecipe(RecipeOutput exporter, Item output, int count, Ingredient base, Ingredient alt, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, count).define('s', base).define('c', alt)
                         .pattern("sss")
                         .pattern("scs")
                         .pattern("sss");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerManualFluidApplication(RecipeExporter exporter, Item output, Ingredient fluid, Ingredient base, String suffix) {
+    public void offerManualFluidApplication(RecipeOutput exporter, Item output, Ingredient fluid, Ingredient base, String suffix) {
         offerManualFluidApplication(exporter, output, 1, fluid, base, suffix);
     }
     
-    public void offerManualFluidApplication(RecipeExporter exporter, Item output, int count, Ingredient fluid, Ingredient base, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, count).input('f', fluid).input('b', base)
+    public void offerManualFluidApplication(RecipeOutput exporter, Item output, int count, Ingredient fluid, Ingredient base, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, count).define('f', fluid).define('b', base)
                         .pattern("bb ")
                         .pattern("bf ")
                         .pattern("   ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerBeadsRecipe(RecipeExporter exporter, Item output, int count, Ingredient fluid, Ingredient base, Ingredient catalyst, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, count).input('f', fluid).input('b', base).input('c', catalyst)
+    public void offerBeadsRecipe(RecipeOutput exporter, Item output, int count, Ingredient fluid, Ingredient base, Ingredient catalyst, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, count).define('f', fluid).define('b', base).define('c', catalyst)
                         .pattern("bb ")
                         .pattern("cf ")
                         .pattern("   ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerDrillRecipe(RecipeExporter exporter, Item output, Ingredient doubleBase, Ingredient motor, Ingredient outer, Ingredient head, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', doubleBase).input('m', motor).input('a', outer).input('e', head)
+    public void offerDrillRecipe(RecipeOutput exporter, Item output, Ingredient doubleBase, Ingredient motor, Ingredient outer, Ingredient head, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('s', doubleBase).define('m', motor).define('a', outer).define('e', head)
                         .pattern(" a ")
                         .pattern("aea")
                         .pattern("mss");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerWrenchRecipe(RecipeExporter exporter, Item output, Ingredient A, Ingredient B, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('a', A).input('b', B)
+    public void offerWrenchRecipe(RecipeOutput exporter, Item output, Ingredient A, Ingredient B, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('a', A).define('b', B)
                         .pattern(" a ")
                         .pattern(" ba")
                         .pattern("a  ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerChainsawRecipe(RecipeExporter exporter, Item output, Ingredient core, Ingredient motor, Ingredient center, Ingredient head, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', core).input('m', motor).input('a', center).input('e', head)
+    public void offerChainsawRecipe(RecipeOutput exporter, Item output, Ingredient core, Ingredient motor, Ingredient center, Ingredient head, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('s', core).define('m', motor).define('a', center).define('e', head)
                         .pattern("aa ")
                         .pattern("ae ")
                         .pattern("mss");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerAxeRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('p', plating).input('c', core)
+    public void offerAxeRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('p', plating).define('c', core)
                         .pattern("pp ")
                         .pattern("pc ")
                         .pattern(" c ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerPickaxeRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('p', plating).input('c', core)
+    public void offerPickaxeRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('p', plating).define('c', core)
                         .pattern("ppp")
                         .pattern(" c ")
                         .pattern(" c ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerHelmetRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('p', plating).input('c', core)
+    public void offerHelmetRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('p', plating).define('c', core)
                         .pattern("ppp")
                         .pattern("pcp")
                         .pattern("   ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerChestplateRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('p', plating).input('c', core)
+    public void offerChestplateRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('p', plating).define('c', core)
                         .pattern("p p")
                         .pattern("ppp")
                         .pattern("pcp");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerLegsRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('p', plating).input('c', core)
+    public void offerLegsRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('p', plating).define('c', core)
                         .pattern("ppp")
                         .pattern("pcp")
                         .pattern("p p");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerFeetRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('p', plating).input('c', core)
+    public void offerFeetRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('p', plating).define('c', core)
                         .pattern("   ")
                         .pattern("p p")
                         .pattern("c c");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerRodRecipe(RecipeExporter exporter, Item output, Ingredient cap, Ingredient rod, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('c', cap).input('r', rod)
+    public void offerRodRecipe(RecipeOutput exporter, Item output, Ingredient cap, Ingredient rod, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('c', cap).define('r', rod)
                         .pattern(" c ")
                         .pattern(" r ")
                         .pattern(" r ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerRodCombinationRecipe(RecipeExporter exporter, Item output, Ingredient cap, Ingredient rod, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('c', cap).input('r', rod)
+    public void offerRodCombinationRecipe(RecipeOutput exporter, Item output, Ingredient cap, Ingredient rod, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('c', cap).define('r', rod)
                         .pattern("   ")
                         .pattern("rcr")
                         .pattern("   ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerStarRecipe(RecipeExporter exporter, Item output, Ingredient inner, Ingredient outer, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('c', inner).input('o', outer)
+    public void offerStarRecipe(RecipeOutput exporter, Item output, Ingredient inner, Ingredient outer, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('c', inner).define('o', outer)
                         .pattern(" o ")
                         .pattern("oco")
                         .pattern(" o ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerTankRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, Ingredient sides, String suffix) {
+    public void offerTankRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, Ingredient sides, String suffix) {
         offerTankRecipe(exporter, output, 1, plating, core, sides, suffix);
     }
     
-    public void offerTankRecipe(RecipeExporter exporter, Item output, int count, Ingredient plating, Ingredient core, Ingredient sides, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, count).input('p', plating).input('s', sides).input('c', core)
+    public void offerTankRecipe(RecipeOutput exporter, Item output, int count, Ingredient plating, Ingredient core, Ingredient sides, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, count).define('p', plating).define('s', sides).define('c', core)
                         .pattern("ppp")
                         .pattern("scs")
                         .pattern("ppp");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerTwoComponentRecipe(RecipeExporter exporter, Item output, Ingredient A, Ingredient B, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('a', A).input('b', B)
+    public void offerTwoComponentRecipe(RecipeOutput exporter, Item output, Ingredient A, Ingredient B, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('a', A).define('b', B)
                         .pattern("ab ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerLeverRecipe(RecipeExporter exporter, Item output, Ingredient A, Ingredient B, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('a', A).input('b', B)
+    public void offerLeverRecipe(RecipeOutput exporter, Item output, Ingredient A, Ingredient B, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('a', A).define('b', B)
                         .pattern("a  ")
                         .pattern("b  ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerParticleMotorRecipe(RecipeExporter exporter, Item output, Ingredient rail, Ingredient top, Ingredient baseInner, Ingredient baseOuter, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('r', rail).input('t', top).input('i', baseInner).input('o', baseOuter)
+    public void offerParticleMotorRecipe(RecipeOutput exporter, Item output, Ingredient rail, Ingredient top, Ingredient baseInner, Ingredient baseOuter, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('r', rail).define('t', top).define('i', baseInner).define('o', baseOuter)
                         .pattern(" t ")
                         .pattern("rrr")
                         .pattern("oio");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerMachinePlatingRecipe(RecipeExporter exporter, Item output, Ingredient side, Ingredient edge, Ingredient core, int count, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, count).input('a', side).input('e', edge).input('c', core)
+    public void offerMachinePlatingRecipe(RecipeOutput exporter, Item output, Ingredient side, Ingredient edge, Ingredient core, int count, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, output, count).define('a', side).define('e', edge).define('c', core)
                         .pattern("eae")
                         .pattern("aca")
                         .pattern("eae");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerDoorRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, 1).input('a', A)
+    public void offerDoorRecipe(RecipeOutput exporter, Item output, Ingredient A, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, output, 1).define('a', A)
                         .pattern("aa ")
                         .pattern("aa ")
                         .pattern("aa ");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerSlabRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.BUILDING_BLOCKS, output, 6).input('a', A)
+    public void offerSlabRecipe(RecipeOutput exporter, Item output, Ingredient A, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, output, 6).define('a', A)
                         .pattern("aaa");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/slab/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/slab/" + suffix));
     }
     
-    public void offerStairsRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.BUILDING_BLOCKS, output, 4).input('a', A)
+    public void offerStairsRecipe(RecipeOutput exporter, Item output, Ingredient A, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, output, 4).define('a', A)
                         .pattern("a  ")
                         .pattern("aa ")
                         .pattern("aaa");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/stairs/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/stairs/" + suffix));
     }
     
-    public void offerPressurePlateRecipe(RecipeExporter exporter, Item output, Ingredient A, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, output, 1).input('a', A)
+    public void offerPressurePlateRecipe(RecipeOutput exporter, Item output, Ingredient A, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, output, 1).define('a', A)
                         .pattern("aa");
-        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/pressureplate/" + suffix));
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/pressureplate/" + suffix));
     }
 }

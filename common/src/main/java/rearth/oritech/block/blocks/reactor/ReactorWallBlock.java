@@ -1,7 +1,7 @@
 package rearth.oritech.block.blocks.reactor;
 
 public class ReactorWallBlock extends BaseReactorBlock {
-    public ReactorWallBlock(Settings settings) {
+    public ReactorWallBlock(Properties settings) {
         super(settings);
     }
     

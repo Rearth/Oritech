@@ -9,7 +9,7 @@ import io.wispforest.owo.ui.core.ParentComponent;
 import io.wispforest.owo.ui.core.Size;
 import io.wispforest.owo.ui.core.Surface;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
-import net.minecraft.client.util.math.Rect2i;
+import net.minecraft.client.renderer.Rect2i;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -36,7 +36,9 @@ class JeiExclusionZoneHandler implements IGuiContainerHandler<BaseOwoHandledScre
                     }
 
                     Size size = component.fullSize();
-                    result.add(new Rect2i(component.x(), component.y(), size.width(), size.height()));
+                    
+                    if (size.height() > 0 && size.width() > 0)
+                        result.add(new Rect2i(component.x(), component.y(), size.width(), size.height()));
                 });
             }
         }

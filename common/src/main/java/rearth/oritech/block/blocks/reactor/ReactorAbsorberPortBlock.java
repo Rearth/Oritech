@@ -2,26 +2,26 @@ package rearth.oritech.block.blocks.reactor;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
 
-public class ReactorAbsorberPortBlock extends BaseReactorBlock implements BlockEntityProvider {
-    public ReactorAbsorberPortBlock(Settings settings) {
+public class ReactorAbsorberPortBlock extends BaseReactorBlock implements EntityBlock {
+    public ReactorAbsorberPortBlock(Properties settings) {
         super(settings);
     }
     
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ReactorAbsorberPortEntity(pos, state);
     }
     
@@ -31,13 +31,13 @@ public class ReactorAbsorberPortBlock extends BaseReactorBlock implements BlockE
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClient && world.getBlockEntity(pos) instanceof ReactorAbsorberPortEntity) {
+        if (!world.isClientSide && world.getBlockEntity(pos) instanceof ReactorAbsorberPortEntity) {
             var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
+                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 }

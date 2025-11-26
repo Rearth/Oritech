@@ -1,12 +1,11 @@
 package rearth.oritech.api.fluid.containers;
 
 import dev.architectury.fluid.FluidStack;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
 import rearth.oritech.api.fluid.FluidApi;
 
 import java.util.function.Consumer;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.ItemStack;
 
 public class SimpleItemFluidStorage extends SimpleFluidStorage {
     
@@ -19,7 +18,7 @@ public class SimpleItemFluidStorage extends SimpleFluidStorage {
         this.setStack(itemStack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
         
         if (!this.getStack().isEmpty())
-            itemStack.set(DataComponentTypes.MAX_STACK_SIZE, 1);
+            itemStack.set(DataComponents.MAX_STACK_SIZE, 1);
     }
     
     @Override
@@ -28,12 +27,12 @@ public class SimpleItemFluidStorage extends SimpleFluidStorage {
         
         if (this.getStack().isEmpty()) {
             itemStack.remove(FluidApi.ITEM.getFluidComponent());
-            itemStack.set(DataComponentTypes.MAX_STACK_SIZE, 64);
+            itemStack.set(DataComponents.MAX_STACK_SIZE, 64);
             return;
         }
         
         itemStack.set(FluidApi.ITEM.getFluidComponent(), this.getStack());
-        itemStack.set(DataComponentTypes.MAX_STACK_SIZE, 1);
+        itemStack.set(DataComponents.MAX_STACK_SIZE, 1);
         
         if (contextCallback != null) contextCallback.accept(itemStack);
     }

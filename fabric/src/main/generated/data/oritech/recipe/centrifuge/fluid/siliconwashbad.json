@@ -1,0 +1,20 @@
+{
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 81000,
+    "fluid": "#c:naphtha"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 4050,
+      "fluid": "oritech:still_silicon_wash"
+    }
+  ],
+  "ingredients": [
+    {
+      "item": "minecraft:gravel"
+    }
+  ],
+  "results": [],
+  "time": 160
+}

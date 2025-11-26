@@ -2,29 +2,6 @@ package rearth.oritech.block.blocks.interaction;
 
 import dev.architectury.registry.menu.MenuRegistry;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.behavior.LaserArmEntityBehavior;
@@ -36,20 +13,45 @@ import rearth.oritech.util.MultiblockMachineController;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-public class LaserArmBlock extends Block implements BlockEntityProvider {
+
+public class LaserArmBlock extends Block implements EntityBlock {
 
     private static final LaserArmBlockBehavior DEFAULT_BLOCK_BEHAVIOR = new LaserArmBlockBehavior();
     public static final Map<Block, LaserArmBlockBehavior> BLOCK_BEHAVIORS = new Object2ObjectOpenHashMap<>();
     private static final LaserArmEntityBehavior DEFAULT_ENTITY_BEHAVIOR = new LaserArmEntityBehavior();
     public static final Map<EntityType<?>, LaserArmEntityBehavior> ENTITY_BEHAVIORS = new Object2ObjectOpenHashMap<>();
     
-    public LaserArmBlock(Settings settings) {
+    public LaserArmBlock(Properties settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(ASSEMBLED, false).with(Properties.FACING, Direction.UP));
+        registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false).setValue(BlockStateProperties.FACING, Direction.UP));
         LaserArmBlockBehavior.registerDefaults();
         LaserArmEntityBehavior.registerDefaults();
     }
@@ -71,29 +73,29 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
-    public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
-        return Objects.requireNonNull(super.getPlacementState(ctx)).with(Properties.FACING, ctx.getSide());
+    public @Nullable BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.FACING, ctx.getClickedFace());
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED);
-        builder.add(Properties.FACING);
+        builder.add(BlockStateProperties.FACING);
     }
     
     @Override
-    public boolean emitsRedstonePower(BlockState state) {
+    public boolean isSignalSource(BlockState state) {
         return true;
     }
     
     @Override
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
         
-        if (world.isClient) return;
+        if (world.isClientSide) return;
         
-        var isPowered = world.isReceivingRedstonePower(pos);
+        var isPowered = world.hasNeighborSignal(pos);
         
         var laserEntity = (LaserArmBlockEntity) world.getBlockEntity(pos);
         laserEntity.setRedstonePowered(isPowered);
@@ -101,20 +103,20 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClient) {
+        if (!world.isClientSide) {
             
             var entity = world.getBlockEntity(pos);
             if (!(entity instanceof LaserArmBlockEntity laserArm)) {
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             
-            var wasAssembled = state.get(ASSEMBLED);
+            var wasAssembled = state.getValue(ASSEMBLED);
             
             if (!wasAssembled) {
                 var corePlaced = laserArm.tryPlaceNextCore(player);
-                if (corePlaced) return ActionResult.SUCCESS;
+                if (corePlaced) return InteractionResult.SUCCESS;
             }
             
             var isAssembled = laserArm.initMultiblock(state);
@@ -123,29 +125,29 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
             if (isAssembled && !wasAssembled) {
                 laserArm.triggerSetupAnimation();
                 laserArm.initAddons();
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             
             if (!isAssembled) {
-                player.sendMessage(Text.translatable("message.oritech.machine.missing_core"));
-                return ActionResult.SUCCESS;
+                player.sendSystemMessage(Component.translatable("message.oritech.machine.missing_core"));
+                return InteractionResult.SUCCESS;
             }
             
             laserArm.initAddons();
-            MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, laserArm);
+            MenuRegistry.openExtendedMenu((ServerPlayer) player, laserArm);
             
         }
         
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
     
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClient()) {
+        if (!world.isClientSide()) {
             
             var entity = world.getBlockEntity(pos);
-            if (state.get(ASSEMBLED) && entity instanceof MultiblockMachineController machineEntity) {
+            if (state.getValue(ASSEMBLED) && entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
             
@@ -158,33 +160,33 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
                 for (var heldStack : stacks) {
                     if (!heldStack.isEmpty()) {
                         var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
-                        world.spawnEntity(itemEntity);
+                        world.addFreshEntity(itemEntity);
                     }
                 }
                 
                 storageBlock.inventory.heldStacks.clear();
-                storageBlock.inventory.markDirty();
+                storageBlock.inventory.setChanged();
             }
         }
         
-        return super.onBreak(world, pos, state, player);
+        return super.playerWillDestroy(world, pos, state, player);
     }
     
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.ENTITYBLOCK_ANIMATED;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
     
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new LaserArmBlockEntity(pos, state);
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
@@ -192,8 +194,8 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
-        super.appendTooltip(stack, context, tooltip, options);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+        super.appendHoverText(stack, context, tooltip, options);
         addMachineTooltip(tooltip, this, this);
     }
 }

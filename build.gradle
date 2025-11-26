@@ -1,124 +1,87 @@
 plugins {
-    id 'dev.architectury.loom' version '1.9-SNAPSHOT' apply false
-    id 'architectury-plugin' version '3.4-SNAPSHOT'
-    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+    id 'net.neoforged.moddev' version '2.0.107' apply false
+    id 'fabric-loom' version '1.9-SNAPSHOT' apply false
+    id "me.modmuss50.mod-publish-plugin" version "0.8.0" apply false
     id 'org.sinytra.wiki.toolkit' version '0.1.16'
-    id "me.modmuss50.mod-publish-plugin" version "0.8.0"
 }
 
-wiki {
-    docs {
-        oritech {
-            // The path to the folder containing the documentation metadata file (sinytra-wiki.json)
-            root = file('docs')
-            exportedAssetNamespaces = ['oritech']
-            wikiAccessToken = System.getenv('WIKI_TOKEN')
-        }
-    }
-}
-
-task runDatagenNeoforge(type: GradleBuild) {
-    buildFile = 'neoforgedatagen/build.gradle'
-    tasks = ['runData']
-}
-
-architectury {
-    minecraft = project.minecraft_version
-}
-
+// all projects including the root project
 allprojects {
-    group = rootProject.maven_group
-    version = rootProject.mod_version
-}
-
-subprojects {
-    apply plugin: 'dev.architectury.loom'
-    apply plugin: 'architectury-plugin'
-    apply plugin: 'maven-publish'
-    apply plugin: 'me.modmuss50.mod-publish-plugin'
+    apply plugin: 'java'
 
     base {
-        // Set up a suffixed format for the mod jar names, e.g. `example-fabric`.
-        archivesName = "$rootProject.archives_name-$project.name"
-    }
-
-    loom {
-        runs.configureEach {
-            vmArg("-Dmixin.env.remapRefMap=true")
-            vmArg("-Dmixin.env.refMapRemappingFile=${projectDir}/build/createSrgToMcp/output.srg")
-        }
-    }
-
-
-    repositories {
-        maven {
-            name = 'Owo'
-            url 'https://maven.wispforest.io/releases/'
-        }
-
-        maven {
-            name = 'GeckoLib'
-            url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
-        }
-        maven {
-            name = 'REI'
-            url "https://maven.shedaniel.me/"
-        }
-
-        maven { // EMI
-            name = 'TerraformersMC'
-            url 'https://maven.terraformersmc.com/'
-        }
-
-        maven { // jade
-            name = 'CurseMaven'
-            url "https://beta.cursemaven.com"
-        }
-
-        maven { // FFAPI
-            name = "Sinytra"
-            url "https://maven.su5ed.dev/releases"
-        }
-
-        maven { // JEI
-            name = "Jared's maven"
-            url = "https://maven.blamejared.com/"
-        }
-
-        maven { // for athena/CSL
-            name = 'teamresourceful'
-            url "https://maven.teamresourceful.com/repository/maven-public/"
-        }
-
-        // create:
-        maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
-        maven { url = "https://maven.createmod.net" }   // create + ponder + flywheel?
-
-    }
-
-    dependencies {
-        minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
-        mappings loom.layered {
-            it.mappings("net.fabricmc:yarn:$rootProject.yarn_mappings:v2")
-            it.mappings("dev.architectury:yarn-mappings-patch-neoforge:$rootProject.yarn_mappings_patch_neoforge_version")
-        }
+        archivesName = "$mod_id-${project.name}-$minecraft_version"
     }
 
     java {
-        // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-        // if it is present.
-        // If you remove this line, sources will not be generated.
         withSourcesJar()
-
+        toolchain.languageVersion = JavaLanguageVersion.of(21)
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+}
 
-    tasks.withType(JavaCompile).configureEach {
-        it.options.release = 21
+// all projects but the root project
+subprojects {
+    apply plugin: 'maven-publish'
+
+    sourceSets {
+        main {
+            resources {
+                srcDir(file("src/main/generated"))
+                exclude("**/.cache")
+            }
+        }
     }
 
-    // Configure Maven publishing.
+    repositories {
+        mavenCentral()
+        
+        // ModMaven
+        // mirrors a lot of commonly used Mavens
+        maven { url = "https://modmaven.dev" }
+        // CurseMaven
+        // Jade, Oracle Index
+        maven { url = "https://beta.cursemaven.com" }
+        
+        // Architectury API, REI
+        maven { url = "https://maven.architectury.dev/" }
+        // Athena (CTM)
+        maven { url = "https://maven.teamresourceful.com/repository/maven-public/" }
+        // EMI
+        maven { url = 'https://maven.terraformersmc.com/' }
+        // Forgified Fabric API
+        maven { url = "https://maven.su5ed.dev/releases" }
+        // FTB Chunks
+        maven { url = "https://maven.ftb.dev/releases" }
+        // GeckoLib
+        maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+        // owo-lib
+        maven { url = 'https://maven.wispforest.io/releases/' }
+    }
+
+    dependencies {
+        // Auto Services
+        compileOnly "com.google.auto.service:auto-service:$autoServiceVersion"
+        annotationProcessor "com.google.auto.service:auto-service:$autoServiceVersion"
+    }
+
+    ['apiElements', 'runtimeElements', 'sourcesElements'].each { variant ->
+        configurations."$variant".outgoing {
+            capability("$group:${base.archivesName.get()}:$version")
+            capability("$group:$mod_id-${project.name}-${minecraft_version}:$version")
+            capability("$group:$mod_id:$version")
+        }
+        publishing.publications.configureEach {
+            suppressPomMetadataWarningsFor(variant)
+        }
+    }
+
+    tasks.withType(AbstractCopyTask).configureEach {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    // configure Maven publishing
     publishing {
         publications {
             mavenJava(MavenPublication) {
@@ -126,13 +89,90 @@ subprojects {
                 from components.java
             }
         }
-
-        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
         repositories {
-            // Add repositories to publish to here.
-            // Notice: This block does NOT have the same function as the block in the top level.
-            // The repositories here will be used for publishing your artifact, not for
-            // retrieving dependencies.
+            maven {
+                url System.getenv('local_maven_url')
+            }
+        }
+    }
+}
+
+// only loader projects
+subprojects {
+    if (project.path == ":common") {
+        return
+    }
+
+    apply plugin: 'me.modmuss50.mod-publish-plugin'
+
+    configurations {
+        commonJava {
+            canBeResolved = true
+        }
+        commonResources {
+            canBeResolved = true
+        }
+    }
+
+    dependencies {
+        compileOnly(project(':common')) {
+            capabilities {
+                requireCapability "$group:$mod_id"
+            }
+            transitive = false
+        }
+        commonJava project(path: ':common', configuration: 'commonJava')
+        commonResources project(path: ':common', configuration: 'commonResources')
+    }
+
+    sourceSets {
+        create("data") {
+            compileClasspath += sourceSets.main.output
+            runtimeClasspath += sourceSets.main.output
+            compileClasspath += sourceSets.main.compileClasspath
+            runtimeClasspath += sourceSets.main.runtimeClasspath
+        }
+    }
+
+    tasks {
+        processResources {
+            dependsOn(configurations.commonResources)
+            from(configurations.commonResources)
+            
+            // copy wiki folder to assets
+            from("$rootDir/docs") {
+                into "assets/oracle_index/books/oritech"
+                exclude '.assets/item/**' // items are rendered in-game as actual item components, no need to include them here
+            }
+        
+            inputs.property 'version', project.version
+            filesMatching(['META-INF/neoforge.mods.toml', "fabric.mod.json"]) {
+                expand version: version
+            }
+        }
+
+        named('compileJava', JavaCompile) {
+            dependsOn(configurations.commonJava)
+            source(configurations.commonJava)
+        }
+
+        named('sourcesJar', Jar) {
+            dependsOn(configurations.commonJava)
+            from(configurations.commonJava)
+            dependsOn(configurations.commonResources)
+            from(configurations.commonResources)
+        }
+    }
+}
+
+// sinytra wiki
+wiki {
+    docs {
+        oritech {
+            // path to the folder containing metadata file (sinytra-wiki.json)
+            root = file('docs')
+            exportedAssetNamespaces = ['oritech']
+            wikiAccessToken = System.getenv('WIKI_TOKEN')
         }
     }
 }

@@ -1,17 +1,17 @@
 package rearth.oritech.api.networking;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.Oritech;
 
 // important: when implementing this class and the block has a GUI, make sure to call `this.sendUpdate(SyncType.GUI_OPEN);` in the `saveExtraData()` method.
@@ -20,6 +20,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     
     private boolean networkDirty = false;
     private boolean needsInitialUpdate = false;
+    private long lastSentTickUpdate = 0;
     
     public NetworkedBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -27,20 +28,23 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     
     // this should never be used in child classes, always use serverTick / clientTick
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        if (world.isClient) {
+    public void tick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        if (world.isClientSide) {
             clientTick(world, pos, state, blockEntity);
             return;
         }
         
         serverTick(world, pos, state, blockEntity);
         
-        if ((world.getTime() + this.pos.asLong()) % getSparseUpdateInterval() == 0)
+        var time = world.getGameTime();
+        
+        if ((time + this.worldPosition.asLong()) % getSparseUpdateInterval() == 0)
             sendUpdate(SyncType.SPARSE_TICK);
         
-        if (networkDirty) {
+        if (networkDirty && time >= lastSentTickUpdate + getTickUpdateInterval()) {
             networkDirty = false;
             sendUpdate(SyncType.TICK);
+            lastSentTickUpdate = time;
         }
         if (needsInitialUpdate) {
             needsInitialUpdate = false;
@@ -48,21 +52,23 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         }
     }
     
-    public abstract void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity);
-    public void clientTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {};
+    public abstract void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity);
+    public void clientTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {};
     
     public int getSparseUpdateInterval() {return 100;}
     
+    public int getTickUpdateInterval() {return 4;}
+    
     @Override
-    public void markDirty() {
+    public void setChanged() {
         markDirty(false);
     }
     
     public void markDirty(boolean updateComparator) {
-        if (this.world != null) {
-            markDirty(this.world, this.pos, this.getCachedState());
+        if (this.level != null) {
+            setChanged(this.level, this.worldPosition, this.getBlockState());
             if (updateComparator)
-                world.updateComparators(pos, getCachedState().getBlock());
+                level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
         }
         
         networkDirty = true;
@@ -71,42 +77,38 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     public void preNetworkUpdate(SyncType type) {}
     
     public void sendUpdate(SyncType type) {
-        if (world == null) {
+        if (level == null) {
             Oritech.LOGGER.warn("unable to send update: World is null.");
             return;
         }
         
         preNetworkUpdate(type);
         
-        var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
-        var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, world);
+        var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess());
+        var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, level);
         if (fieldCount == 0) return;
         
-        Oritech.LOGGER.debug("sending networked entity update: {} at {} for {}", type, pos, this.getType().getRegistryEntry().getKey().get().getValue());
-        
-        NetworkManager.sendBlockHandle(this, new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), type, usedBuf.array()));
+        NetworkManager.sendBlockHandle(this, new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), type, usedBuf.array()));
     }
     
-    public void sendUpdate(SyncType type, ServerPlayerEntity player) {
-        if (world == null) {
+    public void sendUpdate(SyncType type, ServerPlayer player) {
+        if (level == null) {
             Oritech.LOGGER.warn("unable to send player update: World is null.");
             return;
         }
         
         preNetworkUpdate(type);
         
-        var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
-        var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, world);
+        var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess());
+        var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, level);
         if (fieldCount == 0) return;
         
-        Oritech.LOGGER.debug("sending networked entity player update: {} at {} for {}", type, pos, this.getType().getRegistryEntry().getKey().get().getValue());
-        
-        NetworkManager.sendPlayerHandle(new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), type, usedBuf.array()), player);
+        NetworkManager.sendPlayerHandle(new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), type, usedBuf.array()), player);
     }
     
     @Override
-    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
+    public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
         needsInitialUpdate = true;
-        return super.toInitialChunkDataNbt(registryLookup);
+        return super.getUpdateTag(registryLookup);
     }
 }

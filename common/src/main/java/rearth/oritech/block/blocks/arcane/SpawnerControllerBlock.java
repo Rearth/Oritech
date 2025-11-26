@@ -1,54 +1,58 @@
 package rearth.oritech.block.blocks.arcane;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 
 import java.util.List;
 
-public class SpawnerControllerBlock extends HorizontalFacingBlock implements BlockEntityProvider {
+public class SpawnerControllerBlock extends HorizontalDirectionalBlock implements EntityBlock {
     
-    public SpawnerControllerBlock(Settings settings) {
+    public SpawnerControllerBlock(Properties settings) {
         super(settings);
     }
     
     @Override
-    public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
-        super.onSteppedOn(world, pos, state, entity);
+    public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
+        super.stepOn(world, pos, state, entity);
         
-        if (!world.isClient && world.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
+        if (!world.isClientSide && world.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.onEntitySteppedOn(entity);
         }
         
     }
     
     @Override
-    public boolean emitsRedstonePower(BlockState state) {
+    public boolean isSignalSource(BlockState state) {
         return true;
     }
     
     @Override
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
         
-        if (world.isClient) return;
+        if (world.isClientSide) return;
         
-        var isPowered = world.isReceivingRedstonePower(pos);
+        var isPowered = world.hasNeighborSignal(pos);
         
         var entity = (SpawnerControllerBlockEntity) world.getBlockEntity(pos);
         entity.setRedstonePowered(isPowered);
@@ -56,45 +60,45 @@ public class SpawnerControllerBlock extends HorizontalFacingBlock implements Blo
     }
     
     @Override
-    protected boolean hasComparatorOutput(BlockState state) {
+    protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
     
     @Override
-    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
         return ((SpawnerControllerBlockEntity) world.getBlockEntity(pos)).getComparatorOutput();
     }
     
     @Override
-    protected MapCodec<? extends HorizontalFacingBlock> getCodec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;
     }
     
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
 
-        if (!world.isClient && world.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
+        if (!world.isClientSide && world.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.onBlockInteracted(player);
         }
 
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
     
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new SpawnerControllerBlockEntity(pos, state);
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
@@ -102,9 +106,9 @@ public class SpawnerControllerBlock extends HorizontalFacingBlock implements Blo
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
-        super.appendTooltip(stack, context, tooltip, options);
-        tooltip.add(Text.translatable("tooltip.oritech.spawner").formatted(Formatting.GRAY));
-        tooltip.add(Text.translatable("tooltip.oritech.spawner2").formatted(Formatting.GRAY));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+        super.appendHoverText(stack, context, tooltip, options);
+        tooltip.add(Component.translatable("tooltip.oritech.spawner").withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("tooltip.oritech.spawner2").withStyle(ChatFormatting.GRAY));
     }
 }

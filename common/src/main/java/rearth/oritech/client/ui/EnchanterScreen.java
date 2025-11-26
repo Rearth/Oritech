@@ -8,16 +8,19 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.OverlayContainer;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
+import rearth.oritech.block.entity.arcane.EnchanterBlockEntity.EnchanterStatistics;
 
 
 public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> {
@@ -27,7 +30,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     private ButtonComponent openEnchantmentSelection;
     private LabelComponent statisticsLabel;
     
-    public EnchanterScreen(EnchanterScreenHandler handler, PlayerInventory inventory, Text title) {
+    public EnchanterScreen(EnchanterScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
     
@@ -40,7 +43,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     public void fillOverlay(FlowLayout overlay) {
         super.fillOverlay(overlay);
         
-        openEnchantmentSelection = Components.button(Text.translatable("button.oritech.enchanter.bane_of_long_names"), this::onOpenClicked);
+        openEnchantmentSelection = Components.button(Component.translatable("button.oritech.enchanter.bane_of_long_names"), this::onOpenClicked);
         openEnchantmentSelection.positioning(Positioning.relative(54, 13));
         openEnchantmentSelection.active(false);
         openEnchantmentSelection.renderer(ORITECH_BUTTON_DARK);
@@ -50,7 +53,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         detailsScrollPane.padding(Insets.of(2));
         detailsScrollPane.margins(Insets.of(3));
         
-        statisticsLabel = Components.label(Text.translatable("title.oritech.enchanter.catalysts_available", 1, 4));
+        statisticsLabel = Components.label(Component.translatable("title.oritech.enchanter.catalysts_available", 1, 4));
         statisticsLabel.positioning(Positioning.relative(54, 29));
         overlay.child(statisticsLabel);
     }
@@ -61,10 +64,10 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     }
     
     @Override
-    protected void handledScreenTick() {
-        super.handledScreenTick();
+    protected void containerTick() {
+        super.containerTick();
         
-        var stack = this.handler.enchanter.inventory.getStack(0);
+        var stack = this.menu.enchanter.inventory.getItem(0);
         if (currentItem == null)
             currentItem = stack;
         
@@ -73,53 +76,53 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
             onStackChanged();
         }
         
-        Text description = Text.translatable("message.oritech.enchanter.insert_item");
-        var hasSelection = this.handler.enchanter.getSelectedEnchantment() != null;
+        Component description = Component.translatable("message.oritech.enchanter.insert_item");
+        var hasSelection = this.menu.enchanter.getSelectedEnchantment() != null;
         if (hasSelection) {
-            description = this.handler.enchanter.getSelectedEnchantment().value().description();
+            description = this.menu.enchanter.getSelectedEnchantment().value().description();
         }
         openEnchantmentSelection.setMessage(description);
         
         
-        var registry = handler.enchanter.getWorld().getRegistryManager().get(RegistryKeys.ENCHANTMENT);
-        var canBeEnchanted = registry.stream().anyMatch(elem -> elem.isAcceptableItem(stack));
+        var registry = menu.enchanter.getLevel().registryAccess().registryOrThrow(Registries.ENCHANTMENT);
+        var canBeEnchanted = registry.stream().anyMatch(elem -> elem.canEnchant(stack));
         
         openEnchantmentSelection.active(hasSelection && canBeEnchanted);
         
-        var statistics = handler.enchanter.statistics;
+        var statistics = menu.enchanter.statistics;
         if (statistics.equals(EnchanterBlockEntity.EnchanterStatistics.EMPTY)) {
-            statisticsLabel.text(Text.literal(" "));
+            statisticsLabel.text(Component.literal(" "));
         } else {
-            statisticsLabel.text(Text.translatable("title.oritech.enchanter.catalysts", statistics.availableCatalysts(), statistics.requiredCatalysts()).formatted(Formatting.DARK_GRAY));
+            statisticsLabel.text(Component.translatable("title.oritech.enchanter.catalysts", statistics.availableCatalysts(), statistics.requiredCatalysts()).withStyle(ChatFormatting.DARK_GRAY));
         }
         
-        this.progress_indicator.tooltip(Text.translatable("title.oritech.enchanter.souls_used", handler.enchanter.progress, handler.enchanter.maxProgress));
+        this.progress_indicator.tooltip(Component.translatable("title.oritech.enchanter.souls_used", menu.enchanter.progress, menu.enchanter.maxProgress));
         
     }
     
     private void onStackChanged() {
-        if (handler.enchanter.getSelectedEnchantment() != null) return;
+        if (menu.enchanter.getSelectedEnchantment() != null) return;
         openSelectionPanel();
         
     }
     
     private void openSelectionPanel() {
         
-        var slotCount = this.handler.slots.size();
+        var slotCount = this.menu.slots.size();
         
         for (int i = 0; i < slotCount; i++) {
             this.disableSlot(i);
         }
         
         // find enchantments
-        var registry = handler.enchanter.getWorld().getRegistryManager().get(RegistryKeys.ENCHANTMENT);
-        var all = registry.stream().map(registry::getEntry).filter(entry -> entry.value().isAcceptableItem(currentItem)).toList();
+        var registry = menu.enchanter.getLevel().registryAccess().registryOrThrow(Registries.ENCHANTMENT);
+        var all = registry.stream().map(registry::wrapAsHolder).filter(entry -> entry.value().canEnchant(currentItem)).toList();
         
         if (all.isEmpty()) return;
         
         detailsScrollPane.clearChildren();
         
-        var title = Components.label(Text.translatable("tooltip.oritech.enchanter_selection"));
+        var title = Components.label(Component.translatable("tooltip.oritech.enchanter_selection"));
         detailsScrollPane.child(title);
         
         var scrollPane = Containers.verticalScroll(Sizing.fixed(184), Sizing.fixed(200), detailsScrollPane);
@@ -156,14 +159,14 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         this.root.child(floatingPanel);
     }
     
-    private void onEnchantmentSelected(RegistryEntry<Enchantment> entry, OverlayContainer<ScrollContainer<FlowLayout>> floatingPanel) {
-        this.handler.enchanter.selectedEnchantment = Identifier.of(entry.getIdAsString());
-        sendEnchantmentToServer(Identifier.of(entry.getIdAsString()));
+    private void onEnchantmentSelected(Holder<Enchantment> entry, OverlayContainer<ScrollContainer<FlowLayout>> floatingPanel) {
+        this.menu.enchanter.selectedEnchantment = ResourceLocation.parse(entry.getRegisteredName());
+        sendEnchantmentToServer(ResourceLocation.parse(entry.getRegisteredName()));
         floatingPanel.remove();
     }
     
-    private void sendEnchantmentToServer(Identifier selected) {
-        NetworkManager.sendToServer(new EnchanterBlockEntity.SelectEnchantingPacket(this.handler.blockPos, selected));
+    private void sendEnchantmentToServer(ResourceLocation selected) {
+        NetworkManager.sendToServer(new EnchanterBlockEntity.SelectEnchantingPacket(this.menu.blockPos, selected));
     }
     
     

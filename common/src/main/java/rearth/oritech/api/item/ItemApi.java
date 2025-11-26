@@ -1,11 +1,16 @@
 package rearth.oritech.api.item;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import rearth.oritech.api.fluid.ItemFluidApi;
+
+import java.util.ServiceLoader;
 
 public class ItemApi {
     
-    public static BlockItemApi BLOCK;
+    public static BlockItemApi BLOCK = ServiceLoader.load(BlockItemApi.class)
+                                         .findFirst()
+                                         .orElseThrow(() -> new IllegalStateException("Failed to load block item api service."));
     
     public interface BlockProvider {
         InventoryStorage getInventoryStorage(Direction direction);

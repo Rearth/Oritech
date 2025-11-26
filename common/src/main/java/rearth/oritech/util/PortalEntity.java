@@ -1,17 +1,17 @@
 package rearth.oritech.util;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.GlobalPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.augmenter.AugmentApplicationBlock;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -31,38 +31,38 @@ public class PortalEntity extends Entity implements GeoEntity {
     protected static final RawAnimation PORTAL = RawAnimation.begin().thenPlay("create").thenLoop("idle");
     
     
-    public PortalEntity(EntityType<?> type, World world) {
+    public PortalEntity(EntityType<?> type, Level world) {
         super(type, world);
         
     }
     
     @Override
-    public boolean isCollidable() {
+    public boolean canBeCollidedWith() {
         return true;
     }
     
     @Override
-    public void onPlayerCollision(PlayerEntity player) {
-        if (getWorld().isClient) return;
+    public void playerTouch(Player player) {
+        if (level().isClientSide) return;
 
         if (target != null) {
-            if (!(player instanceof ServerPlayerEntity serverPlayer)) return;
+            if (!(player instanceof ServerPlayer serverPlayer)) return;
             
-            ServerWorld targetWorld = this.getServer().getWorld(target.dimension());
+            ServerLevel targetWorld = this.getServer().getLevel(target.dimension());
 
             if (targetWorld != null) {
                 BlockPos targetPos = target.pos();
-                Vec3d centerPos = targetPos.toCenterPos();
+                Vec3 centerPos = targetPos.getCenter();
                 
-                AugmentApplicationBlock.lastTeleportedPlayer = new Pair<>(targetWorld.getTime(), serverPlayer);
+                AugmentApplicationBlock.lastTeleportedPlayer = new Tuple<>(targetWorld.getGameTime(), serverPlayer);
 
-                serverPlayer.teleport(
+                serverPlayer.teleportTo(
                     targetWorld,
                     centerPos.x, centerPos.y, centerPos.z,
-                    serverPlayer.getYaw(), serverPlayer.getPitch()
+                    serverPlayer.getYRot(), serverPlayer.getXRot()
                 );
             } else {
-                Oritech.LOGGER.warn("Attempted to teleport player to non-existent dimension: {}", target.dimension().getValue());
+                Oritech.LOGGER.warn("Attempted to teleport player to non-existent dimension: {}", target.dimension().location());
             }
         }
         
@@ -71,28 +71,28 @@ public class PortalEntity extends Entity implements GeoEntity {
     
     @Override
     public void tick() {
-        var world = this.getWorld();
-        if (world.isClient) return;
+        var world = this.level();
+        if (world.isClientSide) return;
         
-        age++;
+        tickCount++;
         
-        if (age > 100) {
+        if (tickCount > 100) {
             this.remove(RemovalReason.DISCARDED);
         }
     }
     
     @Override
-    protected void initDataTracker(DataTracker.Builder builder) {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
     
     }
     
     @Override
-    protected void readCustomDataFromNbt(NbtCompound nbt) {
+    protected void readAdditionalSaveData(CompoundTag nbt) {
     
     }
     
     @Override
-    protected void writeCustomDataToNbt(NbtCompound nbt) {
+    protected void addAdditionalSaveData(CompoundTag nbt) {
     
     }
     

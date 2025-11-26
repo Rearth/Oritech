@@ -1,96 +1,98 @@
 package rearth.oritech.item.tools;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.interaction.DronePortEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ComponentContent;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class LaserTargetDesignator extends Item {
-    public LaserTargetDesignator(Settings settings) {
+    public LaserTargetDesignator(Properties settings) {
         super(settings);
     }
     
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        if (context.getWorld().isClient()) {
-            return ActionResult.SUCCESS;
+    public InteractionResult useOn(UseOnContext context) {
+        if (context.getLevel().isClientSide()) {
+            return InteractionResult.SUCCESS;
         }
         
-        var targetPos = context.getBlockPos();
+        var targetPos = context.getClickedPos();
         
-        var targetBlockState = context.getWorld().getBlockState(context.getBlockPos());
-        if (targetBlockState.getBlock() instanceof MachineCoreBlock && targetBlockState.get(MachineCoreBlock.USED)) {
+        var targetBlockState = context.getLevel().getBlockState(context.getClickedPos());
+        if (targetBlockState.getBlock() instanceof MachineCoreBlock && targetBlockState.getValue(MachineCoreBlock.USED)) {
             // target the base instead (on laser arms)
-            var machineEntity = MachineCoreBlock.getControllerEntity(context.getWorld(), context.getBlockPos());
+            var machineEntity = MachineCoreBlock.getControllerEntity(context.getLevel(), context.getClickedPos());
             if (machineEntity instanceof LaserArmBlockEntity) {
-                targetPos = context.getBlockPos().down();
-                targetBlockState = context.getWorld().getBlockState(targetPos);
+                targetPos = context.getClickedPos().below();
+                targetBlockState = context.getLevel().getBlockState(targetPos);
             }
         }
         
         if (targetBlockState.getBlock().equals(BlockContent.LASER_ARM_BLOCK)
-              && context.getWorld().getBlockEntity(targetPos) instanceof LaserArmBlockEntity laserEntity) {
+              && context.getLevel().getBlockEntity(targetPos) instanceof LaserArmBlockEntity laserEntity) {
             
             if (laserEntity.hunterAddons > 0) {
                 laserEntity.cycleHunterTargetMode();
-                context.getPlayer().sendMessage(Text.translatable("message.oritech.target_designator.hunter_target", Text.translatable(laserEntity.hunterTargetMode.message)));
-                return ActionResult.SUCCESS;
-            } else if (context.getStack().contains(ComponentContent.TARGET_POSITION.get())) {
-                var target = context.getStack().get(ComponentContent.TARGET_POSITION.get());
+                context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.hunter_target", Component.translatable(laserEntity.hunterTargetMode.message)));
+                return InteractionResult.SUCCESS;
+            } else if (context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
+                var target = context.getItemInHand().get(ComponentContent.TARGET_POSITION.get());
 
                 var success = laserEntity.setTargetFromDesignator(target);
                 if (success)
-                    context.getPlayer().sendMessage(Text.translatable("message.oritech.target_designator.position_saved"));
-                return success ? ActionResult.SUCCESS : ActionResult.FAIL;
+                    context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_saved"));
+                return success ? InteractionResult.SUCCESS : InteractionResult.FAIL;
             }
         }
         
         if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT_BLOCK)
-              && context.getWorld().getBlockEntity(context.getBlockPos()) instanceof DronePortEntity dronePortEntity
-              && context.getStack().contains(ComponentContent.TARGET_POSITION.get())) {
-            var target = context.getStack().get(ComponentContent.TARGET_POSITION.get());
+              && context.getLevel().getBlockEntity(context.getClickedPos()) instanceof DronePortEntity dronePortEntity
+              && context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
+            var target = context.getItemInHand().get(ComponentContent.TARGET_POSITION.get());
             
             var success = dronePortEntity.setTargetFromDesignator(target);
             if (success) {
-                context.getPlayer().sendMessage(Text.translatable("message.oritech.target_designator.position_saved"));
+                context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_saved"));
             } else {
-                context.getPlayer().sendMessage(Text.translatable("message.oritech.target_designator.position_invalid"));
+                context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_invalid"));
             }
-            return success ? ActionResult.SUCCESS : ActionResult.FAIL;
+            return success ? InteractionResult.SUCCESS : InteractionResult.FAIL;
         }
         
         if (!targetBlockState.getBlock().equals(Blocks.AIR)) {
             Oritech.LOGGER.debug(targetBlockState.toString());
             
-            context.getStack().set(ComponentContent.TARGET_POSITION.get(), context.getBlockPos());
-            context.getPlayer().sendMessage(Text.translatable("message.oritech.target_designator.position_stored"));
+            context.getItemInHand().set(ComponentContent.TARGET_POSITION.get(), context.getClickedPos());
+            context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_stored"));
             
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         
-        return super.useOnBlock(context);
+        return super.useOn(context);
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+        super.appendHoverText(stack, context, tooltip, type);
         
-        if (stack.contains(ComponentContent.TARGET_POSITION.get())) {
+        if (stack.has(ComponentContent.TARGET_POSITION.get())) {
             var data = stack.get(ComponentContent.TARGET_POSITION.get());
-            tooltip.add(Text.translatable("tooltip.oritech.target_designator.set_to", data.toShortString()));
+            tooltip.add(Component.translatable("tooltip.oritech.target_designator.set_to", data.toShortString()));
         } else {
-            tooltip.add(Text.translatable("tooltip.oritech.target_designator.no_target"));
+            tooltip.add(Component.translatable("tooltip.oritech.target_designator.no_target"));
         }
     }
 }

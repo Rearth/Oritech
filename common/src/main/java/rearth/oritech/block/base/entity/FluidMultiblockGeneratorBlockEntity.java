@@ -2,36 +2,36 @@ package rearth.oritech.block.base.entity;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi.FluidStorage;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
-
+import rearth.oritech.util.FluidIngredient;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.StackContext;
 
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 
 public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGeneratorBlockEntity implements FluidApi.BlockProvider {
     
     @SyncField
-    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty) {
+    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged) {
         @Override
         public long insert(FluidStack toInsert, boolean simulate) {
             if (toInsert.getFluid().equals(Fluids.WATER)) return 0L;    // to avoid mixups with players inserting water for boiler into main storage
@@ -44,9 +44,9 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (bucketInputAllowed() && !world.isClient && isActive(state)) {
+        if (bucketInputAllowed() && !world.isClientSide && isActive(state)) {
             processBuckets();
         }
         
@@ -55,12 +55,12 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     
     private void processBuckets() {
         
-        var inStack = inventory.getStack(0);
+        var inStack = inventory.getItem(0);
         var canFill = this.fluidStorage.getAmount() < this.fluidStorage.getCapacity();
         
         if (!canFill || inStack.isEmpty() || inStack.getCount() > 1) return;
         
-        var stackRef = new StackContext(inStack, updated -> inventory.setStack(0, updated));
+        var stackRef = new StackContext(inStack, updated -> inventory.setItem(0, updated));
         var candidate = FluidApi.ITEM.find(stackRef);
         if (candidate == null || !candidate.supportsExtraction()) return;
         
@@ -68,13 +68,13 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
         
         if (moved == 0) {
             // move stack
-            var outStack = inventory.getStack(1);
+            var outStack = inventory.getItem(1);
             if (outStack.isEmpty()) {
-                inventory.setStack(1, stackRef.getValue());
-                inventory.setStack(0, ItemStack.EMPTY);
-            } else if (outStack.getItem().equals(stackRef.getValue().getItem()) && outStack.getCount() < outStack.getMaxCount()) {
-                outStack.increment(1);
-                inventory.setStack(0, ItemStack.EMPTY);
+                inventory.setItem(1, stackRef.getValue());
+                inventory.setItem(0, ItemStack.EMPTY);
+            } else if (outStack.getItem().equals(stackRef.getValue().getItem()) && outStack.getCount() < outStack.getMaxStackSize()) {
+                outStack.grow(1);
+                inventory.setItem(0, ItemStack.EMPTY);
             }
         }
     }
@@ -111,19 +111,19 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     
     // gets all recipe of target type, and only checks for matching liquids
     @Override
-    protected Optional<RecipeEntry<OritechRecipe>> getRecipe() {
+    protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
         return getRecipe(fluidStorage);
     }
     
-    protected Optional<RecipeEntry<OritechRecipe>> getRecipe(SimpleFluidStorage checkedTank) {
-        return getRecipe(checkedTank, world, getOwnRecipeType());
+    protected Optional<RecipeHolder<OritechRecipe>> getRecipe(SimpleFluidStorage checkedTank) {
+        return getRecipe(checkedTank, level, getOwnRecipeType());
     }
     
-    public static Optional<RecipeEntry<OritechRecipe>> getRecipe(FluidApi.SingleSlotStorage checkedTank, World world, OritechRecipeType ownType) {
+    public static Optional<RecipeHolder<OritechRecipe>> getRecipe(FluidApi.SingleSlotStorage checkedTank, Level world, OritechRecipeType ownType) {
         
         if (checkedTank.getStack().isEmpty()) return Optional.empty();
         
-        var availableRecipes = world.getRecipeManager().listAllOfType(ownType);
+        var availableRecipes = world.getRecipeManager().getAllRecipesFor(ownType);
         for (var recipeEntry : availableRecipes) {
             var recipe = recipeEntry.value();
             var recipeFluid = recipe.getFluidInput();
@@ -135,17 +135,17 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         fluidStorage.writeNbt(nbt, "");
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         fluidStorage.readNbt(nbt, "");
-        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
     }
     
     @Override

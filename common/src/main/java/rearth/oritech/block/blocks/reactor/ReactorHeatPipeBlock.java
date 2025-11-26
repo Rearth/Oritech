@@ -1,7 +1,7 @@
 package rearth.oritech.block.blocks.reactor;
 
 public class ReactorHeatPipeBlock extends BaseReactorBlock {
-    public ReactorHeatPipeBlock(Settings settings) {
+    public ReactorHeatPipeBlock(Properties settings) {
         super(settings);
     }
 }

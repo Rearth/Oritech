@@ -1,7 +1,9 @@
 package rearth.oritech.init.compat.jei;
 
+import dev.architectury.fluid.FluidStack;
 import dev.architectury.platform.Platform;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableAnimated;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
@@ -10,26 +12,29 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.util.FluidIngredient;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
-
+import rearth.oritech.util.ScreenProvider.GuiSlot;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
+
 
 public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> {
     
@@ -48,7 +53,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
         this.icon = helper.createDrawableItemStack(new ItemStack(machine.asItem()));
         
         try {
-            var screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(new BlockPos(0, 0, 0), machine.getDefaultState());
+            var screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(new BlockPos(0, 0, 0), machine.defaultBlockState());
             this.slots = screenProvider.getGuiSlots();
             this.slotOffsets = screenProvider.getSlotAssignments();
             this.indicatorConfig = screenProvider.getIndicatorConfiguration();
@@ -86,8 +91,8 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
     }
     
     @Override
-    public @NotNull Text getTitle() {
-        return Text.translatable("emi.category.oritech." + type.getIdentifier().getPath());
+    public @NotNull Component getTitle() {
+        return Component.translatable("emi.category.oritech." + type.getIdentifier().getPath());
     }
     
     @Override
@@ -106,13 +111,13 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
     }
     
     @Override
-    public void draw(OritechRecipe recipe, IRecipeSlotsView recipeSlotsView, DrawContext guiGraphics, double mouseX, double mouseY) {
+    public void draw(OritechRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         
         arrow.draw(guiGraphics, indicatorConfig.x() - 23, indicatorConfig.y() - 17);
         
         // data
         var duration = String.format("%.0f", recipe.getTime() / 20f);
-        guiGraphics.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.translatable("emi.title.oritech.cookingtime", duration, recipe.getTime()), (int) (getWidth() * 0.35), (int) (getHeight() * 0.9), 0xffffff);
+        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("emi.title.oritech.cookingtime", duration, recipe.getTime()), (int) (getWidth() * 0.35), (int) (getHeight() * 0.9), 0xffffff);
         
     }
     

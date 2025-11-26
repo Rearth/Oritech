@@ -1,22 +1,21 @@
 package rearth.oritech.block.blocks.processing;
 
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.entity.processing.CoolerBlockEntity;
-
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class CoolerBlock extends MultiblockMachine implements BlockEntityProvider {
+public class CoolerBlock extends MultiblockMachine implements EntityBlock {
     
-    public CoolerBlock(Settings settings) {
+    public CoolerBlock(Properties settings) {
         super(settings);
     }
     
@@ -26,13 +25,13 @@ public class CoolerBlock extends MultiblockMachine implements BlockEntityProvide
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
-        super.appendTooltip(stack, context, tooltip, options);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+        super.appendHoverText(stack, context, tooltip, options);
         
         var showExtra = Screen.hasControlDown();
         
         if (showExtra) {
-            tooltip.add(Text.translatable("tooltip.oritech.cooler_block").formatted(Formatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.oritech.cooler_block").withStyle(ChatFormatting.GRAY));
         }
     }
 }

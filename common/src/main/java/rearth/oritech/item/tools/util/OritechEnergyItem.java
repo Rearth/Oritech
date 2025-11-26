@@ -1,16 +1,16 @@
 package rearth.oritech.item.tools.util;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 
 public interface OritechEnergyItem extends EnergyApi.ItemProvider {
@@ -25,8 +25,8 @@ public interface OritechEnergyItem extends EnergyApi.ItemProvider {
         return 0;
     }
     
-    default boolean tryUseEnergy(ItemStack stack, long amount, PlayerEntity player){
-        Random random = Random.create();
+    default boolean tryUseEnergy(ItemStack stack, long amount, Player player){
+        RandomSource random = RandomSource.create();
         
         int unbreakingLevel = getUnbreakingLevel(stack);
         if (unbreakingLevel > 0) {
@@ -49,9 +49,9 @@ public interface OritechEnergyItem extends EnergyApi.ItemProvider {
     
     // A hack to do this without context of the DRM
     private int getUnbreakingLevel(ItemStack stack) {
-        ItemEnchantmentsComponent enchantments = stack.getOrDefault(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT);
-        for (RegistryEntry<Enchantment> entry : enchantments.getEnchantments()) {
-            if (entry.getKey().isPresent() && entry.getKey().get().equals(Enchantments.UNBREAKING)) {
+        ItemEnchantments enchantments = stack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+        for (Holder<Enchantment> entry : enchantments.keySet()) {
+            if (entry.unwrapKey().isPresent() && entry.unwrapKey().get().equals(Enchantments.UNBREAKING)) {
                 return enchantments.getLevel(entry);
             }
         }

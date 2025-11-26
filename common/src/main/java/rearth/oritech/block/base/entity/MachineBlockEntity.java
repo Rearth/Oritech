@@ -1,38 +1,38 @@
 package rearth.oritech.block.base.entity;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.input.RecipeInput;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.DelegatingInventoryStorage;
 import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -43,9 +43,7 @@ import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class MachineBlockEntity extends NetworkedBlockEntity
   implements ExtendedMenuProvider, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
@@ -74,21 +72,21 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     protected int energyPerTick;
     
     // own storages
-    public final FilteringInventory inventory = new FilteringInventory(getInventorySize(), this::markDirty, getSlotAssignments());
+    public final FilteringInventory inventory = new FilteringInventory(getInventorySize(), this::setChanged, getSlotAssignments());
+    private final Map<Direction, ItemApi.InventoryStorage> sidedInventories = new HashMap<>(); // only for sided input mode
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
+    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::setChanged, this.canEnergyStorageChangeWhileGUIOpen());
     
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state);
         this.energyPerTick = energyPerTick;
-        SingletonGeoAnimatable.registerSyncedAnimatable(this);
         
-        if (world != null)
-            lastWorkedAt = world.getTime();
+        if (level != null)
+            lastWorkedAt = level.getGameTime();
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         if (!isActive(state) || disabledViaRedstone) return;
         
@@ -106,7 +104,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             if (hasEnoughEnergy()) {
                 var activeRecipe = recipeCandidate.get().value();
                 currentRecipe = activeRecipe;
-                lastWorkedAt = world.getTime();
+                lastWorkedAt = world.getGameTime();
                 
                 useEnergy();
                 
@@ -118,7 +116,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
                     resetProgress();
                 }
                 
-                markDirty();
+                setChanged();
             }
             
         } else {
@@ -174,7 +172,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             for (int i = 0; i < inputInventory.size(); i++) {
                 var inputStack = inputInventory.get((i + startOffset) % inputInventory.size());
                 if (removedIng.test(inputStack)) {
-                    inputStack.decrement(1);
+                    inputStack.shrink(1);
                     startOffset++;
                     break;
                 }
@@ -203,7 +201,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         List<ItemStack> results = recipe.getResults();
         for (int i = 0; i < results.size(); i++) {
             var result = results.get(i);
-            var outSlot = outInv.getStack(i);
+            var outSlot = outInv.getItem(i);
             
             if (outSlot.isEmpty()) continue;
             
@@ -217,11 +215,17 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     protected boolean canAddToSlot(ItemStack input, ItemStack slot) {
         if (slot.isEmpty()) return true;
         if (!slot.getItem().equals(input.getItem())) return false;  // type mismatch
-        return slot.getCount() + input.getCount() <= slot.getMaxCount();  // count too high
+        return slot.getCount() + input.getCount() <= slot.getMaxStackSize();  // count too high
     }
     
-    protected Optional<RecipeEntry<OritechRecipe>> getRecipe() {
-        return world.getRecipeManager().getFirstMatch(getOwnRecipeType(), getInputInventory(), world);
+    protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
+        
+        // check if old recipe fits
+        if (currentRecipe != null && currentRecipe != OritechRecipe.DUMMY) {
+            if (currentRecipe.matches(getInputInventory(), level)) return Optional.of(new RecipeHolder<>(currentRecipe.getOriType().getIdentifier(), currentRecipe));
+        }
+        
+        return level.getRecipeManager().getRecipeFor(getOwnRecipeType(), getInputInventory(), level);
     }
     
     protected abstract OritechRecipeType getOwnRecipeType();
@@ -242,14 +246,14 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         return new SimpleCraftingInventory(getInputView().toArray(ItemStack[]::new));
     }
     
-    protected Inventory getOutputInventory() {
-        return new SimpleInventory(getOutputView().toArray(ItemStack[]::new));
+    protected Container getOutputInventory() {
+        return new SimpleContainer(getOutputView().toArray(ItemStack[]::new));
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putInt("oritech.machine_progress", progress);
         nbt.putLong("oritech.machine_energy", energyStorage.amount);
         nbt.putShort("oritech.machine_input_mode", (short) inventoryInputMode.ordinal());
@@ -257,8 +261,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         progress = nbt.getInt("oritech.machine_progress");
         energyStorage.amount = nbt.getLong("oritech.machine_energy");
         inventoryInputMode = InventoryInputMode.values()[nbt.getShort("oritech.machine_input_mode")];
@@ -297,7 +301,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         
         if (state.getController().isPlayingTriggeredAnimation()) return PlayState.CONTINUE;
         
-        if (isActive(getCachedState())) {
+        if (isActive(getBlockState())) {
             if (isActivelyWorking()) {
                 return state.setAndContinue(WORKING);
             } else {
@@ -309,7 +313,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
     
     public boolean isActivelyWorking() {
-        return world.getTime() - lastWorkedAt < 15;
+        return level.getGameTime() - lastWorkedAt < 15;
     }
     
     protected float getAnimationSpeed() {
@@ -332,24 +336,24 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
+    public void saveExtraData(FriendlyByteBuf buf) {
         this.sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(pos);
+        buf.writeBlockPos(worldPosition);
         
     }
     
     protected Direction getFacing() {
-        return Objects.requireNonNull(world).getBlockState(getPos()).get(Properties.HORIZONTAL_FACING);
+        return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.literal("");
+    public Component getDisplayName() {
+        return Component.literal("");
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new BasicMachineScreenHandler(syncId, playerInventory, this);
     }
     
@@ -397,11 +401,14 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
                 inventoryInputMode = InventoryInputMode.FILL_EVENLY;
                 break;
             case FILL_EVENLY:
+                inventoryInputMode = InventoryInputMode.SIDED;
+                break;
+            case SIDED:
                 inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
                 break;
         }
         
-        markDirty();
+        setChanged();
     }
     
     @Override
@@ -446,12 +453,15 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public Inventory getDisplayedInventory() {
+    public Container getDisplayedInventory() {
         return inventory;
     }
     
     @Override
     public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        if (inventoryInputMode.equals(InventoryInputMode.SIDED)) {
+            return sidedInventories.computeIfAbsent(direction, this::getDirectedStorage);
+        }
         return inventory;
     }
     
@@ -464,10 +474,10 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     public int getComparatorSlotAmount(int slot) {
         if (inventory.heldStacks.size() <= slot) return 0;
         
-        var stack = inventory.getStack(slot);
+        var stack = inventory.getItem(slot);
         if (stack.isEmpty()) return 0;
         
-        return (int) ((stack.getCount() / (float) stack.getMaxCount()) * 15);
+        return (int) ((stack.getCount() / (float) stack.getMaxStackSize()) * 15);
     }
     
     @Override
@@ -486,9 +496,79 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         this.disabledViaRedstone = isPowered;
     }
     
-    public static void receiveCycleModePacket(InventoryInputModeSelectorPacket packet, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
-        if (player.getWorld().getBlockEntity(packet.position()) instanceof MachineBlockEntity machineBlock)
+    // whether the energy storage should only send the current amount on network updates, or the full data
+    public boolean canEnergyStorageChangeWhileGUIOpen() {
+        return false;
+    }
+    
+    public static void receiveCycleModePacket(InventoryInputModeSelectorPacket packet, Player player, RegistryAccess dynamicRegistryManager) {
+        if (player.level().getBlockEntity(packet.position()) instanceof MachineBlockEntity machineBlock)
             machineBlock.cycleInputMode();
+    }
+    
+    public ItemApi.InventoryStorage getDirectedStorage(Direction direction) {
+        
+        var slots = getSlotAssignments();
+        if (slots.inputCount() <= 1) return inventory;
+        
+        if (direction == null) return inventory;
+        
+        // input only, disable output
+        if (direction.equals(Direction.UP)) {
+            return new DelegatingInventoryStorage(inventory, () -> true) {
+                @Override
+                public int extract(ItemStack extracted, boolean simulate) {
+                    return 0;
+                }
+                
+                @Override
+                public int extractFromSlot(ItemStack extracted, int slot, boolean simulate) {
+                    return 0;
+                }
+                
+                @Override
+                public boolean supportsExtraction() {
+                    return false;
+                }
+            };
+        } else if (direction.equals(Direction.DOWN)) {
+            return new DelegatingInventoryStorage(inventory, () -> true) {
+                @Override
+                public int insert(ItemStack inserted, boolean simulate) {
+                    return 0;
+                }
+                
+                @Override
+                public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
+                    return 0;
+                }
+                
+                @Override
+                public boolean supportsInsertion() {
+                    return false;
+                }
+            };
+        } else {
+            // north = 0, east = 1, ...
+            var horizontalOrdinal = 0;
+            if (direction.equals(Direction.EAST)) horizontalOrdinal = 1;
+            if (direction.equals(Direction.SOUTH)) horizontalOrdinal = 2;
+            if (direction.equals(Direction.WEST)) horizontalOrdinal = 3;
+            var inputSlotIndex = slots.inputStart() + horizontalOrdinal % slots.inputCount();
+            
+            return new DelegatingInventoryStorage(inventory, () -> true) {
+                @Override
+                public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
+                    if (slot != inputSlotIndex) return 0;
+                    return super.insertToSlot(inserted, slot, simulate);
+                }
+                
+                @Override
+                public int insert(ItemStack inserted, boolean simulate) {
+                    return insertToSlot(inserted, inputSlotIndex, simulate);
+                }
+            };
+        }
     }
     
     public class FilteringInventory extends InOutInventoryStorage {
@@ -509,16 +589,17 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
                 var lowestSlot = 0;
                 var lowestSlotCount = Integer.MAX_VALUE;
                 for (int i = getSlotAssignments().inputStart(); i < getSlotAssignments().inputStart() + getSlotAssignments().inputCount(); i++) {
-                    var content = this.getStack(i);
-                    if (!content.isEmpty() && !content.getItem().equals(toInsert.getItem())) continue;    // skip slots containing other items
+                    var content = this.getItem(i);
+                    if (!content.isEmpty() && !content.getItem().equals(toInsert.getItem()))
+                        continue;    // skip slots containing other items
                     if (content.getCount() < lowestSlotCount) {
                         lowestSlotCount = content.getCount();
                         lowestSlot = i;
                     }
                 }
                 
-                for (var slot = 0; slot < size() && remaining > 0; slot++) {
-                    remaining -= customSlotInsert(toInsert.copyWithCount(slotCountTarget), (slot + lowestSlot) % size(), simulate);
+                for (var slot = 0; slot < getContainerSize() && remaining > 0; slot++) {
+                    remaining -= customSlotInsert(toInsert.copyWithCount(slotCountTarget), (slot + lowestSlot) % getContainerSize(), simulate);
                 }
                 
                 return toInsert.getCount() - remaining;
@@ -544,12 +625,12 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
     
     // Client -> Server (e.g. from UI interactions
-    public record InventoryInputModeSelectorPacket(BlockPos position) implements CustomPayload {
+    public record InventoryInputModeSelectorPacket(BlockPos position) implements CustomPacketPayload {
         
-        public static final CustomPayload.Id<InventoryInputModeSelectorPacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("input_mode"));
+        public static final CustomPacketPayload.Type<InventoryInputModeSelectorPacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("input_mode"));
         
         @Override
-        public Id<? extends CustomPayload> getId() {
+        public Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;
         }
     }

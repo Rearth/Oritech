@@ -1,8 +1,8 @@
 package rearth.oritech.api.energy.containers;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.networking.UpdatableField;
@@ -99,12 +99,12 @@ public class SimpleEnergyStorage extends EnergyApi.EnergyStorage implements Upda
     }
     
     @Override
-    public PacketCodec<? extends ByteBuf, Long> getDeltaCodec() {
-        return PacketCodecs.VAR_LONG;
+    public StreamCodec<? extends ByteBuf, Long> getDeltaCodec() {
+        return ByteBufCodecs.VAR_LONG;
     }
     
     @Override
-    public PacketCodec<? extends ByteBuf, Void> getFullCodec() {
+    public StreamCodec<? extends ByteBuf, Void> getFullCodec() {
         return null;
     }
     

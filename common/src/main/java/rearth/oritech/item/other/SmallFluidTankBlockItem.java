@@ -2,47 +2,47 @@ package rearth.oritech.item.other;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.minecraft.block.Block;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
 
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluids;
 
 public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemProvider {
     
-    public SmallFluidTankBlockItem(Block block, Settings settings) {
+    public SmallFluidTankBlockItem(Block block, Properties settings) {
         super(block, settings);
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         var data = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
         
         if (data.isEmpty()) {
-            tooltip.add(Text.translatable("tooltip.oritech.fluid_empty"));
+            tooltip.add(Component.translatable("tooltip.oritech.fluid_empty"));
         } else {
             var amount = data.getAmount() / (float) FluidStackHooks.bucketAmount();
-            tooltip.add(Text.translatable("tooltip.oritech.fluid_content_tank_tooltip", amount, FluidStackHooks.getName(data).getString()).formatted(Formatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.oritech.fluid_content_tank_tooltip", amount, FluidStackHooks.getName(data).getString()).withStyle(ChatFormatting.GRAY));
         }
         
-        super.appendTooltip(stack, context, tooltip, type);
+        super.appendHoverText(stack, context, tooltip, type);
         
     }
     
     @Override
-    public Text getName(ItemStack stack) {
+    public Component getName(ItemStack stack) {
         var content = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
         if (content.isEmpty()) {
             return super.getName(stack);
         } else {
-            return FluidStackHooks.getName(content).copy().append(Text.literal(" ")).append(super.getName(stack));
+            return FluidStackHooks.getName(content).copy().append(Component.literal(" ")).append(super.getName(stack));
         }
     }
     
@@ -52,13 +52,13 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
     }
     
     @Override
-    public boolean isItemBarVisible(ItemStack stack) {
+    public boolean isBarVisible(ItemStack stack) {
         var contentEmpty = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()).isEmpty();
         return !contentEmpty;
     }
     
     @Override
-    public int getItemBarColor(ItemStack stack) {
+    public int getBarColor(ItemStack stack) {
         var content = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
         if (content.isEmpty())
             return 0x07bdff;
@@ -70,11 +70,11 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
     }
     
     @Override
-    public int getItemBarStep(ItemStack stack) {
+    public int getBarWidth(ItemStack stack) {
         
         var capacity = Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount();
         var fillAmount = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()).getAmount();
         
-        return Math.round((fillAmount * 100f / capacity) * ITEM_BAR_STEPS) / 100;
+        return Math.round((fillAmount * 100f / capacity) * MAX_BAR_WIDTH) / 100;
     }
 }

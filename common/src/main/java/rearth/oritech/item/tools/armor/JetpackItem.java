@@ -1,25 +1,6 @@
 package rearth.oritech.item.tools.armor;
 
 import dev.architectury.fluid.FluidStack;
-import net.minecraft.client.render.entity.model.BipedEntityModel;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
@@ -37,6 +18,26 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 // this item can store both energy and fluids
 // applicable fluids will be consumed first, and then energy
@@ -52,43 +53,43 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     // set to true if space has been pressed at least once AFTER loosing ground contact (to avoid flying forwards when dropping of a cliff
     public static boolean PRESSED_SPACE = false;
     
-    public JetpackItem(RegistryEntry<ArmorMaterial> material, Type type, Item.Settings settings) {
+    public JetpackItem(Holder<ArmorMaterial> material, Type type, Item.Properties settings) {
         super(material, type, settings);
     }
     
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
         
-        if (world.isClient)
+        if (world.isClientSide)
             tickJetpack(stack, entity, world);
     }
     
     @Override
-    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+    public boolean isValidRepairItem(ItemStack stack, ItemStack ingredient) {
         return false;
     }
     
     @Override
-    public boolean isItemBarVisible(ItemStack stack) {
+    public boolean isBarVisible(ItemStack stack) {
         return true;
     }
     
     @Override
-    public int getItemBarColor(ItemStack stack) {
+    public int getBarColor(ItemStack stack) {
         return getJetpackBarColor(stack);
     }
     
     @Override
-    public int getItemBarStep(ItemStack stack) {
+    public int getBarWidth(ItemStack stack) {
         return getJetpackBarStep(stack);
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        var hint = Text.translatable("tooltip.oritech.jetpack_usage").formatted(Formatting.GRAY, Formatting.ITALIC);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+        var hint = Component.translatable("tooltip.oritech.jetpack_usage").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
         tooltip.add(hint);
-        hint = Text.translatable("tooltip.oritech.jetpack_usage2").formatted(Formatting.GRAY, Formatting.ITALIC);
+        hint = Component.translatable("tooltip.oritech.jetpack_usage2").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
         tooltip.add(hint);
         
         addJetpackTooltip(stack, tooltip, true);
@@ -100,7 +101,7 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
             private GeoArmorRenderer<?> renderer;
             
             @Override
-            public @Nullable <T extends LivingEntity> BipedEntityModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable BipedEntityModel<T> original) {
+            public @Nullable <T extends LivingEntity> HumanoidModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable HumanoidModel<T> original) {
                 
                 if (this.renderer == null)
                     this.renderer = new ExosuitArmorRenderer(Oritech.id("armor/basic_jetpack"), Oritech.id("armor/basic_jetpack"));
@@ -156,26 +157,26 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
         return Oritech.CONFIG.basicJetpack.chargeSpeed();
     }
     
-    public static void receiveUsagePacket(JetpackUsageUpdatePacket packet, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
-        var stack = player.getEquippedStack(EquipmentSlot.CHEST);
+    public static void receiveUsagePacket(JetpackUsageUpdatePacket packet, Player player, RegistryAccess dynamicRegistryManager) {
+        var stack = player.getItemBySlot(EquipmentSlot.CHEST);
         if (!(stack.getItem() instanceof BaseJetpackItem)) return;
         
-        if (!(player instanceof ServerPlayerEntity serverPlayer)) return;
+        if (!(player instanceof ServerPlayer serverPlayer)) return;
         
         // to prevent dedicated servers from kicking the player for flying
-        serverPlayer.networkHandler.floatingTicks = 0;
+        serverPlayer.connection.aboveGroundTickCount = 0;
         
         stack.set(EnergyApi.ITEM.getEnergyComponent(), packet.energyStored);
         if (packet.fluidAmount > 0)
-            stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(Registries.FLUID.get(Identifier.of(packet.fluidType)), packet.fluidAmount));
+            stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(BuiltInRegistries.FLUID.get(ResourceLocation.parse(packet.fluidType)), packet.fluidAmount));
     }
     
-    public record JetpackUsageUpdatePacket(long energyStored, String fluidType, long fluidAmount) implements CustomPayload {
+    public record JetpackUsageUpdatePacket(long energyStored, String fluidType, long fluidAmount) implements CustomPacketPayload {
         
-        public static final CustomPayload.Id<JetpackUsageUpdatePacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("jetpack_use"));
+        public static final CustomPacketPayload.Type<JetpackUsageUpdatePacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("jetpack_use"));
         
         @Override
-        public Id<? extends CustomPayload> getId() {
+        public net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;
         }
     }

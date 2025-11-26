@@ -1,14 +1,5 @@
 package rearth.oritech.block.entity.augmenter;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -16,6 +7,15 @@ import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class AugmentResearchStationBlockEntity extends BlockEntity implements MultiblockMachineController {
     
@@ -28,14 +28,14 @@ public class AugmentResearchStationBlockEntity extends BlockEntity implements Mu
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         addMultiblockToNbt(nbt);
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         loadMultiblockNbtData(nbt);
     }
     
@@ -50,18 +50,18 @@ public class AugmentResearchStationBlockEntity extends BlockEntity implements Mu
     
     @Override
     public Direction getFacingForMultiblock() {
-        var state = getCachedState();
-        return state.get(Properties.FACING).getOpposite();
+        var state = getBlockState();
+        return state.getValue(BlockStateProperties.FACING).getOpposite();
     }
     
     @Override
     public BlockPos getPosForMultiblock() {
-        return pos;
+        return worldPosition;
     }
     
     @Override
-    public World getWorldForMultiblock() {
-        return world;
+    public Level getWorldForMultiblock() {
+        return level;
     }
     
     @Override

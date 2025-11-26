@@ -1,21 +1,5 @@
 package rearth.oritech.block.blocks.generators;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.state.StateManager;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.block.PassiveGeneratorBlock;
 import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
@@ -23,47 +7,64 @@ import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
+
 
 public class BigSolarPanelBlock extends PassiveGeneratorBlock {
     
     public final int productionRate;
     
-    public BigSolarPanelBlock(Settings settings, int productionRate) {
+    public BigSolarPanelBlock(Properties settings, int productionRate) {
         super(settings);
         this.productionRate = productionRate;
-        setDefaultState(getDefaultState().with(ASSEMBLED, false));
+        registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false));
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED);
     }
     
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new BigSolarPanelEntity(pos, state);
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClient) {
+        if (!world.isClientSide) {
             
             var entity = world.getBlockEntity(pos);
             if (!(entity instanceof BigSolarPanelEntity solarPanel)) {
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             
-            var wasAssembled = state.get(ASSEMBLED);
+            var wasAssembled = state.getValue(ASSEMBLED);
             
             if (!wasAssembled) {
                 var corePlaced = solarPanel.tryPlaceNextCore(player);
-                if (corePlaced) return ActionResult.SUCCESS;
+                if (corePlaced) return InteractionResult.SUCCESS;
             }
             
             var isAssembled = solarPanel.initMultiblock(state);
@@ -71,25 +72,25 @@ public class BigSolarPanelBlock extends PassiveGeneratorBlock {
             // first time created
             if (isAssembled && !wasAssembled) {
                 solarPanel.triggerSetupAnimation();
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             
             if (!isAssembled) {
-                player.sendMessage(Text.translatable("message.oritech.machine.missing_core"));
+                player.sendSystemMessage(Component.translatable("message.oritech.machine.missing_core"));
             } else {
                 solarPanel.sendInfoMessageToPlayer(player);
             }
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
             
         }
         
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
     
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClient() && state.get(ASSEMBLED)) {
+        if (!world.isClientSide() && state.getValue(ASSEMBLED)) {
             
             var entity = world.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
@@ -97,19 +98,19 @@ public class BigSolarPanelBlock extends PassiveGeneratorBlock {
             }
         }
         
-        return super.onBreak(world, pos, state, player);
+        return super.playerWillDestroy(world, pos, state, player);
     }
     
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.ENTITYBLOCK_ANIMATED;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
-        super.appendTooltip(stack, context, tooltip, options);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+        super.appendHoverText(stack, context, tooltip, options);
         addMachineTooltip(tooltip, this, this);
         if (Screen.hasControlDown())
-            tooltip.add(Text.translatable("tooltip.oritech.solar_generation").formatted(Formatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.oritech.solar_generation").withStyle(ChatFormatting.GRAY));
     }
 }

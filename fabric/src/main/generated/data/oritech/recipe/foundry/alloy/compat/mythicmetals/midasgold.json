@@ -1,0 +1,31 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "mythicmetals"
+      ]
+    }
+  ],
+  "type": "oritech:foundry",
+  "fluidInput": {
+    "amount": 0,
+    "fluid": "minecraft:empty"
+  },
+  "fluidOutputs": [],
+  "ingredients": [
+    {
+      "tag": "mythicmetals:midas_raw_ores"
+    },
+    {
+      "item": "mythicmetals:raw_midas_gold"
+    }
+  ],
+  "results": [
+    {
+      "count": 2,
+      "id": "minecraft:gold_ingot"
+    }
+  ],
+  "time": 120
+}

@@ -1,32 +1,34 @@
 package rearth.oritech.block.entity.accelerator;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.accelerator.AcceleratorPassthroughBlock;
 import rearth.oritech.block.blocks.accelerator.AcceleratorRingBlock;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.Geometry;
-
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 // move this into a second class to keep the entity class smaller and focus on recipe handling, work interaction, etc.
 public class AcceleratorParticleLogic {
     private final BlockPos pos;
-    private final ServerWorld world;
+    private final ServerLevel world;
     private final AcceleratorControllerBlockEntity entity;
     
     private static final Map<CompPair<BlockPos, Vec3i>, BlockPos> cachedGates = new HashMap<>();    // stores the next gate for a combo of source gate and direction
     private static final Map<BlockPos, BlockPos> activeParticles = new HashMap<>(); // stores relations between position of particle -> position of controller
     
-    public AcceleratorParticleLogic(BlockPos pos, ServerWorld world, AcceleratorControllerBlockEntity entity) {
+    public AcceleratorParticleLogic(BlockPos pos, ServerLevel world, AcceleratorControllerBlockEntity entity) {
         this.pos = pos;
         this.world = world;
         this.entity = entity;
@@ -38,7 +40,7 @@ public class AcceleratorParticleLogic {
         
         var timePassed = 1 / 20f;
         
-        var renderedTrail = new ArrayList<Vec3d>();
+        var renderedTrail = new ArrayList<Vec3>();
         renderedTrail.add(particle.position);
         
         // list of positions this frame checked for entities
@@ -48,22 +50,22 @@ public class AcceleratorParticleLogic {
         while (availableDistance > 0.001) {
             
             if (particle.nextGate == null) {
-                exitParticle(particle, new Vec3d(0, 0, 0), AcceleratorControllerBlockEntity.ParticleEvent.ERROR);
+                exitParticle(particle, new Vec3(0, 0, 0), AcceleratorControllerBlockEntity.ParticleEvent.ERROR);
                 return;
             }
             
-            var path = particle.nextGate.toCenterPos().subtract(particle.position);
+            var path = particle.nextGate.getCenter().subtract(particle.position);
             var pathLength = path.length();
             var moveDist = Math.min(pathLength, availableDistance);
             availableDistance -= moveDist;
-            var movedBy = path.normalize().multiply(moveDist);
+            var movedBy = path.normalize().scale(moveDist);
             
             // check if old position intersects with another particle
             var abTest = movedBy.x > 0  || movedBy.y > 0;
             var validLastGate = particle.lastGate == null ? particle.nextGate : particle.lastGate;
             var usedGateForCollision = abTest ? validLastGate : particle.nextGate;
             
-            if (updateParticleCollision(Vec3d.of(usedGateForCollision), particle)) {
+            if (updateParticleCollision(Vec3.atLowerCornerOf(usedGateForCollision), particle)) {
                 return;
             }
             
@@ -85,7 +87,7 @@ public class AcceleratorParticleLogic {
                 
                 // no gate built / too slow
                 if (nextGate == null) {
-                    exitParticle(particle, Vec3d.of(nextDirection), AcceleratorControllerBlockEntity.ParticleEvent.EXITED_NO_GATE);
+                    exitParticle(particle, Vec3.atLowerCornerOf(nextDirection), AcceleratorControllerBlockEntity.ParticleEvent.EXITED_NO_GATE);
                     return;
                 }
                 
@@ -99,7 +101,7 @@ public class AcceleratorParticleLogic {
                     var requiredDist = getRequiredBendDist(particle.velocity);
                     
                     if (combinedDist <= requiredDist) {
-                        exitParticle(particle, Vec3d.of(particle.nextGate.subtract(particle.lastGate)), AcceleratorControllerBlockEntity.ParticleEvent.EXITED_FAST);
+                        exitParticle(particle, Vec3.atLowerCornerOf(particle.nextGate.subtract(particle.lastGate)), AcceleratorControllerBlockEntity.ParticleEvent.EXITED_FAST);
                         return;
                     }
                     
@@ -123,13 +125,13 @@ public class AcceleratorParticleLogic {
         entity.onParticleMoved(renderedTrail);
     }
     
-    private void checkParticleEntityCollision(Vec3d position, ActiveParticle particle, Set<BlockPos> alreadyChecked) {
+    private void checkParticleEntityCollision(Vec3 position, ActiveParticle particle, Set<BlockPos> alreadyChecked) {
         
-        var blockPos = BlockPos.ofFloored(position);
+        var blockPos = BlockPos.containing(position);
         if (alreadyChecked.contains(blockPos)) return;
         alreadyChecked.add(blockPos);
         
-        var targets = world.getEntitiesByClass(LivingEntity.class, new Box(blockPos), elem -> elem.isAlive() && elem.isAttackable() && !elem.isSpectator());
+        var targets = world.getEntitiesOfClass(LivingEntity.class, new AABB(blockPos), elem -> elem.isAlive() && elem.isAttackable() && !elem.isSpectator());
         var remainingMomentum = particle.velocity;
         for (var mob : targets) {
             var usedMomentum = entity.handleParticleEntityCollision(blockPos, particle, remainingMomentum, mob);
@@ -141,12 +143,12 @@ public class AcceleratorParticleLogic {
         particle.velocity = remainingMomentum;
     }
     
-    private void exitParticle(ActiveParticle particle, Vec3d direction, AcceleratorControllerBlockEntity.ParticleEvent reason) {
+    private void exitParticle(ActiveParticle particle, Vec3 direction, AcceleratorControllerBlockEntity.ParticleEvent reason) {
         
         var exitFrom = particle.position;
         
         var distance = Math.max(Math.sqrt(particle.velocity), 0.4) * 0.9;
-        var exitTo = exitFrom.add(direction.normalize().multiply(distance));
+        var exitTo = exitFrom.add(direction.normalize().scale(distance));
         
         entity.onParticleExited(exitFrom, exitTo, particle.lastGate, direction, reason);
         
@@ -158,9 +160,9 @@ public class AcceleratorParticleLogic {
         var remainingMomentum = particle.velocity;
         
         for (int i = 1; i <= searchDist; i++) {
-            var checkPos = searchStart.add(searchDirection.multiply(i));
+            var checkPos = searchStart.offset(searchDirection.multiply(i));
             
-            var targets = world.getEntitiesByClass(LivingEntity.class, new Box(checkPos), elem -> elem.isAlive() && elem.isAttackable() && !elem.isSpectator());
+            var targets = world.getEntitiesOfClass(LivingEntity.class, new AABB(checkPos), elem -> elem.isAlive() && elem.isAttackable() && !elem.isSpectator());
             
             for (var mob : targets) {
                 var usedMomentum = entity.handleParticleEntityCollision(checkPos, particle, remainingMomentum, mob);
@@ -182,7 +184,7 @@ public class AcceleratorParticleLogic {
         
     }
     
-    private boolean updateParticleCollision(Vec3d position, ActiveParticle particle) {
+    private boolean updateParticleCollision(Vec3 position, ActiveParticle particle) {
         
         var blockPos = new BlockPos((int) position.x, (int) position.y, (int) position.z);
         if (activeParticles.containsKey(blockPos) && !activeParticles.get(blockPos).equals(this.pos)) {
@@ -223,9 +225,9 @@ public class AcceleratorParticleLogic {
         // if the target gate has just been destroyed
         if (!targetBlock.equals(BlockContent.ACCELERATOR_RING)) return incomingDir;
         
-        var targetFacing = targetState.get(Properties.HORIZONTAL_FACING);
-        var targetBent = targetState.get(AcceleratorRingBlock.BENT);
-        var targetRedstone = targetState.get(AcceleratorRingBlock.REDSTONE_STATE);
+        var targetFacing = targetState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        var targetBent = targetState.getValue(AcceleratorRingBlock.BENT);
+        var targetRedstone = targetState.getValue(AcceleratorRingBlock.REDSTONE_STATE);
         
         // if we come straight, the exit can be either curved or bent
         // if we come bent, the exit has to be straight
@@ -243,9 +245,9 @@ public class AcceleratorParticleLogic {
             if (targetBent == 0) {  // straight, keep direction. We don't know whether we enter from forward or behind
                 return incomingDir;
             } else if (targetBent == 1) {   // bent left
-                return Geometry.getForward(targetFacing).add(Geometry.getLeft(targetFacing));
+                return Geometry.getForward(targetFacing).offset(Geometry.getLeft(targetFacing));
             } else {   // bent right
-                return Geometry.getForward(targetFacing).add(Geometry.getRight(targetFacing));
+                return Geometry.getForward(targetFacing).offset(Geometry.getRight(targetFacing));
             }
         }
         
@@ -271,7 +273,7 @@ public class AcceleratorParticleLogic {
         
         if (cachedGates.containsKey(key)) {
             var result = cachedGates.get(key);
-            var dist = (int) result.toCenterPos().distanceTo(from.toCenterPos());
+            var dist = (int) result.getCenter().distanceTo(from.getCenter());
             if (dist <= maxDist) return result;
         }
         
@@ -293,7 +295,7 @@ public class AcceleratorParticleLogic {
         var maxDist = getMaxGateDist(speed);
         
         for (int i = 1; i <= maxDist; i++) {
-            var candidatePos = from.add(direction.multiply(i));
+            var candidatePos = from.offset(direction.multiply(i));
             var candidateState = world.getBlockState(candidatePos);
             if (candidateState.isAir()) continue;
             
@@ -303,26 +305,26 @@ public class AcceleratorParticleLogic {
             if (!candidateState.getBlock().equals(BlockContent.ACCELERATOR_RING)) return null;
             
             // check if ring is facing source pos (from)
-            var candidateBent = candidateState.get(AcceleratorRingBlock.BENT);
-            var candidateFacing = candidateState.get(Properties.HORIZONTAL_FACING);
-            var candidateRedstone = candidateState.get(AcceleratorRingBlock.REDSTONE_STATE);
+            var candidateBent = candidateState.getValue(AcceleratorRingBlock.BENT);
+            var candidateFacing = candidateState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            var candidateRedstone = candidateState.getValue(AcceleratorRingBlock.REDSTONE_STATE);
             
-            var candidateBack = candidatePos.add(Geometry.getBackward(candidateFacing).multiply(i));
-            var candidateFront = candidatePos.add(Geometry.getForward(candidateFacing).multiply(i));
+            var candidateBack = candidatePos.offset(Geometry.getBackward(candidateFacing).multiply(i));
+            var candidateFront = candidatePos.offset(Geometry.getForward(candidateFacing).multiply(i));
             
             // front can be bent
-            if (candidateBent == 1) candidateFront = candidateFront.add(Geometry.getLeft(candidateFacing).multiply(i));
-            if (candidateBent == 2) candidateFront = candidateFront.add(Geometry.getRight(candidateFacing).multiply(i));
+            if (candidateBent == 1) candidateFront = candidateFront.offset(Geometry.getLeft(candidateFacing).multiply(i));
+            if (candidateBent == 2) candidateFront = candidateFront.offset(Geometry.getRight(candidateFacing).multiply(i));
             
             var isValid = candidateBack.equals(from) || candidateFront.equals(from);
             
             // check if redstone input is valid
             if (!isValid && candidateRedstone != 3) {
-                candidateFront = candidatePos.add(Geometry.getForward(candidateFacing).multiply(i));    // reset front
+                candidateFront = candidatePos.offset(Geometry.getForward(candidateFacing).multiply(i));    // reset front
                 if (candidateRedstone == 1) {
-                    candidateFront = candidateFront.add(Geometry.getLeft(candidateFacing).multiply(i));
+                    candidateFront = candidateFront.offset(Geometry.getLeft(candidateFacing).multiply(i));
                 } else if (candidateRedstone == 2) {
-                    candidateFront = candidateFront.add(Geometry.getRight(candidateFacing).multiply(i));
+                    candidateFront = candidateFront.offset(Geometry.getRight(candidateFacing).multiply(i));
                 }
                 
                 isValid = candidateFront.equals(from);
@@ -343,16 +345,16 @@ public class AcceleratorParticleLogic {
     
     // remove caches that have either source or target as pos. Called from gate blocks
     public static void resetCachedGate(BlockPos pos) {
-        var toRemove = cachedGates.entrySet().stream().filter(elem -> elem.getKey().getLeft().equals(pos) || elem.getValue().equals(pos)).map(Map.Entry::getKey).toList();
+        var toRemove = cachedGates.entrySet().stream().filter(elem -> elem.getKey().getA().equals(pos) || elem.getValue().equals(pos)).map(Map.Entry::getKey).toList();
         toRemove.forEach(cachedGates::remove);
     }
     
     public static void resetNearbyCache(BlockPos pos) {
-        var toRemove = cachedGates.keySet().stream().filter(blockPos -> blockPos.getLeft().getManhattanDistance(pos) < Oritech.CONFIG.maxGateDist() + 1).toList();
+        var toRemove = cachedGates.keySet().stream().filter(blockPos -> blockPos.getA().distManhattan(pos) < Oritech.CONFIG.maxGateDist() + 1).toList();
         toRemove.forEach(cachedGates::remove);
     }
     
-    public static final class CompPair<A, B> extends Pair<A, B> {
+    public static final class CompPair<A, B> extends Tuple<A, B> {
         
         public CompPair(A left, B right) {
             super(left, right);
@@ -360,7 +362,7 @@ public class AcceleratorParticleLogic {
         
         @Override
         public int hashCode() {
-            return (getLeft() == null ? 0 : getLeft().hashCode()) ^ (getRight() == null ? 0 : getRight().hashCode());
+            return (getA() == null ? 0 : getA().hashCode()) ^ (getB() == null ? 0 : getB().hashCode());
         }
         
         @Override
@@ -369,19 +371,19 @@ public class AcceleratorParticleLogic {
                 return false;
             }
             
-            return Objects.equals(p.getLeft(), getLeft()) && Objects.equals(p.getRight(), getRight());
+            return Objects.equals(p.getA(), getA()) && Objects.equals(p.getB(), getB());
         }
     }
     
     public static final class ActiveParticle {
-        public Vec3d position;
+        public Vec3 position;
         public float velocity;
         public BlockPos nextGate;
         public BlockPos lastGate;
         public float lastBendDistance = 15000;
         public float lastBendDistance2 = 15000;
         
-        public ActiveParticle(Vec3d position, float velocity, BlockPos nextGate, BlockPos lastGate) {
+        public ActiveParticle(Vec3 position, float velocity, BlockPos nextGate, BlockPos lastGate) {
             this.position = position;
             this.velocity = velocity;
             this.nextGate = nextGate;

@@ -1,11 +1,17 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.block.entity.EndPortalBlockEntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.RotationAxis;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Axis;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderType.CompositeRenderType;
+import net.minecraft.client.renderer.blockentity.TheEndPortalRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
 import rearth.oritech.util.PortalEntity;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
@@ -13,7 +19,7 @@ import software.bernie.geckolib.renderer.GeoRenderer;
 import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
 
 public class PortalEntityRenderer extends GeoEntityRenderer<PortalEntity> {
-    public PortalEntityRenderer(EntityRendererFactory.Context renderManager) {
+    public PortalEntityRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new PortalEntityModel());
         
         addRenderLayer(new PortalRenderLayer(this));
@@ -21,9 +27,9 @@ public class PortalEntityRenderer extends GeoEntityRenderer<PortalEntity> {
     }
     
     @Override
-    protected void applyRotations(PortalEntity animatable, MatrixStack poseStack, float ageInTicks, float rotationYaw, float partialTick, float nativeScale) {
+    protected void applyRotations(PortalEntity animatable, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTick, float nativeScale) {
         super.applyRotations(animatable, poseStack, ageInTicks, rotationYaw, partialTick, nativeScale);
-        poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(animatable.getYaw()));
+        poseStack.mulPose(Axis.YP.rotationDegrees(animatable.getYRot()));
     }
     
     public static class PortalRenderLayer extends GeoRenderLayer<PortalEntity> {
@@ -33,19 +39,19 @@ public class PortalEntityRenderer extends GeoEntityRenderer<PortalEntity> {
         }
         
         @Override
-        public void renderForBone(MatrixStack poseStack, PortalEntity animatable, GeoBone bone, RenderLayer renderType, VertexConsumerProvider bufferSource, VertexConsumer buffer, float partialTick, int packedLight, int packedOverlay) {
+        public void renderForBone(PoseStack poseStack, PortalEntity animatable, GeoBone bone, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick, int packedLight, int packedOverlay) {
             super.renderForBone(poseStack, animatable, bone, renderType, bufferSource, buffer, partialTick, packedLight, packedOverlay);
             
             if (!bone.getName().equals("portal")) return;
             
-            var layer = RenderLayer.of("portal_swirl", VertexFormats.POSITION, VertexFormat.DrawMode.QUADS, 1536, false, false, RenderLayer.MultiPhaseParameters.builder().program(RenderPhase.END_GATEWAY_PROGRAM).texture(RenderPhase.Textures.create().add(EndPortalBlockEntityRenderer.SKY_TEXTURE, false, false).add(Identifier.ofVanilla("textures/environment/moon_phases.png"), false, false).build()).build(false));
+            var layer = RenderType.create("portal_swirl", DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS, 1536, false, false, RenderType.CompositeState.builder().setShaderState(RenderStateShard.RENDERTYPE_END_GATEWAY_SHADER).setTextureState(RenderStateShard.MultiTextureStateShard.builder().add(TheEndPortalRenderer.END_SKY_LOCATION, false, false).add(ResourceLocation.withDefaultNamespace("textures/environment/moon_phases.png"), false, false).build()).createCompositeState(false));
             
             var consumer = bufferSource.getBuffer(layer);
             
-            consumer.vertex(poseStack.peek().getPositionMatrix(), 0, 0, 0.55f);
-            consumer.vertex(poseStack.peek().getPositionMatrix(), 0, 1.95f, 0.55f);
-            consumer.vertex(poseStack.peek().getPositionMatrix(), 0, 1.95f, -0.55f);
-            consumer.vertex(poseStack.peek().getPositionMatrix(), 0, 0, -0.55f);
+            consumer.addVertex(poseStack.last().pose(), 0, 0, 0.55f);
+            consumer.addVertex(poseStack.last().pose(), 0, 1.95f, 0.55f);
+            consumer.addVertex(poseStack.last().pose(), 0, 1.95f, -0.55f);
+            consumer.addVertex(poseStack.last().pose(), 0, 0, -0.55f);
             
         }
     }

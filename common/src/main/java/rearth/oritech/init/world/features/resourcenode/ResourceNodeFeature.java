@@ -1,19 +1,20 @@
 package rearth.oritech.init.world.features.resourcenode;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.noise.PerlinNoiseSampler;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.util.FeatureContext;
 import rearth.oritech.Oritech;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
+import net.minecraft.world.level.levelgen.synth.ImprovedNoise;
 
 public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
     
@@ -22,25 +23,25 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
     }
     
     @Override
-    public boolean generate(FeatureContext<ResourceNodeFeatureConfig> context) {
+    public boolean place(FeaturePlaceContext<ResourceNodeFeatureConfig> context) {
 
-        var world = context.getWorld();
-        var origin = context.getOrigin();
+        var world = context.level();
+        var origin = context.origin();
         
-        if (world.isClient()) return false;
+        if (world.isClientSide()) return false;
         
         var solidBlockFound = false;
         var testPos = new BlockPos(origin);
         var deepNodePos = testPos;
         var boulderPos = testPos;
 
-        for (int y = origin.getY(); y > world.getBottomY(); y--) {
-            var downPos = testPos.down();
+        for (int y = origin.getY(); y > world.getMinBuildHeight(); y--) {
+            var downPos = testPos.below();
             var testState = world.getBlockState(downPos);
-            if (testState.isOf(Blocks.BEDROCK)) {
+            if (testState.is(Blocks.BEDROCK)) {
                 deepNodePos = testPos;
                 break;
-            } else if (testState.isSolidBlock(world, downPos) && !solidBlockFound) {
+            } else if (testState.isRedstoneConductor(world, downPos) && !solidBlockFound) {
                 boulderPos = testPos = downPos;
                 solidBlockFound = true;
             } else {
@@ -60,58 +61,58 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
         
     }
     
-    private BlockState getRandomBlockFromList(List<Identifier> list, Random random) {
-        return Registries.BLOCK.get(getRandomFromList(list, random)).getDefaultState();
+    private BlockState getRandomBlockFromList(List<ResourceLocation> list, RandomSource random) {
+        return BuiltInRegistries.BLOCK.get(getRandomFromList(list, random)).defaultBlockState();
     }
     
-    private Identifier getRandomFromList(List<Identifier> list, Random random) {
+    private ResourceLocation getRandomFromList(List<ResourceLocation> list, RandomSource random) {
         return list.get(random.nextInt(list.size()));
     }
     
-    private void placeBedrockNode(BlockPos startPos, FeatureContext<ResourceNodeFeatureConfig> context) {
+    private void placeBedrockNode(BlockPos startPos, FeaturePlaceContext<ResourceNodeFeatureConfig> context) {
         
-        var world = context.getWorld();
-        var random = context.getRandom();
-        var ores = context.getConfig().nodeOres();
+        var world = context.level();
+        var random = context.random();
+        var ores = context.config().nodeOres();
         
-        var radius = context.getConfig().nodeSize();
-        var overlayBlock = Registries.BLOCK.get(context.getConfig().overlayBlock()).getDefaultState();
-        var overlayHeight = context.getConfig().overlayHeight();
+        var radius = context.config().nodeSize();
+        var overlayBlock = BuiltInRegistries.BLOCK.get(context.config().overlayBlock()).defaultBlockState();
+        var overlayHeight = context.config().overlayHeight();
 
-        var noise = new PerlinNoiseSampler(random);
+        var noise = new ImprovedNoise(random);
 
         // the bottom of the "bowl" should start below the top layer of bedrock
-        BlockPos centerPos = startPos.up(radius - 2);
+        BlockPos centerPos = startPos.above(radius - 2);
 
-        for (BlockPos pos : BlockPos.iterateOutwards(centerPos, radius, radius, radius)) {
+        for (BlockPos pos : BlockPos.withinManhattan(centerPos, radius, radius, radius)) {
             // skip anything outside the radius, or outside the vertical cutoff
-            if (Math.sqrt(pos.getSquaredDistance(centerPos)) + noise.sample(pos.getX(), pos.getY(), pos.getZ()) > radius
-                || pos.getY() >= startPos.getY() + overlayHeight + 3 + noise.sample(pos.getX(), pos.getY() + 2, pos.getZ())) continue;
+            if (Math.sqrt(pos.distSqr(centerPos)) + noise.noise(pos.getX(), pos.getY(), pos.getZ()) > radius
+                || pos.getY() >= startPos.getY() + overlayHeight + 3 + noise.noise(pos.getX(), pos.getY() + 2, pos.getZ())) continue;
             // randomly replace some blocks below bedrock level with resource nodes
-            if (pos.getY() <= startPos.getY() + 1 && random.nextDouble() <= context.getConfig().nodeOreChance()) {
-                world.setBlockState(pos, getRandomBlockFromList(ores, random), 0x10);
+            if (pos.getY() <= startPos.getY() + 1 && random.nextDouble() <= context.config().nodeOreChance()) {
+                world.setBlock(pos, getRandomBlockFromList(ores, random), 0x10);
             // set blocks between bedrock and bedrock + overlayHeight to overlayBlock
             } else if (pos.getY() > startPos.getY() + 1 && pos.getY() <= startPos.getY() + overlayHeight + 1) {
-                world.setBlockState(pos, overlayBlock, 0x10);
+                world.setBlock(pos, overlayBlock, 0x10);
             // set anything between overlay and vertical cutoff to air
             } else if (pos.getY() > startPos.getY() + 1) {
-                world.setBlockState(pos, Blocks.AIR.getDefaultState(), 0x10);
+                world.setBlock(pos, Blocks.AIR.defaultBlockState(), 0x10);
             }
         }
     }
     
-    private void placeSurfaceBoulder(BlockPos startPos, FeatureContext<ResourceNodeFeatureConfig> context) {
+    private void placeSurfaceBoulder(BlockPos startPos, FeaturePlaceContext<ResourceNodeFeatureConfig> context) {
         
-        var world = context.getWorld();
-        var random = context.getRandom();
-        var radius = context.getConfig().boulderRadius();
-        var movedCenter = startPos.offset(Axis.pickRandomAxis(random), random.nextBetween(0, radius-1));
-        var ores = context.getConfig().boulderOres();
-        var noise = new PerlinNoiseSampler(random);
+        var world = context.level();
+        var random = context.random();
+        var radius = context.config().boulderRadius();
+        var movedCenter = startPos.relative(Axis.getRandom(random), random.nextIntBetweenInclusive(0, radius-1));
+        var ores = context.config().boulderOres();
+        var noise = new ImprovedNoise(random);
         
-        for (BlockPos pos : BlockPos.iterateOutwards(movedCenter, radius, radius, radius)) {
-            if (Math.sqrt(pos.getSquaredDistance(movedCenter)) > radius + noise.sample(pos.getX(), pos.getY(), pos.getZ())) continue;
-            world.setBlockState(pos, getRandomBlockFromList(ores, random), 0x10);
+        for (BlockPos pos : BlockPos.withinManhattan(movedCenter, radius, radius, radius)) {
+            if (Math.sqrt(pos.distSqr(movedCenter)) > radius + noise.noise(pos.getX(), pos.getY(), pos.getZ())) continue;
+            world.setBlock(pos, getRandomBlockFromList(ores, random), 0x10);
         }
     }
 }

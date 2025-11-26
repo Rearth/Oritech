@@ -1,5 +1,7 @@
 package rearth.oritech.client.ui;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.component.LabelComponent;
@@ -7,12 +9,8 @@ import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
@@ -26,6 +24,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 
 public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
     
@@ -34,7 +38,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
     private FlowLayout root;
     
     private final List<Component> augments = new ArrayList<>();
-    private final HashMap<Component, Identifier> augmentIDs = new HashMap<>();
+    private final HashMap<Component, ResourceLocation> augmentIDs = new HashMap<>();
     private final HashMap<Component, Float> augmentSizes = new HashMap<>();
     
     @Override
@@ -53,7 +57,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         addAugments(rootComponent);
         
         // add tooltip in bot left
-        var label = Components.label(Text.translatable("oritech.text.augment_toggle"));
+        var label = Components.label(net.minecraft.network.chat.Component.translatable("oritech.text.augment_toggle"));
         rootComponent.child(label.positioning(Positioning.relative(2, 90)));
     }
     
@@ -63,18 +67,18 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         
         // update noop text
         if (lastFocused == noOpButton) {
-            noOpButton.text(Text.literal("Exit"));
+            noOpButton.text(net.minecraft.network.chat.Component.literal("Exit"));
         } else if (lastFocused != null && lastFocused instanceof TextureComponent lastButton) {
             var focusedAugmentId = augmentIDs.get(lastButton);
             if (focusedAugmentId == null) return;
-            var focusedAugment = Text.translatable(PlayerModifierScreen.augmentKey(focusedAugmentId));
+            var focusedAugment = net.minecraft.network.chat.Component.translatable(PlayerModifierScreen.augmentKey(focusedAugmentId));
             noOpButton.text(focusedAugment);
         }
         
     }
     
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         
         if (augments.isEmpty()) return;
@@ -124,7 +128,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
             var augmentId = augmentIDs.get(augment);
             var augmentData = PlayerAugments.allAugments.get(augmentId);
             if (augmentData == null) continue;
-            var isEnabled = augmentData.isEnabled(client.player);
+            var isEnabled = augmentData.isEnabled(minecraft.player);
             var active = mousingOver == augment;
             
             var color = new Color(180 / 255f, 30 / 255f, 30 / 255f, 0.3f).argb();  // red
@@ -140,7 +144,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
             if (active) sizeTarget = 1.05f;
             var lastSize = augmentSizes.getOrDefault(augment, 1f);
             
-            var usedSize = MathHelper.lerp(0.15, lastSize, sizeTarget);
+            var usedSize = Mth.lerp(0.15, lastSize, sizeTarget);
             augmentSizes.put(augment, (float) usedSize);
             
             var activeInnerRadius = innerRadius / usedSize;
@@ -160,7 +164,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         
     }
     
-    private static void drawPieSegmented(DrawContext context, double augmentRad, double radSize, Vector2i screenMiddle, double innerRadius, double outerRadius, double screenSize, int color, int segmentCount) {
+    private static void drawPieSegmented(GuiGraphics context, double augmentRad, double radSize, Vector2i screenMiddle, double innerRadius, double outerRadius, double screenSize, int color, int segmentCount) {
         
         // total size
         var segmentSize = radSize / segmentCount;
@@ -179,44 +183,44 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         }
     }
     
-    private static void drawLine(DrawContext context, Vector2i from, Vector2i to, int color) {
+    private static void drawLine(GuiGraphics context, Vector2i from, Vector2i to, int color) {
         
         if (from.distanceSquared(to) < 0.1) return;
         
-        var matrices = context.getMatrices();
-        matrices.push();
+        var matrices = context.pose();
+        matrices.pushPose();
         
-        var pos = matrices.peek().getPositionMatrix();
+        var pos = matrices.last().pose();
         var normal = getNormalVector(from, to).normalize();
         var offset = normal.mul(1);
         var zIndex = 0;
         
-        var buffer = context.getVertexConsumers().getBuffer(RenderLayer.getGui());
-        buffer.vertex(pos, from.x - offset.x, from.y - offset.y, zIndex).color(color);
-        buffer.vertex(pos, from.x + offset.x, from.y + offset.y, zIndex).color(color);
-        buffer.vertex(pos, to.x + offset.x, to.y + offset.y, zIndex).color(color);
-        buffer.vertex(pos, to.x - offset.x, to.y - offset.y, zIndex).color(color);
-        context.draw();
+        var buffer = context.bufferSource().getBuffer(RenderType.gui());
+        buffer.addVertex(pos, from.x - offset.x, from.y - offset.y, zIndex).setColor(color);
+        buffer.addVertex(pos, from.x + offset.x, from.y + offset.y, zIndex).setColor(color);
+        buffer.addVertex(pos, to.x + offset.x, to.y + offset.y, zIndex).setColor(color);
+        buffer.addVertex(pos, to.x - offset.x, to.y - offset.y, zIndex).setColor(color);
+        context.flush();
         
-        matrices.pop();
+        matrices.popPose();
     }
     
-    private static void drawRect(DrawContext context, Vector2i a, Vector2i b, Vector2i c, Vector2i d, int color) {
+    private static void drawRect(GuiGraphics context, Vector2i a, Vector2i b, Vector2i c, Vector2i d, int color) {
         
-        var matrices = context.getMatrices();
-        matrices.push();
+        var matrices = context.pose();
+        matrices.pushPose();
         
-        var pos = matrices.peek().getPositionMatrix();
+        var pos = matrices.last().pose();
         var zIndex = 0;
         
-        var buffer = context.getVertexConsumers().getBuffer(RenderLayer.getGui());
-        buffer.vertex(pos, a.x, a.y, zIndex).color(color);
-        buffer.vertex(pos, b.x, b.y, zIndex).color(color);
-        buffer.vertex(pos, c.x, c.y, zIndex).color(color);
-        buffer.vertex(pos, d.x, d.y, zIndex).color(color);
-        context.draw();
+        var buffer = context.bufferSource().getBuffer(RenderType.gui());
+        buffer.addVertex(pos, a.x, a.y, zIndex).setColor(color);
+        buffer.addVertex(pos, b.x, b.y, zIndex).setColor(color);
+        buffer.addVertex(pos, c.x, c.y, zIndex).setColor(color);
+        buffer.addVertex(pos, d.x, d.y, zIndex).setColor(color);
+        context.flush();
         
-        matrices.pop();
+        matrices.popPose();
     }
     
     public static Vector2f getNormalVector(Vector2i point1, Vector2i point2) {
@@ -229,7 +233,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
     
     private void addAugments(FlowLayout parent) {
         
-        var player = Objects.requireNonNull(this.client).player;
+        var player = Objects.requireNonNull(this.minecraft).player;
         
         var augmentsToAdd = new ArrayList<Augment>();
         
@@ -269,7 +273,7 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
             
         }
         
-        var noOpLabel = Components.label(Text.literal("Nothing"));
+        var noOpLabel = Components.label(net.minecraft.network.chat.Component.literal("Nothing"));
         noOpLabel.positioning(Positioning.relative(50, 50));
         augments.add(noOpLabel);
         noOpButton = noOpLabel;
@@ -277,12 +281,12 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         
     }
     
-    private void toggleAugment(Identifier id) {
+    private void toggleAugment(ResourceLocation id) {
         NetworkManager.sendToServer(new PlayerAugments.AugmentPlayerTogglePacket(id));
     }
     
     @Override
-    public void close() {
+    public void onClose() {
         
         if (lastFocused != null && augmentIDs.containsKey(lastFocused)) {
             var id = augmentIDs.get(lastFocused);
@@ -290,6 +294,6 @@ public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
         }
         
         OritechClient.activeScreen = null;
-        super.close();
+        super.onClose();
     }
 }

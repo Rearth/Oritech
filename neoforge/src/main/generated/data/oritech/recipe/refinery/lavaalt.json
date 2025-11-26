@@ -10,11 +10,11 @@
       "fluid": "oritech:still_sulfuric_acid"
     },
     {
-      "amount": 500,
+      "amount": 250,
       "fluid": "oritech:still_sheol_fire"
     },
     {
-      "amount": 200,
+      "amount": 100,
       "fluid": "oritech:still_strange_matter"
     }
   ],

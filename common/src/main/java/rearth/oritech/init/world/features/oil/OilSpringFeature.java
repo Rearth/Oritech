@@ -1,13 +1,16 @@
 package rearth.oritech.init.world.features.oil;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.noise.PerlinNoiseSampler;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.util.FeatureContext;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
+import net.minecraft.world.level.levelgen.synth.ImprovedNoise;
 import rearth.oritech.Oritech;
 
 public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
@@ -16,20 +19,20 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
     }
     
     @Override
-    public boolean generate(FeatureContext<OilSpringFeatureConfig> context) {
+    public boolean place(FeaturePlaceContext<OilSpringFeatureConfig> context) {
         
-        var world = context.getWorld();
-        var origin = context.getOrigin();
+        var world = context.level();
+        var origin = context.origin();
         
-        if (world.isClient()) return false;
+        if (world.isClientSide()) return false;
         
         
         var testPos = new BlockPos(origin);
         for (int y = 0; y < world.getHeight(); y++) {
-            testPos = testPos.up();
+            testPos = testPos.above();
             
-            if (world.getBlockState(testPos).isIn(BlockTags.DIRT) || world.getBlockState(testPos).isIn(BlockTags.SAND)) {
-                if (world.getBlockState(testPos.up()).isOf(Blocks.AIR)) {
+            if (world.getBlockState(testPos).is(BlockTags.DIRT) || world.getBlockState(testPos).is(BlockTags.SAND)) {
+                if (world.getBlockState(testPos.above()).is(Blocks.AIR)) {
                     placeStructure(testPos, context);
                     return true;
                 }
@@ -40,33 +43,33 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
         return false;
     }
     
-    private void placeStructure(BlockPos surfacePos, FeatureContext<OilSpringFeatureConfig> context) {
+    private void placeStructure(BlockPos surfacePos, FeaturePlaceContext<OilSpringFeatureConfig> context) {
         
-        var random = context.getRandom();
-        var config = context.getConfig();
-        var state = Registries.BLOCK.get(config.blockId()).getDefaultState();
-        var world = context.getWorld();
+        var random = context.random();
+        var config = context.config();
+        var state = BuiltInRegistries.BLOCK.get(config.blockId()).defaultBlockState();
+        var world = context.level();
         
-        var variation = random.nextBetween((int) (-config.number() * 0.5f), config.number());
+        var variation = random.nextIntBetweenInclusive((int) (-config.number() * 0.5f), config.number());
         var height = Math.max(config.number() + variation, 13);
         var depth = height * 2;
         
-        var bottomEnd = surfacePos.down(depth);
-        var center = bottomEnd.add(random.nextBetween(-2, 2), random.nextBetween(-3, 3), random.nextBetween(0, height / 2));
+        var bottomEnd = surfacePos.below(depth);
+        var center = bottomEnd.offset(random.nextIntBetweenInclusive(-2, 2), random.nextIntBetweenInclusive(-3, 3), random.nextIntBetweenInclusive(0, height / 2));
 
-        var perlinSampler = new PerlinNoiseSampler(random);
+        var perlinSampler = new ImprovedNoise(random);
         
         // iterate through a cube, calculate distance from center to get a good circle
         for (int x = 0; x < depth + 2; x++) {
             for (int y = 0; y < depth + 2; y++) {
                 for (int z = 0; z < depth + 2; z++) {
-                    var point = new BlockPos(x - height, y - height, z - height).add(bottomEnd);
-                    var distance = Math.sqrt(point.getSquaredDistance(center));
-                    var noiseOffset = perlinSampler.sample(x, y, z);
+                    var point = new BlockPos(x - height, y - height, z - height).offset(bottomEnd);
+                    var distance = Math.sqrt(point.distSqr(center));
+                    var noiseOffset = perlinSampler.noise(x, y, z);
                     if (distance <= height + noiseOffset - 2) {
-                        world.setBlockState(point, state, 0x10);
+                        world.setBlock(point, state, 0x10);
                     } else if (distance <= height + noiseOffset) {
-                        world.setBlockState(point, Blocks.STONE.getDefaultState(), 0x10);
+                        world.setBlock(point, Blocks.STONE.defaultBlockState(), 0x10);
                     }
                 }
             }
@@ -75,13 +78,13 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
         // fountain up
         if (Oritech.CONFIG.easyFindFeatures()) {
             for (int i = 0; i < height; i++) {
-                world.setBlockState(surfacePos.up(i), state, 0x10);
+                world.setBlock(surfacePos.above(i), state, 0x10);
             }
         }
         
         // down
         for (int i = 1; i < depth + 5; i++) {
-            world.setBlockState(surfacePos.down(i), state, 0x10);
+            world.setBlock(surfacePos.below(i), state, 0x10);
         }
         
     }

@@ -1,13 +1,5 @@
 package rearth.oritech.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
@@ -15,10 +7,19 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.interaction.DeepDrillEntity;
 import rearth.oritech.block.entity.processing.AtomicForgeBlockEntity;
-
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class TooltipHelper {
     
@@ -26,13 +27,13 @@ public class TooltipHelper {
         if (amount < 1000) {
             return String.valueOf(amount);
         } else if (amount < 1_000_000) {
-            return getFormatted(amount / 1_000.0) + I18n.translate("tooltip.oritech.thousand_abbrev");
+            return getFormatted(amount / 1_000.0) + I18n.get("tooltip.oritech.thousand_abbrev");
         } else if (amount < 1_000_000_000) {
-            return getFormatted(amount / 1_000_000.0) + I18n.translate("tooltip.oritech.million_abbrev");
+            return getFormatted(amount / 1_000_000.0) + I18n.get("tooltip.oritech.million_abbrev");
         } else if (amount < 1_000_000_000_000L)  {
-            return getFormatted(amount / 1_000_000_000.0) + I18n.translate("tooltip.oritech.billion_abbrev");
+            return getFormatted(amount / 1_000_000_000.0) + I18n.get("tooltip.oritech.billion_abbrev");
         } else {
-            return getFormatted(amount / 1_000_000_000_000.0) + I18n.translate("tooltip.oritech.trillion_abbrev");
+            return getFormatted(amount / 1_000_000_000_000.0) + I18n.get("tooltip.oritech.trillion_abbrev");
         }
     }
     
@@ -43,63 +44,63 @@ public class TooltipHelper {
         return formatter.format(number);
     }
     
-    public static void addMachineTooltip(List<Text> tooltip, Block block, BlockEntityProvider entityProvider) {
+    public static void addMachineTooltip(List<Component> tooltip, Block block, EntityBlock entityProvider) {
         var showExtra = Screen.hasControlDown();
         
         if (showExtra) {
-            var entity = entityProvider.createBlockEntity(BlockPos.ORIGIN, block.getDefaultState());
+            var entity = entityProvider.newBlockEntity(BlockPos.ZERO, block.defaultBlockState());
             
             if (entity instanceof MultiblockMachineController multiblockController) {
                 var corePositions = multiblockController.getCorePositions();
-                tooltip.add(Text.translatable("tooltip.oritech.core_desc").formatted(Formatting.GRAY).append(Text.literal(String.valueOf(corePositions.size())).formatted(Formatting.GOLD)));
+                tooltip.add(Component.translatable("tooltip.oritech.core_desc").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(corePositions.size())).withStyle(ChatFormatting.GOLD)));
             }
             if (entity instanceof FrameInteractionBlockEntity) {
-                tooltip.add(Text.translatable("tooltip.oritech.frame_needed").formatted(Formatting.GRAY));
+                tooltip.add(Component.translatable("tooltip.oritech.frame_needed").withStyle(ChatFormatting.GRAY));
             }
             if (entity instanceof MachineAddonController addonProvider) {
                 var addonSlots = addonProvider.getAddonSlots();
-                tooltip.add(Text.translatable("tooltip.oritech.addon_desc").formatted(Formatting.GRAY).append(Text.literal(String.valueOf(addonSlots.size())).formatted(Formatting.GOLD)));
+                tooltip.add(Component.translatable("tooltip.oritech.addon_desc").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(addonSlots.size())).withStyle(ChatFormatting.GOLD)));
             }
             if (entity instanceof MachineBlockEntity machineEntity && machineEntity.getEnergyPerTick() > 1) {
                 var energyRate = machineEntity.getEnergyPerTick();
                 if (entity instanceof UpgradableGeneratorBlockEntity) {
-                    tooltip.add(Text.translatable("tooltip.oritech.generator_rate_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", energyRate).formatted(Formatting.GOLD)));
+                    tooltip.add(Component.translatable("tooltip.oritech.generator_rate_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_transfer_rate", energyRate).withStyle(ChatFormatting.GOLD)));
                 } else if (entity instanceof MachineBlockEntity) {
-                    tooltip.add(Text.translatable("tooltip.oritech.machine_rate_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", energyRate).formatted(Formatting.GOLD)));
+                    tooltip.add(Component.translatable("tooltip.oritech.machine_rate_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_transfer_rate", energyRate).withStyle(ChatFormatting.GOLD)));
                 }
             } else if (entity instanceof ExpandableEnergyStorageBlockEntity energyStorage) {
                 var transferRate = energyStorage.getDefaultExtractionRate();
-                tooltip.add(Text.translatable("tooltip.oritech.energy_max_transfer").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_transfer_rate", transferRate).formatted(Formatting.GOLD)));
+                tooltip.add(Component.translatable("tooltip.oritech.energy_max_transfer").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_transfer_rate", transferRate).withStyle(ChatFormatting.GOLD)));
             }
             
             
             if (entity instanceof EnergyApi.BlockProvider energyProvider) {
                 var maxStorage = getEnergyText(energyProvider.getEnergyStorage(null).getCapacity());
-                tooltip.add(Text.translatable("tooltip.oritech.machine_capacity_desc").formatted(Formatting.GRAY).append(Text.translatable("tooltip.oritech.energy_capacity", maxStorage).formatted(Formatting.GOLD)));
+                tooltip.add(Component.translatable("tooltip.oritech.machine_capacity_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_capacity", maxStorage).withStyle(ChatFormatting.GOLD)));
                 
                 if (energyProvider instanceof AtomicForgeBlockEntity || energyProvider instanceof DeepDrillEntity)
-                    tooltip.add(Text.translatable("tooltip.oritech.needs_laser_power").formatted(Formatting.BOLD));
+                    tooltip.add(Component.translatable("tooltip.oritech.needs_laser_power").withStyle(ChatFormatting.BOLD));
                 
-                var id = Registries.BLOCK.getId(block);
-                if (I18n.hasTranslation("tooltip.oritech." + id.getPath() + ".extra")) {
-                    tooltip.add(Text.translatable("tooltip.oritech." + id.getPath() + ".extra").formatted(Formatting.GRAY));
+                var id = BuiltInRegistries.BLOCK.getKey(block);
+                if (I18n.exists("tooltip.oritech." + id.getPath() + ".extra")) {
+                    tooltip.add(Component.translatable("tooltip.oritech." + id.getPath() + ".extra").withStyle(ChatFormatting.GRAY));
                 }
             }
         } else {
-            tooltip.add(Text.translatable("tooltip.oritech.item_extra_info").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
+            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
     }
     
-    public static Text getFormattedEnergyChangeTooltip(long amount, String unit) {
+    public static Component getFormattedEnergyChangeTooltip(long amount, String unit) {
         var formatted = getEnergyText(amount);
         var text = amount > 0 ? "+" + formatted : formatted;
-        return Text.literal(text).formatted(Formatting.GOLD).append(unit).formatted(Formatting.GOLD);
+        return Component.literal(text).withStyle(ChatFormatting.GOLD).append(unit).withStyle(ChatFormatting.GOLD);
     }
     
-    public static Text getFormattedValueChangeTooltip(int amount) {
+    public static Component getFormattedValueChangeTooltip(int amount) {
         var text = amount > 0 ? "+" + amount : String.valueOf(amount);
-        var color = amount > 0 ? Formatting.GREEN : Formatting.RED;
-        return Text.literal(text).formatted(color).append("%").formatted(color);
+        var color = amount > 0 ? ChatFormatting.GREEN : ChatFormatting.RED;
+        return Component.literal(text).withStyle(color).append("%").withStyle(color);
     }
     
 }

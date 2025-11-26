@@ -5,7 +5,7 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.CollectionUtils;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import rearth.oritech.init.recipes.OritechRecipe;
 
 import java.util.List;
@@ -13,9 +13,9 @@ import java.util.List;
 // holds the recipe data, which is then utilized by the different categories
 public class OritechDisplay implements Display {
     
-    public final RecipeEntry<OritechRecipe> entry;
+    public final RecipeHolder<OritechRecipe> entry;
     
-    public OritechDisplay(RecipeEntry<OritechRecipe> entry) {
+    public OritechDisplay(RecipeHolder<OritechRecipe> entry) {
         this.entry = entry;
     }
     
@@ -34,7 +34,7 @@ public class OritechDisplay implements Display {
         return CategoryIdentifier.of(entry.value().getOriType().getIdentifier());
     }
     
-    public RecipeEntry<OritechRecipe> getEntry() {
+    public RecipeHolder<OritechRecipe> getEntry() {
         return entry;
     }
 }

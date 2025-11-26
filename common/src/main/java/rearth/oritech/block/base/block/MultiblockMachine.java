@@ -1,56 +1,57 @@
 package rearth.oritech.block.base.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.explosion.Explosion;
+import net.minecraft.world.level.LevelAccessor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
-
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.BlockHitResult;
 
 public abstract class MultiblockMachine extends UpgradableMachineBlock {
     
-    public static final BooleanProperty ASSEMBLED = BooleanProperty.of("machine_assembled");
+    public static final BooleanProperty ASSEMBLED = BooleanProperty.create("machine_assembled");
     
-    public MultiblockMachine(Settings settings) {
+    public MultiblockMachine(Properties settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(ASSEMBLED, false));
+        registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false));
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED);
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClient) {
+        if (!world.isClientSide) {
             
             var entity = world.getBlockEntity(pos);
             if (!(entity instanceof MultiblockMachineController machineEntity)) {
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             
-            var wasAssembled = state.get(ASSEMBLED);
+            var wasAssembled = state.getValue(ASSEMBLED);
             
             if (!wasAssembled) {
                 var corePlaced = machineEntity.tryPlaceNextCore(player);
-                if (corePlaced) return ActionResult.SUCCESS;
+                if (corePlaced) return InteractionResult.SUCCESS;
             }
             
             var isAssembled = machineEntity.initMultiblock(state);
@@ -60,44 +61,49 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
                 machineEntity.triggerSetupAnimation();
                 if (entity instanceof MachineAddonController controllerEntity)
                     controllerEntity.initAddons();
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             
             if (!isAssembled) {
-                player.sendMessage(Text.translatable("message.oritech.machine.missing_core"));
-                return ActionResult.SUCCESS;
+                player.sendSystemMessage(Component.translatable("message.oritech.machine.missing_core"));
+                return InteractionResult.SUCCESS;
             }
             
         }
         
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
     
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        
-        if (!world.isClient() && state.get(ASSEMBLED)) {
-            
+    public @NotNull BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+        resetMultiblock(state, world, pos);
+        return super.playerWillDestroy(world, pos, state, player);
+    }
+    
+    @Override
+    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
+        resetMultiblock(state, level, pos);
+        super.playerDestroy(level, player, pos, state, blockEntity, tool);
+    }
+    
+    @Override
+    public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
+        resetMultiblock(state, level, pos);
+        super.destroy(level, pos, state);
+    }
+    
+    @Override
+    protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+        resetMultiblock(state, world, pos);
+        super.onExplosionHit(state, world, pos, explosion, stackMerger);
+    }
+    
+    private void resetMultiblock(BlockState state, LevelAccessor world, BlockPos pos) {
+        if (!world.isClientSide() && state.getValue(ASSEMBLED)) {
             var entity = world.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
         }
-        
-        return super.onBreak(world, pos, state, player);
-    }
-    
-    @Override
-    protected void onExploded(BlockState state, World world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
-        
-        if (!world.isClient() && state.get(ASSEMBLED)) {
-            
-            var entity = world.getBlockEntity(pos);
-            if (entity instanceof MultiblockMachineController machineEntity) {
-                machineEntity.onControllerBroken();
-            }
-        }
-        
-        super.onExploded(state, world, pos, explosion, stackMerger);
     }
 }

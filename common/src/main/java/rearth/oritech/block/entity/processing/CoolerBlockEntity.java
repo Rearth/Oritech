@@ -1,17 +1,6 @@
 package rearth.oritech.block.entity.processing;
 
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
@@ -27,11 +16,24 @@ import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.util.FluidIngredient;
 import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
@@ -39,33 +41,33 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     private boolean initialized = false;
     
     @SyncField(SyncType.GUI_TICK)
-    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged);
     
     public CoolerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.COOLER_ENTITY, pos, state, Oritech.CONFIG.processingMachines.coolerData.energyPerTick());
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         super.serverTick(world, pos, state, blockEntity);
         
         if (!initialized) {
             initialized = true;
             var biome = world.getBiome(pos);
-            inColdArea = biome.isIn(TagContent.CONVENTIONAL_COLD);
+            inColdArea = biome.is(TagContent.CONVENTIONAL_COLD);
         }
         
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         fluidStorage.writeNbt(nbt, "");
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         fluidStorage.readNbt(nbt, "");
     }
     
@@ -76,19 +78,19 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
         var progress = getProgress();
         if (progress < 0.35 || progress > 0.65) return;
         
-        if (world.random.nextFloat() > 0.4) return;
+        if (level.random.nextFloat() > 0.4) return;
         // emit particles
-        var emitPosition = Vec3d.ofCenter(pos);
+        var emitPosition = Vec3.atCenterOf(worldPosition);
         
-        ParticleContent.COOLER_WORKING.spawn(world, emitPosition, 2);
+        ParticleContent.COOLER_WORKING.spawn(level, emitPosition, 2);
         
     }
     
     @Override
-    protected Optional<RecipeEntry<OritechRecipe>> getRecipe() {
+    protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
         
         // get recipes matching input items
-        var candidates = Objects.requireNonNull(world).getRecipeManager().getAllMatches(getOwnRecipeType(), getInputInventory(), world);
+        var candidates = Objects.requireNonNull(level).getRecipeManager().getRecipesFor(getOwnRecipeType(), getInputInventory(), level);
         // filter out recipes based on input tank
         var fluidRecipe = candidates.stream().filter(candidate -> CentrifugeBlockEntity.recipeInputMatchesTank(fluidStorage.getStack(), candidate.value())).findAny();
         if (fluidRecipe.isPresent()) {
@@ -133,7 +135,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
             if (inventory.heldStacks.getFirst().isEmpty()) {
                 inventory.heldStacks.set(0, result.copy());
             } else {
-                inventory.heldStacks.getFirst().increment(result.getCount());
+                inventory.heldStacks.getFirst().grow(result.getCount());
             }
             
             return true;
@@ -181,7 +183,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.COOLER_SCREEN;
     }
     

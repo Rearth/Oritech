@@ -13,7 +13,7 @@
   "minimum_temperature": 1000,
   "result": [
     {
-      "amount": 900,
+      "amount": 1000,
       "id": "oritech:still_biofuel"
     }
   ]

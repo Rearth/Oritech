@@ -1,16 +1,5 @@
 package rearth.oritech.block.entity.generators;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.text.Text;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.LightType;
-import net.minecraft.world.World;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
@@ -29,8 +18,20 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.state.BlockState;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
+
 
 public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements MultiblockMachineController, GeoBlockEntity {
     
@@ -53,45 +54,45 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         addMultiblockToNbt(nbt);
         nbt.putBoolean("folded", isFolded);
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         loadMultiblockNbtData(nbt);
         isFolded = nbt.getBoolean("folded");
     }
     
     @Override
     public int getProductionRate() {
-        var baseRate = ((BigSolarPanelBlock) this.getCachedState().getBlock()).productionRate;
-        var skyLightLevel = world.getLightLevel(LightType.SKY, this.getPos());
-        isFolded = world.isNight() && skyLightLevel < 12;
+        var baseRate = ((BigSolarPanelBlock) this.getBlockState().getBlock()).productionRate;
+        var skyLightLevel = level.getBrightness(LightLayer.SKY, this.getBlockPos());
+        isFolded = level.isNight() && skyLightLevel < 12;
         return (int) (coreQuality * baseRate);
     }
     
     @Override
     public boolean isProducing() {
-        var skyLightLevel = world.getLightLevel(LightType.SKY, this.getPos());
-        return !world.isNight() && skyLightLevel >= 12 && isActive(getCachedState());
+        var skyLightLevel = level.getBrightness(LightLayer.SKY, this.getBlockPos());
+        return !level.isNight() && skyLightLevel >= 12 && isActive(getBlockState());
     }
     
-    public void sendInfoMessageToPlayer(PlayerEntity player) {
-        player.sendMessage(Text.translatable("message.oritech.generator.production_rate", getProductionRate(), getCoreQuality()));
+    public void sendInfoMessageToPlayer(Player player) {
+        player.sendSystemMessage(Component.translatable("message.oritech.generator.production_rate", getProductionRate(), getCoreQuality()));
     }
     
     // output only to north, down and south
     @Override
-    protected Set<Pair<BlockPos, Direction>> getOutputTargets(BlockPos pos, World world) {
+    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level world) {
         
-        var res = new HashSet<Pair<BlockPos, Direction>>();
-        res.add(new Pair<>(pos.down(), Direction.DOWN));
-        res.add(new Pair<>(pos.south(), Direction.NORTH));
-        res.add(new Pair<>(pos.north(), Direction.SOUTH));
+        var res = new HashSet<Tuple<BlockPos, Direction>>();
+        res.add(new Tuple<>(pos.below(), Direction.DOWN));
+        res.add(new Tuple<>(pos.south(), Direction.NORTH));
+        res.add(new Tuple<>(pos.north(), Direction.SOUTH));
         
         return res;
         
@@ -166,7 +167,7 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     private AnimationController<BigSolarPanelEntity> getAnimationController() {
         return new AnimationController<>(this, state -> {
             
-            if (!isActive(getCachedState()))
+            if (!isActive(getBlockState()))
                 return state.setAndContinue(MachineBlockEntity.PACKAGED);
             
             if (state.isCurrentAnimation(MachineBlockEntity.SETUP)) {
@@ -179,7 +180,7 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
             
             // update correct state on client
             var timeOfDay = getAdjustedTimeOfDay();
-            var skyLightLevel = world.getLightLevel(LightType.SKY, this.getPos());
+            var skyLightLevel = level.getBrightness(LightLayer.SKY, this.getBlockPos());
             var isDay = timeOfDay > 0 && timeOfDay < 12500;
             isFolded = !isDay || skyLightLevel < 12;
             
@@ -197,25 +198,25 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     
     @Override
     public BlockPos getPosForMultiblock() {
-        return getPos();
+        return getBlockPos();
     }
     
     @Override
-    public World getWorldForMultiblock() {
-        return getWorld();
+    public Level getWorldForMultiblock() {
+        return getLevel();
     }
     
     public long getAdjustedTimeOfDay() {
-        return (world.getTimeOfDay() + getTimeOffset()) % 24000;
+        return (level.getDayTime() + getTimeOffset()) % 24000;
     }
     
     public int getTimeOffset() {
-        var base = pos.getX() + pos.getZ();
+        var base = worldPosition.getX() + worldPosition.getZ();
         return (int) (Math.sin((double) base / 60) * 100);
     }
     
     public boolean isActive(BlockState state) {
-        return state.get(ASSEMBLED);
+        return state.getValue(ASSEMBLED);
     }
     
     @Override

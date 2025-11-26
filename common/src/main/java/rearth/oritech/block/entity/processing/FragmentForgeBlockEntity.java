@@ -1,19 +1,20 @@
 package rearth.oritech.block.entity.processing;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
@@ -53,7 +54,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON)) {
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getYieldCount() > 0) {
             hasByproductAddon = true;
         }
     }
@@ -62,13 +63,13 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     protected void useEnergy() {
         super.useEnergy();
         
-        if (world.random.nextFloat() > 0.8) return;
+        if (level.random.nextFloat() > 0.8) return;
         // emit particles
         var facing = getFacing();
-        var offsetLocal = Geometry.rotatePosition(new Vec3d(0.4, 0.6, 0.5), facing);
-        var emitPosition = Vec3d.ofCenter(pos).add(offsetLocal);
+        var offsetLocal = Geometry.rotatePosition(new Vec3(0.4, 0.6, 0.5), facing);
+        var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        ParticleContent.GRINDER_WORKING.spawn(world, emitPosition, 1);
+        ParticleContent.GRINDER_WORKING.spawn(level, emitPosition, 1);
         
     }
     
@@ -85,21 +86,21 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         nbt.putBoolean("byproductAddon", hasByproductAddon);
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         hasByproductAddon = nbt.getBoolean("byproductAddon");
     }
     
     @Override
     protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
         super.craftItem(activeRecipe, outputInventory, inputInventory);
-        PulverizerBlockEntity.combineSmallDusts(outputInventory, world);
+        PulverizerBlockEntity.combineSmallDusts(outputInventory, level);
     }
     
     @Override
@@ -138,7 +139,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.GRINDER_SCREEN;
     }
     
@@ -148,9 +149,9 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public List<Pair<Text, Text>> getExtraExtensionLabels() {
+    public List<Tuple<Component, Component>> getExtraExtensionLabels() {
         if (!hasByproductAddon) return super.getExtraExtensionLabels();
-        return List.of(new Pair<>(Text.literal("\uD83C\uDF40: Enabled"), Text.translatable("tooltip.oritech.machine.byproduct_bonus.tooltip")));
+        return List.of(new Tuple<>(Component.literal("\uD83C\uDF40: Enabled"), Component.translatable("tooltip.oritech.machine.byproduct_bonus.tooltip")));
     }
     
     @Override

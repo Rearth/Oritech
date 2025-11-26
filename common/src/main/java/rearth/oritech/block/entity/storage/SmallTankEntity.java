@@ -2,25 +2,22 @@ package rearth.oritech.block.entity.storage;
 
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
@@ -34,7 +31,6 @@ import rearth.oritech.block.blocks.storage.SmallFluidTank;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
-
 import rearth.oritech.util.*;
 
 import java.util.List;
@@ -48,10 +44,10 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     
     private ApiLookupCache<FluidApi.FluidStorage> downLookupCache;
     
-    public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::markDirty, new InventorySlotAssignment(0, 2, 2, 1));
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::setChanged, new InventorySlotAssignment(0, 2, 2, 1));
     
     @SyncField({SyncType.TICK, SyncType.INITIAL})
-    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), this::setChanged);
     
     public SmallTankEntity(BlockPos pos, BlockState state, boolean isCreative) {
         super(isCreative ? BlockEntitiesContent.CREATIVE_TANK_ENTITY : BlockEntitiesContent.SMALL_TANK_ENTITY, pos, state);
@@ -59,32 +55,22 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     @Override
-    public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         fluidStorage.writeNbt(nbt, "");
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
     }
     
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         fluidStorage.readNbt(nbt, "");
-        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
-        markDirty();
+        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
+        setChanged();
     }
     
     @Override
-    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
-        super.addComponents(componentMapBuilder);
-    }
-    
-    @Override
-    protected void readComponents(ComponentsAccess components) {
-        super.readComponents(components);
-    }
-    
-    @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         // fills/drains buckets
         
         // in creative, set tank fill level
@@ -110,8 +96,8 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
         
         if (downLookupCache == null) {
             downLookupCache = ApiLookupCache.create(
-              pos.down(),
-              Direction.UP, Objects.requireNonNull(world),
+              worldPosition.below(),
+              Direction.UP, Objects.requireNonNull(level),
               ((world1, targetPos, targetState, targetEntity, direction) -> FluidApi.BLOCK.find(world1, targetPos, targetState, targetEntity, direction)));
             
         }
@@ -124,23 +110,23 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
         SimpleFluidStorage.transfer(ownTank, belowTank, ownTank.getCapacity(), false);
     }
     
-    private void updateComparators(World world, BlockPos pos, BlockState state) {
+    private void updateComparators(Level world, BlockPos pos, BlockState state) {
         var previous = lastComparatorOutput;
         lastComparatorOutput = getComparatorOutput();
         
         if (previous != lastComparatorOutput) {
-            world.updateComparators(pos, state.getBlock());
+            world.updateNeighbourForOutputSignal(pos, state.getBlock());
         }
     }
     
     // from block entity to item
     private void processInput() {
-        var inStack = inventory.getStack(0);
+        var inStack = inventory.getItem(0);
         var canFill = this.fluidStorage.getAmount() > 0;
         
         if (!canFill || inStack.isEmpty() || inStack.getCount() > 1) return;
         
-        var stackRef = new StackContext(inStack, updated -> inventory.setStack(0, updated));
+        var stackRef = new StackContext(inStack, updated -> inventory.setItem(0, updated));
         var candidate = FluidApi.ITEM.find(stackRef);
         if (candidate == null || !candidate.supportsInsertion()) return;
         
@@ -148,25 +134,25 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
         
         if (moved == 0) {
             // move stack to out slot
-            var outStack = inventory.getStack(2);
+            var outStack = inventory.getItem(2);
             if (outStack.isEmpty()) {
-                inventory.setStack(2, stackRef.getValue());
-                inventory.setStack(0, ItemStack.EMPTY);
-            } else if (outStack.getItem().equals(stackRef.getValue().getItem()) && outStack.getCount() < outStack.getMaxCount()) {
-                outStack.increment(1);
-                inventory.setStack(0, ItemStack.EMPTY);
+                inventory.setItem(2, stackRef.getValue());
+                inventory.setItem(0, ItemStack.EMPTY);
+            } else if (outStack.getItem().equals(stackRef.getValue().getItem()) && outStack.getCount() < outStack.getMaxStackSize()) {
+                outStack.grow(1);
+                inventory.setItem(0, ItemStack.EMPTY);
             }
         }
     }
     
     // from item to fluid storage
     private void processOutput() {
-        var inStack = inventory.getStack(1);
+        var inStack = inventory.getItem(1);
         var canFill = this.fluidStorage.getAmount() < this.fluidStorage.getCapacity();
         
         if (!canFill || inStack.isEmpty() || inStack.getCount() > 1) return;
         
-        var stackRef = new StackContext(inStack, updated -> inventory.setStack(1, updated));
+        var stackRef = new StackContext(inStack, updated -> inventory.setItem(1, updated));
         var candidate = FluidApi.ITEM.find(stackRef);
         if (candidate == null || !candidate.supportsExtraction()) return;
         
@@ -174,13 +160,13 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
         
         if (moved == 0) {
             // move stack
-            var outStack = inventory.getStack(2);
+            var outStack = inventory.getItem(2);
             if (outStack.isEmpty()) {
-                inventory.setStack(2, stackRef.getValue());
-                inventory.setStack(1, ItemStack.EMPTY);
-            } else if (outStack.getItem().equals(stackRef.getValue().getItem()) && outStack.getCount() < outStack.getMaxCount()) {
-                outStack.increment(1);
-                inventory.setStack(1, ItemStack.EMPTY);
+                inventory.setItem(2, stackRef.getValue());
+                inventory.setItem(1, ItemStack.EMPTY);
+            } else if (outStack.getItem().equals(stackRef.getValue().getItem()) && outStack.getCount() < outStack.getMaxStackSize()) {
+                outStack.grow(1);
+                inventory.setItem(1, ItemStack.EMPTY);
             }
         }
     }
@@ -194,28 +180,28 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     @Override
-    public void markDirty() {
-        super.markDirty();
-        if (world != null && getCachedState().get(SmallFluidTank.LIT) != isGlowingFluid()) {
-            world.setBlockState(getPos(), getCachedState().with(SmallFluidTank.LIT, isGlowingFluid()));
+    public void setChanged() {
+        super.setChanged();
+        if (level != null && !this.isRemoved() && getBlockState().getValue(SmallFluidTank.LIT) != isGlowingFluid()) {
+            level.setBlockAndUpdate(getBlockPos(), getBlockState().setValue(SmallFluidTank.LIT, isGlowingFluid()));
         }
     }
     
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
+    public void saveExtraData(FriendlyByteBuf buf) {
         sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(pos);
+        buf.writeBlockPos(worldPosition);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.of("");
+    public Component getDisplayName() {
+        return Component.nullToEmpty("");
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new BasicMachineScreenHandler(syncId, playerInventory, this);
     }
     
@@ -250,12 +236,12 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     @Override
-    public Inventory getDisplayedInventory() {
+    public Container getDisplayedInventory() {
         return inventory;
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.TANK_SCREEN;
     }
     

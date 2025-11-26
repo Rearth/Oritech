@@ -54,3 +54,5 @@ side = "BOTH"
 
 [[mixins]]
 config = "oritech_forge.mixins.json"
+[[mixins]]
+config = "oritech.mixins.json"

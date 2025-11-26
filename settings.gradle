@@ -1,16 +1,18 @@
 pluginManagement {
     repositories {
-        maven { url "https://maven.fabricmc.net/" }
-        maven { url "https://maven.architectury.dev/" }
-        maven { url "https://files.minecraftforge.net/maven/" }
-        maven { url "https://maven.sinytra.org/" }
         gradlePluginPortal()
+        mavenCentral()
+        maven { url = "https://maven.fabricmc.net/" }
+        maven { url = "https://maven.sinytra.org/" }
     }
+}
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.10.0'
 }
 
 rootProject.name = 'oritech'
 
 include 'common'
 include 'fabric'
-include 'fabricdatagen'
 include 'neoforge'

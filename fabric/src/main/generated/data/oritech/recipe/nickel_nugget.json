@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "oritech:nickel_ingot"
+    },
+    {
+      "item": "oritech:nickel_ingot"
+    },
+    {
+      "item": "oritech:nickel_ingot"
+    },
+    {
+      "item": "oritech:nickel_ingot"
+    },
+    {
+      "item": "oritech:nickel_ingot"
+    },
+    {
+      "item": "oritech:nickel_ingot"
+    },
+    {
+      "item": "oritech:nickel_ingot"
+    },
+    {
+      "item": "oritech:nickel_ingot"
+    },
+    {
+      "item": "oritech:nickel_ingot"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:nickel_nugget"
+  }
+}

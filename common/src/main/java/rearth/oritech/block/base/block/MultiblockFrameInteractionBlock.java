@@ -1,64 +1,66 @@
 package rearth.oritech.block.base.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import rearth.oritech.util.MultiblockMachineController;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
+
 public abstract class MultiblockFrameInteractionBlock extends FrameInteractionBlock {
     
-    public MultiblockFrameInteractionBlock(Settings settings) {
+    public MultiblockFrameInteractionBlock(Properties settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(ASSEMBLED, false));
+        registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false));
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED);
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClient) {
+        if (!world.isClientSide) {
             
             var entity = world.getBlockEntity(pos);
             if (!(entity instanceof MultiblockMachineController machineEntity)) {
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             
-            var wasAssembled = state.get(ASSEMBLED);
+            var wasAssembled = state.getValue(ASSEMBLED);
             
             if (!wasAssembled) {
                 var corePlaced = machineEntity.tryPlaceNextCore(player);
-                if (corePlaced) return ActionResult.SUCCESS;
+                if (corePlaced) return InteractionResult.SUCCESS;
             }
             
             var isAssembled = machineEntity.initMultiblock(state);
             if (!isAssembled) {
-                player.sendMessage(Text.translatable("message.oritech.machine.missing_core"));
-                return ActionResult.SUCCESS;
+                player.sendSystemMessage(Component.translatable("message.oritech.machine.missing_core"));
+                return InteractionResult.SUCCESS;
             }
             
-            state = state.with(ASSEMBLED, true);
+            state = state.setValue(ASSEMBLED, true);
         }
         
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
     
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClient() && state.get(ASSEMBLED)) {
+        if (!world.isClientSide() && state.getValue(ASSEMBLED)) {
             
             var entity = world.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
@@ -66,6 +68,6 @@ public abstract class MultiblockFrameInteractionBlock extends FrameInteractionBl
             }
         }
         
-        return super.onBreak(world, pos, state, player);
+        return super.playerWillDestroy(world, pos, state, player);
     }
 }

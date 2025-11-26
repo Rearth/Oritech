@@ -2,7 +2,7 @@
   "type": "oritech:refinery",
   "fluidInput": {
     "amount": 500,
-    "fluid": "oritech:still_naphtha"
+    "fluid": "#c:naphtha"
   },
   "fluidOutputs": [],
   "ingredients": [

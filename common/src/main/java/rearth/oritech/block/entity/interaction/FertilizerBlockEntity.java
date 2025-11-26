@@ -2,19 +2,25 @@ package rearth.oritech.block.entity.interaction;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.minecraft.block.*;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.FarmBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.Vec3;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
@@ -36,7 +42,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     public static final long FLUID_USAGE = (long) (Oritech.CONFIG.fertilizerConfig.liquidPerBlockUsage() * FluidStackHooks.bucketAmount());   // per block, tick usage is this divided by work time
     
     @SyncField(SyncType.GUI_TICK)
-    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty) {
+    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged) {
         
         @Override
         public long insert(FluidStack toInsert, boolean simulate) {
@@ -49,14 +55,14 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     };
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         fluidStorage.writeNbt(nbt, "");
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         fluidStorage.readNbt(nbt, "");
     }
     
@@ -86,20 +92,20 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     @Override
     protected boolean hasWorkAvailable(BlockPos toolPosition) {
         
-        var targetPosition = toolPosition.down();
-        var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
+        var targetPosition = toolPosition.below();
+        var targetState = Objects.requireNonNull(level).getBlockState(targetPosition);
         
         // skip not grown crops
         if (canFertilizeFarmland(toolPosition)) return true;
-        return targetState.getBlock() instanceof Fertilizable fertilizable && fertilizable.isFertilizable(world, targetPosition, targetState);
+        return targetState.getBlock() instanceof BonemealableBlock fertilizable && fertilizable.isValidBonemealTarget(level, targetPosition, targetState);
     }
     
     private boolean canFertilizeFarmland(BlockPos toolPosition) {
-        var targetPosition = toolPosition.down(2);
-        var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
+        var targetPosition = toolPosition.below(2);
+        var targetState = Objects.requireNonNull(level).getBlockState(targetPosition);
         
-        if (targetState.getBlock() instanceof FarmlandBlock) {
-            var moistureStatus = targetState.get(Properties.MOISTURE);
+        if (targetState.getBlock() instanceof FarmBlock) {
+            var moistureStatus = targetState.getValue(BlockStateProperties.MOISTURE);
             return moistureStatus != 7;
         }
         
@@ -109,52 +115,52 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     @Override
     public void finishBlockWork(BlockPos processed) {
         
-        var inventoryStack = inventory.getStack(0);
-        var fertilizerInInventory = !inventoryStack.isEmpty() && inventoryStack.isIn(TagContent.CONVENTIONAL_FERTILIZER);
+        var inventoryStack = inventory.getItem(0);
+        var fertilizerInInventory = !inventoryStack.isEmpty() && inventoryStack.is(TagContent.CONVENTIONAL_FERTILIZER);
         var mineralSlurried = fluidStorage.getFluid().equals(FluidContent.STILL_MINERAL_SLURRY.get());
         var fertilizerStrength = fertilizerInInventory ? 2 : 1;
         fertilizerStrength *= mineralSlurried ? 2 : 1;
         var fertilized = false;
         
-        var targetPosition = processed.down();
-        var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
+        var targetPosition = processed.below();
+        var targetState = Objects.requireNonNull(level).getBlockState(targetPosition);
         
         if (!hasWorkAvailable(processed)) return;
 
         if (targetState.getBlock() instanceof CropBlock cropBlock) {
             var newAge = cropBlock.getAge(targetState) + fertilizerStrength;
             newAge = Math.min(newAge, cropBlock.getMaxAge());
-            world.setBlockState(targetPosition, cropBlock.withAge(newAge), Block.NOTIFY_LISTENERS);
+            level.setBlock(targetPosition, cropBlock.getStateForAge(newAge), Block.UPDATE_CLIENTS);
             fertilized = true;
-        } else if (targetState.getBlock() instanceof Fertilizable fertilizable) {
-            fertilizable.grow((ServerWorld) world, world.random, targetPosition, targetState);
+        } else if (targetState.getBlock() instanceof BonemealableBlock fertilizable) {
+            fertilizable.performBonemeal((ServerLevel) level, level.random, targetPosition, targetState);
             if (fertilizerInInventory) {
-                fertilizable.grow((ServerWorld) world, world.random, targetPosition, targetState);
+                fertilizable.performBonemeal((ServerLevel) level, level.random, targetPosition, targetState);
                 fertilized = true;
             }
         }
 
-        var farmlandPosition = processed.down(2);
-        var farmlandState = world.getBlockState(farmlandPosition);
+        var farmlandPosition = processed.below(2);
+        var farmlandState = level.getBlockState(farmlandPosition);
 
-        if (farmlandState.getBlock() instanceof FarmlandBlock && farmlandState.get(Properties.MOISTURE) != 7) {
-            world.setBlockState(farmlandPosition, farmlandState.with(Properties.MOISTURE, 7));
+        if (farmlandState.getBlock() instanceof FarmBlock && farmlandState.getValue(BlockStateProperties.MOISTURE) != 7) {
+            level.setBlockAndUpdate(farmlandPosition, farmlandState.setValue(BlockStateProperties.MOISTURE, 7));
         }
         
         if (fertilized) {
             if (fertilizerInInventory) {
-                inventoryStack.decrement(1);
-                inventory.setStack(0, inventoryStack);
+                inventoryStack.shrink(1);
+                inventory.setItem(0, inventoryStack);
             }
             super.finishBlockWork(processed);
-            ParticleContent.FERTILIZER_EFFECT.spawn(world, Vec3d.of(targetPosition), fertilizerStrength * 3 + 2);
-            world.playSound(null, targetPosition, SoundEvents.ITEM_BONE_MEAL_USE, SoundCategory.BLOCKS, 1f, 1f);
+            ParticleContent.FERTILIZER_EFFECT.spawn(level, Vec3.atLowerCornerOf(targetPosition), fertilizerStrength * 3 + 2);
+            level.playSound(null, targetPosition, SoundEvents.BONE_MEAL_USE, SoundSource.BLOCKS, 1f, 1f);
         }
     }
     
     @Override
     public BlockState getMachineHead() {
-        return BlockContent.BLOCK_FERTILIZER_HEAD.getDefaultState();
+        return BlockContent.BLOCK_FERTILIZER_HEAD.defaultBlockState();
     }
     
     @Override
@@ -169,7 +175,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
         super.doProgress(moving);
         if (!moving && hasWorkAvailable(getCurrentTarget())) {
             fluidStorage.setAmount(fluidStorage.getAmount() - getWaterUsagePerTick());
-            ParticleContent.WATERING_EFFECT.spawn(world, Vec3d.of(getCurrentTarget().down()), 2);
+            ParticleContent.WATERING_EFFECT.spawn(level, Vec3.atLowerCornerOf(getCurrentTarget().below()), 2);
         }
     }
     
@@ -194,7 +200,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.DESTROYER_SCREEN;
     }
     

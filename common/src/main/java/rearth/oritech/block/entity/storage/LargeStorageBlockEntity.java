@@ -1,14 +1,15 @@
 package rearth.oritech.block.entity.storage;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.ExpandableMultiblockEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBlockEntity implements RedstoneAddonBlockEntity.RedstoneControllable {
     
@@ -64,10 +65,10 @@ public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBl
     public int getComparatorSlotAmount(int slot) {
         if (inventory.heldStacks.size() <= slot) return 0;
         
-        var stack = inventory.getStack(slot);
+        var stack = inventory.getItem(slot);
         if (stack.isEmpty()) return 0;
         
-        return (int) (1 + (stack.getCount() / (float) stack.getMaxCount()) * 15);
+        return (int) (1 + (stack.getCount() / (float) stack.getMaxStackSize()) * 15);
     }
     
     @Override

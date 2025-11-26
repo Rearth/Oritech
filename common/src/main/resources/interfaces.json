@@ -1,0 +1,8 @@
+{
+  "net/minecraft/world/entity/EntityType": [
+    "dev/architectury/extensions/injected/InjectedEntityTypeExtension"
+  ],
+  "net/minecraft/world/item/BucketItem": [
+    "dev/architectury/extensions/injected/InjectedBucketItemExtension"
+  ]
+}

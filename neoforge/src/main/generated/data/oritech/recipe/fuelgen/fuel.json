@@ -2,7 +2,7 @@
   "type": "oritech:fuel_generator",
   "fluidInput": {
     "amount": 100,
-    "fluid": "#oritech:turbofuel"
+    "fluid": "#c:turbofuel"
   },
   "fluidOutputs": [],
   "ingredients": [],

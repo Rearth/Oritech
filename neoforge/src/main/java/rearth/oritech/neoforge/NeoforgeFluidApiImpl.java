@@ -1,25 +1,29 @@
 package rearth.oritech.neoforge;
 
+import com.google.auto.service.AutoService;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.item.BlockItemApi;
 import rearth.oritech.util.StackContext;
 import rearth.oritech.api.fluid.BlockFluidApi;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi.FluidStorage;
 import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.api.fluid.containers.DelegatingFluidStorage;
 import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
@@ -28,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+@AutoService({BlockFluidApi.class, ItemFluidApi.class})
 public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     
     private final List<Supplier<BlockEntityType<?>>> registeredBlockEntities = new ArrayList<>();
@@ -76,23 +81,24 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     }
     
     @Override
-    public FluidApi.FluidStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public FluidApi.FluidStorage find(Level world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         var candidate = world.getCapability(Capabilities.FluidHandler.BLOCK, pos, state, entity, direction);
         return switch (candidate) {
             case null -> null;
             case SingleSlotContainerStorageWrapper wrapper -> wrapper.container;
-            case MultiSlotStorageWrapper wrapper -> wrapper.container.getStorageForDirection(direction);
+            case MultiSlotStorageWrapper wrapper -> wrapper.container;
             default -> new NeoforgeStorageWrapper(candidate);
         };
     }
     
     @Override
-    public FluidApi.FluidStorage find(World world, BlockPos pos, @Nullable Direction direction) {
+    public FluidApi.FluidStorage find(Level world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
     }
     
     @Override
     public FluidApi.FluidStorage find(StackContext stack) {
+        if (stack.getValue().getCount() > 1) return null;
         var candidate = stack.getValue().getCapability(Capabilities.FluidHandler.ITEM);
         if (candidate == null) return null;
         if (candidate instanceof SingleSlotContainerStorageWrapper wrapper && wrapper.container instanceof SimpleItemFluidStorage itemContainer) return itemContainer.withCallback(ignored -> stack.sync());

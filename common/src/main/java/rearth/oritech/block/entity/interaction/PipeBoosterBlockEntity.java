@@ -1,14 +1,14 @@
 package rearth.oritech.block.entity.interaction;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -27,7 +27,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTicker<PipeBoosterBlockEntity>, GeoBlockEntity, EnergyApi.BlockProvider {
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 4000, 0, this::markDirty);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 4000, 0, this::setChanged);
     
     public static final RawAnimation EXPAND = RawAnimation.begin().thenPlayAndHold("expand");
     public static final RawAnimation RETRACT = RawAnimation.begin().thenPlayAndHold("retract");
@@ -44,12 +44,12 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, PipeBoosterBlockEntity blockEntity) {
-        if (world.isClient) return;
+    public void tick(Level world, BlockPos pos, BlockState state, PipeBoosterBlockEntity blockEntity) {
+        if (world.isClientSide) return;
         
-        if (!setPipe && (world.getTime() & 25) == 0) {
+        if (!setPipe && (world.getGameTime() & 25) == 0) {
             // try find pipe entity behind
-            var targetPos = pos.add(Geometry.getBackward(state.get(Properties.HORIZONTAL_FACING)));
+            var targetPos = pos.offset(Geometry.getBackward(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
             var candidate = world.getBlockEntity(targetPos);
             if (candidate instanceof GenericPipeInterfaceEntity pipe) {
                 pipe.connectedBooster = pos;
@@ -59,7 +59,7 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
         }
         
         // occasionally set the correct pipe anim state
-        if (world.getTime() % 42 == 0) {
+        if (world.getGameTime() % 42 == 0) {
             if (setPipe) {
                 triggerAnim("machine", "extended");
             } else {
@@ -76,20 +76,20 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
     public void useBoost() {
         if (!canUseBoost()) return;
         energyStorage.amount -= BOOST_ENERGY_COST;
-        this.markDirty();
+        this.setChanged();
         
         triggerAnim("machine", "work");
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         nbt.putLong("energy_stored", energyStorage.amount);
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         energyStorage.amount = nbt.getLong("energy_stored");
     }
     

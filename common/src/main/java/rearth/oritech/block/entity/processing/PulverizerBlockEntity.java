@@ -1,16 +1,5 @@
 package rearth.oritech.block.entity.processing;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ItemStackParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -19,9 +8,20 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     
@@ -32,36 +32,36 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     @Override
     protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
         super.craftItem(activeRecipe, outputInventory, inputInventory);
-        combineSmallDusts(outputInventory, world);
+        combineSmallDusts(outputInventory, level);
     }
     
-    public static void combineSmallDusts(List<ItemStack> outputInventory, World world) {
+    public static void combineSmallDusts(List<ItemStack> outputInventory, Level world) {
         // try compacting
         var smallDustStack = outputInventory.get(1);
         var baseResult = outputInventory.get(0);
-        if (smallDustStack.isEmpty() || smallDustStack.getCount() < 9 || baseResult.getCount() >= baseResult.getMaxCount())
+        if (smallDustStack.isEmpty() || smallDustStack.getCount() < 9 || baseResult.getCount() >= baseResult.getMaxStackSize())
             return;
         
         var recipeInputStacks = new ArrayList<ItemStack>(9);
         for (int i = 0; i < 9; i++) {
             recipeInputStacks.add(i, smallDustStack.copyWithCount(1));
         }
-        var craftingInv = CraftingRecipeInput.create(3, 3, recipeInputStacks);
+        var craftingInv = CraftingInput.of(3, 3, recipeInputStacks);
         
-        var matches = world.getRecipeManager().getAllMatches(RecipeType.CRAFTING, craftingInv, world);
+        var matches = world.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, craftingInv, world);
         
         if (matches.isEmpty()) return;
         
         // gets the result stack of each entry, then filters if the type matches, and then checks if there is a result
         var foundResult = !matches
                              .stream()
-                             .map(elem -> elem.value().getResult(null))
+                             .map(elem -> elem.value().getResultItem(null))
                              .filter(elem -> baseResult.getItem().equals(elem.getItem()))
                              .toList().isEmpty();
         
         if (foundResult) {
-            smallDustStack.decrement(9);
-            baseResult.increment(1);
+            smallDustStack.shrink(9);
+            baseResult.grow(1);
         }
     }
     
@@ -99,7 +99,7 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.PULVERIZER_SCREEN;
     }
     
@@ -112,13 +112,13 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     protected void useEnergy() {
         super.useEnergy();
         
-        if (world.random.nextFloat() > 0.7 && !inventory.getStack(0).isEmpty()) {
-            var effect = new ItemStackParticleEffect(ParticleTypes.ITEM, inventory.getStack(0).copy());
-            var spawnAt = pos.toCenterPos().add(0, 0.3, 0);
-            var offsetX = (world.random.nextFloat() - 0.5) * 0.1;
-            var offsetY = (world.random.nextFloat()) * 0.1;
-            var offsetZ = (world.random.nextFloat() - 0.5) * 0.1;
-            ((ServerWorld) world).spawnParticles(effect, spawnAt.getX(), spawnAt.getY(), spawnAt.getZ(), 3, offsetX, offsetY, offsetZ, 0.08);
+        if (level.random.nextFloat() > 0.7 && !inventory.getItem(0).isEmpty()) {
+            var effect = new ItemParticleOption(ParticleTypes.ITEM, inventory.getItem(0).copy());
+            var spawnAt = worldPosition.getCenter().add(0, 0.3, 0);
+            var offsetX = (level.random.nextFloat() - 0.5) * 0.1;
+            var offsetY = (level.random.nextFloat()) * 0.1;
+            var offsetZ = (level.random.nextFloat() - 0.5) * 0.1;
+            ((ServerLevel) level).sendParticles(effect, spawnAt.x(), spawnAt.y(), spawnAt.z(), 3, offsetX, offsetY, offsetZ, 0.08);
         }
         
         

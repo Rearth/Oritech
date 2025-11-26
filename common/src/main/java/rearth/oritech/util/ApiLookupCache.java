@@ -1,13 +1,13 @@
 package rearth.oritech.util;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * ApiLookupCache is used to cache results from a lookup function (for example,
@@ -21,7 +21,7 @@ public class ApiLookupCache<T> {
     
     @FunctionalInterface
     public interface LookupFunction<T> {
-        T invoke(World world, BlockPos targetPos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction);
+        T invoke(Level world, BlockPos targetPos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction);
     }
     
     private WeakReference<BlockEntity> cachedEntity;
@@ -32,11 +32,11 @@ public class ApiLookupCache<T> {
     
     private final BlockPos targetPos;
     private final Direction direction;
-    private final World world;
+    private final Level world;
     
     private final LookupFunction<T> lookupFunction;
     
-    private ApiLookupCache(BlockEntity cachedEntity, T cachedTarget, BlockPos targetPos, Direction direction, World world, LookupFunction<T> lookupFunction) {
+    private ApiLookupCache(BlockEntity cachedEntity, T cachedTarget, BlockPos targetPos, Direction direction, Level world, LookupFunction<T> lookupFunction) {
         this.cachedEntity = new WeakReference<>(cachedEntity);
         this.cachedTarget = new WeakReference<>(cachedTarget);
         this.targetPos = targetPos;
@@ -47,7 +47,7 @@ public class ApiLookupCache<T> {
         this.lastBlockState = world.getBlockState(targetPos);
     }
     
-    public static <T> ApiLookupCache<T> create(BlockPos targetPos, Direction direction, World world, LookupFunction<T> lookupFunction) {
+    public static <T> ApiLookupCache<T> create(BlockPos targetPos, Direction direction, Level world, LookupFunction<T> lookupFunction) {
         var state = world.getBlockState(targetPos);
         var entity = world.getBlockEntity(targetPos);
         T target = lookupFunction.invoke(world, targetPos, state, entity, direction);

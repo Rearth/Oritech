@@ -1,17 +1,19 @@
 package rearth.oritech.block.blocks.pipes;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -22,7 +24,7 @@ public abstract class AbstractPipeBlock extends Block {
     private static final Boolean USE_ACCURATE_OUTLINES = Oritech.CONFIG.tightCableHitboxes();
     protected VoxelShape[] boundingShapes;
     
-    public AbstractPipeBlock(Settings settings) {
+    public AbstractPipeBlock(Properties settings) {
         super(settings);
         this.boundingShapes = createShapes();
     }
@@ -30,46 +32,51 @@ public abstract class AbstractPipeBlock extends Block {
     protected abstract VoxelShape getShape(BlockState state);
     
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         if (!USE_ACCURATE_OUTLINES)
-            return super.getOutlineShape(state, world, pos, context);
+            return super.getShape(state, world, pos, context);
         return getShape(state);
     }
     
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return getShape(state);
     }
     
     protected abstract VoxelShape[] createShapes();
     
     @Override
-    public abstract void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify);
+    public abstract void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify);
     
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var baseState = super.getPlacementState(ctx);
-        return addConnectionStates(baseState, ctx.getWorld(), ctx.getBlockPos(), true);
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var baseState = addFluidState(super.getStateForPlacement(ctx), ctx.getClickedPos(), ctx.getLevel());
+        return addConnectionStates(baseState, ctx.getLevel(), ctx.getClickedPos(), true);
     }
     
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess worldAccess, BlockPos pos, BlockPos neighborPos) {
-        var world = (World) worldAccess;
-        if (world.isClient) return state;
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor worldAccess, BlockPos pos, BlockPos neighborPos) {
+        var world = (Level) worldAccess;
+        if (world.isClientSide) return state;
         
-        if (neighborState.isOf(Blocks.AIR))
+        if (neighborState.is(Blocks.AIR))
             // remove potential stale machine -> neighboring pipes mapping
             getNetworkData(world).machinePipeNeighbors.remove(neighborPos);
         
         return state;
     }
     
+    public BlockState addFluidState(BlockState state, BlockPos pos, Level level) {
+        if (!state.hasProperty(BlockStateProperties.WATERLOGGED)) return state;
+        return state.setValue(BlockStateProperties.WATERLOGGED, level.getFluidState(pos).is(Fluids.WATER));
+    }
+    
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        super.onStateReplaced(state, world, pos, newState, moved);
+    public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
+        super.onRemove(state, world, pos, newState, moved);
         
-        if (!state.isOf(newState.getBlock()) && !(newState.getBlock() instanceof AbstractPipeBlock)) {
+        if (!state.is(newState.getBlock()) && !(newState.getBlock() instanceof AbstractPipeBlock)) {
             // block was removed/replaced instead of updated
             onBlockRemoved(pos, state, world);
         }
@@ -83,14 +90,14 @@ public abstract class AbstractPipeBlock extends Block {
      * @param pos             The target position
      * @param neighborToggled Whether the neighbor was toggled
      */
-    public abstract void updateNeighbors(World world, BlockPos pos, boolean neighborToggled);
+    public abstract void updateNeighbors(Level world, BlockPos pos, boolean neighborToggled);
     
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        if (!player.isCreative() && !world.isClient) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+        if (!player.isCreative() && !world.isClientSide) {
             onBlockRemoved(pos, state, world);
         }
-        return super.onBreak(world, pos, state, player);
+        return super.playerWillDestroy(world, pos, state, player);
     }
     
     /**
@@ -102,7 +109,7 @@ public abstract class AbstractPipeBlock extends Block {
      * @param createConnection Whether to create a connection
      * @return The updated block-state
      */
-    public abstract BlockState addConnectionStates(BlockState state, World world, BlockPos pos, boolean createConnection);
+    public abstract BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, boolean createConnection);
     
     /**
      * Adds the connection states to the pipe block-state.
@@ -115,7 +122,7 @@ public abstract class AbstractPipeBlock extends Block {
      * @param createDirection The direction to create a connection in
      * @return The updated block-state
      */
-    public abstract BlockState addConnectionStates(BlockState state, World world, BlockPos pos, Direction createDirection);
+    public abstract BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, Direction createDirection);
     
     /**
      * Adds the straight property to the pipe block-state.
@@ -135,7 +142,7 @@ public abstract class AbstractPipeBlock extends Block {
      * @param createConnection Whether to create a connection
      * @return Boolean whether the pipe should connect
      */
-    public abstract boolean shouldConnect(BlockState current, Direction direction, BlockPos currentPos, World world, boolean createConnection);
+    public abstract boolean shouldConnect(BlockState current, Direction direction, BlockPos currentPos, Level world, boolean createConnection);
     
     /**
      * Check if the pipe is connecting in a specific direction.
@@ -145,7 +152,7 @@ public abstract class AbstractPipeBlock extends Block {
      * @param createConnection Whether to create a connection
      * @return Boolean whether the pipe is connecting
      */
-    public abstract boolean isConnectingInDirection(BlockState current, Direction direction, BlockPos currentPos, World world, boolean createConnection);
+    public abstract boolean isConnectingInDirection(BlockState current, Direction direction, BlockPos currentPos, Level world, boolean createConnection);
     
     /**
      * Check if the pipe node has a neighboring machine.
@@ -155,7 +162,7 @@ public abstract class AbstractPipeBlock extends Block {
      * @param pos   The target pipe position
      * @return Boolean whether a machine is connected
      */
-    public boolean hasNeighboringMachine(BlockState state, World world, BlockPos pos, boolean createConnection) {
+    public boolean hasNeighboringMachine(BlockState state, Level world, BlockPos pos, boolean createConnection) {
         var lookup = apiValidationFunction();
         return (isConnectingInDirection(state, Direction.NORTH, pos, world, createConnection) && hasMachineInDirection(Direction.NORTH, world, pos, lookup))
                  || (isConnectingInDirection(state, Direction.EAST, pos, world, createConnection) && hasMachineInDirection(Direction.EAST, world, pos, lookup))
@@ -174,8 +181,8 @@ public abstract class AbstractPipeBlock extends Block {
      * @param lookup    The lookup function {@link AbstractPipeBlock#apiValidationFunction()}
      * @return Boolean whether a machine is connected
      */
-    public boolean hasMachineInDirection(Direction direction, World world, BlockPos ownPos, TriFunction<World, BlockPos, Direction, Boolean> lookup) {
-        var neighborPos = ownPos.add(direction.getVector());
+    public boolean hasMachineInDirection(Direction direction, Level world, BlockPos ownPos, TriFunction<Level, BlockPos, Direction, Boolean> lookup) {
+        var neighborPos = ownPos.offset(direction.getNormal());
         var neighborState = world.getBlockState(neighborPos);
         return !(neighborState.getBlock() instanceof GenericPipeBlock) && lookup.apply(world, neighborPos, direction.getOpposite());
     }
@@ -189,7 +196,7 @@ public abstract class AbstractPipeBlock extends Block {
      * @param pos       The target pipe position
      * @return Boolean whether the target is a valid connection target
      */
-    public boolean isValidConnectionTarget(Block target, World world, Direction direction, BlockPos pos) {
+    public boolean isValidConnectionTarget(Block target, Level world, Direction direction, BlockPos pos) {
         var lookupFunction = apiValidationFunction();
         return connectToOwnBlockType(target) || (lookupFunction.apply(world, pos, direction) && isCompatibleTarget(target));
     }
@@ -203,7 +210,7 @@ public abstract class AbstractPipeBlock extends Block {
      * @param pos       The target pipe position
      * @return Boolean whether the target is a valid interface target
      */
-    public boolean isValidInterfaceTarget(Block target, World world, Direction direction, BlockPos pos) {
+    public boolean isValidInterfaceTarget(Block target, Level world, Direction direction, BlockPos pos) {
         var lookupFunction = apiValidationFunction();
         return (lookupFunction.apply(world, pos, direction) && isCompatibleTarget(target));
     }
@@ -223,7 +230,7 @@ public abstract class AbstractPipeBlock extends Block {
      *
      * @return The validation function for the pipe block
      */
-    public abstract TriFunction<World, BlockPos, Direction, Boolean> apiValidationFunction();
+    public abstract TriFunction<Level, BlockPos, Direction, Boolean> apiValidationFunction();
     
     public abstract BlockState getConnectionBlock();
     
@@ -233,7 +240,7 @@ public abstract class AbstractPipeBlock extends Block {
     
     public abstract boolean connectToOwnBlockType(Block block);
     
-    public abstract GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world);
+    public abstract GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level world);
     
-    protected abstract void onBlockRemoved(BlockPos pos, BlockState oldState, World world);
+    protected abstract void onBlockRemoved(BlockPos pos, BlockState oldState, Level world);
 }

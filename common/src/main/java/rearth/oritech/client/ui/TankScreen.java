@@ -1,19 +1,20 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.Positioning;
 import io.wispforest.owo.ui.core.Sizing;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 import rearth.oritech.Oritech;
 
 public class TankScreen extends BasicMachineScreen<BasicMachineScreenHandler> {
     
-    public static final Identifier TANK_ARROWS = Oritech.id("textures/gui/modular/tank_arrows.png");
+    public static final ResourceLocation TANK_ARROWS = Oritech.id("textures/gui/modular/tank_arrows.png");
     
-    public TankScreen(BasicMachineScreenHandler handler, PlayerInventory inventory, Text title) {
+    public TankScreen(BasicMachineScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
     

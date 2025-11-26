@@ -1,71 +1,73 @@
 package rearth.oritech.block.blocks.storage;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateManager;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.storage.LargeStorageBlockEntity;
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
+
 public class LargeStorageBlock extends SmallStorageBlock {
     
-    public LargeStorageBlock(Settings settings) {
-        super(settings.luminance(value -> 2));
-        setDefaultState(getDefaultState().with(ASSEMBLED, false));
+    public LargeStorageBlock(Properties settings) {
+        super(settings.lightLevel(value -> 2));
+        registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false));
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED);
     }
     
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new LargeStorageBlockEntity(pos, state);
     }
     
     @Override
-    public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
-        return Objects.requireNonNull(super.getPlacementState(ctx)).with(TARGET_DIR, ctx.getHorizontalPlayerFacing().getOpposite());
+    public @Nullable BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(TARGET_DIR, ctx.getHorizontalDirection().getOpposite());
     }
     
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
         return new ItemStack(this);
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClient) {
+        if (!world.isClientSide) {
             
             var entity = world.getBlockEntity(pos);
             if (!(entity instanceof MultiblockMachineController machineEntity)) {
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             
-            var wasAssembled = state.get(ASSEMBLED);
+            var wasAssembled = state.getValue(ASSEMBLED);
             
             if (!wasAssembled) {
                 var corePlaced = machineEntity.tryPlaceNextCore(player);
-                if (corePlaced) return ActionResult.SUCCESS;
+                if (corePlaced) return InteractionResult.SUCCESS;
             }
             
             var isAssembled = machineEntity.initMultiblock(state);
@@ -73,23 +75,23 @@ public class LargeStorageBlock extends SmallStorageBlock {
             // first time created
             if (isAssembled && !wasAssembled) {
                 // NetworkContent.MACHINE_CHANNEL.serverHandle(machineEntity).send(new NetworkContent.MachineSetupEventPacket(pos));
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             
             if (!isAssembled) {
-                player.sendMessage(Text.translatable("message.oritech.machine.missing_core"));
-                return ActionResult.SUCCESS;
+                player.sendSystemMessage(Component.translatable("message.oritech.machine.missing_core"));
+                return InteractionResult.SUCCESS;
             }
             
         }
         
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
     
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClient() && state.get(ASSEMBLED)) {
+        if (!world.isClientSide() && state.getValue(ASSEMBLED)) {
             
             var entity = world.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
@@ -101,15 +103,15 @@ public class LargeStorageBlock extends SmallStorageBlock {
                 for (var heldStack : stacks) {
                     if (!heldStack.isEmpty()) {
                         var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
-                        world.spawnEntity(itemEntity);
+                        world.addFreshEntity(itemEntity);
                     }
                 }
                 
                 storageBlock.inventory.heldStacks.clear();
-                storageBlock.inventory.markDirty();
+                storageBlock.inventory.setChanged();
             }
         }
         
-        return super.onBreak(world, pos, state, player);
+        return super.playerWillDestroy(world, pos, state, player);
     }
 }

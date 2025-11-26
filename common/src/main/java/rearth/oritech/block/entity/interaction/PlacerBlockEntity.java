@@ -1,14 +1,5 @@
 package rearth.oritech.block.entity.interaction;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.AdditionalNetworkingProvider;
 import rearth.oritech.api.networking.SyncType;
@@ -20,6 +11,15 @@ import rearth.oritech.init.BlockEntitiesContent;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements AdditionalNetworkingProvider {
     
@@ -32,11 +32,11 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
         
         var firstBlock = getFirstInInventory();
         if (firstBlock == null) return false;
-        var block = Block.getBlockFromItem(firstBlock.getItem());
+        var block = Block.byItem(firstBlock.getItem());
         if (block == null) return false;
         
-        var targetPosition = toolPosition.down();
-        return Objects.requireNonNull(world).getBlockState(targetPosition).getBlock().equals(Blocks.AIR) && block.getDefaultState().canPlaceAt(world, targetPosition);
+        var targetPosition = toolPosition.below();
+        return Objects.requireNonNull(level).getBlockState(targetPosition).getBlock().equals(Blocks.AIR) && block.defaultBlockState().canSurvive(level, targetPosition);
     }
     
     @Override
@@ -44,14 +44,14 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
         
         var firstBlock = getFirstInInventory();
         if (firstBlock == null) return;
-        var block = Block.getBlockFromItem(firstBlock.getItem());
+        var block = Block.byItem(firstBlock.getItem());
         if (block == null) return;
         
-        var targetPosition = processed.down();
-        if (Objects.requireNonNull(world).getBlockState(targetPosition).getBlock().equals(Blocks.AIR) && block.getDefaultState().canPlaceAt(world, targetPosition)) {
-            world.setBlockState(targetPosition, block.getDefaultState());
-            firstBlock.decrement(1);
-            world.playSound(null, targetPosition, block.getDefaultState().getSoundGroup().getPlaceSound(), SoundCategory.BLOCKS, 1f, 1f);
+        var targetPosition = processed.below();
+        if (Objects.requireNonNull(level).getBlockState(targetPosition).getBlock().equals(Blocks.AIR) && block.defaultBlockState().canSurvive(level, targetPosition)) {
+            level.setBlockAndUpdate(targetPosition, block.defaultBlockState());
+            firstBlock.shrink(1);
+            level.playSound(null, targetPosition, block.defaultBlockState().getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1f, 1f);
             super.finishBlockWork(processed);
         }
     }
@@ -73,7 +73,7 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
     
     @Override
     public BlockState getMachineHead() {
-        return BlockContent.BLOCK_PLACER_HEAD.getDefaultState();
+        return BlockContent.BLOCK_PLACER_HEAD.defaultBlockState();
     }
     
     @Override
@@ -116,7 +116,7 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.PLACER_SCREEN;
     }
     

@@ -1,40 +1,42 @@
 package rearth.oritech.item.tools;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.component.type.AttributeModifierSlot;
-import net.minecraft.component.type.AttributeModifiersComponent;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageTypes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.MaceItem;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.item.tools.harvesting.ChainsawItem;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.TooltipHelper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.MaceItem;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     
@@ -43,72 +45,72 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     
     public static final Map<Long, Runnable> PENDING_LIGHTNING_HITS = new HashMap<>();
     
-    public ElectricMaceItem(Settings settings) {
+    public ElectricMaceItem(Properties settings) {
         super(settings);
     }
     
-    public static AttributeModifiersComponent createAttributeModifiers() {
-        return AttributeModifiersComponent
+    public static ItemAttributeModifiers createAttributes() {
+        return ItemAttributeModifiers
                  .builder()
-                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, new EntityAttributeModifier(BASE_ATTACK_DAMAGE_MODIFIER_ID, BASE_ATTACK_DAMAGE, EntityAttributeModifier.Operation.ADD_VALUE), AttributeModifierSlot.MAINHAND)
-                 .add(EntityAttributes.GENERIC_ATTACK_SPEED, new EntityAttributeModifier(BASE_ATTACK_SPEED_MODIFIER_ID, -3.4F, EntityAttributeModifier.Operation.ADD_VALUE), AttributeModifierSlot.MAINHAND)
-                 .add(EntityAttributes.GENERIC_SAFE_FALL_DISTANCE, new EntityAttributeModifier(Oritech.id("mace_fall_protection"), 10, EntityAttributeModifier.Operation.ADD_VALUE), AttributeModifierSlot.MAINHAND)
-                 .add(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE, new EntityAttributeModifier(Oritech.id("mace_reach"), 3, EntityAttributeModifier.Operation.ADD_VALUE), AttributeModifierSlot.MAINHAND)
+                 .add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, BASE_ATTACK_DAMAGE, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
+                 .add(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, -3.4F, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
+                 .add(Attributes.SAFE_FALL_DISTANCE, new AttributeModifier(Oritech.id("mace_fall_protection"), 10, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
+                 .add(Attributes.ENTITY_INTERACTION_RANGE, new AttributeModifier(Oritech.id("mace_reach"), 3, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
                  .build();
     }
     
     @Override
-    public void postDamageEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+    public void postHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         
         var bonus = 0f;
         
         var usedEnergy = tryUseEnergy(stack, RF_USAGE, null);
-        if (usedEnergy && shouldDealAdditionalDamage(attacker)) {
-            attacker.getWorld().playSound(null, target.getBlockPos(), SoundContent.ELECTRIC_SHOCK, SoundCategory.PLAYERS);
-            attacker.onLanding();
-            bonus = getBonusAttackDamage(target, BASE_ATTACK_DAMAGE, new DamageSource(attacker.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.LIGHTNING_BOLT), attacker));
+        if (usedEnergy && canSmashAttack(attacker)) {
+            attacker.level().playSound(null, target.blockPosition(), SoundContent.ELECTRIC_SHOCK, SoundSource.PLAYERS);
+            attacker.resetFallDistance();
+            bonus = getAttackDamageBonus(target, BASE_ATTACK_DAMAGE, new DamageSource(attacker.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), attacker));
         }
         
         
-        if (attacker instanceof PlayerEntity player && attacker.getWorld() instanceof ServerWorld serverWorld) {
-            if (player.getItemCooldownManager().isCoolingDown(this))
+        if (attacker instanceof Player player && attacker.level() instanceof ServerLevel serverWorld) {
+            if (player.getCooldowns().isOnCooldown(this))
                 return;
             
-            player.getItemCooldownManager().set(this, 40);
+            player.getCooldowns().addCooldown(this, 40);
             createLightningAttack(serverWorld, player, target, stack, (int) (BASE_ATTACK_DAMAGE / 2f + bonus / 2f));
         }
     }
     
-    private void createLightningAttack(ServerWorld world, PlayerEntity attacker, LivingEntity target, ItemStack stack, int damage) {
+    private void createLightningAttack(ServerLevel world, Player attacker, LivingEntity target, ItemStack stack, int damage) {
         
         var usedEnergy = tryUseEnergy(stack, RF_USAGE * Oritech.CONFIG.electricMace.lightningCostMultiplier(), null);
-        if (usedEnergy && attacker.getWorld() instanceof ServerWorld serverWorld) {
+        if (usedEnergy && attacker.level() instanceof ServerLevel serverWorld) {
             
-            var playerPos = attacker.getEyePos();
-            var targetPos = target.getEyePos();
+            var playerPos = attacker.getEyePosition();
+            var targetPos = target.getEyePosition();
             var offset = targetPos.subtract(playerPos);
-            var up = new Vec3d(0, 1, 0);
-            var cross = offset.crossProduct(up).normalize();
-            var pos = targetPos.add(cross.multiply(14)).addRandom(serverWorld.random, 3).add(0, 7, 0);
+            var up = new Vec3(0, 1, 0);
+            var cross = offset.cross(up).normalize();
+            var pos = targetPos.add(cross.scale(14)).offsetRandom(serverWorld.random, 3).add(0, 7, 0);
             
-            createLightningBolt(serverWorld, pos, target.getEyePos().addRandom(serverWorld.random, 0.1f), 10, 0.8f, 4, ParticleTypes.ENCHANTED_HIT, 0.35f, 2, 0);
+            createLightningBolt(serverWorld, pos, target.getEyePosition().offsetRandom(serverWorld.random, 0.1f), 10, 0.8f, 4, ParticleTypes.ENCHANTED_HIT, 0.35f, 2, 0);
             
             for (int i = 1; i <= 5; i++) {
-                final var ownPos = targetPos.add(cross.rotateY(i * 90).multiply(14)).addRandom(serverWorld.random, 5).add(0, 7, 0);
-                PENDING_LIGHTNING_HITS.put(serverWorld.getTime() + 10 * i, () -> {
-                    createLightningBolt(serverWorld, ownPos, target.getEyePos().addRandom(serverWorld.random, 0.1f), 10, 0.8f, 4, ParticleTypes.ENCHANTED_HIT, 0.35f, 2, 0);
+                final var ownPos = targetPos.add(cross.yRot(i * 90).scale(14)).offsetRandom(serverWorld.random, 5).add(0, 7, 0);
+                PENDING_LIGHTNING_HITS.put(serverWorld.getGameTime() + 10 * i, () -> {
+                    createLightningBolt(serverWorld, ownPos, target.getEyePosition().offsetRandom(serverWorld.random, 0.1f), 10, 0.8f, 4, ParticleTypes.ENCHANTED_HIT, 0.35f, 2, 0);
                     target.hurtTime = 0;
-                    target.damage(new DamageSource(serverWorld.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.LIGHTNING_BOLT), attacker), damage);
+                    target.hurt(new DamageSource(serverWorld.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), attacker), damage);
                 });
             }
         }
     }
     
-    public static void processLightningEvents(World world) {
+    public static void processLightningEvents(Level world) {
         var toRemove = new ArrayList<Long>();
         for (var entry : PENDING_LIGHTNING_HITS.entrySet()) {
             var key = entry.getKey();
-            if (world.getTime() > key) {
+            if (world.getGameTime() > key) {
                 var event = entry.getValue();
                 event.run();
                 toRemove.add(key);
@@ -119,11 +121,11 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     }
     
     @Override
-    public float getBonusAttackDamage(Entity target, float baseAttackDamage, DamageSource damageSource) {
+    public float getAttackDamageBonus(Entity target, float baseAttackDamage, DamageSource damageSource) {
         
-        var attacker = damageSource.getSource();
+        var attacker = damageSource.getDirectEntity();
         if (attacker instanceof LivingEntity livingEntity) {
-            if (!shouldDealAdditionalDamage(livingEntity)) {
+            if (!canSmashAttack(livingEntity)) {
                 return 0.0F;
             } else {
                 float fallDist = livingEntity.fallDistance;
@@ -136,9 +138,9 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
                     damage = BASE_ATTACK_DAMAGE * 6 + fallDist - 8.0F;
                 }
                 
-                var world = livingEntity.getWorld();
-                if (world instanceof ServerWorld serverWorld) {
-                    return damage + EnchantmentHelper.getSmashDamagePerFallenBlock(serverWorld, livingEntity.getWeaponStack(), target, damageSource, 2.0F) * fallDist;
+                var world = livingEntity.level();
+                if (world instanceof ServerLevel serverWorld) {
+                    return damage + EnchantmentHelper.modifyFallBasedDamage(serverWorld, livingEntity.getWeaponItem(), target, damageSource, 2.0F) * fallDist;
                 } else {
                     return damage;
                 }
@@ -149,22 +151,22 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        var text = Text.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
-        tooltip.add(text.formatted(Formatting.GOLD));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
+        tooltip.add(text.withStyle(ChatFormatting.GOLD));
         
         var showExtra = Screen.hasControlDown();
         
         if (showExtra) {
-            tooltip.add(Text.translatable("tooltip.oritech.electric_mace").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
-            tooltip.add(Text.translatable("tooltip.oritech.electric_mace.1").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
+            tooltip.add(Component.translatable("tooltip.oritech.electric_mace").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            tooltip.add(Component.translatable("tooltip.oritech.electric_mace.1").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         } else {
-            tooltip.add(Text.translatable("tooltip.oritech.item_extra_info").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
+            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
     }
     
     @Override
-    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+    public boolean isValidRepairItem(ItemStack stack, ItemStack ingredient) {
         return false;
     }
     
@@ -174,17 +176,17 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     }
     
     @Override
-    public int getItemBarStep(ItemStack stack) {
+    public int getBarWidth(ItemStack stack) {
         return Math.round((getStoredEnergy(stack) * 100f / this.getEnergyCapacity(stack)) * ChainsawItem.BAR_STEP_COUNT) / 100;
     }
     
     @Override
-    public boolean isItemBarVisible(ItemStack stack) {
+    public boolean isBarVisible(ItemStack stack) {
         return true;
     }
     
     @Override
-    public int getItemBarColor(ItemStack stack) {
+    public int getBarColor(ItemStack stack) {
         return 0xff7007;
     }
     
@@ -199,11 +201,11 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     }
     
     // this overrides the fabric specific extensions
-    public boolean allowComponentsUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
+    public boolean allowComponentsUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
         return false;
     }
     
-    public boolean allowContinuingBlockBreaking(PlayerEntity player, ItemStack oldStack, ItemStack newStack) {
+    public boolean allowContinuingBlockBreaking(Player player, ItemStack oldStack, ItemStack newStack) {
         return true;
     }
     
@@ -230,9 +232,9 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
      * @param maxBranchDepth     Maximum recursion depth for branches.
      * @param currentBranchDepth Current depth (used internally for recursion).
      */
-    public static void createLightningBolt(ServerWorld level, Vec3d startPos, Vec3d endPos,
+    public static void createLightningBolt(ServerLevel level, Vec3 startPos, Vec3 endPos,
                                            int mainSegments, double jitterAmount,
-                                           double particlesPerMeter, ParticleEffect particleEffect,
+                                           double particlesPerMeter, ParticleOptions particleEffect,
                                            float branchChance, int maxBranchDepth, int currentBranchDepth) {
         var random = level.getRandom();
         var direction = endPos.subtract(startPos);
@@ -240,23 +242,23 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
         
         if (totalDistance < 0.1) { // Too short to draw
             // Optional: just spawn a particle at the point or do nothing
-            level.spawnParticles(particleEffect, startPos.x, startPos.y, startPos.z, 5, 0.1, 0.1, 0.1, 0.05);
+            level.sendParticles(particleEffect, startPos.x, startPos.y, startPos.z, 5, 0.1, 0.1, 0.1, 0.05);
             return;
         }
         
-        var segmentVector = direction.normalize().multiply(totalDistance / mainSegments);
+        var segmentVector = direction.normalize().scale(totalDistance / mainSegments);
         var previousPoint = startPos;
         
         // Sound for the main bolt (only if not a branch or first branch)
         if (currentBranchDepth == 0) {
-            level.playSound(null, endPos.x, endPos.y, endPos.z, SoundContent.ELECTRIC_SHOCK, SoundCategory.PLAYERS, 0.8f, 0.5f + level.random.nextFloat() * 0.8f);
+            level.playSound(null, endPos.x, endPos.y, endPos.z, SoundContent.ELECTRIC_SHOCK, SoundSource.PLAYERS, 0.8f, 0.5f + level.random.nextFloat() * 0.8f);
         }
         
         
         for (int i = 0; i < mainSegments; i++) {
-            Vec3d currentTargetPoint;
+            Vec3 currentTargetPoint;
             if (i < mainSegments - 1) {
-                currentTargetPoint = startPos.add(segmentVector.multiply(i + 1));
+                currentTargetPoint = startPos.add(segmentVector.scale(i + 1));
                 // Add jitter
                 currentTargetPoint = currentTargetPoint.add(
                   (random.nextDouble() - 0.5) * 2 * jitterAmount,
@@ -272,7 +274,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
             
             // Branching logic
             if (currentBranchDepth < maxBranchDepth && random.nextFloat() < branchChance && i < mainSegments - 1) { // Don't branch from the very last segment point
-                var branchEndOffset = new Vec3d(
+                var branchEndOffset = new Vec3(
                   (random.nextDouble() - 0.5) * totalDistance * 0.3, // Branch length relative to main bolt
                   (random.nextDouble() - 0.5) * totalDistance * 0.3,
                   (random.nextDouble() - 0.5) * totalDistance * 0.3
@@ -288,7 +290,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
         }
     }
     
-    private static void spawnParticlesAlongSegment(ServerWorld level, Vec3d p1, Vec3d p2, double particlesPerMeter, ParticleEffect particleEffect) {
+    private static void spawnParticlesAlongSegment(ServerLevel level, Vec3 p1, Vec3 p2, double particlesPerMeter, ParticleOptions particleEffect) {
         var segment = p2.subtract(p1);
         var length = segment.length();
         if (length < 0.01) return; // Avoid division by zero or tiny segments
@@ -298,8 +300,8 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
         
         for (int i = 0; i < numParticles; i++) {
             double progress = (double) i / (double) numParticles;
-            var particlePos = p1.add(unit.multiply(length * progress));
-            level.spawnParticles(particleEffect, particlePos.x, particlePos.y, particlePos.z,
+            var particlePos = p1.add(unit.scale(length * progress));
+            level.sendParticles(particleEffect, particlePos.x, particlePos.y, particlePos.z,
               1, 0, 0, 0, 0.0D); // count, dx, dy, dz, speed
         }
     }

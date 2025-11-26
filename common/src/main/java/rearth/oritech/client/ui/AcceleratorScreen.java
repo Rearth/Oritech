@@ -9,25 +9,27 @@ import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Positioning;
 import io.wispforest.owo.ui.core.Sizing;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
+import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity.LastEventPacket;
 import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
 
 public class AcceleratorScreen extends BasicMachineScreen<AcceleratorScreenHandler> {
     
-    public static final Identifier PARTICLE_OVERLAY = Oritech.id("textures/gui/modular/particle_background_arrow.png");
+    public static final ResourceLocation PARTICLE_OVERLAY = Oritech.id("textures/gui/modular/particle_background_arrow.png");
     
     private LabelComponent titleLabel;
     private LabelComponent speedLabel;
     private LabelComponent statusLabel;
     private ItemComponent activeParticleRenderer;
     
-    public AcceleratorScreen(AcceleratorScreenHandler handler, PlayerInventory inventory, Text title) {
+    public AcceleratorScreen(AcceleratorScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
     
@@ -41,8 +43,8 @@ public class AcceleratorScreen extends BasicMachineScreen<AcceleratorScreenHandl
         super.fillOverlay(overlay);
         
         var shownItem = ItemStack.EMPTY;
-        if (handler.accelerator.lastEvent.activeParticle() != ItemStack.EMPTY)
-            shownItem = handler.accelerator.lastEvent.activeParticle();
+        if (menu.accelerator.lastEvent.activeParticle() != ItemStack.EMPTY)
+            shownItem = menu.accelerator.lastEvent.activeParticle();
         
         activeParticleRenderer = Components.item(shownItem);
         overlay.child(activeParticleRenderer.positioning(Positioning.absolute(7, 34)));
@@ -51,13 +53,13 @@ public class AcceleratorScreen extends BasicMachineScreen<AcceleratorScreenHandl
         particleOverlay.zIndex(-1);
         overlay.child(particleOverlay.positioning(Positioning.absolute(3, 27)));
         
-        titleLabel = Components.label(Text.literal("Waiting...").formatted(Formatting.BLACK, Formatting.BOLD));
+        titleLabel = Components.label(Component.literal("Waiting...").withStyle(ChatFormatting.BLACK, ChatFormatting.BOLD));
         titleLabel.horizontalTextAlignment(HorizontalAlignment.CENTER).horizontalSizing(Sizing.fill()).verticalSizing(Sizing.fixed(10)).margins(Insets.of(1));
         
-        speedLabel = Components.label(Text.literal("Speed: 0 blocks/s").formatted(Formatting.BLACK));
+        speedLabel = Components.label(Component.literal("Speed: 0 blocks/s").withStyle(ChatFormatting.BLACK));
         speedLabel.margins(Insets.of(2));
         
-        statusLabel = Components.label(Text.literal("Insert item to accelerate\nAnd some more details").formatted(Formatting.BLACK));
+        statusLabel = Components.label(Component.literal("Insert item to accelerate\nAnd some more details").withStyle(ChatFormatting.BLACK));
         statusLabel.horizontalTextAlignment(HorizontalAlignment.RIGHT).margins(Insets.of(2));
         
         var labelContainer = Containers.verticalFlow(Sizing.fixed(130), Sizing.fixed(100));
@@ -71,65 +73,65 @@ public class AcceleratorScreen extends BasicMachineScreen<AcceleratorScreenHandl
     
     private void updateItemParticle() {
         var shownItem = ItemStack.EMPTY;
-        if (handler.accelerator.lastEvent.lastEvent().equals(AcceleratorControllerBlockEntity.ParticleEvent.ACCELERATING) && handler.accelerator.lastEvent.activeParticle() != ItemStack.EMPTY)
-            shownItem = handler.accelerator.lastEvent.activeParticle();
+        if (menu.accelerator.lastEvent.lastEvent().equals(AcceleratorControllerBlockEntity.ParticleEvent.ACCELERATING) && menu.accelerator.lastEvent.activeParticle() != ItemStack.EMPTY)
+            shownItem = menu.accelerator.lastEvent.activeParticle();
         
         activeParticleRenderer.stack(shownItem);
     }
     
     @Override
-    protected void handledScreenTick() {
-        var event = handler.accelerator.lastEvent;
+    protected void containerTick() {
+        var event = menu.accelerator.lastEvent;
         titleLabel.horizontalTextAlignment(HorizontalAlignment.RIGHT);
         
         switch (event.lastEvent()) {
             case IDLE -> {
-                var text = Text.translatable("text.oritech.accelerator.ui.waiting.0");
-                var time = handler.blockEntity.getWorld().getTime();
-                if ((time / 20) % 3 == 1) text = Text.translatable("text.oritech.accelerator.ui.waiting.1");
-                if ((time / 20) % 3 == 2) text = Text.translatable("text.oritech.accelerator.ui.waiting.2");
-                text = text.formatted(Formatting.BOLD, Formatting.BLACK);
+                var text = Component.translatable("text.oritech.accelerator.ui.waiting.0");
+                var time = menu.blockEntity.getLevel().getGameTime();
+                if ((time / 20) % 3 == 1) text = Component.translatable("text.oritech.accelerator.ui.waiting.1");
+                if ((time / 20) % 3 == 2) text = Component.translatable("text.oritech.accelerator.ui.waiting.2");
+                text = text.withStyle(ChatFormatting.BOLD, ChatFormatting.BLACK);
                 titleLabel.horizontalTextAlignment(HorizontalAlignment.LEFT).text(text);
-                speedLabel.text(Text.translatable("text.oritech.accelerator.ui.waiting").formatted(Formatting.BLACK));
-                statusLabel.text(Text.literal(" "));
+                speedLabel.text(Component.translatable("text.oritech.accelerator.ui.waiting").withStyle(ChatFormatting.BLACK));
+                statusLabel.text(Component.literal(" "));
             }
             case ERROR -> {
-                titleLabel.text(Text.translatable("text.oritech.accelerator.ui.error").formatted(Formatting.BLACK, Formatting.BOLD));
-                speedLabel.text(Text.translatable("text.oritech.accelerator.ui.nogate").formatted(Formatting.BLACK));
-                statusLabel.text(Text.translatable("text.oritech.accelerator.ui.nogate.more").formatted(Formatting.DARK_GRAY));
+                titleLabel.text(Component.translatable("text.oritech.accelerator.ui.error").withStyle(ChatFormatting.BLACK, ChatFormatting.BOLD));
+                speedLabel.text(Component.translatable("text.oritech.accelerator.ui.nogate").withStyle(ChatFormatting.BLACK));
+                statusLabel.text(Component.translatable("text.oritech.accelerator.ui.nogate.more").withStyle(ChatFormatting.DARK_GRAY));
             }
             case ACCELERATING -> {
                 var speed = event.lastEventSpeed();
                 var gateDist = format(AcceleratorParticleLogic.getMaxGateDist(speed), 1);
                 var curveDist = format(AcceleratorParticleLogic.getRequiredBendDist(speed), 1);
-                titleLabel.text(Text.translatable("text.oritech.accelerator.ui.accelerating").formatted(Formatting.BLACK, Formatting.BOLD));
-                speedLabel.text(Text.translatable("text.oritech.accelerator.ui.accelerating.speed", format(event.lastEventSpeed(), 0)).formatted(Formatting.BLACK));
-                statusLabel.text(Text.translatable("text.oritech.accelerator.ui.accelerating.stats", gateDist, curveDist).formatted(Formatting.DARK_GRAY));
+                titleLabel.text(Component.translatable("text.oritech.accelerator.ui.accelerating").withStyle(ChatFormatting.BLACK, ChatFormatting.BOLD));
+                speedLabel.text(Component.translatable("text.oritech.accelerator.ui.accelerating.speed", format(event.lastEventSpeed(), 0)).withStyle(ChatFormatting.BLACK));
+                statusLabel.text(Component.translatable("text.oritech.accelerator.ui.accelerating.stats", gateDist, curveDist).withStyle(ChatFormatting.DARK_GRAY));
             }
             case COLLIDED -> {
-                titleLabel.text(Text.translatable("text.oritech.accelerator.ui.collision").formatted(Formatting.BLACK, Formatting.BOLD));
-                speedLabel.text(Text.translatable("text.oritech.accelerator.ui.collision.stats", format(event.lastEventSpeed(), 1)).formatted(Formatting.BLACK));
-                statusLabel.text(Text.translatable("text.oritech.accelerator.ui.collision.position", event.lastEventPosition().toShortString()).formatted(Formatting.DARK_GRAY));
+                titleLabel.text(Component.translatable("text.oritech.accelerator.ui.collision").withStyle(ChatFormatting.BLACK, ChatFormatting.BOLD));
+                speedLabel.text(Component.translatable("text.oritech.accelerator.ui.collision.stats", format(event.lastEventSpeed(), 1)).withStyle(ChatFormatting.BLACK));
+                statusLabel.text(Component.translatable("text.oritech.accelerator.ui.collision.position", event.lastEventPosition().toShortString()).withStyle(ChatFormatting.DARK_GRAY));
             }
             case EXITED_FAST -> {
                 var speed = event.lastEventSpeed();
                 var curveDist = format(AcceleratorParticleLogic.getRequiredBendDist(speed), 1);
-                titleLabel.text(Text.translatable("text.oritech.accelerator.ui.exited").formatted(Formatting.BLACK, Formatting.BOLD));
-                speedLabel.text(Text.translatable("text.oritech.accelerator.ui.accelerating.speed", format(event.lastEventSpeed(), 0)).formatted(Formatting.BLACK));
-                statusLabel.text(Text.translatable("text.oritech.accelerator.ui.exited.stats", event.lastEventPosition().toShortString(), curveDist, format(event.minBendDist(), 1)).formatted(Formatting.DARK_GRAY));
+                titleLabel.text(Component.translatable("text.oritech.accelerator.ui.exited").withStyle(ChatFormatting.BLACK, ChatFormatting.BOLD));
+                speedLabel.text(Component.translatable("text.oritech.accelerator.ui.accelerating.speed", format(event.lastEventSpeed(), 0)).withStyle(ChatFormatting.BLACK));
+                statusLabel.text(Component.translatable("text.oritech.accelerator.ui.exited.stats", event.lastEventPosition().toShortString(), curveDist, format(event.minBendDist(), 1)).withStyle(ChatFormatting.DARK_GRAY));
             }
             case EXITED_NO_GATE -> {
                 var speed = event.lastEventSpeed();
                 var gateDist = format(AcceleratorParticleLogic.getMaxGateDist(speed), 1);
-                titleLabel.text(Text.translatable("text.oritech.accelerator.ui.exited").formatted(Formatting.BLACK, Formatting.BOLD));
-                speedLabel.text(Text.translatable("text.oritech.accelerator.ui.accelerating.speed", format(event.lastEventSpeed(), 0)).formatted(Formatting.BLACK));
-                statusLabel.text(Text.translatable("text.oritech.accelerator.ui.exited.nogate", event.lastEventPosition().toShortString(), gateDist).formatted(Formatting.DARK_GRAY));
+                titleLabel.text(Component.translatable("text.oritech.accelerator.ui.exited").withStyle(ChatFormatting.BLACK, ChatFormatting.BOLD));
+                speedLabel.text(Component.translatable("text.oritech.accelerator.ui.accelerating.speed", format(event.lastEventSpeed(), 0)).withStyle(ChatFormatting.BLACK));
+                statusLabel.text(Component.translatable("text.oritech.accelerator.ui.exited.nogate", event.lastEventPosition().toShortString(), gateDist).withStyle(ChatFormatting.DARK_GRAY));
             }
         }
         
         updateItemParticle();
         
-        super.handledScreenTick();
+        super.containerTick();
     }
     
     private static String format(float number, int decimal) {

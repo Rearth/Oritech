@@ -1,35 +1,6 @@
 package rearth.oritech.block.entity.augmenter;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
@@ -42,6 +13,7 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
+import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
@@ -57,6 +29,34 @@ import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class AugmentApplicationEntity extends NetworkedBlockEntity implements MultiblockMachineController, GeoBlockEntity,
                                                                        ExtendedMenuProvider, ItemApi.BlockProvider, EnergyApi.BlockProvider, ScreenProvider {
@@ -73,17 +73,17 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    public final Set<Identifier> researchedAugments = new HashSet<>();
+    public final Set<ResourceLocation> researchedAugments = new HashSet<>();
     // working state
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public final HashMap<Integer, ResearchState> availableStations = new HashMap<>();
     
     public boolean screenInvOverride = false;
     
-    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(5, this::markDirty);
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(5, this::setChanged);
     
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
-    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, maxEnergyStored, maxEnergyStored, this::markDirty);
+    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, maxEnergyStored, maxEnergyStored, this::setChanged);
     
     
     public AugmentApplicationEntity(BlockPos pos, BlockState state) {
@@ -91,7 +91,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         screenInvOverride = false;
         
         // update research stations
@@ -99,35 +99,35 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             var station = availableStations.getOrDefault(i, null);
             if (station == null) continue;
             if (station.working) {
-                var isDone = world.getTime() > station.researchStartedAt + station.workTime;
+                var isDone = world.getGameTime() > station.researchStartedAt + station.workTime;
                 if (!isDone) continue;
                 
                 researchedAugments.add(station.selectedResearch);
                 station.working = false;
-                this.markDirty();
+                this.setChanged();
             }
         }
     }
     
     // persist researched augments, inventory, energy
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
+        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putLong("rf", energyStorage.getAmount());
         addMultiblockToNbt(nbt);
         
         
-        var list = new NbtList();
+        var list = new ListTag();
         for (var augment : researchedAugments) {
-            list.add(NbtString.of(augment.getPath()));
+            list.add(StringTag.valueOf(augment.getPath()));
         }
         
         // also put in pending researches to avoid having to separately store them
         for (var station : availableStations.values()) {
             if (station == null) continue;
             if (station.working) {
-                list.add(NbtString.of(station.selectedResearch.getPath()));
+                list.add(StringTag.valueOf(station.selectedResearch.getPath()));
             }
         }
         
@@ -136,21 +136,21 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
+        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         energyStorage.setAmount(nbt.getLong("rf"));
         loadMultiblockNbtData(nbt);
         
-        var parsedList = nbt.getList("researched", NbtElement.STRING_TYPE);
+        var parsedList = nbt.getList("researched", Tag.TAG_STRING);
         for (var element : parsedList) {
-            var id = Oritech.id(element.asString());
+            var id = Oritech.id(element.getAsString());
             researchedAugments.add(id);
         }
         
     }
     
-    public void researchAugment(Identifier augment, boolean creative, PlayerEntity player) {
+    public void researchAugment(ResourceLocation augment, boolean creative, Player player) {
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -162,7 +162,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             return;
         }
         
-        var recipe = (AugmentDataRecipe) world.getRecipeManager().get(augment).get().value();
+        var recipe = (AugmentDataRecipe) level.getRecipeManager().byKey(augment).get().value();
         
         var extracted = energyStorage.extract(recipe.getRfCost(), false);
         
@@ -175,16 +175,16 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
                 if (type.test(stack)) {
                     var takeAmount = Math.min(stack.getCount(), missingCount);
                     missingCount -= takeAmount;
-                    stack.decrement(takeAmount);
+                    stack.shrink(takeAmount);
                     
                     if (missingCount <= 0) break;
                 }
             }
-            for (var stack : player.getInventory().main) {
+            for (var stack : player.getInventory().items) {
                 if (type.test(stack)) {
                     var takeAmount = Math.min(stack.getCount(), missingCount);
                     missingCount -= takeAmount;
-                    stack.decrement(takeAmount);
+                    stack.shrink(takeAmount);
                     
                     if (missingCount <= 0) break;
                 }
@@ -198,20 +198,20 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             if (station.working) continue;
             
             
-            if (!Registries.BLOCK.getId(station.type).equals(recipe.getRequiredStation())) continue;
+            if (!BuiltInRegistries.BLOCK.getKey(station.type).equals(recipe.getRequiredStation())) continue;
             
             station.selectedResearch = augment;
             station.working = true;
-            station.researchStartedAt = world.getTime();
+            station.researchStartedAt = level.getGameTime();
             station.workTime = creative ? 5 : recipe.getTime();
             
             break;
             
         }
-        this.markDirty();
+        this.setChanged();
     }
     
-    public void installAugmentToPlayer(Identifier augment, PlayerEntity player) {
+    public void installAugmentToPlayer(ResourceLocation augment, Player player) {
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -223,7 +223,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             return;
         }
         
-        var recipe = (AugmentDataRecipe) world.getRecipeManager().get(augment).get().value();
+        var recipe = (AugmentDataRecipe) level.getRecipeManager().byKey(augment).get().value();
         
         // remove available resources
         for (var wantedInput : recipe.getApplyCost()) {
@@ -234,17 +234,17 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
                 if (type.test(stack)) {
                     var takeAmount = Math.min(stack.getCount(), missingCount);
                     missingCount -= takeAmount;
-                    stack.decrement(takeAmount);
+                    stack.shrink(takeAmount);
                     
                     if (missingCount <= 0) break;
                 }
             }
             
-            for (var stack : player.getInventory().main) {
+            for (var stack : player.getInventory().items) {
                 if (type.test(stack)) {
                     var takeAmount = Math.min(stack.getCount(), missingCount);
                     missingCount -= takeAmount;
-                    stack.decrement(takeAmount);
+                    stack.shrink(takeAmount);
                     
                     if (missingCount <= 0) break;
                 }
@@ -253,12 +253,12 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         
         var augmentInstance = PlayerAugments.allAugments.get(augment);
         augmentInstance.installToPlayer(player);
-        this.markDirty();
+        this.setChanged();
         
-        player.getWorld().playSound(null, player.getBlockPos(), SoundContent.SHORT_SERVO, SoundCategory.BLOCKS);
+        player.level().playSound(null, player.blockPosition(), SoundContent.SHORT_SERVO, SoundSource.BLOCKS);
     }
     
-    public void removeAugmentFromPlayer(Identifier augment, PlayerEntity player) {
+    public void removeAugmentFromPlayer(ResourceLocation augment, Player player) {
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -267,10 +267,10 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         
         var augmentInstance = PlayerAugments.allAugments.get(augment);
         augmentInstance.removeFromPlayer(player);
-        this.markDirty();
+        this.setChanged();
     }
     
-    public static void toggleAugmentForPlayer(Identifier augment, PlayerEntity player) {
+    public static void toggleAugmentForPlayer(ResourceLocation augment, Player player) {
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -287,7 +287,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         augmentInstance.toggle(player);
     }
     
-    public boolean hasPlayerAugment(Identifier augment, PlayerEntity player) {
+    public boolean hasPlayerAugment(ResourceLocation augment, Player player) {
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -299,7 +299,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         
     }
     
-    public void loadResearchesFromPlayer(PlayerEntity player) {
+    public void loadResearchesFromPlayer(Player player) {
         
         for (var augmentId : PlayerAugments.allAugments.keySet()) {
             var augment = PlayerAugments.allAugments.get(augmentId);
@@ -312,8 +312,8 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         }
     }
     
-    public void loadAvailableStations(PlayerEntity player) {
-        var facing = this.getCachedState().get(Properties.HORIZONTAL_FACING);
+    public void loadAvailableStations(Player player) {
+        var facing = this.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
         
         var targetPositions = List.of(
           new BlockPos(0, 0, -2),
@@ -323,17 +323,17 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         
         for (int i = 0; i < targetPositions.size(); i++) {
             var candidatePosOffset = targetPositions.get(i);
-            var candidatePos = new BlockPos(Geometry.offsetToWorldPosition(facing, candidatePosOffset, pos));
+            var candidatePos = new BlockPos(Geometry.offsetToWorldPosition(facing, candidatePosOffset, worldPosition));
             
-            var candidateState = world.getBlockState(candidatePos);
-            if (!(candidateState.getBlock() instanceof AugmentResearchStationBlock) || !candidateState.get(MultiblockMachine.ASSEMBLED)) {
+            var candidateState = level.getBlockState(candidatePos);
+            if (!(candidateState.getBlock() instanceof AugmentResearchStationBlock) || !candidateState.getValue(MultiblockMachine.ASSEMBLED)) {
                 continue;
             }
             
             if (availableStations.containsKey(i) && availableStations.get(i) != null && availableStations.get(i).type.equals(candidateState.getBlock()))
                 continue;
             
-            var newState = new ResearchState(candidateState.getBlock(), false, Identifier.of(""), -1, -1);
+            var newState = new ResearchState(candidateState.getBlock(), false, ResourceLocation.parse(""), -1, -1);
             
             availableStations.put(i, newState);
         }
@@ -358,18 +358,18 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     
     @Override
     public Direction getFacingForMultiblock() {
-        var state = getCachedState();
-        return state.get(Properties.HORIZONTAL_FACING).getOpposite();
+        var state = getBlockState();
+        return state.getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite();
     }
     
     @Override
     public BlockPos getPosForMultiblock() {
-        return pos;
+        return worldPosition;
     }
     
     @Override
-    public World getWorldForMultiblock() {
-        return world;
+    public Level getWorldForMultiblock() {
+        return level;
     }
     
     @Override
@@ -414,7 +414,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
                 }
             }
             
-            if (this.getCachedState().get(MultiblockMachine.ASSEMBLED)) {
+            if (this.getBlockState().getValue(MultiblockMachine.ASSEMBLED)) {
                 return state.setAndContinue(MachineBlockEntity.IDLE);
             } else {
                 return state.setAndContinue(MachineBlockEntity.PACKAGED);
@@ -428,20 +428,20 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
-        buf.writeBlockPos(pos);
+    public void saveExtraData(FriendlyByteBuf buf) {
+        buf.writeBlockPos(worldPosition);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.empty();
+    public Component getDisplayName() {
+        return Component.empty();
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         this.sendUpdate(SyncType.GUI_OPEN);
-        var dist = player.squaredDistanceTo(this.pos.toBottomCenterPos());
+        var dist = player.distanceToSqr(this.worldPosition.getBottomCenter());
         if (dist > 1 || screenInvOverride)
             return new BasicMachineScreenHandler(syncId, playerInventory, this);
         
@@ -495,12 +495,12 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     }
     
     @Override
-    public Inventory getDisplayedInventory() {
+    public Container getDisplayedInventory() {
         return inventory;
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.AUGMENTER_INV_SCREEN;
     }
     
@@ -508,16 +508,16 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         
         public Block type;
         public boolean working;
-        public Identifier selectedResearch;
+        public ResourceLocation selectedResearch;
         public int workTime;
         public long researchStartedAt;
         
-        public static PacketCodec<RegistryByteBuf, ResearchState> PACKET_CODEC = PacketCodec.tuple(
-          Identifier.PACKET_CODEC.xmap(Registries.BLOCK::get, Registries.BLOCK::getId), ResearchState::getType,
-          PacketCodecs.BOOL, ResearchState::getWorking,
-          Identifier.PACKET_CODEC, ResearchState::getSelectedResearch,
-          PacketCodecs.INTEGER, ResearchState::getWorkTime,
-          PacketCodecs.VAR_LONG, ResearchState::getResearchStartedAt,
+        public static StreamCodec<RegistryFriendlyByteBuf, ResearchState> PACKET_CODEC = StreamCodec.composite(
+          ResourceLocation.STREAM_CODEC.map(BuiltInRegistries.BLOCK::get, BuiltInRegistries.BLOCK::getKey), ResearchState::getType,
+          ByteBufCodecs.BOOL, ResearchState::getWorking,
+          ResourceLocation.STREAM_CODEC, ResearchState::getSelectedResearch,
+          ByteBufCodecs.INT, ResearchState::getWorkTime,
+          ByteBufCodecs.VAR_LONG, ResearchState::getResearchStartedAt,
           ResearchState::new
         );
         
@@ -529,7 +529,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             return workTime;
         }
         
-        public Identifier getSelectedResearch() {
+        public ResourceLocation getSelectedResearch() {
             return selectedResearch;
         }
         
@@ -541,7 +541,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             return working;
         }
         
-        public ResearchState(Block type, boolean working, Identifier selectedResearch, int workTime, long researchStartedAt) {
+        public ResearchState(Block type, boolean working, ResourceLocation selectedResearch, int workTime, long researchStartedAt) {
             this.type = type;
             this.working = working;
             this.selectedResearch = selectedResearch;

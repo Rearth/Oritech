@@ -1,14 +1,14 @@
 package rearth.oritech.block.blocks.processing;
 
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 
-public class CentrifugeBlock extends MultiblockMachine implements BlockEntityProvider {
+public class CentrifugeBlock extends MultiblockMachine implements EntityBlock {
     
-    public CentrifugeBlock(Settings settings) {
+    public CentrifugeBlock(Properties settings) {
         super(settings);
     }
     

@@ -20,9 +20,13 @@ public class DelegatingEnergyStorage extends EnergyApi.EnergyStorage {
         this(() -> backingStorage, validPredicate);
     }
     
+    private boolean canUseBackend() {
+        return validPredicate.getAsBoolean() && backingStorage.get() != null;
+    }
+    
     @Override
     public long getCapacity() {
-        if (validPredicate.getAsBoolean()) {
+        if (canUseBackend()) {
             return backingStorage.get().getCapacity();
         }
         return 0;
@@ -30,14 +34,14 @@ public class DelegatingEnergyStorage extends EnergyApi.EnergyStorage {
     
     @Override
     public void update() {
-        if (validPredicate.getAsBoolean()) {
+        if (canUseBackend()) {
             backingStorage.get().update();
         }
     }
     
     @Override
     public long insert(long amount, boolean simulate) {
-        if (validPredicate.getAsBoolean()) {
+        if (canUseBackend()) {
             return backingStorage.get().insert(amount, simulate);
         }
         return 0;
@@ -45,7 +49,7 @@ public class DelegatingEnergyStorage extends EnergyApi.EnergyStorage {
     
     @Override
     public long extract(long amount, boolean simulate) {
-        if (validPredicate.getAsBoolean()) {
+        if (canUseBackend()) {
             return backingStorage.get().extract(amount, simulate);
         }
         return 0;
@@ -53,7 +57,7 @@ public class DelegatingEnergyStorage extends EnergyApi.EnergyStorage {
     
     @Override
     public boolean supportsInsertion() {
-        if (validPredicate.getAsBoolean()) {
+        if (canUseBackend()) {
             return backingStorage.get().supportsInsertion();
         }
         return false;
@@ -61,7 +65,7 @@ public class DelegatingEnergyStorage extends EnergyApi.EnergyStorage {
     
     @Override
     public boolean supportsExtraction() {
-        if (validPredicate.getAsBoolean()) {
+        if (canUseBackend()) {
             return backingStorage.get().supportsExtraction();
         }
         return false;
@@ -69,14 +73,14 @@ public class DelegatingEnergyStorage extends EnergyApi.EnergyStorage {
     
     @Override
     public void setAmount(long amount) {
-        if (validPredicate.getAsBoolean()) {
+        if (canUseBackend()) {
             backingStorage.get().setAmount(amount);
         }
     }
     
     @Override
     public long getAmount() {
-        if (validPredicate.getAsBoolean()) {
+        if (canUseBackend()) {
             return backingStorage.get().getAmount();
         }
         return 0;

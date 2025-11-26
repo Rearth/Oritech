@@ -1,59 +1,64 @@
 package rearth.oritech.client.renderers;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import io.wispforest.owo.ui.core.Color;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.util.ModelIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
+import org.joml.Matrix4f;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 
 public class SmallTankItemRenderer {
     
     private BakedModel tankVisualModel;
-    private final Identifier TANK_VISUAL_MODEL_ID;
+    private final ResourceLocation TANK_VISUAL_MODEL_ID;
     
-    public SmallTankItemRenderer(Identifier tankVisualModelId) {
+    public SmallTankItemRenderer(ResourceLocation tankVisualModelId) {
         TANK_VISUAL_MODEL_ID = tankVisualModelId;
     }
     
     public void loadModels() {
         if (tankVisualModel == null) {
-            this.tankVisualModel = MinecraftClient.getInstance().getBakedModelManager().getModel(new ModelIdentifier(TANK_VISUAL_MODEL_ID, ""));
-            if (this.tankVisualModel == MinecraftClient.getInstance().getBakedModelManager().getMissingModel()) {
+            this.tankVisualModel = Minecraft.getInstance().getModelManager().getModel(new ModelResourceLocation(TANK_VISUAL_MODEL_ID, ""));
+            if (this.tankVisualModel == Minecraft.getInstance().getModelManager().getMissingModel()) {
                 this.tankVisualModel = null; // Ensure it's null if missing
                 Oritech.LOGGER.warn("Unable to load model for portable tank renderer: {}. Model not found.", TANK_VISUAL_MODEL_ID);
             }
         }
     }
     
-    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
         
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(0, 0.25, 0);
         matrices.scale(0.84f, 0.84f, 0.84f);
         
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(0.5, 0.5, 0.5);
         matrices.scale(0.9f, 0.9f, 0.9f);
         
-        if (tankVisualModel == null || tankVisualModel == MinecraftClient.getInstance().getBakedModelManager().getMissingModel()) {
+        if (tankVisualModel == null || tankVisualModel == Minecraft.getInstance().getModelManager().getMissingModel()) {
             loadModels();
         }
         
         // render the original tank model
-        if (this.tankVisualModel != null && this.tankVisualModel != MinecraftClient.getInstance().getBakedModelManager().getMissingModel()) {
-            MinecraftClient.getInstance().getItemRenderer().renderItem(
+        if (this.tankVisualModel != null && this.tankVisualModel != Minecraft.getInstance().getModelManager().getMissingModel()) {
+            Minecraft.getInstance().getItemRenderer().render(
               stack,
-              ModelTransformationMode.NONE,
+              ItemDisplayContext.NONE,
               false,
               matrices,
               vertexConsumers,
@@ -63,11 +68,11 @@ public class SmallTankItemRenderer {
             );
         }
         
-        matrices.pop();
+        matrices.popPose();
         
         var storage = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
         if (storage.isEmpty()) {
-            matrices.pop();
+            matrices.popPose();
             return;
         }
         
@@ -76,18 +81,18 @@ public class SmallTankItemRenderer {
         
         var sprite = FluidStackHooks.getStillTexture(fluid);
         var spriteColor = FluidStackHooks.getColor(fluid);
-        var consumer = vertexConsumers.getBuffer(RenderLayer.getTranslucent());
+        var consumer = vertexConsumers.getBuffer(RenderType.translucent());
         
         var parsedColor = Color.ofArgb(spriteColor);
         var opaqueColor = new Color(parsedColor.red(), parsedColor.green(), parsedColor.blue(), 1f);
         spriteColor = opaqueColor.argb();
         
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(0.126, 0.126, 0.126);
         matrices.scale(0.745f, 0.745f * fill, 0.745f);
         
-        var entry = matrices.peek();
-        var modelMatrix = entry.getPositionMatrix();
+        var entry = matrices.last();
+        var modelMatrix = entry.pose();
         
         // Draw the cube using quads
         for (Direction direction : Direction.values()) {
@@ -95,7 +100,7 @@ public class SmallTankItemRenderer {
             SmallTankRenderer.drawQuad(direction, consumer, modelMatrix, entry, sprite, spriteColor, light, overlay);
         }
         
-        matrices.pop();
-        matrices.pop();
+        matrices.popPose();
+        matrices.popPose();
     }
 }

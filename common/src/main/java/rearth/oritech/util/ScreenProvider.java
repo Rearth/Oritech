@@ -1,21 +1,21 @@
 package rearth.oritech.util;
 
-import net.minecraft.inventory.Inventory;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.Direction;
 import rearth.oritech.Oritech;
 
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
 
 public interface ScreenProvider {
     
-    default List<Pair<Text, Text>> getExtraExtensionLabels() {return List.of();}
+    default List<Tuple<Component, Component>> getExtraExtensionLabels() {return List.of();}
     
     record GuiSlot (int index, int x, int y, boolean output) {
         public GuiSlot (int index, int x, int y) {
@@ -25,7 +25,7 @@ public interface ScreenProvider {
 
     record BarConfiguration(int x, int y, int width, int height) {}
 
-    record ArrowConfiguration(Identifier empty, Identifier full, int x, int y, int width, int height, boolean horizontal) {}
+    record ArrowConfiguration(ResourceLocation empty, ResourceLocation full, int x, int y, int width, int height, boolean horizontal) {}
 
     List<GuiSlot> getGuiSlots();
 
@@ -42,14 +42,14 @@ public interface ScreenProvider {
     float getProgress();
     
     InventoryInputMode getInventoryInputMode();
-    Inventory getDisplayedInventory();
+    Container getDisplayedInventory();
     
-    ScreenHandlerType<?> getScreenHandlerType();
+    MenuType<?> getScreenHandlerType();
     
     default boolean inputOptionsEnabled() {return true;}
     
     default Property<Direction> getBlockFacingProperty() {
-        return Properties.HORIZONTAL_FACING;
+        return BlockStateProperties.HORIZONTAL_FACING;
     }
     
     default boolean showProgress() {

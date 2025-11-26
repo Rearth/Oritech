@@ -2,7 +2,6 @@ package rearth.oritech.api.energy.containers;
 
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.api.networking.SyncType;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

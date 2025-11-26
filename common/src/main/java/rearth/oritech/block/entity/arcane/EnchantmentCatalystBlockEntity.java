@@ -1,28 +1,6 @@
 package rearth.oritech.block.entity.arcane;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
@@ -32,9 +10,11 @@ import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.client.init.ParticleContent.SoulParticleData;
 import rearth.oritech.client.ui.CatalystScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 
+import rearth.oritech.init.TagContent;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.ComparatorOutputProvider;
 import rearth.oritech.util.InventoryInputMode;
@@ -48,6 +28,29 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
   implements ItemApi.BlockProvider, EnergyApi.BlockProvider, ScreenProvider, ComparatorOutputProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedMenuProvider {
@@ -71,7 +74,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     private String lastAnimation = "invalid";
     private int lastComparatorOutput;
     
-    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(2, this::markDirty) {
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(2, this::setChanged) {
         @Override
         public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
             if (slot == 0 && !addedStack.isEmpty() && !addedStack.getItem().equals(Items.ENCHANTED_BOOK)) return 0; // only allow enchanter books in slot 0
@@ -86,9 +89,9 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, EnchantmentCatalystBlockEntity blockEntity) {
+    public void tick(Level world, BlockPos pos, BlockState state, EnchantmentCatalystBlockEntity blockEntity) {
         
-        if (world.isClient) return;
+        if (world.isClientSide) return;
         
         // check if powered, and adjust soul capacity
         if (energyStorage.getAmount() > 0) {
@@ -96,7 +99,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             energyStorage.setAmount(0);
             var newMax = baseSoulCapacity + gainedSoulCapacity;
             adjustMaxSouls(newMax);
-            this.markDirty();
+            this.setChanged();
         } else if (maxSouls > baseSoulCapacity) {
             adjustMaxSouls(baseSoulCapacity);
         }
@@ -105,7 +108,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         if (collectedSouls > maxSouls) {
             unstableTicks++;
             
-            ParticleContent.MELTDOWN_IMMINENT.spawn(world, pos.toCenterPos(), unstableTicks / 4);
+            ParticleContent.MELTDOWN_IMMINENT.spawn(world, pos.getCenter(), unstableTicks / 4);
             
             if (unstableTicks > 60)
                 doExplosion();
@@ -121,11 +124,11 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             networkDirty = true;
             progress++;
             
-            ParticleContent.SOUL_USED.spawn(world, pos.toCenterPos().add(0, 0.3, 0), isHyperEnchanting ? 15 : 3);
+            ParticleContent.SOUL_USED.spawn(world, pos.getCenter().add(0, 0.3, 0), isHyperEnchanting ? 15 : 3);
             
             if (progress >= maxProgress) {
                 enchantInput();
-                ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.toCenterPos(), maxProgress + 10);
+                ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.getCenter(), maxProgress + 10);
                 
                 progress = 0;
                 isHyperEnchanting = false;
@@ -143,13 +146,13 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             var level = calculateComparatorLevel();
             if (level != lastComparatorOutput) {
                 lastComparatorOutput = level;
-                world.updateComparators(pos, state.getBlock());
+                world.updateNeighbourForOutputSignal(pos, state.getBlock());
             }
             
         }
         
         // periodically re-trigger animation updates
-        if (world.getTime() % 60 == 0) {
+        if (world.getGameTime() % 60 == 0) {
             lastAnimation = "invalid";
             updateAnimation();
         }
@@ -161,28 +164,28 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
+        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putInt("souls", collectedSouls);
         nbt.putInt("maxSouls", maxSouls);
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
+        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         collectedSouls = nbt.getInt("souls");
         maxSouls = nbt.getInt("maxSouls");
     }
     
     private void doExplosion() {
         
-        var center = pos.toCenterPos();
+        var center = worldPosition.getCenter();
         var strength = Math.sqrt(collectedSouls - baseSoulCapacity);
         
-        world.createExplosion(null, center.x, center.y, center.z, (int) strength, true, World.ExplosionSourceType.BLOCK);
-        world.removeBlock(pos, false);
+        level.explode(null, center.x, center.y, center.z, (int) strength, true, Level.ExplosionInteraction.BLOCK);
+        level.removeBlock(worldPosition, false);
     }
     
     private void adjustMaxSouls(long target) {
@@ -193,24 +196,25 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         }
         
         this.networkDirty = true;
+        this.setChanged();
     }
     
     private void enchantInput() {
         
-        var bookCandidate = inventory.getStack(0);
-        if (!bookCandidate.getItem().equals(Items.ENCHANTED_BOOK) || !bookCandidate.contains(DataComponentTypes.STORED_ENCHANTMENTS))
+        var bookCandidate = inventory.getItem(0);
+        if (!bookCandidate.getItem().equals(Items.ENCHANTED_BOOK) || !bookCandidate.has(DataComponents.STORED_ENCHANTMENTS))
             return;
         
-        var enchantment = bookCandidate.get(DataComponentTypes.STORED_ENCHANTMENTS).getEnchantments().stream().findFirst().get();
+        var enchantment = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).keySet().stream().findFirst().get();
         
-        var inputStack = inventory.getStack(1);
+        var inputStack = inventory.getItem(1);
         var toolLevel = inputStack.getEnchantments().getLevel(enchantment);
-        inputStack.addEnchantment(enchantment, toolLevel + 1);
+        inputStack.enchant(enchantment, toolLevel + 1);
         
         collectedSouls -= getEnchantmentCost(enchantment.value(), toolLevel + 1, isHyperEnchanting);
         
         if (isHyperEnchanting)
-            inventory.setStack(0, ItemStack.EMPTY);
+            inventory.setItem(0, ItemStack.EMPTY);
         
     }
     
@@ -228,18 +232,18 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     
     // for UI
     public int getDisplayedCost() {
-        if (inventory.getStack(0).isEmpty() || inventory.getStack(1).isEmpty()) return 0;
-        var bookCandidate = inventory.getStack(0);
+        if (inventory.getItem(0).isEmpty() || inventory.getItem(1).isEmpty()) return 0;
+        var bookCandidate = inventory.getItem(0);
         
-        if (bookCandidate.getItem().equals(Items.ENCHANTED_BOOK) && bookCandidate.contains(DataComponentTypes.STORED_ENCHANTMENTS)) {
+        if (bookCandidate.getItem().equals(Items.ENCHANTED_BOOK) && bookCandidate.has(DataComponents.STORED_ENCHANTMENTS)) {
             
-            var enchantment = bookCandidate.get(DataComponentTypes.STORED_ENCHANTMENTS).getEnchantments().stream().findFirst().get();
+            var enchantment = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).keySet().stream().findFirst().get();
             var maxLevel = enchantment.value().getMaxLevel();
-            var bookLevel = bookCandidate.get(DataComponentTypes.STORED_ENCHANTMENTS).getLevel(enchantment);
+            var bookLevel = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).getLevel(enchantment);
             
             if (bookLevel != maxLevel) return 0;
             
-            var inputStack = inventory.getStack(1);
+            var inputStack = inventory.getItem(1);
             var toolLevel = inputStack.getEnchantments().getLevel(enchantment);
             var isHyper = toolLevel >= maxLevel;
             
@@ -251,17 +255,19 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     
     private boolean canProceed() {
         
-        if (inventory.getStack(0).isEmpty() || inventory.getStack(1).isEmpty()) return false;
+        if (inventory.getItem(0).isEmpty() || inventory.getItem(1).isEmpty()) return false;
         
-        var bookCandidate = inventory.getStack(0);
-        if (bookCandidate.getItem().equals(Items.ENCHANTED_BOOK) && bookCandidate.contains(DataComponentTypes.STORED_ENCHANTMENTS)) {
+        var bookCandidate = inventory.getItem(0);
+        if (bookCandidate.getItem().equals(Items.ENCHANTED_BOOK) && bookCandidate.has(DataComponents.STORED_ENCHANTMENTS)) {
             
-            var enchantment = bookCandidate.get(DataComponentTypes.STORED_ENCHANTMENTS).getEnchantments().stream().findFirst().get();
+            var enchantment = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).keySet().stream().findFirst().get();
             var maxLevel = enchantment.value().getMaxLevel();
-            var level = bookCandidate.get(DataComponentTypes.STORED_ENCHANTMENTS).getLevel(enchantment);
+            var level = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).getLevel(enchantment);
+            
+            if (enchantment.is(TagContent.CATALYST_ENCHANTMENT_BLACKLIST)) return false;
             
             // yes this does not check if the item can be enchanted with this enchantment. This is intentional, allowing you to skip the normal limitations
-            var inputStack = inventory.getStack(1);
+            var inputStack = inventory.getItem(1);
             var toolLevel = inputStack.getEnchantments().getLevel(enchantment);
             this.isHyperEnchanting = toolLevel >= maxLevel;
             
@@ -272,15 +278,16 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     @Override
-    public void onSoulIncoming(Vec3d source) {
-        var distance = (float) source.distanceTo(pos.toCenterPos());
+    public void onSoulIncoming(Vec3 source) {
+        var distance = (float) source.distanceTo(worldPosition.getCenter());
         collectedSouls++;
         networkDirty = true;
+        this.setChanged();
         
-        var soulPath = pos.toCenterPos().subtract(source);
+        var soulPath = worldPosition.getCenter().subtract(source);
         var animData = new ParticleContent.SoulParticleData(soulPath, (int) getSoulTravelDuration(distance));
         
-        ParticleContent.WANDERING_SOUL.spawn(world, source.add(0, 0.7f, 0), animData);
+        ParticleContent.WANDERING_SOUL.spawn(level, source.add(0, 0.7f, 0), animData);
     }
     
     @Override
@@ -298,17 +305,17 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     private void updateNetwork() {
-        NetworkManager.sendBlockHandle(this, new CatalystSyncPacket(pos, collectedSouls, progress, isHyperEnchanting, maxSouls));
+        NetworkManager.sendBlockHandle(this, new CatalystSyncPacket(worldPosition, collectedSouls, progress, isHyperEnchanting, maxSouls));
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
-        buf.writeBlockPos(pos);
+    public void saveExtraData(FriendlyByteBuf buf) {
+        buf.writeBlockPos(worldPosition);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.literal("");
+    public Component getDisplayName() {
+        return Component.literal("");
     }
     
     @Override
@@ -318,7 +325,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         updateNetwork();
         return new CatalystScreenHandler(syncId, playerInventory, this);
     }
@@ -396,12 +403,12 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     @Override
-    public Inventory getDisplayedInventory() {
+    public Container getDisplayedInventory() {
         return inventory;
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.CATALYST_SCREEN;
     }
     
@@ -416,7 +423,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         return true;
     }
     
-    public static void receiveUpdatePacket(CatalystSyncPacket packet, World world, DynamicRegistryManager dynamicRegistryManager) {
+    public static void receiveUpdatePacket(CatalystSyncPacket packet, Level world, RegistryAccess dynamicRegistryManager) {
         if (world.getBlockEntity(packet.position) instanceof EnchantmentCatalystBlockEntity catalystBlock) {
             catalystBlock.isHyperEnchanting = packet.isHyperEnchanting();
             catalystBlock.progress = packet.progress();
@@ -425,12 +432,12 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         }
     }
     
-    public record CatalystSyncPacket(BlockPos position, int storedSouls, int progress, boolean isHyperEnchanting, int maxSouls) implements CustomPayload {
+    public record CatalystSyncPacket(BlockPos position, int storedSouls, int progress, boolean isHyperEnchanting, int maxSouls) implements CustomPacketPayload {
         
-        public static final CustomPayload.Id<CatalystSyncPacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("catalyst"));
+        public static final CustomPacketPayload.Type<CatalystSyncPacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("catalyst"));
         
         @Override
-        public Id<? extends CustomPayload> getId() {
+        public Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;
         }
     }

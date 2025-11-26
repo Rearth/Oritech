@@ -2,21 +2,21 @@ package rearth.oritech.block.blocks.addons;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
@@ -24,39 +24,39 @@ import rearth.oritech.util.ComparatorOutputProvider;
 
 public class RedstoneAddonBlock extends MachineAddonBlock {
     
-    public RedstoneAddonBlock(Settings settings, AddonSettings addonSettings) {
+    public RedstoneAddonBlock(Properties settings, AddonSettings addonSettings) {
         super(settings, addonSettings);
-        this.setDefaultState(getDefaultState().with(Properties.POWERED, false));
+        this.registerDefaultState(defaultBlockState().setValue(BlockStateProperties.POWERED, false));
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
-        builder.add(Properties.POWERED);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(BlockStateProperties.POWERED);
     }
     
     @Override
-    public boolean emitsRedstonePower(BlockState state) {
+    public boolean isSignalSource(BlockState state) {
         return true;
     }
     
     @Override
-    protected boolean hasComparatorOutput(BlockState state) {
+    protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
     
     @Override
-    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
         return ((ComparatorOutputProvider) world.getBlockEntity(pos)).getComparatorOutput();
     }
     
     @Override
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
         
-        if (world.isClient) return;
+        if (world.isClientSide) return;
         
-        var isPowered = world.isReceivingRedstonePower(pos);
+        var isPowered = world.hasNeighborSignal(pos);
         
         var addonEntity = (RedstoneAddonBlockEntity) world.getBlockEntity(pos);
         addonEntity.setRedstonePowered(isPowered);
@@ -64,24 +64,24 @@ public class RedstoneAddonBlock extends MachineAddonBlock {
     }
     
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
         
-        var isPowered = world.isReceivingRedstonePower(pos);
-        var poweredState = state.with(Properties.POWERED, isPowered);
+        var isPowered = world.hasNeighborSignal(pos);
+        var poweredState = state.setValue(BlockStateProperties.POWERED, isPowered);
         
-        return super.getStateForNeighborUpdate(poweredState, direction, neighborState, world, pos, neighborPos);
+        return super.updateShape(poweredState, direction, neighborState, world, pos, neighborPos);
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClient) {
+        if (!world.isClientSide) {
             var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
+                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
             
         }
         
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
     
     @Override
@@ -92,7 +92,7 @@ public class RedstoneAddonBlock extends MachineAddonBlock {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

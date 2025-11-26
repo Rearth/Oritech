@@ -2,12 +2,12 @@ package rearth.oritech.init.world;
 
 import dev.architectury.registry.level.biome.BiomeModifications;
 import io.wispforest.owo.serialization.CodecUtils;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.BiomeTags;
-import net.minecraft.world.gen.GenerationStep;
-import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BiomeTags;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.world.features.oil.OilSpringFeature;
 import rearth.oritech.init.world.features.oil.OilSpringFeatureConfig;
@@ -29,31 +29,31 @@ public class FeatureContent implements ArchitecturyRegistryContainer<Feature<?>>
         
         BiomeModifications.addProperties((context, mutable) -> {
             if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
-                mutable.getGenerationProperties().addFeature(GenerationStep.Feature.LAKES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("oil_spring")));
+                mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.LAKES, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("oil_spring")));
             }
         });
         
         BiomeModifications.addProperties((context, mutable) -> {
-            if (context.hasTag(BiomeTags.VILLAGE_DESERT_HAS_STRUCTURE)) {
-                mutable.getGenerationProperties().addFeature(GenerationStep.Feature.LAKES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("oil_spring_desert")));
-            }
-        });
-        
-        BiomeModifications.addProperties((context, mutable) -> {
-            if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
-                mutable.getGenerationProperties().addFeature(GenerationStep.Feature.TOP_LAYER_MODIFICATION, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("resource_node_common")));
+            if (context.hasTag(BiomeTags.HAS_VILLAGE_DESERT)) {
+                mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.LAKES, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("oil_spring_desert")));
             }
         });
         
         BiomeModifications.addProperties((context, mutable) -> {
             if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
-                mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_DECORATION, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("resource_node_rare")));
+                mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.TOP_LAYER_MODIFICATION, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("resource_node_common")));
             }
         });
         
         BiomeModifications.addProperties((context, mutable) -> {
             if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
-                mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_DECORATION, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("resource_node_other")));
+                mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("resource_node_rare")));
+            }
+        });
+        
+        BiomeModifications.addProperties((context, mutable) -> {
+            if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
+                mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("resource_node_other")));
             }
         });
         
@@ -61,33 +61,33 @@ public class FeatureContent implements ArchitecturyRegistryContainer<Feature<?>>
         if (Oritech.CONFIG.generateOresFabricOnly()) {
             BiomeModifications.addProperties((context, mutable) -> {
                 if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
-                    mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_ORES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_nickel")));
+                    mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("ore_nickel")));
                 }
             });
             
             BiomeModifications.addProperties((context, mutable) -> {
                 if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
-                    mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_ORES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("uranium_patch")));
+                    mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("uranium_patch")));
                 }
             });
             
             BiomeModifications.addProperties((context, mutable) -> {
                 if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
-                    mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_ORES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_platinum")));
+                    mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("ore_platinum")));
                 }
             });
             
             BiomeModifications.addProperties((context, mutable) -> {
                 if (context.hasTag(BiomeTags.IS_END)) {
-                    mutable.getGenerationProperties().addFeature(GenerationStep.Feature.UNDERGROUND_ORES, RegistryKey.of(RegistryKeys.PLACED_FEATURE, Oritech.id("ore_platinum_end")));
+                    mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("ore_platinum_end")));
                 }
             });
         }
     }
     
     @Override
-    public RegistryKey<Registry<Feature<?>>> getRegistryType() {
-        return RegistryKeys.FEATURE;
+    public ResourceKey<Registry<Feature<?>>> getRegistryType() {
+        return Registries.FEATURE;
     }
     
     @SuppressWarnings("unchecked")

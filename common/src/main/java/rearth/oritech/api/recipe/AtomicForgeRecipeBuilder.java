@@ -1,6 +1,6 @@
 package rearth.oritech.api.recipe;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class AtomicForgeRecipeBuilder extends OritechRecipeBuilder {
@@ -12,7 +12,7 @@ public class AtomicForgeRecipeBuilder extends OritechRecipeBuilder {
         return new AtomicForgeRecipeBuilder();
     }
 
-    public void validate(Identifier id) throws IllegalStateException {
+    public void validate(ResourceLocation id) throws IllegalStateException {
 
     }
 }

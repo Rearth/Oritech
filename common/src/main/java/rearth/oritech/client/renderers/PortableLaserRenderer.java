@@ -1,12 +1,15 @@
 package rearth.oritech.client.renderers;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import rearth.oritech.Oritech;
@@ -26,17 +29,17 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
     }
     
     @Override
-    public void postRender(MatrixStack matrices, PortableLaserItem animatable, BakedGeoModel model, VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int colour) {
+    public void postRender(PoseStack matrices, PortableLaserItem animatable, BakedGeoModel model, MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int colour) {
         super.postRender(matrices, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, colour);
         
-        var client = MinecraftClient.getInstance();
+        var client = Minecraft.getInstance();
         var player = client.player;
-        var heldStack = client.player.getMainHandStack();
-        var world = client.world;
+        var heldStack = client.player.getMainHandItem();
+        var world = client.level;
         
-        if (isReRender || !this.renderPerspective.isFirstPerson()) return;
+        if (isReRender || !this.renderPerspective.firstPerson()) return;
         
-        var singleShotAge = world.getTime() - PortableLaserItem.lastSingleShot;
+        var singleShotAge = world.getGameTime() - PortableLaserItem.lastSingleShot;
         
         if (!OritechClient.laserActive && singleShotAge > 10) return;
         
@@ -45,50 +48,50 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         
         // at this point we know a laser is held and fired
         
-        var startPos = player.getEyePos();
-        var lookVec = player.getRotationVec(0F);
-        var endPos = startPos.add(lookVec.multiply(128));
+        var startPos = player.getEyePosition();
+        var lookVec = player.getViewVector(0F);
+        var endPos = startPos.add(lookVec.scale(128));
         
         var hit = PortableLaserItem.getPlayerTargetRay(player);
         if (hit != null && hit.getType().equals(HitResult.Type.MISS))
-            endPos = hit.getPos();
+            endPos = hit.getLocation();
         
         var dist = (float) endPos.distanceTo(startPos);
         
-        matrices.push();
+        matrices.pushPose();
         
         var lineConsumer = bufferSource.getBuffer(LaserArmRenderer.CUSTOM_LINES);
-        RenderSystem.lineWidth((float) (3 + Math.sin((world.getTime() + partialTick) * 1.1f) * 1));
+        RenderSystem.lineWidth((float) (3 + Math.sin((world.getGameTime() + partialTick) * 1.1f) * 1));
         
         var startOffset = new Vector3f(0, 0.05f, 0);
         var endOffset = new Vector3f(0, 0, -dist);
-        var cross = endPos.subtract(startPos).normalize().crossProduct(new Vec3d(0, 1, 0));
+        var cross = endPos.subtract(startPos).normalize().cross(new Vec3(0, 1, 0));
         
         
-        lineConsumer.vertex(matrices.peek().getPositionMatrix(), startOffset.x, startOffset.y, startOffset.z)
-          .color(138, 242, 223, 255)
-          .light(packedLight)
-          .overlay(packedOverlay)
-          .normal(0, 1, 0);
-        lineConsumer.vertex(matrices.peek().getPositionMatrix(), endOffset.x, endOffset.y, endOffset.z)
-          .color(19, 91, 80, 255)
-          .light(packedLight)
-          .overlay(packedOverlay)
-          .normal(1, 0, 0);
+        lineConsumer.addVertex(matrices.last().pose(), startOffset.x, startOffset.y, startOffset.z)
+          .setColor(138, 242, 223, 255)
+          .setLight(packedLight)
+          .setOverlay(packedOverlay)
+          .setNormal(0, 1, 0);
+        lineConsumer.addVertex(matrices.last().pose(), endOffset.x, endOffset.y, endOffset.z)
+          .setColor(19, 91, 80, 255)
+          .setLight(packedLight)
+          .setOverlay(packedOverlay)
+          .setNormal(1, 0, 0);
         
         // render a second one at right angle to first one
-        lineConsumer.vertex(matrices.peek().getPositionMatrix(), startOffset.x, startOffset.y, startOffset.z)
-          .color(138, 242, 223, 255)
-          .light(packedLight)
-          .overlay(packedOverlay)
-          .normal((float) cross.x, (float) cross.y, (float) cross.z);
-        lineConsumer.vertex(matrices.peek().getPositionMatrix(), endOffset.x, endOffset.y, endOffset.z)
-          .color(19, 91, 80, 255)
-          .light(packedLight)
-          .overlay(packedOverlay)
-          .normal((float) cross.x, (float) cross.y, (float) cross.z);
+        lineConsumer.addVertex(matrices.last().pose(), startOffset.x, startOffset.y, startOffset.z)
+          .setColor(138, 242, 223, 255)
+          .setLight(packedLight)
+          .setOverlay(packedOverlay)
+          .setNormal((float) cross.x, (float) cross.y, (float) cross.z);
+        lineConsumer.addVertex(matrices.last().pose(), endOffset.x, endOffset.y, endOffset.z)
+          .setColor(19, 91, 80, 255)
+          .setLight(packedLight)
+          .setOverlay(packedOverlay)
+          .setNormal((float) cross.x, (float) cross.y, (float) cross.z);
         
-        matrices.pop();
+        matrices.popPose();
         
     }
 }

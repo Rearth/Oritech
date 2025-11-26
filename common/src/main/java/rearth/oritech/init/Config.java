@@ -29,6 +29,7 @@ public class Config {
     public AddonConfig addonConfig = new AddonConfig();
     public boolean additiveAddons = true;
     public boolean layeredExtenders = false;
+    public float blockBreakHardnessExponentialFactor = 0.5f;
     
     @SectionHeader("storageBlocks")
     @Nest
@@ -173,7 +174,7 @@ public class Config {
         @Nest
         public BasicEnergyMachineData fuelGeneratorData = new BasicEnergyMachineData(250_000, 0, 256 * 8, 256);
         @Nest
-        public SteamEngineData steamEngineData = new SteamEngineData(100_000, 50_000, 2, 1, false, true);
+        public SteamEngineData steamEngineData = new SteamEngineData(100_000, 50_000, 2, 1, false, true, 8);
         @Nest
         public BasicEnergyMachineData solarGeneratorData = new BasicEnergyMachineData(100_000, 0, 32 * 8, 32);
     }
@@ -217,6 +218,10 @@ public class Config {
         public float ultimateAddonSpeed = 0.25f;
         public float ultimateAddonEfficiency = 1.1f;
         public float chamberAddonEfficiency = 1.5f;
+        public float burstAddonSpeedMultiplier = 8f;
+        public float burstAddonThrottleMultiplier = 1.2f;
+        public int burstAddonTicks = 240;
+        public long addonShrinkerRF = 50_000_000;
     }
     
     public static class CentrifugeConfig {
@@ -262,14 +267,16 @@ public class Config {
         public int steamToRfRatio;  // used for steam engines
         public boolean stopOnEnergyFull;
         public boolean stopOnWaterFull;
+        public float steamBoilerCapacityBuckets;
         
-        public SteamEngineData(long energyCapacity, long maxEnergyExtraction, float rfToSteamRatio, int steamToRfRatio, boolean stopOnEnergyFull, boolean stopOnWaterFull) {
+        public SteamEngineData(long energyCapacity, long maxEnergyExtraction, float rfToSteamRatio, int steamToRfRatio, boolean stopOnEnergyFull, boolean stopOnWaterFull, float steamBoilerCapacityBuckets) {
             this.energyCapacity = energyCapacity;
             this.maxEnergyExtraction = maxEnergyExtraction;
             this.steamToRfRatio = steamToRfRatio;
             this.rfToSteamRatio = rfToSteamRatio;
             this.stopOnEnergyFull = stopOnEnergyFull;
             this.stopOnWaterFull = stopOnWaterFull;
+            this.steamBoilerCapacityBuckets = steamBoilerCapacityBuckets;
         }
     }
     

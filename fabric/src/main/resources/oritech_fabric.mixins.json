@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "rearth.oritech.fabric.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8.5",
+  "client": [
+    "ElytraLayerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "oritech.refmap.json",
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

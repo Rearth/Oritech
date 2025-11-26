@@ -5,20 +5,28 @@ import dev.architectury.event.events.common.BlockEvent;
 import dev.architectury.event.events.common.EntityEvent;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.registry.registries.RegistrySupplier;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.UnbreakableComponent;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.damage.DamageTypes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.Rarity;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PickaxeItem;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.component.Unbreakable;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.init.ItemContent.Groups;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.*;
@@ -30,18 +38,18 @@ import java.lang.reflect.Field;
 
 public class ToolsContent implements ArchitecturyRegistryContainer<Item> {
     
-    protected static final Item.Settings UNBREAKING_SETTINGS = new Item.Settings()
-                                                               .maxCount(1)
-                                                               .maxDamage(0)
-                                                               .component(DataComponentTypes.UNBREAKABLE, new UnbreakableComponent(true));
+    protected static final Item.Properties UNBREAKING_SETTINGS = new Item.Properties()
+                                                               .stacksTo(1)
+                                                               .durability(0)
+                                                               .component(DataComponents.UNBREAKABLE, new Unbreakable(true));
     
-    protected static final Item.Settings ELECTRIC_SETTINGS = UNBREAKING_SETTINGS; //.component(Oritech.ENERGY_CONTENT.componentType(), 0L);
-    protected static final Item.Settings JETPACK_SETTINGS = UNBREAKING_SETTINGS; // .component(ComponentContent.STORED_FLUID.get(), FluidStack.create(FluidContent.STILL_FUEL.get().getStill(), 0)); //.component(Oritech.ENERGY_CONTENT.componentType(), 0L);
+    protected static final Item.Properties ELECTRIC_SETTINGS = UNBREAKING_SETTINGS; //.component(Oritech.ENERGY_CONTENT.componentType(), 0L);
+    protected static final Item.Properties JETPACK_SETTINGS = UNBREAKING_SETTINGS; // .component(ComponentContent.STORED_FLUID.get(), FluidStack.create(FluidContent.STILL_FUEL.get().getStill(), 0)); //.component(Oritech.ENERGY_CONTENT.componentType(), 0L);
     
-    public static final RegistryEntry<ArmorMaterial> EXOSUIT_MATERIAL = ArmorMaterials.IRON;
-    public static final RegistryEntry<ArmorMaterial> JETPACK_MATERIAL = ArmorMaterials.LEATHER;
-    public static final ToolMaterial ELECTRIC_MATERIAL = new ElectricToolMaterial();
-    public static final ToolMaterial PROMETHIUM_MATERIAL = new PromethiumToolMaterial();
+    public static final Holder<ArmorMaterial> EXOSUIT_MATERIAL = ArmorMaterials.IRON;
+    public static final Holder<ArmorMaterial> JETPACK_MATERIAL = ArmorMaterials.LEATHER;
+    public static final Tier ELECTRIC_MATERIAL = new ElectricToolMaterial();
+    public static final Tier PROMETHIUM_MATERIAL = new PromethiumToolMaterial();
     
     public static final Item EXO_HELMET = new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.HELMET, UNBREAKING_SETTINGS);
     public static final Item EXO_CHESTPLATE = new BackstorageExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, ELECTRIC_SETTINGS);
@@ -54,17 +62,17 @@ public class ToolsContent implements ArchitecturyRegistryContainer<Item> {
     public static final Item JETPACK_EXO_ELYTRA = new JetpackExoElytraItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, JETPACK_SETTINGS);
     
     public static final Item PORTABLE_LASER = new PortableLaserItem(UNBREAKING_SETTINGS);
-    public static final Item ELECTRIC_MACE = new ElectricMaceItem(UNBREAKING_SETTINGS.attributeModifiers(ElectricMaceItem.createAttributeModifiers()).rarity(Rarity.EPIC));
+    public static final Item ELECTRIC_MACE = new ElectricMaceItem(UNBREAKING_SETTINGS.attributes(ElectricMaceItem.createAttributes()).rarity(Rarity.EPIC));
     
-    public static final Item CHAINSAW = new ChainsawItem(ELECTRIC_MATERIAL, ELECTRIC_SETTINGS.attributeModifiers(AxeItem.createAttributeModifiers(ELECTRIC_MATERIAL, 5f, -2.4f)));
-    public static final Item HAND_DRILL = new DrillItem(ELECTRIC_MATERIAL, TagContent.DRILL_MINEABLE, ELECTRIC_SETTINGS.attributeModifiers(PickaxeItem.createAttributeModifiers(ELECTRIC_MATERIAL, 1f, -2.4f)));
+    public static final Item CHAINSAW = new ChainsawItem(ELECTRIC_MATERIAL, ELECTRIC_SETTINGS.attributes(AxeItem.createAttributes(ELECTRIC_MATERIAL, 5f, -2.4f)));
+    public static final Item HAND_DRILL = new DrillItem(ELECTRIC_MATERIAL, TagContent.DRILL_MINEABLE, ELECTRIC_SETTINGS.attributes(PickaxeItem.createAttributes(ELECTRIC_MATERIAL, 1f, -2.4f)));
     
-    public static final Item PROMETHIUM_AXE = new PromethiumAxeItem(PROMETHIUM_MATERIAL, UNBREAKING_SETTINGS.attributeModifiers(AxeItem.createAttributeModifiers(PROMETHIUM_MATERIAL, 12f, -2.1f)));
-    public static final Item PROMETHIUM_PICKAXE = new PromethiumPickaxeItem(PROMETHIUM_MATERIAL, TagContent.DRILL_MINEABLE, UNBREAKING_SETTINGS.attributeModifiers(AxeItem.createAttributeModifiers(PROMETHIUM_MATERIAL, 3f, -2.4f)));
+    public static final Item PROMETHIUM_AXE = new PromethiumAxeItem(PROMETHIUM_MATERIAL, UNBREAKING_SETTINGS.attributes(AxeItem.createAttributes(PROMETHIUM_MATERIAL, 12f, -2.1f)));
+    public static final Item PROMETHIUM_PICKAXE = new PromethiumPickaxeItem(PROMETHIUM_MATERIAL, TagContent.DRILL_MINEABLE, UNBREAKING_SETTINGS.attributes(AxeItem.createAttributes(PROMETHIUM_MATERIAL, 3f, -2.4f)));
     
     @Override
-    public RegistryKey<Registry<Item>> getRegistryType() {
-        return RegistryKeys.ITEM;
+    public ResourceKey<Registry<Item>> getRegistryType() {
+        return Registries.ITEM;
     }
     
     @Override
@@ -100,13 +108,13 @@ public class ToolsContent implements ArchitecturyRegistryContainer<Item> {
         
         EntityEvent.LIVING_HURT.register((entity, source, amount) -> {
             
-            if (source.getTypeRegistryEntry().matchesKey(DamageTypes.FALL) && entity instanceof PlayerEntity player) {
-                var boots = player.getEquippedStack(EquipmentSlot.FEET);
+            if (source.typeHolder().is(DamageTypes.FALL) && entity instanceof Player player) {
+                var boots = player.getItemBySlot(EquipmentSlot.FEET);
                 
                 if (boots == null) return EventResult.pass();
                 if (!(boots.getItem() instanceof ExoArmorItem)) return EventResult.pass();
                 
-                player.getWorld().playSound(null, player.getBlockPos(), SoundContent.SHORT_SERVO, SoundCategory.PLAYERS, 0.2f, 1.0f);
+                player.level().playSound(null, player.blockPosition(), SoundContent.SHORT_SERVO, SoundSource.PLAYERS, 0.2f, 1.0f);
                 
                 return EventResult.interruptFalse();
             }

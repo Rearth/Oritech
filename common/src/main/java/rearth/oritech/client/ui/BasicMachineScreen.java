@@ -1,6 +1,7 @@
 package rearth.oritech.client.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import dev.architectury.platform.Platform;
@@ -11,18 +12,19 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import io.wispforest.owo.ui.util.NinePatchTexture;
 import io.wispforest.owo.ui.util.SpriteUtilInvoker;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.RedstoneTorchBlock;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.*;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RedstoneTorchBlock;
+import net.minecraft.world.level.material.Fluid;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import rearth.oracle.Oracle;
@@ -35,7 +37,7 @@ import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.client.renderers.LaserArmModel;
-
+import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
 
@@ -44,22 +46,22 @@ import java.util.Optional;
 public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends BaseOwoHandledScreen<FlowLayout, S> {
     
     
-    public static final Identifier BACKGROUND = Oritech.id("textures/gui/modular/gui_base.png");
-    public static final Identifier ITEM_SLOT = Oritech.id("textures/gui/modular/itemslot.png");
-    public static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
+    public static final ResourceLocation BACKGROUND = Oritech.id("textures/gui/modular/gui_base.png");
+    public static final ResourceLocation ITEM_SLOT = Oritech.id("textures/gui/modular/itemslot.png");
+    public static final ResourceLocation GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
     public static final int GRAY_TEXT_COLOR = new Color(0.2f, 0.2f, 0.3f).rgb();
-    public static Surface ORITECH_PANEL = (context, component) -> NinePatchTexture.draw(Identifier.of(Oritech.MOD_ID, "bedrock_panel"), context, component);
-    public static Surface ORITECH_PANEL_DARK = (context, component) -> NinePatchTexture.draw(Identifier.of(Oritech.MOD_ID, "bedrock_panel_dark"), context, component);
-    public static Surface ORITECH_PANEL_ORANGE = (context, component) -> NinePatchTexture.draw(Identifier.of(Oritech.MOD_ID, "bedrock_panel_orange"), context, component);
+    public static Surface ORITECH_PANEL = (context, component) -> NinePatchTexture.draw(ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "bedrock_panel"), context, component);
+    public static Surface ORITECH_PANEL_DARK = (context, component) -> NinePatchTexture.draw(ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "bedrock_panel_dark"), context, component);
+    public static Surface ORITECH_PANEL_ORANGE = (context, component) -> NinePatchTexture.draw(ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "bedrock_panel_orange"), context, component);
 
     public static ButtonComponent.Renderer ORITECH_BUTTON = (matrices, button, delta) -> {
         RenderSystem.enableDepthTest();
-        var texture = button.active ? (button.isHovered() ? MinecraftClient.getInstance().mouse.wasLeftButtonClicked() ? Identifier.of(Oritech.MOD_ID, "bedrock_panel_pressed") : Identifier.of(Oritech.MOD_ID, "bedrock_panel_hover") : Identifier.of(Oritech.MOD_ID, "bedrock_panel")) : ButtonComponent.DISABLED_TEXTURE;
+        var texture = button.active ? (button.isHovered() ? Minecraft.getInstance().mouseHandler.isLeftPressed() ? ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "bedrock_panel_pressed") : ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "bedrock_panel_hover") : ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "bedrock_panel")) : ButtonComponent.DISABLED_TEXTURE;
         NinePatchTexture.draw(texture, matrices, button.getX(), button.getY(), button.width(), button.height());
     };
     public static ButtonComponent.Renderer ORITECH_BUTTON_DARK = (matrices, button, delta) -> {
         RenderSystem.enableDepthTest();
-        var texture = button.active ? (button.isHovered() ? MinecraftClient.getInstance().mouse.wasLeftButtonClicked() ? Identifier.of(Oritech.MOD_ID, "bedrock_panel_pressed") : Identifier.of(Oritech.MOD_ID, "bedrock_panel_dark_hover") : Identifier.of(Oritech.MOD_ID, "bedrock_panel_dark")) : ButtonComponent.DISABLED_TEXTURE;
+        var texture = button.active ? (button.isHovered() ? Minecraft.getInstance().mouseHandler.isLeftPressed() ? ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "bedrock_panel_pressed") : ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "bedrock_panel_dark_hover") : ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "bedrock_panel_dark")) : ButtonComponent.DISABLED_TEXTURE;
         NinePatchTexture.draw(texture, matrices, button.getX(), button.getY(), button.width(), button.height());
     };
     
@@ -93,7 +95,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         }
     }
     
-    public BasicMachineScreen(S handler, PlayerInventory inventory, Text title) {
+    public BasicMachineScreen(S handler, Inventory inventory, Component title) {
         
         super(handler, inventory, title);
         
@@ -111,8 +113,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             var configSteam = getBoilerOutConfig();
             steamDisplay = initFluidDisplay(handler.steamStorage, configSteam);
             // the label is then actually added to the screen in the upgradable screen extension
-            steamProductionLabel = Components.label(Text.translatable("title.oritech.steam_production", "0"));
-            steamProductionLabel.tooltip(Text.translatable("tooltip.oritech.steam_production"));
+            steamProductionLabel = Components.label(Component.translatable("title.oritech.steam_production", "0"));
+            steamProductionLabel.tooltip(Component.translatable("tooltip.oritech.steam_production"));
         } else {
             steamDisplay = null;
             waterDisplay = null;
@@ -122,7 +124,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     }
     
     public ScreenProvider.BarConfiguration getBoilerInConfig() {
-        return handler.screenData.getEnergyConfiguration();
+        return menu.screenData.getEnergyConfiguration();
     }
     
     public ScreenProvider.BarConfiguration getBoilerOutConfig() {
@@ -130,15 +132,15 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         return new ScreenProvider.BarConfiguration(config.x() + config.width() + 8, config.y(), config.width(), config.height());
     }
     
-    public Identifier getGuiComponents() {
+    public ResourceLocation getGuiComponents() {
         return GUI_COMPONENTS;
     }
     
-    public Identifier getItemSlot() {
+    public ResourceLocation getItemSlot() {
         return ITEM_SLOT;
     }
     
-    public Identifier getBackground() {
+    public ResourceLocation getBackground() {
         return BACKGROUND;
     }
     
@@ -158,7 +160,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         return new FluidDisplay(fillOverlay, lastFill, container.getStack().getFluid(), background, foreGround, config, container);
     }
     
-    public static Component getItemFrame(int x, int y) {
+    public static io.wispforest.owo.ui.core.Component getItemFrame(int x, int y) {
         return Components.texture(ITEM_SLOT, 0, 0, 18, 18, 18, 18).sizing(Sizing.fixed(18)).positioning(Positioning.absolute(x - 1, y - 1));
     }
     
@@ -189,7 +191,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         }
         
         // equipment panel
-        if (handler.armorSlots != null) {
+        if (menu.armorSlots != null) {
             rootComponent.child(
               Containers.horizontalFlow(Sizing.fixed(176 + 250), Sizing.fixed(166 + 40))
                 .child(Containers.horizontalFlow(Sizing.content(), Sizing.content())
@@ -204,13 +206,13 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         // show oracle lib help button
         if (Oritech.CONFIG.enableHelpButton()) {
             var hasOracleLib = Platform.isModLoaded("oracle_index");
-            Optional<Identifier> linkTarget = hasOracleLib ? getHelpBookLink() : Optional.empty();
-            var oracleButton = Components.button(Text.literal("?"), elem -> onOracleButtonClick(hasOracleLib, linkTarget));
+            Optional<ResourceLocation> linkTarget = hasOracleLib ? getHelpBookLink() : Optional.empty();
+            var oracleButton = Components.button(Component.literal("?"), elem -> onOracleButtonClick(hasOracleLib, linkTarget));
             oracleButton.renderer(ORITECH_BUTTON_DARK);
             if (hasOracleLib) {
-                oracleButton.tooltip(Text.translatable("tooltip.oritech.oracle_available"));
+                oracleButton.tooltip(Component.translatable("tooltip.oritech.oracle_available"));
             } else {
-                oracleButton.tooltip(Text.translatable("tooltip.oritech.oracle_missing"));
+                oracleButton.tooltip(Component.translatable("tooltip.oritech.oracle_missing"));
             }
             
             // calculate help button position
@@ -232,15 +234,15 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     }
     
     public boolean showExtensionPanel() {
-        return handler.screenData.showExpansionPanel();
+        return menu.screenData.showExpansionPanel();
     }
     
     @Override
-    protected void handledScreenTick() {
-        super.handledScreenTick();
+    protected void containerTick() {
+        super.containerTick();
         
-        if (handler.screenData.showEnergy()) {
-            if (handler.steamStorage != null) {
+        if (menu.screenData.showEnergy()) {
+            if (menu.steamStorage != null) {
                 updateFluidDisplay(waterDisplay);
                 updateFluidDisplay(steamDisplay);
             } else {
@@ -248,28 +250,28 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             }
         }
         
-        if (handler.screenData.showProgress())
+        if (menu.screenData.showProgress())
             updateProgressBar();
         
         if (showExtensionPanel())
             updateSettingsButtons();
         
-        if (handler.mainFluidContainer != null)
+        if (menu.mainFluidContainer != null)
             updateFluidDisplay(genericDisplay);
         
         if (steamProductionLabel != null) {
-            var productionRate = handler.screenData.getDisplayedEnergyUsage() * Oritech.CONFIG.generators.steamEngineData.rfToSteamRatio();
+            var productionRate = menu.screenData.getDisplayedEnergyUsage() * Oritech.CONFIG.generators.steamEngineData.rfToSteamRatio();
             productionRate = Math.min(this.waterDisplay.storage.getStack().getAmount(), productionRate);
-            steamProductionLabel.text(Text.translatable("title.oritech.steam_production", String.format("%.0f", productionRate)));
+            steamProductionLabel.text(Component.translatable("title.oritech.steam_production", String.format("%.0f", productionRate)));
         }
     }
     
     private void updateProgressBar() {
-        var config = handler.screenData.getIndicatorConfiguration();
-        var progress = handler.screenData.getProgress();
+        var config = menu.screenData.getIndicatorConfiguration();
+        var progress = menu.screenData.getProgress();
         
         
-        if (handler.blockEntity instanceof MachineBlockEntity machineEntity && (machineEntity.getCurrentRecipe().getTime() > 0 || machineEntity.progress > 0)) {
+        if (menu.blockEntity instanceof MachineBlockEntity machineEntity && (machineEntity.getCurrentRecipe().getTime() > 0 || machineEntity.progress > 0)) {
             
             var progressTicks = machineEntity.progress;
             var recipeDurationTicks = machineEntity.getCurrentRecipe().getTime();
@@ -285,7 +287,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
                 recipeDurationTicks = generatorEntity.currentMaxBurnTime;
             
             
-            progress_indicator.tooltip(Text.translatable("tooltip.oritech.progress_indicator", progressTicks, effectiveDurationTicks, recipeDurationTicks));
+            progress_indicator.tooltip(Component.translatable("tooltip.oritech.progress_indicator", progressTicks, effectiveDurationTicks, recipeDurationTicks));
         }
         
         
@@ -298,35 +300,59 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     protected void updateEnergyBar() {
         
-        var capacity = handler.energyStorage.getCapacity();
-        var amount = handler.energyStorage.getAmount();
+        var capacity = menu.energyStorage.getCapacity();
+        var amount = menu.energyStorage.getAmount();
         
         var fillAmount = (float) amount / capacity;
-        var tooltipText = getEnergyTooltip(amount, capacity, (long) handler.screenData.getDisplayedEnergyUsage(), (long) handler.screenData.getDisplayedEnergyTransfer());
+        var tooltipText = getEnergyTooltip(amount, capacity, (long) menu.screenData.getDisplayedEnergyUsage(), (long) menu.screenData.getDisplayedEnergyTransfer());
         
         energyIndicator.tooltip(tooltipText);
         energyIndicator.visibleArea(PositionedRectangle.of(0, 96 - ((int) (96 * (fillAmount))), 24, (int) (96 * fillAmount)));
     }
     
-    public static Text getEnergyTooltip(long amount, long max, long showedUsage, long showedTransfer) {
+    public static Component getEnergyTooltip(long amount, long max, long showedUsage, long showedTransfer) {
         var percentage = (float) amount / max;
         var energyFill = String.format("%.1f", percentage * 100);
         var storedAmount = TooltipHelper.getEnergyText(amount);
+        var usageText = TooltipHelper.getEnergyText(showedUsage);
         var maxAmount = TooltipHelper.getEnergyText(max);
         var transfer = TooltipHelper.getEnergyText(showedTransfer);
-        return Text.translatable("tooltip.oritech.energy_usage", storedAmount, maxAmount, energyFill, showedUsage, transfer);
+        return Component.translatable("tooltip.oritech.energy_usage", storedAmount, maxAmount, energyFill, usageText, transfer);
     }
     
     public void updateSettingsButtons() {
         
-        var activeMode = handler.screenData.getInventoryInputMode();
+        var activeMode = menu.screenData.getInventoryInputMode();
         var modeName = activeMode.name().toLowerCase();
         
-        cycleInputButton.setMessage(Text.translatable("button.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)).withColor(GRAY_TEXT_COLOR));
-        cycleInputButton.tooltip(Text.translatable("tooltip.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)));
+        if (activeMode.equals(InventoryInputMode.SIDED) && menu.blockEntity instanceof MachineBlockEntity machineBlock) {
+            var tooltip = Component.translatable("tooltip.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName));
+            var assignment = machineBlock.getSlotAssignments();
+            for (var direction : Direction.values()) {
+                var key = "tooltip.oritech.mode_sided_slot_number";
+                if (direction.equals(Direction.DOWN))
+                    key = "tooltip.oritech.mode_sided_bottom";
+                if (direction.equals(Direction.UP))
+                    key = "tooltip.oritech.mode_sided_top";
+                
+                var horizontalOrdinal = 0;
+                if (direction.equals(Direction.EAST)) horizontalOrdinal = 1;
+                if (direction.equals(Direction.SOUTH)) horizontalOrdinal = 2;
+                if (direction.equals(Direction.WEST)) horizontalOrdinal = 3;
+                var inputSlotIndex = assignment.inputStart() + horizontalOrdinal % assignment.inputCount();
+                
+                tooltip = tooltip.append(Component.translatable(key, StringUtils.capitalize(direction.toString()), inputSlotIndex));
+            }
+            cycleInputButton.tooltip(tooltip);
+        } else {
+            cycleInputButton.tooltip(Component.translatable("tooltip.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)));
+        }
+        cycleInputButton.setMessage(Component.translatable("button.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)).withColor(GRAY_TEXT_COLOR));
+        cycleInputButton.setMessage(Component.translatable("button.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)).withColor(GRAY_TEXT_COLOR));
+        
     }
     
-    private Component buildExtensionPanel() {
+    private io.wispforest.owo.ui.core.Component buildExtensionPanel() {
         
         var container = Containers.verticalFlow(Sizing.content(), Sizing.content());
         container.surface(Surface.PANEL_INSET);
@@ -341,7 +367,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         return container;
     }
     
-    private Component buildEquipmentPanel() {
+    private io.wispforest.owo.ui.core.Component buildEquipmentPanel() {
         
         var container = Containers.verticalFlow(Sizing.content(), Sizing.content());
         container.surface(Surface.PANEL_INSET);
@@ -350,8 +376,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         container.padding(Insets.of(2));
         container.margins(Insets.of(6));
         
-        for (int i = handler.armorSlots.size() - 1; i >= 0; i--) {
-            var slotId = handler.armorSlots.get(i);
+        for (int i = menu.armorSlots.size() - 1; i >= 0; i--) {
+            var slotId = menu.armorSlots.get(i);
             
             var slotContainer = Containers.horizontalFlow(Sizing.content(), Sizing.content());
             
@@ -371,13 +397,13 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         return container;
     }
     
-    private Identifier getEquipmentSlotTexture(int armorSlot) {
+    private ResourceLocation getEquipmentSlotTexture(int armorSlot) {
         return switch (armorSlot) {
-            case 0 -> Identifier.of("minecraft", "textures/item/empty_armor_slot_boots.png");
-            case 1 -> Identifier.of("minecraft", "textures/item/empty_armor_slot_leggings.png");
-            case 2 -> Identifier.of("minecraft", "textures/item/empty_armor_slot_chestplate.png");
-            case 3 -> Identifier.of("minecraft", "textures/item/empty_armor_slot_helmet.png");
-            case 4 -> Identifier.of("minecraft", "textures/item/empty_slot_axe.png");
+            case 0 -> ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_boots.png");
+            case 1 -> ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_leggings.png");
+            case 2 -> ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_chestplate.png");
+            case 3 -> ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_helmet.png");
+            case 4 -> ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/empty_slot_axe.png");
             default -> null;
         };
         
@@ -385,46 +411,46 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     public void addExtensionComponents(FlowLayout container) {
         
-        cycleInputButton = Components.button(Text.translatable("button.oritech.input_mode_fill_matching_recipe").withColor(GRAY_TEXT_COLOR),
+        cycleInputButton = Components.button(Component.translatable("button.oritech.input_mode_fill_matching_recipe").withColor(GRAY_TEXT_COLOR),
           button -> {
-              NetworkManager.sendToServer(new MachineBlockEntity.InventoryInputModeSelectorPacket(handler.blockPos));
+              NetworkManager.sendToServer(new MachineBlockEntity.InventoryInputModeSelectorPacket(menu.blockPos));
           });
         cycleInputButton.horizontalSizing(Sizing.fixed(73));
         cycleInputButton.margins(Insets.of(3));
         cycleInputButton.renderer(ORITECH_BUTTON);
         cycleInputButton.textShadow(false);
         
-        container.child(Components.label(Text.translatable("title.oritech.details")).margins(Insets.of(3, 1, 1, 1)));
+        container.child(Components.label(Component.translatable("title.oritech.details")).margins(Insets.of(3, 1, 1, 1)));
         
-        var inputSlots = handler.screenData.getGuiSlots().stream().filter(slot -> !slot.output()).count();
-        if (handler.screenData.inputOptionsEnabled() && inputSlots > 1)
+        var inputSlots = menu.screenData.getGuiSlots().stream().filter(slot -> !slot.output()).count();
+        if (menu.screenData.inputOptionsEnabled() && inputSlots > 1)
             container.child(cycleInputButton);
         
-        for (var label : handler.screenData.getExtraExtensionLabels()) {
-            container.child(Components.label(label.getLeft()).tooltip(label.getRight()).margins(Insets.of(3)));
+        for (var label : menu.screenData.getExtraExtensionLabels()) {
+            container.child(Components.label(label.getA()).tooltip(label.getB()).margins(Insets.of(3)));
         }
         
-        if (handler.showRedstoneAddon()) {
+        if (menu.showRedstoneAddon()) {
             // separator
             container.child(Components.box(Sizing.fixed(73), Sizing.fixed(1))
                               .color(new Color(0.8f, 0.8f, 0.8f))
                               .margins(Insets.of(2)));
             
             // current input state
-            var hasRedstone = handler.screenData.receivedRedstoneSignal() > 0;
+            var hasRedstone = menu.screenData.receivedRedstoneSignal() > 0;
             var statusContainer = Containers.horizontalFlow(Sizing.content(), Sizing.content());
             
-            statusContainer.child(Components.block(Blocks.REDSTONE_TORCH.getDefaultState().with(RedstoneTorchBlock.LIT, hasRedstone))
+            statusContainer.child(Components.block(Blocks.REDSTONE_TORCH.defaultBlockState().setValue(RedstoneTorchBlock.LIT, hasRedstone))
                                     .sizing(Sizing.fixed(20)).margins(Insets.of(-6, -4, -8, -4)));
-            statusContainer.child(Components.label(Text.translatable("text.oritech.redstone_power", handler.screenData.receivedRedstoneSignal()))
+            statusContainer.child(Components.label(Component.translatable("text.oritech.redstone_power", menu.screenData.receivedRedstoneSignal()))
                               .margins(Insets.of(3, 1, 1, 1)));
             
             container.child(statusContainer);
             
             // current input state
-            if (!handler.screenData.currentRedstoneEffect().isEmpty())
-                container.child(Components.label(Text.translatable(handler.screenData.currentRedstoneEffect()))
-                                  .tooltip(Text.translatable(handler.screenData.currentRedstoneEffect() + ".tooltip"))
+            if (!menu.screenData.currentRedstoneEffect().isEmpty())
+                container.child(Components.label(Component.translatable(menu.screenData.currentRedstoneEffect()))
+                                  .tooltip(Component.translatable(menu.screenData.currentRedstoneEffect() + ".tooltip"))
                                   .margins(Insets.of(3, 3, 1, 1)));
         }
         
@@ -442,18 +468,18 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         addTitle(overlay);
         
-        if (handler.mainFluidContainer != null) {
+        if (menu.mainFluidContainer != null) {
             addFluidDisplay(overlay, genericDisplay);
             updateFluidDisplay(genericDisplay);
         }
         
-        for (var slot : handler.screenData.getGuiSlots()) {
+        for (var slot : menu.screenData.getGuiSlots()) {
             overlay.child(this.slotAsComponent(slot.index()).positioning(Positioning.absolute(slot.x(), slot.y())));
             overlay.child(getItemFrame(slot.x(), slot.y()));
         }
         
-        if (handler.screenData.showEnergy()) {
-            if (handler.steamStorage != null) {
+        if (menu.screenData.showEnergy()) {
+            if (menu.steamStorage != null) {
                 addFluidDisplay(overlay, steamDisplay);
                 updateFluidDisplay(steamDisplay);
                 addFluidDisplay(overlay, waterDisplay);
@@ -463,20 +489,20 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
                 updateEnergyBar();
             }
             
-            if (handler.blockEntity instanceof SteamEngineEntity) {
+            if (menu.blockEntity instanceof SteamEngineEntity) {
                 addEnergyBar(overlay);
                 updateEnergyBar();
             }
         }
         
-        if (handler.screenData.showProgress()) {
+        if (menu.screenData.showProgress()) {
             addProgressArrow(overlay);
             updateProgressBar();
         }
     }
     
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private void onOracleButtonClick(boolean enabled, Optional<Identifier> target) {
+    private void onOracleButtonClick(boolean enabled, Optional<ResourceLocation> target) {
         if (!enabled || target.isEmpty()) {
             Oritech.LOGGER.info("Oracle Index mod is missing. Install it here: https://www.curseforge.com/minecraft/mc-mods/oracle-index (or from modrinth)");
             return;
@@ -485,12 +511,12 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         OracleClient.openScreen("oritech", target.get(), this);
     }
     
-    private Optional<Identifier> getHelpBookLink() {
+    private Optional<ResourceLocation> getHelpBookLink() {
         
-        if (this.handler.screenData.getWikiLink().isPresent()) return Optional.of(Identifier.of(Oracle.MOD_ID, "books/oritech/" + handler.screenData.getWikiLink().get() + ".mdx"));
+        if (this.menu.screenData.getWikiLink().isPresent()) return Optional.of(ResourceLocation.fromNamespaceAndPath(Oracle.MOD_ID, "books/oritech/" + menu.screenData.getWikiLink().get() + ".mdx"));
         
-        var blockItem = this.handler.machineBlock.getBlock().asItem();
-        var itemId = Registries.ITEM.getId(blockItem);
+        var blockItem = this.menu.machineBlock.getBlock().asItem();
+        var itemId = BuiltInRegistries.ITEM.getKey(blockItem);
         
         if (OracleClient.ITEM_LINKS.containsKey(itemId)) {
             return Optional.of(OracleClient.ITEM_LINKS.get(itemId).linkTarget());
@@ -501,11 +527,11 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     }
     
     public boolean useHighTitle() {
-        return handler.machineBlock.getBlock().getName().toString().length() > 18;
+        return menu.machineBlock.getBlock().getName().toString().length() > 18;
     }
     
     private void addTitle(FlowLayout overlay) {
-        var blockTitle = handler.machineBlock.getBlock().getName();
+        var blockTitle = menu.machineBlock.getBlock().getName();
         var label = Components.label(blockTitle);
         label.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
         label.zIndex(1);
@@ -537,12 +563,12 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     }
     
     public ItemStack getTitleIcon() {
-        return new ItemStack(this.handler.blockEntity.getCachedState().getBlock());
+        return new ItemStack(this.menu.blockEntity.getBlockState().getBlock());
     }
     
     private void addProgressArrow(FlowLayout panel) {
         
-        var config = handler.screenData.getIndicatorConfiguration();
+        var config = menu.screenData.getIndicatorConfiguration();
         
         var empty = Components.texture(config.empty(), 0, 0, config.width(), config.height(), config.width(), config.height());
         progress_indicator = Components.texture(config.full(), 0, 0, config.width(), config.height(), config.width(), config.height());
@@ -584,8 +610,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         display.fillOverlay.verticalSizing(Sizing.fixed((int) (config.height() * targetFill * 0.98f)));
         
         var tooltipText = container.getStack().getAmount() > 0
-            ? Text.translatable("tooltip.oritech.fluid_content", container.getStack().getAmount() * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(container.getStack()).getString())
-            : Text.translatable("tooltip.oritech.fluid_empty");
+            ? Component.translatable("tooltip.oritech.fluid_content", container.getStack().getAmount() * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(container.getStack()).getString())
+            : Component.translatable("tooltip.oritech.fluid_empty");
         background.tooltip(tooltipText);
     }
     
@@ -601,10 +627,10 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     }
     
     @NotNull
-    private static ColoredSpriteComponent getColoredSpriteComponent(FluidStack stack, ScreenProvider.BarConfiguration config, Sprite sprite, int spriteColor) {
+    private static ColoredSpriteComponent getColoredSpriteComponent(FluidStack stack, ScreenProvider.BarConfiguration config, TextureAtlasSprite sprite, int spriteColor) {
         var tooltipText = stack.getAmount() > 0
-            ? Text.translatable("tooltip.oritech.fluid_content", stack.getAmount() * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(stack).toString())
-            : Text.translatable("tooltip.oritech.fluid_empty");
+            ? Component.translatable("tooltip.oritech.fluid_content", stack.getAmount() * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(stack).toString())
+            : Component.translatable("tooltip.oritech.fluid_empty");
         
         var result = new ColoredSpriteComponent(sprite);
         result.widthMultiplier = config.width() / 60f;
@@ -617,9 +643,9 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     private void addEnergyBar(FlowLayout panel) {
         
-        var config = handler.screenData.getEnergyConfiguration();
+        var config = menu.screenData.getEnergyConfiguration();
         var insetSize = 1;
-        var tooltipText = Text.translatable("tooltip.oritech.energy_indicator", 10, 50);
+        var tooltipText = Component.translatable("tooltip.oritech.energy_indicator", 10, 50);
         
         var frame = Containers.horizontalFlow(Sizing.fixed(config.width() + insetSize * 2), Sizing.fixed(config.height() + insetSize * 2));
         frame.surface(Surface.PANEL_INSET);
@@ -645,11 +671,11 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         public Color color;
         public float widthMultiplier = 1f;
         
-        protected ColoredSpriteComponent(Sprite sprite) {
+        protected ColoredSpriteComponent(TextureAtlasSprite sprite) {
             super(sprite);
         }
         
-        public Sprite getSprite() {
+        public TextureAtlasSprite getSprite() {
             return sprite;
         }
         
@@ -657,30 +683,30 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
             if (sprite == null) return;
             SpriteUtilInvoker.markSpriteActive(this.sprite);
-            drawSprite(this.x, this.y, 0, this.width, this.height, this.sprite, this.color.red(), this.color.green(), this.color.blue(), this.color.alpha(), context.getMatrices());
+            drawSprite(this.x, this.y, 0, this.width, this.height, this.sprite, this.color.red(), this.color.green(), this.color.blue(), this.color.alpha(), context.pose());
         }
         
         // these 2 methods are copies from drawContext, width slight modifications
-        public void drawSprite(int x, int y, int z, int width, int height, Sprite sprite, float red, float green, float blue, float alpha, MatrixStack matrices) {
+        public void drawSprite(int x, int y, int z, int width, int height, TextureAtlasSprite sprite, float red, float green, float blue, float alpha, PoseStack matrices) {
             
-            var uvWidth = sprite.getMaxU() - sprite.getMinU();
-            var newMax = sprite.getMinU() + uvWidth * widthMultiplier;
+            var uvWidth = sprite.getU1() - sprite.getU0();
+            var newMax = sprite.getU0() + uvWidth * widthMultiplier;
             
-            this.drawTexturedQuad(sprite.getAtlasId(), matrices, x, x + width, y, y + height, z, sprite.getMinU(), newMax, sprite.getMinV(), sprite.getMaxV(), red, green, blue, alpha);
+            this.drawTexturedQuad(sprite.atlasLocation(), matrices, x, x + width, y, y + height, z, sprite.getU0(), newMax, sprite.getV0(), sprite.getV1(), red, green, blue, alpha);
         }
         
         // direct copy of the method in drawContext, because it can't be called from here due to private access
-        private void drawTexturedQuad(Identifier texture, MatrixStack matrices, int x1, int x2, int y1, int y2, int z, float u1, float u2, float v1, float v2, float red, float green, float blue, float alpha) {
+        private void drawTexturedQuad(ResourceLocation texture, PoseStack matrices, int x1, int x2, int y1, int y2, int z, float u1, float u2, float v1, float v2, float red, float green, float blue, float alpha) {
             RenderSystem.setShaderTexture(0, texture);
-            RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+            RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
             RenderSystem.enableBlend();
-            Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-            BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-            bufferBuilder.vertex(matrix4f, (float) x1, (float) y1, (float) z).texture(u1, v1).color(red, green, blue, alpha);
-            bufferBuilder.vertex(matrix4f, (float) x1, (float) y2, (float) z).texture(u1, v2).color(red, green, blue, alpha);
-            bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, (float) z).texture(u2, v2).color(red, green, blue, alpha);
-            bufferBuilder.vertex(matrix4f, (float) x2, (float) y1, (float) z).texture(u2, v1).color(red, green, blue, alpha);
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            Matrix4f matrix4f = matrices.last().pose();
+            BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+            bufferBuilder.addVertex(matrix4f, (float) x1, (float) y1, (float) z).setUv(u1, v1).setColor(red, green, blue, alpha);
+            bufferBuilder.addVertex(matrix4f, (float) x1, (float) y2, (float) z).setUv(u1, v2).setColor(red, green, blue, alpha);
+            bufferBuilder.addVertex(matrix4f, (float) x2, (float) y2, (float) z).setUv(u2, v2).setColor(red, green, blue, alpha);
+            bufferBuilder.addVertex(matrix4f, (float) x2, (float) y1, (float) z).setUv(u2, v1).setColor(red, green, blue, alpha);
+            BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
             RenderSystem.disableBlend();
         }
         

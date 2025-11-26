@@ -1,0 +1,33 @@
+---
+title: Addon Splicer
+icon: oritech:shrinker_block
+related_items: [oritech:shrinker_block, oritech:machine_combi_addon]
+---
+
+<center>
+<ModAsset location="oritech:area/shrinker_area" width={512} />
+</center>
+
+The addon splicer can be used to combine multiple addons into a single addon block. The result is mainly useful to minimize the footprint of a machine.
+
+It is built like any other multiblock. To use it, it needs to be full of energy. The "Compaction" process can be started via the UI or by powering the center of the machine
+with a redstone signal. It also needs to have at least 1 addon installed, but having multiple attached through extenders is recommended.
+
+<center>
+<ModAsset location="oritech:area/shrinker_setup_area" width={512} />
+</center>
+
+When activated, it'll consume the addon blocks in the world. They're compacted into a new item called "Heart of the machine". This new item is the result of all attached addons
+being combined into a single addon. Note that this operation cannot be undone.
+
+<Callout variant="warning">
+    A "Heart of the Machine" addon cannot be combined with other addons in a machine. It has to be the only attached addon.
+</Callout>
+
+<center>
+<ModAsset location="oritech:machine_combi_addon" width={256} />
+</center>
+
+
+Note that only addons that influence the statistics of a machine can be compacted this way. The steam boiler addon, redstone addon, inventory proxy addon, hunter addon,
+or anything else that needs an interaction directly with the addon can not be compacted.

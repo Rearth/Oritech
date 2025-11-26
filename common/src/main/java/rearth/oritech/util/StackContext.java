@@ -1,8 +1,7 @@
 package rearth.oritech.util;
 
-import net.minecraft.item.ItemStack;
-
 import java.util.function.Consumer;
+import net.minecraft.world.item.ItemStack;
 
 public class StackContext {
     

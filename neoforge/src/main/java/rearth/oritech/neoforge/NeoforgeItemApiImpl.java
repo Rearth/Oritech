@@ -1,12 +1,13 @@
 package rearth.oritech.neoforge;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import com.google.auto.service.AutoService;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -17,11 +18,11 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.BlockItemApi;
 import rearth.oritech.api.item.ItemApi;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+@AutoService({BlockItemApi.class})
 public class NeoforgeItemApiImpl implements BlockItemApi {
     
     private final List<Supplier<BlockEntityType<?>>> registeredBlockEntities = new ArrayList<>();
@@ -38,7 +39,7 @@ public class NeoforgeItemApiImpl implements BlockItemApi {
     }
     
     @Override
-    public ItemApi.InventoryStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public ItemApi.InventoryStorage find(Level world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         
         var candidate = world.getCapability(Capabilities.ItemHandler.BLOCK, pos, state, entity, direction);
         if (candidate == null) return null;
@@ -47,7 +48,7 @@ public class NeoforgeItemApiImpl implements BlockItemApi {
     }
     
     @Override
-    public ItemApi.InventoryStorage find(World world, BlockPos pos, @Nullable Direction direction) {
+    public ItemApi.InventoryStorage find(Level world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
     }
     
@@ -75,7 +76,7 @@ public class NeoforgeItemApiImpl implements BlockItemApi {
             var total = 0;
             for (int i = 0; i < container.getSlots(); i++) {
                 var available = container.getStackInSlot(i);
-                if (ItemStack.areItemsAndComponentsEqual(available, extracted)) {
+                if (ItemStack.isSameItemSameComponents(available, extracted)) {
                     total += container.extractItem(i, extracted.getCount() - total, simulate).getCount();
                 }
             }

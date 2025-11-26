@@ -1,30 +1,10 @@
 package rearth.oritech.block.entity.storage;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
@@ -49,6 +29,28 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class UnstableContainerBlockEntity extends NetworkedBlockEntity implements ScreenProvider, ExtendedMenuProvider,
                                                                            GeoBlockEntity, MultiblockMachineController, EnergyApi.BlockProvider {
@@ -61,7 +63,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
     @SyncField(SyncType.GUI_OPEN)
-    public BlockState capturedBlock = Blocks.AIR.getDefaultState();
+    public BlockState capturedBlock = Blocks.AIR.defaultBlockState();
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
     public float qualityMultiplier = 1f;
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
@@ -75,7 +77,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     
     //own storage
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
-    protected final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(20_000_000L, 20_000_000L, 20_000_000L, this::markDirty);
+    protected final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(20_000_000L, 20_000_000L, 20_000_000L, this::setChanged);
     
     private final EnergyApi.EnergyStorage outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
@@ -91,14 +93,14 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         age++;
-        if (age > 10 && !state.get(UnstableContainerBlock.SETUP_DONE)) {
-            world.setBlockState(pos, state.with(UnstableContainerBlock.SETUP_DONE, true));
+        if (age > 10 && !state.getValue(UnstableContainerBlock.SETUP_DONE)) {
+            world.setBlockAndUpdate(pos, state.setValue(UnstableContainerBlock.SETUP_DONE, true));
         }
         
-        energyStorage.tick((int) world.getTime());
+        energyStorage.tick((int) world.getGameTime());
         
         adjustEnergyStorageSize();
         
@@ -113,13 +115,13 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
         laserInputStorage.setAmount(0);
         var targetAmount = BASE_CAPACITY * qualityMultiplier * targetMultiplier;
         var currentAmount = energyStorage.getCapacity();
-        energyStorage.capacity = (long) MathHelper.lerp(0.005d, currentAmount, targetAmount);
+        energyStorage.capacity = (long) Mth.lerp(0.005d, currentAmount, targetAmount);
         energyStorage.setMaxInsert((long) targetAmount);
         energyStorage.setMaxExtract((long) targetAmount);
         
         if (energyStorage.capacity < energyStorage.maxInsert * 0.9999) {
             // growing, spawn particles
-            ParticleContent.UNSTABLE_CONTAINER_GROWING.spawn(world, pos.toCenterPos(), 2);
+            ParticleContent.UNSTABLE_CONTAINER_GROWING.spawn(level, worldPosition.getCenter(), 2);
         }
         
         if (energyStorage.amount > energyStorage.capacity) {
@@ -134,8 +136,8 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     private void outputEnergy() {
         var positions = List.of(new Vec3i(0, -3, 0), new Vec3i(0, 2, 0));
         for (var outputPos : positions) {
-            var worldPos = pos.add(outputPos);
-            var candidate = EnergyApi.BLOCK.find(world, worldPos, null);
+            var worldPos = worldPosition.offset(outputPos);
+            var candidate = EnergyApi.BLOCK.find(level, worldPos, null);
             if (candidate != null) {
                 EnergyApi.transfer(energyStorage, candidate, energyStorage.maxExtract, false);
             }
@@ -143,10 +145,10 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         addMultiblockToNbt(nbt);
-        var blockId = Registries.BLOCK.getId(capturedBlock.getBlock());
+        var blockId = BuiltInRegistries.BLOCK.getKey(capturedBlock.getBlock());
         nbt.putString("captured", blockId.toString());
         nbt.putLong("energy_stored", energyStorage.amount);
         nbt.putLong("energy_capacity", energyStorage.capacity);
@@ -154,8 +156,8 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         loadMultiblockNbtData(nbt);
         energyStorage.amount = nbt.getLong("energy_stored");
         energyStorage.capacity = nbt.getLong("energy_capacity");
@@ -163,22 +165,22 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
         qualityMultiplier = nbt.getFloat("quality");
         
         var blockId = nbt.getString("captured");
-        if (!blockId.isBlank() && Registries.BLOCK.containsId(Identifier.of(blockId)))
-            capturedBlock = Registries.BLOCK.get(Identifier.of(blockId)).getDefaultState();
+        if (!blockId.isBlank() && BuiltInRegistries.BLOCK.containsKey(ResourceLocation.parse(blockId)))
+            capturedBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(blockId)).defaultBlockState();
         
     }
     
     @Override
     public void preNetworkUpdate(SyncType type) {
         super.preNetworkUpdate(type);
-        currentStats = energyStorage.getCurrentStatistics(world.getTime());
+        currentStats = energyStorage.getCurrentStatistics(level.getGameTime());
     }
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, 0, state -> {
             if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
-                if (this.getCachedState().get(UnstableContainerBlock.SETUP_DONE)) {
+                if (this.getBlockState().getValue(UnstableContainerBlock.SETUP_DONE)) {
                     return state.setAndContinue(IDLE);
                 } else {
                     return state.setAndContinue(SETUP);
@@ -242,12 +244,12 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     
     @Override
     public BlockPos getPosForMultiblock() {
-        return pos;
+        return worldPosition;
     }
     
     @Override
-    public World getWorldForMultiblock() {
-        return world;
+    public Level getWorldForMultiblock() {
+        return level;
     }
     
     @Override
@@ -285,7 +287,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     
     @Override
     public void onControllerBroken() {
-        onBroken(pos);
+        onBroken(worldPosition);
     }
     
     private void onBroken(BlockPos eventSource) {
@@ -294,19 +296,19 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
         
         for (var corePos : coreBlocksConnected) {
             if (corePos.equals(eventSource)) continue;
-            world.setBlockState(corePos, Blocks.AIR.getDefaultState());
+            level.setBlockAndUpdate(corePos, Blocks.AIR.defaultBlockState());
         }
         
-        world.setBlockState(pos, capturedBlock);
+        level.setBlockAndUpdate(worldPosition, capturedBlock);
         
-        var spawnAt = this.pos.toCenterPos().add(0, 1, 0);
-        world.spawnEntity(new ItemEntity(world, spawnAt.x, spawnAt.y, spawnAt.z, new ItemStack(ItemContent.UNSTABLE_CONTAINER)));
+        var spawnAt = this.worldPosition.getCenter().add(0, 1, 0);
+        level.addFreshEntity(new ItemEntity(level, spawnAt.x, spawnAt.y, spawnAt.z, new ItemStack(ItemContent.UNSTABLE_CONTAINER)));
         
     }
     
     public void setCapturedBlock(BlockState capturedBlock) {
         this.capturedBlock = capturedBlock;
-        markDirty();
+        setChanged();
     }
     
     @Override
@@ -351,12 +353,12 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     }
     
     @Override
-    public Inventory getDisplayedInventory() {
-        return new SimpleInventory();
+    public Container getDisplayedInventory() {
+        return new SimpleContainer();
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.STORAGE_SCREEN;
     }
     
@@ -376,18 +378,18 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
+    public void saveExtraData(FriendlyByteBuf buf) {
         sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(pos);
+        buf.writeBlockPos(worldPosition);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.literal("");
+    public Component getDisplayName() {
+        return Component.literal("");
     }
     
     @Override
-    public @Nullable ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public @Nullable AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
     }
 }

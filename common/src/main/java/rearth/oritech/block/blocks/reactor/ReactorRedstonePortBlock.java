@@ -1,70 +1,69 @@
 package rearth.oritech.block.blocks.reactor;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class ReactorRedstonePortBlock extends BaseReactorBlock {
     
-    public static final IntProperty PORT_MODE = IntProperty.of("port_mode", 0, 2);  // 0 = temperature, 1 = fuel, 2 = power
+    public static final IntegerProperty PORT_MODE = IntegerProperty.create("port_mode", 0, 2);  // 0 = temperature, 1 = fuel, 2 = power
     
-    public ReactorRedstonePortBlock(Settings settings) {
+    public ReactorRedstonePortBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(getDefaultState().with(Properties.FACING, Direction.NORTH).with(PORT_MODE, 0).with(Properties.POWER, 0));
+        this.registerDefaultState(defaultBlockState().setValue(BlockStateProperties.FACING, Direction.NORTH).setValue(PORT_MODE, 0).setValue(BlockStateProperties.POWER, 0));
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
-        builder.add(Properties.FACING);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(BlockStateProperties.FACING);
         builder.add(PORT_MODE);
-        builder.add(Properties.POWER);
+        builder.add(BlockStateProperties.POWER);
     }
     
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return Objects.requireNonNull(super.getPlacementState(ctx)).with(Properties.FACING, ctx.getPlayerLookDirection().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.FACING, ctx.getNearestLookingDirection().getOpposite());
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (world.isClient) return ActionResult.SUCCESS;
+        if (world.isClientSide) return InteractionResult.SUCCESS;
         
-        var lastMode = state.get(PORT_MODE);
+        var lastMode = state.getValue(PORT_MODE);
         var cycledMode = (lastMode + 1) % 3;
         
-        player.sendMessage(Text.translatable("tooltip.oritech.reactor_port_mode." + cycledMode));
+        player.sendSystemMessage(Component.translatable("tooltip.oritech.reactor_port_mode." + cycledMode));
         
-        var newState = state.with(PORT_MODE, cycledMode);
-        world.setBlockState(pos, newState);
+        var newState = state.setValue(PORT_MODE, cycledMode);
+        world.setBlockAndUpdate(pos, newState);
         
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
         
     }
     
     @Override
-    protected boolean hasComparatorOutput(BlockState state) {
+    protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
     
     @Override
-    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        return state.get(Properties.POWER);
+    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
+        return state.getValue(BlockStateProperties.POWER);
     }
     
     @Override

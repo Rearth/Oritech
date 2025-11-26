@@ -3,23 +3,23 @@ package rearth.oritech.util.registry;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import io.wispforest.owo.registration.reflect.BlockRegistryContainer;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import rearth.oritech.Oritech;
 
 import java.lang.reflect.Field;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 public interface ArchitecturyBlockRegistryContainer extends ArchitecturyRegistryContainer<Block> {
     
-    DeferredRegister<Item> ITEM_REGISTRY = DeferredRegister.create(Oritech.MOD_ID, RegistryKeys.ITEM);
+    DeferredRegister<Item> ITEM_REGISTRY = DeferredRegister.create(Oritech.MOD_ID, Registries.ITEM);
     
     @Override
-    default RegistryKey<Registry<Block>> getRegistryType() {
-        return RegistryKeys.BLOCK;
+    default ResourceKey<Registry<Block>> getRegistryType() {
+        return Registries.BLOCK;
     }
     
     @Override
@@ -34,7 +34,7 @@ public interface ArchitecturyBlockRegistryContainer extends ArchitecturyRegistry
     }
     
     default BlockItem createBlockItem(Block block, String identifier) {
-        return new BlockItem(block, new Item.Settings());
+        return new BlockItem(block, new Item.Properties());
     }
     
     static void finishItemRegister() {

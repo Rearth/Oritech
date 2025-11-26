@@ -1,25 +1,23 @@
 package rearth.oritech.api.recipe;
 
+import com.google.common.base.Optional;
+import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.material.Fluid;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.FluidIngredient;
-import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.base.Optional;
-
-import dev.architectury.fluid.FluidStack;
 
 public abstract class OritechRecipeBuilder {
 
@@ -53,12 +51,12 @@ public abstract class OritechRecipeBuilder {
         return this;
     }
 
-    public OritechRecipeBuilder input(ItemConvertible in) {
-        return input(Ingredient.ofItems(in));
+    public OritechRecipeBuilder input(ItemLike in) {
+        return input(Ingredient.of(in));
     }
 
     public OritechRecipeBuilder input(TagKey<Item> in) {
-        return input(Ingredient.fromTag(in));
+        return input(Ingredient.of(in));
     }
 
     public OritechRecipeBuilder fluidInput(FluidIngredient in) {
@@ -151,21 +149,27 @@ public abstract class OritechRecipeBuilder {
         return this;
     }
 
-    public abstract void validate(Identifier id) throws IllegalStateException;
+    public abstract void validate(ResourceLocation id) throws IllegalStateException;
 
-    public void export(RecipeExporter exporter, String suffix) {
-        var id = Oritech.id(resourcePath + "/" + suffix);
+    public void export(RecipeOutput exporter, String suffix, String namespace) {
+        
+        var id = ResourceLocation.fromNamespaceAndPath(namespace, resourcePath + "/" + suffix);
         validate(id);
         
         exporter.accept(
-            id,
-            new OritechRecipe(
-                (int)(time * timeMultiplier),
-                inputs != null ? inputs : List.of(),
-                results != null ? results : List.of(),
-                type,
-                fluidInput != null ? fluidInput : FluidIngredient.EMPTY,
-                fluidOutputs != null ? fluidOutputs : List.of()),
-            null);
+          id,
+          new OritechRecipe(
+            (int)(time * timeMultiplier),
+            inputs != null ? inputs : List.of(),
+            results != null ? results : List.of(),
+            type,
+            fluidInput != null ? fluidInput : FluidIngredient.EMPTY,
+            fluidOutputs != null ? fluidOutputs : List.of()),
+          null);
+    }
+    
+    
+    public void export(RecipeOutput exporter, String suffix) {
+        export(exporter, suffix, Oritech.MOD_ID);
     }
 }

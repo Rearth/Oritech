@@ -2,7 +2,7 @@
   "type": "oritech:refinery",
   "fluidInput": {
     "amount": 1000,
-    "fluid": "oritech:still_biofuel"
+    "fluid": "#c:biofuel"
   },
   "fluidOutputs": [
     {

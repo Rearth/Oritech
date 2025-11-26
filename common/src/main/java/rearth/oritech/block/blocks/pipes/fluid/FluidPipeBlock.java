@@ -1,16 +1,5 @@
 package rearth.oritech.block.blocks.pipes.fluid;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
 import org.apache.commons.lang3.function.TriFunction;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
@@ -18,28 +7,39 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 
 import java.util.HashMap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class FluidPipeBlock extends GenericPipeBlock {
     
-    public static HashMap<Identifier, GenericPipeInterfaceEntity.PipeNetworkData> FLUID_PIPE_DATA = new HashMap<>();
+    public static HashMap<ResourceLocation, GenericPipeInterfaceEntity.PipeNetworkData> FLUID_PIPE_DATA = new HashMap<>();
 
-    public FluidPipeBlock(Settings settings) {
+    public FluidPipeBlock(Properties settings) {
         super(settings);
     }
     
     @Override
-    public TriFunction<World, BlockPos, Direction, Boolean> apiValidationFunction() {
+    public TriFunction<Level, BlockPos, Direction, Boolean> apiValidationFunction() {
         return ((world, pos, direction) -> FluidApi.BLOCK.find(world, pos, direction) != null);
     }
     
     @Override
     public BlockState getConnectionBlock() {
-        return BlockContent.FLUID_PIPE_CONNECTION.getDefaultState();
+        return BlockContent.FLUID_PIPE_CONNECTION.defaultBlockState();
     }
     
     @Override
     public BlockState getNormalBlock() {
-        return BlockContent.FLUID_PIPE.getDefaultState();
+        return BlockContent.FLUID_PIPE.defaultBlockState();
     }
     
     @Override
@@ -49,10 +49,10 @@ public class FluidPipeBlock extends GenericPipeBlock {
     
     // to connect when a neighboring block emits a block update (e.g. the centrifuge getting a fluid addon)
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
 
-        world.setBlockState(pos, getStateForNeighborUpdate(state, Direction.getFacing(Vec3d.of(sourcePos.subtract(pos))), world.getBlockState(sourcePos), world, pos, sourcePos), Block.NOTIFY_LISTENERS, 0);
+        world.setBlock(pos, updateShape(state, Direction.getNearest(Vec3.atLowerCornerOf(sourcePos.subtract(pos))), world.getBlockState(sourcePos), world, pos, sourcePos), Block.UPDATE_CLIENTS, 0);
     }
     
     @Override
@@ -61,34 +61,34 @@ public class FluidPipeBlock extends GenericPipeBlock {
     }
     
     @Override
-    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
-        return FLUID_PIPE_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level world) {
+        return FLUID_PIPE_DATA.computeIfAbsent(world.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 
 	public static class FramedFluidPipeBlock extends FluidPipeBlock {
 
-		public FramedFluidPipeBlock(Settings settings) {
+		public FramedFluidPipeBlock(Properties settings) {
 			super(settings);
 		}
 
 		@Override
-		public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-			return VoxelShapes.fullCube();
+		public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+			return Shapes.block();
 		}
 
 		@Override
-		public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-			return state.getOutlineShape(world, pos);
+		public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+			return state.getShape(world, pos);
 		}
 
 		@Override
 		public BlockState getNormalBlock() {
-			return BlockContent.FRAMED_FLUID_PIPE.getDefaultState();
+			return BlockContent.FRAMED_FLUID_PIPE.defaultBlockState();
 		}
 
 		@Override
 		public BlockState getConnectionBlock() {
-			return BlockContent.FRAMED_FLUID_PIPE_CONNECTION.getDefaultState();
+			return BlockContent.FRAMED_FLUID_PIPE_CONNECTION.defaultBlockState();
 		}
     }
 }

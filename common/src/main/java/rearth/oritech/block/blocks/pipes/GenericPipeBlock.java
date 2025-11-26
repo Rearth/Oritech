@@ -1,88 +1,99 @@
 package rearth.oritech.block.blocks.pipes;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.Wrench;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wrench.Wrenchable {
+public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wrench.Wrenchable, SimpleWaterloggedBlock {
     
     // 0 = no connection, 1 = connection (pipe->pipe or pipe->machine)
     public static int NO_CONNECTION = 0;
     public static int CONNECTION = 1;
     
-    public static final IntProperty NORTH = IntProperty.of("north", 0, 1);
-    public static final IntProperty EAST = IntProperty.of("east", 0, 1);
-    public static final IntProperty SOUTH = IntProperty.of("south", 0, 1);
-    public static final IntProperty WEST = IntProperty.of("west", 0, 1);
-    public static final IntProperty UP = IntProperty.of("up", 0, 1);
-    public static final IntProperty DOWN = IntProperty.of("down", 0, 1);
-    public static final BooleanProperty STRAIGHT = BooleanProperty.of("straight");
+    public static final IntegerProperty NORTH = IntegerProperty.create("north", 0, 1);
+    public static final IntegerProperty EAST = IntegerProperty.create("east", 0, 1);
+    public static final IntegerProperty SOUTH = IntegerProperty.create("south", 0, 1);
+    public static final IntegerProperty WEST = IntegerProperty.create("west", 0, 1);
+    public static final IntegerProperty UP = IntegerProperty.create("up", 0, 1);
+    public static final IntegerProperty DOWN = IntegerProperty.create("down", 0, 1);
+    public static final BooleanProperty STRAIGHT = BooleanProperty.create("straight");
     
     public static final VoxelShape[] THICK_SHAPES = createShapes(
-      Block.createCuboidShape(5, 5, 5, 11, 11, 11),
-      Block.createCuboidShape(5, 5, 0, 11, 11, 5),
-      Block.createCuboidShape(11, 5, 5, 16, 11, 11),
-      Block.createCuboidShape(5, 5, 11, 11, 11, 16),
-      Block.createCuboidShape(0, 5, 5, 5, 11, 11),
-      Block.createCuboidShape(5, 11, 5, 11, 16, 11),
-      Block.createCuboidShape(5, 0, 5, 11, 5, 11)
+      Block.box(5, 5, 5, 11, 11, 11),
+      Block.box(5, 5, 0, 11, 11, 5),
+      Block.box(11, 5, 5, 16, 11, 11),
+      Block.box(5, 5, 11, 11, 11, 16),
+      Block.box(0, 5, 5, 5, 11, 11),
+      Block.box(5, 11, 5, 11, 16, 11),
+      Block.box(5, 0, 5, 11, 5, 11)
     );
     public static final VoxelShape[] EXTRA_THICK_SHAPES = createShapes(
-      Block.createCuboidShape(4, 4, 4, 12, 12, 12),
-      Block.createCuboidShape(4, 4, 0, 12, 12, 4),
-      Block.createCuboidShape(12, 4, 4, 16, 12, 12),
-      Block.createCuboidShape(4, 4, 12, 12, 12, 16),
-      Block.createCuboidShape(0, 4, 4, 4, 12, 12),
-      Block.createCuboidShape(4, 12, 4, 12, 16, 12),
-      Block.createCuboidShape(4, 0, 4, 12, 4, 12)
+      Block.box(4, 4, 4, 12, 12, 12),
+      Block.box(4, 4, 0, 12, 12, 4),
+      Block.box(12, 4, 4, 16, 12, 12),
+      Block.box(4, 4, 12, 12, 12, 16),
+      Block.box(0, 4, 4, 4, 12, 12),
+      Block.box(4, 12, 4, 12, 16, 12),
+      Block.box(4, 0, 4, 12, 4, 12)
     );
     public static final VoxelShape[] THIN_SHAPES = createShapes(
-      Block.createCuboidShape(6, 6, 6, 10, 10, 10),
-      Block.createCuboidShape(6, 6, 0, 10, 10, 6),
-      Block.createCuboidShape(10, 6, 6, 16, 10, 10),
-      Block.createCuboidShape(6, 6, 10, 10, 10, 16),
-      Block.createCuboidShape(0, 6, 6, 6, 10, 10),
-      Block.createCuboidShape(6, 10, 6, 10, 16, 10),
-      Block.createCuboidShape(6, 0, 6, 10, 6, 10)
+      Block.box(6, 6, 6, 10, 10, 10),
+      Block.box(6, 6, 0, 10, 10, 6),
+      Block.box(10, 6, 6, 16, 10, 10),
+      Block.box(6, 6, 10, 10, 10, 16),
+      Block.box(0, 6, 6, 6, 10, 10),
+      Block.box(6, 10, 6, 10, 16, 10),
+      Block.box(6, 0, 6, 10, 6, 10)
     );
     
-    public GenericPipeBlock(Settings settings) {
+    public GenericPipeBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(getDefaultState()
-                               .with(getNorthProperty(), 0)
-                               .with(getEastProperty(), 0)
-                               .with(getSouthProperty(), 0)
-                               .with(getWestProperty(), 0)
-                               .with(getUpProperty(), 0)
-                               .with(getDownProperty(), 0)
-                               .with(STRAIGHT, false));
+        this.registerDefaultState(defaultBlockState()
+                                    .setValue(getNorthProperty(), 0)
+                                    .setValue(getEastProperty(), 0)
+                                    .setValue(getSouthProperty(), 0)
+                                    .setValue(getWestProperty(), 0)
+                                    .setValue(getUpProperty(), 0)
+                                    .setValue(getDownProperty(), 0)
+                                    .setValue(STRAIGHT, false)
+                                    .setValue(BlockStateProperties.WATERLOGGED, false));
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(getNorthProperty(), getEastProperty(), getSouthProperty(), getWestProperty(), getUpProperty(), getDownProperty(), STRAIGHT);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(getNorthProperty(), getEastProperty(), getSouthProperty(), getWestProperty(), getUpProperty(), getDownProperty(), STRAIGHT, BlockStateProperties.WATERLOGGED);
     }
     
     protected VoxelShape getShape(BlockState state) {
@@ -98,13 +109,13 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         
         for (int i = 0; i <= 63; i++) {
             VoxelShape shape = inner;
-            if ((i & 1) != 0) shape = VoxelShapes.combine(shape, north, BooleanBiFunction.OR);
-            if ((i & 2) != 0) shape = VoxelShapes.combine(shape, east, BooleanBiFunction.OR);
-            if ((i & 4) != 0) shape = VoxelShapes.combine(shape, south, BooleanBiFunction.OR);
-            if ((i & 8) != 0) shape = VoxelShapes.combine(shape, west, BooleanBiFunction.OR);
-            if ((i & 16) != 0) shape = VoxelShapes.combine(shape, up, BooleanBiFunction.OR);
-            if ((i & 32) != 0) shape = VoxelShapes.combine(shape, down, BooleanBiFunction.OR);
-            shapes[i] = shape.simplify();
+            if ((i & 1) != 0) shape = Shapes.joinUnoptimized(shape, north, BooleanOp.OR);
+            if ((i & 2) != 0) shape = Shapes.joinUnoptimized(shape, east, BooleanOp.OR);
+            if ((i & 4) != 0) shape = Shapes.joinUnoptimized(shape, south, BooleanOp.OR);
+            if ((i & 8) != 0) shape = Shapes.joinUnoptimized(shape, west, BooleanOp.OR);
+            if ((i & 16) != 0) shape = Shapes.joinUnoptimized(shape, up, BooleanOp.OR);
+            if ((i & 32) != 0) shape = Shapes.joinUnoptimized(shape, down, BooleanOp.OR);
+            shapes[i] = shape.optimize();
         }
         
         return shapes;
@@ -112,19 +123,19 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
     
     private int packStates(BlockState state) {
         int i = 0;
-        if (state.get(getNorthProperty()) != NO_CONNECTION) i |= 1;
-        if (state.get(getEastProperty()) != NO_CONNECTION) i |= 2;
-        if (state.get(getSouthProperty()) != NO_CONNECTION) i |= 4;
-        if (state.get(getWestProperty()) != NO_CONNECTION) i |= 8;
-        if (state.get(getUpProperty()) != NO_CONNECTION) i |= 16;
-        if (state.get(getDownProperty()) != NO_CONNECTION) i |= 32;
+        if (state.getValue(getNorthProperty()) != NO_CONNECTION) i |= 1;
+        if (state.getValue(getEastProperty()) != NO_CONNECTION) i |= 2;
+        if (state.getValue(getSouthProperty()) != NO_CONNECTION) i |= 4;
+        if (state.getValue(getWestProperty()) != NO_CONNECTION) i |= 8;
+        if (state.getValue(getUpProperty()) != NO_CONNECTION) i |= 16;
+        if (state.getValue(getDownProperty()) != NO_CONNECTION) i |= 32;
         return i;
     }
     
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
         if (oldState.getBlock().equals(state.getBlock())) return;
-        else if (oldState.isOf(getConnectionBlock().getBlock())) {
+        else if (oldState.is(getConnectionBlock().getBlock())) {
             GenericPipeInterfaceEntity.addNode(world, pos, false, state, getNetworkData(world));
             return;
         }
@@ -133,7 +144,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         if (hasNeighboringMachine(state, world, pos, true)) {
             var connectionBlock = getConnectionBlock();
             var interfaceState = ((GenericPipeBlock) connectionBlock.getBlock()).addConnectionStates(connectionBlock, world, pos, true);
-            world.setBlockState(pos, interfaceState);
+            world.setBlockAndUpdate(pos, interfaceState);
         } else {
             // no states need to be added (see getPlacementState)
             GenericPipeInterfaceEntity.addNode(world, pos, false, state, getNetworkData(world));
@@ -142,10 +153,14 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         updateNeighbors(world, pos, false);
     }
     
+    // also known as 'getStateForNeighborUpdate'
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess worldAccess, BlockPos pos, BlockPos neighborPos) {
-        var world = (World) worldAccess;
-        if (world.isClient) return state;
+    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor worldAccess, BlockPos pos, BlockPos neighborPos) {
+        var world = (Level) worldAccess;
+        if (world.isClientSide) return state;
+        
+        if (state.getValue(BlockStateProperties.WATERLOGGED))
+            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         
         // transform to interface when machine is placed as neighbor
         if (hasMachineInDirection(direction, world, pos, apiValidationFunction())) {
@@ -155,7 +170,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
             
             var connectionBlock = getConnectionBlock();
             return ((GenericPipeBlock) connectionBlock.getBlock()).addConnectionStates(connectionBlock, world, pos, direction);
-        } else if (neighborState.isOf(Blocks.AIR))
+        } else if (neighborState.is(Blocks.AIR))
             // remove potential stale machine -> neighboring pipes mapping
             getNetworkData(world).machinePipeNeighbors.remove(neighborPos);
         
@@ -163,14 +178,19 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
     }
     
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        super.onStateReplaced(state, world, pos, newState, moved);
+    public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
+        super.onRemove(state, world, pos, newState, moved);
         
-        if (!state.isOf(newState.getBlock()) && !(newState.getBlock() instanceof GenericPipeBlock)) {
+        if (!state.is(newState.getBlock()) && !(newState.getBlock() instanceof GenericPipeBlock)) {
             // block was removed/replaced instead of updated
             onBlockRemoved(pos, state, world);
         }
         
+    }
+    
+    @Override
+    protected @NotNull FluidState getFluidState(BlockState state) {
+        return state.getValue(BlockStateProperties.WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
     
     /**
@@ -180,18 +200,18 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * @param pos             The target position
      * @param neighborToggled Whether the neighbor was toggled
      */
-    public void updateNeighbors(World world, BlockPos pos, boolean neighborToggled) {
+    public void updateNeighbors(Level world, BlockPos pos, boolean neighborToggled) {
         for (var direction : Direction.values()) {
-            var neighborPos = pos.offset(direction);
+            var neighborPos = pos.relative(direction);
             var neighborState = world.getBlockState(neighborPos);
             // Only update pipes
             if (neighborState.getBlock() instanceof AbstractPipeBlock pipeBlock) {
                 var updatedState = pipeBlock.addConnectionStates(neighborState, world, neighborPos, false);
-                world.setBlockState(neighborPos, updatedState);
+                world.setBlockAndUpdate(neighborPos, updatedState);
                 
                 // Update network data if the state was changed
                 if (!neighborState.equals(updatedState) || pipeBlock instanceof GenericPipeDuctBlock) {
-                    boolean interfaceBlock = updatedState.isOf(getConnectionBlock().getBlock());
+                    boolean interfaceBlock = updatedState.is(getConnectionBlock().getBlock());
                     if (neighborToggled)
                         GenericPipeInterfaceEntity.addNode(world, neighborPos, interfaceBlock, updatedState, getNetworkData(world));
                 }
@@ -200,76 +220,90 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
     }
     
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        if (!player.isCreative() && !world.isClient) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+        if (!player.isCreative() && !world.isClientSide) {
             onBlockRemoved(pos, state, world);
         }
-        return super.onBreak(world, pos, state, player);
+        return super.playerWillDestroy(world, pos, state, player);
     }
     
     @Override
-    public ActionResult onWrenchUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand) {
-        if (player.isSneaking()) {
-            this.onBreak(world, pos, state, player);
-            world.breakBlock(pos, true, player);
-            return ActionResult.SUCCESS;
+    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        
+        if (!level.isClientSide() && stack.is(TagContent.WRENCHES) && !stack.is(ItemContent.WRENCH)) {
+            this.onWrenchUse(state, level, pos, player, hand);
+            return ItemInteractionResult.SUCCESS;
         }
         
-        return !toggleSideConnection(state, getInteractDirection(state, pos, player), world, pos) ? ActionResult.FAIL : ActionResult.SUCCESS;
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
     
     @Override
-    public ActionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, World world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, PlayerEntity player, Hand hand) {
-        return toggleSideConnection(state, neighborFace.getOpposite(), world, pos) ? ActionResult.SUCCESS : ActionResult.FAIL;
+    public InteractionResult onWrenchUse(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand) {
+        if (player.isShiftKeyDown()) {
+            this.playerWillDestroy(world, pos, state, player);
+            world.destroyBlock(pos, true, player);
+            return InteractionResult.SUCCESS;
+        }
+        
+        return toggleSideConnection(state, getInteractDirection(state, pos, player), world, pos) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
     }
     
-    protected Direction getInteractDirection(BlockState state, BlockPos pos, PlayerEntity player) {
+    @Override
+    public InteractionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, Level world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, Player player, InteractionHand hand) {
+        return toggleSideConnection(state, neighborFace.getOpposite(), world, pos) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+    }
+    
+    protected Direction getInteractDirection(BlockState state, BlockPos pos, Player player) {
         var shapes = getActiveShapes(state);
-        var start = player.getCameraPosVec(0f);
-        var end = start.add(player.getRotationVec(0).multiply(5));
+        var start = player.getEyePosition(0f);
+        var end = start.add(player.getViewVector(0).scale(5));
         
         var targetShape = shapes.getFirst();
         var distance = Double.MAX_VALUE;
-        var hitPos = Vec3d.ZERO;
+        var hitPos = Vec3.ZERO;
         for (var shape : shapes) {
-            var hitResult = shape.raycast(start, end, pos);
+            var hitResult = shape.clip(start, end, pos);
             if (hitResult == null) continue;
             
-            var shapeDistance = hitResult.getPos().distanceTo(start);
+            // skip center if we already matched one of the outer ones
+            if (shape.equals(shapes.getLast()) && distance < Double.MAX_VALUE) continue;
+            
+            var shapeDistance = hitResult.getLocation().distanceTo(start);
             if (shapeDistance < distance) {
                 distance = shapeDistance;
                 targetShape = shape;
-                hitPos = hitResult.getPos();
+                hitPos = hitResult.getLocation();
             }
         }
         
-        var center = targetShape.getBoundingBox().getCenter();
-        var diff = center.subtract(new Vec3d(0.5, 0.5, 0.5));
-        if (diff.equals(Vec3d.ZERO))
+        var center = targetShape.bounds().getCenter();
+        var diff = center.subtract(new Vec3(0.5, 0.5, 0.5));
+        if (diff.equals(Vec3.ZERO))
             // center hit
-            diff = hitPos.subtract(center.add(Vec3d.of(pos)));
+            diff = hitPos.subtract(center.add(Vec3.atLowerCornerOf(pos)));
         
-        return Direction.getFacing(diff.x, diff.y, diff.z);
+        return Direction.getNearest(diff.x, diff.y, diff.z);
     }
     
+    // only returns the outside shapes
     private List<VoxelShape> getActiveShapes(BlockState state) {
         
         var shapes = new ArrayList<VoxelShape>();
-        if (state.get(getNorthProperty()) != NO_CONNECTION)
-            shapes.add(Block.createCuboidShape(5, 5, 0, 11, 11, 5));
-        if (state.get(getEastProperty()) != NO_CONNECTION)
-            shapes.add(Block.createCuboidShape(11, 5, 5, 16, 11, 11));
-        if (state.get(getSouthProperty()) != NO_CONNECTION)
-            shapes.add(Block.createCuboidShape(5, 5, 11, 11, 11, 16));
-        if (state.get(getWestProperty()) != NO_CONNECTION)
-            shapes.add(Block.createCuboidShape(0, 5, 5, 5, 11, 11));
-        if (state.get(getUpProperty()) != NO_CONNECTION)
-            shapes.add(Block.createCuboidShape(5, 11, 5, 11, 16, 11));
-        if (state.get(getDownProperty()) != NO_CONNECTION)
-            shapes.add(Block.createCuboidShape(5, 0, 5, 11, 5, 11));
+        if (state.getValue(getNorthProperty()) != NO_CONNECTION)
+            shapes.add(Block.box(5, 5, 0, 11, 11, 5));
+        if (state.getValue(getEastProperty()) != NO_CONNECTION)
+            shapes.add(Block.box(11, 5, 5, 16, 11, 11));
+        if (state.getValue(getSouthProperty()) != NO_CONNECTION)
+            shapes.add(Block.box(5, 5, 11, 11, 11, 16));
+        if (state.getValue(getWestProperty()) != NO_CONNECTION)
+            shapes.add(Block.box(0, 5, 5, 5, 11, 11));
+        if (state.getValue(getUpProperty()) != NO_CONNECTION)
+            shapes.add(Block.box(5, 11, 5, 11, 16, 11));
+        if (state.getValue(getDownProperty()) != NO_CONNECTION)
+            shapes.add(Block.box(5, 0, 5, 11, 5, 11));
         
-        if (shapes.isEmpty())
-            shapes.add(Block.createCuboidShape(5, 5, 5, 11, 11, 11));
+        shapes.add(Block.box(5, 5, 5, 11, 11, 11));
         
         return shapes;
     }
@@ -282,26 +316,27 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * @param world The target world
      * @param pos   The target pipe position
      */
-    protected boolean toggleSideConnection(BlockState state, Direction side, World world, BlockPos pos) {
+    protected boolean toggleSideConnection(BlockState state, Direction side, Level world, BlockPos pos) {
         var property = directionToProperty(side);
-        var createConnection = state.get(property) == NO_CONNECTION;
+        var createConnection = state.getValue(property) == NO_CONNECTION;
         
         // check if connection would be valid if state is toggled
-        var targetPos = pos.offset(side);
+        var targetPos = pos.relative(side);
         if (createConnection && !isValidConnectionTarget(world.getBlockState(targetPos).getBlock(), world, side.getOpposite(), targetPos))
             return false;
         
         // toggle connection state
-        int nextConnectionState = getNextConnectionState(state, side, world, pos, state.get(property));
-        var newState = addStraightState(state.with(property, nextConnectionState));
+        int nextConnectionState = getNextConnectionState(state, side, world, pos, state.getValue(property));
+        var newState = addStraightState(state.setValue(property, nextConnectionState));
         
         // transform to interface block if side is being enabled and machine is connected
-        if (!newState.isOf(getConnectionBlock().getBlock()) && createConnection && hasMachineInDirection(side, world, pos, apiValidationFunction())) {
+        if (!newState.is(getConnectionBlock().getBlock()) && createConnection && hasMachineInDirection(side, world, pos, apiValidationFunction())) {
             var connectionState = getConnectionBlock();
             var interfaceState = ((GenericPipeBlock) connectionState.getBlock()).addConnectionStates(connectionState, world, pos, side);
-            world.setBlockState(pos, interfaceState);
+            interfaceState = addFluidState(interfaceState, pos, world);
+            world.setBlockAndUpdate(pos, interfaceState);
         } else {
-            world.setBlockState(pos, newState);
+            world.setBlockAndUpdate(pos, newState);
             GenericPipeInterfaceEntity.addNode(world, pos, false, newState, getNetworkData(world));
             
             // update neighbor if it's a pipe
@@ -309,8 +344,8 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         }
         
         // play sound
-        var soundGroup = getSoundGroup(state);
-        world.playSound(null, pos, soundGroup.getPlaceSound(), SoundCategory.BLOCKS, soundGroup.getVolume() * .5f, soundGroup.getPitch());
+        var soundGroup = getSoundType(state);
+        world.playSound(null, pos, soundGroup.getPlaceSound(), SoundSource.BLOCKS, soundGroup.getVolume() * .5f, soundGroup.getPitch());
         
         return true;
     }
@@ -324,11 +359,14 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * @param createConnection Whether to create a connection
      * @return The updated block-state
      */
-    public BlockState addConnectionStates(BlockState state, World world, BlockPos pos, boolean createConnection) {
+    public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, boolean createConnection) {
+        
+        state = addFluidState(state, pos, world);
+        
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
             var connection = shouldConnect(state, direction, pos, world, createConnection);
-            state = state.with(property, connection ? CONNECTION : NO_CONNECTION);
+            state = state.setValue(property, connection ? CONNECTION : NO_CONNECTION);
         }
         
         return addStraightState(state);
@@ -345,13 +383,13 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * @param createDirection The direction to create a connection in
      * @return The updated block-state
      */
-    public BlockState addConnectionStates(BlockState state, World world, BlockPos pos, Direction createDirection) {
+    public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, Direction createDirection) {
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
             var connection = shouldConnect(state, direction, pos, world, direction.equals(createDirection));
-            state = state.with(property, connection ? CONNECTION : NO_CONNECTION);
+            state = state.setValue(property, connection ? CONNECTION : NO_CONNECTION);
         }
-        return addStraightState(state);
+        return addFluidState(addStraightState(state), pos, world);
     }
     
     /**
@@ -361,12 +399,12 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * @return The updated block-state
      */
     public BlockState addStraightState(BlockState state) {
-        var north = state.get(getNorthProperty()) != NO_CONNECTION;
-        var south = state.get(getSouthProperty()) != NO_CONNECTION;
-        var east = state.get(getEastProperty()) != NO_CONNECTION;
-        var west = state.get(getWestProperty()) != NO_CONNECTION;
-        var up = state.get(getUpProperty()) != NO_CONNECTION;
-        var down = state.get(getDownProperty()) != NO_CONNECTION;
+        var north = state.getValue(getNorthProperty()) != NO_CONNECTION;
+        var south = state.getValue(getSouthProperty()) != NO_CONNECTION;
+        var east = state.getValue(getEastProperty()) != NO_CONNECTION;
+        var west = state.getValue(getWestProperty()) != NO_CONNECTION;
+        var up = state.getValue(getUpProperty()) != NO_CONNECTION;
+        var down = state.getValue(getDownProperty()) != NO_CONNECTION;
         
         // Check for straight connections along each axis
         boolean straightX = north && south && !east && !west && !up && !down;
@@ -376,7 +414,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         // The pipe is straight if exactly one of the axes has a straight connection
         var straight = straightX || straightY || straightZ;
         
-        return state.with(STRAIGHT, straight);
+        return state.setValue(STRAIGHT, straight);
     }
     
     /**
@@ -389,8 +427,8 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * @param createConnection Whether to create a connection
      * @return Boolean whether the pipe should connect
      */
-    public boolean shouldConnect(BlockState current, Direction direction, BlockPos currentPos, World world, boolean createConnection) {
-        var targetPos = currentPos.offset(direction);
+    public boolean shouldConnect(BlockState current, Direction direction, BlockPos currentPos, Level world, boolean createConnection) {
+        var targetPos = currentPos.relative(direction);
         var targetState = world.getBlockState(targetPos);
         
         // If creating a connection we don't check the other pipe's connection state, force the connection
@@ -411,11 +449,11 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * @param createConnection Whether to create a connection
      * @return Boolean whether the pipe is connecting
      */
-    public boolean isConnectingInDirection(BlockState current, Direction direction, BlockPos currentPos, World world, boolean createConnection) {
+    public boolean isConnectingInDirection(BlockState current, Direction direction, BlockPos currentPos, Level world, boolean createConnection) {
         var block = current.getBlock();
         if (!(block instanceof GenericPipeBlock pipeBlock)) return false;
         var property = pipeBlock.directionToProperty(direction);
-        return current.get(property) >= CONNECTION || createConnection && current.get(property) == NO_CONNECTION;
+        return current.getValue(property) >= CONNECTION || createConnection && current.getValue(property) == NO_CONNECTION;
     }
     
     /**
@@ -427,25 +465,25 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      */
     public int directionToPropertyValue(BlockState state, Direction direction) {
         if (direction == Direction.NORTH)
-            return state.get(getNorthProperty());
+            return state.getValue(getNorthProperty());
         else if (direction == Direction.EAST)
-            return state.get(getEastProperty());
+            return state.getValue(getEastProperty());
         else if (direction == Direction.SOUTH)
-            return state.get(getSouthProperty());
+            return state.getValue(getSouthProperty());
         else if (direction == Direction.WEST)
-            return state.get(getWestProperty());
+            return state.getValue(getWestProperty());
         else if (direction == Direction.UP)
-            return state.get(getUpProperty());
-        else return state.get(getDownProperty());
+            return state.getValue(getUpProperty());
+        else return state.getValue(getDownProperty());
     }
     
     /**
-     * Converts a {@link Direction} into a {@link IntProperty} for a connection
+     * Converts a {@link Direction} into a {@link IntegerProperty} for a connection
      *
      * @param direction Respective direction
      * @return the property
      */
-    public IntProperty directionToProperty(Direction direction) {
+    public IntegerProperty directionToProperty(Direction direction) {
         if (direction == Direction.NORTH)
             return getNorthProperty();
         else if (direction == Direction.EAST)
@@ -459,17 +497,17 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         else return getDownProperty();
     }
     
-    protected int getNextConnectionState(BlockState state, Direction side, World world, BlockPos pos, int current) {
+    protected int getNextConnectionState(BlockState state, Direction side, Level world, BlockPos pos, int current) {
         return current == NO_CONNECTION ? CONNECTION : NO_CONNECTION;
     }
     
-    protected void onBlockRemoved(BlockPos pos, BlockState oldState, World world) {
+    protected void onBlockRemoved(BlockPos pos, BlockState oldState, Level world) {
         updateNeighbors(world, pos, false);
         GenericPipeInterfaceEntity.removeNode(world, pos, false, oldState, getNetworkData(world));
     }
     
     @Override
-    protected float getAmbientOcclusionLightLevel(BlockState state, BlockView world, BlockPos pos) {
+    protected float getShadeBrightness(BlockState state, BlockGetter world, BlockPos pos) {
         return 1.0f;
     }
     
@@ -477,27 +515,27 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * The following is a hacky implementation to allow child classes to modify the connection properties
      */
     
-    public IntProperty getNorthProperty() {
+    public IntegerProperty getNorthProperty() {
         return NORTH;
     }
     
-    public IntProperty getEastProperty() {
+    public IntegerProperty getEastProperty() {
         return EAST;
     }
     
-    public IntProperty getSouthProperty() {
+    public IntegerProperty getSouthProperty() {
         return SOUTH;
     }
     
-    public IntProperty getWestProperty() {
+    public IntegerProperty getWestProperty() {
         return WEST;
     }
     
-    public IntProperty getUpProperty() {
+    public IntegerProperty getUpProperty() {
         return UP;
     }
     
-    public IntProperty getDownProperty() {
+    public IntegerProperty getDownProperty() {
         return DOWN;
     }
 }

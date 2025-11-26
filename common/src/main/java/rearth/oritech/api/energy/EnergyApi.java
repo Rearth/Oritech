@@ -1,12 +1,20 @@
 package rearth.oritech.api.energy;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import rearth.oritech.OritechPlatform;
+
+import java.util.ServiceLoader;
 
 public class EnergyApi {
     
-    public static BlockEnergyApi BLOCK;
-    public static ItemEnergyApi ITEM;
+    public static BlockEnergyApi BLOCK = ServiceLoader.load(BlockEnergyApi.class)
+                                           .findFirst()
+                                           .orElseThrow(() -> new IllegalStateException("Failed to load block energy api service."));
+    
+    public static ItemEnergyApi ITEM = ServiceLoader.load(ItemEnergyApi.class)
+                                         .findFirst()
+                                         .orElseThrow(() -> new IllegalStateException("Failed to load item energy api service."));
     
     public static Long transfer(EnergyStorage from, EnergyStorage to, long amount, boolean simulate) {
         var extracted = from.extract(amount, true);

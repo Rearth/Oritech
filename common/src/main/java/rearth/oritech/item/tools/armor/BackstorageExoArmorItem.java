@@ -1,59 +1,62 @@
 package rearth.oritech.item.tools.armor;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.StackContext;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
 
+
 public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEnergyItem {
     
-    public BackstorageExoArmorItem(RegistryEntry<ArmorMaterial> material, Type type, Item.Settings settings) {
+    public BackstorageExoArmorItem(Holder<ArmorMaterial> material, Type type, Item.Properties settings) {
         super(material, type, settings);
     }
     
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if (world.isClient) return;
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+        if (world.isClientSide) return;
         
         var tickPeriod = 10;
-        if (world.getTime() % tickPeriod != 0) return;
+        if (world.getGameTime() % tickPeriod != 0) return;
         
-        var isPlayer = entity instanceof PlayerEntity;
-        var isEquipped = ((PlayerEntity) entity).getEquippedStack(EquipmentSlot.CHEST).equals(stack);
+        var isPlayer = entity instanceof Player;
+        var isEquipped = ((Player) entity).getItemBySlot(EquipmentSlot.CHEST).equals(stack);
         
         if (isPlayer && isEquipped) {
-            distributePower((PlayerEntity) entity, stack, slot);
+            distributePower((Player) entity, stack, slot);
         }
     }
     
-    private void distributePower(PlayerEntity player, ItemStack pack, int slot) {
+    private void distributePower(Player player, ItemStack pack, int slot) {
         
         var packStorage = new SimpleEnergyItemStorage(getEnergyMaxInput(pack), getEnergyMaxOutput(pack), getEnergyCapacity(pack), pack);
         if (packStorage.getAmount() < 10) return;
 
-        for (int i = 0; i < player.getInventory().size(); i++) {
-            var stack = player.getInventory().getStack(i);
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            var stack = player.getInventory().getItem(i);
             if (stack.isEmpty() || stack == pack || slot == i) continue;
             
             final int finalI = i;
-            var stackRef = new StackContext(stack, updated -> player.getInventory().setStack(finalI, updated));
+            var stackRef = new StackContext(stack, updated -> player.getInventory().setItem(finalI, updated));
             var stackStorage = EnergyApi.ITEM.find(stackRef);
             if (stackStorage == null || stackStorage.getAmount() >= stackStorage.getCapacity()) continue;
             
@@ -79,23 +82,23 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEner
     }
     
     @Override
-    public boolean isItemBarVisible(ItemStack stack) {
+    public boolean isBarVisible(ItemStack stack) {
         return true;
     }
     
     @Override
-    public int getItemBarColor(ItemStack stack) {
+    public int getBarColor(ItemStack stack) {
         return 0xff7007;
     }
     
-    public int getItemBarStep(ItemStack stack) {
+    public int getBarWidth(ItemStack stack) {
         return Math.round((getStoredEnergy(stack) * 100f / this.getEnergyCapacity(stack)) * BAR_STEP_COUNT) / 100;
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
-        var text = Text.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
-        tooltip.add(text.formatted(Formatting.GOLD));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+        super.appendHoverText(stack, context, tooltip, type);
+        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
+        tooltip.add(text.withStyle(ChatFormatting.GOLD));
     }
 }

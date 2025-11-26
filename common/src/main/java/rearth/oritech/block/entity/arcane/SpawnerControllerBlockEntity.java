@@ -1,28 +1,29 @@
 package rearth.oritech.block.entity.arcane;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.client.init.ParticleContent.SoulParticleData;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
@@ -42,7 +43,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     private boolean redstonePowered;
     
     // loading cache only
-    private Identifier loadedMob;
+    private ResourceLocation loadedMob;
     
     // client only
     public float lastProgress = 0f;
@@ -52,19 +53,19 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, SpawnerControllerBlockEntity blockEntity) {
+    public void tick(Level world, BlockPos pos, BlockState state, SpawnerControllerBlockEntity blockEntity) {
         
-        if (world.isClient) return;
+        if (world.isClientSide) return;
         
         if (loadedMob != null && spawnedMob == null) {
             loadEntityFromIdentifier(loadedMob);
             loadedMob = null;
-            this.markDirty();
+            this.setChanged();
         }
         
         if (spawnedMob == null || !hasCage || redstonePowered) return;
         
-        if (collectedSouls >= maxSouls && world.getTime() % 4 == 0) {
+        if (collectedSouls >= maxSouls && world.getGameTime() % 4 == 0) {
             spawnMob();
             updateComparator();
         }
@@ -77,27 +78,27 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         nbt.putInt("souls", collectedSouls);
         nbt.putInt("maxSouls", maxSouls);
         nbt.putBoolean("cage", hasCage);
         nbt.putBoolean("redstone", redstonePowered);
         if (spawnedMob != null) {
-            nbt.putString("spawnedMob", Registries.ENTITY_TYPE.getId(spawnedMob).toString());
+            nbt.putString("spawnedMob", BuiltInRegistries.ENTITY_TYPE.getKey(spawnedMob).toString());
         }
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         hasCage = nbt.getBoolean("cage");
         maxSouls = nbt.getInt("maxSouls");
         collectedSouls = nbt.getInt("souls");
         redstonePowered = nbt.getBoolean("redstone");
         
         if (nbt.contains("spawnedMob"))
-            loadedMob = Identifier.of(nbt.getString("spawnedMob"));
+            loadedMob = ResourceLocation.parse(nbt.getString("spawnedMob"));
     }
     
     private void spawnMob() {
@@ -110,24 +111,24 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         if (targetPosition == null) return;
         networkDirty = true;
         
-        spawnedMob.spawn((ServerWorld) world, targetPosition, SpawnReason.SPAWNER);
+        spawnedMob.spawn((ServerLevel) level, targetPosition, MobSpawnType.SPAWNER);
         collectedSouls -= maxSouls;
-        ParticleContent.SOUL_USED.spawn(world, targetPosition.toCenterPos(), maxSouls);
+        ParticleContent.SOUL_USED.spawn(level, targetPosition.getCenter(), maxSouls);
         
     }
     
     private BlockPos findSpawnPosition(int spawnRange, int requiredHeight) {
         for (int i = 0; i < 10; i++) {
-            var candidate = pos.add(world.random.nextBetween(-spawnRange, spawnRange), 3, world.random.nextBetween(-spawnRange, spawnRange));
+            var candidate = worldPosition.offset(level.random.nextIntBetweenInclusive(-spawnRange, spawnRange), 3, level.random.nextIntBetweenInclusive(-spawnRange, spawnRange));
             var foundFree = 0;
             for (int j = 0; j < 9; j++) {
-                var state = world.getBlockState(candidate.down(j));
+                var state = level.getBlockState(candidate.below(j));
                 if (state.isAir()) {
                     foundFree++;
                 } else {
                     if (foundFree > requiredHeight) {
                         // found target
-                        return candidate.down(j - 1);
+                        return candidate.below(j - 1);
                         
                     } else {
                         foundFree = 0;
@@ -143,10 +144,10 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         networkDirty = false;
         
         if (spawnedMob != null)
-            NetworkManager.sendBlockHandle(this, new SpawnerSyncPacket(pos, Registries.ENTITY_TYPE.getId(spawnedMob), hasCage, collectedSouls, maxSouls));
+            NetworkManager.sendBlockHandle(this, new SpawnerSyncPacket(worldPosition, BuiltInRegistries.ENTITY_TYPE.getKey(spawnedMob), hasCage, collectedSouls, maxSouls));
     }
     
-    public static void receiveUpdatePacket(SpawnerSyncPacket message, World world, DynamicRegistryManager dynamicRegistryManager) {
+    public static void receiveUpdatePacket(SpawnerSyncPacket message, Level world, RegistryAccess dynamicRegistryManager) {
         
         if (world.getBlockEntity(message.position) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.loadEntityFromIdentifier(message.spawnedMob);
@@ -157,17 +158,17 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     }
     
     @Override
-    public void markDirty() {
-        super.markDirty();
+    public void setChanged() {
+        super.setChanged();
         this.networkDirty = true;
     }
     
-    public void loadEntityFromIdentifier(Identifier identifier) {
-        var newMob = Registries.ENTITY_TYPE.get(identifier);
+    public void loadEntityFromIdentifier(ResourceLocation identifier) {
+        var newMob = BuiltInRegistries.ENTITY_TYPE.get(identifier);
         
         if (newMob != spawnedMob) {
             spawnedMob = newMob;
-            renderedEntity = spawnedMob.create(world);
+            renderedEntity = spawnedMob.create(level);
         }
     }
     
@@ -180,7 +181,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         var progress = getComparatorOutput();
         if (lastComparatorOutput != progress) {
             lastComparatorOutput = progress;
-            world.updateComparators(pos, getCachedState().getBlock());
+            level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
         }
         
     }
@@ -197,14 +198,14 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     }
     
     @Override
-    public void onSoulIncoming(Vec3d source) {
-        var distance = (float) source.distanceTo(pos.toCenterPos());
+    public void onSoulIncoming(Vec3 source) {
+        var distance = (float) source.distanceTo(worldPosition.getCenter());
         collectedSouls++;
         
-        var soulPath = pos.toCenterPos().subtract(source);
+        var soulPath = worldPosition.getCenter().subtract(source);
         var animData = new ParticleContent.SoulParticleData(soulPath, (int) getSoulTravelDuration(distance));
         
-        ParticleContent.WANDERING_SOUL.spawn(world, source.add(0, 0.7f, 0), animData);
+        ParticleContent.WANDERING_SOUL.spawn(level, source.add(0, 0.7f, 0), animData);
         networkDirty = true;
         updateComparator();
     }
@@ -216,9 +217,9 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     public void onEntitySteppedOn(Entity entity) {
         if (spawnedMob != null) return;
         
-        if (entity instanceof MobEntity mobEntity) {
+        if (entity instanceof Mob mobEntity) {
             
-            if (mobEntity.getType().arch$holder().isIn(TagContent.SPAWNER_BLACKLIST)) {
+            if (mobEntity.getType().arch$holder().is(TagContent.SPAWNER_BLACKLIST)) {
                 Oritech.LOGGER.debug("Ignored blacklisted entity for spawner: " + mobEntity.getType().arch$registryName());
                 return;
             }
@@ -232,14 +233,14 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
             mobEntity.remove(Entity.RemovalReason.DISCARDED);
             reloadCage(null);
             
-            this.markDirty();
+            this.setChanged();
         }
     }
     
-    public void onBlockInteracted(PlayerEntity player) {
+    public void onBlockInteracted(Player player) {
         
         if (spawnedMob == null) {
-            player.sendMessage(Text.translatable("message.oritech.spawner.no_mob"));
+            player.sendSystemMessage(Component.translatable("message.oritech.spawner.no_mob"));
             return;
         }
         
@@ -248,10 +249,10 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         reloadCage(player);
         
         if (hasCage)
-            player.sendMessage(Text.translatable("tooltip.oritech.spawner.collected_souls", collectedSouls, maxSouls));
+            player.sendSystemMessage(Component.translatable("tooltip.oritech.spawner.collected_souls", collectedSouls, maxSouls));
     }
     
-    private void reloadCage(@Nullable PlayerEntity player) {
+    private void reloadCage(@Nullable Player player) {
         var cageSize = new Vec3i(Math.round(spawnedMob.getWidth() * 2 + 0.5f), Math.round(spawnedMob.getHeight() + 0.5f), Math.round(spawnedMob.getWidth() * 2 + 0.5f));
         var offset = cageSize.getX() / 2;
         
@@ -260,12 +261,12 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         for (int x = 0; x < cageSize.getX(); x++) {
             for (int y = 0; y < cageSize.getY(); y++) {
                 for (int z = 0; z < cageSize.getZ(); z++) {
-                    var candidate = pos.add(-offset + x, -y - 1, -offset + z);
+                    var candidate = worldPosition.offset(-offset + x, -y - 1, -offset + z);
                     
                     // block type is a placeholder
-                    if (!world.getBlockState(candidate).getBlock().equals(BlockContent.SPAWNER_CAGE_BLOCK)) {
+                    if (!level.getBlockState(candidate).getBlock().equals(BlockContent.SPAWNER_CAGE_BLOCK)) {
                         hasCage = false;
-                        ParticleContent.DEBUG_BLOCK.spawn(world, Vec3d.of(candidate));
+                        ParticleContent.DEBUG_BLOCK.spawn(level, Vec3.atLowerCornerOf(candidate));
                     }
                     
                 }
@@ -273,18 +274,18 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         }
         
         if (!hasCage && player != null) {
-            player.sendMessage(Text.translatable("message.oritech.spawner.no_cage"));
+            player.sendSystemMessage(Component.translatable("message.oritech.spawner.no_cage"));
         }
         
-        this.markDirty();
+        this.setChanged();
     }
     
-    public record SpawnerSyncPacket(BlockPos position, Identifier spawnedMob, boolean hasCage, int collectedSouls, int maxSouls) implements CustomPayload {
+    public record SpawnerSyncPacket(BlockPos position, ResourceLocation spawnedMob, boolean hasCage, int collectedSouls, int maxSouls) implements CustomPacketPayload {
         
-        public static final CustomPayload.Id<SpawnerSyncPacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("spawner"));
+        public static final CustomPacketPayload.Type<SpawnerSyncPacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("spawner"));
         
         @Override
-        public Id<? extends CustomPayload> getId() {
+        public Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;
         }
     } {

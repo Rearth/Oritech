@@ -7,22 +7,23 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
-
+import rearth.oritech.util.ScreenProvider.GuiSlot;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
+
 
 public class OritechEMIRecipe extends BasicEmiRecipe {
     
@@ -32,7 +33,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
     private final OritechRecipe recipe;
     private final ScreenProvider.ArrowConfiguration indicatorConfig;
     
-    public OritechEMIRecipe(RecipeEntry<OritechRecipe> entry, EmiRecipeCategory category, Class<? extends MachineBlockEntity> screenProviderSource, BlockState machineState) {
+    public OritechEMIRecipe(RecipeHolder<OritechRecipe> entry, EmiRecipeCategory category, Class<? extends MachineBlockEntity> screenProviderSource, BlockState machineState) {
         super(category, entry.id(),  150, 69);
         
         recipe = entry.value();
@@ -63,7 +64,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         
     }
     
-    public OritechEMIRecipe(RecipeEntry<OritechRecipe> entry, EmiRecipeCategory category, Boolean isGenerator, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment slotOffsets) {
+    public OritechEMIRecipe(RecipeHolder<OritechRecipe> entry, EmiRecipeCategory category, Boolean isGenerator, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment slotOffsets) {
         super(category, entry.id(), 150, 69);
         
         this.isGenerator = isGenerator;
@@ -143,7 +144,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         
         // data
         var duration = String.format("%.0f", recipe.getTime() / 20f);
-        widgets.addText(Text.translatable("emi.title.oritech.cookingtime", duration, recipe.getTime()), (int) (getDisplayWidth() * 0.33), (int) (getDisplayHeight() * 0.88), 0xFFFFFF, true);
+        widgets.addText(Component.translatable("emi.title.oritech.cookingtime", duration, recipe.getTime()), (int) (getDisplayWidth() * 0.33), (int) (getDisplayHeight() * 0.88), 0xFFFFFF, true);
         
     }
 }

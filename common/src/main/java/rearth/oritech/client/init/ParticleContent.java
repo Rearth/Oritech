@@ -4,14 +4,14 @@ import io.wispforest.owo.particles.ClientParticles;
 import io.wispforest.owo.particles.systems.ParticleSystem;
 import io.wispforest.owo.particles.systems.ParticleSystemController;
 import io.wispforest.owo.util.VectorRandomUtils;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class ParticleContent {
     
@@ -34,11 +34,11 @@ public class ParticleContent {
     });
     
     public static final ParticleSystem<SoulParticleData> WANDERING_SOUL = PARTICLE_CONTROLLER.register(SoulParticleData.class, (world, pos, data) -> {
-        ClientParticles.setVelocity(data.offset.multiply((1f / data.duration) * 1.5f));
+        ClientParticles.setVelocity(data.offset.scale((1f / data.duration) * 1.5f));
         ClientParticles.spawnWithMaxAge(ParticleTypes.SCULK_SOUL, pos, data.duration);
     });
     
-    public static final ParticleSystem<Vec3d> LASER_BOOM = PARTICLE_CONTROLLER.register(Vec3d.class, (world, pos, data) -> {
+    public static final ParticleSystem<Vec3> LASER_BOOM = PARTICLE_CONTROLLER.register(Vec3.class, (world, pos, data) -> {
         var count = (int) (pos.distanceTo(data) * 0.6f + 1);
         count = Math.min(count, 12);
         spawnLineInnerStaggered(ParticleTypes.SONIC_BOOM, world, pos, data, count, 20);
@@ -48,7 +48,7 @@ public class ParticleContent {
         ClientParticles.spawnEnchantParticles(world, data.start, data.end, 0.7f);
     });
     
-    public static final ParticleSystem<Vec3d> BLACK_HOLE_EMISSION = PARTICLE_CONTROLLER.register(Vec3d.class, (world, pos, data) -> {
+    public static final ParticleSystem<Vec3> BLACK_HOLE_EMISSION = PARTICLE_CONTROLLER.register(Vec3.class, (world, pos, data) -> {
         var dist = (int) data.distanceTo(pos);
         ClientParticles.setParticleCount(dist + world.random.nextInt(3));
         ClientParticles.spawnLine(ParticleTypes.SCULK_CHARGE_POP, world, pos, data, 0.2f);
@@ -71,7 +71,7 @@ public class ParticleContent {
     
     public static final ParticleSystem<Integer> UNSTABLE_CONTAINER_GROWING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(data);
-        ClientParticles.spawn(ParticleTypes.TRIAL_SPAWNER_DETECTION, world, pos, 4);
+        ClientParticles.spawn(ParticleTypes.TRIAL_SPAWNER_DETECTED_PLAYER, world, pos, 4);
     }));
     
     public static final ParticleSystem<Integer> WATERING_EFFECT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
@@ -132,7 +132,7 @@ public class ParticleContent {
         ClientParticles.spawn(ParticleTypes.GUST, world, pos, 0);
     }));
     
-    public static final ParticleSystem<Vec3d> JETPACK_EXHAUST = PARTICLE_CONTROLLER.register(Vec3d.class, ((world, pos, data) -> {
+    public static final ParticleSystem<Vec3> JETPACK_EXHAUST = PARTICLE_CONTROLLER.register(Vec3.class, ((world, pos, data) -> {
         ClientParticles.setVelocity(data);
         ClientParticles.spawn(ParticleTypes.SMOKE, world, pos, 0.1);
     }));
@@ -151,7 +151,7 @@ public class ParticleContent {
         ClientParticles.spawnPrecise(ParticleTypes.REVERSE_PORTAL, world, pos, 0.2, 0.3, 0.2);
     }));
     
-    private static void spawnCubeOutline(ParticleEffect particle, Vec3d origin, float size, int duration, int segments) {
+    private static void spawnCubeOutline(ParticleOptions particle, Vec3 origin, float size, int duration, int segments) {
         
         spawnLineInner(particle, origin, origin.add(size, 0, 0), segments, duration);
         spawnLineInner(particle, origin.add(size, 0, 0), origin.add(size, 0, size), segments, duration);
@@ -172,8 +172,8 @@ public class ParticleContent {
         spawnLineInner(particle, origin.add(size, 0, size), origin.add(size, -size, size), segments, duration);
     }
     
-    private static void spawnLineInner(ParticleEffect particle, Vec3d start, Vec3d end, float particleCount, int duration) {
-        Vec3d increment = end.subtract(start).multiply(1f / particleCount);
+    private static void spawnLineInner(ParticleOptions particle, Vec3 start, Vec3 end, float particleCount, int duration) {
+        Vec3 increment = end.subtract(start).scale(1f / particleCount);
         
         for (int i = 0; i < particleCount; i++) {
             ClientParticles.spawnWithMaxAge(particle, start, duration);
@@ -181,13 +181,13 @@ public class ParticleContent {
         }
     }
     
-    private static void spawnLineInnerStaggered(ParticleEffect particle, World world, Vec3d start, Vec3d end, float particleCount, long pauseMillis) {
-        var increment = end.subtract(start).multiply(1f / particleCount);
+    private static void spawnLineInnerStaggered(ParticleOptions particle, Level world, Vec3 start, Vec3 end, float particleCount, long pauseMillis) {
+        var increment = end.subtract(start).scale(1f / particleCount);
         
         CompletableFuture.runAsync(() -> {
             for (int i = 0; i < particleCount; i++) {
-                var pos =  start.add(increment.multiply(i));
-                world.addParticle(particle, pos.getX(), pos.getY(), pos.getZ(), 0, 0, 0);
+                var pos =  start.add(increment.scale(i));
+                world.addParticle(particle, pos.x(), pos.y(), pos.z(), 0, 0, 0);
                 try {
                     Thread.sleep(pauseMillis);
                 } catch (InterruptedException e) {
@@ -201,8 +201,8 @@ public class ParticleContent {
         Oritech.LOGGER.debug("Registering Oritech particles");
     }
     
-    public record LineData(Vec3d start, Vec3d end) {}
+    public record LineData(Vec3 start, Vec3 end) {}
     
-    public record SoulParticleData(Vec3d offset, int duration) {}
+    public record SoulParticleData(Vec3 offset, int duration) {}
     
 }

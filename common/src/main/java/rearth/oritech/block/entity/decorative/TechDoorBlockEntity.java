@@ -1,8 +1,5 @@
 package rearth.oritech.block.entity.decorative;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
 import rearth.oritech.block.blocks.decorative.TechDoorBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -12,9 +9,11 @@ import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
-
 import java.util.Timer;
 import java.util.TimerTask;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TechDoorBlockEntity extends BlockEntity implements GeoBlockEntity {
     
@@ -31,8 +30,8 @@ public class TechDoorBlockEntity extends BlockEntity implements GeoBlockEntity {
     }
     
     public boolean shouldPlaySoundAgain() {
-        var age = world.getTime() - lastSoundEventAt;
-        lastSoundEventAt = world.getTime();
+        var age = level.getGameTime() - lastSoundEventAt;
+        lastSoundEventAt = level.getGameTime();
         
         return age > 40;
     }
@@ -46,7 +45,7 @@ public class TechDoorBlockEntity extends BlockEntity implements GeoBlockEntity {
                 delayedTimerReset(state);
             }
             
-            var opened = getCachedState().get(TechDoorBlock.OPENED);
+            var opened = getBlockState().getValue(TechDoorBlock.OPENED);
             if (opened) {
                 return state.setAndContinue(OPEN);
             } else {

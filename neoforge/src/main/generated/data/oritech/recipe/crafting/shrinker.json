@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "item": "oritech:still_strange_matter_bucket"
+    },
+    "p": {
+      "item": "oritech:dubios_container"
+    },
+    "s": {
+      "item": "oritech:superconductor"
+    }
+  },
+  "pattern": [
+    "ppp",
+    "scs",
+    "ppp"
+  ],
+  "result": {
+    "count": 1,
+    "id": "oritech:shrinker_block"
+  }
+}

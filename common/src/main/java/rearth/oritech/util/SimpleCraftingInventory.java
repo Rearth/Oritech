@@ -1,21 +1,31 @@
 package rearth.oritech.util;
 
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeInput;
 
-public class SimpleCraftingInventory extends SimpleInventory implements RecipeInput {
+public class SimpleCraftingInventory implements RecipeInput {
     
+    private final int size;
+    private final NonNullList<ItemStack> items;
+
     public SimpleCraftingInventory(ItemStack ... items) {
-        super(items);
+        this.size = items.length;
+        this.items = NonNullList.of(ItemStack.EMPTY, items);
     }
+
     @Override
-    public ItemStack getStackInSlot(int slot) {
-        return slot >= 0 && slot < this.getHeldStacks().size() ? this.getHeldStacks().get(slot) : ItemStack.EMPTY;
+    public ItemStack getItem(int slot) {
+        return slot >= 0 && slot < items.size() ? items.get(slot) : ItemStack.EMPTY;
     }
-    
+
     @Override
-    public int getSize() {
-        return this.size();
+    public int size() {
+        return size;
+    }
+
+    public NonNullList<ItemStack> getItems() {
+        return items;
     }
 }

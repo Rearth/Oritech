@@ -1,72 +1,67 @@
-architectury {
-    common rootProject.enabled_platforms.split(',')
+plugins {
+    id 'net.neoforged.moddev'
 }
 
-loom.accessWidenerPath.set(file("src/main/resources/oritech.accesswidener"))
+neoForge {
+    // only apply NeoForm to use Vanilla mode (no loader)
+    neoFormVersion = "$minecraft_version-$neoform_version"
+    parchment {
+        minecraftVersion = minecraft_version
+        mappingsVersion = parchment_mappings
+    }
+
+    validateAccessTransformers = true
+    interfaceInjectionData.from file('src/main/resources/interfaces.json').absolutePath
+}
+
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    commonJava sourceSets.main.java.sourceDirectories.singleFile
+    sourceSets.main.resources.sourceDirectories.each { dir ->
+        commonResources dir
+    }
+}
 
 dependencies {
-    // We depend on Fabric Loader here to use the Fabric @Environment annotations,
-    // which get remapped to the correct annotations on each platform.
-    // Do NOT use other classes from Fabric Loader.
-    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
-
-    // Architectury API. This is optional, and you can comment it out if you don't need it.
-    modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
-
-    // owo lib (or owo-lib-neoforge)
-    modImplementation "io.wispforest:owo-lib:${owo_version}"
-    annotationProcessor modImplementation("io.wispforest:owo-lib:${owo_version}")
-
-    // geckolib
-    modImplementation "software.bernie.geckolib:geckolib-fabric-1.21.1:4.6.6"
-
+    // Architectury API
+    compileOnlyApi "dev.architectury:architectury-neoforge:$architectury_api_version"
     // EMI
-    // modCompileOnly "dev.emi:emi-xplat-intermediary:${emi_version}:api"
-    modCompileOnly "dev.emi:emi-fabric:${emi_version}"
-
-    // REI
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:16.0.754"
-
+    compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
+    // FTB Chunks
+    compileOnly("dev.ftb.mods:ftb-chunks-neoforge:2101.1.10") { transitive = false }
+    compileOnly("dev.ftb.mods:ftb-library-neoforge:2101.1.19") { transitive = false }
+    // GeckoLib
+    compileOnlyApi "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
+    // Jade
+    compileOnly "curse.maven:jade-324717:6853386"
     // JEI
-    modCompileOnly "mezz.jei:jei-${minecraft_version}-common-api-intermediary:${jei_version}"
+    compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}") { transitive = false }
+    // Mixin
+    compileOnly 'org.spongepowered:mixin:0.8.5'
+    compileOnly 'org.ow2.asm:asm-tree:9.8'
+    // Mixin Extras
+    compileOnly 'io.github.llamalad7:mixinextras-common:0.3.5'
+    annotationProcessor 'io.github.llamalad7:mixinextras-common:0.3.5'
+    // Oracle Index
+    compileOnly "curse.maven:oracle-index-1206582:6904573"
+    // owo-lib
+    compileOnlyApi "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    annotationProcessor "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    accessTransformers "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    interfaceInjectionData "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    // REI
+    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
 
-    // JADE (needed for addon)
-    modImplementation "curse.maven:jade-324717:5639994"
-
-    // oracle index
-    modCompileOnly "curse.maven:oracle-index-1206582:6538216"
-
-}
-
-sourceSets {
-    main {
-        resources.srcDir "src/main/generated"
-        resources.exclude ".cache"
-        // exclude recipes from common because they're loader specific
-        resources.exclude "**/recipe"
-    }
-    fabric {
-        // make recipes available to fabric build
-        resources {
-            srcDir "src/main/generated"
-            include "**/recipe/**"
-        }
-        output.resourcesDir = "data"
-    }
-}
-
-tasks.withType(AbstractCopyTask).configureEach {
-    setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-}
-
-tasks.named('processResources') {
-
-    from("$rootDir/docs") {
-        into "assets/oracle_index/books/oritech"
-        exclude '.assets/item/**'   // items are rendered ingame as actual item components, no need to include them here
-    }
-
-    doLast {
-        println "processResources executed: wiki folder copied into assets/oracle_index"
-    }
+    // ftb filters
+    compileOnly "curse.maven:ftb-filter-system-943925:6899527"
 }

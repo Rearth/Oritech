@@ -1,16 +1,17 @@
 package rearth.oritech.block.blocks.pipes.energy;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.world.World;
 import rearth.oritech.block.blocks.pipes.GenericPipeDuctBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 
 import static rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock.ENERGY_PIPE_DATA;
 
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+
 public class EnergyPipeDuctBlock extends GenericPipeDuctBlock {
-	public EnergyPipeDuctBlock(Settings settings) {
+	public EnergyPipeDuctBlock(Properties settings) {
 		super(settings);
 	}
 
@@ -21,7 +22,7 @@ public class EnergyPipeDuctBlock extends GenericPipeDuctBlock {
 
 	@Override
 	public BlockState getNormalBlock() {
-		return BlockContent.ENERGY_PIPE_DUCT_BLOCK.getDefaultState();
+		return BlockContent.ENERGY_PIPE_DUCT_BLOCK.defaultBlockState();
 	}
 
 	@Override
@@ -35,7 +36,7 @@ public class EnergyPipeDuctBlock extends GenericPipeDuctBlock {
 	}
 
 	@Override
-	public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
-		return ENERGY_PIPE_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+	public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level world) {
+		return ENERGY_PIPE_DATA.computeIfAbsent(world.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
 	}
 }

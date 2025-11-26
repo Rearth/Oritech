@@ -1,11 +1,10 @@
 package rearth.oritech.api.networking;
 
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public interface WorldPacketCodec<I, T> extends PacketCodec<I, T> {
+public interface WorldPacketCodec<I, T> extends StreamCodec<I, T> {
     
     default T decode(I buf) {
         System.out.println("warning: using non-world variant of world packet codec");
@@ -16,7 +15,7 @@ public interface WorldPacketCodec<I, T> extends PacketCodec<I, T> {
         encode(buf, value, null);
     }
     
-    T decode(I buf, @Nullable World world);
-    void encode(I buf, T value, @Nullable World world);
+    T decode(I buf, @Nullable Level world);
+    void encode(I buf, T value, @Nullable Level world);
     
 }

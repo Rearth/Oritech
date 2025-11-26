@@ -2,30 +2,6 @@ package rearth.oritech.block.entity.arcane;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.wispforest.owo.util.VectorRandomUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -57,6 +33,34 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.phys.Vec3;
 
 public class EnchanterBlockEntity extends NetworkedBlockEntity
   implements ItemApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity, ScreenProvider, ExtendedMenuProvider {
@@ -70,17 +74,17 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
     
     @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 1000, 0, this::markDirty);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 1000, 0, this::setChanged);
     
-    public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::markDirty, new InventorySlotAssignment(0, 1, 1, 1));
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new InventorySlotAssignment(0, 1, 1, 1));
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
-    public static final Identifier NONE_SELECTED = Identifier.of("o:empty");
+    public static final ResourceLocation NONE_SELECTED = ResourceLocation.parse("o:empty");
     
     @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
     @NotNull
-    public Identifier selectedEnchantment = NONE_SELECTED;
+    public ResourceLocation selectedEnchantment = NONE_SELECTED;
     @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
     public int progress;
     @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
@@ -96,22 +100,22 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         activeAnimation = "idle";
         
-        if (world.getTime() % 80 == 0)
+        if (world.getGameTime() % 80 == 0)
             triggerAnim("machine", activeAnimation);
         
         // return early if there is no work to do
         statistics = EnchanterStatistics.EMPTY;
         var content = inventory.heldStacks.get(0);
         if (content.isEmpty()
-              || !inventory.getStack(1).isEmpty()
+              || !inventory.getItem(1).isEmpty()
               || !content.getItem().isEnchantable(content)
               || selectedEnchantment.equals(NONE_SELECTED)
-              || !getSelectedEnchantment().hasKeyAndValue()
-              || !getSelectedEnchantment().value().isAcceptableItem(content)) {
+              || !getSelectedEnchantment().isBound()
+              || !getSelectedEnchantment().value().canEnchant(content)) {
             progress = 0;
             return;
         }
@@ -124,19 +128,19 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         maxProgress = getEnchantmentCost(getSelectedEnchantment().value(), existingLevel + 1);
         
         if (canProgress(existingLevel + 1)) {
-            this.markDirty();
+            this.setChanged();
             energyStorage.amount -= (long) getDisplayedEnergyUsage();
             progress++;
             activeAnimation = "working";
             
-            var center = pos.toCenterPos();
+            var center = pos.getCenter();
             var offset = VectorRandomUtils.getRandomOffset(world, center, 4f);
             ParticleContent.WEED_KILLER.spawn(world, center, new ParticleContent.LineData(center, offset));
             
             if (progress >= maxProgress) {
                 progress = 0;
                 finishEnchanting();
-                ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.toCenterPos(), maxProgress + 10);
+                ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.getCenter(), maxProgress + 10);
                 activeAnimation = "idle";
             }
         }
@@ -149,35 +153,35 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         triggerAnim("machine", activeAnimation);
     }
     
-    public RegistryEntry<Enchantment> getSelectedEnchantment() {
+    public Holder<Enchantment> getSelectedEnchantment() {
         if (selectedEnchantment.equals(NONE_SELECTED)) return null;
-        var registry = world.getRegistryManager().get(RegistryKeys.ENCHANTMENT);
-        return registry.getEntry(registry.get(selectedEnchantment));
+        var registry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT);
+        return registry.wrapAsHolder(registry.get(selectedEnchantment));
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
+        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putLong("energy", energyStorage.amount);
         nbt.putString("selected", selectedEnchantment.toString());
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
+        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         energyStorage.amount = nbt.getLong("energy");
         
         if (nbt.contains("selected")) {
-            selectedEnchantment = Identifier.of(nbt.getString("selected"));
+            selectedEnchantment = ResourceLocation.parse(nbt.getString("selected"));
         }
     }
     
     private void finishEnchanting() {
         var content = inventory.heldStacks.get(0);
         var existingLevel = content.getEnchantments().getLevel(getSelectedEnchantment());
-        content.addEnchantment(getSelectedEnchantment(), existingLevel + 1);
+        content.enchant(getSelectedEnchantment(), existingLevel + 1);
         
         inventory.heldStacks.set(0, ItemStack.EMPTY);
         inventory.heldStacks.set(1, content);
@@ -195,13 +199,13 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
             return false;
         }
         
-        if (world.getTime() % 15 == 0) updateNearbyCatalysts();
+        if (level.getGameTime() % 15 == 0) updateNearbyCatalysts();
         var requiredCatalysts = getRequiredCatalystCount(targetLevel);
         
         statistics = new EnchanterStatistics(requiredCatalysts, cachedCatalysts.size());
         
         for (var catalyst : cachedCatalysts) {
-            ParticleContent.CATALYST_CONNECTION.spawn(world, pos.toCenterPos(), new ParticleContent.LineData(catalyst.getPos().toCenterPos(), pos.up().toCenterPos()));
+            ParticleContent.CATALYST_CONNECTION.spawn(level, worldPosition.getCenter(), new ParticleContent.LineData(catalyst.getBlockPos().getCenter(), worldPosition.above().getCenter()));
         }
         
         if (cachedCatalysts.size() < requiredCatalysts) return false;
@@ -212,7 +216,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         if (usedOne.isEmpty()) return false;
         
         usedOne.get().collectedSouls--;
-        markDirty();
+        setChanged();
         
         return true;
     }
@@ -238,23 +242,23 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     private void updateNearbyCatalysts() {
         var chunkRadius = 1;
         
-        var startX = (pos.getX() >> 4) - chunkRadius;
-        var startZ = (pos.getZ() >> 4) - chunkRadius;
-        var endX = (pos.getX() >> 4) + chunkRadius;
-        var endZ = (pos.getZ() >> 4) + chunkRadius;
+        var startX = (worldPosition.getX() >> 4) - chunkRadius;
+        var startZ = (worldPosition.getZ() >> 4) - chunkRadius;
+        var endX = (worldPosition.getX() >> 4) + chunkRadius;
+        var endZ = (worldPosition.getZ() >> 4) + chunkRadius;
         
         cachedCatalysts.clear();
         
         for (int chunkX = startX; chunkX <= endX; chunkX++) {
             for (int chunkZ = startZ; chunkZ <= endZ; chunkZ++) {
-                var chunk = world.getChunk(chunkX, chunkZ, ChunkStatus.FULL, false);
+                var chunk = level.getChunk(chunkX, chunkZ, ChunkStatus.FULL, false);
                 if (chunk == null) continue;
                 
                 var entities = chunk.blockEntities;
                 // select all non-empty catalysts within range (16)
                 var catalysts = entities.values()
                                   .stream()
-                                  .filter(elem -> elem instanceof EnchantmentCatalystBlockEntity catalyst && catalyst.collectedSouls > 0 && elem.getPos().getManhattanDistance(pos) < 16)
+                                  .filter(elem -> elem instanceof EnchantmentCatalystBlockEntity catalyst && catalyst.collectedSouls > 0 && elem.getBlockPos().distManhattan(worldPosition) < 16)
                                   .map(elem -> (EnchantmentCatalystBlockEntity) elem)
                                   .toList();
                 cachedCatalysts.addAll(catalysts);
@@ -263,19 +267,19 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public void saveExtraData(PacketByteBuf buf) {
+    public void saveExtraData(FriendlyByteBuf buf) {
         this.sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(pos);
+        buf.writeBlockPos(worldPosition);
     }
     
     @Override
-    public Text getDisplayName() {
-        return Text.literal("");
+    public Component getDisplayName() {
+        return Component.literal("");
     }
     
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new EnchanterScreenHandler(syncId, playerInventory, this);
     }
     
@@ -320,12 +324,12 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public Inventory getDisplayedInventory() {
+    public Container getDisplayedInventory() {
         return inventory;
     }
     
     @Override
-    public ScreenHandlerType<?> getScreenHandlerType() {
+    public MenuType<?> getScreenHandlerType() {
         return ModScreens.ENCHANTER_SCREEN;
     }
     
@@ -339,19 +343,19 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         return inventory;
     }
     
-    public static void receiveEnchantmentSelection(SelectEnchantingPacket packet, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
-        var blockEntity = player.getWorld().getBlockEntity(packet.self);
+    public static void receiveEnchantmentSelection(SelectEnchantingPacket packet, Player player, RegistryAccess dynamicRegistryManager) {
+        var blockEntity = player.level().getBlockEntity(packet.self);
         if (blockEntity instanceof EnchanterBlockEntity enchanterBlock) {
             enchanterBlock.selectedEnchantment = packet.enchantmentId;
         }
     }
     
-    public record SelectEnchantingPacket(BlockPos self, Identifier enchantmentId) implements CustomPayload {
+    public record SelectEnchantingPacket(BlockPos self, ResourceLocation enchantmentId) implements CustomPacketPayload {
         
-        public static final CustomPayload.Id<SelectEnchantingPacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("selected_enchant"));
+        public static final CustomPacketPayload.Type<SelectEnchantingPacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("selected_enchant"));
         
         @Override
-        public Id<? extends CustomPayload> getId() {
+        public Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;
         }
     }

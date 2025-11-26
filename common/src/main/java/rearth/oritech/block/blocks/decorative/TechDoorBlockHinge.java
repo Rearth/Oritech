@@ -1,79 +1,84 @@
 package rearth.oritech.block.blocks.decorative;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import static rearth.oritech.block.blocks.decorative.TechDoorBlock.OPENED;
 
 // this is the upper section of the tech door
-public class TechDoorBlockHinge extends HorizontalFacingBlock {
+public class TechDoorBlockHinge extends HorizontalDirectionalBlock {
     
-    public TechDoorBlockHinge(Settings settings) {
+    public TechDoorBlockHinge(Properties settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(OPENED, false).with(Properties.HORIZONTAL_FACING, Direction.NORTH));
+        registerDefaultState(defaultBlockState().setValue(OPENED, false).setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(OPENED);
-        builder.add(Properties.HORIZONTAL_FACING);
+        builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
     
     @Override
-    public boolean emitsRedstonePower(BlockState state) {
+    public boolean isSignalSource(BlockState state) {
         return true;
     }
     
     @Override
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
         
         // forward the event to bottom block
-        if (world.isClient) return;
-        world.updateNeighbor(pos.down(), sourceBlock, sourcePos);
+        if (world.isClientSide) return;
+        world.neighborChanged(pos.below(), sourceBlock, sourcePos);
     }
     
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        if (!world.isClient) {
-            var belowState = world.getBlockState(pos.down());
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+        if (!world.isClientSide) {
+            var belowState = world.getBlockState(pos.below());
             if (!player.isCreative())
-                Block.dropStacks(belowState, world, pos.down());
-            world.setBlockState(pos.down(), Blocks.AIR.getDefaultState());
+                Block.dropResources(belowState, world, pos.below());
+            world.setBlockAndUpdate(pos.below(), Blocks.AIR.defaultBlockState());
         }
         
-        return super.onBreak(world, pos, state, player);
+        return super.playerWillDestroy(world, pos, state, player);
     }
     
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return TechDoorBlock.getClosedShape(state.get(Properties.HORIZONTAL_FACING));
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        return TechDoorBlock.getClosedShape(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
     }
     
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        if (state.get(OPENED))
-            return VoxelShapes.empty();
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        if (state.getValue(OPENED))
+            return Shapes.empty();
         return super.getCollisionShape(state, world, pos, context);
     }
     
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.INVISIBLE;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.INVISIBLE;
     }
     
     @Override
-    protected MapCodec<? extends HorizontalFacingBlock> getCodec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;
     }
 }

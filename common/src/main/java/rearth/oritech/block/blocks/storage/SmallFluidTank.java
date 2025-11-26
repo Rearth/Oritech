@@ -2,32 +2,32 @@ package rearth.oritech.block.blocks.storage;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContextParameterSet;
-import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -39,54 +39,54 @@ import rearth.oritech.util.StackContext;
 
 import java.util.List;
 
-public class SmallFluidTank extends Block implements BlockEntityProvider {
-    public static final BooleanProperty LIT = Properties.LIT;
+public class SmallFluidTank extends Block implements EntityBlock {
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
     
-    public SmallFluidTank(Settings settings) {
+    public SmallFluidTank(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(LIT, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(LIT, false));
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(LIT);
     }
     
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
     
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new SmallTankEntity(pos, state, false);
     }
     
     @Override
-    protected boolean hasComparatorOutput(BlockState state) {
+    protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
     
     @Override
-    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
         return ((ComparatorOutputProvider) world.getBlockEntity(pos)).getComparatorOutput();
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClient) {
+        if (!world.isClientSide) {
             var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayerEntity) player, handler);
+            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
             
         }
         
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
     
     @Override
-    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         
         var blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof SmallTankEntity tankEntity) {
@@ -96,19 +96,19 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
             }
             var stackRef = new StackContext(usedStack, updated -> {
                 if (stack.getCount() > 1) {
-                    stack.decrement(1);
-                    if (!player.getInventory().insertStack(updated)) {
-                        player.dropItem(updated, true);
+                    stack.shrink(1);
+                    if (!player.getInventory().add(updated)) {
+                        player.drop(updated, true);
                     }
                 } else {
-                    player.setStackInHand(hand, updated);
+                    player.setItemInHand(hand, updated);
                 }
             });
             
             var candidate = FluidApi.ITEM.find(stackRef);
             if (candidate != null) {
                 
-                if (!world.isClient) {
+                if (!world.isClientSide) {
                     if (candidate.getContent().getFirst().isEmpty()) { // from tank to item
                         var moved = FluidApi.transferFirst(tankEntity.fluidStorage, candidate, tankEntity.fluidStorage.getCapacity(), false);
                         Oritech.LOGGER.debug("moved to item {} {}", moved, stackRef.getValue());
@@ -118,39 +118,42 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
                     }
                 }
                 
-                world.playSoundAtBlockCenter(pos, SoundEvents.ENTITY_AXOLOTL_SPLASH, SoundCategory.PLAYERS, 0.8f, 1.4f, true);
+                world.playLocalSound(pos, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 0.8f, 1.4f, true);
                 
-                return ItemActionResult.success(true);
+                return ItemInteractionResult.sidedSuccess(true);
             }
         }
         
-        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+        return super.useItemOn(stack, state, world, pos, player, hand, hit);
     }
     
-    protected List<ItemStack> getDroppedStacks(BlockState state, LootContextParameterSet.Builder builder) {
-        var droppedStacks = super.getDroppedStacks(state, builder);
+    @Override
+    protected @NotNull List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+        var droppedStacks = super.getDrops(state, builder);
         
-        var blockEntity = builder.getOptional(LootContextParameters.BLOCK_ENTITY);
-        if (blockEntity instanceof SmallTankEntity tankEntity)
+        var blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+        if (blockEntity instanceof SmallTankEntity tankEntity) {
             droppedStacks.addAll(tankEntity.inventory.getHeldStacks());
+            tankEntity.inventory.clearContent();
+        }
         
         return droppedStacks;
     }
     
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
         return getStackWithData(world, pos);
     }
     
     @NotNull
-    private static ItemStack getStackWithData(WorldView world, BlockPos pos) {
+    private static ItemStack getStackWithData(LevelReader world, BlockPos pos) {
         var tankEntity = (SmallTankEntity) world.getBlockEntity(pos);
         var stack = getBasePickStack(tankEntity.isCreative);
         
         if (tankEntity.fluidStorage.getAmount() > 0) {
             var fluidStack = tankEntity.fluidStorage.getStack().copy();
             stack.set(FluidApi.ITEM.getFluidComponent(), fluidStack);
-            stack.set(DataComponentTypes.MAX_STACK_SIZE, 1);
+            stack.set(DataComponents.MAX_STACK_SIZE, 1);
         }
         
         return stack;
@@ -161,19 +164,20 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     }
     
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        super.onPlaced(world, pos, state, placer, itemStack);
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.setPlacedBy(world, pos, state, placer, itemStack);
         
-        if (itemStack.contains(FluidApi.ITEM.getFluidComponent())) {
+        if (itemStack.has(FluidApi.ITEM.getFluidComponent())) {
             var tankEntity = (SmallTankEntity) world.getBlockEntity(pos);
             tankEntity.fluidStorage.setStack(itemStack.get(FluidApi.ITEM.getFluidComponent()).copy());
+            tankEntity.setChanged();
         }
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

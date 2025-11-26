@@ -1,9 +1,10 @@
 package rearth.oritech.api.energy.containers;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.networking.UpdatableField;
 
 public class DynamicEnergyStorage extends EnergyApi.EnergyStorage implements UpdatableField<DynamicEnergyStorage, Long> {
@@ -13,25 +14,32 @@ public class DynamicEnergyStorage extends EnergyApi.EnergyStorage implements Upd
     public long maxInsert;
     public long maxExtract;
     private final Runnable onUpdate;
+    private final boolean forceFullUpdate;
     
-    public static final PacketCodec<ByteBuf, DynamicEnergyStorage> PACKET_CODEC = PacketCodec.tuple(
-      PacketCodecs.VAR_LONG,
+    public static final StreamCodec<ByteBuf, DynamicEnergyStorage> PACKET_CODEC = StreamCodec.composite(
+      ByteBufCodecs.VAR_LONG,
       DynamicEnergyStorage::getMaxExtract,
-      PacketCodecs.VAR_LONG,
+      ByteBufCodecs.VAR_LONG,
       DynamicEnergyStorage::getMaxInsert,
-      PacketCodecs.VAR_LONG,
+      ByteBufCodecs.VAR_LONG,
       DynamicEnergyStorage::getCapacity,
-      PacketCodecs.VAR_LONG,
+      ByteBufCodecs.VAR_LONG,
       DynamicEnergyStorage::getAmount,
       DynamicEnergyStorage::new
     );
     
     
     public DynamicEnergyStorage(long capacity, long maxInsert, long maxExtract, Runnable onUpdate) {
+        this(capacity, maxInsert, maxExtract, onUpdate, false);
+    }
+    
+    
+    public DynamicEnergyStorage(long capacity, long maxInsert, long maxExtract, Runnable onUpdate, boolean alwaysFullUpdate) {
         this.capacity = capacity;
         this.maxInsert = maxInsert;
         this.maxExtract = maxExtract;
         this.onUpdate = onUpdate;
+        this.forceFullUpdate = alwaysFullUpdate;
     }
     
     public DynamicEnergyStorage(long maxExtract, long maxInsert, long capacity, long amount) {
@@ -39,6 +47,7 @@ public class DynamicEnergyStorage extends EnergyApi.EnergyStorage implements Upd
         this.maxInsert = maxInsert;
         this.capacity = capacity;
         this.amount = amount;
+        this.forceFullUpdate = false;
         this.onUpdate = () -> {
         };
     }
@@ -115,17 +124,23 @@ public class DynamicEnergyStorage extends EnergyApi.EnergyStorage implements Upd
     }
     
     @Override
+    public boolean useDeltaOnly(SyncType type) {
+        if (forceFullUpdate) return false;
+        return UpdatableField.super.useDeltaOnly(type);
+    }
+    
+    @Override
     public DynamicEnergyStorage getFullData() {
         return this;
     }
     
     @Override
-    public PacketCodec<? extends ByteBuf, Long> getDeltaCodec() {
-        return PacketCodecs.VAR_LONG;
+    public StreamCodec<? extends ByteBuf, Long> getDeltaCodec() {
+        return ByteBufCodecs.VAR_LONG;
     }
     
     @Override
-    public PacketCodec<? extends ByteBuf, DynamicEnergyStorage> getFullCodec() {
+    public StreamCodec<? extends ByteBuf, DynamicEnergyStorage> getFullCodec() {
         return PACKET_CODEC;
     }
     

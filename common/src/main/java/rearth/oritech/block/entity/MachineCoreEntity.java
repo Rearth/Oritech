@@ -1,11 +1,5 @@
 package rearth.oritech.block.entity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
@@ -21,10 +15,16 @@ import rearth.oritech.util.MultiblockMachineController;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvider, EnergyApi.BlockProvider, FluidApi.BlockProvider {
     
-    private BlockPos controllerPos = BlockPos.ORIGIN;
+    private BlockPos controllerPos = BlockPos.ZERO;
     private MultiblockMachineController controllerEntity;
     private final Map<Direction, DelegatingEnergyStorage> delegatedEnergy = new HashMap<>(6);
     private final Map<Direction, DelegatingFluidStorage> delegatedFluid = new HashMap<>(6);
@@ -35,16 +35,16 @@ public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvi
     }
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
         nbt.putInt("controller_x", controllerPos.getX());
         nbt.putInt("controller_y", controllerPos.getY());
         nbt.putInt("controller_z", controllerPos.getZ());
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
         controllerPos = new BlockPos(nbt.getInt("controller_x"), nbt.getInt("controller_y"), nbt.getInt("controller_z"));
     }
     
@@ -55,15 +55,15 @@ public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvi
     public void setControllerPos(BlockPos controllerPos) {
         this.controllerPos = controllerPos;
         this.controllerEntity = null;    // forces cache reload
-        this.markDirty();
+        this.setChanged();
     }
     
     @Nullable
     public MultiblockMachineController getCachedController() {
-        if (world == null || !this.getCachedState().get(MachineCoreBlock.USED)) return null;
+        if (level == null || !this.getBlockState().getValue(MachineCoreBlock.USED)) return null;
         
         if (controllerEntity == null || ((BlockEntity) controllerEntity).isRemoved()) {
-            var candidate = Objects.requireNonNull(world).getBlockEntity(getControllerPos());
+            var candidate = Objects.requireNonNull(level).getBlockEntity(getControllerPos());
             if (candidate instanceof MultiblockMachineController controller) {
                 controllerEntity = controller;
             } else {
@@ -77,7 +77,7 @@ public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvi
     @Nullable
     private EnergyApi.EnergyStorage getMainEnergyStorage(Direction direction) {
         
-        var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
+        var isUsed = this.getBlockState().getValue(MachineCoreBlock.USED);
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
@@ -87,7 +87,7 @@ public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvi
     
     private FluidApi.FluidStorage getMainFluidStorage(Direction direction) {
         
-        var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
+        var isUsed = this.getBlockState().getValue(MachineCoreBlock.USED);
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
@@ -97,7 +97,7 @@ public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvi
     
     private ItemApi.InventoryStorage getMainItemStorage(Direction direction) {
         
-        var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
+        var isUsed = this.getBlockState().getValue(MachineCoreBlock.USED);
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
@@ -134,7 +134,7 @@ public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvi
     }
     
     public boolean isEnabled() {
-        return this.getCachedState().get(MachineCoreBlock.USED);
+        return this.getBlockState().getValue(MachineCoreBlock.USED);
     }
     
     @Override

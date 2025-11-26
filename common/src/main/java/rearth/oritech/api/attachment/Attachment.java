@@ -1,15 +1,21 @@
 package rearth.oritech.api.attachment;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.util.Identifier;
-
 import java.util.function.Supplier;
+
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 
 public interface Attachment<A> {
     
-    Identifier identifier();
+    ResourceLocation identifier();
     
     Codec<A> persistenceCodec();
+    
+    StreamCodec<ByteBuf, A> networkCodec();
     
     Supplier<A> initializer();
 

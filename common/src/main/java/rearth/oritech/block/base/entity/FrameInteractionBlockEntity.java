@@ -1,18 +1,18 @@
 package rearth.oritech.block.base.entity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import static rearth.oritech.util.Geometry.*;
+
 
 public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     
@@ -52,7 +53,7 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     public long lastWorkedAt;   // not synced
     
     // for smooth client rendering only
-    public Vec3d lastRenderedPosition = new Vec3d(0, 0, 0);
+    public Vec3 lastRenderedPosition = new Vec3(0, 0, 0);
     
     public FrameInteractionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -71,43 +72,43 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
         
         var facing = getFacing();
         var backRelative = new Vec3i(getFrameOffset(), 0, 0);
-        var searchStart = (BlockPos) Geometry.offsetToWorldPosition(facing, backRelative, pos);
+        var searchStart = (BlockPos) Geometry.offsetToWorldPosition(facing, backRelative, worldPosition);
         
         var endRightFront = searchFrameLine(searchStart, getRight(facing));
-        if (endRightFront.equals(BlockPos.ORIGIN)) {
+        if (endRightFront.equals(BlockPos.ZERO)) {
             highlightBlock(searchStart);
             return false;
         }
         
         var endRightBack = searchFrameLine(endRightFront, getBackward(facing));
         if (endRightBack.equals(endRightFront)) {
-            highlightBlock(endRightFront.add(getRight(facing)));
-            highlightBlock(endRightFront.add(getBackward(facing)));
+            highlightBlock(endRightFront.offset(getRight(facing)));
+            highlightBlock(endRightFront.offset(getBackward(facing)));
             return false;
         }
         
         var endLeftBack = searchFrameLine(endRightBack, getLeft(facing));
         if (endLeftBack.equals(endRightBack)) {
-            highlightBlock(endRightBack.add(getBackward(facing)));
-            highlightBlock(endRightBack.add(getLeft(facing)));
+            highlightBlock(endRightBack.offset(getBackward(facing)));
+            highlightBlock(endRightBack.offset(getLeft(facing)));
             return false;
         }
         
         var endLeftFront = searchFrameLine(endLeftBack, getForward(facing));
         if (endLeftFront.equals(endLeftBack)) {
-            highlightBlock(endLeftBack.add(getLeft(facing)));
-            highlightBlock(endLeftBack.add(getForward(facing)));
+            highlightBlock(endLeftBack.offset(getLeft(facing)));
+            highlightBlock(endLeftBack.offset(getForward(facing)));
             return false;
         }
         
         var endMiddleFront = searchFrameLineEnd(endLeftFront, getRight(facing), searchStart);
         if (endMiddleFront.equals(endLeftFront)) {
-            highlightBlock(endMiddleFront.add(getForward(facing)));
-            highlightBlock(endMiddleFront.add(getRight(facing)));
+            highlightBlock(endMiddleFront.offset(getForward(facing)));
+            highlightBlock(endMiddleFront.offset(getRight(facing)));
             return false;
         }
         if (!endMiddleFront.equals(searchStart)) {
-            highlightBlock(endMiddleFront.add(getRight(facing)));
+            highlightBlock(endMiddleFront.offset(getRight(facing)));
             return false;
         }
         
@@ -117,28 +118,28 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
         // offset values by 1 to define the working area instead of bounds
         var startX = Math.min(endLeftFront.getX(), endRightBack.getX()) + 1;
         var startZ = Math.min(endLeftFront.getZ(), endRightBack.getZ()) + 1;
-        areaMin = new BlockPos(startX, getPos().getY(), startZ);
+        areaMin = new BlockPos(startX, getBlockPos().getY(), startZ);
         
         var endX = Math.max(endLeftFront.getX(), endRightBack.getX()) - 1;
         var endZ = Math.max(endLeftFront.getZ(), endRightBack.getZ()) - 1;
-        areaMax = new BlockPos(endX, getPos().getY(), endZ);
+        areaMax = new BlockPos(endX, getBlockPos().getY(), endZ);
         
         if (currentTarget == null || !isInBounds(currentTarget)) {
             currentTarget = areaMin;
             lastTarget = areaMin;
         }
-        this.markDirty();
+        this.setChanged();
         sendUpdate(SyncType.INITIAL);
         
         return true;
     }
     
     protected Direction getFacing() {
-        return Objects.requireNonNull(world).getBlockState(getPos()).get(Properties.HORIZONTAL_FACING);
+        return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
     
     private boolean checkInnerEmpty(BlockPos leftBack, BlockPos rightFront) {
-        assert world != null;
+        assert level != null;
         
         var lengthX = Math.abs(leftBack.getX() - rightFront.getX());
         var lengthZ = Math.abs(leftBack.getZ() - rightFront.getZ());
@@ -151,8 +152,8 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
         for (int x = 1; x < lengthX; x++) {
             for (int z = 1; z < lengthZ; z++) {
                 var offset = new BlockPos(dirX * x, 0, dirZ * z);
-                var checkPos = leftBack.add(offset);
-                var foundBlock = world.getBlockState(checkPos).getBlock();
+                var checkPos = leftBack.offset(offset);
+                var foundBlock = level.getBlockState(checkPos).getBlock();
                 if (!foundBlock.equals(Blocks.AIR)) {
                     highlightBlock(checkPos);
                     valid = false;
@@ -166,10 +167,10 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     
     private BlockPos searchFrameLine(BlockPos searchStart, Vec3i direction) {
         
-        var lastPosition = BlockPos.ORIGIN;        // yes this will break if the frame starts at 0/0/0, however I'm willing to accept this
+        var lastPosition = BlockPos.ZERO;        // yes this will break if the frame starts at 0/0/0, however I'm willing to accept this
         
         for (int i = 0; i < MAX_SEARCH_LENGTH; i++) {
-            var checkPos = searchStart.add(direction.multiply(i));
+            var checkPos = searchStart.offset(direction.multiply(i));
             if (testForFrame(checkPos)) {
                 lastPosition = checkPos;
             } else {
@@ -182,10 +183,10 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     
     private BlockPos searchFrameLineEnd(BlockPos searchStart, Vec3i direction, BlockPos searchEnd) {
         
-        var lastPosition = BlockPos.ORIGIN;        // yes this will break if the frame starts at 0/0/0, however I'm willing to accept this
+        var lastPosition = BlockPos.ZERO;        // yes this will break if the frame starts at 0/0/0, however I'm willing to accept this
         
         for (int i = 0; i < MAX_SEARCH_LENGTH; i++) {
-            var checkPos = searchStart.add(direction.multiply(i));
+            var checkPos = searchStart.offset(direction.multiply(i));
             if (testForFrame(checkPos)) {
                 
                 if (checkPos.equals(searchEnd)) {
@@ -204,20 +205,20 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     
     @SuppressWarnings("DataFlowIssue")
     private boolean testForFrame(BlockPos pos) {
-        var found = world.getBlockState(pos).getBlock();
+        var found = level.getBlockState(pos).getBlock();
         return found.equals(BlockContent.MACHINE_FRAME_BLOCK);
     }
     
     @Override
-    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        if (!isActive(state) || !state.get(FrameInteractionBlock.HAS_FRAME) || getAreaMin() == null)
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        if (!isActive(state) || !state.getValue(FrameInteractionBlock.HAS_FRAME) || getAreaMin() == null)
             return;
         
         if (!canProgress()) return;
         
         while (currentProgress > 0.01) {
             if (!moving && currentProgress >= getWorkTime()) {
-                markDirty();
+                setChanged();
                 if (startBlockMove()) { // only complete work if we can move to the next position
                     currentProgress -= getWorkTime();
                     finishBlockWork(lastTarget);
@@ -227,7 +228,7 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
                     break;  // next pos is blocked. Keep current progress, but dont perform any more actions.
                 }
             } else if (moving && currentProgress >= getMoveTime()) {
-                markDirty();
+                setChanged();
                 if (hasWorkAvailable(currentTarget)) {
                     moving = false;
                     currentProgress -= getMoveTime();
@@ -245,7 +246,12 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
         
         doProgress(moving);
         currentProgress++;
-        lastWorkedAt = world.getTime();
+        lastWorkedAt = world.getGameTime();
+    }
+    
+    @Override
+    public int getTickUpdateInterval() {
+        return 1;
     }
     
     private boolean isBlockAvailable(BlockPos target) {
@@ -260,13 +266,13 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     
     private void updateToolPosInFrame() {
         var frameEntries = occupiedAreas.get(areaMin);
-        frameEntries.put(pos, currentTarget);
+        frameEntries.put(worldPosition, currentTarget);
     }
     
     public void cleanup() {
         var frameEntries = occupiedAreas.get(areaMin);
         if (frameEntries != null)
-            frameEntries.remove(pos);
+            frameEntries.remove(worldPosition);
     }
     
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -279,26 +285,32 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     public abstract void finishBlockWork(BlockPos processed);
     
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        if (getCachedState().get(FrameInteractionBlock.HAS_FRAME) && areaMin != null) {
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(nbt, registryLookup);
+        if (getBlockState().getValue(FrameInteractionBlock.HAS_FRAME) && areaMin != null) {
+            
             nbt.putLong("areaMin", areaMin.asLong());
             nbt.putLong("areaMax", areaMax.asLong());
-            nbt.putLong("currentTarget", currentTarget.asLong());
-            nbt.putLong("currentDirection", new BlockPos(currentDirection).asLong());
+            
+            if (currentTarget != null)
+                nbt.putLong("currentTarget", currentTarget.asLong());
+            
+            if (currentDirection != null)
+                nbt.putLong("currentDirection", new BlockPos(currentDirection).asLong());
+            
             nbt.putInt("progress", (int) currentProgress);
             nbt.putBoolean("moving", moving);
         }
     }
     
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        if (getCachedState().get(FrameInteractionBlock.HAS_FRAME)) {
-            areaMin = BlockPos.fromLong(nbt.getLong("areaMin"));
-            areaMax = BlockPos.fromLong(nbt.getLong("areaMax"));
-            currentTarget = BlockPos.fromLong(nbt.getLong("currentTarget"));
-            currentDirection = BlockPos.fromLong(nbt.getLong("currentDirection"));
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(nbt, registryLookup);
+        if (getBlockState().getValue(FrameInteractionBlock.HAS_FRAME)) {
+            areaMin = BlockPos.of(nbt.getLong("areaMin"));
+            areaMax = BlockPos.of(nbt.getLong("areaMax"));
+            currentTarget = BlockPos.of(nbt.getLong("currentTarget"));
+            currentDirection = BlockPos.of(nbt.getLong("currentDirection"));
             lastTarget = currentTarget;
             currentProgress = nbt.getInt("progress");
             moving = nbt.getBoolean("moving");
@@ -307,15 +319,15 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     
     private boolean startBlockMove() {
         
-        var nextPos = currentTarget.add(currentDirection);
+        var nextPos = currentTarget.offset(currentDirection);
         var nextDir = currentDirection;
         if (!isInBounds(nextPos)) {
-            nextPos = currentTarget.add(0, 0, 1);
+            nextPos = currentTarget.offset(0, 0, 1);
             nextDir = currentDirection.multiply(-1);
             if (!isInBounds(nextPos)) {
                 var data = resetWorkPosition();
-                nextPos = data.getLeft();
-                nextDir = data.getRight();
+                nextPos = data.getA();
+                nextDir = data.getB();
             }
         }
         
@@ -330,8 +342,8 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     }
     
     // return start position + direction
-    private Pair<BlockPos, BlockPos> resetWorkPosition() {
-        return new Pair<>(areaMin, new BlockPos(1, 0, 0));
+    private Tuple<BlockPos, BlockPos> resetWorkPosition() {
+        return new Tuple<>(areaMin, new BlockPos(1, 0, 0));
     }
     
     private boolean isInBounds(BlockPos pos) {
@@ -340,7 +352,7 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     }
     
     private void highlightBlock(BlockPos block) {
-        ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3d.of(block), null);
+        ParticleContent.HIGHLIGHT_BLOCK.spawn(level, Vec3.atLowerCornerOf(block), null);
     }
     
     public abstract BlockState getMachineHead();

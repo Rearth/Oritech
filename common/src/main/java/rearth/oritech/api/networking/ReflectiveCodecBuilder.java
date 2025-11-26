@@ -1,28 +1,31 @@
 package rearth.oritech.api.networking;
 
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 import static rearth.oritech.api.networking.NetworkManager.getAutoCodec;
 
+
 public class ReflectiveCodecBuilder {
     
-    public static <E extends Enum<E>> PacketCodec<RegistryByteBuf, E> createForEnum(Class<E> enumClass) {
-        return new PacketCodec<>() {
+    public static <E extends Enum<E>> StreamCodec<RegistryFriendlyByteBuf, E> createForEnum(Class<E> enumClass) {
+        return new StreamCodec<>() {
             @Override
-            public void encode(RegistryByteBuf buf, E value) {
+            public void encode(RegistryFriendlyByteBuf buf, E value) {
                 buf.writeShort(value.ordinal());
             }
             
             @Override
-            public E decode(RegistryByteBuf buf) {
+            public E decode(RegistryFriendlyByteBuf buf) {
                 var ordinal = buf.readShort();
                 return enumClass.getEnumConstants()[ordinal];
             }
@@ -39,7 +42,7 @@ public class ReflectiveCodecBuilder {
      * @throws RuntimeException if an error occurs during reflection or codec lookup.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Record> PacketCodec<RegistryByteBuf, T> create(Class<T> recordClass) {
+    public static <T extends Record> StreamCodec<RegistryFriendlyByteBuf, T> create(Class<T> recordClass) {
         if (!recordClass.isRecord()) {
             throw new IllegalArgumentException(recordClass.getName() + " is not a record type.");
         }
@@ -48,7 +51,7 @@ public class ReflectiveCodecBuilder {
         var lookup = MethodHandles.publicLookup();
         
         var accessors = new ArrayList<MethodHandle>(recordComponents.length);
-        var componentCodecs = new ArrayList<PacketCodec<RegistryByteBuf, ?>>(recordComponents.length);
+        var componentCodecs = new ArrayList<StreamCodec<RegistryFriendlyByteBuf, ?>>(recordComponents.length);
         var componentTypes = new Class<?>[recordComponents.length];
         
         for (int i = 0; i < recordComponents.length; i++) {
@@ -59,14 +62,14 @@ public class ReflectiveCodecBuilder {
                 var listCandidate = NetworkManager.getListType(component.getGenericType());
                 var mapCandidate = NetworkManager.getMapType(component.getGenericType());
                 if (listCandidate.isPresent()) {
-                    var codec = getAutoCodec((Class<?>) listCandidate.get()).collect(PacketCodecs.toList());
+                    var codec = getAutoCodec((Class<?>) listCandidate.get()).apply(ByteBufCodecs.list());
                     if (codec == null)
                         throw new RuntimeException("Failed to get codec for record component: " + component.getName() + " in " + recordClass.getName());
                     componentCodecs.add(codec);
                 } else if (mapCandidate.isPresent()) {
-                    var keyCodec = getAutoCodec((Class<?>) mapCandidate.get().getLeft());
-                    var valueCodec = getAutoCodec((Class<?>) mapCandidate.get().getRight());
-                    var codec = PacketCodecs.map(HashMap::new, keyCodec, valueCodec);
+                    var keyCodec = getAutoCodec((Class<?>) mapCandidate.get().getA());
+                    var valueCodec = getAutoCodec((Class<?>) mapCandidate.get().getB());
+                    var codec = ByteBufCodecs.map(HashMap::new, keyCodec, valueCodec);
                     componentCodecs.add(codec);
                 } else {
                     var codec = getAutoCodec(component.getType());
@@ -90,9 +93,9 @@ public class ReflectiveCodecBuilder {
             throw new RuntimeException("Failed to find or unreflect canonical constructor for record: " + recordClass.getName(), e);
         }
         
-        return new PacketCodec<>() {
+        return new StreamCodec<>() {
             @Override
-            public T decode(RegistryByteBuf buffer) {
+            public T decode(RegistryFriendlyByteBuf buffer) {
                 var constructorArgs = new Object[recordComponents.length];
                 for (int i = 0; i < recordComponents.length; i++) {
                     try {
@@ -109,11 +112,11 @@ public class ReflectiveCodecBuilder {
             }
             
             @Override
-            public void encode(RegistryByteBuf buffer, T recordInstance) {
+            public void encode(RegistryFriendlyByteBuf buffer, T recordInstance) {
                 for (int i = 0; i < recordComponents.length; i++) {
                     try {
                         Object value = accessors.get(i).invoke(recordInstance);
-                        PacketCodec<RegistryByteBuf, Object> valueCodec = (PacketCodec<RegistryByteBuf, Object>) componentCodecs.get(i);
+                        StreamCodec<RegistryFriendlyByteBuf, Object> valueCodec = (StreamCodec<RegistryFriendlyByteBuf, Object>) componentCodecs.get(i);
                         valueCodec.encode(buffer, value);
                     } catch (Throwable e) {
                         throw new RuntimeException("Error encoding component " + recordComponents[i].getName() + " of record " + recordClass.getName(), e);

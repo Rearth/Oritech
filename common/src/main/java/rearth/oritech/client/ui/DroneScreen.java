@@ -1,24 +1,26 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.OverlayContainer;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.DronePortEntity;
 
 public class DroneScreen extends UpgradableMachineScreen<DroneScreenHandler> {
     
-    public static final Identifier CARD_SLOT = Oritech.id("textures/gui/modular/designator_arrow.png");
+    public static final ResourceLocation CARD_SLOT = Oritech.id("textures/gui/modular/designator_arrow.png");
     private final DronePortEntity dronePort;
     
     private String lastMessage = "";
 
-    public DroneScreen(DroneScreenHandler handler, PlayerInventory inventory, Text title) {
+    public DroneScreen(DroneScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
         dronePort = (DronePortEntity) handler.blockEntity;
     }
@@ -30,14 +32,14 @@ public class DroneScreen extends UpgradableMachineScreen<DroneScreenHandler> {
     }
     
     @Override
-    protected void handledScreenTick() {
-        super.handledScreenTick();
+    protected void containerTick() {
+        super.containerTick();
         
         if (!dronePort.getStatusMessage().equals(lastMessage)) {
             var message = dronePort.getStatusMessage();
             lastMessage = message;
             
-            var label = Components.label(Text.translatable(message).formatted(Formatting.BLACK));
+            var label = Components.label(Component.translatable(message).withStyle(ChatFormatting.BLACK));
             label.horizontalTextAlignment(HorizontalAlignment.CENTER);
             label.verticalTextAlignment(VerticalAlignment.CENTER);
             label.margins(Insets.of(8));
