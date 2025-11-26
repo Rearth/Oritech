@@ -1,14 +1,15 @@
 {
   "machine_frames.mdx": "マシンフレーム",
-  "block_destroyer.mdx": "ブロックブレイカー",
+  "block_destroyer.mdx": "デストロイヤーブロック",
   "block_placer.mdx": "プレイサーブロック",
-  "fertilizer.mdx": "ファーティライザー",
+  "fertilizer.mdx": "ファーティライザーブロック",
   "enderic_laser.mdx": "エンダリックレーザー",
   "unstable_container.mdx": "シュレディンガーのカプセル",
   "deepdrill.mdx": "岩盤ドリル",
   "particle_accelerator.mdx": "粒子加速器",
   "pump.mdx": "ポンプ",
   "tree_cutter.mdx": "ツリーカッター",
+  "shrinker.mdx": "アドオン結合機",
   "redstone.mdx": "レッドストーン",
   "cybernetics.mdx": "サイバネティックオーグメント"
 }
