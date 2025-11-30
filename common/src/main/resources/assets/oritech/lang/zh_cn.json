@@ -436,7 +436,7 @@
   "title.oritech.burst.throttled": "⏩ 节流",
   "title.oritech.burst.throttled.tooltip": "脉冲持续时间过长，已经过热。机器已降速运行，需要冷却 (offset: %s)。",
   "title.oritech.burst.active": "⏩ 激活",
-  "title.oritech.burst.active.tooltip": "脉冲已被激活使用。 剩余: %s ticks。",
+  "title.oritech.burst.active.tooltip": "脉冲已被激活使用。 剩余: %s 刻。",
   "title.oritech.burst.ready": "⏩ 就绪",
   "title.oritech.burst.ready.tooltip": "脉冲已准备就绪 (for %s ticks)。",
   "title.oritech.machine.addon_hunter_range": "%d 扫描距离",
