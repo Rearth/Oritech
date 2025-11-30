@@ -717,6 +717,8 @@
   "block.oritech.fluxite_block": "フラクサイトブロック",
   "block.oritech.silicon_block": "シリコンブロック",
   "block.oritech.raw_nickel_block": "ニッケルの原石ブロック",
+  "block.oritech.raw_uranium_block": "Block of Raw Uranium",
+  "block.oritech.uranium_dust_block": "Block of Uranium",
   "block.oritech.raw_platinum_block": "プラチナの原石ブロック",
   "block.oritech.black_hole_block": [
     {
@@ -1018,8 +1020,8 @@
   "text.oritech.accelerator.ui.accelerating.speed": "速度： %s m/s",
   "text.oritech.accelerator.ui.accelerating.stats": "最大の直線距離: %s\n最小の弧の距離: %s",
   "text.oritech.accelerator.ui.collision": "衝突の詳細",
-  "text.oritech.accelerator.ui.collision.stats": "衝突エネルギー： %sJ",
-  "text.oritech.accelerator.ui.collision.position": "座標 %s",
+  "text.oritech.accelerator.ui.collision.stats": "Energy: %sJ",
+  "text.oritech.accelerator.ui.collision.position": "At: %s",
   "text.oritech.accelerator.ui.exited": "粒子は終了しました。",
   "text.oritech.accelerator.ui.exited.stats": "座標 %s\n最終の弧の距離: %s\n最小の弧の距離: %s",
   "text.oritech.accelerator.ui.exited.nogate": "座標 %s\n範囲内にゲートがない。\n範囲： %s",
