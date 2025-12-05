@@ -20,7 +20,7 @@ public class ModRenderers {
         // processing
         BlockEntityRenderers.register(BlockEntitiesContent.PULVERIZER_ENTITY, ctx -> new MachineRenderer<>("models/pulverizer_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY, ctx -> new MachineRenderer<>("models/fragment_forge_block"));
-        BlockEntityRenderers.register(BlockEntitiesContent.ASSEMBLER_ENTITY, ctx -> new MachineRenderer<>("models/assembler_block", true));
+        BlockEntityRenderers.register(BlockEntitiesContent.ASSEMBLER_ENTITY, ctx -> new MachineRenderer<>("models/assembler_block", false));
         BlockEntityRenderers.register(BlockEntitiesContent.FOUNDRY_ENTITY, ctx -> new MachineRenderer<>("models/foundry_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.COOLER_ENTITY, ctx -> new MachineRenderer<>("models/cooler_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.CENTRIFUGE_ENTITY, ctx -> new MachineRenderer<>("models/centrifuge_block"));
@@ -33,7 +33,7 @@ public class ModRenderers {
         
         // generators
         BlockEntityRenderers.register(BlockEntitiesContent.BIO_GENERATOR_ENTITY, ctx -> new MachineRenderer<>("models/bio_generator_block"));
-        BlockEntityRenderers.register(BlockEntitiesContent.BASIC_GENERATOR_ENTITY, ctx -> new MachineRenderer<>("models/basic_generator_block", true));
+        BlockEntityRenderers.register(BlockEntitiesContent.BASIC_GENERATOR_ENTITY, ctx -> new MachineRenderer<>("models/basic_generator_block", false));
         BlockEntityRenderers.register(BlockEntitiesContent.FUEL_GENERATOR_ENTITY, ctx -> new MachineRenderer<>("models/fuel_generator_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.LAVA_GENERATOR_ENTITY, ctx -> new MachineRenderer<>("models/lava_generator_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.STEAM_ENGINE_ENTITY, ctx -> new MachineRenderer<>("models/steam_engine_block"));
