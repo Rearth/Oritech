@@ -14,6 +14,7 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.util.ColorableMachine;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -35,7 +36,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
-public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity {
+public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity, ColorableMachine {
     
     private static final int MAX_SEARCH_COUNT = 100_000;
     private static final int ENERGY_USAGE = 512;   // per block pumped
@@ -57,6 +58,9 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
     @SyncField(SyncType.TICK)
     private long lastWorkTime;
     
+    @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
+    public ColorableMachine.ColorVariant currentColor = getDefaultColor();
+    
     public PumpBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PUMP_BLOCK, pos, state);
     }
@@ -67,6 +71,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         fluidStorage.writeNbt(nbt, "");
         nbt.putBoolean("initialized", initialized);
         nbt.putLong("energy", energyStorage.getAmount());
+        addColorToNbt(nbt);
         
         if (pendingLiquidPositions != null)
             nbt.putLongArray("pendingTargets", pendingLiquidPositions.stream().mapToLong(BlockPos::asLong).toArray());
@@ -75,6 +80,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
     @Override
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.loadAdditional(nbt, registryLookup);
+        loadColorFromNbt(nbt);
         initialized = nbt.getBoolean("initialized");
         fluidStorage.readNbt(nbt, "");
         energyStorage.setAmount(nbt.getLong("energy"));
@@ -249,6 +255,22 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         initialized = true;
         searchInstance = null;
     }
+    
+    @Override
+    public ColorVariant getCurrentColor() {
+        return currentColor;
+    }
+    
+    @Override
+    public void assignColor(ColorVariant color) {
+        this.currentColor = color;
+        
+        if (this.level != null && !this.level.isClientSide()) {
+            this.markDirty(false);
+            this.sendUpdate(SyncType.SPARSE_TICK);
+        }
+    }
+    
     
     @Override
     public FluidApi.FluidStorage getFluidStorage(Direction direction) {

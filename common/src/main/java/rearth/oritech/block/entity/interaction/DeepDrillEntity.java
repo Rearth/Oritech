@@ -1,6 +1,18 @@
 package rearth.oritech.block.entity.interaction;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
@@ -9,14 +21,12 @@ import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
-import rearth.oritech.util.Geometry;
-import rearth.oritech.util.MultiblockMachineController;
-import rearth.oritech.util.SimpleCraftingInventory;
+import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -25,26 +35,12 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.phys.Vec3;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
 
-public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.BlockProvider, GeoBlockEntity, ItemApi.BlockProvider, MultiblockMachineController {
+public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.BlockProvider, GeoBlockEntity, ItemApi.BlockProvider, MultiblockMachineController, ColorableMachine {
     
     // work data
     private boolean initialized;
@@ -71,6 +67,9 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     // animation
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     private final AnimationController<DeepDrillEntity> animationController = getAnimationController();
+    
+    @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
+    public ColorableMachine.ColorVariant currentColor = getDefaultColor();
     
     public DeepDrillEntity(BlockPos pos, BlockState state) {
         this(BlockEntitiesContent.DEEP_DRILL_ENTITY, pos, state);
@@ -175,6 +174,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         super.saveAdditional(nbt, registryLookup);
         ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         addMultiblockToNbt(nbt);
+        addColorToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
     }
     
@@ -183,6 +183,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         super.loadAdditional(nbt, registryLookup);
         ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         loadMultiblockNbtData(nbt);
+        loadColorFromNbt(nbt);
         energyStorage.amount = nbt.getLong("energy_stored");
     }
     
@@ -290,6 +291,21 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     
     public int getRfPerStep() {
         return Oritech.CONFIG.deepDrillConfig.energyPerStep();
+    }
+    
+    @Override
+    public ColorVariant getCurrentColor() {
+        return currentColor;
+    }
+    
+    @Override
+    public void assignColor(ColorVariant color) {
+        this.currentColor = color;
+        
+        if (this.level != null && !this.level.isClientSide()) {
+            this.markDirty(false);
+            this.sendUpdate(SyncType.SPARSE_TICK);
+        }
     }
     
     private AnimationController<DeepDrillEntity> getAnimationController() {

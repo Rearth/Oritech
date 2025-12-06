@@ -38,7 +38,6 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
@@ -46,7 +45,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.*;
 
 public abstract class MachineBlockEntity extends NetworkedBlockEntity
-  implements ExtendedMenuProvider, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
+  implements ExtendedMenuProvider, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable, ColorableMachine {
     
     // animations
     public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
@@ -67,6 +66,9 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     protected boolean disabledViaRedstone = false;
     @SyncField({SyncType.TICK})
     public long lastWorkedAt;
+    
+    @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
+    public ColorableMachine.ColorVariant currentColor = getDefaultColor();
     
     // static data
     protected int energyPerTick;
@@ -258,6 +260,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         nbt.putLong("oritech.machine_energy", energyStorage.amount);
         nbt.putShort("oritech.machine_input_mode", (short) inventoryInputMode.ordinal());
         nbt.putBoolean("oritech.redstone", disabledViaRedstone);
+        
+        addColorToNbt(nbt);
     }
     
     @Override
@@ -267,6 +271,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         energyStorage.amount = nbt.getLong("oritech.machine_energy");
         inventoryInputMode = InventoryInputMode.values()[nbt.getShort("oritech.machine_input_mode")];
         disabledViaRedstone = nbt.getBoolean("oritech.redstone");
+        
+        loadColorFromNbt(nbt);
     }
     
     private int findLowestMatchingSlot(ItemStack stack, List<ItemStack> inv, boolean allowEmpty) {
@@ -499,6 +505,21 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     // whether the energy storage should only send the current amount on network updates, or the full data
     public boolean canEnergyStorageChangeWhileGUIOpen() {
         return false;
+    }
+    
+    @Override
+    public ColorVariant getCurrentColor() {
+        return currentColor;
+    }
+    
+    @Override
+    public void assignColor(ColorVariant color) {
+        this.currentColor = color;
+        
+        if (this.level != null && !this.level.isClientSide()) {
+            this.markDirty(false);
+            this.sendUpdate(SyncType.SPARSE_TICK);
+        }
     }
     
     public static void receiveCycleModePacket(InventoryInputModeSelectorPacket packet, Player player, RegistryAccess dynamicRegistryManager) {

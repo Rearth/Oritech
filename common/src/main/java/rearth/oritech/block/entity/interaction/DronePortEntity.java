@@ -65,7 +65,7 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 public class DronePortEntity extends NetworkedBlockEntity
   implements ItemApi.BlockProvider, FluidApi.BlockProvider, EnergyApi.BlockProvider,
                GeoBlockEntity, MultiblockMachineController, MachineAddonController, ExtendedMenuProvider,
-               ScreenProvider, RedstoneAddonBlockEntity.RedstoneControllable {
+               ScreenProvider, RedstoneAddonBlockEntity.RedstoneControllable, ColorableMachine {
     
     // addon data
     @SyncField(SyncType.GUI_OPEN)
@@ -74,6 +74,8 @@ public class DronePortEntity extends NetworkedBlockEntity
     private final List<BlockPos> openSlots = new ArrayList<>();
     @SyncField(SyncType.GUI_OPEN)
     private BaseAddonData addonData = BaseAddonData.DEFAULT_ADDON_DATA;
+    @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
+    public ColorableMachine.ColorVariant currentColor = getDefaultColor();
     
     // storage
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
@@ -173,6 +175,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         ContainerHelper.saveAllItems(nbt, inventory.getHeldStacks(), false, registryLookup);
         addMultiblockToNbt(nbt);
         writeAddonToNbt(nbt);
+        addColorToNbt(nbt);
         fluidStorage.writeNbt(nbt, "");
         nbt.putBoolean("has_fluid_addon", hasFluidAddon);
         nbt.putBoolean("disabled_via_redstone", disabledViaRedstone);
@@ -205,6 +208,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         ContainerHelper.loadAllItems(nbt, inventory.getHeldStacks(), registryLookup);
         loadMultiblockNbtData(nbt);
         loadAddonNbtData(nbt);
+        loadColorFromNbt(nbt);
         fluidStorage.readNbt(nbt, "");
         
         hasFluidAddon = nbt.getBoolean("has_fluid_addon");
@@ -341,6 +345,21 @@ public class DronePortEntity extends NetworkedBlockEntity
         if (targetPosition == null) return baseEnergyUsage;
         var distance = worldPosition.distManhattan(targetPosition);
         return (long) Math.sqrt(distance) * 50 + baseEnergyUsage;
+    }
+    
+    @Override
+    public ColorVariant getCurrentColor() {
+        return currentColor;
+    }
+    
+    @Override
+    public void assignColor(ColorVariant color) {
+        this.currentColor = color;
+        
+        if (this.level != null && !this.level.isClientSide()) {
+            this.markDirty(false);
+            this.sendUpdate(SyncType.SPARSE_TICK);
+        }
     }
     
     private void triggerNetworkSendAnimation() {

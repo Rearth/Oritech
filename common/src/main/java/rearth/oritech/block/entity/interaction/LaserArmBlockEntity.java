@@ -79,8 +79,8 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 
 public class LaserArmBlockEntity extends NetworkedBlockEntity implements
-  GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ExtendedMenuProvider,
-    MultiblockMachineController, MachineAddonController, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
+  GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ExtendedMenuProvider, MultiblockMachineController, MachineAddonController,
+    ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable, ColorableMachine {
     
     private static final String LASER_PLAYER_NAME = "oritech_laser";
     public static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
@@ -117,6 +117,9 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     public boolean hasCropFilterAddon = false;
     @SyncField(SyncType.GUI_OPEN)
     public boolean hasSilkTouchAddon = false;
+    
+    @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
+    public ColorableMachine.ColorVariant currentColor = ColorVariant.ORANGE;
     
     // config
     private final int range = Oritech.CONFIG.laserArmConfig.range();
@@ -557,6 +560,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         addMultiblockToNbt(nbt);
         writeAddonToNbt(nbt);
+        addColorToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
         nbt.putBoolean("redstone", redstonePowered);
         nbt.putInt("areaSize", areaSize);
@@ -585,6 +589,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         loadMultiblockNbtData(nbt);
         loadAddonNbtData(nbt);
+        loadColorFromNbt(nbt);
         
         updateEnergyContainer();
         
@@ -988,6 +993,21 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     @Override
     public void onRedstoneEvent(boolean isPowered) {
         this.redstonePowered = isPowered;
+    }
+    
+    @Override
+    public ColorVariant getCurrentColor() {
+        return currentColor;
+    }
+    
+    @Override
+    public void assignColor(ColorVariant color) {
+        this.currentColor = color;
+        
+        if (this.level != null && !this.level.isClientSide()) {
+            this.markDirty(false);
+            this.sendUpdate(SyncType.SPARSE_TICK);
+        }
     }
     
     public enum HunterTargetMode {

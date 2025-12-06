@@ -59,7 +59,7 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
 public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity, ExtendedMenuProvider,
-                                                                           ScreenProvider, MultiblockMachineController, MachineAddonController {
+                                                                           ScreenProvider, MultiblockMachineController, MachineAddonController, ColorableMachine {
     
     public static final RawAnimation SHRINK = RawAnimation.begin().thenPlay("work");
     
@@ -75,6 +75,9 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     
     @SyncField(SyncType.GUI_OPEN)
     private float coreQuality = 1f;
+    
+    @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
+    public ColorableMachine.ColorVariant currentColor = getDefaultColor();
     
     // addon data
     @SyncField(SyncType.GUI_OPEN)
@@ -171,6 +174,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         addMultiblockToNbt(nbt);
         writeAddonToNbt(nbt);
+        addColorToNbt(nbt);
         nbt.putLong("energy_stored", energyStorage.amount);
         nbt.putBoolean("redstone", wasRedstoneActive);
     }
@@ -180,11 +184,27 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         loadMultiblockNbtData(nbt);
         loadAddonNbtData(nbt);
+        loadColorFromNbt(nbt);
         
         energyStorage.amount = nbt.getLong("energy_stored");
         wasRedstoneActive = nbt.getBoolean("redstone");
         
         updateEnergyContainer();
+    }
+    
+    @Override
+    public ColorVariant getCurrentColor() {
+        return currentColor;
+    }
+    
+    @Override
+    public void assignColor(ColorVariant color) {
+        this.currentColor = color;
+        
+        if (this.level != null && !this.level.isClientSide()) {
+            this.markDirty(false);
+            this.sendUpdate(SyncType.SPARSE_TICK);
+        }
     }
     
     @Override

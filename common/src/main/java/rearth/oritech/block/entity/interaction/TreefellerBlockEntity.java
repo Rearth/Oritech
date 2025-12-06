@@ -1,32 +1,6 @@
 package rearth.oritech.block.entity.interaction;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
-import rearth.oritech.api.networking.NetworkedBlockEntity;
-import rearth.oritech.api.networking.SyncField;
-import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
-import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.TagContent;
-import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
-import rearth.oritech.util.Geometry;
-import rearth.oritech.util.InventoryInputMode;
-import rearth.oritech.util.ScreenProvider;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.util.GeckoLibUtil;
-
-import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -49,8 +23,31 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.TagContent;
+import rearth.oritech.util.*;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class TreefellerBlockEntity extends NetworkedBlockEntity implements BlockEntityTicker<NetworkedBlockEntity>, GeoBlockEntity, EnergyApi.BlockProvider, ItemApi.BlockProvider, ExtendedMenuProvider, ScreenProvider {
+import java.util.*;
+
+public class TreefellerBlockEntity extends NetworkedBlockEntity implements
+  BlockEntityTicker<NetworkedBlockEntity>, GeoBlockEntity, EnergyApi.BlockProvider, ColorableMachine, ItemApi.BlockProvider, ExtendedMenuProvider, ScreenProvider {
     
     private static final int LOG_COST = 100;
     private static final int LEAF_COST = 10;
@@ -70,6 +67,9 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
             return false;
         }
     };
+    
+    @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
+    public ColorableMachine.ColorVariant currentColor = getDefaultColor();
     
     public TreefellerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.TREEFELLER_BLOCK_ENTITY, pos, state);
@@ -218,6 +218,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
         super.saveAdditional(nbt, registryLookup);
         ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putLong("energy_stored", energyStorage.amount);
+        addColorToNbt(nbt);
     }
     
     @Override
@@ -225,6 +226,22 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
         super.loadAdditional(nbt, registryLookup);
         ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         energyStorage.amount = nbt.getLong("energy_stored");
+        loadColorFromNbt(nbt);
+    }
+    
+    @Override
+    public ColorVariant getCurrentColor() {
+        return currentColor;
+    }
+    
+    @Override
+    public void assignColor(ColorVariant color) {
+        this.currentColor = color;
+        
+        if (this.level != null && !this.level.isClientSide()) {
+            this.markDirty(false);
+            this.sendUpdate(SyncType.SPARSE_TICK);
+        }
     }
     
     @Override

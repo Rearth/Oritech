@@ -1,12 +1,24 @@
 package rearth.oritech.block.entity.processing;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.DelegatingFluidStorage;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
+import rearth.oritech.util.ColorableMachine;
 import rearth.oritech.util.MultiblockMachineController;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -16,24 +28,18 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
-public class RefineryModuleBlockEntity extends BlockEntity implements MultiblockMachineController, FluidApi.BlockProvider, GeoBlockEntity {
+public class RefineryModuleBlockEntity extends NetworkedBlockEntity implements MultiblockMachineController, FluidApi.BlockProvider, GeoBlockEntity, ColorableMachine {
     
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     private float coreQuality = 1f;
+    
+    @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
+    public ColorableMachine.ColorVariant currentColor = getDefaultColor();
     
     //animation
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
@@ -56,12 +62,34 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.saveAdditional(nbt, registryLookup);
         addMultiblockToNbt(nbt);
+        addColorToNbt(nbt);
     }
     
     @Override
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.loadAdditional(nbt, registryLookup);
         loadMultiblockNbtData(nbt);
+        loadColorFromNbt(nbt);
+    }
+    
+    @Override
+    public ColorVariant getCurrentColor() {
+        return currentColor;
+    }
+    
+    @Override
+    public void assignColor(ColorVariant color) {
+        this.currentColor = color;
+        
+        if (this.level != null && !this.level.isClientSide()) {
+            this.markDirty(false);
+            this.sendUpdate(SyncType.SPARSE_TICK);
+        }
+    }
+    
+    @Override
+    public ColorVariant getDefaultColor() {
+        return ColorVariant.FLUXITE;
     }
     
     @Override
@@ -161,5 +189,10 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
     
     public void setOwningRefinery(RefineryBlockEntity owner) {
         this.owningRefinery = owner;
+    }
+    
+    @Override
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    
     }
 }

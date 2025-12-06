@@ -121,7 +121,7 @@ IGNORE_LIST=(
     "augment_application_block.png"
     "big_solar_panel_block.png"
     "enchanter_block.png"
-    "enchantment_catalyst.png"
+    "enchantment_catalyst_block.png"
     "pipe_booster_block.png"
 )
 

@@ -1,6 +1,17 @@
 package rearth.oritech.block.entity.processing;
 
 import dev.architectury.hooks.fluid.FluidStackHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
@@ -16,24 +27,11 @@ import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.FluidIngredient;
 import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 
 public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
@@ -210,5 +208,10 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     @Override
     public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
         return fluidStorage;
+    }
+    
+    @Override
+    public ColorVariant getDefaultColor() {
+        return ColorVariant.FLUXITE;
     }
 }

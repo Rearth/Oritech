@@ -1,10 +1,30 @@
 package rearth.oritech.block.entity.storage;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
@@ -29,30 +49,8 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Vec3i;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 
-public class UnstableContainerBlockEntity extends NetworkedBlockEntity implements ScreenProvider, ExtendedMenuProvider,
+public class UnstableContainerBlockEntity extends NetworkedBlockEntity implements ScreenProvider, ExtendedMenuProvider, ColorableMachine,
                                                                            GeoBlockEntity, MultiblockMachineController, EnergyApi.BlockProvider {
     
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("setup").thenPlay("idle");
@@ -68,6 +66,9 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     public float qualityMultiplier = 1f;
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
     public DynamicStatisticEnergyStorage.EnergyStatistics currentStats;
+    
+    @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
+    public ColorableMachine.ColorVariant currentColor = getDefaultColor();
     
     private long age = 0;
     private boolean dropped = false;
@@ -148,6 +149,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.saveAdditional(nbt, registryLookup);
         addMultiblockToNbt(nbt);
+        addColorToNbt(nbt);
         var blockId = BuiltInRegistries.BLOCK.getKey(capturedBlock.getBlock());
         nbt.putString("captured", blockId.toString());
         nbt.putLong("energy_stored", energyStorage.amount);
@@ -159,6 +161,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.loadAdditional(nbt, registryLookup);
         loadMultiblockNbtData(nbt);
+        loadColorFromNbt(nbt);
         energyStorage.amount = nbt.getLong("energy_stored");
         energyStorage.capacity = nbt.getLong("energy_capacity");
         energyStorage.capacity = nbt.getLong("energy_capacity");
@@ -174,6 +177,26 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     public void preNetworkUpdate(SyncType type) {
         super.preNetworkUpdate(type);
         currentStats = energyStorage.getCurrentStatistics(level.getGameTime());
+    }
+    
+    @Override
+    public ColorVariant getCurrentColor() {
+        return currentColor;
+    }
+    
+    @Override
+    public void assignColor(ColorVariant color) {
+        this.currentColor = color;
+        
+        if (this.level != null && !this.level.isClientSide()) {
+            this.markDirty(false);
+            this.sendUpdate(SyncType.SPARSE_TICK);
+        }
+    }
+    
+    @Override
+    public ColorVariant getDefaultColor() {
+        return ColorVariant.CAMO;
     }
     
     @Override
