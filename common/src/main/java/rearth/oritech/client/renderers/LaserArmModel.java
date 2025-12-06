@@ -1,5 +1,6 @@
 package rearth.oritech.client.renderers;
 
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector2f;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
@@ -15,7 +16,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 
-public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extends DefaultedBlockGeoModel<T> {
+public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extends MachineModel<T> {
     
     private static final HashMap<Long, ModelRenderData> additionalData = new HashMap<>();
     private static final HashMap<Long, Vec3> drillOffsets = new HashMap<>();
@@ -23,7 +24,7 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
     private Vec3 lastActivePlayerPos = Vec3.ZERO;
     
     public LaserArmModel(String subpath) {
-        super(Oritech.id(subpath));
+        super(subpath);
     }
     
     private ModelRenderData getById(long id) {

@@ -14,9 +14,10 @@ public class MachineModel<T extends BlockEntity & GeoAnimatable> extends Default
     @Override
     public ResourceLocation getTextureResource(T animatable) {
         
-        var color = "white";
+        var color = "redstone";
         
         var base = super.getTextureResource(animatable);
+        // return base;
         return ResourceLocation.fromNamespaceAndPath(base.getNamespace(), base.getPath().replace("models", "models/colored").replace(".png", "_" + color + ".png"));
     }
 }
