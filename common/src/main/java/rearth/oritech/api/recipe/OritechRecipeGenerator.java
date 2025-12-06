@@ -916,7 +916,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
     
     private void addPaintRecipes(RecipeOutput exporter) {
         
-        offerPaintRecipe(exporter, ItemContent.DIAMOND_PAINT, of(ItemContent.DURATIUM_DUST), of(Items.CYAN_DYE), of(TagContent.PLASTIC_PLATES), "_diamondpaint");
+        offerPaintRecipe(exporter, ItemContent.DIAMOND_PAINT, of(ItemContent.ADAMANT_DUST), of(Items.CYAN_DYE), of(TagContent.PLASTIC_PLATES), "_diamondpaint");
         offerPaintRecipe(exporter, ItemContent.CAMO_PAINT, of(TagContent.BIOMASS), of(Items.GREEN_DYE), of(TagContent.PLASTIC_PLATES), "_camopaint");
         offerPaintRecipe(exporter, ItemContent.REDSTONE_PAINT, of(Items.REDSTONE), of(Items.RED_DYE), of(TagContent.PLASTIC_PLATES), "_redstonepaint");
         offerPaintRecipe(exporter, ItemContent.ORANGE_PAINT, of(TagContent.ELECTRUM_DUSTS), of(TagContent.COPPER_DUSTS), of(TagContent.PLASTIC_PLATES), "_orangepaint");

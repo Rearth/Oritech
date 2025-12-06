@@ -2,6 +2,8 @@ package rearth.oritech.item.other;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -57,6 +59,8 @@ public class ColorCartridgeItem extends Item {
             stack.shrink(1);
             
             context.getPlayer().setItemInHand(context.getHand(), stack);
+            
+            context.getLevel().playSound(null, targetBlock, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 1f, 0.6f);
             
             return InteractionResult.CONSUME;
         }
