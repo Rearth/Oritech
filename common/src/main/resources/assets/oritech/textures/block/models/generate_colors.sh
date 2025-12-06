@@ -70,6 +70,12 @@ COLORS_REDSTONE=(
     "#bf2626" "#a11919" "#4f0303" "#b86060" "#2e0101"
 )
 
+# Variant: Sculk (Deep Dark / Vibrant Cyan & Black)
+COLORS_SCULK=(
+    "#0b3842" "#082930" "#051a21" "#031014" "#00b0ba"
+    "#124d59" "#09303b" "#04161c" "#2d6e75" "#020b0d"
+)
+
 # --- 3. THE TARGET ACCENTS (SECONDARY) ---
 
 # Diamond Variant -> Uses ANTIQUE BRASS / DARK COPPER accents
@@ -113,6 +119,12 @@ ACCENT_REDSTONE=(
     "#f2cf6f" "#b59640" "#ffe5a0" "#fff4d6"
 )
 
+# Sculk Variant -> Uses AMETHYST / ECHO SHARD accents
+# (Using purple to contrast against the dark teal body)
+ACCENT_SCULK=(
+    "#564291" "#362561" "#7762b5" "#a393d6"
+)
+
 # --- 4. IGNORE LIST ---
 # Add filenames here that you want the script to skip completely.
 IGNORE_LIST=(
@@ -127,7 +139,7 @@ IGNORE_LIST=(
 
 # --- 5. SETTINGS ---
 
-VARIANTS=("diamond" "camo" "fluxite" "white" "industrial" "netherite" "redstone")
+VARIANTS=("diamond" "camo" "fluxite" "white" "industrial" "netherite" "redstone" "sculk")
 
 FUZZ_AMOUNT="2%"
 COMPRESSION_ARGS=("-strip" "-quality" "95")
@@ -223,6 +235,10 @@ for img in *.png; do
             "redstone")
                 TGT_PRIM=("${COLORS_REDSTONE[@]}")
                 TGT_ACNT=("${ACCENT_REDSTONE[@]}")
+                ;;
+            "sculk")
+                TGT_PRIM=("${COLORS_SCULK[@]}")
+                TGT_ACNT=("${ACCENT_SCULK[@]}")
                 ;;
             *)
                 echo "Unknown variant: $variant"

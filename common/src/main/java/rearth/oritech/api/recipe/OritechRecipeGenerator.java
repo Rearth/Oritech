@@ -56,6 +56,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         addUraniumProcessing(exporter);
         addReactorBlocks(exporter);
         addAugmentRecipes(exporter);
+        addPaintRecipes(exporter);
     }
     
     private void addVanillaAdditions(RecipeOutput exporter) {
@@ -913,6 +914,20 @@ public class OritechRecipeGenerator extends RecipeProvider {
         addCompactingRecipe(exporter, ItemContent.PLUTONIUM_PELLET, ItemContent.SMALL_PLUTONIUM_PELLET, of(ItemContent.SMALL_PLUTONIUM_PELLET), of(ItemContent.PLUTONIUM_PELLET));
     }
     
+    private void addPaintRecipes(RecipeOutput exporter) {
+        
+        offerPaintRecipe(exporter, ItemContent.DIAMOND_PAINT, of(ItemContent.DURATIUM_DUST), of(Items.CYAN_DYE), of(TagContent.PLASTIC_PLATES), "_diamondpaint");
+        offerPaintRecipe(exporter, ItemContent.CAMO_PAINT, of(TagContent.BIOMASS), of(Items.GREEN_DYE), of(TagContent.PLASTIC_PLATES), "_camopaint");
+        offerPaintRecipe(exporter, ItemContent.REDSTONE_PAINT, of(Items.REDSTONE), of(Items.RED_DYE), of(TagContent.PLASTIC_PLATES), "_redstonepaint");
+        offerPaintRecipe(exporter, ItemContent.ORANGE_PAINT, of(TagContent.ELECTRUM_DUSTS), of(TagContent.COPPER_DUSTS), of(TagContent.PLASTIC_PLATES), "_orangepaint");
+        offerPaintRecipe(exporter, ItemContent.WHITE_PAINT, of(TagContent.QUARTZ_DUSTS), of(Items.WHITE_DYE), of(TagContent.PLASTIC_PLATES), "_whitepaint");
+        offerPaintRecipe(exporter, ItemContent.FLUXITE_PAINT, of(ItemContent.FLUXITE), of(Items.MAGENTA_DYE), of(TagContent.PLASTIC_PLATES), "_fluxitepaint");
+        offerPaintRecipe(exporter, ItemContent.NETHERITE_PAINT, of(ItemContent.CARBON_FIBRE_STRANDS), of(Items.NETHERITE_INGOT), of(TagContent.PLASTIC_PLATES), "_netheritepaint");
+        offerPaintRecipe(exporter, ItemContent.SCULK_PAINT, of(ItemContent.ENDERIC_COMPOUND), of(Items.SCULK), of(TagContent.PLASTIC_PLATES), "_sculkpaint");
+        offerPaintRecipe(exporter, ItemContent.INDUSTRIAL_PAINT, of(BlockContent.INDUSTRIAL_GLASS_BLOCK), of(Items.YELLOW_DYE), of(TagContent.PLASTIC_PLATES), "_industrialpaint");
+        
+    }
+    
     private void addAugmentRecipes(RecipeOutput exporter) {
         
         var SIMPLE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.SIMPLE_AUGMENT_STATION);
@@ -1451,6 +1466,14 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("bb ")
                         .pattern("bf ")
                         .pattern("   ");
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
+    }
+    
+    public void offerPaintRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient sides, Ingredient plate, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 4).define('s', sides).define('p', plate).define('b', base)
+                        .pattern(" s ")
+                        .pattern("pbp")
+                        .pattern(" s ");
         builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     

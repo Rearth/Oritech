@@ -154,9 +154,7 @@ public class ItemContent implements ArchitecturyRegistryContainer<Item> {
     public static final Item WHITE_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.WHITE);
     public static final Item INDUSTRIAL_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.INDUSTRIAL);
     public static final Item NETHERITE_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.NETHERITE);
-    
-    // todo check recoloring on some non-geo blocks?
-    
+    public static final Item SCULK_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.SCULK);
 
     @Override
     public void postProcessField(String namespace, Item value, String identifier, Field field, RegistrySupplier<Item> supplier) {

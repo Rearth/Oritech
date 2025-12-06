@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "tag": "c:fuels/bio"
+    },
+    "p": {
+      "tag": "c:plates/plastic"
+    },
+    "s": {
+      "item": "minecraft:green_dye"
+    }
+  },
+  "pattern": [
+    " s ",
+    "pbp",
+    " s "
+  ],
+  "result": {
+    "count": 4,
+    "id": "oritech:camo_paint"
+  }
+}

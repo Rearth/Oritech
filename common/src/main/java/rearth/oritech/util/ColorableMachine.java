@@ -12,7 +12,8 @@ public interface ColorableMachine {
         WHITE,
         INDUSTRIAL,
         NETHERITE,
-        REDSTONE
+        REDSTONE,
+        SCULK
     }
     
     default boolean supportRecoloring() {

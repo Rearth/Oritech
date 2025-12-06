@@ -1,11 +1,18 @@
 package rearth.oritech.item.other;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.util.ColorableMachine;
+
+import java.util.List;
 
 public class ColorCartridgeItem extends Item {
     
@@ -17,7 +24,16 @@ public class ColorCartridgeItem extends Item {
     }
     
     @Override
-    public InteractionResult useOn(UseOnContext context) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
+        
+        tooltipComponents.add(Component.translatable("tooltip.oritech.paint.1").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        tooltipComponents.add(Component.translatable("tooltip.oritech.paint.2").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        
+        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+    }
+    
+    @Override
+    public @NotNull InteractionResult useOn(UseOnContext context) {
         
         if (context.getLevel().isClientSide())
             return super.useOn(context);

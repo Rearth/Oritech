@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_sculk_paint": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:sculk_paint"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:crafting/_sculkpaint"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_sculk_paint"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:crafting/_sculkpaint"
+    ]
+  }
+}

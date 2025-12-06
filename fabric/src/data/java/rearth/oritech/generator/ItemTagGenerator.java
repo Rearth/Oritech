@@ -384,6 +384,17 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         
         getOrCreateTagBuilder(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("industrialforegoing", "bioreactor")))
           .addTag(TagContent.BIOMASS);
+        
+        getOrCreateTagBuilder(TagContent.MACHINE_PAINTS)
+          .add(ItemContent.DIAMOND_PAINT)
+          .add(ItemContent.REDSTONE_PAINT)
+          .add(ItemContent.CAMO_PAINT)
+          .add(ItemContent.ORANGE_PAINT)
+          .add(ItemContent.FLUXITE_PAINT)
+          .add(ItemContent.WHITE_PAINT)
+          .add(ItemContent.INDUSTRIAL_PAINT)
+          .add(ItemContent.NETHERITE_PAINT)
+          .add(ItemContent.SCULK_PAINT);
 
         // recycling
         getOrCreateTagBuilder(TagContent.RECYCLES_TO_NETHERITE_SCRAP)
