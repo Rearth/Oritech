@@ -546,7 +546,7 @@
       "color": "#cc66ff"
     }
   ],
-  "block.oritech.shrinker_block": "插件压缩器",
+  "block.oritech.shrinker_block": "插件绞接器",
   "block.oritech.machine_frame_block": "机器框架",
   "block.oritech.low_yield_nuke": "低当量核爆炸装置",
   "block.oritech.low_yield_nuke.tooltip": "极度谨慎处理：小而强大！",
@@ -996,7 +996,7 @@
   "message.oritech.reactor_wall_invalid": "无效：反应堆墙体需由反应堆适配方块构成（例如：反应堆墙、端口、控制器）",
   "message.oritech.reactor_interior_issues": "无效：反应堆内部组件必须在所有竖直层内一致，并需要在顶部放置对应的端口",
   "config.jade.plugin_oritech.machine_core_controller": "Oritech控制器连接视图",
-  "text.oritech.shrink": "Compact!",
+  "text.oritech.shrink": "压缩！",
   "text.oritech.shrink_no_addon": "缺失连接插件。",
   "text.oritech.shrink_no_energy": "能量不足。",
   "text.oritech.shrink_ready": "",
@@ -1156,7 +1156,7 @@
   "text.config.oritech-config.option.addonConfig.burstAddonSpeedMultiplier": "脉冲超频插件速度倍率",
   "text.config.oritech-config.option.addonConfig.burstAddonThrottleMultiplier": "脉冲超频插件节流倍率",
   "text.config.oritech-config.option.addonConfig.burstAddonTicks": "脉冲超频插件每插件提供刻数",
-  "text.config.oritech-config.option.addonConfig.addonShrinkerRF": "Addon Splicer RF Storage",
+  "text.config.oritech-config.option.addonConfig.addonShrinkerRF": "插件绞接器RF存储总量",
   "text.config.oritech-config.option.additiveAddons": "插件增益使用加法叠加",
   "text.config.oritech-config.option.additiveAddons.tooltip": "设定插件奖励是加法叠加还是乘法叠加。",
   "text.config.oritech-config.option.blockBreakHardnessExponentialFactor": "Block breaking hardness exponential scaling factor",
