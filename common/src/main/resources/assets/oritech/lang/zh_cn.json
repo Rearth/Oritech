@@ -717,8 +717,8 @@
   "block.oritech.fluxite_block": "辐水晶块",
   "block.oritech.silicon_block": "硅块",
   "block.oritech.raw_nickel_block": "粗镍块",
-  "block.oritech.raw_uranium_block": "Block of Raw Uranium",
-  "block.oritech.uranium_dust_block": "Block of Uranium",
+  "block.oritech.raw_uranium_block": "粗铀块",
+  "block.oritech.uranium_dust_block": "铀块",
   "block.oritech.raw_platinum_block": "粗铂块",
   "block.oritech.black_hole_block": [
     {
