@@ -1036,7 +1036,7 @@
   "text.oritech.accelerator.ui.exited": "粒子已退出",
   "text.oritech.accelerator.ui.exited.stats": "坐标 %s\n最后转弯距离：%s\n最小转弯距离：%s",
   "text.oritech.accelerator.ui.exited.nogate": "坐标：%s\n范围内未找到门\n范围：%s",
-  "text.oritech.load_augments.tooltip": "将已有玩家植入体载入机器",
+  "text.oritech.load_augments.tooltip": "将玩家已有植入体载入机器",
   "text.oritech.open_inv.tooltip": "打开强化器物品栏",
   "text.oritech.augmenter_active": "剩余时间：%s 秒",
   "oritech.text.missing_requirements_title": "缺少的要求:",
