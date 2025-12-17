@@ -4,14 +4,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.AxisAngle4f;
@@ -48,11 +47,11 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
         var renderedPosition = Vec3.atLowerCornerOf(currentTarget);
         
         var movingOffset = new Vec3(0, 0, 0);
-        var random = entity.getLevel().random;
         
         if (entity.isMoving()) {
             var lastPosition = Vec3.atLowerCornerOf(entity.getLastTarget());
-            var progress = entity.getCurrentProgress() / entity.getMoveTime();
+            var progress = (entity.getCurrentProgress()) / entity.getMoveTime();
+            progress = Math.min(progress, 1);
             var offset = renderedPosition.subtract(lastPosition);
             renderedPosition = lastPosition.add(offset.scale(progress));
         } else {
@@ -70,34 +69,33 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
         matrices.translate(targetOffset.x(), targetOffset.y(), targetOffset.z());
         
         var pos = entity.getCurrentTarget(); // relevant for correct lighting, actual rendered position is determined by matrix
+        int lightAtHead = LevelRenderer.getLightColor(entity.getLevel(), currentTarget);
+        var renderer = Minecraft.getInstance().getBlockRenderer();
         
-        Minecraft.getInstance().getBlockRenderer().renderBatched(
+        renderer.renderSingleBlock(
           entity.getMachineHead(),
-          pos,
-          entity.getLevel(),
           matrices,
-          vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(entity.getMachineHead())),
-          true,
-          random);
+          vertexConsumers,
+          lightAtHead,
+          overlay);
         
         matrices.popPose();
-        
-        matrices.pushPose();
         
         var length = entity.getAreaMax().getX() - entity.getAreaMin().getX() + 2 - BEAM_DEPTH * 2f;
         var target = new Vec3(entity.getAreaMin().getX() - 0.5 + BEAM_DEPTH, renderedPosition.y, renderedPosition.z).subtract(Vec3.atLowerCornerOf(entity.getBlockPos()));
         
+        
+        matrices.pushPose();
+        
         matrices.translate(target.x(), target.y(), target.z());
         matrices.scale(length, 1, 1);
         
-        Minecraft.getInstance().getBlockRenderer().renderBatched(
+        renderer.renderSingleBlock(
           renderedBeam,
-          pos,
-          entity.getLevel(),
           matrices,
-          vertexConsumers.getBuffer(RenderType.cutout()),
-          true,
-          random);
+          vertexConsumers,
+          lightAtHead,
+          overlay);
         
         matrices.popPose();
         
@@ -152,14 +150,12 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
             matrices.translate(-0.5, 0, -0.5);
             
             // inner beam
-            Minecraft.getInstance().getBlockRenderer().renderBatched(
+            renderer.renderSingleBlock(
               beamInner,
-              pos,
-              entity.getLevel(),
               matrices,
-              vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(beamInner)),
-              true,
-              random);
+              vertexConsumers,
+              lightAtHead,
+              overlay);
             
             matrices.popPose();
             
@@ -170,14 +166,12 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
             matrices.translate(offset.x(), offset.y() - heightOffset + 1, offset.z());
             
             // outer beam
-            Minecraft.getInstance().getBlockRenderer().renderBatched(
+            renderer.renderSingleBlock(
               beamRing,
-              pos,
-              entity.getLevel(),
               matrices,
-              vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(beamRing)),
-              true,
-              random);
+              vertexConsumers,
+              lightAtHead,
+              overlay);
             matrices.popPose();
         }
     }

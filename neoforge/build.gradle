@@ -190,4 +190,9 @@ publishMods {
         projectSlug = "oritech"
         announcementTitle = "Neoforge Version on CurseForge"
     }
+
+    github {
+        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+        parent project(":").tasks.named("publishGithub")
+    }
 }

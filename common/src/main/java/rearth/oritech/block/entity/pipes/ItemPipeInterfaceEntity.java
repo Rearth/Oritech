@@ -187,7 +187,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     }
     
     public static double calculatePathLength(int pathBlocksCount) {
-        return Math.pow(pathBlocksCount * 16, 0.6);
+        return Math.pow(pathBlocksCount * 32, 0.6);
     }
     
     // return pair is optimized path and total path length

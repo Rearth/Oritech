@@ -71,6 +71,10 @@ public abstract class OritechRecipeBuilder {
     public OritechRecipeBuilder specificFluidInput(Fluid in, long amountMillis) {
         return fluidInput(new FluidIngredient().withContent(in).withSpecificAmount(amountMillis));
     }
+    
+    public OritechRecipeBuilder specificFluidInput(TagKey<Fluid> in, long amountMillis) {
+        return fluidInput(new FluidIngredient().withSpecificAmount(amountMillis).withContent(in));
+    }
 
     public OritechRecipeBuilder fluidInput(Fluid in) {
         return fluidInput(in, 1.0f);

@@ -138,7 +138,7 @@ public class EnergyStorageScreen extends UpgradableMachineScreen<UpgradableMachi
         super.containerTick();
         
         var entity = this.menu.blockEntity;
-        var statistics = (entity instanceof ExpandableEnergyStorageBlockEntity) ? ((ExpandableEnergyStorageBlockEntity) entity).currentStats : ((UnstableContainerBlockEntity) entity).currentStats;
+        var statistics = getStatistics(entity);
         if (statistics == null) return;
         
         var updateAll = this.menu.worldAccess.getGameTime() % 4 == 0;
@@ -155,6 +155,10 @@ public class EnergyStorageScreen extends UpgradableMachineScreen<UpgradableMachi
         outLastTick.text(Component.translatable("title.oritech.energy.outLastTick", TooltipHelper.getEnergyText(statistics.extractedLastTickTotal())));
         
         
+    }
+    
+    public EnergyStatistics getStatistics(BlockEntity entity) {
+        return (entity instanceof ExpandableEnergyStorageBlockEntity) ? ((ExpandableEnergyStorageBlockEntity) entity).currentStats : ((UnstableContainerBlockEntity) entity).currentStats;
     }
     
     @Override

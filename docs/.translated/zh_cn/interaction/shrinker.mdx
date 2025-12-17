@@ -1,0 +1,32 @@
+---
+title: 插件结合器（Addon Splicer）
+icon: oritech:shrinker_block
+related_items: [oritech:shrinker_block, oritech:machine_combi_addon]
+---
+
+<center>
+<ModAsset location="oritech:area/shrinker_area" width={512} />
+</center>
+
+插件结合器可将多个插件合并为一个插件方块。这样做可最小化机器的占地面积。
+
+搭建方式与其他多方块结构相同。要使用它，必须先充满能量。通过UI或向机器中心输入红石信号来启动“压缩”过程。
+需要安装至少1个插件，但建议通过扩展坞连接多个插件。
+
+<center>
+<ModAsset location="oritech:area/shrinker_setup_area" width={512} />
+</center>
+
+运行后，它会消耗世界中的插件方块。将这些插件压缩成一个名为“机器之心（Heart of the Machine）”的新物品。
+请注意，此操作无法撤销。
+
+<Callout variant="warning">
+    “机器之心”插件无法与其他插件一起使用。它必须是唯一连接的插件。
+</Callout>
+
+<center>
+<ModAsset location="oritech:machine_combi_addon" width={256} />
+</center>
+
+请注意，只有那些会影响机器属性的插件才能以这种方式被压缩。
+蒸汽锅炉插件、控制单元插件、物品栏代理插件、生物校位插件以及任何需要与插件直接交互的插件都无法被压缩。

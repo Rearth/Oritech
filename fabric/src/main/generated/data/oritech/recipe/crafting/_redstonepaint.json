@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "minecraft:redstone"
+    },
+    "p": {
+      "tag": "c:plates/plastic"
+    },
+    "s": {
+      "item": "minecraft:red_dye"
+    }
+  },
+  "pattern": [
+    " s ",
+    "pbp",
+    " s "
+  ],
+  "result": {
+    "count": 4,
+    "id": "oritech:redstone_paint"
+  }
+}

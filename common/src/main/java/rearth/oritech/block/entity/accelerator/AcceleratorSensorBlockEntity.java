@@ -26,7 +26,7 @@ public class AcceleratorSensorBlockEntity extends BlockEntity implements BlockEn
         if (measuredSpeed != 0) {
             var age = world.getGameTime() - measuredTime;
             
-            if (age > 3) {
+            if (age > 8) {
                 measuredSpeed = 0;
                 dirty = true;
             }

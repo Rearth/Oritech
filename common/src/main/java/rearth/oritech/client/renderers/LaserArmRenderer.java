@@ -39,7 +39,6 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
     
     public LaserArmRenderer(String modelPath) {
         super(new LaserArmModel<>(modelPath));
-        addRenderLayer(new AutoGlowingGeoLayer<>(this));
     }
     
     // Modified RenderLayer.LINES

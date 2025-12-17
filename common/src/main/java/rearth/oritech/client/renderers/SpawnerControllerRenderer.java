@@ -25,7 +25,7 @@ public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerCon
         if (entity.renderedEntity != null && entity.hasCage) {
             
             matrices.pushPose();
-            matrices.translate(0, -Math.round(entity.spawnedMob.getHeight() + 0.4f), 0);
+            matrices.translate(0, -Math.round(entity.renderedEntity.getBbHeight() + 0.4f), 0);
             matrices.mulPose(Axis.YP.rotationDegrees(45));
             
             var dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();

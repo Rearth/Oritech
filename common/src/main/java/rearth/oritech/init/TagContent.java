@@ -93,6 +93,9 @@ public class TagContent {
     // wrenches
     public static final TagKey<Item> WRENCHES = cItemTag("tools/wrench");
     
+    // wrenches
+    public static final TagKey<Item> MACHINE_PAINTS = oritechItemTag("paint");
+    
     // blocks
     public static final TagKey<Block> DRILL_MINEABLE = oritechBlockTag("mineable/drill");
     public static final TagKey<Block> RESOURCE_NODES = oritechBlockTag("resource_nodes");
@@ -166,5 +169,7 @@ public class TagContent {
     public static final TagKey<Fluid> NAPHTHA = cFluidTag("naphtha");
     public static final TagKey<Fluid> DIESEL = cFluidTag("diesel");
     public static final TagKey<Fluid> TURBOFUEL = cFluidTag("turbofuel");
+    
+    public static final TagKey<Fluid> STEAM = cFluidTag("steam");
 
 }

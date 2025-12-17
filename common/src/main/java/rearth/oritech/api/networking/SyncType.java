@@ -5,7 +5,7 @@ import net.minecraft.network.codec.StreamCodec;
 
 public enum SyncType {
     
-    INITIAL, TICK, SPARSE_TICK, GUI_TICK, GUI_OPEN;
+    INITIAL, TICK, SPARSE_TICK, GUI_TICK, GUI_OPEN, CUSTOM;
     
     public static StreamCodec<RegistryFriendlyByteBuf, SyncType> PACKET_CODEC = new StreamCodec<>() {
         @Override

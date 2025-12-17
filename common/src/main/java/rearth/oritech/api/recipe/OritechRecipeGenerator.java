@@ -56,6 +56,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         addUraniumProcessing(exporter);
         addReactorBlocks(exporter);
         addAugmentRecipes(exporter);
+        addPaintRecipes(exporter);
     }
     
     private void addVanillaAdditions(RecipeOutput exporter) {
@@ -110,7 +111,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_GRAVEL).result(Items.GRAVEL).export(exporter, "recycle/gravel");
         PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_SAND).result(Items.SAND).export(exporter, "recycle/sand");
         PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_RED_SAND).result(Items.RED_SAND).export(exporter, "recycle/red_sand");
-        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_STRING).result(Items.STRING, 3).export(exporter, "recycle/string");
+        PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_STRING).result(Items.STRING, 2).export(exporter, "recycle/string");
         PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_BIOMASS).result(ItemContent.BIOMASS).export(exporter, "recycle/biomass");
     }
     
@@ -160,9 +161,10 @@ public class OritechRecipeGenerator extends RecipeProvider {
         FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.DIESEL, 0.1f).timeInSeconds(4).export(exporter, "diesel");
         FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.NAPHTHA, 0.1f).timeInSeconds(2).export(exporter, "naptha");
         FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.TURBOFUEL, 0.1f).timeInSeconds(16).export(exporter, "fuel");
+        
         //steam
         // 32 fabric droplets / 32 neoforge mb (yes this will works, as we produce 2 millis per RF in the generator boilers, and then consume it at a 1:1 ratio)
-        SteamGeneratorRecipeBuilder.build().specificFluidInput(FluidContent.STILL_STEAM.get(), 32).time(1).export(exporter, "steameng");
+        SteamGeneratorRecipeBuilder.build().specificFluidInput(TagContent.STEAM, 32).time(1).export(exporter, "steameng");
     }
     
     private void addFluidProcessing(RecipeOutput exporter) {
@@ -700,6 +702,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         addCompactingRecipe(exporter, BlockContent.SILICON_BLOCK, ItemContent.SILICON, of(TagContent.SILICON), of(getStorageBlockTag("silicon")));
         addCompactingRecipe(exporter, BlockContent.RAW_NICKEL_BLOCK, ItemContent.RAW_NICKEL, of(TagContent.NICKEL_RAW_MATERIALS), of(getStorageBlockTag("raw_nickel")));
         addCompactingRecipe(exporter, BlockContent.RAW_PLATINUM_BLOCK, ItemContent.RAW_PLATINUM, of(TagContent.PLATINUM_RAW_MATERIALS), of(getStorageBlockTag("raw_platinum")));
+        addCompactingRecipe(exporter, BlockContent.RAW_URANIUM_BLOCK, ItemContent.RAW_URANIUM, of(TagContent.URANIUM_RAW_MATERIALS), of(getStorageBlockTag("raw_uranium")));
+        addCompactingRecipe(exporter, BlockContent.URANIUM_DUST_BLOCK, ItemContent.URANIUM_DUST, of(TagContent.URANIUM_DUSTS), of(getStorageBlockTag("uranium_dust")));
         
     }
 
@@ -910,6 +914,20 @@ public class OritechRecipeGenerator extends RecipeProvider {
         addCompactingRecipe(exporter, ItemContent.PLUTONIUM_PELLET, ItemContent.SMALL_PLUTONIUM_PELLET, of(ItemContent.SMALL_PLUTONIUM_PELLET), of(ItemContent.PLUTONIUM_PELLET));
     }
     
+    private void addPaintRecipes(RecipeOutput exporter) {
+        
+        offerPaintRecipe(exporter, ItemContent.DIAMOND_PAINT, of(ItemContent.ADAMANT_DUST), of(Items.CYAN_DYE), of(TagContent.PLASTIC_PLATES), "_diamondpaint");
+        offerPaintRecipe(exporter, ItemContent.CAMO_PAINT, of(TagContent.BIOMASS), of(Items.GREEN_DYE), of(TagContent.PLASTIC_PLATES), "_camopaint");
+        offerPaintRecipe(exporter, ItemContent.REDSTONE_PAINT, of(Items.REDSTONE), of(Items.RED_DYE), of(TagContent.PLASTIC_PLATES), "_redstonepaint");
+        offerPaintRecipe(exporter, ItemContent.ORANGE_PAINT, of(TagContent.ELECTRUM_DUSTS), of(TagContent.COPPER_DUSTS), of(TagContent.PLASTIC_PLATES), "_orangepaint");
+        offerPaintRecipe(exporter, ItemContent.WHITE_PAINT, of(TagContent.QUARTZ_DUSTS), of(Items.WHITE_DYE), of(TagContent.PLASTIC_PLATES), "_whitepaint");
+        offerPaintRecipe(exporter, ItemContent.FLUXITE_PAINT, of(ItemContent.FLUXITE), of(Items.MAGENTA_DYE), of(TagContent.PLASTIC_PLATES), "_fluxitepaint");
+        offerPaintRecipe(exporter, ItemContent.NETHERITE_PAINT, of(ItemContent.CARBON_FIBRE_STRANDS), of(Items.NETHERITE_INGOT), of(TagContent.PLASTIC_PLATES), "_netheritepaint");
+        offerPaintRecipe(exporter, ItemContent.SCULK_PAINT, of(ItemContent.ENDERIC_COMPOUND), of(Items.SCULK), of(TagContent.PLASTIC_PLATES), "_sculkpaint");
+        offerPaintRecipe(exporter, ItemContent.INDUSTRIAL_PAINT, of(BlockContent.INDUSTRIAL_GLASS_BLOCK), of(Items.YELLOW_DYE), of(TagContent.PLASTIC_PLATES), "_industrialpaint");
+        
+    }
+    
     private void addAugmentRecipes(RecipeOutput exporter) {
         
         var SIMPLE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.SIMPLE_AUGMENT_STATION);
@@ -1008,13 +1026,13 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .export(exporter, "dwarf");
         
         AugmentRecipeBuilder.build()
-          .researchCost(ItemContent.RAW_BIOPOLYMER, 64)
-          .researchCost(ItemContent.SMALL_URANIUM_DUST, 4)
+          .researchCost(ItemContent.RAW_BIOPOLYMER, 32)
+          .researchCost(TagContent.URANIUM_DUSTS, 4)
           .applyCost(ItemContent.RAW_BIOPOLYMER, 8)
           .requirement(Oritech.id("augment/dwarf"))
           .requirement(Oritech.id("augment/armor"))
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-          .uiX(55).uiY(90).time(1600).rfCost(80_000_000)
+          .uiX(55).uiY(90).time(1600).rfCost(40_000_000)
           .modifierDefinition(Attributes.SCALE, 1f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
           .toggleable()
           .export(exporter, "giant");
@@ -1448,6 +1466,14 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("bb ")
                         .pattern("bf ")
                         .pattern("   ");
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
+    }
+    
+    public void offerPaintRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient sides, Ingredient plate, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 4).define('s', sides).define('p', plate).define('b', base)
+                        .pattern(" s ")
+                        .pattern("pbp")
+                        .pattern(" s ");
         builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     

@@ -214,5 +214,11 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
         
         getOrCreateTagBuilder(getStorageBlockyTag("raw_platinum"))
           .add(BlockContent.RAW_PLATINUM_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("raw_uranium"))
+          .add(BlockContent.RAW_URANIUM_BLOCK);
+        
+        getOrCreateTagBuilder(getStorageBlockyTag("uranium_dust"))
+          .add(BlockContent.URANIUM_DUST_BLOCK);
     }
 }

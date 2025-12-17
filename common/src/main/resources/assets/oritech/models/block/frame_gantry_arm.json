@@ -1,6 +1,7 @@
 {
 	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
+	"ambientocclusion": false,
 	"textures": {
 		"1": "oritech:block/frame_gantry_arm",
 		"particle": "oritech:block/frame_gantry_arm"

@@ -47,6 +47,8 @@ public class Config {
     public float fluidPipeInternalStorageBuckets = 2f;
     public long energyPipeTransferRate = 10_000;
     public long superConductorTransferRate = 4_194_304;
+    @Nest
+    public PowerPoleConfig poleConfig = new PowerPoleConfig();
     
     @SectionHeader("equipment")
     @Nest
@@ -203,6 +205,12 @@ public class Config {
         public int chargeSpeed = 50_000;
         public int baseDamage = 8;
         public int lightningCostMultiplier = 8;
+    }
+    
+    public static class PowerPoleConfig {
+        public long energyCapacity = 1_000_000;
+        public int minRange = 50;
+        public int maxRange = 1000;
     }
     
     public static class DeepDrillConfig {

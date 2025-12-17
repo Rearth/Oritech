@@ -717,6 +717,8 @@
   "block.oritech.fluxite_block": "Fluxite Bloğu",
   "block.oritech.silicon_block": "Silikon Bloğu",
   "block.oritech.raw_nickel_block": "Ham Nikel Bloğu",
+  "block.oritech.raw_uranium_block": "Block of Raw Uranium",
+  "block.oritech.uranium_dust_block": "Block of Uranium",
   "block.oritech.raw_platinum_block": "Ham Platin Bloğu",
   "block.oritech.black_hole_block": [
     {
@@ -1018,8 +1020,8 @@
   "text.oritech.accelerator.ui.accelerating.speed": "Hız: %s m/s",
   "text.oritech.accelerator.ui.accelerating.stats": "Maks Geçit Mesafesi: %s\nMin Eğri Mesafesi: %s",
   "text.oritech.accelerator.ui.collision": "Çarpışma Detayları",
-  "text.oritech.accelerator.ui.collision.stats": "Çarpışma Gücü: %sJ",
-  "text.oritech.accelerator.ui.collision.position": "Koordinatlar %s",
+  "text.oritech.accelerator.ui.collision.stats": "Energy: %sJ",
+  "text.oritech.accelerator.ui.collision.position": "At: %s",
   "text.oritech.accelerator.ui.exited": "Parçacık Çıktı",
   "text.oritech.accelerator.ui.exited.stats": "Koordinatlar %s\nSon Eğri Mesafesi: %s\nMin Eğri Mesafesi: %s",
   "text.oritech.accelerator.ui.exited.nogate": "Koordinatlar %s\nMenzilde geçit yok\nMenzil: %s",

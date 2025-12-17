@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_orange_paint": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:orange_paint"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:crafting/_orangepaint"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_orange_paint"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:crafting/_orangepaint"
+    ]
+  }
+}

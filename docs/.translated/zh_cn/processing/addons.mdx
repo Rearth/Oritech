@@ -1,7 +1,7 @@
 ---
 title: 插件
 icon: oritech:machine_extender
-related_items: [oritech:machine_extender]
+related_items: [oritech:machine_extender, oritech:machine_burst_addon]
 ---
 
 要想在Oritech中升级机器，您需要用到各类插件。
@@ -22,16 +22,21 @@ related_items: [oritech:machine_extender]
 
 您可以通过安装扩展坞**（或储能扩展坞）**来增加插槽数量，这些扩展坞可以与插件相连并使其能作用于机器。
 
-扩展坞可安装的层数上限取决于机器等级，如机器等级为I时仅可安装一个扩展坞。每个额外的扩展坞**通过**另一个扩展坞连接时，需要提高核心品质1级。
-
-机器核心品质从不直接统计激活的插件数量。相反，它统计插件连接到机器所需的扩展坞数量。如果此数量大于核心品质，则插件将不会连接。请参阅下图的演示：
+扩展坞可安装的层数上限取决于机器品质。如机器品质为1时总共可安装1个扩展坞。
+机器可安装的扩展坞数等于其机器品质。
 
 <center>
 <ModAsset location="oritech:area/extenders" width={700} />
 </center>
 
-正如之前所说，只会统计机器和插件之间的扩展坞数量。这意味着您可以为扩展坞提供多个分支，而所有插件都将正常工作：
+## 爆发插件（Burst Addon）
 
 <center>
-<ModAsset location="oritech:area/addon_branching" width={700} />
+<ModAsset location="oritech:machine_burst_addon" width={256} />
 </center>
+
+爆发插件是一种能安装到任何处理机器上的特殊插件。它允许机器以更快的爆发式速度运行（8倍于正常速度）。可结合其它插件以进一步提升处理速度。
+然而，它只能在爆发时加速。如果长时间以爆发模式运行，机器会过热并大幅减速。需要停止运行一段时间后才能再次爆发。
+
+每个爆发插件增加12秒最大爆发时间。可以使用多个爆发插件来增加最大爆发时间。
+对于需要长期运行的机器，不建议使用爆发插件。

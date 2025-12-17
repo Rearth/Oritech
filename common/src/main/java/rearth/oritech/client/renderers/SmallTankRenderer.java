@@ -1,7 +1,6 @@
 package rearth.oritech.client.renderers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import io.wispforest.owo.ui.core.Color;
@@ -10,11 +9,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.block.entity.storage.SmallTankEntity;
 
 public class SmallTankRenderer implements BlockEntityRenderer<SmallTankEntity> {

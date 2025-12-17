@@ -35,6 +35,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import rearth.oritech.util.TooltipHelper;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.ORITECH_PANEL;
 
@@ -76,7 +77,7 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
         tooltipContainer.padding(Insets.of(3));
         tooltipTitle.zIndex(3001);
         
-        var overlay = Containers.horizontalFlow(Sizing.fixed(329), Sizing.fixed(200));
+        var overlay = Containers.horizontalFlow(Sizing.fixed(340), Sizing.fixed(200));
         rootComponent.child(overlay.surface(ORITECH_PANEL));
         
         addReactorComponentPreview(overlay);
@@ -89,7 +90,7 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
     }
     
     private void addReactorStats(FlowLayout overlay) {
-        var container = Containers.verticalFlow(Sizing.fixed(131), Sizing.content(0));
+        var container = Containers.verticalFlow(Sizing.fixed(141), Sizing.content(0));
         
         productionLabel = Components.label(Component.translatable("RF Production: %s RF/t", "50").withStyle(ChatFormatting.WHITE));
         sumHeatLabel = Components.label(Component.translatable("Heat Production: %s RF/t", "50").withStyle(ChatFormatting.WHITE));
@@ -104,7 +105,7 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
     
     private void addReactorStatus(FlowLayout overlay) {
         
-        var container = Containers.verticalFlow(Sizing.fixed(90), Sizing.content(1));
+        var container = Containers.verticalFlow(Sizing.fixed(95), Sizing.content(1));
         
         statusLabel = Components.label(Component.translatable("Stable").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
         
@@ -205,6 +206,7 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
         var sumProducedEnergy = menu.reactorEntity.componentStats.values().stream()
                                   .mapToInt(data -> data.receivedPulses() * ReactorControllerBlockEntity.RF_PER_PULSE * stackHeight).sum();
         
+        
         var sumProducedHeat = menu.reactorEntity.componentStats.values().stream()
                                 .filter(elem -> elem.receivedPulses() > 0)
                                 .mapToInt(ReactorControllerBlockEntity.ComponentStatistics::heatChanged).sum();
@@ -213,7 +215,7 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
                                  .mapToInt(ReactorControllerBlockEntity.ComponentStatistics::storedHeat)
                                  .max().orElse(0);
         
-        productionLabel.text(Component.translatable("text.oritech.reactor.rf_production", sumProducedEnergy));
+        productionLabel.text(Component.translatable("text.oritech.reactor.rf_production", TooltipHelper.getEnergyText(sumProducedEnergy)));
         hottestLabel.text(Component.translatable("text.oritech.reactor.hottest_part", hottestComponent));
         sumHeatLabel.text(Component.translatable("text.oritech.reactor.heat_production", sumProducedHeat));
         
@@ -364,7 +366,7 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
     
     private void addEnergyBar(FlowLayout panel) {
         
-        var config = new ScreenProvider.BarConfiguration(285, 80, 36, 108);
+        var config = new ScreenProvider.BarConfiguration(295, 80, 36, 108);
         var insetSize = 1;
         var tooltipText = Component.translatable("tooltip.oritech.energy_indicator", 10, 50);
         

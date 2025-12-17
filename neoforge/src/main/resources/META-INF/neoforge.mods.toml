@@ -16,7 +16,7 @@ Simple tech mod.
 [[dependencies.oritech]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.0,)"
+versionRange = "[21.1.200,)"
 ordering = "NONE"
 side = "BOTH"
 

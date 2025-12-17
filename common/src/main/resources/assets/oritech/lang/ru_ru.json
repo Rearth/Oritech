@@ -717,6 +717,8 @@
   "block.oritech.fluxite_block": "Флюкситовый блок",
   "block.oritech.silicon_block": "Кремниевый блок",
   "block.oritech.raw_nickel_block": "Блок сырого никеля",
+  "block.oritech.raw_uranium_block": "Block of Raw Uranium",
+  "block.oritech.uranium_dust_block": "Block of Uranium",
   "block.oritech.raw_platinum_block": "Блок сырой платины",
   "block.oritech.black_hole_block": [
     {
@@ -1018,8 +1020,8 @@
   "text.oritech.accelerator.ui.accelerating.speed": "Скорость: %s м/с",
   "text.oritech.accelerator.ui.accelerating.stats": "Макс. расстояние ворот: %s\nМин. Дистанция: %s",
   "text.oritech.accelerator.ui.collision": "Подробности столкновения",
-  "text.oritech.accelerator.ui.collision.stats": "Сила столкновения: %sJ",
-  "text.oritech.accelerator.ui.collision.position": "Координаты: %s",
+  "text.oritech.accelerator.ui.collision.stats": "Energy: %sJ",
+  "text.oritech.accelerator.ui.collision.position": "At: %s",
   "text.oritech.accelerator.ui.exited": "Частица извлечена",
   "text.oritech.accelerator.ui.exited.stats": "Координаты %s\nПоследний Расчёт кривого: %s\nМинный Расчёт кривого: %s",
   "text.oritech.accelerator.ui.exited.nogate": "Координаты %s\nНет ворот в диапазоне\nДиапазон: %s",

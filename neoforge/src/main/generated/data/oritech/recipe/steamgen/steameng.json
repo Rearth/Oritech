@@ -2,7 +2,7 @@
   "type": "oritech:steam_engine",
   "fluidInput": {
     "amount": 32,
-    "fluid": "oritech:still_steam"
+    "fluid": "#c:steam"
   },
   "fluidOutputs": [],
   "ingredients": [],

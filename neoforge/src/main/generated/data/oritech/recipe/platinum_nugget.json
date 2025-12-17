@@ -4,34 +4,10 @@
   "ingredients": [
     {
       "item": "oritech:platinum_ingot"
-    },
-    {
-      "item": "oritech:platinum_ingot"
-    },
-    {
-      "item": "oritech:platinum_ingot"
-    },
-    {
-      "item": "oritech:platinum_ingot"
-    },
-    {
-      "item": "oritech:platinum_ingot"
-    },
-    {
-      "item": "oritech:platinum_ingot"
-    },
-    {
-      "item": "oritech:platinum_ingot"
-    },
-    {
-      "item": "oritech:platinum_ingot"
-    },
-    {
-      "item": "oritech:platinum_ingot"
     }
   ],
   "result": {
-    "count": 1,
+    "count": 9,
     "id": "oritech:platinum_nugget"
   }
 }

@@ -38,7 +38,8 @@ public class FluidTagGenerator extends FabricTagProvider.FluidTagProvider {
         
         getOrCreateTagBuilder(ConventionalFluidTags.GASEOUS)
             .add(FluidContent.FLOWING_STEAM.get()).add(FluidContent.STILL_STEAM.get());
-        getOrCreateTagBuilder(cFluidTag("steam"))
+        
+        getOrCreateTagBuilder(TagContent.STEAM)
             .add(FluidContent.FLOWING_STEAM.get()).add(FluidContent.STILL_STEAM.get());
         
         getOrCreateTagBuilder(TagContent.OIL)

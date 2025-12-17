@@ -1,13 +1,5 @@
 package rearth.oritech.item.tools;
 
-import rearth.oritech.Oritech;
-import rearth.oritech.block.blocks.processing.MachineCoreBlock;
-import rearth.oritech.block.entity.interaction.DronePortEntity;
-import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.ComponentContent;
-import java.util.List;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
@@ -15,8 +7,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
+import rearth.oritech.Oritech;
+import rearth.oritech.block.blocks.processing.MachineCoreBlock;
+import rearth.oritech.block.entity.interaction.DronePortEntity;
+import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.entity.interaction.PowerPoleEntity;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ComponentContent;
+
+import java.util.List;
 
 public class LaserTargetDesignator extends Item {
     public LaserTargetDesignator(Properties settings) {
@@ -33,10 +32,10 @@ public class LaserTargetDesignator extends Item {
         
         var targetBlockState = context.getLevel().getBlockState(context.getClickedPos());
         if (targetBlockState.getBlock() instanceof MachineCoreBlock && targetBlockState.getValue(MachineCoreBlock.USED)) {
-            // target the base instead (on laser arms)
+            // target the base instead
             var machineEntity = MachineCoreBlock.getControllerEntity(context.getLevel(), context.getClickedPos());
-            if (machineEntity instanceof LaserArmBlockEntity) {
-                targetPos = context.getClickedPos().below();
+            if (machineEntity instanceof LaserArmBlockEntity || machineEntity instanceof PowerPoleEntity) {
+                targetPos = MachineCoreBlock.getControllerPos(context.getLevel(), targetPos);
                 targetBlockState = context.getLevel().getBlockState(targetPos);
             }
         }
@@ -56,9 +55,7 @@ public class LaserTargetDesignator extends Item {
                     context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_saved"));
                 return success ? InteractionResult.SUCCESS : InteractionResult.FAIL;
             }
-        }
-        
-        if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT_BLOCK)
+        } else if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT_BLOCK)
               && context.getLevel().getBlockEntity(context.getClickedPos()) instanceof DronePortEntity dronePortEntity
               && context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
             var target = context.getItemInHand().get(ComponentContent.TARGET_POSITION.get());
@@ -70,6 +67,12 @@ public class LaserTargetDesignator extends Item {
                 context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_invalid"));
             }
             return success ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+        } else if (context.getLevel().getBlockEntity(targetPos) instanceof PowerPoleEntity powerPole && context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
+            
+            var target = context.getItemInHand().get(ComponentContent.TARGET_POSITION.get());
+            powerPole.assignNewTarget(target, context.getPlayer());
+            context.getItemInHand().remove(ComponentContent.TARGET_POSITION.get());
+            return InteractionResult.SUCCESS;
         }
         
         if (!targetBlockState.getBlock().equals(Blocks.AIR)) {

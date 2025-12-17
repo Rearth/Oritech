@@ -10,11 +10,13 @@ import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.ComposterBlock;
 import rearth.oritech.item.UnstableContainerItem;
+import rearth.oritech.item.other.ColorCartridgeItem;
 import rearth.oritech.item.other.CustomTooltipItem;
 import rearth.oritech.item.other.MobCaptureItem;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 import rearth.oritech.item.tools.WeedKiller;
 import rearth.oritech.item.tools.Wrench;
+import rearth.oritech.util.ColorableMachine;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
 import java.lang.annotation.ElementType;
@@ -142,6 +144,17 @@ public class ItemContent implements ArchitecturyRegistryContainer<Item> {
     public static final Item URANIUM_PELLET = new CustomTooltipItem(new Item.Properties(), "tooltip.oritech.uranium_pellet");
     public static final Item SMALL_PLUTONIUM_PELLET = new CustomTooltipItem(new Item.Properties(), "tooltip.oritech.small_plutonium_pellet");
     public static final Item PLUTONIUM_PELLET = new CustomTooltipItem(new Item.Properties(), "tooltip.oritech.plutonium_pellet");
+    
+    // colors
+    public static final Item DIAMOND_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.DIAMOND);
+    public static final Item REDSTONE_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.REDSTONE);
+    public static final Item ORANGE_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.ORANGE);
+    public static final Item CAMO_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.CAMO);
+    public static final Item FLUXITE_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.FLUXITE);
+    public static final Item WHITE_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.WHITE);
+    public static final Item INDUSTRIAL_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.INDUSTRIAL);
+    public static final Item NETHERITE_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.NETHERITE);
+    public static final Item SCULK_PAINT = new ColorCartridgeItem(new Item.Properties(), ColorableMachine.ColorVariant.SCULK);
 
     @Override
     public void postProcessField(String namespace, Item value, String identifier, Field field, RegistrySupplier<Item> supplier) {

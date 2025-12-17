@@ -183,6 +183,11 @@ publishMods {
         projectSlug = "oritech"
         announcementTitle = "Fabric Version on CurseForge"
     }
+
+    github {
+        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+        parent project(":").tasks.named("publishGithub")
+    }
 }
 
 def commonIntermediaryJar = tasks.register('commonIntermediaryJar', RemapJarTask) {

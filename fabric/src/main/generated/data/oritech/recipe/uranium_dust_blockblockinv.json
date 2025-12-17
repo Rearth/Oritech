@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:storage_blocks/uranium_dust"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "oritech:uranium_dust"
+  }
+}

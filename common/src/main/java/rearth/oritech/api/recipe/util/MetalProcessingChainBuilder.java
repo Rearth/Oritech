@@ -3,6 +3,8 @@ package rearth.oritech.api.recipe.util;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.*;
 import rearth.oritech.init.FluidContent;
@@ -338,7 +340,7 @@ public class MetalProcessingChainBuilder {
                 OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, clumpItem, smallClumpItem);
             if (nuggetItem != null && !skipCompactingRecipes) {    // to avoid duplicate vanilla nugget -> item recipes
                 OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, ingotItem, nuggetItem);
-                OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, nuggetItem, ingotItem);
+                ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, nuggetItem, 9).requires(ingotItem, 1).unlockedBy(RecipeProvider.getHasName(ingotItem), RecipeProvider.has(nuggetItem)).save(exporter);
             }
         }
     }

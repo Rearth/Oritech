@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -97,6 +98,7 @@ public class NetworkManager {
         registerCodec(VEC3D_PACKET_CODEC, Vec3.class);
         registerCodec(SIMPLE_BLOCK_STATE_PACKET_CODEC, BlockState.class);
         registerCodec(FLUID_STACK_STREAM_CODEC, FluidStack.class);
+        registerCodec(ByteBufCodecs.COMPOUND_TAG, CompoundTag.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
         registerCodec(OritechRecipeType.PACKET_CODEC, OritechRecipe.class);
         registerCodec(LaserArmBlockEntity.LASER_TARGET_PACKET_CODEC, LivingEntity.class);

@@ -717,6 +717,8 @@
   "block.oritech.fluxite_block": "Block of Fluxite",
   "block.oritech.silicon_block": "Block of Silicon",
   "block.oritech.raw_nickel_block": "Block of Raw Nickel",
+  "block.oritech.raw_uranium_block": "Block of Raw Uranium",
+  "block.oritech.uranium_dust_block": "Block of Uranium",
   "block.oritech.raw_platinum_block": "Block of Raw Platinum",
   "block.oritech.black_hole_block": [
     {
@@ -1018,8 +1020,8 @@
   "text.oritech.accelerator.ui.accelerating.speed": "Vitesse : %s m/s",
   "text.oritech.accelerator.ui.accelerating.stats": "Dist max de la porte : %s\nDist min de courbe : %s",
   "text.oritech.accelerator.ui.collision": "Détails de la collision",
-  "text.oritech.accelerator.ui.collision.stats": "Puissance de collision : %sJ",
-  "text.oritech.accelerator.ui.collision.position": "Coordonnées %s",
+  "text.oritech.accelerator.ui.collision.stats": "Energy: %sJ",
+  "text.oritech.accelerator.ui.collision.position": "At: %s",
   "text.oritech.accelerator.ui.exited": "Particule sortie",
   "text.oritech.accelerator.ui.exited.stats": "Coordonnées %s\nDernière dist de courbe : %s\nDist min de courbe : %s",
   "text.oritech.accelerator.ui.exited.nogate": "Coordonnées %s\nAucune porte en portée\nPortée : %s",

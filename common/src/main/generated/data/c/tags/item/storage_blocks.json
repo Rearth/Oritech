@@ -13,6 +13,8 @@
     "oritech:fluxite_block",
     "oritech:silicon_block",
     "oritech:raw_nickel_block",
+    "oritech:raw_uranium_block",
+    "oritech:uranium_dust_block",
     "oritech:raw_platinum_block"
   ]
 }

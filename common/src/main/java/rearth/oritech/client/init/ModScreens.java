@@ -24,6 +24,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
     public static final MenuType<UpgradableMachineScreenHandler> FOUNDRY_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
     public static final MenuType<UpgradableMachineScreenHandler> COOLER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
     public static final MenuType<UpgradableMachineScreenHandler> STORAGE_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableMachineScreenHandler> POWER_POLE_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
     public static final MenuType<UpgradableMachineScreenHandler> POWERED_FURNACE_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
     public static final MenuType<UpgradableMachineScreenHandler> BIO_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
     public static final MenuType<UpgradableMachineScreenHandler> BASIC_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
@@ -72,6 +73,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
         MenuRegistry.registerScreenFactory(FUEL_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(BASIC_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(STORAGE_SCREEN, EnergyStorageScreen::new);
+        MenuRegistry.registerScreenFactory(POWER_POLE_SCREEN, PowerPoleScreen::new);
         MenuRegistry.registerScreenFactory(DESTROYER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(PLACER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(FERTILIZER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);

@@ -1,6 +1,7 @@
 {
 	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
+	"ambientocclusion": false,
 	"textures": {
 		"0": "oritech:block/block_fertilizer_head",
 		"particle": "oritech:block/block_fertilizer_head"

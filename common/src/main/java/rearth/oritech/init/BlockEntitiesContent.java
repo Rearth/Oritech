@@ -220,6 +220,8 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     @AssignSidedInventory
     public static final BlockEntityType<ItemFilterBlockEntity> ITEM_FILTER_ENTITY = BlockEntityType.Builder.of(ItemFilterBlockEntity::new, BlockContent.ITEM_FILTER_BLOCK).build(null);
     
+    @AssignSidedEnergy
+    public static final BlockEntityType<PowerPoleEntity> POWER_POLE_ENTITY = BlockEntityType.Builder.of(PowerPoleEntity::new, BlockContent.POWER_POLE_BLOCK).build(null);
     
     public static final BlockEntityType<AddonBlockEntity> ADDON_ENTITY = BlockEntityType.Builder.of(AddonBlockEntity::new,
       BlockContent.MACHINE_SPEED_ADDON,

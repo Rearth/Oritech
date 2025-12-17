@@ -8,6 +8,7 @@ plugins {
 // all projects including the root project
 allprojects {
     apply plugin: 'java'
+    apply plugin: 'me.modmuss50.mod-publish-plugin'
 
     base {
         archivesName = "$mod_id-${project.name}-$minecraft_version"
@@ -103,8 +104,6 @@ subprojects {
         return
     }
 
-    apply plugin: 'me.modmuss50.mod-publish-plugin'
-
     configurations {
         commonJava {
             canBeResolved = true
@@ -174,5 +173,19 @@ wiki {
             exportedAssetNamespaces = ['oritech']
             wikiAccessToken = System.getenv('WIKI_TOKEN')
         }
+    }
+}
+
+publishMods {
+    github {
+        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+        repository = "Rearth/Oritech"
+        commitish = "1.21"
+        changelog = file("./CHANGELOG.MD").getText()
+        type = STABLE
+        tagName = "v${project.version}"
+
+        // Allow the release to be initially created without any files.
+        allowEmptyFiles = true
     }
 }

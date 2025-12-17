@@ -1,11 +1,18 @@
 package rearth.oritech.client.renderers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.cache.texture.AutoGlowingTexture;
+import software.bernie.geckolib.cache.texture.GeoAbstractTexture;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
+import software.bernie.geckolib.renderer.GeoRenderer;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
 public class MachineRenderer<T extends BlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
@@ -17,7 +24,7 @@ public class MachineRenderer<T extends BlockEntity & GeoAnimatable> extends GeoB
         super(new MachineModel<>(modelPath));
         
         if (glowing) {
-            addRenderLayer(new AutoGlowingGeoLayer<>(this));
+            addRenderLayer(new CustomGlowingGeoLayer<>(this));
         }
     }
     
@@ -38,6 +45,25 @@ public class MachineRenderer<T extends BlockEntity & GeoAnimatable> extends GeoB
     // the override annotation
     public AABB getRenderBoundingBox(BlockEntity blockEntity) {
         return AABB.ofSize(blockEntity.getBlockPos().getCenter(), 4, 4, 4);
+    }
+    
+    public static class CustomGlowingGeoLayer<T extends BlockEntity & GeoAnimatable> extends AutoGlowingGeoLayer<T> {
+        
+        public CustomGlowingGeoLayer(GeoRenderer<T> renderer) {
+            super(renderer);
+        }
+        
+        @Override
+        protected @Nullable RenderType getRenderType(T animatable, @Nullable MultiBufferSource bufferSource) {
+            
+            if (this.renderer.getGeoModel() instanceof MachineModel<T> machineModel) {
+                var basePath = machineModel.getBaseTexturePath(animatable);
+                var path = GeoAbstractTexture.appendToPath(basePath, "_glowmask");
+                return AutoGlowingTexture.getRenderType(path);
+            }
+            
+            return AutoGlowingTexture.getRenderType(getTextureResource(animatable));
+        }
     }
 }
 

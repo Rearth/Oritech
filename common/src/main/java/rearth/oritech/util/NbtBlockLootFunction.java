@@ -2,6 +2,7 @@ package rearth.oritech.util;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
@@ -32,6 +33,7 @@ public class NbtBlockLootFunction extends LootItemConditionalFunction {
         
         if (blockEntity instanceof SmallTankEntity tankEntity && tankEntity.fluidStorage.getAmount() > 0) {
             stack.set(FluidApi.ITEM.getFluidComponent(), tankEntity.fluidStorage.getStack());
+            stack.set(DataComponents.MAX_STACK_SIZE, 1);
         } else if (blockEntity instanceof SmallStorageBlockEntity storageEntity && storageEntity.energyStorage.amount > 0) {
             stack.set(EnergyApi.ITEM.getEnergyComponent(), storageEntity.energyStorage.amount);
         } else if (blockEntity instanceof CombiAddonEntity combiAddon && combiAddon.storedData != null) {

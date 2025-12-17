@@ -61,10 +61,10 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     
     @Override
     public void setChanged() {
-        markDirty(false);
+        setChanged(false);
     }
     
-    public void markDirty(boolean updateComparator) {
+    public void setChanged(boolean updateComparator) {
         if (this.level != null) {
             setChanged(this.level, this.worldPosition, this.getBlockState());
             if (updateComparator)

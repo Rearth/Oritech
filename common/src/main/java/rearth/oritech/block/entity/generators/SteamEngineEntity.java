@@ -15,6 +15,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.FluidContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -196,7 +197,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     @Override
     public boolean boilerAcceptsInput(Fluid fluid) {
-        return fluid.equals(getUsedSteamFluid());
+        return BuiltInRegistries.FLUID.wrapAsHolder(fluid).is(TagContent.STEAM);
     }
     
     private void spawnParticles() {

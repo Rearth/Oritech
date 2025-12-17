@@ -330,6 +330,8 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(BlockContent.FLUXITE_BLOCK.asItem())
           .add(BlockContent.SILICON_BLOCK.asItem())
           .add(BlockContent.RAW_NICKEL_BLOCK.asItem())
+          .add(BlockContent.RAW_URANIUM_BLOCK.asItem())
+          .add(BlockContent.URANIUM_DUST_BLOCK.asItem())
           .add(BlockContent.RAW_PLATINUM_BLOCK.asItem());
         
         getOrCreateTagBuilder(getStorageBlockTag("steel"))
@@ -374,8 +376,25 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(getStorageBlockTag("raw_platinum"))
           .add(BlockContent.RAW_PLATINUM_BLOCK.asItem());
         
+        getOrCreateTagBuilder(getStorageBlockTag("raw_uranium"))
+          .add(BlockContent.RAW_URANIUM_BLOCK.asItem());
+        
+        getOrCreateTagBuilder(getStorageBlockTag("uranium_dust"))
+          .add(BlockContent.URANIUM_DUST_BLOCK.asItem());
+        
         getOrCreateTagBuilder(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("industrialforegoing", "bioreactor")))
           .addTag(TagContent.BIOMASS);
+        
+        getOrCreateTagBuilder(TagContent.MACHINE_PAINTS)
+          .add(ItemContent.DIAMOND_PAINT)
+          .add(ItemContent.REDSTONE_PAINT)
+          .add(ItemContent.CAMO_PAINT)
+          .add(ItemContent.ORANGE_PAINT)
+          .add(ItemContent.FLUXITE_PAINT)
+          .add(ItemContent.WHITE_PAINT)
+          .add(ItemContent.INDUSTRIAL_PAINT)
+          .add(ItemContent.NETHERITE_PAINT)
+          .add(ItemContent.SCULK_PAINT);
 
         // recycling
         getOrCreateTagBuilder(TagContent.RECYCLES_TO_NETHERITE_SCRAP)

@@ -21,8 +21,5 @@ public class PneumaticcraftRecipeGenerator {
 
         // fuels
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(ModFluids.OIL.get()).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, PATH + "fuel");
-        FuelGeneratorRecipeBuilder.build().fluidInput(ModFluids.OIL.get()).timeInSeconds(3).export(exporter, PATH + "oil");
-        FuelGeneratorRecipeBuilder.build().fluidInput(ModFluids.DIESEL.get()).timeInSeconds(12).export(exporter, PATH + "diesel");
-        FuelGeneratorRecipeBuilder.build().fluidInput(ModFluids.BIODIESEL.get()).timeInSeconds(12).export(exporter, PATH + "biodiesel");
     }
 }

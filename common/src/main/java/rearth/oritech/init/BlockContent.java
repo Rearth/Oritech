@@ -94,6 +94,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @NoBlockItem
     public static final Block TRANSPARENT_ITEM_PIPE_CONNECTION = new ItemPipeConnectionBlock.TransparentItemPipeConnectionBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     
+    public static final Block POWER_POLE_BLOCK = new PowerPoleBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    
     @NoBlockItem
     public static final Block FRAME_GANTRY_ARM = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.CHAIN).noOcclusion());
     @NoBlockItem
@@ -427,9 +429,13 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block SILICON_BLOCK = new SlimeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.SLIME_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block RAW_NICKEL_BLOCK = new SlimeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
+    public static final Block RAW_NICKEL_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block RAW_PLATINUM_BLOCK = new SlimeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
+    public static final Block RAW_PLATINUM_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RAW_URANIUM_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block URANIUM_DUST_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).lightLevel(state -> 2));
     //endregion
     
     @Override

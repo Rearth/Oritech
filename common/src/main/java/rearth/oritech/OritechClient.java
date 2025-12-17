@@ -2,6 +2,7 @@ package rearth.oritech;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.event.EventResult;
+import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientRawInputEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
@@ -14,9 +15,11 @@ import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.renderers.MachineGantryRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.util.Helpers;
+import software.bernie.geckolib.event.GeoRenderEvent;
 
 
 public final class OritechClient {

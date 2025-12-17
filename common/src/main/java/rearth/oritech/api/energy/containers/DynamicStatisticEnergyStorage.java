@@ -76,6 +76,9 @@ public class DynamicStatisticEnergyStorage extends DynamicEnergyStorage {
       int insertionCountLastTick,
       long maxInsertSecond,
       long maxExtractSecond) {
+        
+        public static final EnergyStatistics EMPTY = new EnergyStatistics(0, 0, 0, 0, 0, 0, 0);
+        
         @Override
         public @NotNull String toString() {
             return "EnergyStatistics{" +

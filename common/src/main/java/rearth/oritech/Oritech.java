@@ -3,15 +3,12 @@ package rearth.oritech;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import dev.architectury.event.events.common.LifecycleEvent;
-import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.TickEvent;
 import io.wispforest.endec.impl.ReflectiveEndecBuilder;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rearth.oritech.api.networking.NetworkManager;
@@ -23,15 +20,14 @@ import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.api.Augment;
+import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
-import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
-
 import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRecipeRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
@@ -144,6 +140,10 @@ public final class Oritech {
             var superConductorDataId = "superconductor_" + regKey.getNamespace() + "_" + regKey.getPath();
             var superConductorResult = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, superConductorDataId);
             SuperConductorBlock.SUPERCONDUCTOR_DATA.put(regKey, superConductorResult);
+            
+            var powerPoleId = "pole_" + regKey.getNamespace() + "_" + regKey.getPath();
+            var powerPoleResult = world.getDataStorage().computeIfAbsent(PowerPoleEntity.PoleNetworkData.TYPE, powerPoleId);
+            PowerPoleEntity.POLE_NETWORK_DATA.put(regKey, powerPoleResult);
         });
     }
 }

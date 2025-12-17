@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "oritech:enderic_compound"
+    },
+    "p": {
+      "tag": "c:plates/plastic"
+    },
+    "s": {
+      "item": "minecraft:sculk"
+    }
+  },
+  "pattern": [
+    " s ",
+    "pbp",
+    " s "
+  ],
+  "result": {
+    "count": 4,
+    "id": "oritech:sculk_paint"
+  }
+}

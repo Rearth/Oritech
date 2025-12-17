@@ -71,6 +71,8 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.createNonTemplateHorizontalBlock(BlockContent.DESTROYER_BLOCK);
         blockStateModelGenerator.createNonTemplateHorizontalBlock(BlockContent.FERTILIZER_BLOCK);
         
+        blockStateModelGenerator.createNonTemplateHorizontalBlock(BlockContent.POWER_POLE_BLOCK);
+        
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.PUMP_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.CHARGER_BLOCK);
         
@@ -217,6 +219,8 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.createTrivialCube(BlockContent.SILICON_BLOCK);
         blockStateModelGenerator.createTrivialCube(BlockContent.RAW_NICKEL_BLOCK);
         blockStateModelGenerator.createTrivialCube(BlockContent.RAW_PLATINUM_BLOCK);
+        blockStateModelGenerator.createTrivialCube(BlockContent.RAW_URANIUM_BLOCK);
+        blockStateModelGenerator.createTrivialCube(BlockContent.URANIUM_DUST_BLOCK);
         
         var machinePlatingPool = blockStateModelGenerator.family(BlockContent.MACHINE_PLATING_BLOCK);
         machinePlatingPool.stairs(BlockContent.MACHINE_PLATING_STAIRS);

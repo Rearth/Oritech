@@ -58,6 +58,7 @@ import net.minecraft.world.phys.Vec3;
 public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity>, ItemApi.BlockProvider, ExtendedMenuProvider, ScreenProvider {
     
     private AcceleratorParticleLogic.ActiveParticle particle;
+    private AcceleratorParticleLogic.ActiveParticle lastParticle;
     public ItemStack activeItemParticle = ItemStack.EMPTY;
     
     private AcceleratorParticleLogic particleLogic;
@@ -159,6 +160,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var eventPosition = BlockPos.containing(particle.position);
         NetworkManager.sendBlockHandle(this, new LastEventPacket(worldPosition, reason, particle.velocity, eventPosition, AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
         
+        this.lastParticle = particle;
         this.particle = null;
         
         var renderedTrail = List.of(from, to);
@@ -167,7 +169,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         this.setChanged();
     }
     
-    public void onParticleCollided(float relativeSpeed, Vec3 collision, BlockPos secondController, AcceleratorControllerBlockEntity secondControllerEntity) {
+    public void onParticleCollided(float relativeSpeed, Vec3 collision, AcceleratorControllerBlockEntity secondControllerEntity) {
         
         // create end portal area when two ender pearls collide, nether portal for two firecharges
         if (relativeSpeed > Oritech.CONFIG.endPortalRequiredSpeed() && activeItemParticle.getItem().equals(Items.ENDER_PEARL) && secondControllerEntity.activeItemParticle.getItem().equals(Items.ENDER_PEARL)) {
@@ -179,7 +181,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         }
         
         NetworkManager.sendBlockHandle(this, new LastEventPacket(worldPosition, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.containing(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
-        NetworkManager.sendBlockHandle(this, new LastEventPacket(secondController, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.containing(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
+        NetworkManager.sendBlockHandle(this, new LastEventPacket(secondControllerEntity.getBlockPos(), ParticleEvent.COLLIDED, relativeSpeed, BlockPos.containing(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
         
         this.removeParticleDueToCollision();
         secondControllerEntity.removeParticleDueToCollision();
@@ -348,8 +350,10 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     public AcceleratorParticleLogic.ActiveParticle getParticle() {
+        if (particle == null && lastParticle != null) return lastParticle;  // helper for edge case collisions
         return particle;
     }
+    
     // returns the amount of moment used
     public float handleParticleEntityCollision(BlockPos checkPos, AcceleratorParticleLogic.ActiveParticle particle, float remainingMomentum, LivingEntity mob) {
         

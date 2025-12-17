@@ -110,7 +110,7 @@ public class AcceleratorScreen extends BasicMachineScreen<AcceleratorScreenHandl
             }
             case COLLIDED -> {
                 titleLabel.text(Component.translatable("text.oritech.accelerator.ui.collision").withStyle(ChatFormatting.BLACK, ChatFormatting.BOLD));
-                speedLabel.text(Component.translatable("text.oritech.accelerator.ui.collision.stats", format(event.lastEventSpeed(), 1)).withStyle(ChatFormatting.BLACK));
+                speedLabel.text(Component.translatable("text.oritech.accelerator.ui.collision.stats", format(event.lastEventSpeed(), 0)).withStyle(ChatFormatting.BLACK));
                 statusLabel.text(Component.translatable("text.oritech.accelerator.ui.collision.position", event.lastEventPosition().toShortString()).withStyle(ChatFormatting.DARK_GRAY));
             }
             case EXITED_FAST -> {
