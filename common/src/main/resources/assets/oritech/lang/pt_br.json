@@ -42,8 +42,8 @@
   "advancements.oritech.reactor.description": "Construa um reator nuclear. Lembre-se, segurança em primeiro lugar! Ou, sabe... apenas aproveite o show de luzes.",
   "advancements.oritech.atomicforge": "Ferreiro Atômico",
   "advancements.oritech.atomicforge.description": "Obtenha uma forja atômica e comece a criar como um profissional. É atômico!",
-  "advancements.oritech.promethium": "Fogo de Prometeu",
-  "advancements.oritech.promethium.description": "Obtenha uma barra de promécio. Você roubou o fogo dos deuses!",
+  "advancements.oritech.promethium": "Fogo de Promécio",
+  "advancements.oritech.promethium.description": "Obtenha um Lingote de Promécio. Você roubou o fogo dos deuses!",
   "advancements.oritech.ultimate_core": "A Máquina Suprema",
   "advancements.oritech.ultimate_core.description": "Obtenha um núcleo de máquina supremo. Agora você pode adicionar addons excessivos!",
   "advancements.oritech.gold_gem": "Alquimista Lendário",
@@ -407,7 +407,7 @@
   "title.oritech.machine.capacitor_added_throughput": "🔋 %d RF/t",
   "tooltip.oritech.machine.capacitor_added_throughput": "Taxa de Transferência Adicionada",
   "title.oritech.machine_option_enabled": "🔨 Ativado",
-  "tooltip.oritech.pulverizer_dust_combine": "Auto-combina pequenos Pós em Barras.",
+  "tooltip.oritech.pulverizer_dust_combine": "Auto-combina pequenos Pós em Lingotes.",
   "tooltip.oritech.fluid_content": "%f mB %s",
   "tooltip.oritech.fluid_content_tank_tooltip": "%fB %s",
   "tooltip.oritech.jetpack_fuel": "%f/%f mB %s",
@@ -841,18 +841,18 @@
   "item.oritech.fluxite": "Fluxite",
   "item.oritech.adamant_ingot": "Barra de Adamante",
   "item.oritech.adamant_dust": "Pó de Adamante",
-  "item.oritech.biosteel_ingot": "Barra de BioAço",
+  "item.oritech.biosteel_ingot": "Lingote  de BioAço",
   "item.oritech.biosteel_dust": "Pó de BioAço",
   "item.oritech.duratium_ingot": "Barra de Duratium",
   "item.oritech.duratium_dust": "Pó de Duratium",
-  "item.oritech.electrum_ingot": "Barra de Eléctro",
+  "item.oritech.electrum_ingot": "Lingote de Eléctro",
   "item.oritech.electrum_dust": "Pó de Eléctro",
   "item.oritech.energite_ingot": "Barra de Energita",
   "item.oritech.energite_dust": "Pó de Energita",
   "item.oritech.electric_mace": "Maça Elétrica",
   "item.oritech.prometheum_ingot": [
     {
-      "text": "Promethium",
+      "text": "Promécio",
       "color": "#ffd505"
     }
   ],
@@ -946,13 +946,13 @@
   "item.oritech.wrench": "Chave de Tubo",
   "item.oritech.promethium_axe": [
     {
-      "text": "Machado de Batalha de Promethium",
+      "text": "Machado de Batalha de Promécio",
       "color": "#ffd505"
     }
   ],
   "item.oritech.promethium_pickaxe": [
     {
-      "text": "Picareta de Promethium",
+      "text": "Picareta de Promécio",
       "color": "#ffd505"
     }
   ],
@@ -1354,13 +1354,13 @@
   "tag.item.c.dusts.steel": "Pó de Aço",
   "tag.item.c.gems.fluxite": "Gema de Fluxite",
   "tag.item.c.ingots.adamant": "Barra de Adamante",
-  "tag.item.c.ingots.biosteel": "Barra de BioAço",
+  "tag.item.c.ingots.biosteel": "Lingote de BioAço",
   "tag.item.c.ingots.duratium": "Barra de Duratium",
-  "tag.item.c.ingots.electrum": "Barra de Eléctro",
+  "tag.item.c.ingots.electrum": "Lingote de Eléctro",
   "tag.item.c.ingots.energite": "Barra de Energita",
   "tag.item.c.ingots.nickel": "Barra de Níquel",
   "tag.item.c.ingots.platinum": "Barra de Platina",
-  "tag.item.c.ingots.prometheum": "Barra de Promethium",
+  "tag.item.c.ingots.prometheum": "Lingote de Promécio",
   "tag.item.c.ingots.steel": "Barra de Aço",
   "tag.item.c.nuggets.nickel": "Pepita de Níquel",
   "tag.item.c.nuggets.platinum": "Pepita de Platina",
