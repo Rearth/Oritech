@@ -983,7 +983,7 @@
   "message.oritech.target_designator.hunter_hostile": "敵対的なモブ",
   "message.oritech.target_designator.hunter_neutral": "敵対的と中立的なモブ（ペットを除く）",
   "message.oritech.target_designator.hunter_all": "プレイヤー以外の全てのモブ",
-  "message.oritech.target_designator.connected_poles": "送電ポールは接続されました。ターゲットデザイナーをリセットしました。",
+  "message.oritech.target_designator.connected_poles": "Power Poles Connected. Designator cleared.",
   "message.oritech.target_designator.removing_pole_connection": "送電ポールは切断されました。ターゲットデザイナーをリセットしました。",
   "message.oritech.target_designator.pole_position_invalid": "送電ポールは有効なターゲットを見つけられませんでした。ターゲットデザイナーをリセットしました。",
   "message.oritech.target_designator.pole_dist_invalid": "送電ポール同士の距離が不適正です。最小値： %s, 最大値： %s, 現在値： %s です。ターゲットデザイナーをリセットしました。",
