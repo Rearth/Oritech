@@ -983,7 +983,7 @@
   "message.oritech.target_designator.hunter_hostile": "apenas mobs hostis",
   "message.oritech.target_designator.hunter_neutral": "mobs hostis e neutros (animais de estimação excluídos)",
   "message.oritech.target_designator.hunter_all": "todos os mobs não-jogadores",
-  "message.oritech.target_designator.connected_poles": "Power Poles Connected. Designator cleared.",
+  "message.oritech.target_designator.connected_poles": "Postes de Energia conectados. Designador liberado.",
   "message.oritech.target_designator.removing_pole_connection": "Postes de Energia Desconectados. Designador apagado.",
   "message.oritech.target_designator.pole_position_invalid": "Alvo do poste de energia inválido (não encontrado). Designador limpo.",
   "message.oritech.target_designator.pole_dist_invalid": "Distância do poste de energia inválida. Mínimo: %s, Máximo: %s. Atual: %s. Designador limpo.",
