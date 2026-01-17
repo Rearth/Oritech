@@ -1333,7 +1333,7 @@
   "text.config.oritech-config.option.maxZiplineSpeed": "Velocidade Máxima de Tirolesa (em blocos/segundo)",
   "text.config.oritech-config.option.ziplineAcceleration": "Aceleração de Tirolesa (Mais alta = Mais rápida)",
   "text.config.oritech-config.option.ziplineAutoJump": "Ativar Pulo Automático no Fim da Tirolesa",
-  "text.config.oritech-config.option.ziplineCameraSwitch": "Enable 3rd Person Camera while Ziplining",
+  "text.config.oritech-config.option.ziplineCameraSwitch": "Habilitar Câmera de Terceira Pessoa enquanto anda de Tirolesa",
   "text.config.oritech-config.section.particleAccelerator": "Acelerador de Partículas",
   "text.config.oritech-config.option.bendFactor": "Fator de Requisito de Curva da Partícula",
   "text.config.oritech-config.option.accelerationRFCost": "Custo Base de Aceleração de RF da Partícula",
