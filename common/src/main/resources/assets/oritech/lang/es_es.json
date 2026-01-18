@@ -389,7 +389,7 @@
   "title.oritech.machine_speed": "⌛ %s%% ",
   "tooltip.oritech.machine_speed": "Velocidad de Procesamiento",
   "title.oritech.machine_efficiency": "⚡ %s%% ",
-  "tooltip.oritech.wrench": "Used to configure pipes. Or to zipline on energy pole cables.",
+  "tooltip.oritech.wrench": "Utilizado para configurar tuberías. O para conectar cables en postes de energía.",
   "tooltip.oritech.machine_efficiency": "Energy Efficiency Change",
   "tooltip.oritech.steam_workers": "Chained steam generators will share/use the steam and water tank of this block.",
   "title.oritech.machine_energy_production": "↗ %d RF/t ",
