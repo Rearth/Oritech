@@ -400,6 +400,7 @@
   "tooltip.oritech.steam_consumption": "Consumo total de vapor em unidades de armazenamento (unidades de vapor) por tick (inclui geradores encadeados)",
   "tooltip.oritech.refinery_module_count": "Dois módulos de tanque de câmara extras podem ser construídos no topo para desbloquear os respectivos tanques.\nNão ter módulos dobra a saída de item e a primeira saída lenta.\nTer um módulo dobra apenas a saída do segundo tanque. Ter dois módulos habilita todas as saídas.",
   "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Carregado\n\nUso Máximo: %s RF/t\nTransferência Máxima: %s RF/t",
+  "tooltip.oritech.atomic_forge_energy_tip": "\n\nCapacity depends on recipe.\nThe recipe finishes when the storage is full.",
   "title.oritech.machine.no_addons": "Nenhum addon conectado",
   "button.oritech.machine.addons": "Addons",
   "tooltip.oritech.pipe_booster": "Aumenta a velocidade de extração de um tubo de fluido/item atrás dele",
