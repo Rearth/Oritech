@@ -1,6 +1,5 @@
 package rearth.oritech.api.recipe;
 
-import dev.architectury.platform.Platform;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.recipes.AugmentDataRecipe;

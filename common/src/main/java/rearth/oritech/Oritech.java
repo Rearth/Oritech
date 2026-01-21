@@ -30,6 +30,7 @@ import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
+import rearth.oritech.util.ServerZiplineHandler;
 import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRecipeRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
@@ -73,6 +74,8 @@ public final class Oritech {
         TickEvent.SERVER_POST.register(elem -> AddonBlockEntity.completeInits());
         TickEvent.SERVER_POST.register(elem -> ElectricMaceItem.processLightningEvents(elem.overworld()));
         
+        TickEvent.PLAYER_POST.register(ServerZiplineHandler::onPlayerTick);
+        
         ComponentContent.COMPONENTS.register();
         
         // for player augment ticks
@@ -90,7 +93,8 @@ public final class Oritech {
         EVENT_MAP.get(Registries.FLUID.location()).forEach(Runnable::run);
         
         for (var type : EVENT_MAP.keySet()) {
-            if (type.equals(Registries.FLUID.location()) || type.equals(Registries.CREATIVE_MODE_TAB.location())) continue;
+            if (type.equals(Registries.FLUID.location()) || type.equals(Registries.CREATIVE_MODE_TAB.location()))
+                continue;
             EVENT_MAP.get(type).forEach(Runnable::run);
         }
         
@@ -120,7 +124,10 @@ public final class Oritech {
         res.put(Registries.CREATIVE_MODE_TAB.location(), () -> ArchitecturyRegistryContainer.register(ItemGroups.class, MOD_ID, false));
         res.put(Registries.RECIPE_SERIALIZER.location(), ArchitecturyRecipeRegistryContainer::finishSerializerRegister);
         res.put(Registries.LOOT_FUNCTION_TYPE.location(), FluidContent::registerItemsToGroups);
-        res.put(ResourceLocation.fromNamespaceAndPath("neoforge", "attachment_types"), Augment::registerAttachmentTypes);   // this works just fine on fabric aswell, as they key is not really relevant there.
+        res.put(ResourceLocation.fromNamespaceAndPath("neoforge", "attachment_types"), () -> {
+            Augment.registerAttachmentTypes();
+            ServerZiplineHandler.registerAttachments();
+        });   // this works just fine on fabric aswell, as they key is not really relevant there.
         
         return res;
     }

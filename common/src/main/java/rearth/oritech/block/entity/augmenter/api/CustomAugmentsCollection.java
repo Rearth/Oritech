@@ -9,14 +9,12 @@ import rearth.oritech.api.attachment.AttachmentApi;
 import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.PortalEntity;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.component.DataComponents;
@@ -28,10 +26,7 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 
 public class CustomAugmentsCollection {
     

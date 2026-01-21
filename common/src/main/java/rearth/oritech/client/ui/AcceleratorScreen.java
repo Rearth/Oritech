@@ -11,13 +11,11 @@ import io.wispforest.owo.ui.core.Positioning;
 import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
-import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity.LastEventPacket;
 import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
 
 public class AcceleratorScreen extends BasicMachineScreen<AcceleratorScreenHandler> {

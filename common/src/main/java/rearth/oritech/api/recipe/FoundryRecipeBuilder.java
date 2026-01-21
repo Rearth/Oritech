@@ -1,9 +1,6 @@
 package rearth.oritech.api.recipe;
 
-import dev.architectury.fluid.FluidStack;
 import net.minecraft.resources.ResourceLocation;
-import rearth.oritech.Oritech;
-import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class FoundryRecipeBuilder extends OritechRecipeBuilder {

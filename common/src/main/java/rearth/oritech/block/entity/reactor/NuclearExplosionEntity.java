@@ -2,11 +2,7 @@ package rearth.oritech.block.entity.reactor;
 
 import dev.architectury.platform.Platform;
 import dev.ftb.mods.ftbchunks.api.FTBChunksAPI;
-import dev.ftb.mods.ftbchunks.api.Protection;
 import dev.ftb.mods.ftblibrary.math.ChunkDimPos;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.level.ChunkPos;
-import rearth.oritech.OritechPlatform;
 import rearth.oritech.block.blocks.reactor.NuclearExplosionBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;

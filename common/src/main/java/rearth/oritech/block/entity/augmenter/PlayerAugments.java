@@ -3,7 +3,6 @@ package rearth.oritech.block.entity.augmenter;
 import dev.architectury.registry.menu.MenuRegistry;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.AttachmentApi;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.init.recipes.RecipeContent;
 
@@ -16,8 +15,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class PlayerAugments {
     

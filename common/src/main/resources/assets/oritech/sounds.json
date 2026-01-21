@@ -124,5 +124,14 @@
         "volume": 0.1
       }
     ]
+  },
+  "bedrock_extractor": {
+    "sounds": [
+      {
+        "name": "oritech:bedrock_extractor",
+        "volume": 3,
+        "pitch": 0.7
+      }
+    ]
   }
 }

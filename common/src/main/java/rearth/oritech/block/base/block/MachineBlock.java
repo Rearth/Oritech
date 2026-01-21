@@ -1,12 +1,10 @@
 package rearth.oritech.block.base.block;
 
 import com.mojang.serialization.MapCodec;
-import dev.architectury.hooks.fluid.FluidStackHooks;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -34,11 +32,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
-import rearth.oritech.util.StackContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;

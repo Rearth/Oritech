@@ -2,7 +2,6 @@ package rearth.oritech.init.compat.emi;
 
 import dev.emi.emi.api.EmiDragDropHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
-import io.wispforest.owo.ui.container.FlowLayout;
 import net.minecraft.client.gui.GuiGraphics;
 import rearth.oritech.client.ui.ItemFilterScreen;
 

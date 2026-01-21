@@ -3,19 +3,17 @@ package rearth.oritech.client.ui;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
-import rearth.oritech.util.ScreenProvider.GuiSlot;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Inventory;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.*;

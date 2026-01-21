@@ -3,21 +3,18 @@ package rearth.oritech.block.entity.augmenter.api;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.Attachment;
 import rearth.oritech.api.attachment.AttachmentApi;
 import rearth.oritech.api.networking.NetworkManager;
-import rearth.oritech.block.entity.augmenter.PlayerAugments;
 
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 // all events / methods here are called just on the server (except for refreshClient()). However the augments are also present and loaded

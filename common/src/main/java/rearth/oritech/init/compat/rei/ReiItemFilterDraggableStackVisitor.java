@@ -1,6 +1,5 @@
 package rearth.oritech.init.compat.rei;
 
-import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.drag.DraggableStack;
 import me.shedaniel.rei.api.client.gui.drag.DraggableStackVisitor;
@@ -14,8 +13,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static rearth.oritech.client.ui.ItemFilterScreen.FILTER_SIZE;
-
-import io.wispforest.owo.ui.container.FlowLayout;
 
 public class ReiItemFilterDraggableStackVisitor implements DraggableStackVisitor<ItemFilterScreen> {
 

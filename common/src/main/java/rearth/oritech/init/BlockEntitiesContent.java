@@ -25,7 +25,6 @@ import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.block.entity.reactor.*;
-import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
 import rearth.oritech.block.entity.storage.*;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 

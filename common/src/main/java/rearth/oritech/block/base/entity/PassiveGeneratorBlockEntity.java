@@ -1,7 +1,6 @@
 package rearth.oritech.block.base.entity;
 
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
 import java.util.Set;
 import net.minecraft.core.BlockPos;

@@ -12,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
-import rearth.oritech.util.ScreenProvider.GuiSlot;
 
 public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
     

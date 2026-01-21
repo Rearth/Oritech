@@ -9,7 +9,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;

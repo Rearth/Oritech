@@ -39,10 +39,10 @@ import java.util.Optional;
 
 public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
-    @SyncField(SyncType.GUI_TICK)
+    @SyncField({SyncType.GUI_TICK, SyncType.INITIAL})
     public final SimpleInOutFluidStorage fluidContainer = new SimpleInOutFluidStorage(Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidStackHooks.bucketAmount(), this::setChanged);
     
-    @SyncField(SyncType.GUI_OPEN)
+    @SyncField({SyncType.GUI_OPEN, SyncType.INITIAL})
     public boolean hasFluidAddon = false;
     
     public CentrifugeBlockEntity(BlockPos pos, BlockState state) {

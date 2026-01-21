@@ -13,7 +13,7 @@ import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.ScreenProvider.GuiSlot;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import net.minecraft.core.BlockPos;

@@ -19,7 +19,7 @@ import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.SimpleCraftingInventory;
 
 import java.util.List;
-import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;

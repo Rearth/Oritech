@@ -2,6 +2,7 @@ package rearth.oritech.init.world.features.uranium;
 
 import com.mojang.serialization.Codec;
 import org.joml.Vector2d;
+import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.Geometry;
 
@@ -49,6 +50,7 @@ public class UraniumPatchFeature extends Feature<UraniumPatchFeatureConfig> {
         var random = context.random();
         var config = context.config();
         var state = BuiltInRegistries.BLOCK.get(config.blockId()).defaultBlockState();
+        var crystalBlock = BuiltInRegistries.BLOCK.get(config.crystalId());
         var world = context.level();
         
         var range = config.number();
@@ -90,7 +92,7 @@ public class UraniumPatchFeature extends Feature<UraniumPatchFeatureConfig> {
                     var testState = world.getBlockState(projected);
                     var testState2 = world.getBlockState(projected2);
                     if (isValidReplacementBloc(testState)) {
-                        createCrystals(projected, world, random);
+                        createCrystals(projected, world, random, crystalBlock);
                         world.setBlock(projected, state, Block.UPDATE_CLIENTS, 0);
                         break;
                     }
@@ -108,10 +110,10 @@ public class UraniumPatchFeature extends Feature<UraniumPatchFeatureConfig> {
     }
     
     private boolean isValidReplacementBloc(BlockState state) {
-        return state.is(BlockTags.DEEPSLATE_ORE_REPLACEABLES);
+        return state.is(BlockTags.DEEPSLATE_ORE_REPLACEABLES) || state.is(BlockTags.STONE_ORE_REPLACEABLES);
     }
     
-    private void createCrystals(BlockPos pos, WorldGenLevel world, RandomSource random) {
+    private void createCrystals(BlockPos pos, WorldGenLevel world, RandomSource random, Block crystal) {
         for (var neighborPos : getNeighbors(pos)) {
             var neighborState = world.getBlockState(neighborPos);
             
@@ -121,7 +123,7 @@ public class UraniumPatchFeature extends Feature<UraniumPatchFeatureConfig> {
             var waterLogged = neighborState.is(Blocks.WATER);
             var facing = Geometry.fromVector(neighborPos.subtract(pos));
             if (facing == null) continue;
-            var targetState = BlockContent.URANIUM_CRYSTAL.defaultBlockState()
+            var targetState = crystal.defaultBlockState()
                                 .setValue(AmethystClusterBlock.WATERLOGGED, waterLogged)
                                 .setValue(AmethystClusterBlock.FACING, facing);
             world.setBlock(neighborPos, targetState, Block.UPDATE_CLIENTS, 0);

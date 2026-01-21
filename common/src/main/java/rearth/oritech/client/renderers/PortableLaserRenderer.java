@@ -1,25 +1,24 @@
 package rearth.oritech.client.renderers;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
+import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.PortableLaserItem;
-import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
+
+import static rearth.oritech.client.renderers.LaserArmRenderer.BEAM_TEXTURE;
 
 public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
     
@@ -64,36 +63,29 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         
         matrices.pushPose();
         
-        var lineConsumer = bufferSource.getBuffer(LaserArmRenderer.CUSTOM_LINES);
-        RenderSystem.lineWidth((float) (3 + Math.sin((world.getGameTime() + partialTick) * 1.1f) * 1));
+        var localStart = new Vec3(0, 0.05, 0);
         
-        var startOffset = new Vector3f(0, 0.05f, 0);
-        var endOffset = new Vector3f(0, 0, -dist);
-        var cross = endPos.subtract(startPos).normalize().cross(new Vec3(0, 1, 0));
+        var deltaVec = new Vec3(0, 0, -dist);
         
+        var beamConsumer = bufferSource.getBuffer(RenderType.eyes(BEAM_TEXTURE));
         
-        lineConsumer.addVertex(matrices.last().pose(), startOffset.x, startOffset.y, startOffset.z)
-          .setColor(138, 242, 223, 255)
-          .setLight(packedLight)
-          .setOverlay(packedOverlay)
-          .setNormal(0, 1, 0);
-        lineConsumer.addVertex(matrices.last().pose(), endOffset.x, endOffset.y, endOffset.z)
-          .setColor(19, 91, 80, 255)
-          .setLight(packedLight)
-          .setOverlay(packedOverlay)
-          .setNormal(1, 0, 0);
+        float baseThickness = (float) (0.03f + Math.sin((world.getGameTime() + partialTick) * 1.1f) * 0.01f);
         
-        // render a second one at right angle to first one
-        lineConsumer.addVertex(matrices.last().pose(), startOffset.x, startOffset.y, startOffset.z)
-          .setColor(138, 242, 223, 255)
-          .setLight(packedLight)
-          .setOverlay(packedOverlay)
-          .setNormal((float) cross.x, (float) cross.y, (float) cross.z);
-        lineConsumer.addVertex(matrices.last().pose(), endOffset.x, endOffset.y, endOffset.z)
-          .setColor(19, 91, 80, 255)
-          .setLight(packedLight)
-          .setOverlay(packedOverlay)
-          .setNormal((float) cross.x, (float) cross.y, (float) cross.z);
+        BeamRenderer.renderStraightBeam(
+          matrices, beamConsumer, localStart, deltaVec,
+          baseThickness * 0.3f,
+          LightTexture.FULL_BRIGHT,
+          LaserArmRenderer.CORE_COLOR_START,
+          LaserArmRenderer.CORE_COLOR_END
+        );
+        
+        BeamRenderer.renderStraightBeam(
+          matrices, beamConsumer, localStart, deltaVec,
+          baseThickness,
+          LightTexture.FULL_BRIGHT,
+          LaserArmRenderer.GLOW_COLOR_START,
+          LaserArmRenderer.GLOW_COLOR_END
+        );
         
         matrices.popPose();
         

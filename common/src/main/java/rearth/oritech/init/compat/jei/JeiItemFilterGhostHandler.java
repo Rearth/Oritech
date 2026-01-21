@@ -13,8 +13,6 @@ import java.util.List;
 
 import static rearth.oritech.client.ui.ItemFilterScreen.FILTER_SIZE;
 
-import io.wispforest.owo.ui.container.FlowLayout;
-
 class JeiItemFilterGhostHandler implements IGhostIngredientHandler<ItemFilterScreen> {
 
     @Override

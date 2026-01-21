@@ -1,21 +1,18 @@
 package rearth.oritech.client.renderers;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import org.joml.Vector3f;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.world.phys.Vec3;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.client.renderers.util.BeamRenderer;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.world.phys.Vec3;
-
-import static rearth.oritech.client.renderers.LaserArmRenderer.CUSTOM_LINES;
 
 
 public class AcceleratorControllerRenderer implements BlockEntityRenderer<AcceleratorControllerBlockEntity> {
@@ -42,7 +39,6 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
             return;
         }
         
-        var lineConsumer = vertexConsumers.getBuffer(CUSTOM_LINES);
         var time = entity.getLevel().getGameTime() + tickDelta;
         
         // try adding new tail to lines
@@ -59,51 +55,37 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
             if (entity.displayTrail.equals(activeLine.positions)) entity.displayTrail = null;
         }
         
+        var bePos = Vec3.atLowerCornerOf(entity.getBlockPos());
+        var baseThickness = 0.07f;
+        var beamConsumer = vertexConsumers.getBuffer(RenderType.eyes(LaserArmRenderer.BEAM_TEXTURE));
         
         for (int i = 0; i < line.size() - 1; i++) {
-            var start = line.get(i).subtract(Vec3.atLowerCornerOf(entity.getBlockPos()));
-            var end = line.get(i + 1).subtract(Vec3.atLowerCornerOf(entity.getBlockPos()));
+            var pointCurrent = line.get(i);
+            var pointNext = line.get(i + 1);
             
-            var startPos = new Vector3f((float) start.x, (float) start.y, (float) start.z);
-            var endPos = new Vector3f((float) end.x, (float) end.y, (float) end.z);
+            // to local space
+            var startLocal = pointCurrent.subtract(bePos);
+            var endLocal = pointNext.subtract(bePos);
             
-            var camPos = Minecraft.getInstance().cameraEntity.position();
-            var camDist = camPos.subtract(line.get(i)).length();
-            RenderSystem.lineWidth((float) (40 / Math.sqrt(camDist)));
+            Vec3 delta = endLocal.subtract(startLocal);
             
-            displayLine(matrices, light, overlay, startPos, endPos, lineConsumer, 1);
+            BeamRenderer.renderStraightBeam(
+              matrices, beamConsumer, startLocal, delta,
+              baseThickness * 0.3f,
+              LightTexture.FULL_BRIGHT,
+              LaserArmRenderer.CORE_COLOR_START,
+              LaserArmRenderer.CORE_COLOR_END
+            );
+            
+            // render glow
+            BeamRenderer.renderStraightBeam(
+              matrices, beamConsumer, startLocal, delta,
+              baseThickness,
+              LightTexture.FULL_BRIGHT,
+              LaserArmRenderer.GLOW_COLOR_START,
+              LaserArmRenderer.GLOW_COLOR_END
+            );
         }
         
-    }
-    
-    private static void displayLine(PoseStack matrices, int light, int overlay, Vector3f startPos, Vector3f endPos, VertexConsumer lineConsumer, float alpha) {
-        
-        matrices.pushPose();
-        var cross = new Vector3f(endPos).sub(startPos).normalize().cross(0, 1, 0);
-        var scaledAlpha = (int) (alpha * 255);
-        
-        lineConsumer.addVertex(matrices.last().pose(), startPos.x, startPos.y, startPos.z)
-          .setColor(188, 22, 196, scaledAlpha)
-          .setLight(light)
-          .setOverlay(overlay)
-          .setNormal(0, 1, 0);
-        lineConsumer.addVertex(matrices.last().pose(), endPos.x, endPos.y, endPos.z)
-          .setColor(188, 22, 196, scaledAlpha)
-          .setLight(light)
-          .setOverlay(overlay)
-          .setNormal(1, 0, 0);
-        
-        // render a second one at right angle to first one
-        lineConsumer.addVertex(matrices.last().pose(), startPos.x, startPos.y, startPos.z)
-          .setColor(188, 22, 196, scaledAlpha)
-          .setLight(light)
-          .setOverlay(overlay)
-          .setNormal(cross.x, cross.y, cross.z);
-        lineConsumer.addVertex(matrices.last().pose(), endPos.x, endPos.y, endPos.z)
-          .setColor(188, 22, 196, scaledAlpha)
-          .setLight(light)
-          .setOverlay(overlay)
-          .setNormal(cross.x, cross.y, cross.z);
-        matrices.popPose();
     }
 }

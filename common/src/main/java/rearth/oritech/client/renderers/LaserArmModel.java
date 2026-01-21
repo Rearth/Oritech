@@ -1,14 +1,12 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector2f;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.util.Geometry;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.cache.object.GeoBone;
-import software.bernie.geckolib.model.DefaultedBlockGeoModel;
+
 import java.util.HashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -52,7 +50,16 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
         
         if (target == null || target == Vec3.ZERO) return;
         
-        if (!isIdle && laserEntity.isTargetingDeepdrill(laserEntity.getLevel().getBlockState(laserEntity.getCurrentTarget()).getBlock())) {
+        var targetBlock = laserEntity.getLevel().getBlockState(laserEntity.getCurrentTarget()).getBlock();
+        var startPos = laserEntity.laserHead;
+        
+        if (laserEntity.isTargetingAtomicForge(targetBlock)) { // adjust so the beam end faces one of the corner pillars
+            var moveX = 0.5;
+            var moveZ = 0.5;
+            if (startPos.x < target.x) moveX = -0.5;
+            if (startPos.z < target.z) moveZ = -0.5;
+            target = target.add(moveX, 0.2, moveZ);
+        } else if (!isIdle && laserEntity.isTargetingDeepdrill(laserEntity.getLevel().getBlockState(laserEntity.getCurrentTarget()).getBlock())) {
             var drillId = laserEntity.getCurrentTarget().asLong();
             var offset = getOffsetByDrillId(drillId, laserEntity);
             target = target.add(offset);

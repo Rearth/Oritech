@@ -33,6 +33,7 @@ public class SoundContent implements ArchitecturyRegistryContainer<SoundEvent> {
     public static final SoundEvent REACTOR_WARNING = SoundEvent.createVariableRangeEvent(Oritech.id("reactor_warning"));
     public static final SoundEvent NUKE_EXPLOSION = SoundEvent.createVariableRangeEvent(Oritech.id("nuke_explosion"));
     public static final SoundEvent ELECTRIC_SHOCK = SoundEvent.createVariableRangeEvent(Oritech.id("electric_shock"));
+    public static final SoundEvent BEDROCK_EXTRACTOR = SoundEvent.createVariableRangeEvent(Oritech.id("bedrock_extractor"));
     
     @Override
     public Class<SoundEvent> getTargetFieldType() {

@@ -16,10 +16,8 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class TooltipHelper {
     
@@ -50,6 +48,8 @@ public class TooltipHelper {
         if (showExtra) {
             var entity = entityProvider.newBlockEntity(BlockPos.ZERO, block.defaultBlockState());
             
+            var isAtomicForge = entity instanceof AtomicForgeBlockEntity;
+            
             if (entity instanceof MultiblockMachineController multiblockController) {
                 var corePositions = multiblockController.getCorePositions();
                 tooltip.add(Component.translatable("tooltip.oritech.core_desc").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(corePositions.size())).withStyle(ChatFormatting.GOLD)));
@@ -61,7 +61,7 @@ public class TooltipHelper {
                 var addonSlots = addonProvider.getAddonSlots();
                 tooltip.add(Component.translatable("tooltip.oritech.addon_desc").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(addonSlots.size())).withStyle(ChatFormatting.GOLD)));
             }
-            if (entity instanceof MachineBlockEntity machineEntity && machineEntity.getEnergyPerTick() > 1) {
+            if (entity instanceof MachineBlockEntity machineEntity && machineEntity.getEnergyPerTick() > 1 && !isAtomicForge) {
                 var energyRate = machineEntity.getEnergyPerTick();
                 if (entity instanceof UpgradableGeneratorBlockEntity) {
                     tooltip.add(Component.translatable("tooltip.oritech.generator_rate_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_transfer_rate", energyRate).withStyle(ChatFormatting.GOLD)));
@@ -76,9 +76,10 @@ public class TooltipHelper {
             
             if (entity instanceof EnergyApi.BlockProvider energyProvider) {
                 var maxStorage = getEnergyText(energyProvider.getEnergyStorage(null).getCapacity());
-                tooltip.add(Component.translatable("tooltip.oritech.machine_capacity_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_capacity", maxStorage).withStyle(ChatFormatting.GOLD)));
+                if (!isAtomicForge)
+                    tooltip.add(Component.translatable("tooltip.oritech.machine_capacity_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_capacity", maxStorage).withStyle(ChatFormatting.GOLD)));
                 
-                if (energyProvider instanceof AtomicForgeBlockEntity || energyProvider instanceof DeepDrillEntity)
+                if (isAtomicForge || energyProvider instanceof DeepDrillEntity)
                     tooltip.add(Component.translatable("tooltip.oritech.needs_laser_power").withStyle(ChatFormatting.BOLD));
                 
                 var id = BuiltInRegistries.BLOCK.getKey(block);

@@ -1,10 +1,8 @@
 package rearth.oritech.client.ui.components;
 
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import io.wispforest.owo.ui.base.BaseComponent;
-import io.wispforest.owo.ui.component.BlockComponent;
 import io.wispforest.owo.ui.core.OwoUIDrawContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
@@ -13,7 +11,6 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 
 public class CustomBlockComponent extends BaseComponent {
     

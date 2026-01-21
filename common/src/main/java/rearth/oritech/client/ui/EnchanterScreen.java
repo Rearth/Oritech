@@ -8,10 +8,8 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.OverlayContainer;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
-import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -20,7 +18,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
-import rearth.oritech.block.entity.arcane.EnchanterBlockEntity.EnchanterStatistics;
 
 
 public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> {

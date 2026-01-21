@@ -2,10 +2,8 @@ package rearth.oritech.api.fluid;
 
 import dev.architectury.fluid.FluidStack;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.api.energy.BlockEnergyApi;
 import rearth.oritech.api.fluid.containers.DelegatingFluidStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 

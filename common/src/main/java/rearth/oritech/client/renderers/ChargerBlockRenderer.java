@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import rearth.oritech.block.entity.interaction.ChargerBlockEntity;
 
 public class ChargerBlockRenderer implements BlockEntityRenderer<ChargerBlockEntity> {

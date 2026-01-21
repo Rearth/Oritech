@@ -5,7 +5,6 @@ import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.FluidApi.FluidStorage;
 import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeConnectionBlock;
@@ -15,8 +14,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -61,6 +58,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             if (!block.isSideExtractable(state, direction.getOpposite())) continue;
             
             var sourceBlock = world.getBlockState(sourcePos);
+            
             if (sourceBlock.is(BlockTags.CAULDRONS))
                 transferAmount = (int) FluidStackHooks.bucketAmount();
             
@@ -121,8 +119,12 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         var availableFluid = stackToMove.getAmount();
         
         for (var targetStorage : filteredFluidTargetsCached) {
-            var transferred = targetStorage.insert(stackToMove, false);
-            stackToMove.shrink(transferred);
+            
+            var maxInsert = targetStorage.insert(stackToMove, true);
+            var taken = takenFrom.extract(stackToMove.copyWithAmount(maxInsert), false);
+            var inserted = targetStorage.insert(stackToMove.copyWithAmount(taken), false);
+            
+            stackToMove.shrink(inserted);
             targetStorage.update();
             
             if (stackToMove.getAmount() <= 0) break;
@@ -131,7 +133,6 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         var moved = availableFluid - stackToMove.getAmount();
         if (moved > 0) {
             stackToMove.setAmount(moved);
-            takenFrom.extract(stackToMove, false);
             onBoostUsed();
             takenFrom.update();
         }

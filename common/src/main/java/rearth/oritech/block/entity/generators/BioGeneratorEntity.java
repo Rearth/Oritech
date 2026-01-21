@@ -66,7 +66,7 @@ public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     
     @Override
     public int getInventorySize() {
-        return 2;
+        return 1;
     }
     
     @Override

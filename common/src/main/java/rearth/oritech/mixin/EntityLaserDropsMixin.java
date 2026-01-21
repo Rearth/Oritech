@@ -1,6 +1,5 @@
 package rearth.oritech.mixin;
 
-import net.minecraft.world.entity.Attackable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;

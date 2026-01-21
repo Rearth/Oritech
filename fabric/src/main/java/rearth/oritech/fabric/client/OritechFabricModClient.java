@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
+import rearth.oritech.client.cablesurfer.ActiveCableRenderer;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
@@ -65,6 +66,8 @@ public final class OritechFabricModClient implements ClientModInitializer {
         var vertexConsumers = worldRenderContext.consumers();
         
         OreFinderRenderer.doRender(matrices, camera, vertexConsumers);
+        
+        ActiveCableRenderer.render(matrices, vertexConsumers);
         
     }
     

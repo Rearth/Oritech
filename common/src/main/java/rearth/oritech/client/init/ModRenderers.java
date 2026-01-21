@@ -60,7 +60,7 @@ public class ModRenderers {
         BlockEntityRenderers.register(BlockEntitiesContent.BLACK_HOLE_ENTITY, ctx -> new BlackHoleRenderer());
         BlockEntityRenderers.register(BlockEntitiesContent.ITEM_PIPE_ENTITY, ctx -> new ItemPipeTransferRenderer());
         BlockEntityRenderers.register(BlockEntitiesContent.CHARGER_BLOCK_ENTITY, ctx -> new ChargerBlockRenderer());
-        BlockEntityRenderers.register(BlockEntitiesContent.POWER_POLE_ENTITY, ctx -> new PowerPoleLineRenderer());
+        BlockEntityRenderers.register(BlockEntitiesContent.POWER_POLE_ENTITY, ctx -> new PowerPoleCableRenderer());
         BlockEntityRenderers.register(BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY, ctx -> new UnstableContainerRenderer("models/unstable_container"));
         
         BlockEntityRenderers.register(BlockEntitiesContent.TECH_DOOR_ENTITY, ctx -> new MachineRenderer<>("models/tech_door"));

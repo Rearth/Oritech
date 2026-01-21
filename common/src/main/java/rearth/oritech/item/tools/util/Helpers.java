@@ -1,7 +1,6 @@
 package rearth.oritech.item.tools.util;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.ItemStack;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 
 public class Helpers {

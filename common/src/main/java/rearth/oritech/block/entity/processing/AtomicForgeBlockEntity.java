@@ -56,7 +56,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
             energyStorage.setCapacity((long) Oritech.CONFIG.processingMachines.atomicForgeData.energyPerTick() * result.get().value().getTime());
         } else {
             energyStorage.setCapacity(1);
-            energyStorage.setAmount(1);
+            energyStorage.setAmount(0);
         }
         
         return result;
@@ -104,9 +104,9 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 56, 38),
-          new GuiSlot(1, 83, 21),
-          new GuiSlot(2, 83, 54),
+          new GuiSlot(0, 50, 36),
+          new GuiSlot(1, 74, 17),
+          new GuiSlot(2, 74, 55),
           new GuiSlot(3, 117, 36, true));
     }
     
@@ -147,5 +147,15 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public void saveExtraData(FriendlyByteBuf buf) {
         buf.writeBlockPos(worldPosition);
+    }
+    
+    @Override
+    public float getDisplayedEnergyTransfer() {
+        return energyStorage.getCapacity();
+    }
+    
+    @Override
+    public float getDisplayedEnergyUsage() {
+        return energyStorage.getCapacity();
     }
 }

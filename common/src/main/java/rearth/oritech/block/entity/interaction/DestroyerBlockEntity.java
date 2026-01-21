@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
@@ -162,7 +163,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         return (targetBlock instanceof CropBlock cropBlock && !cropBlock.isMaxAge(targetState))
                  || (targetBlock instanceof NetherWartBlock && targetState.getValue(NetherWartBlock.AGE) < NetherWartBlock.MAX_AGE)
                  || (targetBlock instanceof SweetBerryBushBlock && targetState.getValue(SweetBerryBushBlock.AGE) < SweetBerryBushBlock.MAX_AGE)
-                 || (targetBlock instanceof CocoaBlock && targetState.getValue(CocoaBlock.AGE) < CocoaBlock.MAX_AGE);
+                 || (targetBlock instanceof CocoaBlock && targetState.getValue(CocoaBlock.AGE) < CocoaBlock.MAX_AGE)
+                 || (targetState.is(BlockTags.SAPLINGS));
     }
     
     private Tuple<BlockPos, BlockState> getQuarryDownwardState(BlockPos toolPosition) {

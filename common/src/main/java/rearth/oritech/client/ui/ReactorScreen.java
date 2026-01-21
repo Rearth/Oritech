@@ -8,32 +8,28 @@ import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector2i;
 import rearth.oritech.block.blocks.reactor.ReactorAbsorberBlock;
 import rearth.oritech.block.blocks.reactor.ReactorHeatPipeBlock;
 import rearth.oritech.block.blocks.reactor.ReactorHeatVentBlock;
 import rearth.oritech.block.blocks.reactor.ReactorRodBlock;
 import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
-import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity.ComponentStatistics;
 import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
 import rearth.oritech.client.ui.components.ReactorBlockRenderComponent;
 import rearth.oritech.client.ui.components.ReactorPreviewContainer;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.ScreenProvider.BarConfiguration;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Map.Entry;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.util.TooltipHelper;
 

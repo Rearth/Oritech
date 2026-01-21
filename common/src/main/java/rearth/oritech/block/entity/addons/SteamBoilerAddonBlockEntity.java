@@ -9,7 +9,6 @@ import rearth.oritech.util.MachineAddonController;
 import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SteamBoilerAddonBlockEntity extends AddonBlockEntity implements FluidApi.BlockProvider {

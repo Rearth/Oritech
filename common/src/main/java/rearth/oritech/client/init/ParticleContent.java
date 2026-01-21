@@ -3,7 +3,6 @@ package rearth.oritech.client.init;
 import io.wispforest.owo.particles.ClientParticles;
 import io.wispforest.owo.particles.systems.ParticleSystem;
 import io.wispforest.owo.particles.systems.ParticleSystemController;
-import io.wispforest.owo.util.VectorRandomUtils;
 import rearth.oritech.Oritech;
 
 import java.util.concurrent.CompletableFuture;

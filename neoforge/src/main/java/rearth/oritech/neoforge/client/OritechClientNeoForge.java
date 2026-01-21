@@ -27,6 +27,7 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
+import rearth.oritech.client.cablesurfer.ActiveCableRenderer;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
@@ -52,6 +53,7 @@ public class OritechClientNeoForge {
         public static void onWorldRender(RenderLevelStageEvent event) {
             if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
                 OreFinderRenderer.doRender(event.getPoseStack(), event.getCamera(), Minecraft.getInstance().renderBuffers().bufferSource());
+                ActiveCableRenderer.render(event.getPoseStack(), Minecraft.getInstance().renderBuffers().bufferSource());
             }
         }
         

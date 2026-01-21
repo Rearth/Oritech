@@ -7,6 +7,8 @@ import rearth.oritech.util.ColorableMachine;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.model.DefaultedBlockGeoModel;
 
+import java.util.Locale;
+
 public class MachineModel<T extends BlockEntity & GeoAnimatable> extends DefaultedBlockGeoModel<T> {
     public MachineModel(String subpath) {
         super(Oritech.id(subpath));
@@ -21,7 +23,7 @@ public class MachineModel<T extends BlockEntity & GeoAnimatable> extends Default
             
             if (color.equals(ColorableMachine.ColorVariant.ORANGE)) return base;
             
-            var colorFileSuffix = color.toString().toLowerCase();
+            var colorFileSuffix = color.toString().toLowerCase(Locale.ROOT);
             
             return ResourceLocation.fromNamespaceAndPath(base.getNamespace(), base.getPath().replace("models", "models/colored").replace(".png", "_" + colorFileSuffix + ".png"));
         } else {

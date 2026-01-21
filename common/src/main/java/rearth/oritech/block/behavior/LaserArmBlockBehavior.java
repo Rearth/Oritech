@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
@@ -77,7 +76,7 @@ public class LaserArmBlockBehavior {
                     storageCandidate = unstableContainerBlockEntity.laserInputStorage;
                 
                 var insertAmount = storageCandidate.getCapacity() - storageCandidate.getAmount();
-                if (insertAmount <= 0)
+                if (insertAmount <= 0 || storageCandidate.getCapacity() <= 1)
                     return false;
                 
                 var transferCapacity = Math.min(insertAmount, laserEntity.energyRequiredToFire());

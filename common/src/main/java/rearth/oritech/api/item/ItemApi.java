@@ -2,7 +2,6 @@ package rearth.oritech.api.item;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import rearth.oritech.api.fluid.ItemFluidApi;
 
 import java.util.ServiceLoader;
 

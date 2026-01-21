@@ -1,20 +1,17 @@
 package rearth.oritech.block.blocks.pipes;
 
 import rearth.oritech.block.entity.pipes.ExtractablePipeInterfaceEntity;
-import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity.PipeNetworkData;
 import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.SoundContent;
+
 import java.util.HashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;

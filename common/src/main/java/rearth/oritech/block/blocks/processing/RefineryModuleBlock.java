@@ -1,7 +1,6 @@
 package rearth.oritech.block.blocks.processing;
 
 import com.mojang.serialization.MapCodec;
-import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,13 +24,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.block.entity.processing.RefineryModuleBlockEntity;
 
 import rearth.oritech.util.MultiblockMachineController;
-import rearth.oritech.util.StackContext;
 
 import java.util.List;
 import java.util.Objects;

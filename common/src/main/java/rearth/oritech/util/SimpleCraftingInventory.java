@@ -1,7 +1,6 @@
 package rearth.oritech.util;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 

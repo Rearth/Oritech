@@ -13,5 +13,9 @@
   "refmap": "oritech.refmap.json",
   "overwrites": {
     "requireAnnotations": true
-  }
+  },
+  "client": [
+    "client.CapeLayerMixin",
+    "client.HumanoidModelMixin"
+  ]
 }

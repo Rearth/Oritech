@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.augmenter;
 
-import io.wispforest.owo.network.ClientAccess;
 import rearth.oritech.api.attachment.AttachmentApi;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 

@@ -5,7 +5,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import rearth.oritech.Oritech;
 import rearth.oritech.util.PortalEntity;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 

@@ -3,24 +3,20 @@ package rearth.oritech.client.ui;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.DiscreteSliderComponent;
 import io.wispforest.owo.ui.component.LabelComponent;
-import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity.RedstoneControllable;
-import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity.RedstoneMode;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.ScreenProvider.ArrowConfiguration;
-import rearth.oritech.util.ScreenProvider.GuiSlot;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Inventory;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.ORITECH_PANEL;
@@ -159,11 +155,11 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
     }
     
     private Component getModeText(RedstoneAddonBlockEntity.RedstoneMode mode) {
-        return Component.translatable("title.oritech.redstone_" + mode.toString().toLowerCase()).withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_GRAY);
+        return Component.translatable("title.oritech.redstone_" + mode.toString().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_GRAY);
     }
     
     private Component getDescriptionText(RedstoneAddonBlockEntity.RedstoneMode mode) {
-        return Component.translatable("tooltip.oritech.redstone_" + mode.toString().toLowerCase()).withStyle(ChatFormatting.BLACK);
+        return Component.translatable("tooltip.oritech.redstone_" + mode.toString().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.BLACK);
     }
     
     private void addTitle(FlowLayout overlay) {

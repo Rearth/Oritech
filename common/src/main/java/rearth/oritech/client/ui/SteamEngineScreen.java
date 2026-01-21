@@ -7,9 +7,7 @@ import io.wispforest.owo.ui.core.Insets;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
-import rearth.oritech.block.entity.generators.SteamEngineEntity.SteamEngineSyncPacket;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.ScreenProvider.BarConfiguration;
 
 public class SteamEngineScreen extends UpgradableMachineScreen<UpgradableMachineScreenHandler> {
     

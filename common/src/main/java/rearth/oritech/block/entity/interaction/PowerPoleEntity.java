@@ -1,9 +1,7 @@
 package rearth.oritech.block.entity.interaction;
 
-import com.google.common.collect.ImmutableCollection;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.particle.Particle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -18,7 +16,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -259,9 +256,9 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     
     public void onRemoved() {
         
-        // remove connection from targets (if loaded)
+        // remove connection from targets
         for (var target: connections) {
-            if (level.isLoaded(target.pos) && level.getBlockEntity(target.pos) instanceof PowerPoleEntity powerPole) {
+            if (level.getBlockEntity(target.pos) instanceof PowerPoleEntity powerPole) {
                 powerPole.removeIncomingConnection(worldPosition);
             }
         }
@@ -355,7 +352,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     
     @Override
     public Direction getFacingForMultiblock() {
-        return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite();
+        return getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite();
     }
     
     @Override

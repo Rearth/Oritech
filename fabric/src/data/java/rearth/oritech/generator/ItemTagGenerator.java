@@ -289,6 +289,10 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(ItemTags.FOOT_ARMOR_ENCHANTABLE)
           .add(ToolsContent.EXO_BOOTS);
         
+        getOrCreateTagBuilder(cItemTag("elytras"))
+          .add(ToolsContent.JETPACK_ELYTRA)
+          .add(ToolsContent.JETPACK_EXO_ELYTRA);
+        
         getOrCreateTagBuilder(ItemTags.HEAD_ARMOR)
           .add(ToolsContent.EXO_HELMET);
         getOrCreateTagBuilder(ItemTags.CHEST_ARMOR)
@@ -395,7 +399,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.INDUSTRIAL_PAINT)
           .add(ItemContent.NETHERITE_PAINT)
           .add(ItemContent.SCULK_PAINT);
-
+        
         // recycling
         getOrCreateTagBuilder(TagContent.RECYCLES_TO_NETHERITE_SCRAP)
           .add(Items.NETHERITE_AXE)
@@ -418,7 +422,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(Items.DIAMOND_SHOVEL)
           .add(Items.DIAMOND_SWORD);
         getOrCreateTagBuilder(TagContent.RECYCLES_TO_IRON_DUST)
-          .add(Items.BUCKET)  
+          .add(Items.BUCKET)
           .add(Items.CAULDRON)
           .add(Items.COMPASS)
           .add(Items.HOPPER)
@@ -437,7 +441,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(Items.MINECART)
           .add(Items.SHEARS);
         getOrCreateTagBuilder(TagContent.RECYCLES_TO_SMALL_IRON_DUST)
-          .add(Items.ACTIVATOR_RAIL)  
+          .add(Items.ACTIVATOR_RAIL)
           .add(Items.CHAIN)
           .add(Items.DETECTOR_RAIL)
           .add(Items.FLINT_AND_STEEL)

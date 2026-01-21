@@ -4,7 +4,7 @@ import dev.architectury.fluid.FluidStack;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.FluidApi.FluidStorage;
+
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;

@@ -36,11 +36,13 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
+import rearth.oritech.block.entity.processing.AtomicForgeBlockEntity;
 import rearth.oritech.client.renderers.LaserArmModel;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
 
+import java.util.Locale;
 import java.util.Optional;
 
 public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends BaseOwoHandledScreen<FlowLayout, S> {
@@ -302,15 +304,22 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         var capacity = menu.energyStorage.getCapacity();
         var amount = menu.energyStorage.getAmount();
+        var transfer = (long) menu.screenData.getDisplayedEnergyTransfer();
+        var usage = (long) menu.screenData.getDisplayedEnergyUsage();
         
         var fillAmount = (float) amount / capacity;
-        var tooltipText = getEnergyTooltip(amount, capacity, (long) menu.screenData.getDisplayedEnergyUsage(), (long) menu.screenData.getDisplayedEnergyTransfer());
+        var tooltipText = getEnergyTooltip(amount, capacity, usage, transfer);
+        
+        var isAtomicForge = menu.blockEntity instanceof AtomicForgeBlockEntity;
+        if (isAtomicForge)
+            tooltipText = tooltipText.plainCopy().append(Component.translatable("tooltip.oritech.atomic_forge_energy_tip"));
         
         energyIndicator.tooltip(tooltipText);
         energyIndicator.visibleArea(PositionedRectangle.of(0, 96 - ((int) (96 * (fillAmount))), 24, (int) (96 * fillAmount)));
     }
     
     public static Component getEnergyTooltip(long amount, long max, long showedUsage, long showedTransfer) {
+        
         var percentage = (float) amount / max;
         var energyFill = String.format("%.1f", percentage * 100);
         var storedAmount = TooltipHelper.getEnergyText(amount);
@@ -323,7 +332,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     public void updateSettingsButtons() {
         
         var activeMode = menu.screenData.getInventoryInputMode();
-        var modeName = activeMode.name().toLowerCase();
+        var modeName = activeMode.name().toLowerCase(Locale.ROOT);
         
         if (activeMode.equals(InventoryInputMode.SIDED) && menu.blockEntity instanceof MachineBlockEntity machineBlock) {
             var tooltip = Component.translatable("tooltip.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName));
@@ -645,7 +654,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         var config = menu.screenData.getEnergyConfiguration();
         var insetSize = 1;
-        var tooltipText = Component.translatable("tooltip.oritech.energy_indicator", 10, 50);
+        var tooltipText = Component.translatable("tooltip.oritech.energy_indicator", 0, 50);
         
         var frame = Containers.horizontalFlow(Sizing.fixed(config.width() + insetSize * 2), Sizing.fixed(config.height() + insetSize * 2));
         frame.surface(Surface.PANEL_INSET);

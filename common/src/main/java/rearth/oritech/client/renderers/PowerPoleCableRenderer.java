@@ -9,16 +9,16 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.util.Geometry;
 
-public class PowerPoleLineRenderer implements BlockEntityRenderer<PowerPoleEntity> {
+public class PowerPoleCableRenderer implements BlockEntityRenderer<PowerPoleEntity> {
     
-    private static final ResourceLocation CABLE_TEXTURE = ResourceLocation.withDefaultNamespace("textures/block/white_concrete.png");
+    public static final ResourceLocation CABLE_TEXTURE = ResourceLocation.withDefaultNamespace("textures/block/white_concrete.png");
+    
+    public static final int CABLE_SEGMENT_COUNT = 12;
     
     @Override
     public void render(@NotNull PowerPoleEntity blockEntity, float partialTick, @NotNull PoseStack poseStack, @NotNull MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
@@ -94,7 +94,7 @@ public class PowerPoleLineRenderer implements BlockEntityRenderer<PowerPoleEntit
         // Calculate the full vector from start to end
         var totalOffset = endPos.subtract(startPos);
         
-        var segments = 8;
+        var segments = CABLE_SEGMENT_COUNT;
         var totalLength = (float) totalOffset.length();
         var sag = totalLength * 0.05f; // Sag amount based on distance
         sag = Math.min(sag, 4);
@@ -106,6 +106,8 @@ public class PowerPoleLineRenderer implements BlockEntityRenderer<PowerPoleEntit
             
             // Linear interpolation from Start to End
             var nextPos = startPos.add(totalOffset.scale(t));
+            
+            // note: The same formula is also used in cablemath, but since some values are precalculated here its duplicated
             
             // Parabolic Sag to Y component
             // Formula: -4 * sag * t * (1-t)

@@ -3,7 +3,6 @@ package rearth.oritech.api.fluid;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.fluid.FluidApi.FluidStorage;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.StackContext;
 
@@ -15,7 +14,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 
 public interface ItemFluidApi {
     

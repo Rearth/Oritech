@@ -2,7 +2,6 @@ package rearth.oritech.api.energy;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import rearth.oritech.OritechPlatform;
 
 import java.util.ServiceLoader;
 

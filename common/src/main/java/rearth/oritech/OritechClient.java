@@ -2,24 +2,21 @@ package rearth.oritech;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.event.EventResult;
-import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientRawInputEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import org.lwjgl.glfw.GLFW;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
-import rearth.oritech.block.entity.augmenter.api.Augment;
+import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
+import rearth.oritech.client.cablesurfer.ZiplineFxHandler;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.renderers.MachineGantryRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.util.Helpers;
-import software.bernie.geckolib.event.GeoRenderEvent;
 
 
 public final class OritechClient {
@@ -73,15 +70,20 @@ public final class OritechClient {
             }
         });
         
+        ClientTickEvent.CLIENT_POST.register((client) -> {
+            ClientZiplineHandler.onClientTick();
+            ZiplineFxHandler.tick();
+        });
+        
         // interrupt left mouse for portable lasers (only seems to work on fabric)
         ClientRawInputEvent.MOUSE_CLICKED_PRE.register((client, button, action, mods) ->
                                                          handleMouseClicked(client, button, action, mods) ? EventResult.interruptTrue() : EventResult.pass());
-        
+                
         Oritech.LOGGER.info("Oritech client initialization done");
     }
     
     // returns true if the event is cancelled
-    public static boolean handleMouseClicked(Minecraft  client, int button, int action, int mods) {
+    public static boolean handleMouseClicked(Minecraft client, int button, int action, int mods) {
         if (client.player != null && client.player.getMainHandItem().getItem() instanceof PortableLaserItem && button == 0 && client.screen == null) {
             laserActive = action == 1; // activate laser on mouse down
             return action == 1;

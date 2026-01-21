@@ -1,16 +1,7 @@
 package rearth.oritech.block.blocks.processing;
 
 import net.minecraft.world.level.LevelAccessor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.base.block.MachineBlock;
-import rearth.oritech.block.entity.MachineCoreEntity;
-import rearth.oritech.block.entity.interaction.DeepDrillEntity;
-import rearth.oritech.util.MultiblockMachineController;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.function.BiConsumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
