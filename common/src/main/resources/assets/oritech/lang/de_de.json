@@ -400,6 +400,7 @@
   "tooltip.oritech.steam_consumption": "Gesamter Dampf Verbrauch (in Tropfen) pro Tick (beinhaltet verbundene Generatoren)",
   "tooltip.oritech.refinery_module_count": "Two extra chamber tank modules can be built on top to unlock the respective tanks.\nHaving no modules doubles the item and first slow output.\nHaving one module double the second tank output only. Having two modules enables all outputs.",
   "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Geladen\n\nMaximaler Verbrauch: %s RF/t",
+  "tooltip.oritech.atomic_forge_energy_tip": "\n\nCapacity depends on recipe.\nThe recipe finishes when the storage is full.",
   "title.oritech.machine.no_addons": "Keine Add-Ons verbunden",
   "button.oritech.machine.addons": "Add-Ons",
   "tooltip.oritech.pipe_booster": "Increases the extraction speed of a fluid/item pipe behind it",
