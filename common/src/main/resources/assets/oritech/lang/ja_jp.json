@@ -400,6 +400,7 @@
   "tooltip.oritech.steam_consumption": "ティックあたりの単位蒸気（su）の合計消費量（連結された発電機を含む）",
   "tooltip.oritech.refinery_module_count": "精製チャンバーモジュールを２つまで追加することで、それぞれのタンクのロックを解除します。\nモジュールを付けない場合、最初のスロットの生成物が２倍になります。\nモジュールを１つ付ける場合、２つ目のスロットの生成物が２倍になります。\nモジュールを２つ付ける場合、すべてのスロットの生成物を得ることができるようになります。",
   "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% 充電済み\n\n最大使用量: %s RF/t\n最大転送量: %s RF/t",
+  "tooltip.oritech.atomic_forge_energy_tip": "\n\nCapacity depends on recipe.\nThe recipe finishes when the storage is full.",
   "title.oritech.machine.no_addons": "アドオンは接続されていません。",
   "button.oritech.machine.addons": "アドオン",
   "tooltip.oritech.pipe_booster": "後ろにある流体またはアイテムパイプの抽出速度を向上させます。",

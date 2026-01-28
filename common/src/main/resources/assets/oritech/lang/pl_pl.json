@@ -400,6 +400,7 @@
   "tooltip.oritech.steam_consumption": "Całkowite zużycie pary w jednostkach magazynowych (kropli) na tick (zawiera połączone generatory)",
   "tooltip.oritech.refinery_module_count": "Dwa dodatkowe moduły zbiornika komory mogą być zbudowane na górze, aby odblokować odpowiednie zbiorniki.\nBrak modułów podwaja przedmiot i pierwsze wolne wyjście.\nPosiadanie jednego modułu podwaja tylko drugie wyjście zbiornika. Posiadanie dwóch modułów włącza wszystkie wyjścia.",
   "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Naładowane\n\nMaksymalne Zużycie: %s RF/t\nMaksymalny Transfer: %s RF/t",
+  "tooltip.oritech.atomic_forge_energy_tip": "\n\nCapacity depends on recipe.\nThe recipe finishes when the storage is full.",
   "title.oritech.machine.no_addons": "Brak podłączonych dodatków",
   "button.oritech.machine.addons": "Dodatki",
   "tooltip.oritech.pipe_booster": "Zwiększa prędkość ekstrakcji płynów lub przedmiotów w rurze za nim",

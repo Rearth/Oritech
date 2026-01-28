@@ -400,6 +400,7 @@
   "tooltip.oritech.steam_consumption": "Общее потребление пара в накопительных единицах (каплях) на такт (включая цепи-генераторы)",
   "tooltip.oritech.refinery_module_count": "Два дополнительных модуля резервуара можно установить сверху для разблокировки соответствующих баков.\nБез модулей удваивается выход предметов и первого бака.\nОдин модуль удваивает только второй бак. Два модуля — все выходы.",
   "tooltip.oritech.energy_usage": "%s / %s RF\n%s%% Заряжено\n\nМаксимальное потребление: %s RF/тик\nМаксимальная передача: %s RF/тик",
+  "tooltip.oritech.atomic_forge_energy_tip": "\n\nCapacity depends on recipe.\nThe recipe finishes when the storage is full.",
   "title.oritech.machine.no_addons": "Дополнения не подключены",
   "button.oritech.machine.addons": "Дополнения",
   "tooltip.oritech.pipe_booster": "Увеличивает скорость извлечения из трубы (жидкостной/предметной) позади",
