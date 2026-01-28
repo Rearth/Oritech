@@ -108,6 +108,13 @@ repositories {
 }
 ```
 
+Note that Oritech still has some dependencies that need to be installed in your dev env in order to boot up. You can find their maven setup guides on their
+respective github pages (or just use cursemaven, or manually drag in the jars if you really want). Currently, the following dependencies are required:
+- [Architectury API](https://github.com/architectury/architectury-api)
+- [Owo Lib](https://github.com/wisp-forest/owo-lib)
+- [Athena](https://github.com/terrarium-earth/Athena)
+- [Geckolib](https://github.com/bernie-g/geckolib)
+
 ### Common
 
 The common module is published with Mojang mappings. It can only be used in an environment that doesn't remap the code,
