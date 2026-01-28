@@ -146,6 +146,10 @@ public class NeoforgeItemApiImpl implements BlockItemApi {
         
         @Override
         public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack arg, boolean simulate) {
+            if (arg.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+
             var inserted = container.insertToSlot(arg, slot, simulate);
             
             if (inserted > 0 && !simulate) {
