@@ -1,8 +1,6 @@
 package rearth.oritech.item.tools;
 
 import dev.architectury.platform.Platform;
-import dev.ftb.mods.ftbchunks.api.FTBChunksAPI;
-import dev.ftb.mods.ftbchunks.api.Protection;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -42,6 +40,7 @@ import net.minecraft.world.phys.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.OritechPlatform;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.block.entity.MachineCoreEntity;
@@ -134,10 +133,8 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         var hit = getPlayerTargetRay(player);
         
         if (hit != null) {
-            var canInteract = true;
-            if (Platform.isModLoaded("ftbchunks")) {
-                canInteract = !FTBChunksAPI.api().getManager().shouldPreventInteraction(player, hand, BlockPos.containing(hit.getLocation()), Protection.EDIT_AND_INTERACT_BLOCK, null);
-            }
+            var targetBlockPos = BlockPos.containing(hit.getLocation());
+            var canInteract = OritechPlatform.INSTANCE.canPlayerBreakBlock(world, targetBlockPos, world.getBlockState(targetBlockPos), player);
             
             if (canInteract)
                 world.explode(null, new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player),
@@ -151,10 +148,9 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         }
         
         if (hit instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
-            var canInteract = true;
-            if (Platform.isModLoaded("ftbchunks")) {
-                canInteract = !FTBChunksAPI.api().getManager().shouldPreventInteraction(player, hand, BlockPos.containing(hit.getLocation()), Protection.INTERACT_ENTITY, livingEntity);
-            }
+            
+            var source = new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player);
+            var canInteract = OritechPlatform.INSTANCE.canAttackBeDone(world, livingEntity, 20f, source);
             
             if (canInteract)
                 processEntityTarget(player, livingEntity, 20, stack, world);
@@ -198,20 +194,17 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             var blockState = world.getBlockState(blockPos);
             if (blockState.isAir() || blockState.is(TagContent.LASER_PASSTHROUGH)) return;
             
-            var canInteract = true;
-            if (Platform.isModLoaded("ftbchunks")) {
-                canInteract = !FTBChunksAPI.api().getManager().shouldPreventInteraction(player, InteractionHand.MAIN_HAND, BlockPos.containing(finalHit.getLocation()), Protection.EDIT_AND_INTERACT_BLOCK, null);
-            }
+            var canInteract = OritechPlatform.INSTANCE.canPlayerBreakBlock(world, blockPos, blockState, player);
             
             if (canInteract)
                 processBlockBreaking(blockPos, blockState, world, player, stack, rfUsage);
         } else if (finalHit instanceof EntityHitResult entityHitResult) {
+            
             var target = entityHitResult.getEntity();
             if (!(target instanceof LivingEntity livingEntity)) return;
-            var canInteract = true;
-            if (Platform.isModLoaded("ftbchunks")) {
-                canInteract = !FTBChunksAPI.api().getManager().shouldPreventInteraction(player, InteractionHand.MAIN_HAND, BlockPos.containing(finalHit.getLocation()), Protection.EDIT_AND_INTERACT_BLOCK, target);
-            }
+            
+            var source = new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player);
+            var canInteract = OritechPlatform.INSTANCE.canAttackBeDone(world, livingEntity, 20f, source);
             
             if (canInteract)
                 processEntityTarget(player, livingEntity, Oritech.CONFIG.portableLaserConfig.damageBase(), stack, world);

@@ -83,9 +83,6 @@ dependencies {
     modCompileOnly "dev.emi:emi-fabric:$emi_version"
     // Energy API
     include modApi("teamreborn:energy:$reborn_energy_version") { transitive = false }
-    // FTB Chunks
-    modCompileOnly("dev.ftb.mods:ftb-chunks-fabric:2101.1.10") { transitive = false }
-    modCompileOnly("dev.ftb.mods:ftb-library-fabric:2101.1.19") { transitive = false }
     // GeckoLib
     modApi "software.bernie.geckolib:geckolib-fabric-$minecraft_version:$geckolib_version"
     // Jade

@@ -9,17 +9,26 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.damagesource.DamageContainer;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.apache.logging.log4j.util.TriConsumer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechPlatform;
 import rearth.oritech.api.attachment.Attachment;
@@ -137,5 +146,29 @@ public class OritechPlatformNeoForge implements OritechPlatform {
     @Override
     public void resetCapabilities(ServerLevel world, BlockPos pos) {
         world.invalidateCapabilities(pos);
+    }
+    
+    @Override
+    public boolean canPlayerBreakBlock(Level level, BlockPos pos, BlockState state, @NotNull Player player) {
+        
+        if (level.isClientSide() || !(level instanceof ServerLevel serverLevel)) {
+            return true;
+        }
+        
+        var event = new BlockEvent.BreakEvent(serverLevel, pos, state, player);
+        NeoForge.EVENT_BUS.post(event);
+        return !event.isCanceled();
+    }
+    
+    @Override
+    public boolean canAttackBeDone(Level level, LivingEntity target, float amount, DamageSource damageSource) {
+        
+        if (level.isClientSide() || !(level instanceof ServerLevel serverLevel)) {
+            return true;
+        }
+        
+        var event = new LivingIncomingDamageEvent(target, new DamageContainer(damageSource, amount));
+        NeoForge.EVENT_BUS.post(event);
+        return !event.isCanceled();
     }
 }

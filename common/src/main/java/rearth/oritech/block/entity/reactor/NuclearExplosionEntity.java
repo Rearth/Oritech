@@ -1,15 +1,20 @@
 package rearth.oritech.block.entity.reactor;
 
+import com.mojang.authlib.GameProfile;
 import dev.architectury.platform.Platform;
-import dev.ftb.mods.ftbchunks.api.FTBChunksAPI;
 import dev.ftb.mods.ftblibrary.math.ChunkDimPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import rearth.oritech.OritechPlatform;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.block.blocks.reactor.NuclearExplosionBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
@@ -27,6 +32,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import rearth.oritech.util.FakeMachinePlayer;
 
 public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTicker<NuclearExplosionEntity> {
 
@@ -35,6 +41,8 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
     private final Set<BlockPos> borderBlocks = new HashSet<>();
     private final Set<DirectionExplosionWave> waves = new HashSet<>();
     private final int size;
+    
+    private ServerPlayer nukePlayerEntity = null;
 
     public NuclearExplosionEntity(BlockPos pos, BlockState state, int size) {
         super(BlockEntitiesContent.REACTOR_EXPLOSION_ENTITY, pos, state);
@@ -95,11 +103,8 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
             var percentageDist = distSq / (maxDist * maxDist) * 8;
             var percentageVaried = percentageDist * (level.random.nextFloat() * 0.6 - 0.3 + 1);
             
-            if (Platform.isModLoaded("ftbchunks")) {
-                var isClaimed = FTBChunksAPI.api().getManager().getChunk(new ChunkDimPos(level, target)) != null;
-                if (isClaimed) return;
-            }
-
+            if (!OritechPlatform.INSTANCE.canPlayerBreakBlock(level, target, targetBlock, getNukePlayerEntity())) return;
+            
             var replaced = false;
             var replacementState = Blocks.AIR.defaultBlockState();
 
@@ -225,10 +230,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
 
             usedPower += targetHardness;
             
-            if (Platform.isModLoaded("ftbchunks")) {
-                var isClaimed = FTBChunksAPI.api().getManager().getChunk(new ChunkDimPos(level, target)) != null;
-                if (isClaimed) return 1000;
-            }
+            if (!OritechPlatform.INSTANCE.canPlayerBreakBlock(level, target, targetState, getNukePlayerEntity())) return 1000;
             
             targetBlock.destroy(level, pos, targetState);
             level.setBlock(target, Blocks.AIR.defaultBlockState(), Block.UPDATE_SUPPRESS_DROPS | Block.UPDATE_CLIENTS, 0);
@@ -282,6 +284,14 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
 
     private Vec3 addRandomOffset(Vec3 direction, float amount) {
         return direction.add(level.random.nextFloat() * amount - amount / 2, level.random.nextFloat() * amount - amount / 2, level.random.nextFloat() * amount - amount / 2);
+    }
+    
+    private Player getNukePlayerEntity() {
+        if (nukePlayerEntity == null && level instanceof ServerLevel serverWorld) {
+            nukePlayerEntity = FakeMachinePlayer.create(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_nuke"), new SimpleInventoryStorage(2, () -> {}));
+        }
+        
+        return nukePlayerEntity;
     }
 
     private class DirectionExplosionWave {

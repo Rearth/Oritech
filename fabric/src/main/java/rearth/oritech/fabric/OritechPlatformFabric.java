@@ -2,10 +2,13 @@ package rearth.oritech.fabric;
 
 import com.google.auto.service.AutoService;
 import com.mojang.authlib.GameProfile;
+import dev.architectury.event.events.common.EntityEvent;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -17,11 +20,15 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.util.TriConsumer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechPlatform;
 import rearth.oritech.api.attachment.Attachment;
@@ -147,5 +154,25 @@ public class OritechPlatformFabric implements OritechPlatform {
     @Override
     public void resetCapabilities(ServerLevel world, BlockPos pos) {
         // nothing to do on fabric
+    }
+    
+    @Override
+    public boolean canPlayerBreakBlock(Level level, BlockPos pos, BlockState state, @NotNull Player player) {
+        
+        if (level.isClientSide() || !(level instanceof ServerLevel serverLevel)) {
+            return true;
+        }
+        
+        return PlayerBlockBreakEvents.BEFORE.invoker().beforeBlockBreak(serverLevel, player, pos, state, null);
+    }
+    
+    @Override
+    public boolean canAttackBeDone(Level level, LivingEntity target, float amount, DamageSource damageSource) {
+        
+        if (level.isClientSide() || !(level instanceof ServerLevel serverLevel)) {
+            return true;
+        }
+        
+        return ServerLivingEntityEvents.ALLOW_DAMAGE.invoker().allowDamage(target, damageSource, amount);
     }
 }

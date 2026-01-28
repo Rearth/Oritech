@@ -70,9 +70,6 @@ dependencies {
     api "dev.architectury:architectury-neoforge:$architectury_api_version"
     // EMI
     compileOnly "dev.emi:emi-neoforge:${emi_version}"
-    // FTB Chunks
-    compileOnly("dev.ftb.mods:ftb-chunks-neoforge:2101.1.10") { transitive = false }
-    compileOnly("dev.ftb.mods:ftb-library-neoforge:2101.1.19") { transitive = false }
     // GeckoLib
     api "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
     // GrandPower
@@ -98,6 +95,7 @@ dependencies {
     additionalRuntimeClasspath 'org.ow2.asm:asm-tree:9.8'
 
     compileOnly "curse.maven:ftb-filter-system-943925:6899527"
+    compileOnly("dev.ftb.mods:ftb-library-neoforge:2101.1.19") { transitive = false }
 
     runtimeOnly "curse.maven:jade-324717:5846105"
 
