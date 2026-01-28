@@ -74,7 +74,7 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
               baseThickness * 0.3f,
               LightTexture.FULL_BRIGHT,
               LaserArmRenderer.CORE_COLOR_START,
-              LaserArmRenderer.CORE_COLOR_END
+              LaserArmRenderer.CORE_COLOR_START
             );
             
             // render glow
@@ -83,7 +83,7 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
               baseThickness,
               LightTexture.FULL_BRIGHT,
               LaserArmRenderer.GLOW_COLOR_START,
-              LaserArmRenderer.GLOW_COLOR_END
+              LaserArmRenderer.GLOW_COLOR_START
             );
         }
         

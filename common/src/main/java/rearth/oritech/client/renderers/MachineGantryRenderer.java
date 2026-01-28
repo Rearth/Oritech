@@ -4,7 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.RandomSource;
@@ -16,6 +18,7 @@ import org.joml.Quaternionf;
 import rearth.oritech.block.base.block.FrameInteractionBlock;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
+import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.init.BlockContent;
 
 public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteractionBlockEntity> {
@@ -118,44 +121,34 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
             matrices.popPose();
         }
         
-        if (entity instanceof DestroyerBlockEntity destroyerBlock && destroyerBlock.range > 1) {
+        if (entity instanceof DestroyerBlockEntity destroyerBlock && (!destroyerBlock.isMoving() || destroyerBlock.range > 1)) {
             
             var beamHeight = pos.getY() - destroyerBlock.quarryTarget.getY() - 1.3f;
             
-            var beamInner = BlockContent.QUARRY_BEAM_INNER.defaultBlockState();
-            var beamFrame = BlockContent.QUARRY_BEAM_TARGET.defaultBlockState();
             var beamRing = BlockContent.QUARRY_BEAM_RING.defaultBlockState();
             
             var offset = targetOffset.add(0, -1, 0);
             
-            matrices.pushPose();
-            matrices.translate(offset.x(), offset.y() - beamHeight + 1, offset.z());
-            matrices.scale(1, beamHeight, 1);
+            var beamConsumer = vertexConsumers.getBuffer(RenderType.eyes(LaserArmRenderer.BEAM_TEXTURE));
+            var baseThickness = 0.035f;
+            var thickness = (float) (baseThickness * 2 + Math.sin((entity.getLevel().getGameTime() + tickDelta) * 0.54) * 0.02f);
             
-            // outer beam
-//            MinecraftClient.getInstance().getBlockRenderManager().renderBlock(
-//              beamFrame,
-//              pos,
-//              entity.getWorld(),
-//              matrices,
-//              vertexConsumers.getBuffer(RenderLayers.getBlockLayer(beamFrame)),
-//              true,
-//              random);
+            BeamRenderer.renderStraightBeam(
+              matrices, beamConsumer, offset.add(0.5, 1, 0.5), new Vec3(0, -beamHeight - 1, 0),
+              baseThickness,
+              LightTexture.FULL_BRIGHT,
+              LaserArmRenderer.CORE_COLOR_START,
+              LaserArmRenderer.CORE_COLOR_END
+            );
             
-            matrices.translate(0.5, 0, 0.5);
-            var rotation = new Quaternionf(new AxisAngle4f((entity.getLevel().getGameTime() / 3f) % 360, 0, 1, 0));
-            matrices.mulPose(rotation);
-            matrices.translate(-0.5, 0, -0.5);
-            
-            // inner beam
-            renderer.renderSingleBlock(
-              beamInner,
-              matrices,
-              vertexConsumers,
-              lightAtHead,
-              overlay);
-            
-            matrices.popPose();
+            // render glow
+            BeamRenderer.renderStraightBeam(
+              matrices, beamConsumer, offset.add(0.5, 1, 0.5), new Vec3(0, -beamHeight - 1, 0),
+              thickness,
+              LightTexture.FULL_BRIGHT,
+              LaserArmRenderer.GLOW_COLOR_START,
+              LaserArmRenderer.GLOW_COLOR_END
+            );
             
             // beam ring
             matrices.pushPose();
@@ -170,6 +163,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
               vertexConsumers,
               lightAtHead,
               overlay);
+            
             matrices.popPose();
         }
     }

@@ -111,11 +111,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @NoBlockItem
     public static final Block CREATIVE_TANK_ITEM_MODEL = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.CHAIN).noOcclusion());   // workaround because I don't understand how to properly get the model to load
     @NoBlockItem
-    public static final Block QUARRY_BEAM_INNER = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.CHAIN).noOcclusion().lightLevel(item -> 5));
-    @NoBlockItem
     public static final Block QUARRY_BEAM_RING = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.CHAIN).noOcclusion().lightLevel(item -> 5));
-    @NoBlockItem
-    public static final Block QUARRY_BEAM_TARGET = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.CHAIN).noOcclusion());
     @NoBlockItem
     public static final Block BLACK_HOLE_INNER = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.CHAIN).noOcclusion().lightLevel(item -> 5));
     @NoBlockItem

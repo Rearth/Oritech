@@ -83,8 +83,6 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.createTrivialCube(BlockContent.PUMP_TRUNK_BLOCK);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.TANK_ITEM_MODEL);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.CREATIVE_TANK_ITEM_MODEL);
-        blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.QUARRY_BEAM_INNER);
-        blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.QUARRY_BEAM_TARGET);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.QUARRY_BEAM_RING);
         
         // reactor section

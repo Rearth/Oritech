@@ -83,7 +83,6 @@ public class ModRenderers {
         RENDER_LAYERS.put(BlockContent.SMALL_TANK_BLOCK, RenderType.cutout());
         RENDER_LAYERS.put(BlockContent.CREATIVE_TANK_BLOCK, RenderType.cutout());
         RENDER_LAYERS.put(BlockContent.INDUSTRIAL_GLASS_BLOCK, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.QUARRY_BEAM_TARGET, RenderType.cutout());
         RENDER_LAYERS.put(BlockContent.QUARRY_BEAM_RING, RenderType.cutout());
         RENDER_LAYERS.put(BlockContent.WITHER_CROP_BLOCK, RenderType.cutout());
         RENDER_LAYERS.put(BlockContent.SPAWNER_CONTROLLER_BLOCK, RenderType.cutout());
