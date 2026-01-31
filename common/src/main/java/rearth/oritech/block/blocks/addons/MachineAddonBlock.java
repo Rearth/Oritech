@@ -39,6 +39,8 @@ import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.TooltipHelper;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -105,7 +107,16 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
         
         if (world.isClientSide) return;
         
-        for (var direction : Direction.values()) {
+        var directions = new ArrayList<>(List.of(Direction.values()));
+        
+        if (addonSettings.needsSupport()) {
+            var facing = getConnectedDirection(state).getOpposite();
+            directions.remove(facing);
+            directions.addFirst(facing);
+        }
+        
+        
+        for (var direction : directions) {
             var checkPos = pos.offset(direction.getNormal());
             var checkEntity = world.getBlockEntity(checkPos);
             if (checkEntity instanceof MachineAddonController machineEntity) {
