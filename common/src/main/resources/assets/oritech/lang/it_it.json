@@ -1350,7 +1350,7 @@
   "text.config.oritech-config.section.blackHole": "Buco Nero",
   "text.config.oritech-config.option.pullTimeMultiplier": "Moltiplicatore Tempo Attrazione Buco Nero",
   "text.config.oritech-config.option.pullRange": "Ampiezza Attrazione Buco Nero",
-  "text.config.oritech-config.option.idleWaitTicks": "Ticks Attesa Inattiva Buco Nero",
+  "text.config.oritech-config.option.idleWaitTicks": "Tick Attesa Inattiva Buco Nero",
   "tag.item.c.carbon_fibre": "Carbon Fibre",
   "tag.item.c.dusts.adamant": "Polvere D'Adamantio",
   "tag.item.c.dusts.biosteel": "Polvere Di Bioacciaio",
