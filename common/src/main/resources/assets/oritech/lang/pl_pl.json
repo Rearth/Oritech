@@ -1,6 +1,7 @@
 {
   "oracle_index.title.oritech": "Oritech",
   "advancements.oritech.begin": "Oritech",
+  "key.oritech.hotkey_category": "Oritech",
   "advancements.oritech.begin.description": "Nickel & Dime - Rozpocznij swoją technologiczną przygodę, zdobywając surowy nikiel. Błyszcz, szalony górniku!",
   "advancements.oritech.generator": "Zasilaj!",
   "advancements.oritech.generator.description": "Wytwarzaj poważną moc za pomocą podstawowego generatora. Elektryzujące, prawda?",
@@ -54,7 +55,7 @@
   "advancements.oritech.unholy.description": "Zdobądź nieświętą inteligencję. Wiedza to potęga, ale to coś innego!",
   "advancements.oritech.steam_engine": "Marzenia o parze",
   "advancements.oritech.steam_engine.description": "Wykorzystaj moc pary! Zamieniłeś wodę w energię—teraz miejmy nadzieję, że nie zamieni się to w gorący bałagan!",
-  "key.oritech.augment_screen": "(Przytrzymaj) Sterowanie Implantami [Oritech]",
+  "key.oritech.augment_screen": "Implant Controls [Hold]",
   "oritech.text.augment.hpboost": "Rama Wzmocniona Stalą",
   "oritech.text.augment.hpboost.desc": "Integruje trwałą ramę, zwiększając odporność twojego ciała.",
   "oritech.text.augment.hpboost.desc.1": "Zwiększa maksymalne zdrowie o 6 (3 serca).",
