@@ -1,9 +1,0 @@
-- Improve compatibility of crop filter addon with most modded crops
-- Move augment hotkey to separate hotkey
-- Fix crash with oracle index 1.0.0
-- Fix crash with latest version of ftb filters (now reflects their latest api changes)
-- Fix potential entity pathing issues when damaged by enderic lasers
-- Fix reactor ports (fuel/coolant) not dropping contents when broken
-- Fix small error in steam engine documentation
-- Fix potential crash with some mods due to unchecked level casts
-- Fix powered furnace z fighting issues in model
