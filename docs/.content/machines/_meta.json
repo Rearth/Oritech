@@ -1,10 +1,9 @@
 {
-  "charger_block.mdx": "Charger Block",
-  "deep_drill_block.mdx": "Deep Drill Block",
-  "drone_port_block.mdx": "Drone Port Block",
-  "laser_arm_block.mdx": "Laser Arm Block",
-  "pipe_booster_block.mdx": "Pipe Booster Block",
-  "pump_block.mdx": "Pump Block",
-  "shrinker_block.mdx": "Shrinker Block",
-  "treefeller_block.mdx": "Treefeller Block"
+  "addons": "Addons",
+  "arcane": "Arcane",
+  "augmentations": "Augmentations",
+  "gantries": "Gantries",
+  "machine_core_2.mdx": "Machine Cores",
+  "processing": "Processing",
+  "utility": "Utility"
 }

@@ -1,6 +1,7 @@
 {
   "arcane": "Arcane",
   "building": "Building",
+  "collect_ids.sh": "Collect Ids",
   "components": "Components",
   "create_dirs.sh": "Create Dirs",
   "equipment": "Equipment",

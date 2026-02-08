@@ -11,7 +11,6 @@
   "flux_gate.mdx": "Flux Gate",
   "heisenberg_compensator.mdx": "Heisenberg Compensator",
   "ion_thruster.mdx": "Ion Thruster",
-  "machine_cores.mdx": "Machine Cores",
   "magnetic_coil.mdx": "Magnetic Coil",
   "motor.mdx": "Motor",
   "overcharged_crystal.mdx": "Overcharged Crystal",
@@ -22,6 +21,6 @@
   "reinforced_carbon_sheet.mdx": "Reinforced Carbon Sheet",
   "silicon_wafer.mdx": "Silicon Wafer",
   "solid_biofuel.mdx": "Solid Biofuel",
-  "super_ai_chip.mdx": "Super Ai Chip",
+  "super_ai_chip.mdx": "Super AI Chip",
   "unholy_intelligence.mdx": "Unholy Intelligence"
 }

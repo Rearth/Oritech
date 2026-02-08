@@ -1,11 +1,11 @@
 {
   "ceiling_light.mdx": "Ceiling Light",
-  "industrial_glass_block.mdx": "Industrial Glass Block",
+  "industrial_glass_block.mdx": "Industrial Glass",
   "industrial_paints.mdx": "Industrial Paints",
-  "machine_plating_block.mdx": "Machine Plating Block",
-  "metal_beam_block.mdx": "Metal Beam Block",
-  "metal_girder_block.mdx": "Metal Girder Block",
-  "tech_button.mdx": "Tech Button",
-  "tech_door.mdx": "Tech Door",
-  "tech_lever.mdx": "Tech Lever"
+  "machine_plating_block.mdx": "Machine Plating Blocks",
+  "metal_beam_block.mdx": "Metal Beam",
+  "metal_girder_block.mdx": "Metal Girder",
+  "tech_button.mdx": "Industrial Button",
+  "tech_door.mdx": "Industrial Door",
+  "tech_lever.mdx": "Industrial Lever"
 }
