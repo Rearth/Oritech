@@ -94,8 +94,8 @@ dependencies {
     // This adds the ASM library to the runtime classpath for all runs (client, server, data)
     additionalRuntimeClasspath 'org.ow2.asm:asm-tree:9.8'
 
-    compileOnly "curse.maven:ftb-filter-system-943925:6899527"
-    compileOnly("dev.ftb.mods:ftb-library-neoforge:2101.1.19") { transitive = false }
+    // filters (optional addon)
+    compileOnly("dev.ftb.mods:ftb-filter-system-neoforge:$ftb_filters_version") { transitive = false }
 
     runtimeOnly "curse.maven:jade-324717:5846105"
 

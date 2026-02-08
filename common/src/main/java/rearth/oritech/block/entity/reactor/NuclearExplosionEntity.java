@@ -1,11 +1,8 @@
 package rearth.oritech.block.entity.reactor;
 
 import com.mojang.authlib.GameProfile;
-import dev.architectury.platform.Platform;
-import dev.ftb.mods.ftblibrary.math.ChunkDimPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import rearth.oritech.OritechPlatform;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;

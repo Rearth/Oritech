@@ -37,8 +37,6 @@ dependencies {
     compileOnlyApi "dev.architectury:architectury-neoforge:$architectury_api_version"
     // EMI
     compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
-    // FTB Chunks
-    compileOnly("dev.ftb.mods:ftb-library-neoforge:2101.1.19") { transitive = false }
     // GeckoLib
     compileOnlyApi "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
     // Jade
@@ -62,5 +60,5 @@ dependencies {
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
 
     // ftb filters
-    compileOnly "curse.maven:ftb-filter-system-943925:6899527"
+    compileOnly("dev.ftb.mods:ftb-filter-system-neoforge:$ftb_filters_version") { transitive = false }
 }

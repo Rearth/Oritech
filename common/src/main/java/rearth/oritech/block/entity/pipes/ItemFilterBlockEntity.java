@@ -201,7 +201,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
                 if (Platform.isModLoaded("ftbfiltersystem")) {
                     var filterApi = dev.ftb.mods.ftbfiltersystem.api.FTBFilterSystemAPI.api();
                     if (filterApi.isFilterItem(filterItem)) {
-                        if (filterApi.doesFilterMatch(filterItem, stack)) {
+                        if (filterApi.doesFilterMatch(filterItem, stack, getLevel().registryAccess())) {
                             matchesFilterItems = true;
                             break;
                         }
