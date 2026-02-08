@@ -2,127 +2,61 @@
 	"format_version": "1.8.0",
 	"animations": {
 		"deploy": {
-			"animation_length": 2.6,
+			"animation_length": 1.04,
 			"bones": {
 				"upper_part": {
 					"rotation": {
-						"0.76": {
-							"vector": [0, 0, 0]
-						},
-						"1.56": {
-							"vector": [0, 180, 0],
-							"easing": "easeOutCirc"
-						}
+						"0.12": [0, 0, 0],
+						"0.92": [0, 180, 0]
 					},
 					"position": {
-						"0.76": {
-							"vector": [0, -13, 0]
-						},
-						"1.56": {
-							"vector": [0, 0, 0],
-							"easing": "easeOutCirc"
-						}
+						"0.12": [0, -13, 0],
+						"0.92": [0, 0, 0]
 					}
 				},
 				"beam": {
 					"scale": {
-						"0.76": {
-							"vector": [0, 0, 0]
-						},
-						"1.36": {
-							"vector": [0, 0, 0]
-						},
-						"1.56": {
-							"vector": [1, 1, 1],
-							"easing": "easeInOutBack"
-						}
+						"0.12": [0, 0, 0],
+						"0.72": [0, 0, 0],
+						"0.92": [1, 1, 1]
 					}
 				},
 				"capsule": {
 					"scale": {
-						"0.76": {
-							"vector": [1, 0.5, 1]
-						},
-						"1.56": {
-							"vector": [1, 1, 1],
-							"easing": "easeOutExpo"
-						}
+						"0.12": [1, 0.5, 1],
+						"0.92": [1, 1, 1]
 					}
 				},
 				"southclip": {
 					"position": {
-						"0.76": {
-							"vector": [0, 0, 0]
-						},
-						"1.16": {
-							"vector": [0, 0, -0.75],
-							"easing": "easeOutBack",
-							"easingArgs": [2]
-						},
-						"1.32": {
-							"vector": [0, 0, 0]
-						},
-						"1.56": {
-							"vector": [0, 1, 0],
-							"easing": "easeOutBack"
-						}
+						"0.12": [0, 0, 0],
+						"0.52": [0, 0, -0.75],
+						"0.68": [0, 0, 0],
+						"0.92": [0, 1, 0]
 					}
 				},
 				"eastclip": {
 					"position": {
-						"0.76": {
-							"vector": [0, 0, 0]
-						},
-						"1.12": {
-							"vector": [-0.75, 0, 0],
-							"easing": "easeOutBack",
-							"easingArgs": [2]
-						},
-						"1.28": {
-							"vector": [0, 0, 0]
-						},
-						"1.56": {
-							"vector": [0, 1, 0],
-							"easing": "easeOutBack"
-						}
+						"0.12": [0, 0, 0],
+						"0.48": [-0.75, 0, 0],
+						"0.64": [0, 0, 0],
+						"0.92": [0, 1, 0]
 					}
 				},
 				"northclip": {
 					"position": {
-						"0.76": {
-							"vector": [0, 0, 0]
-						},
-						"1.08": {
-							"vector": [0, 0, 0.75],
-							"easing": "easeOutBack",
-							"easingArgs": [2]
-						},
-						"1.24": {
-							"vector": [0, 0, 0]
-						},
-						"1.56": {
-							"vector": [0, 1, 0],
-							"easing": "easeOutBack"
-						}
+						"0.12": [0, 0, 0],
+						"0.44": [0, 0, 0.75],
+						"0.6": [0, 0, 0],
+						"0.92": [0, 1, 0]
 					}
 				},
 				"westclip": {
 					"position": {
-						"0.76": {
-							"vector": [0, 0, 0]
-						},
-						"1.12": {
-							"vector": [0.75, 0, 0],
-							"easing": "easeOutBack",
-							"easingArgs": [2]
-						},
-						"1.28": {
-							"vector": [0, 0, 0]
-						},
-						"1.56": {
-							"vector": [0, 1, 0],
-							"easing": "easeOutBack"
-						}
+						"0.12": [0, 0, 0],
+						"0.48": [0.75, 0, 0],
+						"0.64": [0, 0, 0],
+						"0.92": [0, 1, 0]
 					}
 				}
 			},
@@ -130,7 +64,7 @@
 				"0.0": {
 					"effect": "oritech:metal_sounds"
 				},
-				"0.6": {
+				"0.4": {
 					"effect": "oritech:servo_noises"
 				}
 			}
