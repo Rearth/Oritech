@@ -2,6 +2,7 @@ package rearth.oritech.block.blocks.pipes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -156,8 +157,8 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
     // also known as 'getStateForNeighborUpdate'
     @Override
     public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor worldAccess, BlockPos pos, BlockPos neighborPos) {
-        var world = (Level) worldAccess;
-        if (world.isClientSide) return state;
+        
+        if (!(worldAccess instanceof ServerLevel world)) return state;
         
         if (state.getValue(BlockStateProperties.WATERLOGGED))
             world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));

@@ -2,6 +2,7 @@ package rearth.oritech.block.blocks.pipes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -57,8 +58,8 @@ public abstract class AbstractPipeBlock extends Block {
     
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor worldAccess, BlockPos pos, BlockPos neighborPos) {
-        var world = (Level) worldAccess;
-        if (world.isClientSide) return state;
+        
+        if (!(worldAccess instanceof ServerLevel world)) return state;
         
         if (neighborState.is(Blocks.AIR))
             // remove potential stale machine -> neighboring pipes mapping

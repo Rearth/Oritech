@@ -47,31 +47,31 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     
     @Override
     public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
-        var worldImp = (Level) world;
-        if (worldImp.isClientSide) return state;
+        
+        if (!(world instanceof ServerLevel serverLevel)) return state;
         
         if (state.getValue(BlockStateProperties.WATERLOGGED))
             world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         
-        if (!hasNeighboringMachine(state, worldImp, pos, false)) {
+        if (!hasNeighboringMachine(state, serverLevel, pos, false)) {
             // remove stale machine -> neighboring pipes mapping
-            GenericPipeInterfaceEntity.removeStaleMachinePipeNeighbors(pos, getNetworkData(worldImp));
+            GenericPipeInterfaceEntity.removeStaleMachinePipeNeighbors(pos, getNetworkData(serverLevel));
             
             var normalState = getNormalBlock();
-            return ((GenericPipeBlock) normalState.getBlock()).addConnectionStates(normalState, worldImp, pos, false);
+            return ((GenericPipeBlock) normalState.getBlock()).addConnectionStates(normalState, serverLevel, pos, false);
         }
         
         var interfaceState = state;
         if (!(neighborState.getBlock() instanceof AbstractPipeBlock)) {
             // only update connection if neighbor is a new machine
-            var hasMachine = getNetworkData(worldImp).machinePipeNeighbors.getOrDefault(neighborPos, HashSet.newHashSet(0)).contains(direction.getOpposite());
+            var hasMachine = getNetworkData(serverLevel).machinePipeNeighbors.getOrDefault(neighborPos, HashSet.newHashSet(0)).contains(direction.getOpposite());
             if (neighborState.is(Blocks.AIR) || !hasMachine) {
-                interfaceState = addConnectionStates(state, worldImp, pos, direction);
+                interfaceState = addConnectionStates(state, serverLevel, pos, direction);
             }
             
             if (!interfaceState.equals(state)) {
                 // reload connection when state has changed (e.g. machine added/removed)
-                GenericPipeInterfaceEntity.addNode(worldImp, pos, true, interfaceState, getNetworkData(worldImp));
+                GenericPipeInterfaceEntity.addNode(serverLevel, pos, true, interfaceState, getNetworkData(serverLevel));
             }
         }
         
