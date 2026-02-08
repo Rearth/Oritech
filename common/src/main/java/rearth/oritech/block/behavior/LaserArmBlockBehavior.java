@@ -28,7 +28,7 @@ public class LaserArmBlockBehavior {
      * Perform laser behavior on block
      */
     public boolean fireAtBlock(Level world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
-        if (laserEntity.hasCropFilterAddon && DestroyerBlockEntity.isImmatureCrop(blockState))
+        if (laserEntity.hasCropFilterAddon && DestroyerBlockEntity.isImmatureCrop(blockState, world, blockPos))
             return false;
         
         // has an energy storage, try to transfer power to it

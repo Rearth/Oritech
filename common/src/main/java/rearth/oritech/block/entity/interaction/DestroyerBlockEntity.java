@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -139,7 +140,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         var targetState = Objects.requireNonNull(level).getBlockState(targetPosition);
         
         // skip not grown crops
-        if (hasCropFilterAddon && isImmatureCrop(targetState)) {
+        if (hasCropFilterAddon && isImmatureCrop(targetState, level, targetPosition)) {
             return false;
         }
         
@@ -158,13 +159,12 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         return getQuarryDownwardState(toolPosition) != null;
     }
     
-    public static boolean isImmatureCrop(BlockState targetState) {
+    public static boolean isImmatureCrop(BlockState targetState, LevelReader reader, BlockPos targetPos) {
         Block targetBlock = targetState.getBlock();
-        return (targetBlock instanceof CropBlock cropBlock && !cropBlock.isMaxAge(targetState))
+        return (targetBlock instanceof BonemealableBlock cropBlock && cropBlock.isValidBonemealTarget(reader, targetPos, targetState))
+                 // some crops arent bonemealable but still growing
                  || (targetBlock instanceof NetherWartBlock && targetState.getValue(NetherWartBlock.AGE) < NetherWartBlock.MAX_AGE)
-                 || (targetBlock instanceof SweetBerryBushBlock && targetState.getValue(SweetBerryBushBlock.AGE) < SweetBerryBushBlock.MAX_AGE)
-                 || (targetBlock instanceof CocoaBlock && targetState.getValue(CocoaBlock.AGE) < CocoaBlock.MAX_AGE)
-                 || (targetState.is(BlockTags.SAPLINGS));
+                 || (targetBlock instanceof TorchflowerCropBlock && targetState.getValue(TorchflowerCropBlock.AGE) < TorchflowerCropBlock.MAX_AGE);
     }
     
     private Tuple<BlockPos, BlockState> getQuarryDownwardState(BlockPos toolPosition) {
@@ -209,7 +209,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         if (targetHardness < 0) return;    // skip undestroyable blocks, such as bedrock
         
         // skip not grown crops
-        if (range == 1 && hasCropFilterAddon && isImmatureCrop(targetState)) {
+        if (range == 1 && hasCropFilterAddon && isImmatureCrop(targetState, level, targetPosition)) {
             return;
         }
         
