@@ -276,6 +276,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         
         if (laserPlayerEntity == null) {
             laserPlayerEntity = FakeMachinePlayer.create((ServerLevel) level, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME), inventory);
+            laserPlayerEntity.setPos(Vec3.atLowerCornerOf(getBlockPos()));
         }
         
         if (hunterAddons > 0 && yieldAddons > 0) {

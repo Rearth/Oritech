@@ -35,6 +35,7 @@ public class LaserArmEntityBehavior {
           new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), laserEntity.getLaserPlayerEntity()),
           laserEntity.getDamageTick());
         
+        
         return true;
     }
     
