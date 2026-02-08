@@ -90,7 +90,7 @@ dependencies {
     // JEI
     modCompileOnly("mezz.jei:jei-$minecraft_version-fabric:$jei_version") { transitive = false }
     // Oracle Index
-    modCompileOnly "curse.maven:oracle-index-1206582:6904576"
+    modCompileOnly "curse.maven:oracle-index-1206582:7590937"
     // owo-lib
     modApi "io.wispforest:owo-lib:$owo_version"
     annotationProcessor "io.wispforest:owo-lib:$owo_version"

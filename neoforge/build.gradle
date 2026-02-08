@@ -79,7 +79,7 @@ dependencies {
     // JEI
     compileOnly("mezz.jei:jei-$minecraft_version-neoforge:$jei_version") { transitive = false }
     // Oracle Index
-    compileOnly "curse.maven:oracle-index-1206582:6904573"
+    compileOnly "curse.maven:oracle-index-1206582:7590938"
     // owo-lib
     api "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     annotationProcessor "io.wispforest:owo-lib-neoforge:$owo_neo_version"
