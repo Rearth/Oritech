@@ -1,0 +1,13 @@
+{
+  "arcane": "Arcane",
+  "building": "Building",
+  "components": "Components",
+  "create_dirs.sh": "Create Dirs",
+  "equipment": "Equipment",
+  "generate_meta.sh": "Generate Meta",
+  "machines": "Machines",
+  "nuclear": "Nuclear",
+  "particle": "Particle",
+  "power": "Power",
+  "resources": "Resources"
+}
