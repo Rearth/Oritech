@@ -38,7 +38,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMenuProvider, ScreenProvider, ItemApi.BlockProvider {
     
-    private final InOutInventoryStorage inventory = new InOutInventoryStorage(1, this::setChanged, new InventorySlotAssignment(0, 1, 1, 0)) {
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(1, this::setChanged, new InventorySlotAssignment(0, 1, 1, 0)) {
         @Override
         public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
             if (!addedStack.is(TagContent.REACTOR_COOLANT)) return 0;
