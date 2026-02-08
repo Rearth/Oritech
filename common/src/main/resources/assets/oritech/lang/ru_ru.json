@@ -1,6 +1,7 @@
 {
   "oracle_index.title.oritech": "Oritech",
   "advancements.oritech.begin": "Oritech",
+  "key.oritech.hotkey_category": "Oritech",
   "advancements.oritech.begin.description": "Никель & Диме - начните свое технологическое приключение с добычи необработанного никеля. Сияй, сумасшедший шахтер!",
   "advancements.oritech.generator": "Заряжайся!",
   "advancements.oritech.generator.description": "Получите серьезную энергию с помощью генератора. Захватывающе, не правда ли?",
@@ -54,7 +55,7 @@
   "advancements.oritech.unholy.description": "Приобрести несвященный интеллект. Знание — это сила, но это что-то еще!",
   "advancements.oritech.steam_engine": "Паровые мечты",
   "advancements.oritech.steam_engine.description": "Обуздай силу пара! Ты превратил воду в энергию — надеюсь, это не обернётся горячей катастрофой!",
-  "key.oritech.augment_screen": "(Удерживайте) Управление имплантами [Oritech]",
+  "key.oritech.augment_screen": "Implant Controls [Hold]",
   "oritech.text.augment.hpboost": "Стальной каркас",
   "oritech.text.augment.hpboost.desc": "Встраивает прочный каркас, повышая выносливость тела.",
   "oritech.text.augment.hpboost.desc.1": "Увеличивает максимальное здоровье на 6 (3 сердца).",
