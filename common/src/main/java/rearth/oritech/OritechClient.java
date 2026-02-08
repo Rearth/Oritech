@@ -21,7 +21,7 @@ import rearth.oritech.item.tools.util.Helpers;
 
 public final class OritechClient {
     
-    public static final KeyMapping AUGMENT_SELECTOR = new KeyMapping("key.oritech.augment_screen", GLFW.GLFW_KEY_G, "key.categories.misc");
+    public static final KeyMapping AUGMENT_SELECTOR = new KeyMapping("key.oritech.augment_screen", GLFW.GLFW_KEY_G, "key.oritech.hotkey_category");
     
     public static AugmentSelectionScreen activeScreen = null;
     

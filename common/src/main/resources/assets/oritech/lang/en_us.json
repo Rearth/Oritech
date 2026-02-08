@@ -1,6 +1,7 @@
 {
   "oracle_index.title.oritech": "Oritech",
   "advancements.oritech.begin": "Oritech",
+  "key.oritech.hotkey_category": "Oritech",
   "advancements.oritech.begin.description": "Nickel & Dime - Start your technological adventure by acquiring some raw nickel. Shine on, you crazy miner!",
   "advancements.oritech.generator": "Power Up!",
   "advancements.oritech.generator.description": "Generate some serious power with a basic generator. Electrifying, isn't it?",
@@ -54,7 +55,7 @@
   "advancements.oritech.unholy.description": "Acquire an unholy intelligence. Knowledge is power, but this is something else!",
   "advancements.oritech.steam_engine": "Steam Dreams",
   "advancements.oritech.steam_engine.description": "Harness the power of steam! You've turned water into energy—now let's hope it doesn't turn into a hot mess!",
-  "key.oritech.augment_screen": "(Hold) Implant Controls [Oritech]",
+  "key.oritech.augment_screen": "Implant Controls [Hold]",
   "oritech.text.augment.hpboost": "Steel-Infused Frame",
   "oritech.text.augment.hpboost.desc": "Integrates a durable framework, enhancing your body's resilience.",
   "oritech.text.augment.hpboost.desc.1": "Increases maximum health by 6 (3 hearts).",
