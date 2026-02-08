@@ -1,6 +1,7 @@
 {
   "oracle_index.title.oritech": "Oritech",
   "advancements.oritech.begin": "Oritech",
+  "key.oritech.hotkey_category": "Oritech",
   "advancements.oritech.begin.description": "Nickel & Dime - Commencez votre aventure technologique en acquérant du nickel brut. Brillez, cher mineur fou!",
   "advancements.oritech.generator": "Puissance activée !",
   "advancements.oritech.generator.description": "Générez une puissance sérieuse avec un générateur basique. Électrisant, n'est-ce pas?",
@@ -54,7 +55,7 @@
   "advancements.oritech.unholy.description": "Acquérez une intelligence impie. La connaissance est le pouvoir, mais c'est autre chose!",
   "advancements.oritech.steam_engine": "Rêves de vapeur",
   "advancements.oritech.steam_engine.description": "Exploitez la puissance de la vapeur! Vous avez transformé l'eau en énergie, espérons que ça ne devienne pas un gâchis!",
-  "key.oritech.augment_screen": "(Hold) Implant Controls [Oritech]",
+  "key.oritech.augment_screen": "Implant Controls [Hold]",
   "oritech.text.augment.hpboost": "Steel-Infused Frame",
   "oritech.text.augment.hpboost.desc": "Integrates a durable framework, enhancing your body's resilience.",
   "oritech.text.augment.hpboost.desc.1": "Increases maximum health by 6 (3 hearts).",
