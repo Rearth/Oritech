@@ -1,0 +1,18 @@
+---
+title: Reactor Redstone Port
+id: oritech:reactor_redstone_port
+type: block
+---
+
+An energy signal to a redstone port will disable the intake of new fuels.
+
+Any fuel pellet that has already started burning needs to be finished before the reactor will fully shut off
+with a redstone signal to a port.
+
+The port can also be used with a comparator to output data. It has 3 modes:
+
+*   **Temperature**: Outputs signal based on the hottest component temperature
+*   **Active Rod Count**: Indicates the amount of burning fuel
+*   **Energy**: Measures current RF stored
+
+To cycle between the modes, simply right-click the port.

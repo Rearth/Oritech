@@ -2,7 +2,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.107' apply false
     id 'fabric-loom' version '1.9-SNAPSHOT' apply false
     id "me.modmuss50.mod-publish-plugin" version "0.8.0" apply false
-    id 'org.sinytra.wiki.toolkit' version '0.1.16'
+    id 'org.moddedmc.wiki.toolkit' version '0.4.1'
 }
 
 // all projects including the root project
@@ -139,10 +139,10 @@ subprojects {
             from(configurations.commonResources)
             
             // copy wiki folder to assets
-            from("$rootDir/docs") {
-                into "assets/oracle_index/books/oritech"
-                exclude '.assets/item/**' // items are rendered in-game as actual item components, no need to include them here
-            }
+//            from("$rootDir/docs") {
+//                into "assets/oracle_index/books/oritech"
+//                exclude '.assets/item/**' // items are rendered in-game as actual item components, no need to include them here
+//            }
         
             inputs.property 'version', project.version
             filesMatching(['META-INF/neoforge.mods.toml', "fabric.mod.json"]) {
@@ -170,8 +170,6 @@ wiki {
         oritech {
             // path to the folder containing metadata file (sinytra-wiki.json)
             root = file('docs')
-            exportedAssetNamespaces = ['oritech']
-            wikiAccessToken = System.getenv('WIKI_TOKEN')
         }
     }
 }

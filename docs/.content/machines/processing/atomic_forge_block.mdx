@@ -1,0 +1,29 @@
+---
+title: Atomic Forge
+id: oritech:atomic_forge_block
+type: block
+---
+
+The atomic forge is a powerful machine capable of creating advanced
+computer chips, reinforcing deepslate, and even duplicating ores.
+
+<center>
+<ModAsset location="oritech:area/enderic_laser_energy" width={512} />
+</center>
+
+It is a specialized [multiblock]($multiblocks) that requires
+precisely placed [machine cores](@oritech:machine_cores) to function.
+
+<Callout variant="warning">
+    Energy pipes cannot connect directly to an atomic forge; it needs 
+    to be powered by an [enderic laser](@oritech:laser_arm_block).
+</Callout>
+
+---
+
+**High-Energy Processing**
+
+Unlike other machines, the atomic forge's processing cycle is 
+determined by its energy buffer. The recipe will only complete once 
+the forge has been fully charged to the required level.
+Using multiple lasers can significantly speed up this process.

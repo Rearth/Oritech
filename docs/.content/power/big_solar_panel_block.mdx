@@ -1,0 +1,32 @@
+---
+id: oritech:big_solar_panel_block
+type: block
+title: Solar Panel
+---
+
+A large multiblock that generates power from sunlight.
+Features a folding animation that activates based on time of day and light levels.
+
+## Usage
+
+Build the 3x3 multiblock structure using [Machine Cores](@oritech:machine_cores).
+The panel automatically generates energy during the day when it has a clear view of the sky.
+
+### Folding Mechanic
+The panel folds and unfolds based on conditions:
+*   **Unfolded (Active)**: Day time with light level >= 12
+*   **Folded (Inactive)**: Night or low light
+
+Core quality directly affects power generation rate.
+
+The base generation rate is 32 RF/t, multiplied by the core quality.
+
+<Callout variant="info">
+    Make sure the panel has a clear view of the sky for best results.
+</Callout>
+
+## Construction
+
+Requires a 3x3 area. Place the controller and add the required cores.
+
+Energy outputs to the **North**, **South**, and **Down** sides.

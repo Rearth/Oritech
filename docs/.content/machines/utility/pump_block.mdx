@@ -1,0 +1,26 @@
+---
+title: Pump
+id: oritech:pump_block
+type: block
+---
+
+The Pump is used to extract large volumes of liquid from 
+the world. 
+When placed, it extends a trunk downward until it finds a liquid 
+source, at which point it begins scanning and draining the entire 
+connected body of fluid.
+
+<center>
+<ModAsset location="oritech:area/pump" width={512} />
+</center>
+
+---
+
+**High-Volume Draining**
+
+The pump can efficiently drain liquid reservoirs of up to 100,000 
+blocks in size. For larger reservoirs it might not drain the entire thing.
+It processes fluids into its internal storage at a rate of 4 buckets 
+per second, with an energy consumption of 512 RF per block removed. 
+The scanning process for very large liquid bodies may take 
+several seconds to initialize.

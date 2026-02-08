@@ -1,13 +1,20 @@
 ---
-title: Item Transportation
-icon: oritech:item_filter_block
-related_items: [oritech:item_filter_block, oritech:item_pipe, oritech:transparent_item_pipe]
+id: oritech:item_pipe
+type: block
+related_items: ["oritech:framed_item_pipe", "oritech:item_pipe_duct_block", "oritech:transparent_item_pipe"]
+title: Item Pipe
 ---
 
 Oritech includes item transport pipes and item filter blocks to meet your item logistics needs. Item pipes connect to each other and all neighboring inventories.
 
 Unlike other pipes, item pipes do not have an inventory. This means that other blocks, such as hoppers, cannot insert items
 into the pipe network on their own. Instead, an item pipe can be set to extract from a nearby inventory.
+
+## Variants
+*   **Standard**: Basic pipe
+*   **Framed**: Full-block version
+*   **Transparent**: See items moving inside. Only works if the entire pipe path is from transparent pipes.
+*   **Duct**: Alternative aesthetic style. Ducted variants do not connect to machines directly, only to other pipes.
 
 To toggle extraction mode, you must right-click the section of the pipe connected to the block you wish to extract from.
 Extraction will only be enabled if the pipe is connected to a block that supports extraction. Each pipe connection can be toggled independently.
@@ -21,22 +28,8 @@ Extracted items will be placed into the **closest** (based on world distance) av
     You can install a motor in the pipe (by right-clicking it) to upgrade the extracting pipe to extract from all slots. This is not the default behaviour for performance reasons.
 </Callout>
 
-The maximum transfer range is 256 blocks. Any network longer than that needs to be split.
-
 <center>
 <ModAsset location="oritech:area/item_pipes" width={512} />
 </center>
 
----
-
-**Item Filters**
-
-To filter which items go where, you can use item filters. They are blocks you can place next to the target inventory.
-They have five input sides and always output to the side they are facing.
-They only accept items that match the filter set via the UI and automatically output them to the target inventory.
-
-However, they will not automatically extract items from neighboring inventories.
-
-<center>
-<ModAsset location="oritech:area/item_filters" width={512} />
-</center>
+Default transfer rate is 8 items every 5 ticks.

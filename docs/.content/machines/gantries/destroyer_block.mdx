@@ -1,0 +1,35 @@
+---
+title: Destroyer Block
+id: oritech:destroyer_block
+type: block
+---
+
+The destroyer block is a gantry component that breaks blocks in the area below. It's a multiblock
+that operates on a [machine frame](@oritech:machine_frame_block) and targets the block layer directly below the frame.
+
+The time and energy required to break a block depend on the block's hardness.
+
+### Farming
+
+To enable farming use, the [crop filter addon](@oritech:crop_filter_addon) can be installed. This causes the block destroyer
+to skip all non-finished crops, allowing for automated harvesting without replanting.
+
+<center>
+<ModAsset location="oritech:area/block_destroyer_farming" width={1000} />
+</center>
+
+### Quarry
+
+By adding [quarry addons](@oritech:quarry_addon), the block destroyer can also function as a quarry.
+Each quarry addon multiplies the downward range by 8:
+
+*   **1 Addon**: 8 blocks range
+*   **2 Addons**: 64 blocks range
+*   **3 Addons**: 512 blocks range
+
+The default speed will be quite slow when used as a quarry, so adding some
+[speed](@oritech:machine_speed_addon) and [efficiency](@oritech:machine_efficiency_addon) addons is recommended.
+
+<center>
+<ModAsset location="oritech:area/block_destroyer_quarry" width={1000} />
+</center>

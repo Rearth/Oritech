@@ -1,0 +1,35 @@
+---
+title: Refinery
+id: oritech:refinery_block
+type: block
+---
+
+The refinery is a versatile machine used to process complex mixtures 
+of items and fluids. It features one item and one fluid input slot, 
+with capability for multiple output streams.
+
+<center>
+<ModAsset location="oritech:area/refinery" width={1000} />
+</center>
+
+---
+
+**Fractional Distillation**
+
+The refinery has **1 item input** and **1 fluid input**, with **1 item output** 
+and **3 fluid outputs**.
+
+By default, only the first fluid output slot is active. 
+To enable the second and third fluid output slots, you must install 
+[Refinery Chamber Modules](@oritech:refinery_module_block) on top of the 
+main block. 
+Fluids from the 2nd and 3rd slots must be extracted directly 
+from these modules.
+
+**Yield Mechanics**
+
+If a recipe has fewer fluid outputs than available slots (or modules), 
+the internal logic repurposes the unused capacity:
+- If no modules are used, the item and first fluid output are doubled.
+- If only one module is used (2 fluid outputs active), the second fluid 
+output amount is doubled (if applicable).

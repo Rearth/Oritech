@@ -1,0 +1,22 @@
+---
+id: oritech:energy_pipe
+type: block
+related_items: ["oritech:framed_energy_pipe", "oritech:energy_pipe_duct_block"]
+title: Energy Pipes
+---
+
+Transfers energy (RF) between machines and power storage. Default transfer rate is 10 000 RF/t.
+
+## Usage
+Connects power sources (generators, batteries) to consumers (machines).
+Power is Oritech is push-based, so generators/storage blocks will push power into the pipes, which then pushes the power to connected machines. 
+There's is no "extraction" mode on the pipe itself. A wrench can be used to disable pipe connections.
+
+## Variants
+*   **Standard**: Basic stick-like pipe
+*   **Framed**: Full-block variant for building integration
+*   **Duct**: Alternative aesthetic style. Ducted variants do not connect to machines directly, only to other pipes.
+
+<Callout variant="info">
+    For very high power transfer, use [Superconductors](@oritech:superconductor) instead.
+</Callout>
