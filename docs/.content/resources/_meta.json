@@ -2,8 +2,6 @@
   "adamant_ingot.mdx": "Adamant",
   "biomass.mdx": "Biomass",
   "biosteel_ingot.mdx": "Biosteel",
-  "deepslate_platinum_ore.mdx": "World Ores",
-  "deepslate_uranium_ore.mdx": "Uranium Veins",
   "duratium_ingot.mdx": "Duratium",
   "electrum_ingot.mdx": "Electrum",
   "energite_ingot.mdx": "Energite",
@@ -12,7 +10,7 @@
   "plastic_sheet.mdx": "Plastic",
   "platinum_ingot.mdx": "Platinum",
   "prometheum_ingot.mdx": "Prometheum",
-  "resource_node_redstone.mdx": "Resource Nodes",
   "silicon.mdx": "Silicon",
-  "steel_ingot.mdx": "Steel"
+  "steel_ingot.mdx": "Steel",
+  "world": "World Generation"
 }
