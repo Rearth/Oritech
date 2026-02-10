@@ -1,0 +1,22 @@
+---
+title: 기반암 추출기
+icon: oritech:deep_drill_block
+related_items: [oritech:deep_drill_block]
+---
+
+<center>
+<ModAsset location="oritech:area/bedrock_extraction" width={800} />
+</center>
+
+기반암 추출기는 [광석 자원 노드](../resources/resource_node)가 있는 위치에서 기반암 아래의 광석을 채굴할 수 있습니다.
+이 [멀티블록](../processing/multiblocks) 기계는 자원 노드 위에 배치해야만 작동하며, [엔더릭 레이저](../interaction/enderic_laser)를 사용하여 전력을 공급해야 합니다.
+
+우클릭하면 아래의 대상 자원 노드를 표시합니다. 아래의 (3x3 영역에서) 첫 번째로 보이는 광석 노드를 대상으로 합니다. 최대 3블록 아래까지 탐색합니다.
+
+<Callout variant="info">
+    광석 자원 노드는 무한하며 파괴할 수 없습니다.
+</Callout>
+
+작동 중에는 기반암 추출기가 바로 아래의 광석을 3x3 전체 영역에 걸쳐 채굴합니다. 각 작동 시 아래 블록 중 하나를 무작위로 선택합니다.
+모든 블록이 광석 노드일 필요는 없습니다.
+최고 수율을 위해 추출기 바로 아래에 가장 많은 광석이 있는 지점을 찾아보세요.

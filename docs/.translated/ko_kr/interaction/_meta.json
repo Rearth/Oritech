@@ -1,0 +1,15 @@
+{
+  "machine_frames.mdx": "기계 프레임",
+  "block_destroyer.mdx": "블록 파괴기",
+  "block_placer.mdx": "블록 설치기",
+  "fertilizer.mdx": "비료기",
+  "enderic_laser.mdx": "엔더릭 레이저",
+  "unstable_container.mdx": "슈뢰딩거의 금고",
+  "deepdrill.mdx": "기반암 추출기",
+  "particle_accelerator.mdx": "입자 가속기",
+  "pump.mdx": "펌프",
+  "tree_cutter.mdx": "나무 절단기",
+  "shrinker.mdx": "애드온 결합기",
+  "redstone.mdx": "레드스톤",
+  "cybernetics.mdx": "사이버네틱 증강"
+}

@@ -1,0 +1,26 @@
+---
+title: 블록 파괴기
+icon: oritech:destroyer_block
+related_items: [oritech:destroyer_block]
+---
+
+블록 파괴기는, 이름에서 짐작할 수 있듯이, 블록을 파괴하는 데 사용됩니다. [기계 프레임](../interaction/machine_frames)에서 작동하는 [멀티블록](../processing/multiblocks)으로,
+프레임 바로 아래의 블록 레이어를 대상으로 합니다.
+
+블록을 부수는 데 필요한 시간과 에너지는 블록의 경도에 따라 달라집니다.
+블록 파괴기는 프레임 아래 한 층의 모든 블록을 파괴하려고 시도합니다.
+농업 용도로 사용하려면 작물 필터 애드온을 설치할 수 있으며, 이를 통해 블록 파괴기가 아직 다 자라지 않은 작물을 건너뛰게 할 수 있습니다.
+
+<center>
+<ModAsset location="oritech:area/block_destroyer_farming" width={1000} />
+</center>
+
+채굴장 애드온을 추가하면 블록 파괴기를 채굴장으로도 사용할 수 있습니다. 각 채굴장 애드온은 (하향) 범위를 8배로 증가시킵니다.
+
+즉, 애드온 1개는 8블록 범위, 2개는 64블록 범위, 3개는 512블록 범위를 제공합니다.
+
+채굴장으로 사용할 때 기본 속도가 상당히 느리므로, 속도와 효율 애드온을 추가하는 것이 좋습니다.
+
+<center>
+<ModAsset location="oritech:area/block_destroyer_quarry" width={1000} />
+</center>

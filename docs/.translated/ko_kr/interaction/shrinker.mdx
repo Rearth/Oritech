@@ -1,0 +1,31 @@
+---
+title: 애드온 결합기
+icon: oritech:shrinker_block
+related_items: [oritech:shrinker_block, oritech:machine_combi_addon]
+---
+
+<center>
+<ModAsset location="oritech:area/shrinker_area" width={512} />
+</center>
+
+애드온 결합기는 여러 애드온을 하나의 애드온 블록으로 결합하는 데 사용할 수 있습니다. 결과물은 주로 기계의 설치 면적을 최소화하는 데 유용합니다.
+
+다른 멀티블록과 동일하게 건설됩니다. 사용하려면 에너지가 가득 차 있어야 합니다. "압축" 과정은 UI를 통해 시작하거나 기계의 중심에 레드스톤 신호를 보내 시작할 수 있습니다. 또한 최소 1개의 애드온이 설치되어 있어야 하지만, 확장기를 통해 여러 개를 연결하는 것을 권장합니다.
+
+<center>
+<ModAsset location="oritech:area/shrinker_setup_area" width={512} />
+</center>
+
+활성화되면 월드에 있는 애드온 블록을 소모합니다. 이들은 "머신의 심장"이라는 새로운 아이템으로 압축됩니다. 이 새로운 아이템은 연결된 모든 애드온이 하나의 애드온으로 결합된 결과물입니다. 이 작업은 되돌릴 수 없습니다.
+
+<Callout variant="warning">
+    "머신의 심장" 애드온은 기계에서 다른 애드온과 결합할 수 없습니다. 유일하게 연결된 애드온이어야 합니다.
+</Callout>
+
+<center>
+<ModAsset location="oritech:machine_combi_addon" width={256} />
+</center>
+
+
+기계의 통계에 영향을 주는 애드온만 이 방식으로 압축할 수 있습니다. 스팀 보일러 애드온, 레드스톤 애드온, 인벤토리 프록시 애드온, 헌터 애드온 등
+애드온과 직접 상호작용이 필요한 것들은 압축할 수 없습니다.

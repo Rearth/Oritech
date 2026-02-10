@@ -1,0 +1,30 @@
+{
+  "getting_started": {
+    "name": "\uD83D\uDCD5 시작하기",
+    "icon": null
+  },
+  "resources": {
+    "name": "\uD83E\uDEA8 자원",
+    "icon": null
+  },
+  "tools": {
+    "name": "\uD83D\uDD28 도구",
+    "icon": null
+  },
+  "logistics": {
+    "name": "\uD83D\uDEDE 물류",
+    "icon": null
+  },
+  "processing": {
+    "name": "\uD83D\uDEE0 가공",
+    "icon": null
+  },
+  "interaction": {
+    "name": "\uD83E\uDEF3 상호작용",
+    "icon": null
+  },
+  "arcane": {
+    "name": "\uD83E\uDE84 비전",
+    "icon": null
+  }
+}

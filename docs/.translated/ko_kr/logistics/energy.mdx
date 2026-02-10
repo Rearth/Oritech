@@ -1,0 +1,26 @@
+---
+title: 에너지
+icon: oritech:energy_pipe
+related_items: [oritech:energy_pipe]
+---
+
+Oritech는 **RF**를 사용하여 모든 기계에 전력을 공급하며, Fabric에서는 Reborn Energy API를, NeoForge에서는 FE를 활용합니다.
+이를 통해 Fabric과 NeoForge의 모든 에너지 사용 모드와 호환됩니다.
+
+케이블 티어는 하나뿐이며, 최대 **10k RF/t**를 전송할 수 있습니다. 그것으로 부족하다면 **4M RF/t**를 전송할 수 있는 초전도체도 있습니다.
+
+발전기는 항상 에너지를 출력하며, 다른 모든 기계는 모든 면에서 에너지를 수용하고 다시 출력하지 않습니다.
+케이블 자체는 에너지를 출력할 수 없을 때 각 기계 연결에 최대 **10k RF**를 저장합니다.
+
+에너지를 버퍼링하고 저장하려면 에너지 저장 블록을 사용할 수 있습니다. 두 가지 크기로 제공되며 애드온을 사용하여 대폭 확장할 수 있습니다.
+에너지 저장 블록은 모든 면의 🟢 *녹색 포트*를 통해 에너지를 수용하고, 단일 🔴 *빨간색 포트*를 통해서만 출력할 수 있습니다. 레드스톤 신호는 모든 에너지 출력을 비활성화합니다.
+
+<center>
+<ModAsset location="oritech:small_storage_block" width={256} />
+</center>
+
+에너지는 엔더릭 레이저를 사용하여 무선으로도 전송할 수 있습니다. [엔더릭 레이저](../interaction/enderic_laser)를 참조하세요.
+
+<center>
+<ModAsset location="oritech:area/enderic_laser_energy" width={512} />
+</center>
