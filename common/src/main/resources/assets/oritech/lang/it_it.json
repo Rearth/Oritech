@@ -234,7 +234,7 @@
   "tooltip.oritech.addon_fluid_desc": "Allows fluid processing. Applicable to centrifuge and drone port.",
   "tooltip.oritech.addon_burst_desc": "Allows the machine to operate in very fast bursts. Applicable to processing machines.",
   "tooltip.oritech.addon_acceptor_desc": "Allows energy to be inserted to the addon instead of the machine itself.",
-  "tooltip.oritech.addon_crop_desc": "Applicabile al Distruttore dei Blocchi e al Laser Enderico. Ignora le colture o gli animali non completamente cresciuti.",
+  "tooltip.oritech.addon_crop_desc": "Applicabile al Distruttore dei Blocchi e al Laser Enderico. Ignora le colture o gli animali non completamente cresciuti",
   "tooltip.oritech.addon_proxy_desc": "Consente l'accesso a specifici slot dell'inventario",
   "tooltip.oritech.addon_proxy_select": "Selezionare lo slot di destinazione proxy",
   "tooltip.oritech.addon_quarry_desc": "Applicable to block destroyer and Enderic Laser. Increases working area size.",
@@ -336,19 +336,19 @@
   ],
   "tooltip.oritech.capture_item_desc_2": [
     {
-      "text": "Aiutante",
+      "text": "Un Aiutante",
       "color": "#26d0ff",
       "italic": true
     },
     {
-      "text": " potrebbe adattarsi a quella descrizione. Anche se cercano sempre di prendere l'oggetto",
+      "text": " potrebbe corrispondere a questa descrizione. Tuttavia, cerca sempre di prendere l’oggetto",
       "italic": true,
       "color": "grigio"
     }
   ],
   "tooltip.oritech.capture_item_desc_3": [
     {
-      "text": "da te. Forse potresti anche trovare un'altra entità simile da catturare.",
+      "text": "da te. Forse potresti anche trovare un’altra entità simile da catturare.",
       "italic": true,
       "color": "grigio"
     }
@@ -514,10 +514,10 @@
   "emi.title.oritech.cookingtime": "%ds (%d ticks)",
   "emi.title.oritech.collisionspeed": "Energia di collisione richiesta: %sJ",
   "emi.title.oritech.laser_interaction": "Enderic Laser Block Destruction",
-  "itemgroup.oritech.machines": "Macchine Della Oritech",
-  "itemgroup.oritech.components": "Componenti Della Oritech",
-  "itemgroup.oritech.decorative": "Blocchi Della Oritech",
-  "itemgroup.oritech.equipment": "Equipaggiamento Della Oritech",
+  "itemgroup.oritech.machines": "Macchinari della Oritech",
+  "itemgroup.oritech.components": "Componenti della Oritech",
+  "itemgroup.oritech.decorative": "Blocchi della Oritech",
+  "itemgroup.oritech.equipment": "Equipaggiamento della Oritech",
   "tooltip.oritech.addon_combi_burst": "Burst Time: %s ticks",
   "tooltip.oritech.addon_combi_crop": "Enabled Crop Filter",
   "tooltip.oritech.addon_combi_fluid": "Enabled Fluid Processing",
@@ -573,7 +573,7 @@
   "block.oritech.item_filter_block": "Filtro Oggetti",
   "block.oritech.fluid_pipe_connection": "Collegamento Tubi Per Fluidi",
   "block.oritech.energy_pipe_connection": "Collegamento Fili Elettrici",
-  "block.oritech.item_pipe_connection": "Collegamento Tubi Per Oggetti",
+  "block.oritech.item_pipe_connection": "Collegamento Condotto Per Oggetti",
   "block.oritech.framed_fluid_pipe": "Framed Fluid Pipe",
   "block.oritech.framed_energy_pipe": "Framed Energy Pipe",
   "block.oritech.framed_superconductor": "Framed Superconductor",
@@ -1220,7 +1220,7 @@
   "text.config.oritech-config.option.portableTankCapacityBuckets": "Capacità Serbatoio Portatile (in Secchi)",
   "text.config.oritech-config.option.overchargedCrystalChargeRate": "Tasso Generazione Energia Cristallo Sovraccarico",
   "text.config.oritech-config.section.logistics": "Logistica",
-  "text.config.oritech-config.option.itemPipeTransferAmount": "Quantità Trasferibile Del Condotto di Oggetti",
+  "text.config.oritech-config.option.itemPipeTransferAmount": "Quantità Trasferibile Del Condotto per Oggetti",
   "text.config.oritech-config.section.worldGeneration": "Generazione Mondo",
   "text.config.oritech-config.option.generateOresFabricOnly": "[Fabric Only] Generate Ores",
   "text.config.oritech-config.option.generateOresFabricOnly.tooltip": "This setting only works on fabric. On Neoforge, a datapack is required because NF is annoying.",
@@ -1319,9 +1319,9 @@
   "text.config.oritech-config.option.easyFindFeatures": "Funzionalità facilmente reperibili",
   "text.config.oritech-config.option.easyFindFeatures.tooltip": "Rende più facile la ricerca di pozzi petroliferi e nodi di minerale di roccia di fondo. I pozzi petroliferi includeranno una piccola fontana e i nodi di minerali un piccolo masso sulla superficie",
   "text.config.oritech-config.option.itemPipeIntervalDuration": "Durata Intervallo del Condotto per Oggetti",
-  "text.config.oritech-config.option.fluidPipeExtractAmountBuckets": "Quantità Secchi Estratti del Condotto per Liquidi",
-  "text.config.oritech-config.option.fluidPipeExtractIntervalDuration": "Durata Intervallo di Estrazione del Condotto per Liquidi",
-  "text.config.oritech-config.option.fluidPipeInternalStorageBuckets": "Accumulo Interno di Secchi del Condotto per Liquidi",
+  "text.config.oritech-config.option.fluidPipeExtractAmountBuckets": "Quantità Secchi Estratti dal Tubo per Fluidi",
+  "text.config.oritech-config.option.fluidPipeExtractIntervalDuration": "Durata Intervallo di Estrazione del Tubo per Fluidi",
+  "text.config.oritech-config.option.fluidPipeInternalStorageBuckets": "Accumulo Interno di Secchi del Tubo per Fluidi",
   "text.config.oritech-config.option.energyPipeTransferRate": "Tasso di Trasferimento del Cavo",
   "text.config.oritech-config.option.superConductorTransferRate": "Tasso di Trasferimento del Superconduttore",
   "text.config.oritech-config.option.augmenterMaxEnergy": "Cybernetical Station Max Energy",
