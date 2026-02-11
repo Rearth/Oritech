@@ -317,7 +317,7 @@
   "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
   "tooltip.oritech.capture_item_desc_1": [
     {
-      "text": "Può catturare il cervello di una piccola creatura magica volante e intelligente. La",
+      "text": "In grado di catturare il cervello di una piccola creatura magica, volante e intelligente. L'",
       "italic": true,
       "color": "grigio"
     }
@@ -336,19 +336,19 @@
   ],
   "tooltip.oritech.capture_item_desc_2": [
     {
-      "text": "Un Aiutante",
+      "text": "Alleviante",
       "color": "#26d0ff",
       "italic": true
     },
     {
-      "text": " potrebbe corrispondere a questa descrizione. Tuttavia, cerca sempre di prendere l’oggetto",
+      "text": "corrisponde alla descrizione, anche se cercherà sempre di prenderti l'oggetto",
       "italic": true,
       "color": "grigio"
     }
   ],
   "tooltip.oritech.capture_item_desc_3": [
     {
-      "text": "da te. Forse potresti anche trovare un’altra entità simile da catturare.",
+      "text": "di mano. Forse potresti trovare un'altra entità simile da catturare.",
       "italic": true,
       "color": "grigio"
     }
