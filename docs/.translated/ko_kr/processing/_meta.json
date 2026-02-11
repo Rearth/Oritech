@@ -6,9 +6,9 @@
   "assembler.mdx": "조립기",
   "centrifuge.mdx": "원심분리기",
   "foundry.mdx": "주조소",
-  "fragment_forge.mdx": "파편 단조",
+  "fragment_forge.mdx": "파편 제련기",
   "refinery.mdx": "정제소",
-  "atomic_forge.mdx": "원자 단조",
+  "atomic_forge.mdx": "원자 제련기",
   "generators.mdx": "발전기 시스템",
   "steam_engine.mdx": "증기 동력 시스템",
   "reactor": "원자로"
