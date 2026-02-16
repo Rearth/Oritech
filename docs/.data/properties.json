@@ -1,7 +1,8 @@
 {
   "oritech:energy_pipe": {
     "stack_size": 64,
-    "rarity": "common"
+    "rarity": "common",
+    "Transfer Rate": "10 000 RF/t"
   },
   "oritech:steel_block": {
     "stack_size": 64,
