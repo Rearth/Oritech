@@ -18,7 +18,8 @@ to bind a sending port to a specific destination.
 Target ports must be at least 50 blocks away and located in 
 chunk-loaded areas. 
 While a port can only send to one destination, it can receive 
-shipments from multiple external ports.
+shipments from multiple external ports. However if one port is continuously sending items, it can "clog"
+a target port and prevent shipments from other ports from arriving.
 
 ---
 
@@ -31,7 +32,7 @@ consumption scales with distance according to
 receiving ports must be equipped with a 
 [fluid addon](@oritech:machine_fluid_addon).
 - **Automation**: Attaching a [redstone addon](@oritech:machine_redstone_addon) 
-allows for remote monitoring of inventory levels and operational status.
+allows for monitoring of inventory levels and operational status.
 
 **Redstone Control Modes**
 

@@ -5,13 +5,14 @@ related_items: ["oritech:steam_boiler_addon"]
 title: Steam Engine
 ---
 
-<center>
-<ModAsset location="oritech:area/steam_power" width={1000} />
-</center>
 
 All generators (except the basic generator) can be upgraded to produce steam by adding a steam boiler addon.
 When added, the machine will no longer directly produce RF. Instead, it will produce steam at a rate of 2:1.
 To produce steam, water will be consumed. Water and steam can be pumped in and out directly from the addon, but not the machine itself.
+
+<center>
+<ModAsset location="oritech:area/steam_power" width={1000} />
+</center>
 
 To utilize the steam, a steam engine can be used to produce RF from it. It takes steam as input and outputs water.
 However, during the process, around 20% of the water will be lost, so a steady supply of water is needed for the generators.
@@ -19,11 +20,6 @@ However, during the process, around 20% of the water will be lost, so a steady s
 <Callout variant="info">
     Steam engines will not work if their water storage is completely full. Always ensure that the water can go somewhere. 
     With some tanks, comparators and redstone you can build a self-sustaining loop.
-</Callout>
-
-<Callout variant="info">
-    Chaining lets you process huge amounts of steam
-    without complex piping for each block.
 </Callout>
 
 A steam engine's speed varies based on the stored steam. More steam results in more pressure, making it operate faster. 
@@ -35,12 +31,19 @@ The machine's efficiency is highest when operating at around 700% speed. Anythin
 
 Energy will be output from the red machine slots. Fluid ports are marked blue.
 
+<Callout variant="info">
+    Chaining lets you process huge amounts of steam
+    without complex piping for each block.
+</Callout>
+
 
 ## Chaining
 
-You can chain multiple Steam Engines together to form a massive power plant.
+You can chain multiple Steam Engines together to form a massive power plant by just building steam machines next to each other.
 *   **Master Engine**: The main controller that handles operation
 *   **Slave Engines**: Extra engines connected in a line (up to 10 blocks)
 *   **Processing**: The master distributes steam processing to slaves,
     increasing total throughput
-*   All piping and interactions should target only the first steam engine.
+*   All piping and interactions should target only the first steam engine (the master engine).
+
+The master engine is designated as the first engine that any steam is inserted into. Only connect your pipes to this first engine.

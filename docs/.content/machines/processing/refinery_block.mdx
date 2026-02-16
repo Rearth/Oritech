@@ -34,8 +34,8 @@ from these modules.
 
 **Yield Mechanics**
 
-If a recipe has fewer fluid outputs than available slots (or modules), 
+If a recipe has more fluid outputs than available slots (or modules),
 the internal logic repurposes the unused capacity:
-- If no modules are used, the item and first fluid output are doubled.
-- If only one module is used (2 fluid outputs active), the second fluid 
+- If no modules are available, the first fluid output is doubled.
+- If only one module is available (2 fluid outputs active), the second fluid
 output amount is doubled (if applicable).

@@ -7,8 +7,18 @@ type: block
 The Efficiency Addon focuses on reducing the energy footprint of your
 machinery.
 Installing this addon reduces the energy consumption of the machine by
-20% per cycle.
+20% per cycle. The machine will not be any faster, but it'll need less RF/t.
 
 This is particularly useful for machines that are constantly running or
 for setups where energy generation is limited.
 Multiple efficiency addons can be stacked to further minimize power usage.
+
+Applicable to all machines that consume energy each tick they work.
+
+## Energy Calculations
+
+With default configs, the bonuses are additive, not multiplicative. This means that one
+efficiency addon reduces the energy usage by 20%, two by 40%, etc.
+
+Note that an efficiency bonus of +100% means that only half the energy is needed, +200% efficiency only needs a quarter, etc.
+An efficiency change of -100% would result in the energy needing twice as much energy.

@@ -10,10 +10,24 @@ attack living entities instead of just blocks.
 
 ---
 
-**Combat Application**
+## Combat Application
 
 Once installed, the laser will scan for mobs within its beam path.
 Each additional hunter addon increases the effective scanning distance
 and improves the laser's ability to track moving targets.
 This can be used to create automated base defense systems or
 specialized mob farming setups.
+
+Speed addons will make the laser deal more damage. Efficiency addons make it need less RF/t. Yield addons do **not** increase the loot dropped.
+
+Loot from killed entities is automatically collected in the lasers inventory. XP orbs will not be dropped when an entity is killed by the laser.
+
+## Configuration
+
+To determine what kind of targets the laser shoots, you can shift-right click it with a target designator in hand to designate / switch target type.
+It'll cycle through the following options:
+- All non-player mobs
+- Hostile and neutral mobs (pets excluded)
+- Hostile mobs only
+
+It can not be set to target specific mobs only. However, a crop filter addon will allow it to skip child entities.
