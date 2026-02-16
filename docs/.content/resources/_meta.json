@@ -1,16 +1,16 @@
 {
-  "adamant_ingot.mdx": "Adamant",
+  "world": "World Generation",
   "biomass.mdx": "Biomass",
-  "biosteel_ingot.mdx": "Biosteel",
-  "duratium_ingot.mdx": "Duratium",
+  "silicon.mdx": "Silicon",
+  "plastic_sheet.mdx": "Plastic",
+  "steel_ingot.mdx": "Steel",
+  "nickel_ingot.mdx": "Nickel",
   "electrum_ingot.mdx": "Electrum",
+  "platinum_ingot.mdx": "Platinum",
+  "duratium_ingot.mdx": "Duratium",
+  "adamant_ingot.mdx": "Adamant",
+  "biosteel_ingot.mdx": "Biosteel",
   "energite_ingot.mdx": "Energite",
   "fluxite.mdx": "Fluxite",
-  "nickel_ingot.mdx": "Nickel",
-  "plastic_sheet.mdx": "Plastic",
-  "platinum_ingot.mdx": "Platinum",
-  "prometheum_ingot.mdx": "Prometheum",
-  "silicon.mdx": "Silicon",
-  "steel_ingot.mdx": "Steel",
-  "world": "World Generation"
+  "prometheum_ingot.mdx": "Prometheum"
 }
