@@ -11,8 +11,10 @@ with a redstone signal to a port.
 
 The port can also be used with a comparator to output data. It has 3 modes:
 
-*   **Temperature**: Outputs signal based on the hottest component temperature
-*   **Active Rod Count**: Indicates the amount of burning fuel
+*   **Temperature**: Outputs signal based on the hottest component temperature (relative to the maximum reactor heat)
+*   **Active Rod Count**: Indicates the amount of rods burning fuel (e.g. the actual number of rods per layer that are currently active. Double/Quad rods are counted as one.)
 *   **Energy**: Measures current RF stored
 
 To cycle between the modes, simply right-click the port.
+
+For detailed information on reactor mechanics, see the [nuclear reactor documentation]($NUCLEAR_REACTOR).
