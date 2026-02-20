@@ -69,6 +69,36 @@ public class FabricItemApi implements BlockItemApi {
         @Override
         public int insert(ItemStack inserted, boolean simulate) {
             if (inserted.isEmpty()) return 0;
+
+            // Use slot-by-slot insertion to respect item max stack size,
+            // which Fabric's bulk insert may not check for component-based MAX_STACK_SIZE
+            if (storage instanceof SlottedStorage<ItemVariant> slottedStorage) {
+                var variant = ItemVariant.of(inserted);
+                var maxStackSize = inserted.getMaxStackSize();
+                var remaining = inserted.getCount();
+
+                try (var transaction = Transaction.openOuter()) {
+                    for (int i = 0; i < slottedStorage.getSlotCount() && remaining > 0; i++) {
+                        var slot = slottedStorage.getSlot(i);
+                        var currentAmount = (int) slot.getAmount();
+
+                        // Skip slots that are full according to the item's max stack size
+                        if (!slot.isResourceBlank() && currentAmount >= maxStackSize) continue;
+
+                        var canInsert = Math.min(remaining, maxStackSize - (slot.isResourceBlank() ? 0 : currentAmount));
+                        if (canInsert <= 0) continue;
+
+                        var insertedCount = (int) slot.insert(variant, canInsert, transaction);
+                        remaining -= insertedCount;
+                    }
+
+                    if (!simulate)
+                        transaction.commit();
+                    return inserted.getCount() - remaining;
+                }
+            }
+
+            // Fallback for non-slotted storage
             try (var transaction = Transaction.openOuter()) {
                 var insertCount = storage.insert(ItemVariant.of(inserted), inserted.getCount(), transaction);
                 if (!simulate)
