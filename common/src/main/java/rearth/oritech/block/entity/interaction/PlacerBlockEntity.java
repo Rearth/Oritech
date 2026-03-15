@@ -79,6 +79,7 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
         
         if (Objects.requireNonNull(level).getBlockState(targetPosition).isAir() && placementState != null && placementState.canSurvive(level, targetPosition)) {
             level.setBlockAndUpdate(targetPosition, placementState);
+            block.setPlacedBy(level, targetPosition, placementState, getPlacerPlayerEntity(), firstBlock);
             firstBlock.shrink(1);
             level.playSound(null, targetPosition, placementState.getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1f, 1f);
             super.finishBlockWork(processed);
