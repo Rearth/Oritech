@@ -1,0 +1,46 @@
+---
+title: Drone Port
+id: oritech:drone_port_block
+type: block
+---
+
+The drone port enables long-range logistics by transporting items and 
+fluids via autonomous flying drones. 
+It requires a matching drone port at both the takeoff and landing 
+positions.
+
+---
+
+**Logistics and Targeting**
+
+To establish a connection, use a [target designator](@oritech:target_designator) 
+to bind a sending port to a specific destination. 
+Target ports must be at least 50 blocks away and located in 
+chunk-loaded areas. 
+While a port can only send to one destination, it can receive 
+shipments from multiple external ports. However if one port is continuously sending items, it can "clog"
+a target port and prevent shipments from other ports from arriving.
+
+---
+
+**Energy and Upgrades**
+
+- **Travel Cost**: Delivery time is constant, but the energy 
+consumption scales with distance according to 
+`sqrt(distance) * 50 + 1024` RF.
+- **Fluid Transport**: To carry liquids, both the sending and 
+receiving ports must be equipped with a 
+[fluid addon](@oritech:machine_fluid_addon).
+- **Automation**: Attaching a [redstone addon](@oritech:machine_redstone_addon) 
+allows for monitoring of inventory levels and operational status.
+
+**Redstone Control Modes**
+
+The redstone addon enables advanced comparator outputs:
+- **Power Measure**: Signal strength based on stored energy.
+- **Inventory Slot Measure**: Signal strength based on the largest 
+amount of material (item or fluid).
+- **Progress Measure**: Signal based on operation progress.
+- **Activity Measure**: Signal based on state (idle, sending, receiving).
+- **Input Control**: Powering the addon prevents the port from 
+sending or receiving.

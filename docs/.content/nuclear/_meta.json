@@ -1,0 +1,18 @@
+{
+  "nuke.mdx": "Manhattan Module",
+  "low_yield_nuke.mdx": "Low-Yield Nuclear Explosion Device",
+  "uranium_pellet.mdx": "Uranium Processing",
+  "reactor_controller.mdx": "Nuclear Reactor Controller",
+  "reactor_wall.mdx": "Reactor Wall",
+  "reactor_absorber_port.mdx": "Reactor Absorber Port",
+  "reactor_condenser.mdx": "Reactor Heat Absorber",
+  "reactor_heat_pipe.mdx": "Reactor Heat Pipe",
+  "reactor_vent.mdx": "Reactor Heat Vent",
+  "reactor_reflector.mdx": "Neutron Reflector",
+  "reactor_rod.mdx": "Reactor Fuel Rod",
+  "reactor_double_rod.mdx": "Reactor Double Rod",
+  "reactor_quad_rod.mdx": "Reactor Quad Rod",
+  "reactor_fuel_port.mdx": "Reactor Fuel Port",
+  "reactor_energy_port.mdx": "Reactor Energy Port",
+  "reactor_redstone_port.mdx": "Reactor Redstone Port"
+}

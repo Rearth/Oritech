@@ -37,6 +37,16 @@ neoForge {
                 }
             }
         }
+
+        exportClient {
+            client()
+            systemProperty 'wiki_exporter.enabled', 'true'
+        }
+        exportServer {
+            server()
+            programArgument 'nogui'
+            systemProperty 'wiki_exporter.enabled', 'true'
+        }
     }
 
     mods {
@@ -116,6 +126,8 @@ dependencies {
     localRuntime "curse.maven:mekanism-268560:5680395"
     // Spark
     localRuntime "curse.maven:spark-361579:5759671"
+
+    localRuntime "org.sinytra:wiki-exporter-neoforge:2.2.1+1.21.1"
 
     /// datagen-only
 

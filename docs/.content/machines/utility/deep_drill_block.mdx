@@ -1,0 +1,43 @@
+---
+title: Bedrock Extractor
+id: oritech:deep_drill_block
+type: block
+custom:
+    RF Capacity: "20,000"
+    RF per step: "1,024"
+    Steps per ore: "20"
+    Cores required: "26"
+---
+The Bedrock Extractor is a massive machine
+designed to extract resources from below the bedrock layer. 
+
+<center>
+<ModAsset location="oritech:area/bedrock_extraction" width={800} />
+</center>
+
+It can only operate when placed directly above 
+[resource nodes](@oritech:resource_node_redstone).
+
+---
+
+**Bedrock Resource Extraction**
+
+The extractor scans a 3x3 area below it and mines from the first 
+visible ore nodes found within 3 blocks depth. 
+When right-clicked, the machine will highlight the targeted resource 
+nodes below.
+
+Because of its immense power requirements, it cannot be powered via 
+standard cables and must be energized by 
+[enderic lasers](@oritech:laser_arm_block).
+
+Resource nodes are infinite sources of material and will never be 
+depleted by the extractor.
+
+**Operation Details**
+
+During operation, the extractor randomly selects one block from the 
+3x3 area below it for each successful cycle.
+Not all blocks in the area need to be ore nodes, but for the highest 
+yield, you should try to position the extractor over a spot with the 
+maximum number of ore nodes.

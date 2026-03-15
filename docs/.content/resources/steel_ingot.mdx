@@ -1,0 +1,29 @@
+---
+id: oritech:steel_ingot
+title: Steel
+type: item
+related_items: ["oritech:steel_dust", "oritech:steel_block"]
+---
+
+Steel is a mid-tier alloy used to create [machine frames](@oritech:machine_frame_block),
+[item pipes](@oritech:item_pipe), and various other components.
+
+Steel can be created in a crafting grid using iron and coal:
+
+<CraftingRecipe
+    slots={[
+        'minecraft:iron_ingot',
+        'minecraft:iron_ingot',
+        '',
+        'minecraft:coal',
+        'minecraft:coal',
+        '',
+        '',
+        '',
+        ''
+    ]}
+    result="oritech:steel_ingot"
+    count={1}
+/>
+
+The [foundry](@oritech:foundry_block) can produce more steel using fewer iron and coal.

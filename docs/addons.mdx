@@ -1,0 +1,29 @@
+---
+title: Addons
+icon: oritech:machine_extender
+---
+
+To upgrade machines in Oritech, addons are used. They are blocks that need to be attached to the machine itself or a connected machine extender.
+Addons can perform a variety of functions, such as increasing speed, improving energy efficiency, providing access to specific inventory slots, and more.
+
+Machines can only accept addons at specific positions. To view these, either check the "addons" UI page or look for these markers on the machine:
+
+<center>
+<ModAsset location="oritech:area/addon_marker" width={300} />
+</center>
+
+Addons are activated when the machine is right-clicked, or when a machine is found when the addon is placed. To indicate activation, the pink parts of an addon turn blue when in use.
+
+<Callout variant="warning">
+    Addons change color when connected. Blue means connected, pink means disconnected. If an addon is pink, it's not connected to any machine.
+</Callout>
+
+To extend the available number of addon slots, you can use machine extenders. These specific addons do not directly influence the machine but allow
+addons to be placed on them, which then count towards the machine they are connected to.
+
+The maximum layers of machine extenders you can use depends on the machine quality. If you have a machine with a core quality of 1,
+you can use 1 addon in total. The total number of machine extenders you can use in a machine is equal to the machine quality.
+
+<center>
+<ModAsset location="oritech:area/extenders" width={700} />
+</center>

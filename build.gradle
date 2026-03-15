@@ -2,7 +2,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.107' apply false
     id 'fabric-loom' version '1.9-SNAPSHOT' apply false
     id "me.modmuss50.mod-publish-plugin" version "0.8.0" apply false
-    id 'org.sinytra.wiki.toolkit' version '0.1.16'
+    id 'org.moddedmc.wiki.toolkit' version '0.4.1'
 }
 
 // all projects including the root project
@@ -170,8 +170,6 @@ wiki {
         oritech {
             // path to the folder containing metadata file (sinytra-wiki.json)
             root = file('docs')
-            exportedAssetNamespaces = ['oritech']
-            wikiAccessToken = System.getenv('WIKI_TOKEN')
         }
     }
 }

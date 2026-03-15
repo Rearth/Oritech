@@ -1,0 +1,16 @@
+{
+  "world": "World Generation",
+  "biomass.mdx": "Biomass",
+  "silicon.mdx": "Silicon",
+  "plastic_sheet.mdx": "Plastic",
+  "steel_ingot.mdx": "Steel",
+  "nickel_ingot.mdx": "Nickel",
+  "electrum_ingot.mdx": "Electrum",
+  "platinum_ingot.mdx": "Platinum",
+  "duratium_ingot.mdx": "Duratium",
+  "adamant_ingot.mdx": "Adamant",
+  "biosteel_ingot.mdx": "Biosteel",
+  "energite_ingot.mdx": "Energite",
+  "fluxite.mdx": "Fluxite",
+  "prometheum_ingot.mdx": "Prometheum"
+}

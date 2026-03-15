@@ -1,0 +1,53 @@
+---
+id: oritech:enchantment_catalyst_block
+type: block
+title: Arcane Catalyst
+custom:
+    Base soul capacity: "50"
+    Soul collection range: "16 blocks"
+---
+
+The Arcane Catalyst is a central component for soul management and advanced 
+enchanting. It acts as a storage for souls, which can then be used by a 
+nearby [Stabilized Enchanter](@oritech:enchanter_block) or for direct book enchanting.
+
+## Soul Collection
+
+The catalyst automatically pulls in any souls released within a **16-block radius**. 
+Souls are released when mobs die nearby or when [Soul Flowers](@oritech:wither_crop_block) 
+are harvested.
+
+## Stabilization & Storage
+
+The catalyst has a base capacity of **50 souls**. To store more, the block must be 
+supplied with energy (such as from a [Laser Arm](@oritech:laser_arm_block)). 
+
+- **Charging**: Every **20 RF/t** provided increases the soul capacity by **1**.
+- **Decay**: If the energy supply is cut, the capacity will slowly drop back to 50.
+
+<Callout variant="danger">
+    **Stability Risk**: If the catalyst contains more souls than its current capacity 
+    (e.g., if power is lost while it's full), it will become unstable. After **3 seconds** 
+    (60 ticks) of instability, it will **explode**. The explosion strength increases with 
+    the amount of excess souls.
+</Callout>
+
+## Hyper Enchanting
+
+By placing an **Enchanted Book** in the first slot and an item in the second, you 
+can enchant items directly. 
+
+- **Level Requirement**: The book used must be at the **maximum vanilla level** for that 
+enchantment.
+- **No Restrictions**: This method ignores standard enchantment rules, allowing you 
+to apply any enchantment to any item.
+- **Hyper Levels**: If the item already has the enchantment at its maximum level, 
+the catalyst can "hyper enchant" it to even higher levels.
+- **Consumption**: The enchanted book is consumed during the hyper enchanting process.
+
+<center>
+<ModAsset location="oritech:area/catalyst_stabilized" width={640} />
+</center>
+
+Hyper enchanting costs significantly more souls than standard enchanting, scaling 
+exponentially with the target level.

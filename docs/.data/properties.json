@@ -1,0 +1,1181 @@
+{
+  "oritech:energy_pipe": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:steel_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:silicon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:still_sheol_fire_bucket": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:jetpack_exo_elytra": {
+    "stack_size": 1,
+    "rarity": "common",
+    "enchantability": 9
+  },
+  "oritech:exo_chestplate": {
+    "stack_size": 1,
+    "rarity": "common",
+    "enchantability": 9
+  },
+  "oritech:destroyer_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:unstable_container": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:raw_uranium_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:enchanter_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:fluid_pipe": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:energite_ingot": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_hunter_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:iron_plating_pressure_plate": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_redstone_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:enchantment_catalyst_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:iron_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:silicon_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:copper_nugget": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:fuel_generator_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:clay_catalyst_beads": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:resource_node_uranium": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_frame_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:advanced_computing_engine": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:framed_superconductor": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:resource_node_lapis": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:enderic_compound": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:nickel_gem": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:tech_lever": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:charger_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:portable_laser": {
+    "stack_size": 1,
+    "rarity": "common",
+    "enchantability": 10
+  },
+  "oritech:resource_node_nickel": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_plating_stairs": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:carbon_plating_pressure_plate": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:white_paint": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:unholy_intelligence": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:small_nickel_clump": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:nickel_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:particle_collector_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:still_heavy_oil_bucket": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:netherite_paint": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:fluxite": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:still_diesel_bucket": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:camo_paint": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:refinery_module_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:accelerator_ring": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:reactor_heat_pipe": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:black_hole_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_silk_touch_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_iron_clump": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:accelerator_controller": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:creative_storage_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:nickel_ingot": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:uranium_pellet": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:exo_leggings": {
+    "stack_size": 1,
+    "rarity": "common",
+    "enchantability": 9
+  },
+  "oritech:fertilizer_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:copper_clump": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:accelerator_sensor": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:uranium_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:advanced_augment_station": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:metal_girder_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:treefeller_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:adamant_ingot": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_gold_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:platinum_nugget": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:power_pole_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:platinum_ingot": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:deepslate_platinum_ore": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:nickel_plating_pressure_plate": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:drone_port_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:nickel_plating_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:copper_gem": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:reactor_energy_port": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:biosteel_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:superconductor": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:packed_wheat": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_plating_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:electrum_ingot": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:foundry_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:nickel_ore": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:fluxite_paint": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:spawner_controller_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:energite_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:resource_node_copper": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:steel_ingot": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:cooler_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:plutonium_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_storage_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:pump_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:still_oil_bucket": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:small_uranium_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:item_pipe": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:weed_killer": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:processing_unit": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_plating_pressure_plate": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:uranium_dust_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:platinum_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:still_silicon_wash_bucket": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:iron_plating_slab": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:superconductor_duct_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:basic_generator_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:reactor_absorber_port": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:industrial_glass_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:biomass": {
+    "stack_size": 64,
+    "rarity": "common",
+    "nutrition": 2
+  },
+  "oritech:still_biofuel_bucket": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:endstone_platinum_ore": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:steel_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:electric_mace": {
+    "stack_size": 1,
+    "rarity": "epic",
+    "attack_damage": 9.0,
+    "attack_speed": 0.6,
+    "enchantability": 15
+  },
+  "oritech:biomass_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:low_yield_nuke": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:gold_clump": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:hand_drill": {
+    "stack_size": 1,
+    "rarity": "epic",
+    "durability": 1000,
+    "mining_speed": 9.0,
+    "attack_damage": 5.0,
+    "attack_speed": 1.6,
+    "enchantability": 22
+  },
+  "oritech:iron_plating_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:super_ai_chip": {
+    "stack_size": 4,
+    "rarity": "common"
+  },
+  "oritech:machine_extender": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:resource_node_coal": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:platinum_clump": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_acceptor_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_yield_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:energite_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:copper_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:reactor_vent": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:duratium_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_plating_slab": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:still_sulfuric_acid_bucket": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:still_naphtha_bucket": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:banana": {
+    "stack_size": 64,
+    "rarity": "common",
+    "nutrition": 4
+  },
+  "oritech:bio_generator_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:reinforced_carbon_sheet": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:heisenberg_compensator": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:simple_augment_station": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_copper_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:reactor_wall": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:exo_helmet": {
+    "stack_size": 1,
+    "rarity": "common",
+    "enchantability": 9
+  },
+  "oritech:raw_silicon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_tank_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_fluid_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_copper_clump": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:prometheum_ingot": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:still_fuel_bucket": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:pulverizer_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_capacitor_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:still_steam_bucket": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:still_mineral_slurry_bucket": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:resource_node_platinum": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:duratium_ingot": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:laser_arm_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:raw_uranium": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_plutonium_pellet": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_processing_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:nuke": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:reactor_double_rod": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:iron_gem": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:platinum_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:biosteel_ingot": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_speed_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:resource_node_gold": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:steam_boiler_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:plutonium_pellet": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_platinum_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:reactor_quad_rod": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_combi_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:electrum_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:solid_biofuel": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:steam_engine_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:powered_furnace_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:electrum_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:motor": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:nickel_clump": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:ceiling_light_hanging": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:crop_filter_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:exo_boots": {
+    "stack_size": 1,
+    "rarity": "common",
+    "enchantability": 9
+  },
+  "oritech:raw_nickel_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:metal_beam_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:sculk_paint": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:accelerator_motor": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:fluid_pipe_duct_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:raw_nickel": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:deepslate_nickel_ore": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:jetpack_elytra": {
+    "stack_size": 1,
+    "rarity": "common",
+    "enchantability": 15
+  },
+  "oritech:small_nickel_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:orange_paint": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:target_designator": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:placer_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:carbon_plating_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:arcane_augment_station": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:framed_fluid_pipe": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:promethium_pickaxe": {
+    "stack_size": 1,
+    "rarity": "epic",
+    "durability": 10000,
+    "mining_speed": 24.0,
+    "attack_damage": 9.0,
+    "attack_speed": 1.6,
+    "enchantability": 28
+  },
+  "oritech:transparent_item_pipe": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:flux_gate": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_platinum_clump": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:carbon_plating_stairs": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:ion_thruster": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:raw_biopolymer": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:enderic_lens": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:item_pipe_duct_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:nickel_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:reactor_controller": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:dubios_container": {
+    "stack_size": 16,
+    "rarity": "common"
+  },
+  "oritech:iron_clump": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:resource_node_diamond": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:still_strange_matter_bucket": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:industrial_paint": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:atomic_forge_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:raw_platinum_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:carbon_fibre_strands": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:silicon_wafer": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:wrench": {
+    "stack_size": 1,
+    "rarity": "common",
+    "mining_speed": 25.0
+  },
+  "oritech:deepslate_uranium_ore": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:chainsaw": {
+    "stack_size": 1,
+    "rarity": "epic",
+    "durability": 1000,
+    "mining_speed": 9.0,
+    "attack_damage": 9.0,
+    "attack_speed": 1.6,
+    "enchantability": 22
+  },
+  "oritech:machine_burst_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_efficiency_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:plastic_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:exo_jetpack": {
+    "stack_size": 1,
+    "rarity": "common",
+    "enchantability": 9
+  },
+  "oritech:assembler_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:big_solar_panel_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:refinery_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:fluxite_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_inventory_proxy_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:capacitor_addon_extender": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:promethium_axe": {
+    "stack_size": 1,
+    "rarity": "epic",
+    "durability": 10000,
+    "mining_speed": 24.0,
+    "attack_damage": 18.0,
+    "attack_speed": 1.9,
+    "enchantability": 28
+  },
+  "oritech:reactor_fuel_port": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:adamant_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:spawner_cage_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:reactor_condenser": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:polymer_resin": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:uranium_gem": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:gold_gem": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:plastic_sheet": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:shrinker_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:uranium_crystal": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_plutonium_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:nickel_nugget": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:iron_plating_stairs": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:deep_drill_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:basic_battery": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:tech_button": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:raw_platinum": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:centrifuge_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:pipe_booster_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:advanced_battery": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:magnetic_coil": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:reactor_rod": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:resource_node_emerald": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_gold_clump": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:creative_tank_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:reactor_redstone_port": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:resource_node_redstone": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:coal_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:platinum_gem": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:diamond_paint": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:lava_generator_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:nickel_plating_stairs": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:framed_energy_pipe": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:adamant_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:gold_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:resource_node_iron": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:quartz_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:quarry_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:duratium_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:overcharged_crystal": {
+    "stack_size": 1,
+    "rarity": "common"
+  },
+  "oritech:fragment_forge_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:energy_pipe_duct_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_ultimate_addon": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:wither_crop_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_core_1": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_core_6": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_core_7": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:augment_application_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:large_storage_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:redstone_paint": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_core_2": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:framed_item_pipe": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_core_3": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_uranium_pellet": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_core_4": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:machine_core_5": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:jetpack": {
+    "stack_size": 1,
+    "rarity": "common",
+    "enchantability": 15
+  },
+  "oritech:reactor_reflector": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:biosteel_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:tech_door": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:ceiling_light": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:nickel_plating_slab": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:item_filter_block": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:small_iron_dust": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:carbon_plating_slab": {
+    "stack_size": 64,
+    "rarity": "common"
+  }
+}

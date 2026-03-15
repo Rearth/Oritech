@@ -1,0 +1,47 @@
+---
+id: oritech:deepslate_uranium_ore
+title: Uranium Veins
+type: block
+related_items: ["oritech:uranium_ore", "oritech:uranium_crystal"]
+---
+
+<center>
+<ModAsset location="oritech:area/uranium_cave" width={700} />
+</center>
+
+Uranium is a high-yield energy source found in the deepest reaches of the world.
+Unlike standard mineral deposits, uranium generates in distinct **uranium veins** that
+cling to the surfaces of underground caverns.
+
+### Generation
+
+Uranium veins primarily generate deep within the world, typically between **Y -64 and Y -24**.
+These veins have a unique generation requirement: they will only appear on cave walls or floors
+where there is **exposed air**.
+
+In addition to the standard ore blocks, these veins often feature glowing **Uranium Crystals** that
+illuminate the surrounding dark depths.
+
+### Harvesting and Crystals
+
+While uranium ore can be mined normally, the **Uranium Crystals** found within these veins offer
+unique opportunities:
+
+*   **Standard Mining**: Breaking the crystals will drop raw uranium, which can be processed into fuel.
+*   **Enderic Laser**: Destroying a crystal with an [Enderic Laser](@oritech:laser_arm_block)
+will yield **plutonium dust** instead. Plutonium is a much more powerful fuel source
+for [Nuclear Reactors]($reactor/introduction).
+*   **Non-Renewable**: Unlike amethyst, Uranium Crystals do not regrow.
+Once a vein is depleted, you must find another.
+
+<Callout variant="warning">
+    Uranium is highly energetic. While the veins themselves aren't dangerous to stand
+    near in their raw form, the pellets and fuel rods derived from them require careful
+    handling in a [Reactor]($reactor/introduction) to avoid catastrophic meltdowns.
+</Callout>
+
+### Resource Nodes
+
+If you require a more sustainable supply of uranium, you should look
+for [Uranium Resource Nodes](@oritech:resource_nodes). These are found near the bedrock
+layer and can be harvested indefinitely using a [Bedrock Extractor](@oritech:deep_drill_block).

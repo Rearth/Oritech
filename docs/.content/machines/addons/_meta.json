@@ -1,0 +1,21 @@
+{
+  "capacitor_addon_extender.mdx": "Power Bank Addon Extender",
+  "machine_extender.mdx": "Machine Addon Extender",
+  "machine_capacitor_addon.mdx": "Capacitor Addon",
+  "machine_acceptor_addon.mdx": "Acceptor Addon",
+  "machine_speed_addon.mdx": "Speed Addon",
+  "machine_efficiency_addon.mdx": "Efficiency Addon",
+  "machine_ultimate_addon.mdx": "Synergy Matrix Addon",
+  "machine_burst_addon.mdx": "Burst Addon",
+  "machine_processing_addon.mdx": "Auxiliary Processing Chamber Addon",
+  "machine_fluid_addon.mdx": "Fluid Addon",
+  "machine_inventory_proxy_addon.mdx": "Inventory Proxy Addon",
+  "machine_redstone_addon.mdx": "Control Unit Addon",
+  "steam_boiler_addon.mdx": "Steam Boiler Addon",
+  "machine_hunter_addon.mdx": "Hunter Addon",
+  "quarry_addon.mdx": "Quarry Addon",
+  "crop_filter_addon.mdx": "Crop Filter Addon",
+  "machine_yield_addon.mdx": "Yield Addon",
+  "machine_silk_touch_addon.mdx": "Silk Touch Addon",
+  "machine_combi_addon.mdx": "Heart of the Machine"
+}

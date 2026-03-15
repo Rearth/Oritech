@@ -1,0 +1,154 @@
+---
+title: Particle Accelerator
+icon: oritech:area/accelerator_ring_area
+---
+
+The particle accelerator is used to, as you might guess, accelerate particles. When particles of different items collide, they can create new items.
+The particle starts from the particle accelerator block, where you can insert any item to be used as a particle.
+A straight guide ring needs to be placed right behind the controller, facing to the side, with visuals aligning correctly.
+
+<Callout variant="info">
+    TL;DR: Build a ring from guide rings and motors. Once an inserted particle is up to speed, measured via a particle speed sensor,
+    insert a second particle into the same ring to create a collision, with one very fast particle and one basically still.
+    If you need higher speeds, make the ring bigger on all sides.
+</Callout>
+
+<center>
+<ModAsset location="oritech:area/accelerator_ring_area" width={500} />
+</center>
+
+Once inserted, the particle travels along a route defined by the guide rings. They can be right-clicked to add a 45-degree turn on one side.
+Another guide ring needs to be in the particle's path as defined by the guide rings. Depending on the speed, the allowed distance between guide blocks increases.
+
+The maximum distance is calculated with the following formula:
+
+> clamp(sqrt(speed) / 2, 2, 10)
+
+This means that at higher speeds, the distance between guide blocks can be larger.
+
+---
+
+## Particle Collisions
+
+When 2 particles from different particle accelerator controllers collide with each other, they can result in a different item. Depending on the recipe,
+the required collision energy will differ. The collision energy is the sum of the speeds of both particles. The item type is irrelevant here, only the speeds matter.
+
+<Callout variant="info">
+    At high speeds, quantum interference makes collision points unpredictable and occasionally miss when both particles are moving at high speeds.
+    Make sure to put the particle into the same ring in the opposing direction when colliding.
+</Callout>
+
+For example, if 2 particles crash into each other while moving in opposite directions each at 500 m/s, the collision energy will be 1000 J.
+If one particle travels at 1000 m/s, and the other one only at 1 m/s, the resulting energy will be 1001 J.
+This means that you do not need to speed up both particles for a collision. In most cases it is easier to speed up just one particle,
+and then insert a second, slow particle into the same ring.
+
+---
+
+## Redstone Switches
+
+When a redstone signal is applied to a non-straight guide block, it becomes a switch block. When powered on, it leads particles straight; when powered off, it guides them into the original curved direction.
+A particle can also enter from the other direction, visualized by the smaller red glass tube, following the path of the white tube, and entering from both the red and white tubes.
+
+<center>
+<ModAsset location="oritech:area/accelerator_switch_area" width={500} />
+</center>
+
+At higher speeds, the particle cannot take tight turns. If the last full 90-degree turn is too close, it exits the guided path and shoots out into the world.
+If the distance between guide blocks is too big, or no next guide is found, it will also shoot out. The minimum distance between turns is calculated as follows:
+
+> sqrt(speed) / 2.5
+
+The following picture shows how the curve distance is being calculated in game. To allow higher speeds, either increase the distance between the corners, or make the corners themselves longer:
+
+<center>
+<ModAsset location="oritech:area/particle_dist_calc" width={800} />
+</center>
+
+---
+
+## Interactions
+
+Entities hit by the particle take damage based on the particle's speed. When exiting the guided path, it also harms entities in its path
+and destroys blocks until momentum is depleted. When two particles collide, they can create new items.
+
+Passing through an accelerator motor speeds up the particle by 1 m/s, requiring the motor to be powered.
+The power requirement increases with speed. Each time a motor speeds up a particle, it consumes the particle's current speed * 10 RF.
+Both particle motors and sensors can be used as straight guides.
+
+---
+
+## Tachyons
+
+When particles collide at high speed, they emit energy-dense tachyons. The higher the collision energy, the more energy will be ejected with tachyons.
+They also fly farther, and there will be more tachyons at higher speeds.
+
+Tachyon collectors can be used to catch those particles and turn them into energy. The tachyons always exit in random directions at the collision point. Surrounding
+the entire area in collectors ensures you will catch them all. If all tachyons are collected, you can get up to 4x the amount of energy that was used to accelerate
+the particles.
+
+However, for large collisions, a lot of high-energy tachyons will be emitted, which may cause collectors to reach their limit, and any excess energy will be wasted.
+Placing the collectors further back allows the tachyons to be spread over multiple collectors, so they do not fill up too quickly and get overwhelmed. At very high speeds,
+roughly above 10000, even collectors further back will usually be overwhelmed, and the energy cannot be fully collected.
+
+<center>
+<ModAsset location="oritech:area/tachyon_catcher" width={500} />
+</center>
+
+The distance the tachyons can reach can be calculated as follows:
+> (sqrt(collisionEnergy) / 2 + 1) / 3
+
+Basically this means that at higher collisions, tachyons will travel further from the point of the collision.
+
+---
+
+## Speed Sensors
+
+A particle's speed can be measured with a particle sensor. A comparator can then provide a redstone signal based on the particle's speed. The following table shows the required speed for each redstone level:
+
+1. 0
+2. 10
+3. 50
+4. 75
+5. 100
+6. 150
+7. 250
+8. 500
+9. 750
+10. 1000
+11. 2500
+12. 5000
+13. 7500
+14. 10000
+15. 15000
+
+<center>
+<ModAsset location="oritech:area/accelerator_speed_area" width={600} />
+</center>
+
+---
+
+## Accelerator Design
+
+Particle accelerators can be built in various ways, depending on their goals. A straight line of motors can shoot particles at something,
+but higher speeds are more efficiently reached with a circular design. Very large rings might be needed to reach certain elements. Slow particles require guide rings to be close together,
+so starting in a small ring and then using redstone to move to a larger ring often makes sense.
+
+Multiple ring stages might be necessary for some cases.
+
+---
+
+## Dimensional Incursions
+
+<Callout variant="warning">
+    This section is based on notes from experimental researchers, and is not officially endorsed by Oritech Inc.
+</Callout>
+
+When certain elements collide with excessive energy, they can rip a hole in space-time, leading to a small dimensional incursion.
+The energy required to achieve this is immense, and little is known about these incursions and their triggers.
+Researchers have noted that colliding fire charges with a collision energy over 5000 J seems to bring the Nether closer.
+Ender pearls with more than 10000 J appear to do the same for the End dimension.
+
+There are unsettling rumors of reckless scientists attempting to bombard these incursion points with speeds that defy known measurement methods,
+aiming to create singularities of their own. However, none have returned to share their findings, leaving their fates shrouded in mystery. Ever since,
+sensors are recording a mysterious tachyon stream from the site of the experiment.

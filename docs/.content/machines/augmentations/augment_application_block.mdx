@@ -1,0 +1,91 @@
+---
+title: Cybernetic Augmentation Center
+id: oritech:augment_application_block
+type: block
+custom:
+    RF Capacity: "500,000,000"
+    Max RF input: "50,000,000"
+    Cores required: "10"
+    Research station slots: "3"
+---
+
+The Cybernetic Augmentation Center is the primary facility for 
+researching and installing permanent upgrades to your body. 
+These augmentations provide various benefits, ranging from passive 
+stat boosts to entirely new abilities.
+
+<Callout variant="warning">
+    Congratulations! If **from the moment you understood the weakness of your flesh, it disgusted you**,
+    then you are our ideal customer. You crave the strength and certainty of steel, and *Oritech Inc*
+    is happy to oblige.
+
+    Please remember that once you aspire to the purity of the blessed machine, there is no going back.
+    All augmentations are permanent, and may cause an inexplicable urge to refer to
+    your former peers as "crude biomass."
+</Callout>
+
+
+---
+
+# Research and Development
+
+To begin your transformation, simply walk into the assembled **Cybernetic Augmentation Center**. 
+This grants access to the research interface, where you can browse and initiate projects. 
+Each augmentation requires specific energy and resources, drawn from either your personal inventory or 
+the machine's internal storage (accessible via the interface).
+
+Advancement is iterative; many high-tier upgrades require prerequisite research, as visualized in the tech tree.
+
+The center acts as a hub for **Research Stations**, constructed as multiblock add-ons. The main unit supports 
+up to **three stations**, allowing for parallel processing.
+*   Each station requires **3 Machine Cores**.
+*   A station handles one active research task at a time.
+
+<center>
+<ModAsset location="oritech:area/cyborg_research_ui" width={700} />
+</center>
+
+<Callout variant="info">
+    Researched Augments are stored locally within the machine's memory. If the center is
+    destroyed, all unapplied research progress and blueprints will be lost.
+</Callout>
+
+---
+
+# Application and Control
+
+Once a research is complete, the augmentation becomes available for installation. The procedure requires a one-time resource cost
+to permanently fuse the technology with your player.
+
+If you have augmentations installed, you can load them into the machine using the **Import** 
+function (bottom-left UI button).
+
+**Augmentation Management**:
+Your enhancements are designed for permantent usage: they require no maintenance or ongoing energy cost. 
+However, should an ability prove distracting (like **Ore Vision** or **Hyper Speed**), it can be toggled at will.
+
+*   **Toggle Menu**: Hold the augmentation hotkey (**[G]** by default) to open the radial interface. Hover over the desired 
+augment and release to switch its state.
+*   **Removal**: While augmentations are intended to be permanent, they can be surgically removed if necessary. 
+Note that resources invested in the installation are non-refundable.
+
+<center>
+<ModAsset location="oritech:area/cyborg_ui" width={700} />
+</center>
+
+---
+
+**Information for Modpack Developers**
+
+Oritech augmentations are fully data-driven and configurable, allowing for extensive customization via datapacks.
+
+*   **Modifier Augments**: Alter entity attributes (e.g., speed, reach, health).
+*   **Effect Augments**: Apply status effects similar to potions.
+*   **Custom Augments**: Implement unique logic (e.g., Ore Vision). These can be referenced in datapacks but require a Java 
+mod for the underlying logic.
+
+Existing augments can be modified or disabled, and completely new ones can be defined via JSON.
+*   **Example Definition**: [Attack Damage Augment (GitHub)](https://github.com/Rearth/Oritech/blob/1.21/fabric/src/main/generated/data/oritech/recipe/augment/attackdamage.json)
+*   **Texture Location**: `oritech/textures/gui/augment`
+
+Please remember to include translation entries for any custom additions.
