@@ -139,10 +139,10 @@ subprojects {
             from(configurations.commonResources)
             
             // copy wiki folder to assets
-//            from("$rootDir/docs") {
-//                into "assets/oracle_index/books/oritech"
-//                exclude '.assets/item/**' // items are rendered in-game as actual item components, no need to include them here
-//            }
+            from("$rootDir/docs") {
+                into "assets/oracle_index/books/oritech"
+                exclude '.assets/item/**' // items are rendered in-game as actual item components, no need to include them here
+            }
         
             inputs.property 'version', project.version
             filesMatching(['META-INF/neoforge.mods.toml', "fabric.mod.json"]) {
