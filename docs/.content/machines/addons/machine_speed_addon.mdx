@@ -2,15 +2,20 @@
 title: Speed Addon
 id: oritech:machine_speed_addon
 type: block
+custom:
+    Speed: "+50%"
+    Energy efficiency: "-20%"
 ---
 
 The Speed Addon is used to accelerate the processing time of a machine.
-It reduces the base time required for each processing cycle by 50%.
+With the default additive addon setting, it adds 50% speed, meaning the
+machine runs at 150% of its normal speed. A recipe that would normally
+take 100 ticks will therefore finish in about 67 ticks.
 
 However, this performance boost comes at the cost of energy efficiency,
 increasing the energy consumption of the machine by 20%.
 Multiple speed addons can be used on a single machine to further
-decrease processing time.
+increase total speed.
 
 Applicable to all machines that consume energy each tick they work.
 
@@ -18,8 +23,8 @@ Applicable to all machines that consume energy each tick they work.
 
 **Processing multiplied**
 
-When multiple speed addons are used, their effects are combined.
-For example, two speed addons will reduce the processing time to 25% of the
-original value (50% of 50%).
-This allows for extremely fast processing at the cost of significantly
+When multiple speed addons are used, their speed bonuses are added together.
+For example, two speed addons give a total speed bonus of +100%, so the
+machine runs at 200% speed and a 100-tick recipe finishes in 50 ticks.
+This allows for much faster processing at the cost of significantly
 higher power requirements.

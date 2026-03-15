@@ -1,0 +1,49 @@
+---
+title: Reactor Design Principles
+icon: oritech:area/reactor
+---
+
+You can design your reactors as you wish. In general, dual or quad rods are more fuel-usage efficient, as they generate more total RF per pellet, but are also
+much harder to cool.
+
+You can use active cooling with heat absorbers, or passive cooling with just heat vents. When surrounded by active components on all sides, a single absorber
+may absorb up to 16 * 4 = 64 heat per tick, but it does require ice to work. You can create ice from water with the industrial chiller.
+
+A single heat vent can vent heat based on the hottest neighboring block. At 1000 C, it will vent 14 heat, and at 0 C just 4. Depending on your
+goals you probably want to either spread the heat with heat spreaders to many vents, or surround a few absorbers with heat pipes.
+
+<div onlineOnly="true" >
+Based on the provided formulas, here is a small table that did some of the math for you:
+| Rod Type   | Rod Count | Internal Pulses | External Pulses | Total Pulses | Heat Generated | RF Generated | Vents needed at 0 C | Vents needed at 1000 C | Absorber contacts needed |
+| ---------- | --------- | --------------- | --------------- | ------------ | -------------- | ------------ | ------------------- | ---------------------- | ------------------------ |
+| single rod | 1         | 1               | 0               | 1            | 4              | 32           | 1                   | 1                      | 1                        |
+|            | 1         | 1               | 1               | 2            | 6              | 64           | 2                   | 1                      | 1                        |
+|            | 1         | 1               | 2               | 3            | 8              | 96           | 2                   | 1                      | 1                        |
+|            | 1         | 1               | 4               | 5            | 16             | 160          | 4                   | 2                      | 1                        |
+| double rod | 2         | 4               | 0               | 4            | 12             | 128          | 3                   | 1                      | 1                        |
+|            | 2         | 4               | 1               | 5            | 16             | 160          | 4                   | 2                      | 1                        |
+|            | 2         | 4               | 2               | 6            | 22             | 192          | 6                   | 2                      | 2                        |
+|            | 2         | 4               | 4               | 8            | 36             | 256          | 9                   | 3                      | 3                        |
+|            | 2         | 4               | 8               | 12           | 76             | 384          | 19                  | 6                      | 5                        |
+| quad rod   | 4         | 12              | 0               | 12           | 76             | 384          | 19                  | 6                      | 5                        |
+|            | 4         | 12              | 1               | 13           | 88             | 416          | 22                  | 7                      | 6                        |
+|            | 4         | 12              | 2               | 14           | 102            | 448          | 26                  | 8                      | 7                        |
+|            | 4         | 12              | 4               | 16           | 132            | 512          | 33                  | 10                     | 9                        |
+|            | 4         | 12              | 8               | 20           | 204            | 640          | 51                  | 15                     | 13                       |
+|            | 4         | 12              | 16              | 28           | 396            | 896          | 99                  | 29                     | 25                       |
+</div>
+
+Reactor design can vary. A small reactor may be good enough for early to mid-game power generation, while massive reactors may be needed in the late game.
+When testing designs, it is often advisable to use small pellets to allow faster shutdown should the reactor begin overheating.
+
+Usually a few fuel rods are surrounded by heat pipes and cooling components, as below:
+
+<center>
+<ModAsset location="oritech:area/reactor_small_layout" width={500} />
+</center>
+
+For bigger reactors with denser rods, you will need a lot more cooling. Note that not all interior blocks need to be filled:
+
+<center>
+<ModAsset location="oritech:area/reactor_bigger_layout" width={500} />
+</center>

@@ -2,6 +2,8 @@
 title: Machine Frame
 id: oritech:machine_frame_block
 type: block
+custom:
+    Max frame length: "64 blocks"
 ---
 
 The Machine Frame is the structural backbone of Oritech's larger
@@ -23,6 +25,8 @@ It is required for constructing the following machines:
 - **[Placer Block](@oritech:placer_block)**
 - **[Fertilizer Block](@oritech:fertilizer_block)**
 
-When building these machines, the frames define the working length and
-area.
-Refer to the specific machine documentation for their usage.
+The machines always target the blocks below the frame, and they cannot be placed on the corners.
+
+Multiple compatible machines can operate on the same frame. They iterate through the frame area rather than requiring one dedicated frame each.
+
+Most frame-based machines can use the usual addon set, and speed addons improve both movement speed and work speed.

@@ -3,28 +3,11 @@
     "name": "\uD83D\uDCD5 Getting Started",
     "icon": null
   },
-  "resources": {
-    "name": "\uD83E\uDEA8 Resources",
-    "icon": null
-  },
-  "tools": {
-    "name": "\uD83D\uDD28 Tools",
-    "icon": null
-  },
-  "logistics": {
-    "name": "\uD83D\uDEDE Logistics",
-    "icon": null
-  },
-  "processing": {
-    "name": "\uD83D\uDEE0 Processing",
-    "icon": null
-  },
-  "interaction": {
-    "name": "\uD83E\uDEF3 World Interaction",
-    "icon": null
-  },
-  "arcane": {
-    "name": "\uD83E\uDE84 Arcane",
+  "multiblocks.mdx": "Multiblocks",
+  "addons.mdx": "Addons",
+  "particle_accelerator.mdx": "Particle Accelerator",
+  "reactor": {
+    "name": "☢\uFE0F Nuclear Reactors",
     "icon": null
   }
 }
