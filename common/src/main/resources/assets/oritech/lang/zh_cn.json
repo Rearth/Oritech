@@ -1,6 +1,7 @@
 {
   "oracle_index.title.oritech": "Oritech",
   "advancements.oritech.begin": "Oritech",
+  "key.oritech.hotkey_category": "Oritech",
   "advancements.oritech.begin.description": "“锱铢必掘” —— 从获取一些粗镍开始你的科技冒险之路。尽情闪耀吧，你这疯狂的矿工！",
   "advancements.oritech.generator": "蓄力待发！",
   "advancements.oritech.generator.description": "用基础发电机产生一些重要能量。很“机动”人心，不是吗？",
@@ -54,7 +55,7 @@
   "advancements.oritech.unholy.description": "获得一个堕落智能。知识就是力量，但这个是别的东西！",
   "advancements.oritech.steam_engine": "氤氲幻境",
   "advancements.oritech.steam_engine.description": "驯化蒸汽之力！你已经把水转化成了能量，祈祷它不会进一步变为混乱的热点吧！",
-  "key.oritech.augment_screen": "（按住）植入体控制 [Oritech]",
+  "key.oritech.augment_screen": "Implant Controls [Hold]",
   "oritech.text.augment.hpboost": "钢铸骨架",
   "oritech.text.augment.hpboost.desc": "植入一个耐用的钢架以提高你身体的抗性。",
   "oritech.text.augment.hpboost.desc.1": "增加6点（3颗心）最大生命值。",

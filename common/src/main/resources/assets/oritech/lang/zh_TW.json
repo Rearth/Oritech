@@ -1,6 +1,7 @@
 {
   "oracle_index.title.oritech": "Oritech",
   "advancements.oritech.begin": "Oritech",
+  "key.oritech.hotkey_category": "Oritech",
   "advancements.oritech.begin.description": "鎳與微光 - 開啟你的科技冒險，取得一些鎳原礦。閃耀吧，瘋狂的礦工！",
   "advancements.oritech.generator": "啟動電力！",
   "advancements.oritech.generator.description": "用基礎發電機產生強大電力。是不是很電力十足？",
@@ -54,7 +55,7 @@
   "advancements.oritech.unholy.description": "取得黑科技智慧。知識就是力量，但這是超乎想像！",
   "advancements.oritech.steam_engine": "蒸汽夢想",
   "advancements.oritech.steam_engine.description": "掌握蒸汽力量！你把水變成能量——希望不會變成一場熱災！",
-  "key.oritech.augment_screen": "(長按）植入控制 [Oritech]",
+  "key.oritech.augment_screen": "Implant Controls [Hold]",
   "oritech.text.augment.hpboost": "鋼製框架",
   "oritech.text.augment.hpboost.desc": "整合耐用的框架，增強身體的彈性。",
   "oritech.text.augment.hpboost.desc.1": "最大生命值增加 6 點（3 顆心）。",

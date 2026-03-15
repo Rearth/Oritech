@@ -1,6 +1,7 @@
 {
   "oracle_index.title.oritech": "Орітех",
   "advancements.oritech.begin": "Орітех",
+  "key.oritech.hotkey_category": "Орітех",
   "advancements.oritech.begin.description": "Нікель та Дайм - Почніть свою технологічну пригоду, отримавши трохи сирого нікелю. Сяй, на шибенику!",
   "advancements.oritech.generator": "Нова сила!",
   "advancements.oritech.generator.description": "Згенерувати серйозну потужність з основним генератором. Електрифікація, чи не так?",
@@ -54,7 +55,7 @@
   "advancements.oritech.unholy.description": "Набути нечестивого розуму. Знання - це сила, але це щось інше!",
   "advancements.oritech.steam_engine": "Парова мрія",
   "advancements.oritech.steam_engine.description": "Сила Пару! Ви перетворили воду в енергію - тепер сподіваємося, що вона не перетвориться на гарячий безлад!",
-  "key.oritech.augment_screen": "(Утримувати) Керування імплантатами [Oritech]",
+  "key.oritech.augment_screen": "Implant Controls [Hold]",
   "oritech.text.augment.hpboost": "Сталева рама",
   "oritech.text.augment.hpboost.desc": "Інтегрує міцний каркас, підвищуючи стійкість вашого тіла.",
   "oritech.text.augment.hpboost.desc.1": "Збільшує максимальне здоров'я на 6 (3 серця).",

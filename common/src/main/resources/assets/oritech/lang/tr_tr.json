@@ -1,6 +1,7 @@
 {
   "oracle_index.title.oritech": "Oritech",
   "advancements.oritech.begin": "Oritech",
+  "key.oritech.hotkey_category": "Oritech",
   "advancements.oritech.begin.description": "Nikel & Dime - Teknolojik maceranıza biraz ham nikel elde ederek başlayın. Parla, seni çılgın madenci!",
   "advancements.oritech.generator": "Gücü Aç!",
   "advancements.oritech.generator.description": "Basit bir jeneratörle ciddi bir güç üretin. Heyecan verici, değil mi?",
@@ -54,7 +55,7 @@
   "advancements.oritech.unholy.description": "Kutsal olmayan bir zeka edinin. Bilgi güçtür, ama bu başka bir şey!",
   "advancements.oritech.steam_engine": "Buhar Düşleri",
   "advancements.oritech.steam_engine.description": "Buharın gücünden yararlanın! Suyu enerjiye dönüştürdünüz-şimdi umalım da sıcak bir karmaşaya dönüşmesin!",
-  "key.oritech.augment_screen": "(Basılı Tut) İmplant Kontrolleri [Oritech]",
+  "key.oritech.augment_screen": "Implant Controls [Hold]",
   "oritech.text.augment.hpboost": "Çelik Aşılanmış İskelet",
   "oritech.text.augment.hpboost.desc": "Vücudunuzun direncini artırarak dayanıklı bir iskelet oluşturur.",
   "oritech.text.augment.hpboost.desc.1": "Maksimum sağlığı 6 artırır (3 kalp).",

@@ -1,6 +1,7 @@
 {
   "oracle_index.title.oritech": "Oritech",
   "advancements.oritech.begin": "Oritech",
+  "key.oritech.hotkey_category": "Oritech",
   "advancements.oritech.begin.description": "Níquel e Trocados - Comece sua aventura tecnológica adquirindo um pouco de níquel bruto. Continue brilhando, seu mineiro maluco!",
   "advancements.oritech.generator": "Energizar!",
   "advancements.oritech.generator.description": "Gere uma energia considerável com um gerador básico. Eletrizante, não é?",
@@ -54,7 +55,7 @@
   "advancements.oritech.unholy.description": "Adquira uma inteligência profana. Conhecimento é poder, mas isso é outra coisa!",
   "advancements.oritech.steam_engine": "Sonhos a Vapor",
   "advancements.oritech.steam_engine.description": "Aproveite o poder do vapor! Você transformou água em energia—agora vamos torcer para que não vire uma bagunça quente!",
-  "key.oritech.augment_screen": "(Segurar) Controles de Implante [Oritech]",
+  "key.oritech.augment_screen": "Implant Controls [Hold]",
   "oritech.text.augment.hpboost": "Estrutura com Infusão de Aço",
   "oritech.text.augment.hpboost.desc": "Integra uma estrutura durável, melhorando a resiliência do seu corpo.",
   "oritech.text.augment.hpboost.desc.1": "Aumenta a vida máxima em 6 (3 corações).",

@@ -1,6 +1,7 @@
 {
   "oracle_index.title.oritech": "Oritech",
   "advancements.oritech.begin": "Oritech",
+  "key.oritech.hotkey_category": "Oritech",
   "advancements.oritech.begin.description": "Níquel y Centavos - Comienza tu aventura tecnológica adquiriendo algo de níquel crudo. ¡Brilla, minero loco!",
   "advancements.oritech.generator": "¡Enciende!",
   "advancements.oritech.generator.description": "Genera energía seria con un generador básico. ¡Electrizante, ¿no?!",
@@ -54,7 +55,7 @@
   "advancements.oritech.unholy.description": "Adquiere una inteligencia impía. El conocimiento es poder, ¡pero esto es otra cosa!",
   "advancements.oritech.steam_engine": "Sueños de Vapor",
   "advancements.oritech.steam_engine.description": "¡Aprovecha el poder del vapor! Has convertido agua en energía, ¡esperemos que no se convierta en un desastre ardiente!",
-  "key.oritech.augment_screen": "(Hold) Implant Controls [Oritech]",
+  "key.oritech.augment_screen": "Implant Controls [Hold]",
   "oritech.text.augment.hpboost": "Steel-Infused Frame",
   "oritech.text.augment.hpboost.desc": "Integrates a durable framework, enhancing your body's resilience.",
   "oritech.text.augment.hpboost.desc.1": "Increases maximum health by 6 (3 hearts).",
