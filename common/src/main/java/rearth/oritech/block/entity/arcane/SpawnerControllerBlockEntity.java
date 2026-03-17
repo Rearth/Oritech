@@ -8,9 +8,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,6 +29,11 @@ import rearth.oritech.util.ComparatorOutputProvider;
 import java.util.UUID;
 
 public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity implements BlockEntityTicker<SpawnerControllerBlockEntity>, ComparatorOutputProvider {
+    private static final String[] STRIPPED_MOB_NBT_KEYS = {
+        "ArmorDropChances", "ArmorItems", "BodyArmorDropChance", "body_armor_drop_chance", "BodyArmorItem", "body_armor_item",
+        "CanPickUpLoot", "ChestedHorse", "DecorItem", "HandDropChances", "HandItems", "Inventory", "Item", "Items",
+        "Leash", "Passengers", "SaddleItem"
+    };
     
     public int maxSouls = 100_000;
     public int collectedSouls = 0;
@@ -48,21 +55,19 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, SpawnerControllerBlockEntity blockEntity) {
-        
         if (world.isClientSide) return;
-        
+
+        if (networkDirty) {
+            updateNetwork();
+            DeathListener.resetEvents();
+        }
+
         if (mobNbt.isEmpty() || !hasCage || redstonePowered) return;
         
         if (collectedSouls >= maxSouls && world.getGameTime() % 4 == 0) {
             spawnMob();
             updateComparator();
         }
-        
-        if (networkDirty) {
-            updateNetwork();
-            DeathListener.resetEvents();
-        }
-        
     }
     
     @Override
@@ -84,7 +89,8 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         maxSouls = nbt.getInt("maxSouls");
         collectedSouls = nbt.getInt("souls");
         redstonePowered = nbt.getBoolean("redstone");
-        mobNbt = nbt.getCompound("mobNbt");
+        mobNbt = sanitizeMobNbt(nbt.getCompound("mobNbt"));
+        lastComparatorOutput = getComparatorOutput();
     }
     
     private void spawnMob() {
@@ -98,6 +104,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
             if (targetPosition == null) return null;
             entity.moveTo(Vec3.atLowerCornerOf(targetPosition));
             entity.setUUID(UUID.randomUUID());
+            clearMobEquipment(entity);
             ParticleContent.SOUL_USED.spawn(level, targetPosition.getCenter(), maxSouls);
             
             return entity;
@@ -105,9 +112,9 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         
         if (spawned == null) return;
         
-        networkDirty = true;
         level.addFreshEntity(spawned);
         collectedSouls -= maxSouls;
+        this.setChanged();
         
     }
     
@@ -120,7 +127,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
                 if (state.isAir()) {
                     foundFree++;
                 } else {
-                    if (foundFree > requiredHeight) {
+                    if (foundFree >= requiredHeight) {
                         // found target
                         return candidate.below(j - 1);
                         
@@ -148,6 +155,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
             spawnerEntity.hasCage = message.hasCage;
             spawnerEntity.collectedSouls = message.collectedSouls;
             spawnerEntity.maxSouls = message.maxSouls;
+            spawnerEntity.lastComparatorOutput = spawnerEntity.getComparatorOutput();
             spawnerEntity.loadRendererFromUpdate();
         }
     }
@@ -190,7 +198,9 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     }
     
     public void setRedstonePowered(boolean active) {
+        if (this.redstonePowered == active) return;
         this.redstonePowered = active;
+        this.setChanged();
     }
     
     @Override
@@ -202,8 +212,8 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         var animData = new ParticleContent.SoulParticleData(soulPath, (int) getSoulTravelDuration(distance));
         
         ParticleContent.WANDERING_SOUL.spawn(level, source.add(0, 0.7f, 0), animData);
-        networkDirty = true;
         updateComparator();
+        this.setChanged();
     }
     
     private int getSoulCost(int maxHp) {
@@ -223,9 +233,8 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
             var nbt = new CompoundTag();
             
             mobEntity.save(nbt);
-            this.mobNbt = nbt;
+            this.mobNbt = sanitizeMobNbt(nbt);
             
-            networkDirty = true;
             maxSouls = getSoulCost((int) mobEntity.getMaxHealth());
             
             mobEntity.remove(Entity.RemovalReason.DISCARDED);
@@ -241,8 +250,6 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
             player.sendSystemMessage(Component.translatable("message.oritech.spawner.no_mob"));
             return;
         }
-        
-        networkDirty = true;
         
         reloadCage(player);
         
@@ -281,6 +288,22 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         
         this.setChanged();
     }
+
+    private CompoundTag sanitizeMobNbt(CompoundTag nbt) {
+        var sanitizedNbt = nbt.copy();
+        for (var key : STRIPPED_MOB_NBT_KEYS) {
+            sanitizedNbt.remove(key);
+        }
+        return sanitizedNbt;
+    }
+
+    private void clearMobEquipment(Entity entity) {
+        if (!(entity instanceof Mob mobEntity)) return;
+
+        for (var slot : EquipmentSlot.values()) {
+            mobEntity.setItemSlot(slot, ItemStack.EMPTY);
+        }
+    }
     
     public record SpawnerSyncPacket(BlockPos position, CompoundTag spawnedMob, boolean hasCage, int collectedSouls,
                                     int maxSouls) implements CustomPacketPayload {
@@ -291,8 +314,5 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         public Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;
         }
-    }
-    
-    {
     }
 }
