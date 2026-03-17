@@ -9,6 +9,7 @@ import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
@@ -85,6 +86,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
             return 0L;
         }
     };
+
+    private BlockLookupCache<EnergyApi.EnergyStorage> cachedOutputTarget;
     
     public ExpandableEnergyStorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -114,10 +117,13 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
         if (energyStorage.amount <= 0) return;
         
         chargeItems();
-        
-        // todo caching for targets? Used to be BlockApiCache.create()
-        var target = getOutputPosition(worldPosition, getFacing());
-        var candidate = EnergyApi.BLOCK.find(level, target.getB(), target.getA().getOpposite());
+
+        if (cachedOutputTarget == null) {
+            var target = getOutputPosition(worldPosition, getFacing());
+            cachedOutputTarget = EnergyApi.BLOCK.createCache(level, target.getB(), target.getA().getOpposite());
+        }
+
+        var candidate = cachedOutputTarget.find();
         if (candidate != null && candidate.supportsInsertion()) {
             EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }

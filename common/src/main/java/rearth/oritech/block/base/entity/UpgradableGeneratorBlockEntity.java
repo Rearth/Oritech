@@ -18,6 +18,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -31,7 +32,6 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBlockEntity {
-    
     @SyncField
     public int currentMaxBurnTime; // needed only for progress display and animation speed
     private List<ItemStack> pendingOutputs = new ArrayList<>(); // used if a recipe produces a byproduct at the end
@@ -47,6 +47,8 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             return super.insert(toInsert, simulate);
         }
     };
+
+    private List<BlockLookupCache<EnergyApi.EnergyStorage>> cachedOutputTargets = List.of();
     
     // speed multiplier increases output rate and reduces burn time by same percentage
     // efficiency multiplier only increases burn time
@@ -220,10 +222,15 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         if (energyStorage.getAmount() <= 0) return;
         
         var moved = 0L;
-        
-        // todo caching for targets? Used to be BlockApiCache.create()
-        for (var target : getOutputTargets(worldPosition, level)) {
-            var candidate = EnergyApi.BLOCK.find(level, target.getA(), target.getB());
+
+        if (cachedOutputTargets.isEmpty()) {
+            cachedOutputTargets = getOutputTargets(worldPosition, level).stream()
+                                    .map(target -> EnergyApi.BLOCK.createCache(level, target.getA(), target.getB()))
+                                    .toList();
+        }
+
+        for (var target : cachedOutputTargets) {
+            var candidate = target.find();
             if (candidate != null)
                 moved += EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }

@@ -1,6 +1,7 @@
 package rearth.oritech.api.fluid;
 
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.lookup.BlockLookupCache;
 
 import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
@@ -17,4 +18,6 @@ public interface BlockFluidApi {
     FluidApi.FluidStorage find(Level world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction);
     
     FluidApi.FluidStorage find(Level world, BlockPos pos, @Nullable Direction direction);
+
+    BlockLookupCache<FluidApi.FluidStorage> createCache(Level world, BlockPos pos, @Nullable Direction direction);
 }

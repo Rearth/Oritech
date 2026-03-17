@@ -1,6 +1,7 @@
 package rearth.oritech.api.energy;
 
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.lookup.BlockLookupCache;
 
 import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
@@ -17,5 +18,7 @@ public interface BlockEnergyApi {
     EnergyApi.EnergyStorage find(Level world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction);
     
     EnergyApi.EnergyStorage find(Level world, BlockPos pos, @Nullable Direction direction);
+
+    BlockLookupCache<EnergyApi.EnergyStorage> createCache(Level world, BlockPos pos, @Nullable Direction direction);
     
 }

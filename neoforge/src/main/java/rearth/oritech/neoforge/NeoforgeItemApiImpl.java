@@ -3,11 +3,13 @@ package rearth.oritech.neoforge;
 import com.google.auto.service.AutoService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -18,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.BlockItemApi;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.lookup.BlockLookupCache;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -50,6 +53,22 @@ public class NeoforgeItemApiImpl implements BlockItemApi {
     @Override
     public ItemApi.InventoryStorage find(Level world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
+    }
+
+    @Override
+    public BlockLookupCache<ItemApi.InventoryStorage> createCache(Level world, BlockPos pos, @Nullable Direction direction) {
+        if (world instanceof ServerLevel serverLevel) {
+            var cache = BlockCapabilityCache.create(Capabilities.ItemHandler.BLOCK, serverLevel, pos, direction);
+            return BlockLookupCache.of(() -> wrapInventory(cache.getCapability()));
+        }
+
+        return BlockLookupCache.of(() -> wrapInventory(world.getCapability(Capabilities.ItemHandler.BLOCK, pos, null, null, direction)));
+    }
+
+    private @Nullable ItemApi.InventoryStorage wrapInventory(@Nullable IItemHandler candidate) {
+        if (candidate == null) return null;
+        if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
+        return new NeoforgeStoragerWrapper(candidate);
     }
     
     // used to interact with storages from other mods. Oritech really only uses the insert/extract methods, not the insertToSlot/extractFromSlot variants.

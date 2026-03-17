@@ -24,11 +24,10 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
-    
     private static final int TRANSFER_AMOUNT = Oritech.CONFIG.itemPipeTransferAmount();
     private static final int TRANSFER_PERIOD = Oritech.CONFIG.itemPipeIntervalDuration();
     
-    private List<Tuple<ItemApi.InventoryStorage, BlockPos>> filteredTargetItemStorages;
+    private List<CachedTarget<ItemApi.InventoryStorage>> filteredTargetItemStorages;
     
     // item path cache (invalidated on network update)
     private final HashMap<BlockPos, Tuple<ArrayList<BlockPos>, Integer>> cachedTransferPaths = new HashMap<>();
@@ -60,6 +59,13 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         // try to move it to one of the destinations
         
         var data = ItemPipeBlock.ITEM_PIPE_DATA.getOrDefault(world.dimension().location(), new PipeNetworkData());
+        var targets = findNetworkTargets(pos, data);
+        if (targets == null) {
+            System.err.println("Yeah your pipe network likely is too long. At: " + this.getBlockPos());
+            return;
+        }
+
+        refreshTargetCaches(world, pos, targets);
         
         var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
         var stackToMove = ItemStack.EMPTY;
@@ -96,42 +102,18 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 
                 if (stackToMove.isEmpty()) continue;
                 
-                var targets = findNetworkTargets(pos, data);
-                if (targets == null) {
-                    System.err.println("Yeah your pipe network likely is too long. At: " + this.getBlockPos());
-                    return;
-                }
-                
-                var netHash = targets.hashCode();
-                
-                if (netHash != filteredTargetsNetHash || filteredTargetItemStorages == null) {
-                    filteredTargetItemStorages = targets.stream()
-                                                   .filter(target -> {
-                                                       var targetDir = target.getB();
-                                                       var pipePos = target.getA().offset(targetDir.getNormal());
-                                                       var pipeState = world.getBlockState(pipePos);
-                                                       if (!(pipeState.getBlock() instanceof ItemPipeConnectionBlock itemBlock))
-                                                           return true;   // edge case, this should never happen
-                                                       var extracting = itemBlock.isSideExtractable(pipeState, targetDir.getOpposite());
-                                                       return !extracting;
-                                                   })
-                                                   .map(target -> new Tuple<>(ItemApi.BLOCK.find(world, target.getA(), target.getB()), target.getA()))
-                                                   .filter(obj -> Objects.nonNull(obj.getA()) && obj.getA().supportsInsertion())
-                                                   .sorted(Comparator.comparingInt(a -> a.getB().distManhattan(pos)))
-                                                   .toList();
-                    
-                    filteredTargetsNetHash = netHash;
-                    cachedTransferPaths.clear();
-                }
-                
                 var remainingToMove = stackToMove.getCount();
                 var moved = 0;
                 
-                for (var storagePair : filteredTargetItemStorages) {
-                    if (storagePair.getA().equals(moveFromInventory))
+                for (var cachedTarget : filteredTargetItemStorages) {
+                    if (cachedTarget.pos().equals(takenFrom))
                         continue;    // skip when targeting same machine
+
+                    var targetStorage = cachedTarget.lookup().find();
+                    if (targetStorage == null || !targetStorage.supportsInsertion()) {
+                        continue;
+                    }
                     
-                    var targetStorage = storagePair.getA();
                     var wasEmptyStorage = IntStream.range(0, targetStorage.getSlotCount()).allMatch(slot -> targetStorage.getStackInSlot(slot).isEmpty());
                     
                     var inserted = targetStorage.insert(stackToMove.copyWithCount(remainingToMove), false);
@@ -139,7 +121,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                     moved += inserted;
                     
                     if (inserted > 0) {
-                        onItemMoved(this.worldPosition, takenFrom, storagePair.getB(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.worldPosition, 0), new HashSet<>()), world, stackToMove.getItem(), inserted, wasEmptyStorage);
+                        onItemMoved(this.worldPosition, takenFrom, cachedTarget.pos(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.worldPosition, 0), new HashSet<>()), world, stackToMove.getItem(), inserted, wasEmptyStorage);
                     }
                     
                     if (remainingToMove <= 0) break;  // target has been found for all items
@@ -162,6 +144,30 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
         if (moveCapacity > TRANSFER_AMOUNT) onBoostUsed();
         
+    }
+
+    private void refreshTargetCaches(Level world, BlockPos pos, Set<Tuple<BlockPos, Direction>> targets) {
+        var netHash = targets.hashCode();
+        if (netHash == filteredTargetsNetHash && filteredTargetItemStorages != null) {
+            return;
+        }
+
+        filteredTargetItemStorages = targets.stream()
+                                       .filter(target -> {
+                                           var targetDir = target.getB();
+                                           var pipePos = target.getA().offset(targetDir.getNormal());
+                                           var pipeState = world.getBlockState(pipePos);
+                                           if (!(pipeState.getBlock() instanceof ItemPipeConnectionBlock itemBlock))
+                                               return true;
+                                           var extracting = itemBlock.isSideExtractable(pipeState, targetDir.getOpposite());
+                                           return !extracting;
+                                       })
+                                       .map(target -> new CachedTarget<>(target.getA(), target.getB(), ItemApi.BLOCK.createCache(world, target.getA(), target.getB())))
+                                       .sorted(Comparator.comparingInt(target -> target.pos().distManhattan(pos)))
+                                       .toList();
+
+        filteredTargetsNetHash = netHash;
+        cachedTransferPaths.clear();
     }
     
     private void onItemMoved(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, Level world, Item moved, int movedCount, boolean wasEmpty) {

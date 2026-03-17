@@ -5,12 +5,14 @@ import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -27,6 +29,7 @@ import rearth.oritech.api.fluid.FluidApi.FluidStorage;
 import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.api.fluid.containers.DelegatingFluidStorage;
 import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
+import rearth.oritech.api.lookup.BlockLookupCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +98,16 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     public FluidApi.FluidStorage find(Level world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
     }
+
+    @Override
+    public BlockLookupCache<FluidApi.FluidStorage> createCache(Level world, BlockPos pos, @Nullable Direction direction) {
+        if (world instanceof ServerLevel serverLevel) {
+            var cache = BlockCapabilityCache.create(Capabilities.FluidHandler.BLOCK, serverLevel, pos, direction);
+            return BlockLookupCache.of(() -> wrapStorage(cache.getCapability()));
+        }
+
+        return BlockLookupCache.of(() -> wrapStorage(world.getCapability(Capabilities.FluidHandler.BLOCK, pos, null, null, direction)));
+    }
     
     @Override
     public FluidApi.FluidStorage find(StackContext stack) {
@@ -103,6 +116,16 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         if (candidate == null) return null;
         if (candidate instanceof SingleSlotContainerStorageWrapper wrapper && wrapper.container instanceof SimpleItemFluidStorage itemContainer) return itemContainer.withCallback(ignored -> stack.sync());
         return new NeoforgeItemStorageWrapper(candidate, stack);
+    }
+
+    private @Nullable FluidApi.FluidStorage wrapStorage(@Nullable IFluidHandler candidate) {
+        return switch (candidate) {
+            case null -> null;
+            case SingleSlotContainerStorageWrapper wrapper -> wrapper.container;
+            case MultiSlotStorageWrapper wrapper -> wrapper.container;
+            case DelegatingContainerStorageWrapper wrapper -> wrapper.container;
+            default -> new NeoforgeStorageWrapper(candidate);
+        };
     }
     
     // used to interact with tanks from other mods

@@ -1,6 +1,7 @@
 package rearth.oritech.fabric;
 
 import com.google.auto.service.AutoService;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
@@ -13,6 +14,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -25,6 +27,7 @@ import rearth.oritech.api.fluid.BlockFluidApi;
 import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.api.item.BlockItemApi;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.lookup.BlockLookupCache;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -50,6 +53,22 @@ public class FabricItemApi implements BlockItemApi {
     @Override
     public ItemApi.InventoryStorage find(Level world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
+    }
+
+    @Override
+    public BlockLookupCache<ItemApi.InventoryStorage> createCache(Level world, BlockPos pos, @Nullable Direction direction) {
+        if (world instanceof ServerLevel serverLevel) {
+            var cache = BlockApiCache.create(ItemStorage.SIDED, serverLevel, pos);
+            return BlockLookupCache.of(() -> wrapInventory(cache.find(direction)));
+        }
+
+        return BlockLookupCache.of(() -> wrapInventory(ItemStorage.SIDED.find(world, pos, null, null, direction)));
+    }
+
+    private @Nullable ItemApi.InventoryStorage wrapInventory(@Nullable Storage<ItemVariant> candidate) {
+        if (candidate == null) return null;
+        if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
+        return new FabricStorageWrapper(candidate);
     }
     
     // used to interact with storages from other mods

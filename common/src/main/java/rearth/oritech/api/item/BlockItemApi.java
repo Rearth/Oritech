@@ -1,6 +1,7 @@
 package rearth.oritech.api.item;
 
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.lookup.BlockLookupCache;
 
 import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
@@ -17,4 +18,6 @@ public interface BlockItemApi {
     ItemApi.InventoryStorage find(Level world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction);
     
     ItemApi.InventoryStorage find(Level world, BlockPos pos, @Nullable Direction direction);
+
+    BlockLookupCache<ItemApi.InventoryStorage> createCache(Level world, BlockPos pos, @Nullable Direction direction);
 }

@@ -13,10 +13,11 @@ import rearth.oritech.init.BlockEntitiesContent;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Tuple;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,7 +27,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     public static final int MAX_TRANSFER_RATE = (int) (FluidStackHooks.bucketAmount() * Oritech.CONFIG.fluidPipeExtractAmountBuckets());
     private static final int TRANSFER_PERIOD = Oritech.CONFIG.fluidPipeExtractIntervalDuration();
     
-    private List<FluidApi.FluidStorage> filteredFluidTargetsCached;
+    private List<CachedTarget<FluidApi.FluidStorage>> filteredFluidTargetsCached;
     
     public FluidPipeInterfaceEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.FLUID_PIPE_ENTITY, pos, state);
@@ -93,32 +94,16 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             System.err.println("Yeah your pipe network likely is too long. At: " + this.getBlockPos());
             return;
         }
-        
-        var netHash = targets.hashCode();
-        
-        if (netHash != filteredTargetsNetHash || filteredFluidTargetsCached == null) {
-            filteredFluidTargetsCached = targets.stream()
-                                           .filter(target -> {
-                                               var direction = target.getB();
-                                               var pipePos = target.getA().offset(direction.getNormal());
-                                               var pipeState = world.getBlockState(pipePos);
-                                               if (!(pipeState.getBlock() instanceof FluidPipeConnectionBlock fluidBlock))
-                                                   return true;   // edge case, this should never happen
-                                               var extracting = fluidBlock.isSideExtractable(pipeState, target.getB().getOpposite());
-                                               return !extracting;
-                                           })
-                                           .map(target -> FluidApi.BLOCK.find(world, target.getA(), target.getB()))
-                                           .filter(obj -> Objects.nonNull(obj) && obj.supportsInsertion())
-                                           .collect(Collectors.toList());
-            
-            filteredTargetsNetHash = netHash;
-        }
+
+        refreshTargetCaches(world, targets);
         
         Collections.shuffle(filteredFluidTargetsCached);
         
         var availableFluid = stackToMove.getAmount();
         
-        for (var targetStorage : filteredFluidTargetsCached) {
+        for (var cachedTarget : filteredFluidTargetsCached) {
+            var targetStorage = cachedTarget.lookup().find();
+            if (targetStorage == null || !targetStorage.supportsInsertion()) continue;
             
             var maxInsert = targetStorage.insert(stackToMove, true);
             var taken = takenFrom.extract(stackToMove.copyWithAmount(maxInsert), false);
@@ -137,5 +122,27 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             takenFrom.update();
         }
         
+    }
+
+    private void refreshTargetCaches(Level world, Set<Tuple<BlockPos, Direction>> targets) {
+        var netHash = targets.hashCode();
+        if (netHash == filteredTargetsNetHash && filteredFluidTargetsCached != null) {
+            return;
+        }
+
+        filteredFluidTargetsCached = targets.stream()
+                                       .filter(target -> {
+                                           var direction = target.getB();
+                                           var pipePos = target.getA().offset(direction.getNormal());
+                                           var pipeState = world.getBlockState(pipePos);
+                                           if (!(pipeState.getBlock() instanceof FluidPipeConnectionBlock fluidBlock))
+                                               return true;
+                                           var extracting = fluidBlock.isSideExtractable(pipeState, target.getB().getOpposite());
+                                           return !extracting;
+                                       })
+                                       .map(target -> new CachedTarget<>(target.getA(), target.getB(), FluidApi.BLOCK.createCache(world, target.getA(), target.getB())))
+                                       .collect(Collectors.toList());
+
+        filteredTargetsNetHash = netHash;
     }
 }

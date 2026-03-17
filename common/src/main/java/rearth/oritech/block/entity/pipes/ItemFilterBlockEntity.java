@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
@@ -40,6 +41,7 @@ import java.util.Map;
 public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemApi.BlockProvider, ExtendedMenuProvider {
     
     public final FilterBlockInventory inventory = new FilterBlockInventory(1, this::setChanged);
+    private BlockLookupCache<ItemApi.InventoryStorage> cachedTargetInventory;
     
     @SyncField(SyncType.GUI_OPEN)
     protected FilterData filterSettings = new FilterData(false, true, false, new HashMap<>());
@@ -118,11 +120,13 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
         // if non-empty and inventory in target, move it
         if (inventory.isEmpty()) return;
         
-        var targetDirection = getBlockState().getValue(ItemFilterBlock.TARGET_DIR);
-        var targetPos = pos.offset(targetDirection.getNormal());
-        
-        // todo caching
-        var targetInv = ItemApi.BLOCK.find(world, targetPos, targetDirection);
+        if (cachedTargetInventory == null) {
+            var targetDirection = getBlockState().getValue(ItemFilterBlock.TARGET_DIR);
+            var targetPos = pos.offset(targetDirection.getNormal());
+            cachedTargetInventory = ItemApi.BLOCK.createCache(world, targetPos, targetDirection);
+        }
+
+        var targetInv = cachedTargetInventory.find();
         if (targetInv == null) return;
         
         var firstItem = inventory.heldStacks.getFirst();

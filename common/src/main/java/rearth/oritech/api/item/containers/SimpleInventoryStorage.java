@@ -51,7 +51,10 @@ public class SimpleInventoryStorage implements Container, ItemApi.InventoryStora
             var available = slotLimit - slotStack.getCount();
             var toInsert = Math.min(available, addedStack.getCount());
             if (toInsert > 0) {
-                if (!simulate) slotStack.grow(toInsert);
+                if (!simulate) {
+                    slotStack.grow(toInsert);
+                    this.setChanged();
+                }
                 return toInsert;
             }
         }
@@ -75,7 +78,10 @@ public class SimpleInventoryStorage implements Container, ItemApi.InventoryStora
             return 0;
         
         var toExtract = Math.min(slotStack.getCount(), extracted.getCount());
-        if (!simulate) slotStack.shrink(toExtract);
+        if (!simulate) {
+            slotStack.shrink(toExtract);
+            this.setChanged();
+        }
         return toExtract;
     }
     

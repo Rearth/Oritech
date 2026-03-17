@@ -7,9 +7,9 @@ import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,7 +23,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     private final SimpleEnergyStorage energyStorage;
     private final boolean isSuperConductor;
     
-    private List<EnergyApi.EnergyStorage> cachedTargets = List.of();
+    private List<ExtractablePipeInterfaceEntity.CachedTarget<EnergyApi.EnergyStorage>> cachedTargets = new ArrayList<>();
     private int cacheHash;
     
     public EnergyPipeInterfaceEntity(BlockPos pos, BlockState state) {
@@ -73,24 +73,20 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
         if (targets == null) return;    // this should never happen
         
         var targetHash = targets.hashCode();
-        
-        List<EnergyApi.EnergyStorage> energyStorages;
-        
-        if (this.cacheHash == targetHash) {
-            energyStorages = this.cachedTargets;
-        } else {
-            energyStorages = targets.stream()
-                               .map(target -> EnergyApi.BLOCK.find(world, target.getA(), target.getB()))
-                               .filter(obj -> Objects.nonNull(obj) && obj.supportsInsertion())
-                               .collect(Collectors.toList());
-            this.cachedTargets = energyStorages;
+
+        if (this.cacheHash != targetHash) {
+            this.cachedTargets = targets.stream()
+                                   .map(target -> new ExtractablePipeInterfaceEntity.CachedTarget<>(target.getA(), target.getB(), EnergyApi.BLOCK.createCache(world, target.getA(), target.getB())))
+                                   .collect(Collectors.toList());
             this.cacheHash = targetHash;
         }
         
-        Collections.shuffle(energyStorages);
+        Collections.shuffle(this.cachedTargets);
         
-        for (var targetStorage : energyStorages) {
+        for (var cachedTarget : this.cachedTargets) {
             if (energyStorage.getAmount() <= 0) break;
+            var targetStorage = cachedTarget.lookup().find();
+            if (targetStorage == null || !targetStorage.supportsInsertion()) continue;
             EnergyApi.transfer(energyStorage, targetStorage, Long.MAX_VALUE, false);
         }
         

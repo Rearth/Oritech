@@ -2,6 +2,8 @@ package rearth.oritech.block.base.entity;
 
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.api.lookup.BlockLookupCache;
+import java.util.List;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -15,8 +17,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements EnergyApi.BlockProvider, BlockEntityTicker<PassiveGeneratorBlockEntity> {
-    
     protected final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(0, 5_000, 200_000, this::setChanged);
+    private List<BlockLookupCache<EnergyApi.EnergyStorage>> cachedOutputTargets = List.of();
     
     public PassiveGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -39,9 +41,15 @@ public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements
     
     private void outputEnergy() {
         if (energyStorage.getAmount() <= 0) return;
-        
-        for (var target : getOutputTargets(worldPosition, level)) {
-            var candidate = EnergyApi.BLOCK.find(level, target.getA(), target.getB());
+
+        if (cachedOutputTargets.isEmpty()) {
+            cachedOutputTargets = getOutputTargets(worldPosition, level).stream()
+                                    .map(target -> EnergyApi.BLOCK.createCache(level, target.getA(), target.getB()))
+                                    .toList();
+        }
+
+        for (var target : cachedOutputTargets) {
+            var candidate = target.find();
             if (candidate != null)
                 EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }

@@ -6,10 +6,12 @@ import dev.technici4n.grandpower.impl.NonLongWrapper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +22,7 @@ import rearth.oritech.api.energy.BlockEnergyApi;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.ItemEnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
+import rearth.oritech.api.lookup.BlockLookupCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +80,23 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     @Override
     public EnergyApi.EnergyStorage find(Level world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
+    }
+
+    @Override
+    public BlockLookupCache<EnergyApi.EnergyStorage> createCache(Level world, BlockPos pos, @Nullable Direction direction) {
+        if (world instanceof ServerLevel serverLevel) {
+            var cache = BlockCapabilityCache.create(ILongEnergyStorage.BLOCK, serverLevel, pos, direction);
+            return BlockLookupCache.of(() -> wrapStorage(cache.getCapability()));
+        }
+
+        return BlockLookupCache.of(() -> wrapStorage(world.getCapability(ILongEnergyStorage.BLOCK, pos, null, null, direction)));
+    }
+
+    private @Nullable EnergyApi.EnergyStorage wrapStorage(@Nullable ILongEnergyStorage candidate) {
+        if (candidate == null) return null;
+        if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
+        if (candidate instanceof NonLongWrapper outerWrapper && outerWrapper.storage() instanceof ContainerStorageWrapper wrapper) return wrapper.container;
+        return new NeoforgeStorageWrapper(candidate);
     }
     
     // this is used to interact with energy storages from other mods

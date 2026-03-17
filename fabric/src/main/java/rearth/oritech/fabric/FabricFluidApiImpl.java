@@ -4,6 +4,7 @@ import com.google.auto.service.AutoService;
 import com.google.common.collect.Streams;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.fabric.FluidStackHooksFabric;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -13,6 +14,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -31,6 +33,7 @@ import rearth.oritech.api.fluid.FluidApi.FluidStorage;
 import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.api.fluid.containers.DelegatingFluidStorage;
 import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
+import rearth.oritech.api.lookup.BlockLookupCache;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -91,6 +94,16 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     public FluidApi.FluidStorage find(Level world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
     }
+
+    @Override
+    public BlockLookupCache<FluidApi.FluidStorage> createCache(Level world, BlockPos pos, @Nullable Direction direction) {
+        if (world instanceof ServerLevel serverLevel) {
+            var cache = BlockApiCache.create(net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED, serverLevel, pos);
+            return BlockLookupCache.of(() -> wrapStorage(cache.find(direction)));
+        }
+
+        return BlockLookupCache.of(() -> wrapStorage(net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.find(world, pos, null, null, direction)));
+    }
     
     @Override
     public FluidApi.FluidStorage find(StackContext stack) {
@@ -100,6 +113,16 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         if (candidate == null) return null;
         if (candidate instanceof SingleSlotContainerStorageWrapper wrapper && wrapper.container instanceof SimpleItemFluidStorage itemContainer) return itemContainer.withCallback(ignored -> stack.sync());
         return new FabricStorageWrapper(candidate, stack);
+    }
+
+    private @Nullable FluidApi.FluidStorage wrapStorage(@Nullable Storage<FluidVariant> candidate) {
+        return switch (candidate) {
+            case null -> null;
+            case SingleSlotContainerStorageWrapper wrapper -> wrapper.container;
+            case MultiSlotWrapper wrapper -> wrapper.storage;
+            case DelegatedContainerStorageWrapper wrapper -> wrapper.storage;
+            default -> new FabricStorageWrapper(candidate, null);
+        };
     }
     
     // this is used to interact with fluid storages from other mods

@@ -12,6 +12,16 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
 
 public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInterfaceEntity> {
+
+    @Override
+    public int getViewDistance() {
+        return 256;
+    }
+
+    @Override
+    public boolean shouldRenderOffScreen(ItemPipeInterfaceEntity blockEntity) {
+        return true;
+    }
     
     @Override
     public void render(ItemPipeInterfaceEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {

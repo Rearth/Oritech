@@ -1,6 +1,7 @@
 package rearth.oritech.fabric;
 
 import com.google.auto.service.AutoService;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
@@ -9,6 +10,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -20,6 +22,7 @@ import rearth.oritech.api.energy.BlockEnergyApi;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.ItemEnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
+import rearth.oritech.api.lookup.BlockLookupCache;
 import team.reborn.energy.api.EnergyStorage;
 import java.util.function.Supplier;
 
@@ -65,6 +68,22 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     @Override
     public EnergyApi.EnergyStorage find(Level world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
+    }
+
+    @Override
+    public BlockLookupCache<EnergyApi.EnergyStorage> createCache(Level world, BlockPos pos, @Nullable Direction direction) {
+        if (world instanceof ServerLevel serverLevel) {
+            var cache = BlockApiCache.create(team.reborn.energy.api.EnergyStorage.SIDED, serverLevel, pos);
+            return BlockLookupCache.of(() -> wrapStorage(cache.find(direction)));
+        }
+
+        return BlockLookupCache.of(() -> wrapStorage(team.reborn.energy.api.EnergyStorage.SIDED.find(world, pos, null, null, direction)));
+    }
+
+    private @Nullable EnergyApi.EnergyStorage wrapStorage(@Nullable EnergyStorage candidate) {
+        if (candidate == null) return null;
+        if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
+        return new FabricStorageWrapper(candidate, null);
     }
     
     // this is used to interact with energy storages from other mods
