@@ -9,12 +9,11 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.joml.AxisAngle4f;
-import org.joml.Quaternionf;
 import rearth.oritech.block.base.block.FrameInteractionBlock;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
@@ -121,7 +120,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
             matrices.popPose();
         }
         
-        if (entity instanceof DestroyerBlockEntity destroyerBlock && (!destroyerBlock.isMoving() || destroyerBlock.range > 1)) {
+        if (entity instanceof DestroyerBlockEntity destroyerBlock && (!destroyerBlock.isMoving() || destroyerBlock.range > 1) && !destroyerBlock.quarryTarget.equals(BlockPos.ZERO)) {
             
             var beamHeight = pos.getY() - destroyerBlock.quarryTarget.getY() - 1.3f;
             
