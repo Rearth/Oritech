@@ -362,9 +362,9 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
             
         }
         
-        // returns all neighboring positions except up
+        // check all sides to get filled caverns below
         private List<BlockPos> getNeighbors(BlockPos pos) {
-            return List.of(pos.below(), pos.north(), pos.east(), pos.south(), pos.west());
+            return List.of(pos.below(), pos.above(), pos.north(), pos.east(), pos.south(), pos.west());
         }
         
     }
