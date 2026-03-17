@@ -70,6 +70,12 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .add(BlockContent.TRANSPARENT_ITEM_PIPE)
           .add(BlockContent.ITEM_PIPE_CONNECTION)
           .add(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION);
+
+        getOrCreateTagBuilder(BlockTags.CROPS)
+          .add(BlockContent.WITHER_CROP_BLOCK);
+
+        getOrCreateTagBuilder(BlockTags.MAINTAINS_FARMLAND)
+          .add(BlockContent.WITHER_CROP_BLOCK);
         
         getOrCreateTagBuilder(ConventionalBlockTags.ORES)
           .add(BlockContent.NICKEL_ORE)

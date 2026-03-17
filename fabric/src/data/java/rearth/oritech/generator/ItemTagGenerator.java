@@ -150,6 +150,8 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         
         getOrCreateTagBuilder(cItemTag("bananas")).add(ItemContent.BANANA);
         getOrCreateTagBuilder(cItemTag("foods/fruit")).add(ItemContent.BANANA);
+        getOrCreateTagBuilder(ConventionalItemTags.CROPS).add(BlockContent.WITHER_CROP_BLOCK.asItem());
+        getOrCreateTagBuilder(cItemTag("crops/soul_flower")).add(BlockContent.WITHER_CROP_BLOCK.asItem());
         
         // biomass
         getOrCreateTagBuilder(TagContent.BIOMATTER)
