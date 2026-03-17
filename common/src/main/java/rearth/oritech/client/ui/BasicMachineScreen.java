@@ -24,7 +24,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
 import net.minecraft.world.level.material.Fluid;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import rearth.oracle.Oracle;
@@ -350,7 +349,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
                 if (direction.equals(Direction.WEST)) horizontalOrdinal = 3;
                 var inputSlotIndex = assignment.inputStart() + horizontalOrdinal % assignment.inputCount();
                 
-                tooltip = tooltip.append(Component.translatable(key, StringUtils.capitalize(direction.toString()), inputSlotIndex));
+                tooltip = tooltip.append(Component.translatable("tooltip.oritech.input_dir." + direction).append(Component.translatable(key, inputSlotIndex)));
             }
             cycleInputButton.tooltip(tooltip);
         } else {
