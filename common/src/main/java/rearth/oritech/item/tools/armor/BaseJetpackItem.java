@@ -2,18 +2,6 @@ package rearth.oritech.item.tools.armor;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
-import rearth.oritech.api.networking.NetworkManager;
-import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.client.renderers.LaserArmRenderer;
-import rearth.oritech.init.ComponentContent;
-import rearth.oritech.init.FluidContent;
-import rearth.oritech.item.tools.util.OritechEnergyItem;
-
-import rearth.oritech.util.TooltipHelper;
-
-import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -25,6 +13,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
+import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.client.renderers.LaserArmRenderer;
+import rearth.oritech.init.ComponentContent;
+import rearth.oritech.init.TagContent;
+import rearth.oritech.item.tools.util.OritechEnergyItem;
+import rearth.oritech.util.TooltipHelper;
+
+import java.util.List;
 
 import static rearth.oritech.item.tools.harvesting.ChainsawItem.BAR_STEP_COUNT;
 
@@ -219,7 +218,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
     }
     
     default boolean isValidFuel(Fluid variant) {
-        return variant.isSame(FluidContent.STILL_FUEL.get());
+        return BuiltInRegistries.FLUID.wrapAsHolder(variant).is(TagContent.TURBOFUEL);
     }
     
     @Override
