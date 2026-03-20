@@ -972,7 +972,7 @@
   "message.oritech.deep_drill.ore_placement": "Машина повинна бути розміщена на рудних жилах",
   "message.oritech.generator.production_rate": "Швидкість виробництва: %d з множником ядра: %d",
   "tooltip.oritech.hangar_door.1": "Can be daisy-chained with neighboring hangar doors.",
-  "tooltip.oritech.hangar_door.2": "Size: 1x3x1 blocks.",
+  "tooltip.oritech.hangar_door.2": "Size: 1x3x1 blocks. Can be placed on walls on ceilings.",
   "message.oritech.machine.missing_core": "Машина не зібрана. Будь ласка, додайте відсутні блоки ядра",
   "message.oritech.machine_frame.missing_frame": "Відсутня рама. Додайте порожню прямокутну раму позаду машини, використовуючи блоки рами машини",
   "message.oritech.enchanter.insert_item": "Вставте предмет",
