@@ -1,7 +1,15 @@
 package rearth.oritech.block.entity.decorative;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.block.blocks.decorative.TechDoorBlock;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.util.ColorableMachine;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -9,19 +17,18 @@ import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
+
 import java.util.Timer;
 import java.util.TimerTask;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 
-public class TechDoorBlockEntity extends BlockEntity implements GeoBlockEntity {
+public class TechDoorBlockEntity extends BlockEntity implements GeoBlockEntity, ColorableMachine {
     
     public static final RawAnimation OPEN = RawAnimation.begin().thenPlayAndHold("door_open");
     public static final RawAnimation CLOSE = RawAnimation.begin().thenPlayAndHold("door_close");
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     private final AnimationController<TechDoorBlockEntity> animationController = getAnimationController();
+    private ColorVariant currentColor = getDefaultColor();
     
     private long lastSoundEventAt = 0;
     
@@ -65,6 +72,47 @@ public class TechDoorBlockEntity extends BlockEntity implements GeoBlockEntity {
               }
           }, 1000
         );
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registryLookup) {
+        super.saveAdditional(tag, registryLookup);
+        addColorToNbt(tag);
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registryLookup) {
+        super.loadAdditional(tag, registryLookup);
+        loadColorFromNbt(tag);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
+        var tag = super.getUpdateTag(registryLookup);
+        addColorToNbt(tag);
+        return tag;
+    }
+
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public ColorVariant getCurrentColor() {
+        return currentColor;
+    }
+
+    @Override
+    public void assignColor(ColorVariant color) {
+        currentColor = color;
+
+        if (level != null) {
+            setChanged();
+            if (!level.isClientSide()) {
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
+            }
+        }
     }
     
     @Override

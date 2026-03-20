@@ -401,9 +401,10 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @UseGeoBlockItem(scale = 0.5f)
     public static final Block TECH_DOOR = new TechDoorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).strength(8f).forceSolidOn());
     @NoBlockItem
+    @NoAutoDrop
     public static final Block TECH_DOOR_HINGE = new TechDoorBlockHinge(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).strength(8f).forceSolidOn());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    @UseGeoBlockItem(scale = 0.33f)
+    @UseGeoBlockItem(scale = 0.37f)
     public static final Block HANGAR_DOOR = new HangarDoorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).strength(8f).forceSolidOn());
     @NoBlockItem
     @NoAutoDrop

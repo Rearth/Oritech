@@ -6,7 +6,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -32,6 +36,7 @@ import rearth.oritech.init.SoundContent;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class HangarDoorBlock extends Block implements EntityBlock {
@@ -136,6 +141,12 @@ public class HangarDoorBlock extends Block implements EntityBlock {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+        tooltip.add(Component.translatable("tooltip.oritech.hangar_door.1").withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("tooltip.oritech.hangar_door.2").withStyle(ChatFormatting.GRAY));
+    }
+
     public static VoxelShape getClosedShape(Direction surface, boolean rotated) {
         
         // on floor/ceiling
@@ -163,12 +174,6 @@ public class HangarDoorBlock extends Block implements EntityBlock {
 
     public static BlockPos getAnchorPos(BlockPos helperPos, BlockState helperState) {
         return helperPos.relative(getSegmentDirection(helperState), -helperState.getValue(HangarDoorHelperBlock.PART));
-    }
-
-    public static boolean hasSupport(LevelReader world, BlockPos anchorPos, BlockState anchorState) {
-        var surface = anchorState.getValue(SURFACE);
-        var supportPos = anchorPos.relative(surface.getOpposite());
-        return world.getBlockState(supportPos).isFaceSturdy(world, supportPos, surface);
     }
 
     public static boolean isStructureValid(LevelReader world, BlockPos anchorPos, BlockState anchorState) {
@@ -265,7 +270,7 @@ public class HangarDoorBlock extends Block implements EntityBlock {
             }
         }
     }
-
+    
     public static void removeHelpers(Level world, BlockPos anchorPos, BlockState anchorState) {
         var segmentDirection = getSegmentDirection(anchorState);
         for (int part = 1; part <= 2; part++) {
@@ -275,14 +280,14 @@ public class HangarDoorBlock extends Block implements EntityBlock {
             }
         }
     }
-
+    
     public static void removeFullStructure(Level world, BlockPos anchorPos, BlockState anchorState, boolean dropAnchor) {
         removeHelpers(world, anchorPos, anchorState);
-
+        
         if (dropAnchor) {
             Block.dropResources(anchorState, world, anchorPos, world.getBlockEntity(anchorPos));
         }
-
+        
         world.setBlock(anchorPos, Blocks.AIR.defaultBlockState(), 3);
     }
 

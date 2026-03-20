@@ -56,6 +56,8 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
         pickaxeBuilder.add(BlockContent.IRON_PLATING_SLAB);
         pickaxeBuilder.add(BlockContent.MACHINE_PLATING_SLAB);
         pickaxeBuilder.add(BlockContent.NICKEL_PLATING_SLAB);
+        pickaxeBuilder.add(BlockContent.TECH_DOOR_HINGE);
+        pickaxeBuilder.add(BlockContent.HANGAR_DOOR_HELPER);
         
         pickaxeBuilder
           .add(BlockContent.NICKEL_ORE)
