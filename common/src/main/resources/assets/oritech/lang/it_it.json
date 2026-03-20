@@ -972,7 +972,7 @@
   "message.oritech.deep_drill.ore_placement": "La macchina deve essere posizionata sui nodi minerali",
   "message.oritech.generator.production_rate": "Tasso di produzione: %d con moltiplicatore nucleo: %d",
   "tooltip.oritech.hangar_door.1": "Can be daisy-chained with neighboring hangar doors.",
-  "tooltip.oritech.hangar_door.2": "Size: 1x3x1 blocks.",
+  "tooltip.oritech.hangar_door.2": "Size: 1x3x1 blocks. Can be placed on walls on ceilings.",
   "message.oritech.machine.missing_core": "La macchina non è assemblata. Si prega di aggiungere blocchi nucleo mancanti",
   "message.oritech.machine_frame.missing_frame": "Telaio mancante. Aggiungere un telaio rettangolare vuoto dietro la macchina utilizzando blocchi di telaio",
   "message.oritech.enchanter.insert_item": "Inserisci Oggetto",
