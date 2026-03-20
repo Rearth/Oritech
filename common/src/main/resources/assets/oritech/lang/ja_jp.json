@@ -972,7 +972,7 @@
   "message.oritech.deep_drill.ore_placement": "マシンは鉱石資源ノード上に配置する必要があります。",
   "message.oritech.generator.production_rate": "生産率： %d コア倍率： %d",
   "tooltip.oritech.hangar_door.1": "Can be daisy-chained with neighboring hangar doors.",
-  "tooltip.oritech.hangar_door.2": "Size: 1x3x1 blocks.",
+  "tooltip.oritech.hangar_door.2": "Size: 1x3x1 blocks. Can be placed on walls on ceilings.",
   "message.oritech.machine.missing_core": "マシンは組み立てられていません。欠落しているコアブロックを追加してください。",
   "message.oritech.machine_frame.missing_frame": "フレームがありません。マシンフレームブロックを使用してマシンの後ろに長方形の中空のフレームを追加してください",
   "message.oritech.enchanter.insert_item": "アイテムの挿入",
