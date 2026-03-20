@@ -403,6 +403,12 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @NoBlockItem
     public static final Block TECH_DOOR_HINGE = new TechDoorBlockHinge(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).strength(8f).forceSolidOn());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    @UseGeoBlockItem(scale = 0.33f)
+    public static final Block HANGAR_DOOR = new HangarDoorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).strength(8f).forceSolidOn());
+    @NoBlockItem
+    @NoAutoDrop
+    public static final Block HANGAR_DOOR_HELPER = new HangarDoorHelperBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).strength(8f).forceSolidOn());
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block STEEL_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block ENERGITE_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).lightLevel(state -> 6));

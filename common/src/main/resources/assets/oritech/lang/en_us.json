@@ -706,6 +706,8 @@
   "block.oritech.tech_lever": "Industrial Lever",
   "block.oritech.tech_door": "Industrial Door",
   "block.oritech.tech_door_hinge": "Industrial Door",
+  "block.oritech.hangar_door": "Industrial Hangar Door",
+  "block.oritech.hangar_door_helper": "Industrial Hangar Door",
   "block.oritech.metal_beam_block": "Industrial Support Beam",
   "block.oritech.metal_girder_block": "Industrial Support Girder",
   "block.oritech.machine_plating_block": "Copper Reinforced Plating",

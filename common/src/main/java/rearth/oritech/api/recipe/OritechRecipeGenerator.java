@@ -379,6 +379,15 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerLeverRecipe(exporter, BlockContent.TECH_LEVER.asItem(), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "techlever");
         // tech door
         offerDoorRecipe(exporter, BlockContent.TECH_DOOR.asItem(), of(TagContent.STEEL_INGOTS), "techdoor");
+        // hangar door
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, BlockContent.HANGAR_DOOR)
+          .define('s', TagContent.STEEL_INGOTS)
+          .define('m', ItemContent.MOTOR)
+          .pattern("sms")
+          .pattern("sss")
+          .pattern("sms")
+          .unlockedBy("has_motor", has(ItemContent.MOTOR))
+          .save(exporter, Oritech.id("crafting/hangardoor"));
         // metal beam
         offerRotatedCableRecipe(exporter, new ItemStack(BlockContent.METAL_BEAM_BLOCK.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalbeams");
         // metal girder

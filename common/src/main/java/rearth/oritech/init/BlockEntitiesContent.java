@@ -16,6 +16,7 @@ import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.AugmentResearchStationBlockEntity;
+import rearth.oritech.block.entity.decorative.HangarDoorBlockEntity;
 import rearth.oritech.block.entity.decorative.TechDoorBlockEntity;
 import rearth.oritech.block.entity.generators.*;
 import rearth.oritech.block.entity.interaction.*;
@@ -256,6 +257,7 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     ).build(null);
     
     public static final BlockEntityType<TechDoorBlockEntity> TECH_DOOR_ENTITY = BlockEntityType.Builder.of(TechDoorBlockEntity::new, BlockContent.TECH_DOOR).build(null);
+    public static final BlockEntityType<HangarDoorBlockEntity> HANGAR_DOOR_ENTITY = BlockEntityType.Builder.of(HangarDoorBlockEntity::new, BlockContent.HANGAR_DOOR).build(null);
     
     @Override
     @SuppressWarnings("unchecked")

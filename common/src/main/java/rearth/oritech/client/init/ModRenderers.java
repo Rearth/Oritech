@@ -64,6 +64,7 @@ public class ModRenderers {
         BlockEntityRenderers.register(BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY, ctx -> new UnstableContainerRenderer("models/unstable_container"));
         
         BlockEntityRenderers.register(BlockEntitiesContent.TECH_DOOR_ENTITY, ctx -> new MachineRenderer<>("models/tech_door"));
+        BlockEntityRenderers.register(BlockEntitiesContent.HANGAR_DOOR_ENTITY, ctx -> new HangarDoorRenderer("models/hangar_door"));
         
         // cutout renders
         RENDER_LAYERS.put(BlockContent.MACHINE_FRAME_BLOCK, RenderType.cutout());
