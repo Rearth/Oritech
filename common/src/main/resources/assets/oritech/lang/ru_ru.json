@@ -163,7 +163,7 @@
   "tooltip.oritech.input_mode_fill_left_to_right": "Заполняет слоты слева направо. Перемещается в следующую слот-зону когда первый слот был заполнен.",
   "tooltip.oritech.input_mode_fill_evenly": "Заполняет элементы равномерно. Новые элементы всегда помещают в нижний соответствующий слот.",
   "tooltip.oritech.input_mode_sided": "Items interactions are sided.\n\n",
-  "tooltip.oritech.mode_sided_slot_number": ": Slot %s\n",
+  "tooltip.oritech.mode_sided_slot_number": "Слот %s ",
   "tooltip.oritech.mode_sided_top": ": Input only\n",
   "tooltip.oritech.mode_sided_bottom": ": Extract only\n",
   "tooltip.oritech.input_dir.north": "North",
