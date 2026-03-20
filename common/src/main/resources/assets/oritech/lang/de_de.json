@@ -972,7 +972,7 @@
   "message.oritech.deep_drill.ore_placement": "Maschine muss auf Erz Knoten platziert werden",
   "message.oritech.generator.production_rate": "Produktionsrate: %d mit Kernmultiplikator: %d",
   "tooltip.oritech.hangar_door.1": "Can be daisy-chained with neighboring hangar doors.",
-  "tooltip.oritech.hangar_door.2": "Size: 1x3x1 blocks.",
+  "tooltip.oritech.hangar_door.2": "Size: 1x3x1 blocks. Can be placed on walls on ceilings.",
   "message.oritech.machine.missing_core": "Machine ist nicht zusammengesetzt. Bitte füge fehlende Maschninenkern-Blöcke hinzu",
   "message.oritech.machine_frame.missing_frame": "Fehlender Rahmen. Füge einen leeren Eckigen Rahmen hinter der Maschine mit Maschnin-Rahmen Blöcken hinzu",
   "message.oritech.enchanter.insert_item": "Füge Gegenstand ein",
