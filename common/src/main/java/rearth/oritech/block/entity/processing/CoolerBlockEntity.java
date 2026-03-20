@@ -210,8 +210,4 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
         return fluidStorage;
     }
     
-    @Override
-    public ColorVariant getDefaultColor() {
-        return ColorVariant.FLUXITE;
-    }
 }
