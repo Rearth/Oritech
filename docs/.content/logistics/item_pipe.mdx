@@ -8,7 +8,7 @@ custom:
     Transfer interval: "5 ticks"
 ---
 
-Oritech includes item transport pipes and item filter blocks to meet your item logistics needs. Item pipes connect to each other and all neighboring inventories.
+Oritech includes item pipes and item filter blocks for item logistics. Item pipes connect to each other and to neighboring inventories.
 
 Unlike other pipes, item pipes do not have an inventory. This means that other blocks, such as hoppers, cannot insert items
 into the pipe network on their own. Instead, an item pipe can be set to extract from a nearby inventory.
@@ -19,11 +19,11 @@ into the pipe network on their own. Instead, an item pipe can be set to extract 
 *   **Transparent**: Shows items moving inside. Only works if the entire pipe path is from transparent pipes.
 *   **Duct**: Alternative aesthetic style. Ducted variants do not connect to machines directly, only to other pipes.
 
-To toggle extraction mode, you must right-click the section of the pipe connected to the block you wish to extract from.
+To toggle extraction mode, right-click the section of the pipe connected to the block you want to extract from.
 Extraction will only be enabled if the pipe is connected to a block that supports extraction. Each pipe connection can be toggled independently.
 Use a pipe-wrench to disable connections in specific directions.
 
-Extracted items will be placed into the **closest** (based on world distance) available inventory further down the network.
+Extracted items are placed into the **closest** available inventory further down the network, based on world distance.
 
 <Callout variant="warning">
     Pipes will always extract from the first non-empty slot in an inventory.
@@ -36,4 +36,4 @@ Extracted items will be placed into the **closest** (based on world distance) av
 <ModAsset location="oritech:area/item_pipes" width={512} />
 </center>
 
-Default transfer rate is 8 items every 5 ticks.
+The default transfer rate is 8 items every 5 ticks.
