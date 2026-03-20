@@ -972,7 +972,7 @@
   "message.oritech.deep_drill.ore_placement": "La machine doit être placée sur des gisements de minerai",
   "message.oritech.generator.production_rate": "Taux de production : %d avec multiplicateur de noyau : %d",
   "tooltip.oritech.hangar_door.1": "Can be daisy-chained with neighboring hangar doors.",
-  "tooltip.oritech.hangar_door.2": "Size: 1x3x1 blocks.",
+  "tooltip.oritech.hangar_door.2": "Size: 1x3x1 blocks. Can be placed on walls on ceilings.",
   "message.oritech.machine.missing_core": "Machine non assemblée. Veuillez ajouter les blocs de noyau manquants",
   "message.oritech.machine_frame.missing_frame": "Cadre manquant. Ajoutez un cadre rectangulaire vide derrière la machine en utilisant des blocs de cadre de machine",
   "message.oritech.enchanter.insert_item": "Insérer l'objet",
