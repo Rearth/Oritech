@@ -972,7 +972,7 @@
   "message.oritech.deep_drill.ore_placement": "机器必须被放置在资源节点上",
   "message.oritech.generator.production_rate": "产率：%d（核心倍率：%d）",
   "tooltip.oritech.hangar_door.1": "Can be daisy-chained with neighboring hangar doors.",
-  "tooltip.oritech.hangar_door.2": "Size: 1x3x1 blocks.",
+  "tooltip.oritech.hangar_door.2": "Size: 1x3x1 blocks. Can be placed on walls on ceilings.",
   "message.oritech.machine.missing_core": "机器还未组装完毕。请添加缺失的机器核心",
   "message.oritech.machine_frame.missing_frame": "框架缺失。请在机器后面使用机器框架方块添加中空的矩形框架",
   "message.oritech.enchanter.insert_item": "插入物品",
