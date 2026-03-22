@@ -1,30 +1,13 @@
 {
   "getting_started": {
-    "name": "\uD83D\uDCD5 起步",
+    "name": "\uD83D\uDCD5 Getting Started",
     "icon": null
   },
-  "resources": {
-    "name": "\uD83E\uDEA8 资源",
-    "icon": null
-  },
-  "tools": {
-    "name": "\uD83D\uDD28 工具",
-    "icon": null
-  },
-  "logistics": {
-    "name": "\uD83D\uDEDE 物流",
-    "icon": null
-  },
-  "processing": {
-    "name": "\uD83D\uDEE0 处理",
-    "icon": null
-  },
-  "interaction": {
-    "name": "\uD83E\uDEF3 世界交互",
-    "icon": null
-  },
-  "arcane": {
-    "name": "\uD83E\uDE84 奥术",
+  "multiblocks.mdx": "Multiblocks",
+  "addons.mdx": "Addons",
+  "particle_accelerator.mdx": "Particle Accelerator",
+  "reactor": {
+    "name": "☢ Nuclear Reactors",
     "icon": null
   }
 }
