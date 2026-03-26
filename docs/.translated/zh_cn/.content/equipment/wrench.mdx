@@ -1,28 +1,28 @@
 ---
-title: 扳手
-icon: oritech:wrench
+id: oritech:wrench
+title: 管道扳手
 type: item
-related_items: [oritech:wrench]
 ---
 
-### 描述
-扳手是一种用于编辑和破坏管道的工具。它用于更改管道每个方向上的连接，以及用于破坏管道。
+管道扳手是管理工厂物流的主要工具。
+它适用于本模组中所有类型的管道和线缆。
 
-### 使用方法
+### 管道
 
-#### 切换管道连接
-所有管道在各自的方向上都可以断开或连接。要切换管道连接：
-- 您必须右键点击现有的连接以禁用它。
-- 要启用连接，您必须右键点击管道的中心，并点击您希望启用的方向对应的侧面。
+扳手可帮助你调整管道网络：
+- **切换**：右击管道连接至其他方块的一侧，
+  可切换其连接与否。
+- **快速拆除**：Shift+右击管道可
+  立即将其拆除。
 
-#### 破坏管道
-要破坏管道，您必须按住Shift并右键点击管道（同时手持扳手）。管道会立即掉落为物品。
-或者，您可以像使用镐一样用扳手破坏管道。扳手在破坏管道时具有更高的挖掘速度。
+### 滑行
 
-### 合成
-扳手可以通过以下配方合成：
-<CraftingRecipe
-    slots={['', 'oritech:nickel_ingot', '', '', 'oritech:steel_ingot', 'oritech:nickel_ingot', 'oritech:nickel_ingot', '', '']}
-    result='oritech:wrench'
-/>
+<center>
+<ModAsset location="oritech:area/cable_ziplining" width={512} />
+</center>
 
+你可以用扳手在[输电杆（Energy Transmission Pole）](@oritech:power_pole_block)
+之间的线缆上**滑行**。
+只需右击线缆即可在线缆上快速滑行。
+
+滑行是一种不消耗任何能量的快速移动方式。
