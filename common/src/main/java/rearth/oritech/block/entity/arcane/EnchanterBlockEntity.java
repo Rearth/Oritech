@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.arcane;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import io.wispforest.owo.util.VectorRandomUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -128,7 +127,8 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
             activeAnimation = "working";
             
             var center = pos.getCenter();
-            var offset = VectorRandomUtils.getRandomOffset(world, center, 4f);
+            var r = world.random;
+            var offset = center.add(r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f);
             ParticleContent.WEED_KILLER.spawn(world, center, new ParticleContent.LineData(center, offset));
             
             if (progress >= maxProgress) {

@@ -1,7 +1,7 @@
 package rearth.oritech.init;
 
 import dev.architectury.registry.registries.RegistrySupplier;
-import io.wispforest.owo.registration.reflect.BlockRegistryContainer.NoBlockItem;
+import rearth.oritech.util.registry.NoBlockItem;
 import net.minecraft.core.Registry;
 import net.minecraft.core.dispenser.ShulkerBoxDispenseBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;

@@ -2,7 +2,6 @@ package rearth.oritech.util.registry;
 
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
-import io.wispforest.owo.registration.reflect.BlockRegistryContainer;
 import rearth.oritech.Oritech;
 
 import java.lang.reflect.Field;
@@ -29,7 +28,7 @@ public interface ArchitecturyBlockRegistryContainer extends ArchitecturyRegistry
     
     @Override
     default void postProcessField(String namespace, Block value, String identifier, Field field, RegistrySupplier<Block> supplier) {
-        if (field.isAnnotationPresent(BlockRegistryContainer.NoBlockItem.class)) return;
+        if (field.isAnnotationPresent(NoBlockItem.class)) return;
         ITEM_REGISTRY.register(identifier, () -> createBlockItem(value, identifier));
     }
     

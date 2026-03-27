@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import io.wispforest.owo.ui.core.Color;
+import rearth.oritech.util.ColorHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import rearth.oritech.block.entity.processing.RefineryBlockEntity;
@@ -88,11 +88,7 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> ext
         }
         
         var sprite = FluidStackHooks.getStillTexture(fluid);
-        var spriteColor = FluidStackHooks.getColor(fluid);
-        
-        var parsedColor = Color.ofArgb(spriteColor);
-        var opaqueColor = new Color(parsedColor.red(), parsedColor.green(), parsedColor.blue(), 1f);
-        spriteColor = opaqueColor.argb();
+        var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(fluid));
         
         matrices.pushPose();
         matrices.translate(min.x + 0.01f, min.y + 0.01f, min.z + 0.01f);

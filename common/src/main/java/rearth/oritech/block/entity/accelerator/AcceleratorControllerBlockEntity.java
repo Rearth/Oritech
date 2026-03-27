@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.accelerator;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import io.wispforest.owo.util.VectorRandomUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
@@ -196,7 +195,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var caughtParticles = 0;
         
         for (int i = 0; i < shotCount; i++) {
-            var offset = VectorRandomUtils.getRandomOffset(level, collisionPosition, rayRange);
+            var r = level.random;
+            var offset = collisionPosition.add(r.nextFloat() * rayRange * 2 - rayRange, r.nextFloat() * rayRange * 2 - rayRange, r.nextFloat() * rayRange * 2 - rayRange);
             var direction = offset.subtract(collisionPosition).normalize();
             
             var impactPos = BlackHoleBlockEntity.basicRaycast(collisionPosition.add(direction.scale(1.2)), direction, rayRange, level);

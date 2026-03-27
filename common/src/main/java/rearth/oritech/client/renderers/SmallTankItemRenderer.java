@@ -3,7 +3,7 @@ package rearth.oritech.client.renderers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import io.wispforest.owo.ui.core.Color;
+import rearth.oritech.util.ColorHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -75,12 +75,8 @@ public class SmallTankItemRenderer {
         var fill = storage.getAmount() / (float) (Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount());
         
         var sprite = FluidStackHooks.getStillTexture(fluid);
-        var spriteColor = FluidStackHooks.getColor(fluid);
+        var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(fluid));
         var consumer = vertexConsumers.getBuffer(RenderType.translucent());
-        
-        var parsedColor = Color.ofArgb(spriteColor);
-        var opaqueColor = new Color(parsedColor.red(), parsedColor.green(), parsedColor.blue(), 1f);
-        spriteColor = opaqueColor.argb();
         
         matrices.pushPose();
         matrices.translate(0.126, 0.126, 0.126);
