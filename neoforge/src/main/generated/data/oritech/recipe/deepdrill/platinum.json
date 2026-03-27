@@ -1,10 +1,5 @@
 {
   "type": "oritech:deep_drill",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "oritech:resource_node_platinum"

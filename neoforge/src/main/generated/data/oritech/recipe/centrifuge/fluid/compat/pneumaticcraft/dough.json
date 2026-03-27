@@ -7,10 +7,8 @@
   ],
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 1000,
     "fluid": "pneumaticcraft:yeast_culture"
   },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "pneumaticcraft:wheat_flour"

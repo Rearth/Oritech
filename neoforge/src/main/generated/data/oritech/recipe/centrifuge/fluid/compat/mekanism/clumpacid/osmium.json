@@ -14,7 +14,6 @@
   ],
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 1000,
     "fluid": "oritech:still_sulfuric_acid"
   },
   "fluidOutputs": [

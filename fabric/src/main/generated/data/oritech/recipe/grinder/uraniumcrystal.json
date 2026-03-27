@@ -1,10 +1,5 @@
 {
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "oritech:uranium_crystal"
@@ -19,6 +14,5 @@
       "count": 1,
       "id": "oritech:small_plutonium_dust"
     }
-  ],
-  "time": 60
+  ]
 }

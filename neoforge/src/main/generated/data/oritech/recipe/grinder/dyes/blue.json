@@ -1,10 +1,5 @@
 {
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:raw_materials/dyes/blue"
@@ -15,6 +10,5 @@
       "count": 1,
       "id": "minecraft:blue_dye"
     }
-  ],
-  "time": 60
+  ]
 }

@@ -1,17 +1,15 @@
 package rearth.oritech.init.world.features.oil;
 
-import io.wispforest.endec.Endec;
-import io.wispforest.endec.impl.StructEndecBuilder;
-import io.wispforest.owo.serialization.endec.MinecraftEndecs;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
 public record OilSpringFeatureConfig(int number, ResourceLocation blockId) implements FeatureConfiguration {
     
-    public static final Endec<OilSpringFeatureConfig> OIL_FEATURE_ENDEC = StructEndecBuilder.of(
-      Endec.INT.fieldOf("number", OilSpringFeatureConfig::number),
-      MinecraftEndecs.IDENTIFIER.fieldOf("blockId", OilSpringFeatureConfig::blockId),
-      OilSpringFeatureConfig::new
-    );
+    public static final Codec<OilSpringFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+      Codec.INT.fieldOf("number").forGetter(OilSpringFeatureConfig::number),
+      ResourceLocation.CODEC.fieldOf("blockId").forGetter(OilSpringFeatureConfig::blockId)
+    ).apply(instance, OilSpringFeatureConfig::new));
     
 }

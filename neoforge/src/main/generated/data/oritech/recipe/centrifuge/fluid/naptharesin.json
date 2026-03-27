@@ -4,7 +4,6 @@
     "amount": 100,
     "fluid": "#c:naphtha"
   },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "minecraft:sand"

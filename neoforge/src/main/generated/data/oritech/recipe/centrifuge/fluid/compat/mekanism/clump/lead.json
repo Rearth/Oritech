@@ -14,10 +14,8 @@
   ],
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 1000,
     "fluid": "minecraft:water"
   },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:clumps/lead"

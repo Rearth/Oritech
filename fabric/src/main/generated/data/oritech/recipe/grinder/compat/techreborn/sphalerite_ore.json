@@ -8,11 +8,6 @@
     }
   ],
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:ores/sphalerite"
@@ -31,6 +26,5 @@
       "count": 1,
       "id": "techreborn:yellow_garnet_small_dust"
     }
-  ],
-  "time": 60
+  ]
 }

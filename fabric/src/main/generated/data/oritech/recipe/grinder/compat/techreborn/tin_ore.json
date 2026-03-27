@@ -8,11 +8,6 @@
     }
   ],
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:ores/tin"
@@ -31,6 +26,5 @@
       "count": 3,
       "id": "techreborn:zinc_nugget"
     }
-  ],
-  "time": 60
+  ]
 }

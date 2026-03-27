@@ -1,10 +1,8 @@
 {
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 81000,
     "fluid": "minecraft:water"
   },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:clumps/iron"

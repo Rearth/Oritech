@@ -8,11 +8,6 @@
     }
   ],
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:ores/lead"
@@ -27,6 +22,5 @@
       "count": 2,
       "id": "techreborn:galena_small_dust"
     }
-  ],
-  "time": 60
+  ]
 }

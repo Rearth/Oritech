@@ -1,8 +1,8 @@
 package rearth.oritech.init.recipes;
 
 import com.mojang.datafixers.util.Either;
-import io.wispforest.endec.Endec;
-import io.wispforest.endec.impl.ReflectiveEndecBuilder;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.block.entity.augmenter.api.CustomAugmentsCollection;
@@ -218,17 +218,26 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
     
     // used to apply an effect, similar to potion effects
     public record EffectDefinition(ResourceLocation potionEffectId, int effectStrength) {
-        public static Endec<EffectDefinition> ENDEC = ReflectiveEndecBuilder.SHARED_INSTANCE.get(EffectDefinition.class);
+        public static final Codec<EffectDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+          ResourceLocation.CODEC.fieldOf("potionEffectId").forGetter(EffectDefinition::potionEffectId),
+          Codec.INT.fieldOf("effectStrength").forGetter(EffectDefinition::effectStrength)
+        ).apply(instance, EffectDefinition::new));
     }
     
     // apply a stat modification. The attributeOperationType type can be either "add_value=0", "add_multiplied_base=1" or "add_multiplied_total=2"
     public record ModifierDefinition(ResourceLocation entityAttributeId, int attributeOperationType, float amount) {
-        public static Endec<ModifierDefinition> ENDEC = ReflectiveEndecBuilder.SHARED_INSTANCE.get(ModifierDefinition.class);
+        public static final Codec<ModifierDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+          ResourceLocation.CODEC.fieldOf("entityAttributeId").forGetter(ModifierDefinition::entityAttributeId),
+          Codec.INT.fieldOf("attributeOperationType").forGetter(ModifierDefinition::attributeOperationType),
+          Codec.FLOAT.fieldOf("amount").forGetter(ModifierDefinition::amount)
+        ).apply(instance, ModifierDefinition::new));
     }
     
     // apply a custom modification, that implements custom functionality.
     public record CustomAugmentDefinition(ResourceLocation customAugmentId) {
-        public static Endec<CustomAugmentDefinition> ENDEC = ReflectiveEndecBuilder.SHARED_INSTANCE.get(CustomAugmentDefinition.class);
+        public static final Codec<CustomAugmentDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+          ResourceLocation.CODEC.fieldOf("customAugmentId").forGetter(CustomAugmentDefinition::customAugmentId)
+        ).apply(instance, CustomAugmentDefinition::new));
     }
     
 }

@@ -1,7 +1,6 @@
 {
   "type": "oritech:refinery",
   "fluidInput": {
-    "amount": 81000,
     "fluid": "#c:biofuel"
   },
   "fluidOutputs": [

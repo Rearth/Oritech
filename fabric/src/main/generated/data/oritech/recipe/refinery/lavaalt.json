@@ -1,12 +1,10 @@
 {
   "type": "oritech:refinery",
   "fluidInput": {
-    "amount": 81000,
     "fluid": "minecraft:lava"
   },
   "fluidOutputs": [
     {
-      "amount": 81000,
       "fluid": "oritech:still_sulfuric_acid"
     },
     {

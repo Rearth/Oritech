@@ -1,10 +1,5 @@
 {
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "minecraft:glowstone"
@@ -15,6 +10,5 @@
       "count": 4,
       "id": "minecraft:glowstone_dust"
     }
-  ],
-  "time": 60
+  ]
 }

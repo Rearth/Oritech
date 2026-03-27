@@ -1,17 +1,11 @@
 package rearth.oritech.util;
 
 import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.architectury.fluid.FluidStack;
 import io.netty.buffer.ByteBuf;
-import io.wispforest.endec.Endec;
-import io.wispforest.endec.impl.StructEndecBuilder;
-import io.wispforest.owo.serialization.CodecUtils;
-import io.wispforest.owo.serialization.endec.MinecraftEndecs;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -23,6 +17,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 // Inspired by Immersive Engineering https://github.com/BluSunrize/ImmersiveEngineering/blob/1.21.1/src/api/java/blusunrize/immersiveengineering/api/crafting/FluidTagInput.java
 
@@ -36,20 +35,18 @@ public record FluidIngredient(Either<TagKey<Fluid>, ResourceLocation> fluidConte
     
     // A FluidIngredient should have a "fluid" which can be an identifier with a namespace or a tag beginning in #
     // A FluidIngredient can have an "amount" should be a long integer and will default to 1 bucket
-    public static final Endec<FluidIngredient> FLUID_INGREDIENT_ENDEC = StructEndecBuilder.of(
-      CodecUtils.eitherEndec(
-        Endec.STRING.xmap(
-          s -> {
-              if (s.charAt(0) != '#') throw new IllegalStateException("tag must start with #");
-              return TagKey.create(Registries.FLUID, ResourceLocation.parse(s.substring(1)));
-          },
+    public static final Codec<FluidIngredient> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+      Codec.either(
+        Codec.STRING.comapFlatMap(
+          s -> s.startsWith("#")
+            ? DataResult.success(TagKey.create(Registries.FLUID, ResourceLocation.parse(s.substring(1))))
+            : DataResult.error(() -> "Not a tag: " + s),
           tag -> "#" + tag.location()
         ),
-        MinecraftEndecs.IDENTIFIER
-      ).fieldOf("fluid", FluidIngredient::fluidContent),
-      Endec.LONG.optionalFieldOf("amount", FluidIngredient::amount, FluidStack.bucketAmount()),
-      FluidIngredient::new
-    );
+        ResourceLocation.CODEC
+      ).fieldOf("fluid").forGetter(FluidIngredient::fluidContent),
+      Codec.LONG.optionalFieldOf("amount", FluidStack.bucketAmount()).forGetter(FluidIngredient::amount)
+    ).apply(instance, FluidIngredient::new));
     
     public static final StreamCodec<ByteBuf, TagKey<Fluid>> FLUID_TAG_KEY_CODEC = ResourceLocation.STREAM_CODEC.map(id -> TagKey.create(Registries.FLUID, id), TagKey::location);
     

@@ -1,7 +1,6 @@
 package rearth.oritech.init.world;
 
 import dev.architectury.registry.level.biome.BiomeModifications;
-import io.wispforest.owo.serialization.CodecUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -21,9 +20,9 @@ import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 // when adding/changing features, make sure to update the neo json files aswell
 public class FeatureContent implements ArchitecturyRegistryContainer<Feature<?>> {
     
-    public static final Feature<OilSpringFeatureConfig> OIL_SPRING = new OilSpringFeature(CodecUtils.toCodec(OilSpringFeatureConfig.OIL_FEATURE_ENDEC));
-    public static final Feature<ResourceNodeFeatureConfig> RESOURCE_NODE = new ResourceNodeFeature(CodecUtils.toCodec(ResourceNodeFeatureConfig.NODE_FEATURE_ENDEC));
-    public static final Feature<UraniumPatchFeatureConfig> URANIUM_PATCH = new UraniumPatchFeature(CodecUtils.toCodec(UraniumPatchFeatureConfig.URANIUM_FEATURE_ENDEC));
+    public static final Feature<OilSpringFeatureConfig> OIL_SPRING = new OilSpringFeature(OilSpringFeatureConfig.CODEC);
+    public static final Feature<ResourceNodeFeatureConfig> RESOURCE_NODE = new ResourceNodeFeature(ResourceNodeFeatureConfig.CODEC);
+    public static final Feature<UraniumPatchFeatureConfig> URANIUM_PATCH = new UraniumPatchFeature(UraniumPatchFeatureConfig.CODEC);
     
     public static void initialize() {
         

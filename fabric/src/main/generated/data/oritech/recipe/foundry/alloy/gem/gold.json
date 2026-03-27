@@ -1,10 +1,5 @@
 {
   "type": "oritech:foundry",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "oritech:gold_gem"

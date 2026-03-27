@@ -6,11 +6,6 @@
     }
   ],
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "ae2:sky_stone_block"
@@ -21,6 +16,5 @@
       "count": 1,
       "id": "ae2:sky_dust"
     }
-  ],
-  "time": 60
+  ]
 }

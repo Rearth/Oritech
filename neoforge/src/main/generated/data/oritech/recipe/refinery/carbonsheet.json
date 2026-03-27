@@ -4,7 +4,6 @@
     "amount": 500,
     "fluid": "#c:naphtha"
   },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "oritech:carbon_fibre_strands"
