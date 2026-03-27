@@ -8,7 +8,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -22,10 +21,10 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.Geometry;
 
+import java.util.ArrayDeque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
-
-import static rearth.oritech.util.Geometry.*;
 
 
 public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
@@ -63,65 +62,23 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
         
         Oritech.LOGGER.debug("searching machine frame");
         
-        // select block on back (or based on offset of machine)
-        // from there on move right, till no more frame blocks are found
-        // then move back, searching again till end
-        // then move left, searching again till end
-        // then move forward, searching again till end
-        // then move right again, searching till start position
-        
         var facing = getFacing();
         var backRelative = new Vec3i(getFrameOffset(), 0, 0);
+        // Frame machines always anchor to the frame block directly behind the controller.
         var searchStart = (BlockPos) Geometry.offsetToWorldPosition(facing, backRelative, worldPosition);
-        
-        var endRightFront = searchFrameLine(searchStart, getRight(facing));
-        if (endRightFront.equals(BlockPos.ZERO)) {
-            highlightBlock(searchStart);
+
+        var bounds = findFrameBounds(searchStart);
+        if (bounds == null) {
             return false;
         }
-        
-        var endRightBack = searchFrameLine(endRightFront, getBackward(facing));
-        if (endRightBack.equals(endRightFront)) {
-            highlightBlock(endRightFront.offset(getRight(facing)));
-            highlightBlock(endRightFront.offset(getBackward(facing)));
-            return false;
-        }
-        
-        var endLeftBack = searchFrameLine(endRightBack, getLeft(facing));
-        if (endLeftBack.equals(endRightBack)) {
-            highlightBlock(endRightBack.offset(getBackward(facing)));
-            highlightBlock(endRightBack.offset(getLeft(facing)));
-            return false;
-        }
-        
-        var endLeftFront = searchFrameLine(endLeftBack, getForward(facing));
-        if (endLeftFront.equals(endLeftBack)) {
-            highlightBlock(endLeftBack.offset(getLeft(facing)));
-            highlightBlock(endLeftBack.offset(getForward(facing)));
-            return false;
-        }
-        
-        var endMiddleFront = searchFrameLineEnd(endLeftFront, getRight(facing), searchStart);
-        if (endMiddleFront.equals(endLeftFront)) {
-            highlightBlock(endMiddleFront.offset(getForward(facing)));
-            highlightBlock(endMiddleFront.offset(getRight(facing)));
-            return false;
-        }
-        if (!endMiddleFront.equals(searchStart)) {
-            highlightBlock(endMiddleFront.offset(getRight(facing)));
-            return false;
-        }
-        
-        var innerValid = checkInnerEmpty(endLeftBack, endRightFront);
-        if (!innerValid) return false;
-        
+
         // offset values by 1 to define the working area instead of bounds
-        var startX = Math.min(endLeftFront.getX(), endRightBack.getX()) + 1;
-        var startZ = Math.min(endLeftFront.getZ(), endRightBack.getZ()) + 1;
+        var startX = bounds.minX + 1;
+        var startZ = bounds.minZ + 1;
         areaMin = new BlockPos(startX, getBlockPos().getY(), startZ);
-        
-        var endX = Math.max(endLeftFront.getX(), endRightBack.getX()) - 1;
-        var endZ = Math.max(endLeftFront.getZ(), endRightBack.getZ()) - 1;
+
+        var endX = bounds.maxX - 1;
+        var endZ = bounds.maxZ - 1;
         areaMax = new BlockPos(endX, getBlockPos().getY(), endZ);
         
         if (currentTarget == null || !isInBounds(currentTarget)) {
@@ -137,70 +94,78 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     protected Direction getFacing() {
         return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
-    
-    private boolean checkInnerEmpty(BlockPos leftBack, BlockPos rightFront) {
+
+    private FrameBounds findFrameBounds(BlockPos searchStart) {
+        if (!testForFrame(searchStart)) {
+            highlightBlock(searchStart);
+            return null;
+        }
+
         assert level != null;
-        
-        var lengthX = Math.abs(leftBack.getX() - rightFront.getX());
-        var lengthZ = Math.abs(leftBack.getZ() - rightFront.getZ());
-        
-        var dirX = leftBack.getX() - rightFront.getX() > 0 ? -1 : 1;
-        var dirZ = leftBack.getZ() - rightFront.getZ() > 0 ? -1 : 1;
-        
-        var valid = true;
-        
-        for (int x = 1; x < lengthX; x++) {
-            for (int z = 1; z < lengthZ; z++) {
-                var offset = new BlockPos(dirX * x, 0, dirZ * z);
-                var checkPos = leftBack.offset(offset);
-                var foundBlock = level.getBlockState(checkPos).getBlock();
-                if (!foundBlock.equals(Blocks.AIR)) {
+
+        var frameBlocks = new HashSet<BlockPos>();
+        var openSet = new ArrayDeque<BlockPos>();
+        frameBlocks.add(searchStart);
+        openSet.add(searchStart);
+
+        var minX = searchStart.getX();
+        var maxX = searchStart.getX();
+        var minZ = searchStart.getZ();
+        var maxZ = searchStart.getZ();
+        var maxFrameBlocks = MAX_SEARCH_LENGTH * 4;
+
+        // Collect the connected frame loop first so validation works no matter which edge or corner we started from.
+        while (!openSet.isEmpty()) {
+            var currentPos = openSet.removeFirst();
+
+            minX = Math.min(minX, currentPos.getX());
+            maxX = Math.max(maxX, currentPos.getX());
+            minZ = Math.min(minZ, currentPos.getZ());
+            maxZ = Math.max(maxZ, currentPos.getZ());
+
+            for (var direction : new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
+                var nextPos = currentPos.relative(direction);
+                if (nextPos.getY() != searchStart.getY() || frameBlocks.contains(nextPos) || !testForFrame(nextPos)) {
+                    continue;
+                }
+
+                frameBlocks.add(nextPos);
+                openSet.add(nextPos);
+                if (frameBlocks.size() > maxFrameBlocks) {
+                    highlightBlock(nextPos);
+                    return null;
+                }
+            }
+        }
+
+        var width = maxX - minX + 1;
+        var depth = maxZ - minZ + 1;
+        if (width < 3 || depth < 3 || width > MAX_SEARCH_LENGTH || depth > MAX_SEARCH_LENGTH) {
+            highlightBlock(searchStart);
+            return null;
+        }
+
+        // A valid frame is a solid rectangle border with a completely empty interior.
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                var checkPos = new BlockPos(x, searchStart.getY(), z);
+                var isBoundary = x == minX || x == maxX || z == minZ || z == maxZ;
+                var isFrame = testForFrame(checkPos);
+
+                if (isBoundary && !isFrame) {
                     highlightBlock(checkPos);
-                    valid = false;
+                    return null;
+                }
+
+                if (!isBoundary && !level.getBlockState(checkPos).isAir()) {
+                    highlightBlock(checkPos);
+                    return null;
                 }
             }
         }
-        
-        
-        return valid;
-    }
-    
-    private BlockPos searchFrameLine(BlockPos searchStart, Vec3i direction) {
-        
-        var lastPosition = BlockPos.ZERO;        // yes this will break if the frame starts at 0/0/0, however I'm willing to accept this
-        
-        for (int i = 0; i < MAX_SEARCH_LENGTH; i++) {
-            var checkPos = searchStart.offset(direction.multiply(i));
-            if (testForFrame(checkPos)) {
-                lastPosition = checkPos;
-            } else {
-                break;
-            }
-        }
-        
-        return lastPosition;
-    }
-    
-    private BlockPos searchFrameLineEnd(BlockPos searchStart, Vec3i direction, BlockPos searchEnd) {
-        
-        var lastPosition = BlockPos.ZERO;        // yes this will break if the frame starts at 0/0/0, however I'm willing to accept this
-        
-        for (int i = 0; i < MAX_SEARCH_LENGTH; i++) {
-            var checkPos = searchStart.offset(direction.multiply(i));
-            if (testForFrame(checkPos)) {
-                
-                if (checkPos.equals(searchEnd)) {
-                    Oritech.LOGGER.debug("found start, machine is valid");
-                    return checkPos;
-                }
-                
-                lastPosition = checkPos;
-            } else {
-                break;
-            }
-        }
-        
-        return lastPosition;
+
+        Oritech.LOGGER.debug("found valid machine frame from {} to {}", new BlockPos(minX, searchStart.getY(), minZ), new BlockPos(maxX, searchStart.getY(), maxZ));
+        return new FrameBounds(minX, maxX, minZ, maxZ);
     }
     
     @SuppressWarnings("DataFlowIssue")
@@ -437,5 +402,8 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     public void sendUpdate(SyncType type) {
         if (currentTarget == null || lastTarget == null) return;
         super.sendUpdate(type);
+    }
+
+    private record FrameBounds(int minX, int maxX, int minZ, int maxZ) {
     }
 }
