@@ -317,7 +317,7 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     }
     
     private void highlightBlock(BlockPos block) {
-        ParticleContent.HIGHLIGHT_BLOCK.spawn(level, Vec3.atLowerCornerOf(block), null);
+        ParticleContent.HighlightBlock(level, Vec3.atLowerCornerOf(block));
     }
     
     public abstract BlockState getMachineHead();

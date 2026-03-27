@@ -34,8 +34,9 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.storage.UnstableContainerBlock;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.*;
@@ -122,7 +123,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
         
         if (energyStorage.capacity < energyStorage.maxInsert * 0.9999) {
             // growing, spawn particles
-            ParticleContent.UNSTABLE_CONTAINER_GROWING.spawn(level, worldPosition.getCenter(), 2);
+            if (level instanceof ServerLevel sl) { var c = worldPosition.getCenter(); sl.sendParticles(ParticleTypes.TRIAL_SPAWNER_DETECTED_PLAYER, c.x, c.y, c.z, 2, 2, 2, 2, 0); }
         }
         
         if (energyStorage.amount > energyStorage.capacity) {

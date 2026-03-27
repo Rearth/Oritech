@@ -15,9 +15,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.util.Geometry;
+import net.minecraft.core.particles.ParticleTypes;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
@@ -85,8 +85,11 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         var targetPosOffset = worldToOffsetPosition(facing, targetPos, startPos).add(startOffset);
         
         var forward = targetPos.subtract(startPos).normalize();
-        if (!laserEntity.isTargetingEnergyContainer() && !laserEntity.isTargetingBuddingAmethyst() && laserEntity.getLevel().random.nextFloat() > 0.7)
-            ParticleContent.LASER_BEAM_EFFECT.spawn(laserEntity.getLevel(), targetPos.add(0.5, 0, 0.5).subtract(forward.scale(0.6)));
+        if (!laserEntity.isTargetingEnergyContainer() && !laserEntity.isTargetingBuddingAmethyst() && laserEntity.getLevel().random.nextFloat() > 0.7) {
+            var world = laserEntity.getLevel();
+            var p = targetPos.add(0.5, 0, 0.5).subtract(forward.scale(0.6));
+            world.addParticle(ParticleTypes.SMALL_FLAME, p.x + (world.random.nextDouble() - 0.5) * 0.8, p.y + (world.random.nextDouble() - 0.5) * 0.6, p.z + (world.random.nextDouble() - 0.5) * 0.8, 0, 0, 0);
+        }
         
         
         matrices.pushPose();

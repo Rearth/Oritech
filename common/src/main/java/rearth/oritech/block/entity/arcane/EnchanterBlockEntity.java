@@ -15,6 +15,8 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.EnchanterScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.InventoryInputMode;
@@ -129,12 +131,12 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
             var center = pos.getCenter();
             var r = world.random;
             var offset = center.add(r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f);
-            ParticleContent.WEED_KILLER.spawn(world, center, new ParticleContent.LineData(center, offset));
+            ParticleContent.WeedKiller(world, center, offset);
             
             if (progress >= maxProgress) {
                 progress = 0;
                 finishEnchanting();
-                ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.getCenter(), maxProgress + 10);
+                if (world instanceof ServerLevel sl) { var c = pos.getCenter(); sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, maxProgress + 10, 0.6, 0.6, 0.6, 0); }
                 activeAnimation = "idle";
             }
         }
@@ -199,7 +201,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         statistics = new EnchanterStatistics(requiredCatalysts, cachedCatalysts.size());
         
         for (var catalyst : cachedCatalysts) {
-            ParticleContent.CATALYST_CONNECTION.spawn(level, worldPosition.getCenter(), new ParticleContent.LineData(catalyst.getBlockPos().getCenter(), worldPosition.above().getCenter()));
+            ParticleContent.CatalystConnection(level, catalyst.getBlockPos().getCenter(), worldPosition.above().getCenter());
         }
         
         if (cachedCatalysts.size() < requiredCatalysts) return false;

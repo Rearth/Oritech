@@ -118,7 +118,7 @@ public class UnstableContainerItem extends Item implements GeoItem {
             var candidateState = context.getLevel().getBlockState(worldPos);
             if (!candidateState.canBeReplaced() && !offset.equals(new Vec3i(0, -1, 0))) {   // ignore below block for dragon egg support blocks
                 context.getPlayer().sendSystemMessage(Component.translatable("text.oritech.unstable_container_blocked"));
-                ParticleContent.HIGHLIGHT_BLOCK.spawn(context.getLevel(), Vec3.atLowerCornerOf(worldPos));
+                ParticleContent.HighlightBlock(context.getLevel(), Vec3.atLowerCornerOf(worldPos));
                 return InteractionResult.FAIL;
             }
         }

@@ -24,6 +24,8 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.*;
@@ -110,7 +112,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
             setChanged();
             
             var particlePos = getCenter(0);
-            ParticleContent.FURNACE_BURNING.spawn(world, Vec3.atLowerCornerOf(particlePos), 1);
+            if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, particlePos.getX() + 0.5, particlePos.getY() + 0.5, particlePos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
         
         // try increasing faster if too much energy is provided
@@ -147,7 +149,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
                     var target = center.offset(x, y, z);
                     var targetState = level.getBlockState(target);
                     if (targetState.is(TagContent.RESOURCE_NODES)) {
-                        if (manual) ParticleContent.DEBUG_BLOCK.spawn(level, Vec3.atLowerCornerOf(target));
+                        if (manual) ParticleContent.DebugBlock(level, Vec3.atLowerCornerOf(target));
                         targetedOre.add(targetState.getBlock());
                         break;
                     } else if (!targetState.isAir()) break;

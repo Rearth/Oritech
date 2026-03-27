@@ -21,9 +21,10 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -80,7 +81,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
         // emit particles
         var emitPosition = Vec3.atCenterOf(worldPosition);
         
-        ParticleContent.COOLER_WORKING.spawn(level, emitPosition, 2);
+        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SNOWFLAKE, emitPosition.x, emitPosition.y, emitPosition.z, 2, 1.2, 1.2, 1.2, 0);
         
     }
     

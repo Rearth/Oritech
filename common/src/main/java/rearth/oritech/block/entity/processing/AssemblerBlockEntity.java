@@ -3,8 +3,9 @@ package rearth.oritech.block.entity.processing;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.Geometry;
@@ -63,7 +64,7 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
         var offsetLocal = Geometry.rotatePosition(new Vec3(0, 0.6, 0.5), facing);
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        ParticleContent.ASSEMBLER_WORKING.spawn(level, emitPosition, 1);
+        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.ENCHANTED_HIT, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
         
     }
     

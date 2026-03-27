@@ -85,13 +85,13 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
             var cachedHit = tryGetCachedCollector(cacheKey);
             if (cachedHit != null) {
                 // re-use existing result
-                ParticleContent.BLACK_HOLE_EMISSION.spawn(level, worldPosition.getCenter(), cachedHit.getBlockPos().getCenter());
+                ParticleContent.BlackHoleEmission(level, worldPosition.getCenter(), cachedHit.getBlockPos().getCenter());
                 cachedHit.onParticleCollided();
             } else {
                 // find target along exit line, and add it to cache
                 var impactPos = basicRaycast(worldPosition.getCenter().add(pulledDir.scale(1.2)), shootDir, 12, level);
                 if (impactPos != null) {
-                    ParticleContent.BLACK_HOLE_EMISSION.spawn(level, worldPosition.getCenter(), impactPos.getCenter());
+                    ParticleContent.BlackHoleEmission(level, worldPosition.getCenter(), impactPos.getCenter());
                     
                     var candidate = level.getBlockEntity(impactPos);
                     if (candidate instanceof ParticleCollectorBlockEntity collectorEntity) {
@@ -104,7 +104,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
                     
                 } else {
                     // only cast one particle if no block has been found (for performance sake to avoid all those searches)
-                    ParticleContent.BLACK_HOLE_EMISSION.spawn(level, worldPosition.getCenter(), worldPosition.getCenter().add(shootDir.scale(15)));
+                    ParticleContent.BlackHoleEmission(level, worldPosition.getCenter(), worldPosition.getCenter().add(shootDir.scale(15)));
                     break;
                 }
             }

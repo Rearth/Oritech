@@ -215,7 +215,7 @@ public interface MultiblockMachineController {
     }
     
     private void highlightBlock(BlockPos block, Level world) {
-        ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3.atLowerCornerOf(block), null);
+        ParticleContent.HighlightBlock(world, Vec3.atLowerCornerOf(block));
     }
     
     // this should be called on the server

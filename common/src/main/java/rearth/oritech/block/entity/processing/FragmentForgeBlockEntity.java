@@ -16,8 +16,9 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -69,7 +70,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
         var offsetLocal = Geometry.rotatePosition(new Vec3(0.4, 0.6, 0.5), facing);
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        ParticleContent.GRINDER_WORKING.spawn(level, emitPosition, 1);
+        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.DUST_PLUME, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.8, 0.8, 0.8, 0);
         
     }
     

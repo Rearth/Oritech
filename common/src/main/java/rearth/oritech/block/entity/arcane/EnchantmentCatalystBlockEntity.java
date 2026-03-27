@@ -12,6 +12,8 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.CatalystScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 
 import rearth.oritech.init.TagContent;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
@@ -106,7 +108,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         if (collectedSouls > maxSouls) {
             unstableTicks++;
             
-            ParticleContent.MELTDOWN_IMMINENT.spawn(world, pos.getCenter(), unstableTicks / 4);
+            if (world instanceof ServerLevel sl) { var c = pos.getCenter(); sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, unstableTicks / 4, 1, 1, 1, 0); }
             
             if (unstableTicks > 60)
                 doExplosion();
@@ -122,11 +124,11 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             networkDirty = true;
             progress++;
             
-            ParticleContent.SOUL_USED.spawn(world, pos.getCenter().add(0, 0.3, 0), isHyperEnchanting ? 15 : 3);
+            if (world instanceof ServerLevel sl) { var c = pos.getCenter().add(0, 0.3, 0); sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, c.x, c.y, c.z, isHyperEnchanting ? 15 : 3, 1.2, 1.2, 1.2, 0); }
             
             if (progress >= maxProgress) {
                 enchantInput();
-                ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.getCenter(), maxProgress + 10);
+                if (world instanceof ServerLevel sl) { var c = pos.getCenter(); sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, maxProgress + 10, 0.6, 0.6, 0.6, 0); }
                 
                 progress = 0;
                 isHyperEnchanting = false;
@@ -283,9 +285,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         this.setChanged();
         
         var soulPath = worldPosition.getCenter().subtract(source);
-        var animData = new ParticleContent.SoulParticleData(soulPath, (int) getSoulTravelDuration(distance));
-        
-        ParticleContent.WANDERING_SOUL.spawn(level, source.add(0, 0.7f, 0), animData);
+        ParticleContent.WanderingSoul(level, source.add(0, 0.7f, 0), soulPath, (int) getSoulTravelDuration(distance));
     }
     
     @Override

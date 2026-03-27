@@ -58,9 +58,9 @@ import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.BlockContent;
+import net.minecraft.core.particles.ParticleTypes;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -243,7 +243,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
             var recipe = blockRecipe.value();
             var farmedCount = 1 + yieldAddons;
             dropped = List.of(new ItemStack(recipe.getResults().get(0).getItem(), farmedCount));
-            ParticleContent.CHARGING.spawn(level, Vec3.atLowerCornerOf(targetPos), 1);
+            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
         
         // yes, this will discard items that wont fit anymore

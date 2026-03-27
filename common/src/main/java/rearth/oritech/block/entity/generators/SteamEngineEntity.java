@@ -11,9 +11,10 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -204,7 +205,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         var offsetLocal = Geometry.rotatePosition(new Vec3(0, 0, -0.5), facing);
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        ParticleContent.STEAM_ENGINE_WORKING.spawn(level, emitPosition, 1);
+        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.CLOUD, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
     }
     
     private float getSteamEnergyEfficiency(float x) {

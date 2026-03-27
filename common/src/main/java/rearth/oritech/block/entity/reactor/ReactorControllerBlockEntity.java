@@ -15,6 +15,8 @@ import rearth.oritech.client.ui.ReactorScreenHandler;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 
 import rearth.oritech.util.Geometry;
 
@@ -280,7 +282,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     }
     
     private void playMeltdownAnimation(BlockPos port) {
-        ParticleContent.MELTDOWN_IMMINENT.spawn(level, port.getCenter().add(0, 0.3, 0), 5);
+        if (level instanceof ServerLevel sl) { var c = port.getCenter().add(0, 0.3, 0); sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, 5, 1, 1, 1, 0); }
     }
     
     private void playAmbientSound() {

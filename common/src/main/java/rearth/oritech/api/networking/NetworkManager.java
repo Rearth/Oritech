@@ -14,6 +14,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.LivingEntity;
@@ -72,6 +73,15 @@ public class NetworkManager {
     
     public static void sendToServer(CustomPacketPayload message) {
         OritechPlatform.INSTANCE.sendToServer(message);
+    }
+    
+    public static void sendNearby(ServerLevel level, Vec3 pos, double radius, CustomPacketPayload message) {
+        double rSq = radius * radius;
+        for (var player : level.players()) {
+            if (player.distanceToSqr(pos.x, pos.y, pos.z) < rSq) {
+                sendPlayerHandle(message, player);
+            }
+        }
     }
     
     public static <T extends CustomPacketPayload> void registerToClient(CustomPacketPayload.Type<T> id, StreamCodec<RegistryFriendlyByteBuf, T> packetCodec, TriConsumer<T, Level, RegistryAccess> consumer) {

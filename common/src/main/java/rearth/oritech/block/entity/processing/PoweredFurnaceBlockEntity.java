@@ -4,8 +4,9 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
@@ -67,7 +68,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
                 lastWorkedAt = world.getGameTime();
                 
                 if (world.random.nextFloat() > 0.8)
-                    ParticleContent.FURNACE_BURNING.spawn(world, Vec3.atLowerCornerOf(pos), 1);
+                    if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
                 
                 if (furnaceCraftingFinished(activeRecipe)) {
                     craftFurnaceItem(activeRecipe);

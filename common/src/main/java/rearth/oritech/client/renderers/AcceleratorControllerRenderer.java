@@ -7,8 +7,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.world.phys.Vec3;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.util.BeamRenderer;
+import net.minecraft.core.particles.ParticleTypes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +45,9 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
         var displayTrail = entity.displayTrail;
         if (!activeLines.containsKey(entity.getBlockPos().asLong()) || !activeLines.get(entity.getBlockPos().asLong()).positions.equals(displayTrail)) {
             activeLines.put(entity.getBlockPos().asLong(), new RenderedLine(time, displayTrail));
-            ParticleContent.PARTICLE_MOVING.spawn(entity.getLevel(), displayTrail.getLast());
+            var world = entity.getLevel();
+            var pp = displayTrail.getLast();
+            world.addParticle(ParticleTypes.REVERSE_PORTAL, pp.x + (world.random.nextDouble() - 0.5) * 0.4, pp.y + (world.random.nextDouble() - 0.5) * 0.6, pp.z + (world.random.nextDouble() - 0.5) * 0.4, 0, 0, 0);
         }
         
         var activeLine = activeLines.get(entity.getBlockPos().asLong());

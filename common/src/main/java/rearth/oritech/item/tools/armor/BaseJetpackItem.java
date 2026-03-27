@@ -10,13 +10,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
 import rearth.oritech.api.networking.NetworkManager;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.LaserArmRenderer;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.TagContent;
@@ -99,8 +99,16 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         var direction = new Vec3(0, -1, 0);
         if (forward) direction = playerForward.normalize().scale(-1).add(0, -1, 0);
         
-        ParticleContent.JETPACK_EXHAUST.spawn(world, particlePosA, direction);
-        ParticleContent.JETPACK_EXHAUST.spawn(world, particlePosB, direction);
+        world.addParticle(ParticleTypes.SMOKE,
+            particlePosA.x + (world.random.nextDouble() - 0.5) * 0.2,
+            particlePosA.y + (world.random.nextDouble() - 0.5) * 0.2,
+            particlePosA.z + (world.random.nextDouble() - 0.5) * 0.2,
+            direction.x, direction.y, direction.z);
+        world.addParticle(ParticleTypes.SMOKE,
+            particlePosB.x + (world.random.nextDouble() - 0.5) * 0.2,
+            particlePosB.y + (world.random.nextDouble() - 0.5) * 0.2,
+            particlePosB.z + (world.random.nextDouble() - 0.5) * 0.2,
+            direction.x, direction.y, direction.z);
     }
     
     private static boolean isJetpackStarted(Player player, Level world, boolean up) {

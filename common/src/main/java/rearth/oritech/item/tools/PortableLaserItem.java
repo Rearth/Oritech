@@ -1,6 +1,5 @@
 package rearth.oritech.item.tools;
 
-import dev.architectury.platform.Platform;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -48,6 +47,7 @@ import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.PortableLaserRenderer;
 import rearth.oritech.init.ComponentContent;
+import net.minecraft.core.particles.ParticleTypes;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
@@ -167,8 +167,8 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         Vec3 rightDir = new Vec3(rightX, 0, rightZ).normalize();
         
         var startPos = player.getEyePosition().add(endPos.subtract(player.getEyePosition()).scale(0.4f)).add(0, -0.5f, 0).add(rightDir.scale(0.3f));
-        ParticleContent.LASER_BOOM.spawn(world, startPos, endPos);
-        ParticleContent.MELTDOWN_IMMINENT.spawn(world, endPos, 6);
+        ParticleContent.LaserBoom(world, startPos, endPos);
+        if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, endPos.x, endPos.y, endPos.z, 6, 1, 1, 1, 0);
         
         return InteractionResultHolder.consume(stack);
     }
@@ -211,7 +211,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         }
         
         if (finalHit != null && finalHit.getType() != HitResult.Type.MISS && laserItem.isMiningEnabled(stack)) {
-            ParticleContent.LASER_BEAM_EFFECT.spawn(world, finalHit.getLocation());
+            if (world instanceof ServerLevel sl) { var loc = finalHit.getLocation(); sl.sendParticles(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z, 1, 0.4, 0.3, 0.4, 0); }
         }
         
     }
@@ -262,7 +262,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         if (blockState.is(TagContent.LASER_ACCELERATED)) {
             blockState.randomTick((ServerLevel) world, blockPos, world.random);
-            ParticleContent.ACCELERATING.spawn(world, Vec3.atLowerCornerOf(blockPos));
+            ParticleContent.Accelerating(world, Vec3.atLowerCornerOf(blockPos));
             stats = new Tuple<>(blockPos, -1);
         }
         
@@ -319,7 +319,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             var recipe = blockRecipe.value();
             var farmedCount = 1;
             dropped = List.of(new ItemStack(recipe.getResults().get(0).getItem(), farmedCount));
-            ParticleContent.CHARGING.spawn(world, Vec3.atLowerCornerOf(targetPos), 1);
+            if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
         
         // add stack to player inv, or spawn at block pos

@@ -26,8 +26,8 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
+import net.minecraft.core.particles.ParticleTypes;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.TagContent;
@@ -151,7 +151,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
                 inventory.setItem(0, inventoryStack);
             }
             super.finishBlockWork(processed);
-            ParticleContent.FERTILIZER_EFFECT.spawn(level, Vec3.atLowerCornerOf(targetPosition), fertilizerStrength * 3 + 2);
+            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, targetPosition.getX() + 0.5, targetPosition.getY() + 0.5, targetPosition.getZ() + 0.5, fertilizerStrength * 3 + 2, 0.5, 0.5, 0.5, 0);
             level.playSound(null, targetPosition, SoundEvents.BONE_MEAL_USE, SoundSource.BLOCKS, 1f, 1f);
         }
     }
@@ -173,7 +173,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
         super.doProgress(moving);
         if (!moving && hasWorkAvailable(getCurrentTarget())) {
             fluidStorage.setAmount(fluidStorage.getAmount() - getWaterUsagePerTick());
-            ParticleContent.WATERING_EFFECT.spawn(level, Vec3.atLowerCornerOf(getCurrentTarget().below()), 2);
+            if (level instanceof ServerLevel sl) { var bp = getCurrentTarget().below(); sl.sendParticles(ParticleTypes.FALLING_WATER, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 2, 0.6, 0.6, 0.6, 0); }
         }
     }
     

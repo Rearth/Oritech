@@ -36,6 +36,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.AcceleratorScreenHandler;
 import rearth.oritech.init.BlockContent;
+import net.minecraft.core.particles.ParticleTypes;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -181,7 +182,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var particleCount = Math.pow(relativeSpeed, 0.5) / 2f + 1;
         createCollisionParticles((int) relativeSpeed, collision, (int) particleCount);
         
-        ParticleContent.PARTICLE_COLLIDE.spawn(level, collision);
+        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.GUST, collision.x, collision.y, collision.z, 1, 0, 0, 0, 0);
         this.setChanged();
     }
     
@@ -201,7 +202,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             
             var impactPos = BlackHoleBlockEntity.basicRaycast(collisionPosition.add(direction.scale(1.2)), direction, rayRange, level);
             if (impactPos != null) {
-                ParticleContent.BLACK_HOLE_EMISSION.spawn(level, collisionPosition, impactPos.getCenter());
+                ParticleContent.BlackHoleEmission(level, collisionPosition, impactPos.getCenter());
                 
                 var candidate = level.getBlockEntity(impactPos);
                 if (candidate instanceof ParticleCollectorBlockEntity collectorEntity) {
@@ -209,7 +210,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
                     caughtParticles++;
                 }
             } else {
-                ParticleContent.BLACK_HOLE_EMISSION.spawn(level, collisionPosition, offset);
+                ParticleContent.BlackHoleEmission(level, collisionPosition, offset);
             }
             
             // System.out.println("caught: " + caughtParticles + " of " + shotCount);
@@ -354,7 +355,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         mob.hurt(level.damageSources().magic(), remainingMomentum);
         var position = mob.getBoundingBox().getCenter();
         position = new Vec3(position.x, particle.position.y, position.z);
-        ParticleContent.BIG_HIT.spawn(level, position);
+        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SONIC_BOOM, position.x, position.y, position.z, 1, 0.3, 0.3, 0.3, 0);
         
         return inflictedDamage;
     }
@@ -382,7 +383,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     private void createBlackHole(BlockPos checkPos) {
-        ParticleContent.MELTDOWN_IMMINENT.spawn(level, checkPos.getCenter(), 30);
+        if (level instanceof ServerLevel sl) { var c = checkPos.getCenter(); sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, 30, 1, 1, 1, 0); }
         
         var center = checkPos.getCenter();
         level.explode(null, center.x, center.y, center.z, 10, false, Level.ExplosionInteraction.BLOCK);

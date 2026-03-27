@@ -14,9 +14,10 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventorySlotAssignment;
@@ -84,7 +85,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
         }
         
         if (fluidStorage.getAmount() != startFluid || energyStorage.amount != startEnergy) {
-            ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.getCenter().add(0.1, 0.1, 0), 1);
+            if (world instanceof ServerLevel sl) { var c = pos.getCenter().add(0.1, 0.1, 0); sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 1, 0.6, 0.6, 0.6, 0); }
         }
         
     }

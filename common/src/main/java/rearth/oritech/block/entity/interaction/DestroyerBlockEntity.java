@@ -33,8 +33,8 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockFrameInteractionEntity;
 import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
+import net.minecraft.core.particles.ParticleTypes;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.FakeMachinePlayer;
 
@@ -284,9 +284,10 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             return;
         
         if (range > 1 && quarryTarget != BlockPos.ZERO) {
-            ParticleContent.QUARRY_DESTROY_EFFECT.spawn(level, Vec3.atCenterOf(quarryTarget).add(0, 0.5, 0), 3);
+            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, quarryTarget.getX() + 0.5, quarryTarget.getY() + 1.0, quarryTarget.getZ() + 0.5, 3, 0.4, 0.4, 0.4, 0);
         } else if (hasWorkAvailable(getCurrentTarget())) {
-            ParticleContent.BLOCK_DESTROY_EFFECT.spawn(level, Vec3.atLowerCornerOf(getCurrentTarget().below()), 4);
+            var bp = getCurrentTarget().below();
+            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
         }
     }
     

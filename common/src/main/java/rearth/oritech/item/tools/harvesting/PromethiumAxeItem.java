@@ -24,8 +24,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.TreefellerBlockEntity;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
+import net.minecraft.core.particles.ParticleTypes;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -91,7 +91,7 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
             world.playSound(null, candidate, candidateState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.5f, 1f);
             world.addDestroyBlockEffect(candidate, candidateState);
             
-            ParticleContent.BLOCK_DESTROY_EFFECT.spawn(world, Vec3.atLowerCornerOf(candidate), 4);
+            if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, candidate.getX() + 0.5, candidate.getY() + 0.5, candidate.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
             
             if (candidateState.is(BlockTags.LOGS)) break;
         }
