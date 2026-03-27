@@ -157,6 +157,7 @@ publishMods {
         requires("athena-ctm")
         requires("fabric-api")
         requires("architectury-api")
+        optional("oracle-index")
 
         announcementTitle = "Fabric Version on Modrinth"
     }
@@ -172,6 +173,7 @@ publishMods {
         requires("athena")
         requires("fabric-api")
         requires("architectury-api")
+        optional("oracle-index")
 
         javaVersions.add(JavaVersion.VERSION_21)
         clientRequired = true
