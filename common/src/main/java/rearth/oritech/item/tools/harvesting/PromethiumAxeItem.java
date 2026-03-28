@@ -8,7 +8,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.AxeItem;
@@ -39,7 +38,8 @@ import java.util.function.Consumer;
 
 public class PromethiumAxeItem extends AxeItem implements GeoItem {
     
-    public static final Deque<Tuple<Level, BlockPos>> pendingBlocks = new ArrayDeque<>();
+    public record PendingBlock(Level level, BlockPos pos, ItemStack tool) {};
+    public static final Deque<PendingBlock> pendingBlocks = new ArrayDeque<>();
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
@@ -65,7 +65,7 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
             var startState = world.getBlockState(startPos);
             if (startState.is(BlockTags.LOGS)) {
                 var treeBlocks = TreefellerBlockEntity.getTreeBlocks(startPos, world);
-                pendingBlocks.addAll(treeBlocks.stream().map(elem -> new Tuple<>(world, elem)).toList());
+                pendingBlocks.addAll(treeBlocks.stream().map(elem -> new PendingBlock(world, elem, stack)).toList());
             }
         }
         
@@ -75,23 +75,24 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
     public static void processPendingBlocks(Level world) {
         if (pendingBlocks.isEmpty()) return;
         
-        var topWorld = pendingBlocks.getFirst().getA();
+        var topWorld = pendingBlocks.getFirst().level();
         if (topWorld != world) return;
         
         for (int i = 0; i < 8 && !pendingBlocks.isEmpty(); i++) {
-            var candidate = pendingBlocks.pollFirst().getB();
-            var candidateState = world.getBlockState(candidate);
+            var candidate = pendingBlocks.pollFirst();
+            var candidatePos = candidate.pos();
+            var candidateState = world.getBlockState(candidatePos);
             if (!candidateState.is(BlockTags.LOGS) && !candidateState.is(BlockTags.LEAVES)) return;
             
-            var dropped = Block.getDrops(candidateState, (ServerLevel) world, candidate, null);
-            world.setBlockAndUpdate(candidate, Blocks.AIR.defaultBlockState());
+            var dropped = Block.getDrops(candidateState, (ServerLevel) world, candidatePos, null, null, candidate.tool());
+            world.setBlockAndUpdate(candidatePos, Blocks.AIR.defaultBlockState());
             
-            dropped.forEach(elem -> world.addFreshEntity(new ItemEntity(world, candidate.getX(), candidate.getY(), candidate.getZ(), elem)));
+            dropped.forEach(elem -> world.addFreshEntity(new ItemEntity(world, candidatePos.getX(), candidatePos.getY(), candidatePos.getZ(), elem)));
             
-            world.playSound(null, candidate, candidateState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.5f, 1f);
-            world.addDestroyBlockEffect(candidate, candidateState);
+            world.playSound(null, candidatePos, candidateState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.5f, 1f);
+            world.addDestroyBlockEffect(candidatePos, candidateState);
             
-            ParticleContent.BLOCK_DESTROY_EFFECT.spawn(world, Vec3.atLowerCornerOf(candidate), 4);
+            ParticleContent.BLOCK_DESTROY_EFFECT.spawn(world, Vec3.atLowerCornerOf(candidatePos), 4);
             
             if (candidateState.is(BlockTags.LOGS)) break;
         }

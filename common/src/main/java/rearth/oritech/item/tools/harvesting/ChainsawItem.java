@@ -78,7 +78,7 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
             var startState = world.getBlockState(startPos);
             if (startState.is(BlockTags.LOGS)) {
                 var treeBlocks = TreefellerBlockEntity.getTreeBlocks(startPos, world);
-                PromethiumAxeItem.pendingBlocks.addAll(treeBlocks.stream().map(elem -> new Tuple<>(world, elem)).toList());
+                PromethiumAxeItem.pendingBlocks.addAll(treeBlocks.stream().map(elem -> new PromethiumAxeItem.PendingBlock(world, elem, stack)).toList());
                 
                 var extraEnergyUsed = treeBlocks.size() * energyUsageMultiplier / 2;
                 this.tryUseEnergy(stack, (long) extraEnergyUsed, player);
