@@ -5,26 +5,34 @@ import static rearth.oritech.api.recipe.util.RecipeHelpers.createInsulatedCableR
 import java.util.List;
 import java.util.Optional;
 
+import com.enderio.base.common.init.EIOFluids;
 import com.enderio.base.common.init.EIOItems;
 import com.enderio.base.common.recipe.FireCraftingRecipe;
+import com.enderio.machines.common.blocks.soul_binder.SoulBindingRecipe;
 import com.enderio.machines.common.blocks.alloy.AlloySmeltingRecipe;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
+import rearth.oritech.api.recipe.CentrifugeFluidRecipeBuilder;
 import rearth.oritech.api.recipe.FoundryRecipeBuilder;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
+import rearth.oritech.util.FluidIngredient;
 import rearth.oritech.generator.loot.FireCraftingLootProvider;
 
 public class EnderIORecipeGenerator {
@@ -33,8 +41,13 @@ public class EnderIORecipeGenerator {
     public static void generateRecipes(RecipeOutput exporter, RecipeProvider provider) {
         addAlloys(exporter);
         conduitBinderCrafting(exporter, provider);
+        soulBinding(exporter);
 
+        // enderic compound from ender pearl dust
         CentrifugeRecipeBuilder.build().input(EIOItems.POWDERED_ENDER_PEARL.get()).result(ItemContent.ENDERIC_COMPOUND, 2).export(exporter, PATH + "endericcompound");
+
+        // xp juice from sculk
+        CentrifugeFluidRecipeBuilder.build().input(Items.SCULK).fluidInput(Fluids.WATER, 0.25f).fluidOutput(EIOFluids.XP_JUICE.getSource(), 0.1f).export(exporter, PATH + "sculkxp");
     }
 
     private static void addAlloys(RecipeOutput exporter) {
@@ -70,5 +83,23 @@ public class EnderIORecipeGenerator {
             .pattern("fcf")
             .pattern("sbs")
             .unlockedBy(provider.getHasName(conduitBinder), RecipeProvider.has(conduitBinder)).save(exporter, Oritech.id(PATH + "crafting/pump"));
+    }
+
+    private static void soulBinding(RecipeOutput exporter) {
+        // Kind of redundant, but still fun. A soul vial is filled the exact same way a dubious container is--by "capturing" an entity with the item.
+        for (EntityType entityType : List.of(EntityType.ALLAY, EntityType.VEX, EntityType.PHANTOM)) {
+            var entityKey = BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
+            exporter.accept(
+                Oritech.id(PATH + entityKey.getPath() + "soul"),
+                new SoulBindingRecipe(
+                    new ItemStack(ItemContent.UNHOLY_INTELLIGENCE),
+                    Ingredient.of(ItemContent.DUBIOS_CONTAINER),
+                    51200,
+                    4,
+                    Optional.of(entityKey),
+                    Optional.empty(),
+                    Optional.empty(),
+                    false), null);
+        }
     }
 }

@@ -145,11 +145,23 @@ dependencies {
     dataImplementation("com.enderio:enderio-machines:$enderio_version") { transitive = false }
     // Energized Power
     dataImplementation "curse.maven:energized-power-782147:$energized_power_neo_version_id"
+    // EvilCraft
+    dataImplementation "curse.maven:evilcraft-74610:$evilcraft_version_id"
+    dataRuntimeOnly "curse.maven:cyclops-core-232758:$cyclopscore_version_id"
+    // Extended AE
+    dataImplementation "curse.maven:ex-pattern-provider-892005:$extendedae_version_id"
+    dataRuntimeOnly "curse.maven:glodium-957920:$glodium_version_id"
+    // GeOre
+    dataImplementation "curse.maven:geore-530544:$geore_version_id"    
     // Immersive Engineering
     dataImplementation "curse.maven:immersive-engineering-231951:$immersive_engineering_version_id"
     // Industrial Foregoing
     dataImplementation "curse.maven:industrial-foregoing-266515:$industrial_foregoing_version_id"
     dataImplementation "curse.maven:titanium-287342:$titanium_version_id"
+    // Iron's Spells 'n Spellbooks
+    dataImplementation "curse.maven:irons-spells-n-spellbooks-855414:$irons_spells_version_id"
+    dataRuntimeOnly "curse.maven:playeranimator-658587:$player_animator_version_id"
+    dataRuntimeOnly "curse.maven:caelus-308989:$caelus_version_id"
     // Mekanism
     dataImplementation "curse.maven:mekanism-268560:6486993"
     dataImplementation "curse.maven:mekanism-generators-268566:6486996"
