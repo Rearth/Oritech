@@ -18,7 +18,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
     public static final MenuType<BasicMachineScreenHandler> AUGMENTER_INV_SCREEN = MenuRegistry.ofExtended((BasicMachineScreenHandler::new));
     
     public static final MenuType<UpgradableMachineScreenHandler> LASER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
-    public static final MenuType<UpgradableMachineScreenHandler> PULVERIZER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    public static final MenuType<UpgradableOritechScreenHandler> PULVERIZER_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<UpgradableMachineScreenHandler> GRINDER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
     public static final MenuType<UpgradableMachineScreenHandler> ASSEMBLER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
     public static final MenuType<UpgradableMachineScreenHandler> FOUNDRY_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
@@ -62,7 +62,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
         MenuRegistry.registerScreenFactory(AUGMENTER_INV_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(REFINERY_SCREEN, RefineryScreen::new);
         
-        MenuRegistry.registerScreenFactory(PULVERIZER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
+        MenuRegistry.registerScreenFactory(PULVERIZER_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(GRINDER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(ASSEMBLER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(FOUNDRY_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);

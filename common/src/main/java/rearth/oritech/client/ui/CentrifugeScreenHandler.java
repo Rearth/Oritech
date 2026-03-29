@@ -9,7 +9,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class CentrifugeScreenHandler extends UpgradableMachineScreenHandler {
+public class CentrifugeScreenHandler extends UpgradableOritechScreenHandler {
     
     public final FluidApi.SingleSlotStorage inputTank;
     

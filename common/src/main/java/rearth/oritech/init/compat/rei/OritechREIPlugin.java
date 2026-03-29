@@ -1,5 +1,6 @@
 package rearth.oritech.init.compat.rei;
 
+import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
@@ -14,6 +15,7 @@ import rearth.oritech.block.entity.generators.FuelGeneratorEntity;
 import rearth.oritech.block.entity.generators.LavaGeneratorEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.*;
+import rearth.oritech.client.ui.OritechScreen;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.compat.rei.Screens.OritechReiDisplay;
 import rearth.oritech.init.compat.rei.Screens.OritechReiLaserDisplay;
@@ -100,6 +102,14 @@ public class OritechREIPlugin implements REIClientPlugin {
     @Override
     public void registerScreens(ScreenRegistry registry) {
         registry.registerDraggableStackVisitor(new ReiItemFilterDraggableStackVisitor());
+        registry.exclusionZones().register(OritechScreen.class, screen -> {
+            var zones = new java.util.ArrayList<Rectangle>();
+            for (var zone : screen.getExclusionZones()) {
+                var rect = (net.minecraft.client.renderer.Rect2i) zone;
+                zones.add(new Rectangle(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight()));
+            }
+            return zones;
+        });
     }
 
     private void registerOritechCategory(CategoryRegistry registry, OritechRecipeType recipeType, ItemLike machineIcon, BiFunction<OritechRecipeType, ItemLike, ? extends DisplayCategory<Display>> screenType) {

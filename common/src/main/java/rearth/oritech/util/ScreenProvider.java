@@ -1,9 +1,5 @@
 package rearth.oritech.util;
 
-import rearth.oritech.Oritech;
-
-import java.util.List;
-import java.util.Optional;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -12,6 +8,10 @@ import net.minecraft.world.Container;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
+import rearth.oritech.Oritech;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface ScreenProvider {
     
@@ -67,7 +67,7 @@ public interface ScreenProvider {
     default String currentRedstoneEffect() {return "";}
 
     default BarConfiguration getEnergyConfiguration() {
-        return new BarConfiguration(7, 24, 15, 54);
+        return new BarConfiguration(8, 24, 16, 54);
     }
     default BarConfiguration getFluidConfiguration() {
         return new BarConfiguration(147, 6, 21, 74);

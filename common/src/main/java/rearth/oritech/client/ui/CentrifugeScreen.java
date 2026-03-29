@@ -1,44 +1,26 @@
 package rearth.oritech.client.ui;
 
-import io.wispforest.owo.ui.container.FlowLayout;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
+import rearth.oritech.api.screen.widgets.FluidSlotWidget;
 import rearth.oritech.util.ScreenProvider;
 
-public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHandler> {
-    private final FluidDisplay inFluidDisplay;
-    
-    private static final ScreenProvider.BarConfiguration inputConfig = new ScreenProvider.BarConfiguration(28, 6, 21, 74);
-    
+public class CentrifugeScreen extends UpgradableOritechScreen<CentrifugeScreenHandler> {
+    private static final ScreenProvider.BarConfiguration INPUT_CONFIG = new ScreenProvider.BarConfiguration(28, 6, 21, 74);
+
+    private final FluidSlotWidget inputFluidDisplay;
+
     public CentrifugeScreen(CentrifugeScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
-        
-        if (((CentrifugeBlockEntity) handler.blockEntity).hasFluidAddon) {
-            inFluidDisplay = initFluidDisplay(handler.inputTank, inputConfig);
-            
-        } else {
-            inFluidDisplay = null;
-        }
+        this.inputFluidDisplay = handler.inputTank != null ? createFluidDisplay(handler.inputTank, INPUT_CONFIG) : null;
     }
-    
+
     @Override
-    public void fillOverlay(FlowLayout overlay) {
-        super.fillOverlay(overlay);
-        
-        if (inFluidDisplay != null) {
-            addFluidDisplay(overlay, inFluidDisplay);
-            updateFluidDisplay(inFluidDisplay);
+    protected void addExtraComponents() {
+        super.addExtraComponents();
+
+        if (inputFluidDisplay != null) {
+            addComponent(inputFluidDisplay);
         }
-        
-    }
-    
-    @Override
-    protected void containerTick() {
-        
-        if (inFluidDisplay != null)
-            updateFluidDisplay(inFluidDisplay);
-        
-        super.containerTick();
     }
 }

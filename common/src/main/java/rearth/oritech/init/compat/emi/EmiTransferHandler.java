@@ -5,15 +5,16 @@ import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.client.ui.MachineMenuHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-public class EmiTransferHandler<S extends BasicMachineScreenHandler> implements StandardRecipeHandler<S> {
+public class EmiTransferHandler<S extends AbstractContainerMenu & MachineMenuHandler> implements StandardRecipeHandler<S> {
     
     private final ResourceLocation categoryId;
     
@@ -29,7 +30,7 @@ public class EmiTransferHandler<S extends BasicMachineScreenHandler> implements 
     @Override
     public List<Slot> getCraftingSlots(S handler) {
         
-        if (!(handler.blockEntity instanceof MachineBlockEntity machine)) return List.of();
+        if (!(handler.getBlockEntity() instanceof MachineBlockEntity machine)) return List.of();
         
         var res = new ArrayList<Slot>();
         

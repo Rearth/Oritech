@@ -1,6 +1,5 @@
 package rearth.oritech.client.ui;
 
-import io.wispforest.owo.client.screens.SlotGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -8,6 +7,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -28,101 +28,119 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class BasicMachineScreenHandler extends AbstractContainerMenu implements MachineMenuHandler {
+/**
+ * Base screen handler for all Oritech machine screens.
+ * Replaces the owo-lib based BasicMachineScreenHandler.
+ * <p>
+ * Handles: machine inventory slots, player inventory slots, armor slots,
+ * energy storage reference, fluid storage references, screen data.
+ */
+public class OritechScreenHandler extends AbstractContainerMenu implements MachineMenuHandler {
     
     @NotNull
-    protected final Inventory playerInventory;
+    public final Inventory playerInventory;
     @NotNull
-    protected final Container inventory;
+    public final Container inventory;
+    @Nullable
+    public final EnergyApi.EnergyStorage energyStorage;
     @NotNull
-    protected final EnergyApi.EnergyStorage energyStorage;
-    
-    @NotNull
-    protected final BlockPos blockPos;
-    
+    public final BlockPos blockPos;
     @NotNull
     public final ScreenProvider screenData;
     
     @Nullable
-    protected final FluidApi.SingleSlotStorage steamStorage;
+    public final FluidApi.SingleSlotStorage steamStorage;
     @Nullable
-    protected final FluidApi.SingleSlotStorage waterStorage;
+    public final FluidApi.SingleSlotStorage waterStorage;
     @Nullable
-    protected FluidApi.SingleSlotStorage mainFluidContainer;
+    public FluidApi.SingleSlotStorage mainFluidContainer;
     
-    protected BlockState machineBlock;
+    public BlockState machineBlock;
     public BlockEntity blockEntity;
-    protected List<Integer> armorSlots;
+    public List<Integer> armorSlots;
     
-    public BasicMachineScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
+    public OritechScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
         this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
     }
     
-    // on server, also called from client constructor
-    public BasicMachineScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
+    public OritechScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(((ScreenProvider) blockEntity).getScreenHandlerType(), syncId);
         
         this.screenData = (ScreenProvider) blockEntity;
         this.blockPos = blockEntity.getBlockPos();
         this.inventory = screenData.getDisplayedInventory();
-        if (inventory != null)
-            inventory.startOpen(playerInventory.player);
+        if (this.inventory != null)
+            this.inventory.startOpen(playerInventory.player);
         this.playerInventory = playerInventory;
         
         if (blockEntity instanceof EnergyApi.BlockProvider energyProvider) {
-            energyStorage = energyProvider.getEnergyStorage(null);
+            this.energyStorage = energyProvider.getEnergyStorage(null);
         } else {
-            energyStorage = null;
+            this.energyStorage = null;
         }
         
         if (blockEntity instanceof FluidApi.BlockProvider blockProvider && blockProvider.getFluidStorage(null) instanceof SimpleFluidStorage container) {
             this.mainFluidContainer = container;
         } else {
-            mainFluidContainer = null;
+            this.mainFluidContainer = null;
         }
         
         this.machineBlock = blockEntity.getBlockState();
         this.blockEntity = blockEntity;
         
         if (this.blockEntity instanceof UpgradableGeneratorBlockEntity generatorEntity && generatorEntity.isProducingSteam) {
-            waterStorage = generatorEntity.boilerStorage.getInputContainer();
-            steamStorage = generatorEntity.boilerStorage.getOutputContainer();
+            this.waterStorage = generatorEntity.boilerStorage.getInputContainer();
+            this.steamStorage = generatorEntity.boilerStorage.getOutputContainer();
         } else if (this.blockEntity instanceof SteamEngineEntity steamEngineEntity) {
-            waterStorage = steamEngineEntity.boilerStorage.getOutputContainer();
-            steamStorage = steamEngineEntity.boilerStorage.getInputContainer();
+            this.waterStorage = steamEngineEntity.boilerStorage.getOutputContainer();
+            this.steamStorage = steamEngineEntity.boilerStorage.getInputContainer();
         } else {
-            steamStorage = null;
-            waterStorage = null;
+            this.steamStorage = null;
+            this.waterStorage = null;
         }
         
         buildItemSlots();
     }
     
+    /**
+     * Protected constructor for subclasses that need a specific MenuType.
+     */
+    protected OritechScreenHandler(MenuType<?> type, int syncId) {
+        super(type, syncId);
+        this.playerInventory = null;
+        this.inventory = null;
+        this.energyStorage = null;
+        this.blockPos = BlockPos.ZERO;
+        this.screenData = null;
+        this.steamStorage = null;
+        this.waterStorage = null;
+    }
+    
     private void buildItemSlots() {
-        
+        // Machine inventory slots
         for (var slot : screenData.getGuiSlots()) {
             addMachineSlot(slot.index(), slot.x(), slot.y(), slot.output());
         }
         
-        SlotGenerator.begin(this::addSlot, 8, 84)
-          .playerInventory(playerInventory);
+        // Player inventory (3 rows of 9, starting at x=8, y=84)
+        addPlayerInventory(playerInventory, 8, 84);
         
+        // Armor slots (optional): 4 armor + 1 offhand
         if (screenData.showArmor()) {
             armorSlots = new ArrayList<>(5);
             for (int i = 0; i < playerInventory.armor.size() + 1; i++) {
-                final var iteration = i;
-                var index = this.addSlot(new Slot(playerInventory, 36 + i, -20, i * 19) {
+                final var armorIndex = i;
+                var slot = this.addSlot(new Slot(playerInventory, 36 + i, -20, i * 19) {
                     @Override
                     public boolean mayPlace(ItemStack stack) {
-                        if (iteration == 4) return super.mayPlace(stack);  // offhand, to prevent dupes
-                        
+                        if (armorIndex == 4) return super.mayPlace(stack); // offhand slot
                         if (stack.getItem() instanceof ArmorItem armorItem) {
-                            return super.mayPlace(stack) && armorItem.getEquipmentSlot().getIndex() == iteration;
+                            return super.mayPlace(stack) && armorItem.getEquipmentSlot().getIndex() == armorIndex;
                         }
                         return false;
                     }
                 });
-                armorSlots.add(index.index);
+                armorSlots.add(slot.index);
             }
         }
     }
@@ -132,6 +150,22 @@ public class BasicMachineScreenHandler extends AbstractContainerMenu implements 
             this.addSlot(new BasicMachineOutputSlot(inventory, inventorySlot, x, y));
         } else {
             this.addSlot(new Slot(inventory, inventorySlot, x, y));
+        }
+    }
+    
+    /**
+     * Adds the standard player inventory slots (27 main + 9 hotbar).
+     */
+    protected void addPlayerInventory(Inventory playerInventory, int startX, int startY) {
+        // Main inventory (3 rows of 9, slot indices 9-35)
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 9; col++) {
+                this.addSlot(new Slot(playerInventory, col + row * 9 + 9, startX + col * 18, startY + row * 18));
+            }
+        }
+        // Hotbar (1 row of 9, slot indices 0-8)
+        for (int col = 0; col < 9; col++) {
+            this.addSlot(new Slot(playerInventory, col, startX + col * 18, startY + 58));
         }
     }
     
@@ -146,28 +180,22 @@ public class BasicMachineScreenHandler extends AbstractContainerMenu implements 
             int machineSize = this.inventory.getContainerSize();
             int playerInvStart = getPlayerInvStartSlot(newStack);
             int playerInvEnd = getPlayerInvEndSlot(newStack);
-            int totalSize = this.slots.size();   // Includes armor/offhand if enabled
+            int totalSize = this.slots.size();
             
-            // case 1: Slot is inside the Machine (Output/Input)
+            // Machine → player
             if (invSlot < machineSize) {
-                // Move to Player Main Inventory
-                if (!this.moveItemStackTo(originalStack, playerInvStart, playerInvEnd, true)) {
+                if (!this.moveItemStackTo(originalStack, playerInvStart, playerInvEnd, true))
                     return ItemStack.EMPTY;
-                }
             }
-            // case 2: Slot is inside Player Main Inventory (Storage + Hotbar)
+            // Player → machine
             else if (invSlot >= playerInvStart && invSlot < playerInvEnd) {
-                // Move to Machine Inventory
-                if (!this.moveItemStackTo(originalStack, 0, machineSize, false)) {
+                if (!this.moveItemStackTo(originalStack, 0, machineSize, false))
                     return ItemStack.EMPTY;
-                }
             }
-            // case 3: Slot is an Armor or Offhand slot
+            // Armor/offhand → player
             else if (invSlot >= playerInvEnd && invSlot < totalSize) {
-                // Move to Player Main Inventory ONLY.
-                if (!this.moveItemStackTo(originalStack, playerInvStart, playerInvEnd, true)) {
+                if (!this.moveItemStackTo(originalStack, playerInvStart, playerInvEnd, true))
                     return ItemStack.EMPTY;
-                }
             }
             
             if (originalStack.isEmpty()) {
@@ -182,17 +210,11 @@ public class BasicMachineScreenHandler extends AbstractContainerMenu implements 
         return ItemStack.EMPTY;
     }
     
-    // order is:
-    // machine inv slots
-    // player inv slots
-    // player equipment slots
-    
     public int getPlayerInvStartSlot(ItemStack stack) {
         return this.inventory.getContainerSize();
     }
     
     public int getPlayerInvEndSlot(ItemStack stack) {
-        
         return getPlayerInvStartSlot(stack) + 36;
     }
     
@@ -214,20 +236,14 @@ public class BasicMachineScreenHandler extends AbstractContainerMenu implements 
         return blockEntity;
     }
     
-    public @NotNull BlockPos getBlockPos() {
-        return blockPos;
-    }
-    
     public boolean showRedstoneAddon() {
         return screenData.hasRedstoneControlAvailable();
     }
     
     @Override
     public void broadcastChanges() {
-        
         if (blockEntity instanceof NetworkedBlockEntity networkedBlockEntity)
             networkedBlockEntity.sendUpdate(SyncType.GUI_TICK, (ServerPlayer) this.player());
-        
         super.broadcastChanges();
     }
 }

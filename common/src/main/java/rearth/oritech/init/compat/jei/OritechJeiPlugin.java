@@ -2,12 +2,14 @@ package rearth.oritech.init.compat.jei;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Block;
@@ -21,6 +23,7 @@ import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.client.ui.BasicMachineScreen;
 import rearth.oritech.client.ui.ItemFilterScreen;
+import rearth.oritech.client.ui.OritechScreen;
 import rearth.oritech.client.ui.PlayerModifierScreen;
 import rearth.oritech.client.ui.ReactorScreen;
 import rearth.oritech.init.BlockContent;
@@ -144,6 +147,12 @@ public class OritechJeiPlugin implements IModPlugin {
         registration.addGenericGuiContainerHandler(BasicMachineScreen.class, new JeiExclusionZoneHandler());
         registration.addGenericGuiContainerHandler(ReactorScreen.class, new JeiExclusionZoneHandler());
         registration.addGenericGuiContainerHandler(PlayerModifierScreen.class, new JeiExclusionZoneHandler());
+        registration.addGenericGuiContainerHandler(OritechScreen.class, new IGuiContainerHandler<OritechScreen<?>>() {
+            @Override
+            public @NotNull List<Rect2i> getGuiExtraAreas(@NotNull OritechScreen<?> screen) {
+                return screen.getExclusionZones();
+            }
+        });
 
         registration.addGhostIngredientHandler(ItemFilterScreen.class, new JeiItemFilterGhostHandler());
     }
