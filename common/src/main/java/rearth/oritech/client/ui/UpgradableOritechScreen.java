@@ -22,7 +22,7 @@ import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;
 
-public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> extends OritechScreen<T> {
+public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> extends OritechMachineScreen<T> {
     
     private static final ResourceLocation MACHINE_CORE_CENTER = Oritech.id("textures/gui/modular/machine_core/center.png");
     
@@ -31,10 +31,10 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
     private static final int CAPACITY_COLOR = ColorHelper.argb(2 / 255f, 48 / 255f, 71 / 255f);
     private static final int THROUGHPUT_COLOR = ColorHelper.argb(1f, 183 / 255f, 3 / 255f);
     
-    private LabelWidget speedLabel;
-    private LabelWidget efficiencyLabel;
-    private LabelWidget burstLabel;
-    private OverlayWidget addonOverlay;
+    public LabelWidget speedLabel;
+    public LabelWidget efficiencyLabel;
+    public LabelWidget burstLabel;
+    public OverlayWidget addonOverlay;
     
     public UpgradableOritechScreen(T handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
@@ -102,12 +102,6 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
             content.add(chambersLabel);
         }
         
-        // Steam production label (set up by parent)
-        if (steamProductionLabel != null) {
-            content.add(steamProductionLabel);
-            speedLabel.withAlignment(LabelWidget.Alignment.CENTER);
-        }
-        
         // Pulverizer/FragmentForge dust combine note
         if (menu.blockEntity instanceof PulverizerBlockEntity || menu.blockEntity instanceof FragmentForgeBlockEntity) {
             var dustLabel = new LabelWidget(0, 0, 60, 10,
@@ -135,7 +129,6 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
     }
     
     // addon preview
-    
     private void toggleAddonOverlay() {
         if (addonOverlay != null) {
             removeComponent(addonOverlay);
