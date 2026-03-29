@@ -93,8 +93,8 @@ public class ScrollWidget extends UIComponent {
     @Override
     protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         
-        renderedX = Mth.lerp(0.1f, renderedX, scrollX);
-        renderedY = Mth.lerp(0.1f, renderedY, scrollY);
+        renderedX = Mth.lerp(0.12f, renderedX, scrollX);
+        renderedY = Mth.lerp(0.12f, renderedY, scrollY);
         
         // Inner viewport with margin inside the surface
         int cx = x + innerMargin;

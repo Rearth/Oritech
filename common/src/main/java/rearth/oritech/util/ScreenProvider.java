@@ -15,20 +15,25 @@ import java.util.Optional;
 
 public interface ScreenProvider {
     
-    default List<Tuple<Component, Component>> getExtraExtensionLabels() {return List.of();}
+    default List<Tuple<Component, Component>> getExtraExtensionLabels() {
+        return List.of();
+    }
     
-    record GuiSlot (int index, int x, int y, boolean output) {
-        public GuiSlot (int index, int x, int y) {
+    record GuiSlot(int index, int x, int y, boolean output) {
+        public GuiSlot(int index, int x, int y) {
             this(index, x, y, false);
         }
     }
-
-    record BarConfiguration(int x, int y, int width, int height) {}
-
-    record ArrowConfiguration(ResourceLocation empty, ResourceLocation full, int x, int y, int width, int height, boolean horizontal) {}
-
+    
+    record BarConfiguration(int x, int y, int width, int height) {
+    }
+    
+    record ArrowConfiguration(ResourceLocation empty, ResourceLocation full, int x, int y, int width, int height,
+                              boolean horizontal) {
+    }
+    
     List<GuiSlot> getGuiSlots();
-
+    
     default boolean showEnergy() {
         return true;
     }
@@ -38,15 +43,18 @@ public interface ScreenProvider {
     default float getDisplayedEnergyTransfer() {
         return getDisplayedEnergyUsage() * 10;
     }
-
+    
     float getProgress();
     
     InventoryInputMode getInventoryInputMode();
+    
     Container getDisplayedInventory();
     
     MenuType<?> getScreenHandlerType();
     
-    default boolean inputOptionsEnabled() {return true;}
+    default boolean inputOptionsEnabled() {
+        return true;
+    }
     
     default Property<Direction> getBlockFacingProperty() {
         return BlockStateProperties.HORIZONTAL_FACING;
@@ -56,30 +64,51 @@ public interface ScreenProvider {
         return true;
     }
     
-    default boolean showArmor() {return false;}
+    default boolean showArmor() {
+        return false;
+    }
     
-    default boolean showExpansionPanel() {return true;}
+    default boolean showExpansionPanel() {
+        return true;
+    }
     
-    default boolean hasRedstoneControlAvailable() {return false;}
+    default boolean hasRedstoneControlAvailable() {
+        return false;
+    }
     
-    default int receivedRedstoneSignal() {return 0;}
+    default int receivedRedstoneSignal() {
+        return 0;
+    }
     
-    default String currentRedstoneEffect() {return "";}
-
+    default String currentRedstoneEffect() {
+        return "";
+    }
+    
+    default boolean showEnergyUsage() {
+        return true;
+    }
+    
+    default boolean showEnergyTransfer() {
+        return true;
+    }
+    
     default BarConfiguration getEnergyConfiguration() {
         return new BarConfiguration(8, 24, 16, 54);
     }
+    
     default BarConfiguration getFluidConfiguration() {
         return new BarConfiguration(147, 6, 21, 74);
     }
     
-    default Optional<String> getWikiLink() { return Optional.empty(); } // optional override. Expected format is "interaction/enderic_laser". Defaults to the item link defined in the pages markdown.
+    default Optional<String> getWikiLink() {
+        return Optional.empty();
+    } // optional override. Expected format is "interaction/enderic_laser". Defaults to the item link defined in the pages markdown.
     
     default ArrowConfiguration getIndicatorConfiguration() {
         return new ArrowConfiguration(
-                Oritech.id("textures/gui/modular/arrow_empty.png"),
-                Oritech.id("textures/gui/modular/arrow_full.png"),
-                80, 35, 29, 16, true);
+          Oritech.id("textures/gui/modular/arrow_empty.png"),
+          Oritech.id("textures/gui/modular/arrow_full.png"),
+          80, 35, 29, 16, true);
     }
-
+    
 }

@@ -419,7 +419,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     
     @Override
     public BarConfiguration getEnergyConfiguration() {
-        return new BarConfiguration(7, 6, 18, 54 + 18);
+        return new BarConfiguration(8, 6, 18, 54 + 18);
     }
     
     @Override

@@ -14,7 +14,12 @@ public class ProgressDisplayWidget extends AbstractDataDisplayWidget {
     public ProgressDisplayWidget(DisplayDataSource dataSource) {
         super(dataSource);
     }
-
+    
+    @Override
+    protected boolean applySmoothing() {
+        return false;
+    }
+    
     @Override
     protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         int cx = contentX();

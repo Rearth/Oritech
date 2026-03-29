@@ -11,6 +11,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RedstoneTorchBlock;
 import rearth.oracle.Oracle;
 import rearth.oracle.OracleClient;
 import rearth.oritech.Oritech;
@@ -128,16 +130,18 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
         }
         
         if (menu.showRedstoneAddon()) {
+            var torchOn = menu.screenData.receivedRedstoneSignal() > 0;
             content.add(BoxWidget.filled(0, 0, 63, 1, SEPARATOR_COLOR));
-            content.add(new LabelWidget(0, 0, 60, 10,
-                Component.translatable("text.oritech.redstone_power", menu.screenData.receivedRedstoneSignal())));
+            content.add(new BlockWidget(-3, -7, 20, Blocks.REDSTONE_TORCH.defaultBlockState().setValue(RedstoneTorchBlock.LIT, torchOn)).withPadding(Insets.of(-1)));
+            content.add(new LabelWidget(10, 1, 50, 10,
+                Component.translatable("text.oritech.redstone_power", menu.screenData.receivedRedstoneSignal())).withAlignment(LabelWidget.Alignment.CENTER));
             
             if (!menu.screenData.currentRedstoneEffect().isEmpty()) {
                 var effectLabel = new LabelWidget(0, 0, 60, 10,
                     Component.translatable(menu.screenData.currentRedstoneEffect()));
                 effectLabel.withTooltip(
                     Component.translatable(menu.screenData.currentRedstoneEffect() + ".tooltip"));
-                content.add(effectLabel);
+                content.add(effectLabel.withAlignment(LabelWidget.Alignment.CENTER));
             }
         }
     }
@@ -194,16 +198,22 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
         int panelW = 85;
         int outerPad = 7;
         int innerPad = 4;
-        int spacing = 3;
+        int spacing = 4;
         
         int cx = panelX + outerPad + innerPad + 3;
         int cy = panelY + outerPad + innerPad;
         
         for (int i = 0; i < content.size(); i++) {
             var component = content.get(i);
+            
+            cy += component.getPadding().top();
+            
             component.setPosition(component.getX() + cx, component.getY() + cy);
             addComponent(component);
-            cy += component.getHeight() + spacing;
+            
+            // negative paddings are used as marker to not increase spacing (e.g. inline component)
+            if (component.getPadding().top() >= 0)
+                cy += component.getHeight() + component.getPadding().bottom() + spacing;
             
             if (i == 0 && cycleInputButton != null) {
                 cycleInputButton.setPosition(cx, cy);

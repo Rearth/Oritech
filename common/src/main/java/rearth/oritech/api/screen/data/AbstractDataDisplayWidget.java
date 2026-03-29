@@ -28,14 +28,24 @@ public abstract class AbstractDataDisplayWidget extends UIComponent {
     public void tick() {
         // smoothly moves displayed amount to target amount
         currentAmount = getTargetAmount();
-        displayedAmount += (currentAmount - displayedAmount) * 0.15f;
-
-        if (Math.abs(currentAmount - displayedAmount) < 0.5f) {
+        
+        if (applySmoothing()) {
             displayedAmount = currentAmount;
+        } else {
+            displayedAmount += (currentAmount - displayedAmount) * 0.15f;
+            
+            if (Math.abs(currentAmount - displayedAmount) < 0.5f) {
+                displayedAmount = currentAmount;
+            }
         }
+        
         
         this.setTooltip(List.of(tooltipSupplier.get()));
         
+    }
+    
+    protected boolean applySmoothing() {
+        return true;
     }
 
     protected long getCapacity() {

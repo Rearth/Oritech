@@ -14,6 +14,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.screen.data.DisplayDataSource;
@@ -69,7 +71,18 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         if (screenData.showProgress())
             dataDisplays.add(DisplayDataSource.CreateProgress(screenData, blockEntity));
         
+        addFluidDisplay();
+        
         buildItemSlots();
+    }
+    
+    public void addFluidDisplay() {
+        if (blockEntity instanceof FluidApi.BlockProvider blockProvider) {
+            var storage = blockProvider.getFluidStorage(null);
+            if (storage instanceof SimpleFluidStorage singleSlotStorage) {
+                dataDisplays.add(DisplayDataSource.CreateFluid(singleSlotStorage, screenData.getFluidConfiguration(), screenData));
+            }
+        }
     }
     
     public Collection<DisplayDataSource> getDataDisplays() {

@@ -2,6 +2,7 @@ package rearth.oritech.api.screen.widgets;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -9,6 +10,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Vector3f;
 import rearth.oritech.api.screen.UIComponent;
 
 /**
@@ -61,21 +63,25 @@ public class BlockWidget extends UIComponent {
         pose.translate(cx, cy, 150);
         pose.scale(scale, -scale, scale);
         
-        pose.mulPose(Axis.XP.rotationDegrees(rotationX));
-        pose.mulPose(Axis.YP.rotationDegrees(rotationY + currentMouseRotation));
+        appleRotation(pose);
         
         pose.translate(-0.5f, -0.5f, -0.5f);
         
         RenderSystem.runAsFancy(() -> {
-            Lighting.setupForEntityInInventory();
             var bufferSource = client.renderBuffers().bufferSource();
             client.getBlockRenderer().renderSingleBlock(
                 state, pose, bufferSource, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY
             );
+            RenderSystem.setShaderLights(new Vector3f(-1.5f, -.5f, 0), new Vector3f(0, -1, 0));
             bufferSource.endBatch();
+            Lighting.setupFor3DItems();
         });
-        
-        Lighting.setupFor3DItems();
+
         pose.popPose();
+    }
+    
+    public void appleRotation(PoseStack pose) {
+        pose.mulPose(Axis.XP.rotationDegrees(rotationX));
+        pose.mulPose(Axis.YP.rotationDegrees(rotationY + currentMouseRotation));
     }
 }

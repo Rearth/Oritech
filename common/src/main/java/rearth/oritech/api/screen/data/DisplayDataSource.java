@@ -85,18 +85,25 @@ public abstract class DisplayDataSource {
         return new EnergyDataSource(
           storage.getCapacity(),
           storage::getAmount,
-          () -> getEnergyTooltip(storage.getAmount(), storage.getCapacity(), (long) provider.getDisplayedEnergyUsage(), (long) provider.getDisplayedEnergyTransfer()),
+          () -> getEnergyTooltip(storage.getAmount(), storage.getCapacity(), (long) provider.getDisplayedEnergyUsage(), (long) provider.getDisplayedEnergyTransfer(), provider.showEnergyUsage(), provider.showEnergyTransfer()),
           config);
     }
     
-    public static Component getEnergyTooltip(long amount, long max, long usage, long transfer) {
+    public static Component getEnergyTooltip(long amount, long max, long usage, long transfer, boolean showUsage, boolean showTransfer) {
         float percentage = (float) amount / max;
-        return Component.translatable("tooltip.oritech.energy_usage",
+        
+        var res = Component.translatable("tooltip.oritech.energy_usage_base",
           TooltipHelper.getEnergyText(amount),
           TooltipHelper.getEnergyText(max),
-          String.format("%.1f", percentage * 100),
-          TooltipHelper.getEnergyText(usage),
-          TooltipHelper.getEnergyText(transfer));
+          String.format("%.1f", percentage * 100));
+        
+        if (showUsage)
+            res = res.append(Component.translatable("tooltip.oritech.energy_usage_usage", TooltipHelper.getEnergyText(usage)));
+        if (showTransfer)
+            res = res.append(Component.translatable("tooltip.oritech.energy_usage_transfer", TooltipHelper.getEnergyText(transfer)));
+        
+        
+        return res;
     }
 
     public static class SoulDataSource extends DisplayDataSource {

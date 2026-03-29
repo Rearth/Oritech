@@ -1,11 +1,17 @@
 package rearth.oritech.block.entity.processing;
 
-import rearth.oritech.init.OritechConfig;
-import rearth.oritech.Oritech;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -14,13 +20,6 @@ import rearth.oritech.util.InventorySlotAssignment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
@@ -74,7 +73,17 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public BarConfiguration getEnergyConfiguration() {
-        return new BarConfiguration(7, 7, 18, 71);
+        return new BarConfiguration(8, 7, 18, 71);
+    }
+    
+    @Override
+    public boolean showEnergyTransfer() {
+        return false;
+    }
+    
+    @Override
+    public boolean showEnergyUsage() {
+        return false;
     }
     
     @Override

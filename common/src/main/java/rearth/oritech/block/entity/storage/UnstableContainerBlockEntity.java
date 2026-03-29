@@ -363,7 +363,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     
     @Override
     public BarConfiguration getEnergyConfiguration() {
-        return new BarConfiguration(7, 6, 15, 54 + 18);
+        return new BarConfiguration(8, 6, 15, 54 + 18);
     }
     
     @Override

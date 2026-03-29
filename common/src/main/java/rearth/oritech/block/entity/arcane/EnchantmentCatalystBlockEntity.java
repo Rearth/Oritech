@@ -348,7 +348,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     
     @Override
     public BarConfiguration getEnergyConfiguration() {
-        return new BarConfiguration(7, 7, 18, 71);
+        return new BarConfiguration(8, 7, 18, 71);
     }
     
     @Override
