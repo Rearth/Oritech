@@ -1,7 +1,9 @@
 package rearth.oritech.client.ui;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -13,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
@@ -20,6 +23,7 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.screen.data.DisplayDataSource;
 import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.util.StackContext;
 
 import java.util.*;
 
@@ -219,4 +223,55 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
             networkedBlockEntity.sendUpdate(SyncType.GUI_TICK, (ServerPlayer) this.player());
         super.broadcastChanges();
     }
+    
+    public record FluidContainerInteractionPacket(BlockPos position, boolean extract) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<FluidContainerInteractionPacket> PACKET_ID =
+            new CustomPacketPayload.Type<>(Oritech.id("fluid_container_interaction"));
+        
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return PACKET_ID;
+        }
+    }
+    
+    public static void handleFluidContainerInteraction(FluidContainerInteractionPacket packet, Player player, RegistryAccess registryAccess) {
+        var level = player.level();
+        var blockEntity = level.getBlockEntity(packet.position());
+        
+        if (!(blockEntity instanceof FluidApi.BlockProvider tankProvider)) return;
+        
+        var carriedStack = player.containerMenu.getCarried();
+        if (carriedStack.isEmpty()) return;
+        
+        var usedStack = carriedStack;
+        if (carriedStack.getCount() > 1) {
+            usedStack = carriedStack.copyWithCount(1);
+        }
+        
+        var stackRef = new StackContext(usedStack, updated -> {
+            if (carriedStack.getCount() > 1) {
+                carriedStack.shrink(1);
+                if (!player.getInventory().add(updated)) {
+                    player.drop(updated, true);
+                }
+            } else {
+                player.containerMenu.setCarried(updated);
+            }
+        });
+        
+        var itemFluidStorage = FluidApi.ITEM.find(stackRef);
+        if (itemFluidStorage == null) return;
+        
+        var tankStorage = tankProvider.getFluidStorage(null);
+        
+        if (packet.extract()) {
+            // Right click: tank → item
+            FluidApi.transferFirst(tankStorage, itemFluidStorage, Long.MAX_VALUE, false);
+        } else {
+            // Left click: item → tank
+            FluidApi.transferFirst(itemFluidStorage, tankStorage, Long.MAX_VALUE, false);
+        }
+    }
+    
+    // endregion
 }

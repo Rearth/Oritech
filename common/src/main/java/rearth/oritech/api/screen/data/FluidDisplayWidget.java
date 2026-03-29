@@ -7,12 +7,17 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.util.ColorHelper;
 
 import java.util.function.Supplier;
@@ -28,11 +33,31 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
     private final Supplier<FluidStack> fluidStackSupplier;
     private TextureAtlasSprite fluidSprite;
     private int fluidColor;
+    @Nullable
+    private final BlockPos blockPos;
 
     public FluidDisplayWidget(DisplayDataSource.FluidDataSource dataSource) {
+        this(dataSource, null);
+    }
+
+    public FluidDisplayWidget(DisplayDataSource.FluidDataSource dataSource, @Nullable BlockPos blockPos) {
         super(dataSource);
+        this.blockPos = blockPos;
         this.fluidStackSupplier = dataSource.getFluidSupplier();
         updateFluidRenderData();
+    }
+
+    @Override
+    public boolean handleClick(double mouseX, double mouseY, int button) {
+        if (blockPos != null && (button == 0 || button == 1)) {
+            var carried = Minecraft.getInstance().player.containerMenu.getCarried();
+            if (!carried.isEmpty()) {
+                boolean extract = (button == 1);
+                NetworkManager.sendToServer(new OritechScreenHandler.FluidContainerInteractionPacket(blockPos, extract));
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

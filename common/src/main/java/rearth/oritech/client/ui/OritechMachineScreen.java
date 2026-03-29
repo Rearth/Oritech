@@ -78,7 +78,7 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
             if (source instanceof DisplayDataSource.EnergyDataSource energySource) {
                 addComponent(new EnergyDisplayWidget(energySource).withSurface(OritechSurface.PANEL_INSET).withPadding(Insets.of(1)));
             } else if (source instanceof DisplayDataSource.FluidDataSource fluidSource) {
-                addComponent(new FluidDisplayWidget(fluidSource));
+                addComponent(new FluidDisplayWidget(fluidSource, menu.blockPos));
             } else if (source instanceof DisplayDataSource.SoulDataSource soulSource) {
                 addComponent(new SoulDisplayWidget(soulSource));
             } else if (source instanceof DisplayDataSource.ProgressDataSource progressSource) {
