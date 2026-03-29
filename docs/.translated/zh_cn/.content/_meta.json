@@ -1,30 +1,11 @@
 {
-  "getting_started": {
-    "name": "\uD83D\uDCD5 起步",
-    "icon": null
-  },
-  "resources": {
-    "name": "\uD83E\uDEA8 资源",
-    "icon": null
-  },
-  "tools": {
-    "name": "\uD83D\uDD28 工具",
-    "icon": null
-  },
-  "logistics": {
-    "name": "\uD83D\uDEDE 物流",
-    "icon": null
-  },
-  "processing": {
-    "name": "\uD83D\uDEE0 处理",
-    "icon": null
-  },
-  "interaction": {
-    "name": "\uD83E\uDEF3 世界交互",
-    "icon": null
-  },
-  "arcane": {
-    "name": "\uD83E\uDE84 奥术",
-    "icon": null
-  }
+  "arcane": "奥术",
+  "building": "建筑方块",
+  "components": "组件",
+  "equipment": "装备",
+  "machines": "机器",
+  "nuclear": "核能",
+  "particle": "粒子加速器",
+  "logistics": "物流",
+  "resources": "资源"
 }
