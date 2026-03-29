@@ -23,7 +23,7 @@ import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.client.ui.BasicMachineScreen;
 import rearth.oritech.client.ui.ItemFilterScreen;
-import rearth.oritech.client.ui.OritechScreen;
+import rearth.oritech.client.ui.OritechMachineScreen;
 import rearth.oritech.client.ui.PlayerModifierScreen;
 import rearth.oritech.client.ui.ReactorScreen;
 import rearth.oritech.init.BlockContent;
@@ -147,9 +147,9 @@ public class OritechJeiPlugin implements IModPlugin {
         registration.addGenericGuiContainerHandler(BasicMachineScreen.class, new JeiExclusionZoneHandler());
         registration.addGenericGuiContainerHandler(ReactorScreen.class, new JeiExclusionZoneHandler());
         registration.addGenericGuiContainerHandler(PlayerModifierScreen.class, new JeiExclusionZoneHandler());
-        registration.addGenericGuiContainerHandler(OritechScreen.class, new IGuiContainerHandler<OritechScreen<?>>() {
+        registration.addGenericGuiContainerHandler(OritechMachineScreen.class, new IGuiContainerHandler<OritechMachineScreen<?>>() {
             @Override
-            public @NotNull List<Rect2i> getGuiExtraAreas(@NotNull OritechScreen<?> screen) {
+            public @NotNull List<Rect2i> getGuiExtraAreas(@NotNull OritechMachineScreen<?> screen) {
                 return screen.getExclusionZones();
             }
         });

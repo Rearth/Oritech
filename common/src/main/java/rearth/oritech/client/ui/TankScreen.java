@@ -10,7 +10,7 @@ import rearth.oritech.api.screen.data.DisplayDataSource;
 import rearth.oritech.api.screen.data.FluidDisplayWidget;
 import rearth.oritech.api.screen.widgets.TextureWidget;
 
-public class TankScreen extends OritechScreen<OritechScreenHandler> {
+public class TankScreen extends OritechMachineScreen<OritechScreenHandler> {
     
     public static final ResourceLocation TANK_ARROWS = Oritech.id("textures/gui/modular/tank_arrows.png");
     

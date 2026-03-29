@@ -6,7 +6,6 @@ import net.minecraft.network.chat.Component;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
-import rearth.oritech.util.ColorHelper;
 
 import java.util.function.Consumer;
 
@@ -16,8 +15,8 @@ import java.util.function.Consumer;
  */
 public class ButtonWidget extends UIComponent {
     
-    public static final int DEFAULT_TEXT_COLOR = ColorHelper.argb(0.25f, 0.25f, 0.25f);
-    public static final int DISABLED_COLOR = ColorHelper.argb(0.47f, 0.47f, 0.47f);
+    public static final int DEFAULT_TEXT_COLOR = 0xFF404040;
+    public static final int DISABLED_COLOR = 0xFF787878;
     
     private final Consumer<ButtonWidget> onPress;
     private Component label;
@@ -73,14 +72,24 @@ public class ButtonWidget extends UIComponent {
     @Override
     public boolean handleClick(double mouseX, double mouseY, int button) {
         if (!active || button != 0) return false;
+        pressed = true;
         onPress.accept(this);
         return true;
     }
     
     @Override
+    public boolean handleMouseRelease(double mouseX, double mouseY, int button) {
+        if (button == 0 && pressed) {
+            pressed = false;
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
     protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         hovered = isMouseOver(mouseX, mouseY);
-        pressed = hovered && Minecraft.getInstance().mouseHandler.isLeftPressed();
+        if (pressed && !hovered) pressed = false;
         
         OritechSurface activeSurface;
         if (!active) activeSurface = disabledSurface;
@@ -95,7 +104,7 @@ public class ButtonWidget extends UIComponent {
             height + surfacePadding.vertical());
         
         var font = Minecraft.getInstance().font;
-        int textY = y + (height - 8) / 2 + (pressed ? 1 : 0);
+        int textY = y + (height - 8) / 2 + (hovered ? 1 : 0) + (pressed ? 2 : 0);
         int textX = x + (width - font.width(label)) / 2;
         graphics.drawString(font, label, textX, textY, active ? textColor : DISABLED_COLOR, textShadow);
     }

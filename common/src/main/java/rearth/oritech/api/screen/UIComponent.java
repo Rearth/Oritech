@@ -167,5 +167,6 @@ public abstract class UIComponent {
     // mouse events (override in interactive widgets)
     
     public boolean handleClick(double mouseX, double mouseY, int button) { return false; }
+    public boolean handleMouseRelease(double mouseX, double mouseY, int button) { return false; }
     public boolean handleMouseScroll(double mouseX, double mouseY, double scrollDelta) { return false; }
 }

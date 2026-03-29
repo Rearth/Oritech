@@ -51,15 +51,15 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
     public static final MenuType<InventoryProxyScreenHandler> INVENTORY_PROXY_SCREEN = MenuRegistry.ofExtended((InventoryProxyScreenHandler::new));
     
     public static void registerScreens() {
-        MenuRegistry.registerScreenFactory(TREEFELLER_SCREEN, OritechScreen<OritechScreenHandler>::new);
+        MenuRegistry.registerScreenFactory(TREEFELLER_SCREEN, OritechMachineScreen<OritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(TANK_SCREEN, TankScreen::new);
-        MenuRegistry.registerScreenFactory(ATOMIC_FORGE_SCREEN, OritechScreen<OritechScreenHandler>::new);
+        MenuRegistry.registerScreenFactory(ATOMIC_FORGE_SCREEN, OritechMachineScreen<OritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(CATALYST_SCREEN, CatalystScreen::new);
         MenuRegistry.registerScreenFactory(ENCHANTER_SCREEN, EnchanterScreen::new);
         MenuRegistry.registerScreenFactory(ACCELERATOR_SCREEN, AcceleratorScreen::new);
-        MenuRegistry.registerScreenFactory(CHARGER_SCREEN, OritechScreen<OritechScreenHandler>::new);
-        MenuRegistry.registerScreenFactory(FUEL_PORT_SCREEN, OritechScreen<OritechScreenHandler>::new);
-        MenuRegistry.registerScreenFactory(AUGMENTER_INV_SCREEN, OritechScreen<OritechScreenHandler>::new);
+        MenuRegistry.registerScreenFactory(CHARGER_SCREEN, OritechMachineScreen<OritechScreenHandler>::new);
+        MenuRegistry.registerScreenFactory(FUEL_PORT_SCREEN, OritechMachineScreen<OritechScreenHandler>::new);
+        MenuRegistry.registerScreenFactory(AUGMENTER_INV_SCREEN, OritechMachineScreen<OritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(REFINERY_SCREEN, RefineryScreen::new);
         
         MenuRegistry.registerScreenFactory(PULVERIZER_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);

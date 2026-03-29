@@ -21,6 +21,7 @@ public class LabelWidget extends UIComponent {
     private int color = BRIGHT_TEXT;
     private boolean shadow = false;
     private Alignment alignment = Alignment.LEFT;
+    private boolean wrap = false;
     
     public LabelWidget(int x, int y, int width, int height, Component text) {
         super(x, y, width, height);
@@ -61,6 +62,11 @@ public class LabelWidget extends UIComponent {
         return this;
     }
     
+    public LabelWidget withWrap(boolean wrap) {
+        this.wrap = wrap;
+        return this;
+    }
+    
     @Override
     protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         Font font = Minecraft.getInstance().font;
@@ -68,12 +74,24 @@ public class LabelWidget extends UIComponent {
         int cy = contentY();
         int cw = contentWidth();
         
-        int textX = switch (alignment) {
-            case LEFT -> cx;
-            case CENTER -> cx + (cw - font.width(text)) / 2;
-            case RIGHT -> cx + cw - font.width(text);
-        };
-        
-        graphics.drawString(font, text, textX, cy, color, shadow);
+        if (wrap) {
+            var lines = font.split(text, cw);
+            for (int i = 0; i < lines.size(); i++) {
+                var line = lines.get(i);
+                int textX = switch (alignment) {
+                    case LEFT -> cx;
+                    case CENTER -> cx + (cw - font.width(line)) / 2;
+                    case RIGHT -> cx + cw - font.width(line);
+                };
+                graphics.drawString(font, line, textX, cy + i * font.lineHeight, color, shadow);
+            }
+        } else {
+            int textX = switch (alignment) {
+                case LEFT -> cx;
+                case CENTER -> cx + (cw - font.width(text)) / 2;
+                case RIGHT -> cx + cw - font.width(text);
+            };
+            graphics.drawString(font, text, textX, cy, color, shadow);
+        }
     }
 }

@@ -16,16 +16,15 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import rearth.oritech.init.OritechConfig;
-import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
+import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipe;
 
 import java.util.ArrayList;
@@ -110,7 +109,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             for (int i = 0; i < activeRecipe.getInputs().size(); i++) {
                 var taken = ContainerHelper.removeItem(getInputView(), i, 1);  // amount is not configurable, because ingredient doesn't parse amount in recipe
             }
-            pendingOutputs = activeRecipe.getResults();
+            pendingOutputs = new ArrayList<>(activeRecipe.getResults());
             
             setChanged();
             

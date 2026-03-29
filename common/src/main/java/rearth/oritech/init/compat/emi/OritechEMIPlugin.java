@@ -19,7 +19,7 @@ import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.ItemFilterScreen;
-import rearth.oritech.client.ui.OritechScreen;
+import rearth.oritech.client.ui.OritechWidgetScreen;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -73,7 +73,7 @@ public class OritechEMIPlugin implements EmiPlugin {
         registry.addDragDropHandler(ItemFilterScreen.class, new EmiItemFilterDragDropHandler());
         
         registry.addGenericExclusionArea((screen, consumer) -> {
-            if (!(screen instanceof OritechScreen<?> oritechScreen)) return;
+            if (!(screen instanceof OritechWidgetScreen<?> oritechScreen)) return;
             
             oritechScreen.getExclusionZones().forEach(elem -> consumer.accept(new Bounds(elem.getX(), elem.getY(), elem.getWidth(), elem.getHeight())));
         });
