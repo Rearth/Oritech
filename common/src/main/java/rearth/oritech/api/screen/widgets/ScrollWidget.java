@@ -1,6 +1,7 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 import rearth.oritech.api.screen.OritechSurface;
@@ -17,12 +18,14 @@ import java.util.List;
  */
 public class ScrollWidget extends UIComponent {
     
-    private static final int SCROLLBAR_TRACK = ColorHelper.argb(0.6f, 0.65f, 0.7f, 0.25f);
-    private static final int SCROLLBAR_THUMB = ColorHelper.argb(0.6f, 0.65f, 0.7f, 0.5f);
+    private static final int SCROLLBAR_TRACK = ColorHelper.argb(0.2f, 0.25f, 0.3f, 0.35f);
+    private static final int SCROLLBAR_THUMB = ColorHelper.argb(0.2f, 0.25f, 0.3f, 0.9f);
     
     private final List<UIComponent> children = new ArrayList<>();
     private int scrollX = 0;
     private int scrollY = 0;
+    private float renderedX = 0;    // basically the smoothed versions of scrollX/Y
+    private float renderedY = 0;
     private int contentTotalWidth = 0;
     private int contentTotalHeight = 0;
     private boolean verticalScroll = true;
@@ -81,14 +84,18 @@ public class ScrollWidget extends UIComponent {
     
     @Override
     public boolean handleMouseScroll(double mouseX, double mouseY, double scrollDelta) {
-        return handleMouseScroll(mouseX, mouseY, scrollDelta, net.minecraft.client.gui.screens.Screen.hasShiftDown());
+        return handleMouseScroll(mouseX, mouseY, scrollDelta, Screen.hasShiftDown());
     }
     
-    public int getScrollX() { return scrollX; }
-    public int getScrollY() { return scrollY; }
+    public float getScrollX() { return scrollX; }
+    public float getScrollY() { return scrollY; }
     
     @Override
     protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        
+        renderedX = Mth.lerp(0.1f, renderedX, scrollX);
+        renderedY = Mth.lerp(0.1f, renderedY, scrollY);
+        
         // Inner viewport with margin inside the surface
         int cx = x + innerMargin;
         int cy = y + innerMargin;
@@ -106,15 +113,15 @@ public class ScrollWidget extends UIComponent {
         
         // Translate so children at (0,0) render at the content origin
         graphics.pose().pushPose();
-        graphics.pose().translate(cx - scrollX, cy - scrollY, 0);
+        graphics.pose().translate(cx - renderedX, cy - renderedY, 0);
         
         // Mouse coords relative to content origin + scroll offset
-        int childMouseX = mouseX - cx + scrollX;
-        int childMouseY = mouseY - cy + scrollY;
+        float childMouseX = mouseX - cx + renderedX;
+        float childMouseY = mouseY - cy + renderedY;
         
         for (var child : sorted) {
             if (child.isVisible())
-                child.render(graphics, childMouseX, childMouseY, delta);
+                child.render(graphics, (int) childMouseX, (int) childMouseY, delta);
         }
         
         graphics.pose().popPose();
@@ -122,14 +129,14 @@ public class ScrollWidget extends UIComponent {
         
         // Scrollbar indicator
         if (verticalScroll && contentTotalHeight > ch) {
-            renderScrollbar(graphics, cx + cw, cy, 2, ch, scrollY, contentTotalHeight, ch);
+            renderScrollbar(graphics, cx + cw, cy, 2, ch, renderedY, contentTotalHeight, ch);
         }
     }
     
-    private void renderScrollbar(GuiGraphics graphics, int barX, int barY, int barW, int trackH, int scroll, int totalContent, int viewportH) {
+    private void renderScrollbar(GuiGraphics graphics, int barX, int barY, int barW, int trackH, float scroll, int totalContent, int viewportH) {
         float thumbRatio = (float) viewportH / totalContent;
         int thumbH = Math.max(8, (int) (trackH * thumbRatio));
-        float scrollRatio = (float) scroll / (totalContent - viewportH);
+        float scrollRatio = scroll / (totalContent - viewportH);
         int thumbY = barY + (int) ((trackH - thumbH) * scrollRatio);
         
         graphics.fill(barX, barY, barX + barW, barY + trackH, SCROLLBAR_TRACK);

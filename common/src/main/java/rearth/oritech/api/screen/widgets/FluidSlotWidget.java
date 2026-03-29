@@ -1,8 +1,10 @@
 package rearth.oritech.api.screen.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
-import dev.architectury.fluid.FluidStack;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
@@ -27,6 +29,8 @@ import java.util.List;
  * <p>
  * Replaces the old FluidDisplay inner class pattern from BasicMachineScreen.
  */
+
+// todo remove this class
 public class FluidSlotWidget extends UIComponent {
     
     private static final ResourceLocation GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
@@ -40,7 +44,7 @@ public class FluidSlotWidget extends UIComponent {
     private TextureAtlasSprite fluidSprite;
     private int fluidColor;
     
-    public FluidSlotWidget(int x, int y, int width, int height, FluidApi.SingleSlotStorage storage) {
+    private FluidSlotWidget(int x, int y, int width, int height, FluidApi.SingleSlotStorage storage) {
         super(x, y, width, height);
         this.storage = storage;
         this.displayedFill = getFill();

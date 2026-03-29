@@ -1,18 +1,17 @@
-package rearth.oritech.api.screen.widgets;
+package rearth.oritech.api.screen.data;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.screen.data.DisplayDataSource;
 
-public class EnergyDisplayWidget extends AbstractDataDisplayWidget {
+public class SoulDisplayWidget extends AbstractDataDisplayWidget {
 
-    private static final ResourceLocation GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
+    private static final ResourceLocation GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components_souls.png");
     private static final int REGION_WIDTH = 24;
     private static final int REGION_HEIGHT = 96;
 
-    public EnergyDisplayWidget(int x, int y, int width, int height, DisplayDataSource dataSource) {
-        super(x, y, width, height, dataSource);
+    public SoulDisplayWidget(DisplayDataSource dataSource) {
+        super(dataSource);
     }
 
     @Override

@@ -7,30 +7,22 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
-import rearth.oritech.block.entity.generators.SteamEngineEntity;
+import rearth.oritech.api.screen.data.DisplayDataSource;
 import rearth.oritech.util.ScreenProvider;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Base screen handler for all Oritech machine screens.
- * Replaces the owo-lib based BasicMachineScreenHandler.
  * <p>
  * Handles: machine inventory slots, player inventory slots, armor slots,
  * energy storage reference, fluid storage references, screen data.
@@ -41,19 +33,12 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
     public final Inventory playerInventory;
     @NotNull
     public final Container inventory;
-    @Nullable
-    public final EnergyApi.EnergyStorage energyStorage;
     @NotNull
     public final BlockPos blockPos;
     @NotNull
     public final ScreenProvider screenData;
     
-    @Nullable
-    public final FluidApi.SingleSlotStorage steamStorage;
-    @Nullable
-    public final FluidApi.SingleSlotStorage waterStorage;
-    @Nullable
-    public FluidApi.SingleSlotStorage mainFluidContainer;
+    private Set<DisplayDataSource> dataDisplays = new HashSet<>();
     
     public BlockState machineBlock;
     public BlockEntity blockEntity;
@@ -68,52 +53,27 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         
         this.screenData = (ScreenProvider) blockEntity;
         this.blockPos = blockEntity.getBlockPos();
-        this.inventory = screenData.getDisplayedInventory();
-        if (this.inventory != null)
-            this.inventory.startOpen(playerInventory.player);
         this.playerInventory = playerInventory;
-        
-        if (blockEntity instanceof EnergyApi.BlockProvider energyProvider) {
-            this.energyStorage = energyProvider.getEnergyStorage(null);
-        } else {
-            this.energyStorage = null;
-        }
-        
-        if (blockEntity instanceof FluidApi.BlockProvider blockProvider && blockProvider.getFluidStorage(null) instanceof SimpleFluidStorage container) {
-            this.mainFluidContainer = container;
-        } else {
-            this.mainFluidContainer = null;
-        }
-        
         this.machineBlock = blockEntity.getBlockState();
         this.blockEntity = blockEntity;
+        this.inventory = screenData.getDisplayedInventory();
         
-        if (this.blockEntity instanceof UpgradableGeneratorBlockEntity generatorEntity && generatorEntity.isProducingSteam) {
-            this.waterStorage = generatorEntity.boilerStorage.getInputContainer();
-            this.steamStorage = generatorEntity.boilerStorage.getOutputContainer();
-        } else if (this.blockEntity instanceof SteamEngineEntity steamEngineEntity) {
-            this.waterStorage = steamEngineEntity.boilerStorage.getOutputContainer();
-            this.steamStorage = steamEngineEntity.boilerStorage.getInputContainer();
-        } else {
-            this.steamStorage = null;
-            this.waterStorage = null;
+        if (this.inventory != null)
+            this.inventory.startOpen(playerInventory.player);
+        
+        if (screenData.showEnergy() && blockEntity instanceof EnergyApi.BlockProvider energyProvider) {
+            var storage = energyProvider.getEnergyStorage(null);
+            dataDisplays.add(DisplayDataSource.CreateEnergy(storage, screenData.getEnergyConfiguration(), screenData));
         }
+        
+        if (screenData.showProgress())
+            dataDisplays.add(DisplayDataSource.CreateProgress(screenData, blockEntity));
         
         buildItemSlots();
     }
     
-    /**
-     * Protected constructor for subclasses that need a specific MenuType.
-     */
-    protected OritechScreenHandler(MenuType<?> type, int syncId) {
-        super(type, syncId);
-        this.playerInventory = null;
-        this.inventory = null;
-        this.energyStorage = null;
-        this.blockPos = BlockPos.ZERO;
-        this.screenData = null;
-        this.steamStorage = null;
-        this.waterStorage = null;
+    public Collection<DisplayDataSource> getDataDisplays() {
+        return dataDisplays;
     }
     
     private void buildItemSlots() {

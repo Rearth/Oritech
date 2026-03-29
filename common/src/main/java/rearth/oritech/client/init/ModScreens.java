@@ -78,6 +78,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
         MenuRegistry.registerScreenFactory(PLACER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(FERTILIZER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(LASER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
+        MenuRegistry.registerScreenFactory(CENTRIFUGE_SCREEN, UpgradableOritechScreen<CentrifugeScreenHandler>::new);
         MenuRegistry.registerScreenFactory(SHRINKER_SCREEN, ShrinkerScreen::new);
         
         MenuRegistry.registerScreenFactory(INVENTORY_PROXY_SCREEN, InventoryProxyScreen::new);
@@ -86,7 +87,6 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
         MenuRegistry.registerScreenFactory(ITEM_FILTER_SCREEN, ItemFilterScreen::new);
         MenuRegistry.registerScreenFactory(DRONE_SCREEN, DroneScreen::new);
         MenuRegistry.registerScreenFactory(REDSTONE_ADDON_SCREEN, RedstoneAddonScreen::new);
-        MenuRegistry.registerScreenFactory(CENTRIFUGE_SCREEN, CentrifugeScreen::new);
         MenuRegistry.registerScreenFactory(STEAM_ENGINE_SCREEN, SteamEngineScreen::new);
     }
     

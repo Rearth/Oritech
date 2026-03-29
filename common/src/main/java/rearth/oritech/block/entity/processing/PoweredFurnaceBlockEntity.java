@@ -1,21 +1,9 @@
 package rearth.oritech.block.entity.processing;
 
-import rearth.oritech.init.OritechConfig;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.networking.NetworkedBlockEntity;
-import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.init.BlockEntitiesContent;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
-import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.InventorySlotAssignment;
-import java.util.List;
-import java.util.Objects;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
@@ -23,7 +11,17 @@ import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.phys.Vec3;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
+import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.util.InventorySlotAssignment;
+
+import java.util.List;
+import java.util.Objects;
 
 public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     
@@ -144,7 +142,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     
     @SuppressWarnings("OptionalIsPresent")
     @Override
-    protected int getRecipeDuration() {
+    public int getRecipeDuration() {
         var recipeCandidate = Objects.requireNonNull(level).getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), level);
         if (recipeCandidate.isPresent()) {
             return (int) (recipeCandidate.get().value().getCookingTime() * getSpeedMultiplier());

@@ -7,7 +7,6 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
-import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -73,12 +72,12 @@ public class OritechEMIPlugin implements EmiPlugin {
 
         registry.addDragDropHandler(ItemFilterScreen.class, new EmiItemFilterDragDropHandler());
         
-        registry.addExclusionArea(OritechScreen.class, (screen, consumer) -> {
-            for (var zone : screen.getExclusionZones()) {
-                var rect = (Rect2i) zone;
-                consumer.accept(new Bounds(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight()));
-            }
+        registry.addGenericExclusionArea((screen, consumer) -> {
+            if (!(screen instanceof OritechScreen<?> oritechScreen)) return;
+            
+            oritechScreen.getExclusionZones().forEach(elem -> consumer.accept(new Bounds(elem.getX(), elem.getY(), elem.getWidth(), elem.getHeight())));
         });
+        
     }
     
     private void registerOritechCategory(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType, ItemLike machine,  Class<? extends MachineBlockEntity> screenProviderSource) {

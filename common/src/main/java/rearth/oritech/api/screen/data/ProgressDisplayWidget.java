@@ -1,9 +1,8 @@
-package rearth.oritech.api.screen.widgets;
+package rearth.oritech.api.screen.data;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.screen.data.DisplayDataSource;
 
 public class ProgressDisplayWidget extends AbstractDataDisplayWidget {
 
@@ -12,8 +11,8 @@ public class ProgressDisplayWidget extends AbstractDataDisplayWidget {
     private static final int REGION_WIDTH = 29;
     private static final int REGION_HEIGHT = 16;
 
-    public ProgressDisplayWidget(int x, int y, int width, int height, DisplayDataSource dataSource) {
-        super(x, y, width, height, dataSource);
+    public ProgressDisplayWidget(DisplayDataSource dataSource) {
+        super(dataSource);
     }
 
     @Override

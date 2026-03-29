@@ -1,4 +1,4 @@
-package rearth.oritech.api.screen.widgets;
+package rearth.oritech.api.screen.data;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferUploader;
@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.screen.data.DisplayDataSource;
 import rearth.oritech.util.ColorHelper;
 
 import java.util.function.Supplier;
@@ -30,9 +29,9 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
     private TextureAtlasSprite fluidSprite;
     private int fluidColor;
 
-    public FluidDisplayWidget(int x, int y, int width, int height, DisplayDataSource dataSource, Supplier<FluidStack> fluidStackSupplier) {
-        super(x, y, width, height, dataSource);
-        this.fluidStackSupplier = fluidStackSupplier;
+    public FluidDisplayWidget(DisplayDataSource.FluidDataSource dataSource) {
+        super(dataSource);
+        this.fluidStackSupplier = dataSource.getFluidSupplier();
         updateFluidRenderData();
     }
 

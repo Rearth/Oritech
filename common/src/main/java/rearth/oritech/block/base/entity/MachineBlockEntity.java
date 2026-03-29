@@ -332,7 +332,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         return 60;  // 3s
     }
     
-    protected int getRecipeDuration() {
+    public int getRecipeDuration() {
         return getCurrentRecipe().getTime();
     }
     

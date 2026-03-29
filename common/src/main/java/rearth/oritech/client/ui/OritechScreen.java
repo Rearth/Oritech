@@ -14,22 +14,20 @@ import net.minecraft.world.item.ItemStack;
 import rearth.oracle.Oracle;
 import rearth.oracle.OracleClient;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.networking.NetworkManager;
-import rearth.oritech.api.screen.*;
+import rearth.oritech.api.screen.Insets;
+import rearth.oritech.api.screen.OritechSurface;
+import rearth.oritech.api.screen.UIComponent;
+import rearth.oritech.api.screen.data.DisplayDataSource;
+import rearth.oritech.api.screen.data.EnergyDisplayWidget;
+import rearth.oritech.api.screen.data.FluidDisplayWidget;
+import rearth.oritech.api.screen.data.ProgressDisplayWidget;
+import rearth.oritech.api.screen.data.SoulDisplayWidget;
 import rearth.oritech.api.screen.widgets.*;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
-import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
-import rearth.oritech.block.entity.generators.SteamEngineEntity;
-import rearth.oritech.block.entity.processing.AtomicForgeBlockEntity;
 import rearth.oritech.client.init.OritechClientConfig;
-
-import rearth.oritech.init.OritechConfig;
 import rearth.oritech.util.ColorHelper;
 import rearth.oritech.util.InventoryInputMode;
-import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.TooltipHelper;
 
 import java.util.*;
 
@@ -48,13 +46,7 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
     
     protected final List<UIComponent> components = new ArrayList<>();
     
-    protected TextureWidget progressIndicator;
-    protected TextureWidget energyIndicator;
-    protected FluidSlotWidget genericFluidDisplay;
-    protected FluidSlotWidget steamFluidDisplay;
-    protected FluidSlotWidget waterFluidDisplay;
     protected ButtonWidget cycleInputButton;
-    protected LabelWidget steamProductionLabel;
     
     protected Rect2i extensionBounds;
     protected Rect2i extensionInsetBounds;
@@ -67,19 +59,12 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
     }
     
     // init
-    
     @Override
     protected void init() {
         super.init();
         clearWidgets();
         components.clear();
-        progressIndicator = null;
-        energyIndicator = null;
-        genericFluidDisplay = null;
-        steamFluidDisplay = null;
-        waterFluidDisplay = null;
         cycleInputButton = null;
-        steamProductionLabel = null;
         extensionBounds = null;
         extensionInsetBounds = null;
         equipmentBounds = null;
@@ -90,11 +75,7 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
     protected void buildComponents() {
         addTitle();
         addItemSlots();
-        addFluidDisplays();
-        addEnergyDisplay();
-        
-        if (menu.screenData.showProgress())
-            addProgressArrow();
+        addDataSlots();
         
         if (showExtensionPanel())
             buildExtensionPanel();
@@ -111,37 +92,21 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
             addComponent(new ItemSlotWidget(slot.x(), slot.y()));
     }
     
-    private void addFluidDisplays() {
-        if (menu.mainFluidContainer != null) {
-            genericFluidDisplay = createFluidDisplay(menu.mainFluidContainer, menu.screenData.getFluidConfiguration());
-            addComponent(genericFluidDisplay);
+    private void addDataSlots() {
+        for (var source : menu.getDataDisplays()) {
+            if (source instanceof DisplayDataSource.EnergyDataSource energySource) {
+                addComponent(new EnergyDisplayWidget(energySource).withSurface(OritechSurface.PANEL_INSET).withPadding(Insets.of(1)));
+            } else if (source instanceof DisplayDataSource.FluidDataSource fluidSource) {
+                addComponent(new FluidDisplayWidget(fluidSource));
+            } else if (source instanceof DisplayDataSource.SoulDataSource soulSource) {
+                addComponent(new SoulDisplayWidget(soulSource));
+            } else if (source instanceof DisplayDataSource.ProgressDataSource progressSource) {
+                addComponent(new ProgressDisplayWidget(progressSource));
+            }
         }
-        
-        if (menu.steamStorage != null) {
-            waterFluidDisplay = createFluidDisplay(menu.waterStorage, getBoilerInConfig());
-            steamFluidDisplay = createFluidDisplay(menu.steamStorage, getBoilerOutConfig());
-            addComponent(waterFluidDisplay);
-            addComponent(steamFluidDisplay);
-            
-            steamProductionLabel = new LabelWidget(0, 0, 70, 10,
-                Component.translatable("title.oritech.steam_production", "0"));
-            steamProductionLabel.withTooltip(Component.translatable("tooltip.oritech.steam_production"));
-        }
-    }
-    
-    private void addEnergyDisplay() {
-        if (!menu.screenData.showEnergy()) return;
-        
-        // Steam machines replace the energy bar with fluid bars; steam engine shows both
-        boolean hasSteamBars = menu.steamStorage != null;
-        boolean isSteamEngine = menu.blockEntity instanceof SteamEngineEntity;
-        
-        if (!hasSteamBars || isSteamEngine)
-            addEnergyBar();
     }
     
     // subclass hooks
-    
     protected void addExtraComponents() {}
     protected void tickExtra() {}
     
@@ -178,7 +143,6 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
     }
     
     // title
-    
     protected void addTitle() {
         var blockTitle = menu.machineBlock.getBlock().getName();
         var icon = getTitleIcon();
@@ -214,122 +178,8 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
         return new ItemStack(menu.blockEntity.getBlockState().getBlock());
     }
     
-    // energy bar
-    
-    protected void addEnergyBar() {
-        var config = menu.screenData.getEnergyConfiguration();
-        
-        // Inset frame around energy bar
-        int insetPad = 1;
-        var insetFrame = new BoxWidget(config.x() - insetPad, config.y() - insetPad,
-            config.width() + insetPad * 2, config.height() + insetPad * 2, 0, false);
-        insetFrame.withSurface(OritechSurface.PANEL_INSET);
-        addComponent(insetFrame);
-        
-        addComponent(new TextureWidget(config.x(), config.y(), config.width(), config.height(),
-            getGuiComponents(), 24, 0, 24, 96, 98, 96));
-        
-        energyIndicator = new TextureWidget(config.x(), config.y(), config.width(), config.height(),
-            getGuiComponents(), 0, 0, 24, 96, 98, 96);
-        energyIndicator.withZIndex(1);
-        addComponent(energyIndicator);
-    }
-    
-    protected void updateEnergyBar() {
-        if (energyIndicator == null || menu.energyStorage == null) return;
-        
-        var capacity = menu.energyStorage.getCapacity();
-        var amount = menu.energyStorage.getAmount();
-        var transfer = (long) menu.screenData.getDisplayedEnergyTransfer();
-        var usage = (long) menu.screenData.getDisplayedEnergyUsage();
-        
-        float fillAmount = (float) amount / capacity;
-        int barW = energyIndicator.contentWidth();
-        int barH = energyIndicator.contentHeight();
-        int filledH = (int) (barH * fillAmount);
-        energyIndicator.setVisibleArea(0, barH - filledH, barW, filledH);
-        
-        var tooltipText = getEnergyTooltip(amount, capacity, usage, transfer);
-        if (menu.blockEntity instanceof AtomicForgeBlockEntity)
-            tooltipText = tooltipText.plainCopy().append(Component.translatable("tooltip.oritech.atomic_forge_energy_tip"));
-        
-        energyIndicator.setTooltip(List.of(tooltipText));
-    }
-    
-    public static Component getEnergyTooltip(long amount, long max, long usage, long transfer) {
-        float percentage = (float) amount / max;
-        return Component.translatable("tooltip.oritech.energy_usage",
-            TooltipHelper.getEnergyText(amount),
-            TooltipHelper.getEnergyText(max),
-            String.format("%.1f", percentage * 100),
-            TooltipHelper.getEnergyText(usage),
-            TooltipHelper.getEnergyText(transfer));
-    }
-    
-    // progress arrow
-    
-    protected void addProgressArrow() {
-        var config = menu.screenData.getIndicatorConfiguration();
-        
-        addComponent(new TextureWidget(config.x(), config.y(), config.width(), config.height(),
-            config.empty(), 0, 0, config.width(), config.height(), config.width(), config.height()));
-        
-        progressIndicator = new TextureWidget(config.x(), config.y(), config.width(), config.height(),
-            config.full(), 0, 0, config.width(), config.height(), config.width(), config.height());
-        progressIndicator.setVisibleArea(0, 0, 0, config.height());
-        progressIndicator.withZIndex(1);
-        addComponent(progressIndicator);
-    }
-    
-    protected void updateProgressBar() {
-        if (progressIndicator == null) return;
-        
-        var config = menu.screenData.getIndicatorConfiguration();
-        var progress = menu.screenData.getProgress();
-        
-        if (config.horizontal())
-            progressIndicator.setVisibleArea(0, 0, (int) (config.width() * progress), config.height());
-        else
-            progressIndicator.setVisibleArea(0, 0, config.width(), (int) (config.height() * progress));
-        
-        if (menu.blockEntity instanceof MachineBlockEntity machineEntity
-            && (machineEntity.getCurrentRecipe().getTime() > 0 || machineEntity.progress > 0)) {
-            
-            var progressTicks = machineEntity.progress;
-            var recipeDurationTicks = machineEntity.getCurrentRecipe().getTime();
-            var effectiveDurationTicks = (int) (recipeDurationTicks * machineEntity.getSpeedMultiplier());
-            
-            if (machineEntity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
-                if (recipeDurationTicks <= 0)
-                    recipeDurationTicks = (int) (generatorBlock.currentMaxBurnTime / generatorBlock.getSpeedMultiplier() * generatorBlock.getEfficiencyMultiplier());
-                effectiveDurationTicks = generatorBlock.currentMaxBurnTime;
-            }
-            
-            if (machineEntity instanceof BasicGeneratorEntity generatorEntity)
-                recipeDurationTicks = generatorEntity.currentMaxBurnTime;
-            
-            progressIndicator.setTooltip(List.of(
-                Component.translatable("tooltip.oritech.progress_indicator", progressTicks, effectiveDurationTicks, recipeDurationTicks)));
-        }
-    }
-    
-    // fluid display
-    
-    protected FluidSlotWidget createFluidDisplay(FluidApi.SingleSlotStorage storage, ScreenProvider.BarConfiguration config) {
-        return new FluidSlotWidget(config.x(), config.y(), config.width(), config.height(), storage);
-    }
-    
-    public ScreenProvider.BarConfiguration getBoilerInConfig() {
-        return menu.screenData.getEnergyConfiguration();
-    }
-    
-    public ScreenProvider.BarConfiguration getBoilerOutConfig() {
-        var config = getBoilerInConfig();
-        return new ScreenProvider.BarConfiguration(config.x() + config.width() + 8, config.y(), config.width(), config.height());
-    }
     
     // extension panel
-    
     public boolean showExtensionPanel() {
         return menu.screenData.showExpansionPanel();
     }
@@ -416,7 +266,6 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
     }
     
     // equipment panel
-    
     private void buildEquipmentPanel() {
         int slotCount = menu.armorSlots.size();
         int slotX = -20;
@@ -455,7 +304,6 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
     }
     
     // oracle help button
-    
     private void buildOracleButton() {
         if (!OritechClientConfig.enableHelpButton.get()) return;
         
@@ -498,7 +346,6 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
     }
     
     // tick
-    
     @Override
     protected void containerTick() {
         super.containerTick();
@@ -506,25 +353,10 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
         for (var component : components)
             component.tick();
         
-        updateEnergyBar();
-        
-        if (menu.screenData.showProgress())
-            updateProgressBar();
-        
-        if (showExtensionPanel())
-            updateSettingsButtons();
-        
-        if (steamProductionLabel != null && waterFluidDisplay != null) {
-            var productionRate = menu.screenData.getDisplayedEnergyUsage() * OritechConfig.generators.steamEngineData.rfToSteamRatio.get();
-            productionRate = Math.min(waterFluidDisplay.getStorage().getStack().getAmount(), productionRate);
-            steamProductionLabel.setText(Component.translatable("title.oritech.steam_production", String.format("%.0f", productionRate)));
-        }
-        
         tickExtra();
     }
     
     // rendering
-    
     @Override
     protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         renderComponents(graphics, mouseX, mouseY, partialTick);
@@ -615,8 +447,7 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
             graphics.renderComponentTooltip(Minecraft.getInstance().font, topHovered.getTooltip(), mouseX, mouseY);
     }
     
-    // mouse event dispatch to UIComponents
-    
+    // mouse event dispatch to components
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int relX = (int) mouseX - leftPos;
@@ -648,7 +479,6 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
     }
     
     // exclusion zones for recipe viewer compat (EMI, REI, JEI)
-    
     public List<Rect2i> getExclusionZones() {
         var zones = new ArrayList<Rect2i>();
         if (extensionBounds != null) {
@@ -669,7 +499,6 @@ public class OritechScreen<T extends OritechScreenHandler> extends AbstractConta
     }
     
     // utilities
-    
     protected void addComponent(UIComponent component) {
         components.add(component);
     }

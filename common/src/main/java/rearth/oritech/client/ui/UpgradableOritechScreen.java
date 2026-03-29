@@ -101,12 +101,6 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
             content.add(chambersLabel);
         }
         
-        // Steam production label (set up by parent)
-        if (steamProductionLabel != null) {
-            content.add(steamProductionLabel);
-            speedLabel.withAlignment(LabelWidget.Alignment.CENTER);
-        }
-        
         // Pulverizer/FragmentForge dust combine note
         if (menu.blockEntity instanceof PulverizerBlockEntity || menu.blockEntity instanceof FragmentForgeBlockEntity) {
             var dustLabel = new LabelWidget(0, 0, 60, 10,
@@ -131,7 +125,6 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
     }
     
     // addon preview
-    
     private void toggleAddonOverlay() {
         if (addonOverlay != null) {
             removeComponent(addonOverlay);
@@ -245,9 +238,9 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
         }
         
         if (addonBlocks.isEmpty()) {
-            scroll.addChild(new LabelWidget(6, 0, 190, 10,
+            scroll.addChild(new LabelWidget(6, 4, 190, 10,
               Component.translatable("title.oritech.machine.no_addons")));
-            yOffset = 12;
+            yOffset = 16;
         }
         
         var background = new SurfaceWidget(0, 0, 194, yOffset);
