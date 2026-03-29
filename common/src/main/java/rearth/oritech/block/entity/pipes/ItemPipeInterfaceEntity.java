@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.time.StopWatch;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.NetworkManager;
@@ -24,8 +25,8 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
-    private static final int TRANSFER_AMOUNT = Oritech.CONFIG.itemPipeTransferAmount();
-    private static final int TRANSFER_PERIOD = Oritech.CONFIG.itemPipeIntervalDuration();
+    private static final int TRANSFER_AMOUNT = OritechConfig.itemPipeTransferAmount.get();
+    private static final int TRANSFER_PERIOD = OritechConfig.itemPipeIntervalDuration.get();
     
     private List<CachedTarget<ItemApi.InventoryStorage>> filteredTargetItemStorages;
     

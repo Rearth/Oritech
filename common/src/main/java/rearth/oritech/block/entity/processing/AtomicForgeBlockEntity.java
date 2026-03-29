@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.processing;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
@@ -24,7 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     public AtomicForgeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ATOMIC_FORGE_ENTITY, pos, state, Oritech.CONFIG.processingMachines.atomicForgeData.energyPerTick());
+        super(BlockEntitiesContent.ATOMIC_FORGE_ENTITY, pos, state, OritechConfig.processingMachines.atomicForgeData.energyPerTick.get());
     }
     
     @Override
@@ -53,7 +54,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
         
         // also adjust energy storage when getting recipe
         if (result.isPresent()) {
-            energyStorage.setCapacity((long) Oritech.CONFIG.processingMachines.atomicForgeData.energyPerTick() * result.get().value().getTime());
+            energyStorage.setCapacity((long) OritechConfig.processingMachines.atomicForgeData.energyPerTick.get() * result.get().value().getTime());
         } else {
             energyStorage.setCapacity(1);
             energyStorage.setAmount(0);
@@ -83,12 +84,12 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.atomicForgeData.energyCapacity();
+        return OritechConfig.processingMachines.atomicForgeData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.atomicForgeData.maxEnergyInsertion();
+        return OritechConfig.processingMachines.atomicForgeData.maxEnergyInsertion.get();
     }
     
     @Override

@@ -2,6 +2,7 @@ package rearth.oritech.block.base.entity;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
@@ -110,7 +111,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
         
         if (!inventory.getItem(0).getItem().equals(ItemContent.OVERCHARGED_CRYSTAL)) return;
         
-        energyStorage.amount = Math.min(energyStorage.capacity, energyStorage.amount + Oritech.CONFIG.overchargedCrystalChargeRate());
+        energyStorage.amount = Math.min(energyStorage.capacity, energyStorage.amount + OritechConfig.overchargedCrystalChargeRate.get());
     }
     
     private void outputEnergy() {

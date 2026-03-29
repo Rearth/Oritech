@@ -8,6 +8,7 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import rearth.oritech.Oritech;
+import rearth.oritech.init.OritechStartupConfig;
 import rearth.oritech.init.world.features.oil.OilSpringFeature;
 import rearth.oritech.init.world.features.oil.OilSpringFeatureConfig;
 import rearth.oritech.init.world.features.resourcenode.ResourceNodeFeature;
@@ -57,7 +58,7 @@ public class FeatureContent implements ArchitecturyRegistryContainer<Feature<?>>
         });
         
         // ores
-        if (Oritech.CONFIG.generateOresFabricOnly()) {
+        if (OritechStartupConfig.generateOresFabricOnly.get()) {
             BiomeModifications.addProperties((context, mutable) -> {
                 if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
                     mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("ore_nickel")));

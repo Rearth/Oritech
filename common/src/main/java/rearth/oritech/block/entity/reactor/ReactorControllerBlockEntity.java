@@ -3,6 +3,7 @@ package rearth.oritech.block.entity.reactor;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
@@ -42,13 +43,13 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ReactorControllerBlockEntity extends NetworkedBlockEntity implements EnergyApi.BlockProvider, ExtendedMenuProvider {
     
-    public static final int MAX_SIZE = Oritech.CONFIG.maxSize();
-    public static final int RF_PER_PULSE = Oritech.CONFIG.rfPerPulse();
-    public static final int ABSORBER_RATE = Oritech.CONFIG.absorberRate();
-    public static final int VENT_BASE_RATE = Oritech.CONFIG.ventBaseRate();
-    public static final int VENT_RELATIVE_RATE = Oritech.CONFIG.ventRelativeRate();
-    public static final int MAX_HEAT = Oritech.CONFIG.maxHeat();
-    public static final int MAX_UNSTABLE_TICKS = Oritech.CONFIG.maxUnstableTicks();
+    public static final int MAX_SIZE = OritechConfig.maxSize.get();
+    public static final int RF_PER_PULSE = OritechConfig.rfPerPulse.get();
+    public static final int ABSORBER_RATE = OritechConfig.absorberRate.get();
+    public static final int VENT_BASE_RATE = OritechConfig.ventBaseRate.get();
+    public static final int VENT_RELATIVE_RATE = OritechConfig.ventRelativeRate.get();
+    public static final int MAX_HEAT = OritechConfig.maxHeat.get();
+    public static final int MAX_UNSTABLE_TICKS = OritechConfig.maxUnstableTicks.get();
     
     private final HashMap<Vector2i, BaseReactorBlock> activeComponents = new HashMap<>();   // 2d local position on the first layer containing the reactor blocks
     private final HashMap<Vector2i, ReactorFuelPortEntity> fuelPorts = new HashMap<>();     // same grid, but contains a reference to the port at the ceiling
@@ -61,7 +62,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     public final HashMap<Vector2i, ComponentStatistics> componentStats = new HashMap<>(); // mainly for client displays, same grid
     
     @SyncField(SyncType.GUI_TICK)
-    public SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(0, Oritech.CONFIG.reactorMaxEnergyStored(), Oritech.CONFIG.reactorMaxEnergyStored(), this::setChanged);
+    public SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(0, OritechConfig.reactorMaxEnergyStored.get(), OritechConfig.reactorMaxEnergyStored.get(), this::setChanged);
     
     public boolean active = false;
     
@@ -303,7 +304,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     // strength is the amount of total active rods (e.g. activeRods * stackHeight)
     private void doReactorExplosion(int strength) {
         
-        if (Oritech.CONFIG.safeMode()) {
+        if (OritechConfig.safeMode.get()) {
             disableReactor();
             return;
         }
@@ -319,7 +320,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     }
     
     private void disableReactor() {
-        this.disabledUntil = level.getGameTime() + Oritech.CONFIG.safeModeCooldown();
+        this.disabledUntil = level.getGameTime() + OritechConfig.safeModeCooldown.get();
     }
     
     public void init(@Nullable Player player) {
@@ -549,7 +550,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     private void outputEnergy() {
         
         var totalMoved = 0;
-        var maxRatePerSlot = Oritech.CONFIG.reactorMaxEnergyOutput();
+        var maxRatePerSlot = OritechConfig.reactorMaxEnergyOutput.get();
         
         var randomOrderedList = new ArrayList<>(energyPorts);
         Collections.shuffle(randomOrderedList);

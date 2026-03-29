@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.storage;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.ExpandableMultiblockEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
@@ -32,17 +33,17 @@ public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBl
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.largeEnergyStorage.energyCapacity();
+        return OritechConfig.largeEnergyStorage.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.largeEnergyStorage.maxEnergyInsertion();
+        return OritechConfig.largeEnergyStorage.maxEnergyInsertion.get();
     }
     
     @Override
     public long getDefaultExtractionRate() {
-        return Oritech.CONFIG.largeEnergyStorage.maxEnergyExtraction();
+        return OritechConfig.largeEnergyStorage.maxEnergyExtraction.get();
     }
     
     @Override

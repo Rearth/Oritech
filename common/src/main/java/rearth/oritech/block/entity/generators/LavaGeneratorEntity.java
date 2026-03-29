@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.generators;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -20,7 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     public LavaGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.LAVA_GENERATOR_ENTITY, pos, state, Oritech.CONFIG.generators.lavaGeneratorData.energyPerTick());
+        super(BlockEntitiesContent.LAVA_GENERATOR_ENTITY, pos, state, OritechConfig.generators.lavaGeneratorData.energyPerTick.get());
     }
     
     @Override
@@ -54,12 +55,12 @@ public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     
     @Override
     public long getDefaultExtractionRate() {
-        return Oritech.CONFIG.generators.lavaGeneratorData.maxEnergyExtraction();
+        return OritechConfig.generators.lavaGeneratorData.maxEnergyExtraction.get();
     }
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.generators.lavaGeneratorData.energyCapacity();
+        return OritechConfig.generators.lavaGeneratorData.energyCapacity.get();
     }
     
     @Override

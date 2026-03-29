@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
@@ -188,9 +189,9 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     
     public float getBurstBonus() {
         if (isBurstAvailable()) {
-            return 1 / Oritech.CONFIG.addonConfig.burstAddonSpeedMultiplier();
+            return 1 / OritechConfig.addonConfig.burstAddonSpeedMultiplier.get().floatValue();
         } else if(isBurstThrottled()) {
-            return Oritech.CONFIG.addonConfig.burstAddonThrottleMultiplier();
+            return OritechConfig.addonConfig.burstAddonThrottleMultiplier.get().floatValue();
         } else {
             return 1f;
         }

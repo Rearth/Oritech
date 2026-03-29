@@ -13,6 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
@@ -43,7 +44,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged);
     
     public CoolerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.COOLER_ENTITY, pos, state, Oritech.CONFIG.processingMachines.coolerData.energyPerTick());
+        super(BlockEntitiesContent.COOLER_ENTITY, pos, state, OritechConfig.processingMachines.coolerData.energyPerTick.get());
     }
     
     @Override
@@ -157,12 +158,12 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.coolerData.energyCapacity();
+        return OritechConfig.processingMachines.coolerData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.coolerData.maxEnergyInsertion();
+        return OritechConfig.processingMachines.coolerData.maxEnergyInsertion.get();
     }
     
     @Override

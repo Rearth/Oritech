@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.init.ParticleContent;
@@ -217,7 +218,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     }
     
     private int getSoulCost(int maxHp) {
-        return (int) (Math.sqrt(maxHp) + 0.5f) * Oritech.CONFIG.spawnerCostMultiplier();
+        return (int) (Math.sqrt(maxHp) + 0.5f) * OritechConfig.spawnerCostMultiplier.get();
     }
     
     public void onEntitySteppedOn(Entity entity) {

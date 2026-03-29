@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.processing;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -21,17 +22,17 @@ import net.minecraft.world.phys.Vec3;
 public class AssemblerBlockEntity extends MultiblockMachineEntity {
     
     public AssemblerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ASSEMBLER_ENTITY, pos, state, Oritech.CONFIG.processingMachines.assemblerData.energyPerTick());
+        super(BlockEntitiesContent.ASSEMBLER_ENTITY, pos, state, OritechConfig.processingMachines.assemblerData.energyPerTick.get());
     }
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.assemblerData.energyCapacity();
+        return OritechConfig.processingMachines.assemblerData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.assemblerData.maxEnergyInsertion();
+        return OritechConfig.processingMachines.assemblerData.maxEnergyInsertion.get();
     }
     
     @Override

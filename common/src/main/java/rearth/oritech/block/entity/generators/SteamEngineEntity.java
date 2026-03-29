@@ -3,6 +3,7 @@ package rearth.oritech.block.entity.generators;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.platform.Platform;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
@@ -72,7 +73,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     public SteamEngineSyncPacket clientStats;
     
     public SteamEngineEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.STEAM_ENGINE_ENTITY, pos, state, Oritech.CONFIG.generators.steamEngineData.steamToRfRatio());
+        super(BlockEntitiesContent.STEAM_ENGINE_ENTITY, pos, state, OritechConfig.generators.steamEngineData.steamToRfRatio.get());
         clientStats = new SteamEngineSyncPacket(pos, 1f, 1f, 0, 0, 0);
     }
     
@@ -101,9 +102,9 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         var waterTank = boilerStorage.getOutputContainer();
         
         // optional config stops (energy full / water full)
-        if (energyStorage.getAmount() >= energyStorage.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnEnergyFull())
+        if (energyStorage.getAmount() >= energyStorage.getCapacity() && OritechConfig.generators.steamEngineData.stopOnEnergyFull.get())
             return;
-        if (waterTank.getStack().getAmount() >= waterTank.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnWaterFull())
+        if (waterTank.getStack().getAmount() >= waterTank.getCapacity() && OritechConfig.generators.steamEngineData.stopOnWaterFull.get())
             return;
         
         // if not recipe is currently set, or it does not match the steam tank, search for a recipe
@@ -261,12 +262,12 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.generators.steamEngineData.energyCapacity();
+        return OritechConfig.generators.steamEngineData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultExtractionRate() {
-        return Oritech.CONFIG.generators.steamEngineData.maxEnergyExtraction();
+        return OritechConfig.generators.steamEngineData.maxEnergyExtraction.get();
     }
     
     @Override
@@ -330,7 +331,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     public static Fluid getUsedSteamFluid() {
         if (USED_STEAM_FLUID == null) {
-            USED_STEAM_FLUID = BuiltInRegistries.FLUID.get(ResourceLocation.parse(Oritech.CONFIG.generators.steamId()));
+            USED_STEAM_FLUID = BuiltInRegistries.FLUID.get(ResourceLocation.parse(OritechConfig.generators.steamId.get()));
         }
         
         return USED_STEAM_FLUID;

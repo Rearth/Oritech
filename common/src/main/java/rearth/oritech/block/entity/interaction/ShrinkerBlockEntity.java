@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -318,12 +319,12 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.addonConfig.addonShrinkerRF();
+        return OritechConfig.addonConfig.addonShrinkerRF.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.addonConfig.addonShrinkerRF() / 60;
+        return OritechConfig.addonConfig.addonShrinkerRF.get() / 60;
     }
     
     @Override

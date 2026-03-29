@@ -10,6 +10,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
@@ -106,7 +107,7 @@ public interface MachineAddonController {
     // addon loading algorithm, called during init
     default List<AddonBlock> getAllAddons(BlockPos brokenAddon) {
         
-        var useLayered = Oritech.CONFIG.layeredExtenders();
+        var useLayered = OritechConfig.layeredExtenders.get();
         
         var maxIterationCount = (int) getCoreQuality() + 1;
         
@@ -226,7 +227,7 @@ public interface MachineAddonController {
         for (var addon : addons) {
             var addonSettings = addon.addonBlock().getAddonSettings();
             
-            if (Oritech.CONFIG.additiveAddons()) {
+            if (OritechConfig.additiveAddons.get()) {
                 speed += 1 - addonSettings.speedMultiplier();
                 efficiency += 1 - addonSettings.efficiencyMultiplier();
             } else {
@@ -242,7 +243,7 @@ public interface MachineAddonController {
             getAdditionalStatFromAddon(addon);
         }
         
-        if (Oritech.CONFIG.additiveAddons()) {
+        if (OritechConfig.additiveAddons.get()) {
             // convert addon numbers to base (e.g. +2 (+200%) speed bonus is actually a total multiplier of 0.5) (+2 would be a speed of 3, because we start at 1)
             // efficiency change of -100% would result in efficiency multiplier of 2. -400% would be 5
             // efficiency and speed numbers < 1 here make things better.

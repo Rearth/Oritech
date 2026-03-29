@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.accelerator;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.NetworkedEventHandler;
@@ -51,7 +52,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
         
         if (currentlyPullingFrom != null) return;
         
-        int pullRange = Oritech.CONFIG.pullRange();
+        int pullRange = OritechConfig.pullRange.get();
         
         for (var candidate : BlockPos.withinManhattan(pos, pullRange, pullRange, pullRange)) {
             var candidateState = world.getBlockState(candidate);
@@ -61,7 +62,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
             currentlyPullingFrom = candidate;
             currentlyPulling = candidateState;
             pullingStartedAt = world.getGameTime();
-            pullTime = (long) candidate.distManhattan(pos) * Oritech.CONFIG.pullTimeMultiplier();
+            pullTime = (long) candidate.distManhattan(pos) * OritechConfig.pullTimeMultiplier.get();
             world.setBlockAndUpdate(candidate, Blocks.AIR.defaultBlockState());
             setChanged();
             
@@ -69,7 +70,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
         }
         
         if (currentlyPullingFrom == null) {
-            waitTicks = Oritech.CONFIG.idleWaitTicks();
+            waitTicks = OritechConfig.idleWaitTicks.get();
         }
     }
     

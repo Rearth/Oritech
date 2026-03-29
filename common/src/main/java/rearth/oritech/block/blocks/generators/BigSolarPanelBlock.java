@@ -30,11 +30,8 @@ import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 public class BigSolarPanelBlock extends PassiveGeneratorBlock {
     
-    public final int productionRate;
-    
-    public BigSolarPanelBlock(Properties settings, int productionRate) {
+    public BigSolarPanelBlock(Properties settings) {
         super(settings);
-        this.productionRate = productionRate;
         registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false));
     }
     

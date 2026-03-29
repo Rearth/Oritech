@@ -3,6 +3,7 @@ package rearth.oritech.block.entity.arcane;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -218,7 +219,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
     
     private int getEnchantmentCost(Enchantment enchantment, int targetLevel) {
-        return enchantment.getAnvilCost() * targetLevel * Oritech.CONFIG.enchanterCostMultiplier() + 1;
+        return enchantment.getAnvilCost() * targetLevel * OritechConfig.enchanterCostMultiplier.get() + 1;
     }
     
     @Override

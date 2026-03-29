@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.generators;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -21,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     public BioGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BIO_GENERATOR_ENTITY, pos, state, Oritech.CONFIG.generators.bioGeneratorData.energyPerTick());
+        super(BlockEntitiesContent.BIO_GENERATOR_ENTITY, pos, state, OritechConfig.generators.bioGeneratorData.energyPerTick.get());
     }
     
     @Override
@@ -80,12 +81,12 @@ public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     
     @Override
     public long getDefaultExtractionRate() {
-        return Oritech.CONFIG.generators.bioGeneratorData.maxEnergyExtraction();
+        return OritechConfig.generators.bioGeneratorData.maxEnergyExtraction.get();
     }
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.generators.bioGeneratorData.energyCapacity();
+        return OritechConfig.generators.bioGeneratorData.energyCapacity.get();
     }
     
     @Override

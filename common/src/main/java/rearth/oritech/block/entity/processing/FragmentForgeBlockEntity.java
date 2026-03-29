@@ -10,6 +10,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
@@ -35,17 +36,17 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     private boolean hasByproductAddon;
     
     public FragmentForgeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY, pos, state, Oritech.CONFIG.processingMachines.fragmentForgeData.energyPerTick());
+        super(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY, pos, state, OritechConfig.processingMachines.fragmentForgeData.energyPerTick.get());
     }
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.fragmentForgeData.energyCapacity();
+        return OritechConfig.processingMachines.fragmentForgeData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.fragmentForgeData.maxEnergyInsertion();
+        return OritechConfig.processingMachines.fragmentForgeData.maxEnergyInsertion.get();
     }
     
     @Override

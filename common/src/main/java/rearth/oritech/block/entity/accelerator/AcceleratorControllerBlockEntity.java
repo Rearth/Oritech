@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.InOutInventoryStorage;
@@ -165,9 +166,9 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     public void onParticleCollided(float relativeSpeed, Vec3 collision, AcceleratorControllerBlockEntity secondControllerEntity) {
         
         // create end portal area when two ender pearls collide, nether portal for two firecharges
-        if (relativeSpeed > Oritech.CONFIG.endPortalRequiredSpeed() && activeItemParticle.getItem().equals(Items.ENDER_PEARL) && secondControllerEntity.activeItemParticle.getItem().equals(Items.ENDER_PEARL)) {
+        if (relativeSpeed > OritechConfig.endPortalRequiredSpeed.get() && activeItemParticle.getItem().equals(Items.ENDER_PEARL) && secondControllerEntity.activeItemParticle.getItem().equals(Items.ENDER_PEARL)) {
             spawnEndPortal(BlockPos.containing(collision));
-        } else if (relativeSpeed > Oritech.CONFIG.netherPortalRequiredSpeed() && activeItemParticle.getItem().equals(Items.FIRE_CHARGE) && secondControllerEntity.activeItemParticle.getItem().equals(Items.FIRE_CHARGE)) {
+        } else if (relativeSpeed > OritechConfig.netherPortalRequiredSpeed.get() && activeItemParticle.getItem().equals(Items.FIRE_CHARGE) && secondControllerEntity.activeItemParticle.getItem().equals(Items.FIRE_CHARGE)) {
             spawnNetherPortal(BlockPos.containing(collision));
         } else {
             var success = tryCraftResult(relativeSpeed, activeItemParticle, secondControllerEntity.activeItemParticle);
@@ -188,8 +189,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     
     private void createCollisionParticles(int collisionEnergy, Vec3 collisionPosition, int shotCount) {
         
-        var energyMultiplier = 4 * Oritech.CONFIG.tachyonCollisionEnergyFactor();
-        int energyPotential = (int) (Math.pow(collisionEnergy / 2f, 2) * energyMultiplier * Oritech.CONFIG.accelerationRFCost());    // exactly N times the amount of energy used to accelerate
+        var energyMultiplier = 4 * OritechConfig.tachyonCollisionEnergyFactor.get();
+        int energyPotential = (int) (Math.pow(collisionEnergy / 2f, 2) * energyMultiplier * OritechConfig.accelerationRFCost.get());    // exactly N times the amount of energy used to accelerate
         var energyPerRay = energyPotential / shotCount;
         var rayRange = shotCount / 3;
         
@@ -365,7 +366,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var blockHardness = hitState.getDestroySpeed(level, checkPos);
         
         // hit portal, create black hole with explosion
-        if (remainingMomentum > Oritech.CONFIG.blackHoleRequiredSpeed() && hitState.getBlock() instanceof Portal) {
+        if (remainingMomentum > OritechConfig.blackHoleRequiredSpeed.get() && hitState.getBlock() instanceof Portal) {
             createBlackHole(checkPos);
             return remainingMomentum;
         }
@@ -401,7 +402,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var availableEnergy = storage.getAmount();
         
         var speed = particle.velocity;
-        var cost = speed * Oritech.CONFIG.accelerationRFCost();
+        var cost = speed * OritechConfig.accelerationRFCost.get();
         if (availableEnergy < cost) return;
         
         storage.extract((long) cost, false);

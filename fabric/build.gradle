@@ -94,6 +94,8 @@ dependencies {
     // owo-lib
     modApi "io.wispforest:owo-lib:$owo_version"
     annotationProcessor "io.wispforest:owo-lib:$owo_version"
+    // Forge Config API Port (Fabric runtime)
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:$forge_config_api_port_version"
     // REI
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"
 

@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
@@ -37,7 +38,7 @@ import java.util.Objects;
 
 public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements FluidApi.BlockProvider {
     
-    public static final long FLUID_USAGE = (long) (Oritech.CONFIG.fertilizerConfig.liquidPerBlockUsage() * FluidStackHooks.bucketAmount());   // per block, tick usage is this divided by work time
+    public static final long FLUID_USAGE = (long) (OritechConfig.fertilizerConfig.liquidPerBlockUsage.get() * FluidStackHooks.bucketAmount());   // per block, tick usage is this divided by work time
     
     @SyncField(SyncType.GUI_TICK)
     private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged) {
@@ -179,22 +180,22 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     
     @Override
     public float getMoveTime() {
-        return Oritech.CONFIG.fertilizerConfig.moveDuration() * this.getSpeedMultiplier();
+        return OritechConfig.fertilizerConfig.moveDuration.get() * this.getSpeedMultiplier();
     }
     
     @Override
     public float getWorkTime() {
-        return Oritech.CONFIG.fertilizerConfig.workDuration() * this.getSpeedMultiplier();
+        return OritechConfig.fertilizerConfig.workDuration.get() * this.getSpeedMultiplier();
     }
     
     @Override
     public int getMoveEnergyUsage() {
-        return Oritech.CONFIG.fertilizerConfig.moveEnergyUsage();
+        return OritechConfig.fertilizerConfig.moveEnergyUsage.get();
     }
     
     @Override
     public int getOperationEnergyUsage() {
-        return Oritech.CONFIG.fertilizerConfig.workEnergyUsage();
+        return OritechConfig.fertilizerConfig.workEnergyUsage.get();
     }
     
     @Override

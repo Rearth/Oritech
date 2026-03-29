@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -54,7 +55,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     // config
     
     // storage
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.deepDrillConfig.energyCapacity(), getMaxRfInput(), 0, this::setChanged);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.deepDrillConfig.energyCapacity.get(), getMaxRfInput(), 0, this::setChanged);
     
     public final SimpleInventoryStorage inventory = createInventoryStorage();
     
@@ -116,7 +117,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         }
         
         // try increasing faster if too much energy is provided
-        for (int i = 0; i < Oritech.CONFIG.deepDrillConfig.stepsPerOre(); i++) {
+        for (int i = 0; i < OritechConfig.deepDrillConfig.stepsPerOre.get(); i++) {
             if (energyStorage.amount >= energyPerStep) {
                 progress++;
                 energyStorage.amount -= energyPerStep;
@@ -125,9 +126,9 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
             }
         }
         
-        if (progress >= Oritech.CONFIG.deepDrillConfig.stepsPerOre()) {
+        if (progress >= OritechConfig.deepDrillConfig.stepsPerOre.get()) {
             craftResult(world, pos);
-            progress -= Oritech.CONFIG.deepDrillConfig.stepsPerOre();
+            progress -= OritechConfig.deepDrillConfig.stepsPerOre.get();
             this.setChanged();
         }
         
@@ -292,7 +293,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     }
     
     public int getRfPerStep() {
-        return Oritech.CONFIG.deepDrillConfig.energyPerStep();
+        return OritechConfig.deepDrillConfig.energyPerStep.get();
     }
     
     @Override

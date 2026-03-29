@@ -2,6 +2,7 @@ package rearth.oritech.block.entity.augmenter;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
@@ -59,8 +60,8 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
                                                                        ExtendedMenuProvider, ItemApi.BlockProvider, EnergyApi.BlockProvider, ScreenProvider {
     
     // config
-    public static long maxEnergyTransfer = Oritech.CONFIG.augmenterMaxEnergy() / 10;
-    public static long maxEnergyStored = Oritech.CONFIG.augmenterMaxEnergy();
+    public static long maxEnergyTransfer = OritechConfig.augmenterMaxEnergy.get() / 10;
+    public static long maxEnergyStored = OritechConfig.augmenterMaxEnergy.get();
     
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();

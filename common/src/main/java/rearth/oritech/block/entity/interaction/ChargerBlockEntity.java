@@ -3,6 +3,7 @@ package rearth.oritech.block.entity.interaction;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -45,7 +46,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
                                                                  ScreenProvider, ExtendedMenuProvider {
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.charger.energyCapacity(), Oritech.CONFIG.charger.maxEnergyInsertion(), Oritech.CONFIG.charger.maxEnergyExtraction(), this::setChanged);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.charger.energyCapacity.get(), OritechConfig.charger.maxEnergyInsertion.get(), OritechConfig.charger.maxEnergyExtraction.get(), this::setChanged);
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::setChanged);

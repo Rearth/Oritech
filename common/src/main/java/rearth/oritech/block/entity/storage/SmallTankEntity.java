@@ -19,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
@@ -48,7 +49,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::setChanged, new InventorySlotAssignment(0, 2, 2, 1));
     
     @SyncField({SyncType.TICK, SyncType.INITIAL})
-    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), this::setChanged);
+    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(OritechConfig.portableTankCapacityBuckets.get() * FluidStackHooks.bucketAmount(), this::setChanged);
     
     public SmallTankEntity(BlockPos pos, BlockState state, boolean isCreative) {
         super(isCreative ? BlockEntitiesContent.CREATIVE_TANK_ENTITY : BlockEntitiesContent.SMALL_TANK_ENTITY, pos, state);

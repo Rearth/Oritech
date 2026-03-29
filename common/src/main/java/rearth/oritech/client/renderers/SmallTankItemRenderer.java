@@ -13,6 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 
@@ -72,7 +73,7 @@ public class SmallTankItemRenderer {
         }
         
         var fluid = storage.getFluid();
-        var fill = storage.getAmount() / (float) (Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount());
+        var fill = storage.getAmount() / (float) (OritechConfig.portableTankCapacityBuckets.get() * FluidStackHooks.bucketAmount());
         
         var sprite = FluidStackHooks.getStillTexture(fluid);
         var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(fluid));

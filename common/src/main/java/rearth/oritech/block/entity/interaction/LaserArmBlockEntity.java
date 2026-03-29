@@ -41,6 +41,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -83,7 +84,6 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable, ColorableMachine {
     
     private static final String LASER_PLAYER_NAME = "oritech_laser";
-    public static final int BLOCK_BREAK_ENERGY = Oritech.CONFIG.laserArmConfig.blockBreakEnergyBase();
     
     // storage
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
@@ -122,7 +122,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     public ColorableMachine.ColorVariant currentColor = ColorVariant.ORANGE;
     
     // config
-    private final int range = Oritech.CONFIG.laserArmConfig.range();
+    private final int range = OritechConfig.laserArmConfig.range.get();
     
     public Vec3 laserHead;
     
@@ -142,7 +142,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     private int progress;
     private ArrayDeque<BlockPos> pendingArea;
     private final ArrayDeque<LivingEntity> pendingLivingTargets = new ArrayDeque<>();
-    private int targetBlockEnergyNeeded = BLOCK_BREAK_ENERGY;
+    private int targetBlockEnergyNeeded = OritechConfig.laserArmConfig.blockBreakEnergyBase.get();
     
     // needed only on client
     public Vec3 lastRenderPosition;
@@ -504,11 +504,11 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
     
     public int energyRequiredToFire() {
-        return (int) (Oritech.CONFIG.laserArmConfig.energyPerTick() * (1 / addonData.speed()));
+        return (int) (OritechConfig.laserArmConfig.energyPerTick.get() * (1 / addonData.speed()));
     }
     
     public float getDamageTick() {
-        return (Oritech.CONFIG.laserArmConfig.damageTickBase() * (1 / addonData.speed()));
+        return (OritechConfig.laserArmConfig.damageTickBase.get().floatValue() * (1 / addonData.speed()));
     }
     
     public boolean setTargetFromDesignator(BlockPos targetPos) {
@@ -538,7 +538,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
             return false;
         }
         
-        this.targetBlockEnergyNeeded = (int) (BLOCK_BREAK_ENERGY * Math.pow(blockHardness, Oritech.CONFIG.blockBreakHardnessExponentialFactor()) * addonData.efficiency());
+        this.targetBlockEnergyNeeded = (int) (OritechConfig.laserArmConfig.blockBreakEnergyBase.get() * Math.pow(blockHardness, OritechConfig.blockBreakHardnessExponentialFactor.get()) * addonData.efficiency());
         
         if (targetState.is(TagContent.LASER_FAST_BREAKING))
             targetBlockEnergyNeeded /= 8;
@@ -717,12 +717,12 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.laserArmConfig.energyCapacity();
+        return OritechConfig.laserArmConfig.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.laserArmConfig.maxEnergyInsertion();
+        return OritechConfig.laserArmConfig.maxEnergyInsertion.get();
     }
     //endregion
     

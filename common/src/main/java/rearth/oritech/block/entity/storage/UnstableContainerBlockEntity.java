@@ -5,11 +5,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -23,7 +25,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
@@ -35,10 +36,9 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.storage.UnstableContainerBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -57,7 +57,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("setup").thenPlay("idle");
     public static final RawAnimation IDLE = RawAnimation.begin().thenPlay("idle");
     
-    public static final Long BASE_CAPACITY = Oritech.CONFIG.unstableContainerBaseCapacity();
+    public static final Long BASE_CAPACITY = OritechConfig.unstableContainerBaseCapacity.get();
     
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
@@ -112,7 +112,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     
     private void adjustEnergyStorageSize() {
         
-        var targetMultiplier = 1 + Math.pow((double) laserInputStorage.getAmount() / Oritech.CONFIG.laserArmConfig.energyPerTick(), 2);
+        var targetMultiplier = 1 + Math.pow((double) laserInputStorage.getAmount() / OritechConfig.laserArmConfig.energyPerTick.get(), 2);
         targetMultiplier = Math.min(targetMultiplier, 5_000);
         laserInputStorage.setAmount(0);
         var targetAmount = BASE_CAPACITY * qualityMultiplier * targetMultiplier;

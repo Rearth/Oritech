@@ -2,6 +2,7 @@ package rearth.oritech.block.entity.arcane;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
@@ -60,13 +61,13 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     public static final RawAnimation UNSTABLE = RawAnimation.begin().thenLoop("unstable");
     public static final RawAnimation EMPTY = RawAnimation.begin().thenLoop("empty");
     
-    public final int baseSoulCapacity = Oritech.CONFIG.catalystBaseSouls();
+    public final int baseSoulCapacity = OritechConfig.catalystBaseSouls.get();
     public final int maxProgress = 20;
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     // working data
     public int collectedSouls;
-    public int maxSouls = Oritech.CONFIG.catalystBaseSouls();
+    public int maxSouls = OritechConfig.catalystBaseSouls.get();
     private int unstableTicks;
     private int progress;
     private boolean isHyperEnchanting;
@@ -95,7 +96,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         
         // check if powered, and adjust soul capacity
         if (energyStorage.getAmount() > 0) {
-            var gainedSoulCapacity = energyStorage.getAmount() / Oritech.CONFIG.catalystRFPerSoul();
+            var gainedSoulCapacity = energyStorage.getAmount() / OritechConfig.catalystRFPerSoul.get();
             energyStorage.setAmount(0);
             var newMax = baseSoulCapacity + gainedSoulCapacity;
             adjustMaxSouls(newMax);
@@ -225,8 +226,8 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     
     private int getEnchantmentCost(Enchantment enchantment, int targetLevel, boolean hyper) {
         var baseCost = enchantment.getAnvilCost();
-        var resultingCost = baseCost * targetLevel * Oritech.CONFIG.catalystCostMultiplier();
-        if (hyper) resultingCost = (int) (Math.pow(resultingCost * Oritech.CONFIG.catalystHyperMultiplier(), Oritech.CONFIG.catalystHyperExpFactor()) + Oritech.CONFIG.catalystBaseSouls());
+        var resultingCost = baseCost * targetLevel * OritechConfig.catalystCostMultiplier.get();
+        if (hyper) resultingCost = (int) (Math.pow(resultingCost * OritechConfig.catalystHyperMultiplier.get(), OritechConfig.catalystHyperExpFactor.get()) + OritechConfig.catalystBaseSouls.get());
         return resultingCost;
     }
     

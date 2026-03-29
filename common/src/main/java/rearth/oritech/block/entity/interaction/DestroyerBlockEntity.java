@@ -27,6 +27,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
@@ -336,24 +337,24 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     public float getMoveTime() {
         var quarrySpeedBonus = range > 1 ? 0.15f : 1f;
-        return Oritech.CONFIG.destroyerConfig.moveDuration() * this.getSpeedMultiplier() * quarrySpeedBonus;
+        return OritechConfig.destroyerConfig.moveDuration.get() * this.getSpeedMultiplier() * quarrySpeedBonus;
     }
     
     @Override
     public float getWorkTime() {
         var quarrySpeedBonus = range > 1 ? 0.15f : 1f;
-        return (float) (Oritech.CONFIG.destroyerConfig.workDuration() * this.getSpeedMultiplier() * Math.pow(targetHardness, Oritech.CONFIG.blockBreakHardnessExponentialFactor()) * quarrySpeedBonus);
+        return (float) (OritechConfig.destroyerConfig.workDuration.get() * this.getSpeedMultiplier() * Math.pow(targetHardness, OritechConfig.blockBreakHardnessExponentialFactor.get()) * quarrySpeedBonus);
     }
     
     @Override
     public int getMoveEnergyUsage() {
-        return Oritech.CONFIG.destroyerConfig.moveEnergyUsage();
+        return OritechConfig.destroyerConfig.moveEnergyUsage.get();
     }
     
     @Override
     public int getOperationEnergyUsage() {
         var quarryCostBonus = range > 1 ? 4 : 1;
-        return Oritech.CONFIG.destroyerConfig.workEnergyUsage() * quarryCostBonus;
+        return OritechConfig.destroyerConfig.workEnergyUsage.get() * quarryCostBonus;
     }
     
     @Override

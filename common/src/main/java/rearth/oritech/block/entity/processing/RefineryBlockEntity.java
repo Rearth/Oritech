@@ -19,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
@@ -57,7 +58,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     private int moduleCount;    // range 0-2
     
     public RefineryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REFINERY_ENTITY, pos, state, Oritech.CONFIG.processingMachines.refineryData.energyPerTick());
+        super(BlockEntitiesContent.REFINERY_ENTITY, pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
     }
     
     @Override
@@ -206,12 +207,12 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.refineryData.energyCapacity();
+        return OritechConfig.processingMachines.refineryData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.refineryData.maxEnergyInsertion();
+        return OritechConfig.processingMachines.refineryData.maxEnergyInsertion.get();
     }
     
     @Override

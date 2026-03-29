@@ -40,7 +40,6 @@ public final class Oritech {
     
     public static final String MOD_ID = "oritech";
     public static final Logger LOGGER = LoggerFactory.getLogger("oritech");
-    public static final OritechConfig CONFIG = OritechConfig.createAndLoad();
     
     public static final Multimap<ResourceLocation, Runnable> EVENT_MAP = initEventMap();
     public static Set<Pair<ItemLike, Float>> COMPOSTABLES_DATA = new HashSet<>();

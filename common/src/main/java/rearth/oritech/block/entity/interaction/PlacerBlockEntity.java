@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.AdditionalNetworkingProvider;
 import rearth.oritech.api.networking.SyncType;
@@ -126,22 +127,22 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
     
     @Override
     public float getMoveTime() {
-        return Oritech.CONFIG.placerConfig.moveDuration() * this.getSpeedMultiplier();
+        return OritechConfig.placerConfig.moveDuration.get() * this.getSpeedMultiplier();
     }
     
     @Override
     public float getWorkTime() {
-        return Oritech.CONFIG.placerConfig.workDuration() * this.getSpeedMultiplier();
+        return OritechConfig.placerConfig.workDuration.get() * this.getSpeedMultiplier();
     }
     
     @Override
     public int getMoveEnergyUsage() {
-        return Oritech.CONFIG.placerConfig.moveEnergyUsage();
+        return OritechConfig.placerConfig.moveEnergyUsage.get();
     }
     
     @Override
     public int getOperationEnergyUsage() {
-        return Oritech.CONFIG.placerConfig.workEnergyUsage();
+        return OritechConfig.placerConfig.workEnergyUsage.get();
     }
     
     @Override

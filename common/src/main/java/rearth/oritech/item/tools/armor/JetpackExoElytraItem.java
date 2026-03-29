@@ -1,5 +1,6 @@
 package rearth.oritech.item.tools.armor;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 
 import java.util.List;
@@ -91,31 +92,31 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     
     @Override
     public float getSpeed() {
-        return Oritech.CONFIG.exoElytraJetpack.speed();
+        return OritechConfig.exoElytraJetpack.speed.get().floatValue();
     }
     
     @Override
     public int getRfUsage() {
-        return Oritech.CONFIG.exoElytraJetpack.energyUsage();
+        return OritechConfig.exoElytraJetpack.energyUsage.get();
     }
     
     @Override
     public int getFuelUsage() {
-        return Oritech.CONFIG.exoElytraJetpack.fuelUsage();
+        return OritechConfig.exoElytraJetpack.fuelUsage.get();
     }
     
     @Override
     public long getFuelCapacity() {
-        return Oritech.CONFIG.exoElytraJetpack.fuelCapacity();
+        return OritechConfig.exoElytraJetpack.fuelCapacity.get();
     }
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return Oritech.CONFIG.exoElytraJetpack.energyCapacity();
+        return OritechConfig.exoElytraJetpack.energyCapacity.get();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return Oritech.CONFIG.exoElytraJetpack.chargeSpeed();
+        return OritechConfig.exoElytraJetpack.chargeSpeed.get();
     }
 }

@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -29,7 +30,7 @@ import java.util.Objects;
 
 public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     
-    private static final int MAX_SEARCH_LENGTH = Oritech.CONFIG.processingMachines.machineFrameMaxLength();
+    private static final int MAX_SEARCH_LENGTH = OritechConfig.processingMachines.machineFrameMaxLength.get();
     private static final HashMap<Vec3i, HashMap<Vec3i, Vec3i>> occupiedAreas = new HashMap<>();
     
     @SyncField({SyncType.INITIAL, SyncType.SPARSE_TICK})
