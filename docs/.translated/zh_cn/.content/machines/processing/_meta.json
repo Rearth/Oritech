@@ -1,15 +1,12 @@
 {
-  "machine_basics.mdx": "机器基础",
-  "multiblocks.mdx": "多方块结构",
-  "addons.mdx": "插件",
-  "pulverizer.mdx": "磨粉机",
-  "assembler.mdx": "装配器",
-  "centrifuge.mdx": "离心机",
-  "foundry.mdx": "铸造器",
-  "refinery.mdx": "精炼厂",
-  "fragment_forge.mdx": "粉碎工厂",
-  "atomic_forge.mdx": "原子锻造器",
-  "generators.mdx": "发电机",
-  "steam_engine.mdx": "蒸汽动力",
-  "reactor": "核反应堆"
+  "assembler_block.mdx": "装配器",
+  "atomic_forge_block.mdx": "原子锻造器",
+  "centrifuge_block.mdx": "离心机",
+  "cooler_block.mdx": "工业冷却器",
+  "foundry_block.mdx": "铸造器",
+  "fragment_forge_block.mdx": "粉碎工厂",
+  "powered_furnace_block.mdx": "电炉",
+  "pulverizer_block.mdx": "磨粉机",
+  "refinery_block.mdx": "精炼厂",
+  "refinery_module_block.mdx": "精炼厂罐室模块"
 }
