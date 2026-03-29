@@ -29,7 +29,7 @@ public abstract class AbstractDataDisplayWidget extends UIComponent {
         // smoothly moves displayed amount to target amount
         currentAmount = getTargetAmount();
         
-        if (applySmoothing()) {
+        if (!applySmoothing()) {
             displayedAmount = currentAmount;
         } else {
             displayedAmount += (currentAmount - displayedAmount) * 0.15f;
