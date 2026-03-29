@@ -118,7 +118,7 @@ public class LaserArmBlockBehavior {
                 if (blockState.isAir() || !blockState.getFluidState().isEmpty()) return false;
                 
                 blockState.randomTick((ServerLevel) world, blockPos, world.random);
-                ParticleContent.ACCELERATING.spawn(world, Vec3.atLowerCornerOf(blockPos));
+                ParticleContent.Accelerating(world, Vec3.atLowerCornerOf(blockPos));
                 
                 return true;
             }

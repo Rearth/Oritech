@@ -1,5 +1,7 @@
 package rearth.oritech.client.renderers;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -20,12 +22,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
 import rearth.oritech.block.blocks.processing.RefineryModuleBlock;
 import rearth.oritech.block.blocks.storage.LargeStorageBlock;
 import rearth.oritech.block.blocks.storage.SmallStorageBlock;
+import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
@@ -33,8 +35,7 @@ import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MultiblockMachineController;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+
 import java.util.ArrayList;
 
 public class BlockOutlineRenderer {
@@ -49,7 +50,7 @@ public class BlockOutlineRenderer {
         var itemStack = player.getMainHandItem();
         var blockPos = ((BlockHitResult) client.hitResult).getBlockPos();
         
-        if (Oritech.CONFIG.showMachinePreview()) {
+        if (OritechClientConfig.showMachinePreview.get()) {
             renderBlockPlacementPreviewOutline(world, camera, matrixStack, consumer, itemStack, player, blockPos);
             renderParticlePlacementHelper(world, camera, matrixStack, consumer, itemStack, player, blockPos);
         }

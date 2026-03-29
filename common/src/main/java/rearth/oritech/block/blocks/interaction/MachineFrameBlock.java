@@ -19,8 +19,9 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
+import rearth.oritech.client.init.OritechClientConfig;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.TagContent;
 
 import java.util.List;
@@ -28,7 +29,6 @@ import java.util.Objects;
 
 public class MachineFrameBlock extends Block {
     
-    private static final Boolean USE_ACCURATE_OUTLINES = Oritech.CONFIG.tightMachineFrameHitboxes();
     
     public static final BooleanProperty NORTH = PipeBlock.NORTH;
     public static final BooleanProperty EAST = PipeBlock.EAST;
@@ -54,7 +54,7 @@ public class MachineFrameBlock extends Block {
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);
         tooltip.add(Component.translatable("tooltip.oritech.machine_frame").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
-        tooltip.add(Component.translatable("tooltip.oritech.machine_frame.1", Oritech.CONFIG.processingMachines.machineFrameMaxLength(), Oritech.CONFIG.processingMachines.machineFrameMaxLength()).withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("tooltip.oritech.machine_frame.1", OritechConfig.processingMachines.machineFrameMaxLength.get(), OritechConfig.processingMachines.machineFrameMaxLength.get()).withStyle(ChatFormatting.GRAY));
     }
     
     @Override
@@ -79,7 +79,7 @@ public class MachineFrameBlock extends Block {
     
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        if (!USE_ACCURATE_OUTLINES)
+        if (!(OritechClientConfig.CLIENT_SPEC.isLoaded() && OritechClientConfig.tightMachineFrameHitboxes.get()))
             return super.getShape(state, world, pos, context);
         return getShape(state);
     }

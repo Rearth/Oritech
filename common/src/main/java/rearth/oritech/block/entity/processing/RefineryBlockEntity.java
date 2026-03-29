@@ -19,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
@@ -28,9 +29,10 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.RefineryScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -56,7 +58,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     private int moduleCount;    // range 0-2
     
     public RefineryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REFINERY_ENTITY, pos, state, Oritech.CONFIG.processingMachines.refineryData.energyPerTick());
+        super(BlockEntitiesContent.REFINERY_ENTITY, pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
     }
     
     @Override
@@ -205,12 +207,12 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.refineryData.energyCapacity();
+        return OritechConfig.processingMachines.refineryData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.refineryData.maxEnergyInsertion();
+        return OritechConfig.processingMachines.refineryData.maxEnergyInsertion.get();
     }
     
     @Override
@@ -228,7 +230,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         var offsetLocal = Geometry.rotatePosition(new Vec3(0.3, 0.5, 0.3), facing);
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        ParticleContent.COOLER_WORKING.spawn(level, emitPosition, 1);
+        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SNOWFLAKE, emitPosition.x, emitPosition.y, emitPosition.z, 1, 1.2, 1.2, 1.2, 0);
         
     }
     

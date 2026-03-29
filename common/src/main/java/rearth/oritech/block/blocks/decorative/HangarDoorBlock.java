@@ -1,13 +1,13 @@
 package rearth.oritech.block.blocks.decorative;
 
 import com.mojang.serialization.MapCodec;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.network.chat.Component;
-import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -29,8 +29,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.decorative.HangarDoorBlockEntity;
+import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.SoundContent;
 
@@ -209,7 +209,7 @@ public class HangarDoorBlock extends Block implements EntityBlock {
 
         var blockEntity = world.getBlockEntity(anchorPos);
         if (blockEntity instanceof HangarDoorBlockEntity hangarDoor && hangarDoor.shouldPlaySoundAgain()) {
-            world.playSound(null, anchorPos, SoundContent.PRESS, SoundSource.BLOCKS, Oritech.CONFIG.machineVolumeMultiplier() * 0.18f, 1.15f);
+            world.playSound(null, anchorPos, SoundContent.PRESS, SoundSource.BLOCKS, OritechClientConfig.machineVolumeMultiplier.get().floatValue() * 0.18f, 1.15f);
         }
 
         for (var connectedAnchorPos : connectedAnchors) {

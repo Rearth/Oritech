@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
@@ -26,8 +27,8 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
+import net.minecraft.core.particles.ParticleTypes;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.TagContent;
@@ -37,7 +38,7 @@ import java.util.Objects;
 
 public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements FluidApi.BlockProvider {
     
-    public static final long FLUID_USAGE = (long) (Oritech.CONFIG.fertilizerConfig.liquidPerBlockUsage() * FluidStackHooks.bucketAmount());   // per block, tick usage is this divided by work time
+    public static final long FLUID_USAGE = (long) (OritechConfig.fertilizerConfig.liquidPerBlockUsage.get() * FluidStackHooks.bucketAmount());   // per block, tick usage is this divided by work time
     
     @SyncField(SyncType.GUI_TICK)
     private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged) {
@@ -151,7 +152,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
                 inventory.setItem(0, inventoryStack);
             }
             super.finishBlockWork(processed);
-            ParticleContent.FERTILIZER_EFFECT.spawn(level, Vec3.atLowerCornerOf(targetPosition), fertilizerStrength * 3 + 2);
+            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, targetPosition.getX() + 0.5, targetPosition.getY() + 0.5, targetPosition.getZ() + 0.5, fertilizerStrength * 3 + 2, 0.5, 0.5, 0.5, 0);
             level.playSound(null, targetPosition, SoundEvents.BONE_MEAL_USE, SoundSource.BLOCKS, 1f, 1f);
         }
     }
@@ -173,28 +174,28 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
         super.doProgress(moving);
         if (!moving && hasWorkAvailable(getCurrentTarget())) {
             fluidStorage.setAmount(fluidStorage.getAmount() - getWaterUsagePerTick());
-            ParticleContent.WATERING_EFFECT.spawn(level, Vec3.atLowerCornerOf(getCurrentTarget().below()), 2);
+            if (level instanceof ServerLevel sl) { var bp = getCurrentTarget().below(); sl.sendParticles(ParticleTypes.FALLING_WATER, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 2, 0.6, 0.6, 0.6, 0); }
         }
     }
     
     @Override
     public float getMoveTime() {
-        return Oritech.CONFIG.fertilizerConfig.moveDuration() * this.getSpeedMultiplier();
+        return OritechConfig.fertilizerConfig.moveDuration.get() * this.getSpeedMultiplier();
     }
     
     @Override
     public float getWorkTime() {
-        return Oritech.CONFIG.fertilizerConfig.workDuration() * this.getSpeedMultiplier();
+        return OritechConfig.fertilizerConfig.workDuration.get() * this.getSpeedMultiplier();
     }
     
     @Override
     public int getMoveEnergyUsage() {
-        return Oritech.CONFIG.fertilizerConfig.moveEnergyUsage();
+        return OritechConfig.fertilizerConfig.moveEnergyUsage.get();
     }
     
     @Override
     public int getOperationEnergyUsage() {
-        return Oritech.CONFIG.fertilizerConfig.workEnergyUsage();
+        return OritechConfig.fertilizerConfig.workEnergyUsage.get();
     }
     
     @Override

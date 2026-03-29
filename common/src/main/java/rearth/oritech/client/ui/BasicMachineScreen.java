@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import rearth.oracle.Oracle;
 import rearth.oracle.OracleClient;
+import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.networking.NetworkManager;
@@ -37,6 +38,7 @@ import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.AtomicForgeBlockEntity;
 import rearth.oritech.client.renderers.LaserArmModel;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
@@ -205,7 +207,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         }
         
         // show oracle lib help button
-        if (Oritech.CONFIG.enableHelpButton()) {
+        if (OritechClientConfig.enableHelpButton.get()) {
             var hasOracleLib = Platform.isModLoaded("oracle_index");
             Optional<ResourceLocation> linkTarget = hasOracleLib ? getHelpBookLink() : Optional.empty();
             var oracleButton = Components.button(Component.literal("?"), elem -> onOracleButtonClick(hasOracleLib, linkTarget));
@@ -261,7 +263,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             updateFluidDisplay(genericDisplay);
         
         if (steamProductionLabel != null) {
-            var productionRate = menu.screenData.getDisplayedEnergyUsage() * Oritech.CONFIG.generators.steamEngineData.rfToSteamRatio();
+            var productionRate = menu.screenData.getDisplayedEnergyUsage() * OritechConfig.generators.steamEngineData.rfToSteamRatio.get();
             productionRate = Math.min(this.waterDisplay.storage.getStack().getAmount(), productionRate);
             steamProductionLabel.text(Component.translatable("title.oritech.steam_production", String.format("%.0f", productionRate)));
         }

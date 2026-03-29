@@ -1,10 +1,5 @@
 {
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "minecraft:wool"
@@ -16,5 +11,5 @@
       "id": "minecraft:string"
     }
   ],
-  "time": 60
+  "time": 40
 }

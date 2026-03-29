@@ -13,11 +13,6 @@
     }
   ],
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:ingots/lead"
@@ -29,5 +24,5 @@
       "id": "mekanism:dust_lead"
     }
   ],
-  "time": 140
+  "time": 40
 }

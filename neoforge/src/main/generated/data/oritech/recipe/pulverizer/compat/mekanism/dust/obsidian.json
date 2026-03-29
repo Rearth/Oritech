@@ -6,11 +6,6 @@
     }
   ],
   "type": "oritech:pulverizer",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:obsidians"
@@ -22,5 +17,5 @@
       "id": "mekanism:dust_obsidian"
     }
   ],
-  "time": 120
+  "time": 100
 }

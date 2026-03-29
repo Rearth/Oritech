@@ -64,7 +64,7 @@ public class SteamEngineBlock extends MultiblockMachine {
             if (entity.isPresent() && entity.get().inSlaveMode()) {
                 // working in slave mode. Don't open UI, just highlight controller
                 player.sendSystemMessage(Component.translatable("message.oritech.steamengine.controller_link"));
-                ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3.atLowerCornerOf(entity.get().master.getBlockPos()));
+                ParticleContent.HighlightBlock(world, Vec3.atLowerCornerOf(entity.get().master.getBlockPos()));
                 return InteractionResult.SUCCESS;
             }
             

@@ -1,12 +1,9 @@
 package rearth.oritech.init.recipes;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.architectury.fluid.FluidStack;
-import io.wispforest.endec.Endec;
-import io.wispforest.endec.StructEndec;
-import io.wispforest.endec.impl.StructEndecBuilder;
-import io.wispforest.owo.serialization.CodecUtils;
-import io.wispforest.owo.serialization.EndecRecipeSerializer;
-import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.util.FluidIngredient;
 
@@ -18,24 +15,24 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 
-public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> implements RecipeType<OritechRecipe> {
+public class OritechRecipeType implements RecipeSerializer<OritechRecipe>, RecipeType<OritechRecipe> {
     
-    public static final Endec<FluidStack> FLUID_STACK_ENDEC = StructEndecBuilder.of(
-        MinecraftEndecs.ofRegistry(BuiltInRegistries.FLUID).fieldOf("fluid", FluidStack::getFluid),
-        Endec.LONG.optionalFieldOf("amount", FluidStack::getAmount, FluidStack.bucketAmount()),
-        FluidStack::create);
+    public static final Codec<FluidStack> FLUID_STACK_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        BuiltInRegistries.FLUID.byNameCodec().fieldOf("fluid").forGetter(FluidStack::getFluid),
+        Codec.LONG.optionalFieldOf("amount", FluidStack.bucketAmount()).forGetter(FluidStack::getAmount)
+    ).apply(instance, FluidStack::create));
     
-    public static final Endec<OritechRecipe> ORI_RECIPE_ENDEC = StructEndecBuilder.of(
-      Endec.INT.optionalFieldOf("time", OritechRecipe::getTime, 60),
-      CodecUtils.toEndec(Ingredient.CODEC_NONEMPTY).listOf().fieldOf("ingredients", OritechRecipe::getInputs),
-      MinecraftEndecs.ITEM_STACK.listOf().fieldOf("results", OritechRecipe::getResults),
-      MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (OritechRecipeType) BuiltInRegistries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type", OritechRecipe::getOriType),
-      FluidIngredient.FLUID_INGREDIENT_ENDEC.optionalFieldOf("fluidInput", OritechRecipe::getFluidInput, FluidIngredient.EMPTY),
-      FLUID_STACK_ENDEC.listOf().optionalFieldOf("fluidOutputs", OritechRecipe::getFluidOutputs, List.of()),
-      OritechRecipe::new
-    );
+    public static final MapCodec<OritechRecipe> ORI_RECIPE_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+      Codec.INT.optionalFieldOf("time", 60).forGetter(OritechRecipe::getTime),
+      Ingredient.CODEC_NONEMPTY.listOf().fieldOf("ingredients").forGetter(OritechRecipe::getInputs),
+      ItemStack.CODEC.listOf().fieldOf("results").forGetter(OritechRecipe::getResults),
+      ResourceLocation.CODEC.xmap(identifier1 -> (OritechRecipeType) BuiltInRegistries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type").forGetter(OritechRecipe::getOriType),
+      FluidIngredient.CODEC.optionalFieldOf("fluidInput", FluidIngredient.EMPTY).forGetter(OritechRecipe::getFluidInput),
+      FLUID_STACK_CODEC.listOf().optionalFieldOf("fluidOutputs", List.of()).forGetter(OritechRecipe::getFluidOutputs)
+    ).apply(instance, OritechRecipe::new));
     
     public static final StreamCodec<RegistryFriendlyByteBuf, OritechRecipe> PACKET_CODEC = StreamCodec.composite(
       ByteBufCodecs.INT, OritechRecipe::getTime,
@@ -54,8 +51,17 @@ public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> impl
     }
     
     public OritechRecipeType(ResourceLocation identifier) {
-        super((StructEndec<OritechRecipe>) ORI_RECIPE_ENDEC);
         this.identifier = identifier;
+    }
+    
+    @Override
+    public MapCodec<OritechRecipe> codec() {
+        return ORI_RECIPE_CODEC;
+    }
+    
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, OritechRecipe> streamCodec() {
+        return PACKET_CODEC;
     }
     
     @Override

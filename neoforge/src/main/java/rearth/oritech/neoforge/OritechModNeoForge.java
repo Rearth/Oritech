@@ -1,46 +1,49 @@
 package rearth.oritech.neoforge;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.PrimitiveCodec;
-import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
-import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
-import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.FluidContent;
+import rearth.oritech.init.OritechConfig;
+import rearth.oritech.init.OritechStartupConfig;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 
 @Mod(Oritech.MOD_ID)
 public final class OritechModNeoForge {
     
-    public OritechModNeoForge(IEventBus eventBus) {
+    public OritechModNeoForge(IEventBus eventBus, ModContainer container) {
         
         eventBus.register(new EventHandler());
         EventHandler.COMPONENT_REGISTRAR.register(eventBus);
         
         OritechPlatformNeoForge.ATTACHMENT_TYPES.register(eventBus);
+        
+        // Register config specs
+        container.registerConfig(ModConfig.Type.COMMON, OritechConfig.COMMON_SPEC);
+        container.registerConfig(ModConfig.Type.CLIENT, OritechClientConfig.CLIENT_SPEC);
+        container.registerConfig(ModConfig.Type.STARTUP, OritechStartupConfig.STARTUP_SPEC);
         
         NetworkManager.FLUID_STACK_CODEC = net.neoforged.neoforge.fluids.FluidStack.OPTIONAL_CODEC.xmap(FluidStackHooksForge::fromForge, FluidStackHooksForge::toForge);
         NetworkManager.FLUID_STACK_STREAM_CODEC = net.neoforged.neoforge.fluids.FluidStack.OPTIONAL_STREAM_CODEC.map(FluidStackHooksForge::fromForge, FluidStackHooksForge::toForge);

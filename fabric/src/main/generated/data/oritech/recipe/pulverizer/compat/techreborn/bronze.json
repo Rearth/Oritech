@@ -8,11 +8,6 @@
     }
   ],
   "type": "oritech:pulverizer",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:ingots/bronze"
@@ -24,5 +19,5 @@
       "id": "techreborn:bronze_dust"
     }
   ],
-  "time": 120
+  "time": 100
 }

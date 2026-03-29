@@ -178,6 +178,8 @@ publishMods {
         requires("geckolib")
         requires("athena-ctm")
         requires("architectury-api")
+        optional("oracle-index")
+
 
         announcementTitle = "Neoforge Version on Modrinth"
     }
@@ -192,6 +194,7 @@ publishMods {
         requires("geckolib")
         requires("athena")
         requires("architectury-api")
+        optional("oracle-index")
 
         javaVersions.add(JavaVersion.VERSION_21)
         clientRequired = true

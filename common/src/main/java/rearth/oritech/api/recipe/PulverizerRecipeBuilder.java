@@ -8,7 +8,7 @@ public class PulverizerRecipeBuilder extends OritechRecipeBuilder {
 
     protected PulverizerRecipeBuilder() {
         super(RecipeContent.PULVERIZER, "pulverizer");
-        this.time = 120;
+        this.time = 100;
     }
 
     public static PulverizerRecipeBuilder build() {

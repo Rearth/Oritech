@@ -6,6 +6,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.PassiveGeneratorBlockEntity;
 import rearth.oritech.block.blocks.generators.BigSolarPanelBlock;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.util.MultiblockMachineController;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -69,7 +70,7 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     
     @Override
     public int getProductionRate() {
-        var baseRate = ((BigSolarPanelBlock) this.getBlockState().getBlock()).productionRate;
+        var baseRate = OritechConfig.generators.solarGeneratorData.energyPerTick.get();
         var skyLightLevel = level.getBrightness(LightLayer.SKY, this.getBlockPos());
         isFolded = level.isNight() && skyLightLevel < 12;
         return (int) (coreQuality * baseRate);

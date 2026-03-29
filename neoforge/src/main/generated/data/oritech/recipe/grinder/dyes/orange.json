@@ -1,10 +1,5 @@
 {
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:raw_materials/dyes/orange"
@@ -16,5 +11,5 @@
       "id": "minecraft:orange_dye"
     }
   ],
-  "time": 60
+  "time": 40
 }

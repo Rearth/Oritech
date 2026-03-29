@@ -1,19 +1,9 @@
 package rearth.oritech.block.entity.processing;
 
-import rearth.oritech.Oritech;
-import rearth.oritech.api.networking.NetworkedBlockEntity;
-import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.InventorySlotAssignment;
-import java.util.List;
-import java.util.Objects;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
@@ -21,24 +11,34 @@ import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.phys.Vec3;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
+import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.util.InventorySlotAssignment;
+
+import java.util.List;
+import java.util.Objects;
 
 public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     
-    private final float FURNACE_SPEED_MULTIPLIER = Oritech.CONFIG.processingMachines.furnaceData.speedMultiplier();
+    private final float FURNACE_SPEED_MULTIPLIER = OritechConfig.processingMachines.furnaceData.speedMultiplier.get().floatValue();
     
     public PoweredFurnaceBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.POWERED_FURNACE_ENTITY, pos, state, Oritech.CONFIG.processingMachines.furnaceData.energyPerTick());
+        super(BlockEntitiesContent.POWERED_FURNACE_ENTITY, pos, state, OritechConfig.processingMachines.furnaceData.energyPerTick.get());
     }
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.furnaceData.energyCapacity();
+        return OritechConfig.processingMachines.furnaceData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.furnaceData.maxEnergyInsertion();
+        return OritechConfig.processingMachines.furnaceData.maxEnergyInsertion.get();
     }
     
     @Override
@@ -67,7 +67,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
                 lastWorkedAt = world.getGameTime();
                 
                 if (world.random.nextFloat() > 0.8)
-                    ParticleContent.FURNACE_BURNING.spawn(world, Vec3.atLowerCornerOf(pos), 1);
+                    if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
                 
                 if (furnaceCraftingFinished(activeRecipe)) {
                     craftFurnaceItem(activeRecipe);
@@ -142,7 +142,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     
     @SuppressWarnings("OptionalIsPresent")
     @Override
-    protected int getRecipeDuration() {
+    public int getRecipeDuration() {
         var recipeCandidate = Objects.requireNonNull(level).getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), level);
         if (recipeCandidate.isPresent()) {
             return (int) (recipeCandidate.get().value().getCookingTime() * getSpeedMultiplier());

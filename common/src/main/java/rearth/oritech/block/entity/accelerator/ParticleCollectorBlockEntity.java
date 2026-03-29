@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -22,7 +23,7 @@ import static rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntit
 
 public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEntityTicker<ParticleCollectorBlockEntity>, EnergyApi.BlockProvider {
     
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.collectorEnergyStorage(), 0, Oritech.CONFIG.collectorEnergyStorage(), this::setChanged);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.collectorEnergyStorage.get(), 0, OritechConfig.collectorEnergyStorage.get(), this::setChanged);
     
     public ParticleCollectorBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PARTICLE_COLLECTOR_BLOCK_ENTITY, pos, state);
@@ -34,7 +35,7 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
     }
     
     public void onParticleCollided() {
-        onParticleCollided(Oritech.CONFIG.blackHoleTachyonEnergy());
+        onParticleCollided(OritechConfig.blackHoleTachyonEnergy.get());
     }
     
     public void onParticleCollided(int amount) {

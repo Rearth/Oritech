@@ -1,10 +1,5 @@
 {
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "oritech:biomatter"
@@ -16,5 +11,5 @@
       "id": "oritech:biomass"
     }
   ],
-  "time": 60
+  "time": 40
 }

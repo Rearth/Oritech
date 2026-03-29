@@ -1,12 +1,10 @@
 {
   "type": "oritech:refinery",
   "fluidInput": {
-    "amount": 81000,
     "fluid": "oritech:still_heavy_oil"
   },
   "fluidOutputs": [
     {
-      "amount": 81000,
       "fluid": "oritech:still_diesel"
     },
     {

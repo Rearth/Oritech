@@ -51,7 +51,8 @@
     "athena": "*"
   },
   "suggests": {
-    "emi": "*"
+    "emi": "*",
+    "oracle_index": "*"
   },
   "custom": {
     "loom:injected_interfaces": {

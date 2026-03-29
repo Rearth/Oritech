@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.processing;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -25,7 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     
     public PulverizerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.PULVERIZER_ENTITY, pos, state, Oritech.CONFIG.processingMachines.pulverizerData.energyPerTick());
+        super(BlockEntitiesContent.PULVERIZER_ENTITY, pos, state, OritechConfig.processingMachines.pulverizerData.energyPerTick.get());
     }
     
     @Override
@@ -66,12 +67,12 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.pulverizerData.energyCapacity();
+        return OritechConfig.processingMachines.pulverizerData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.pulverizerData.maxEnergyInsertion();
+        return OritechConfig.processingMachines.pulverizerData.maxEnergyInsertion.get();
     }
     
     @Override

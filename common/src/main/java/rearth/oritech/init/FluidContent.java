@@ -8,7 +8,7 @@ import dev.architectury.core.item.ArchitecturyBucketItem;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
-import io.wispforest.owo.ui.core.Color;
+import rearth.oritech.util.ColorHelper;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -87,21 +87,21 @@ public class FluidContent {
                                                                        .bucketItemSupplier(() -> FluidContent.STILL_OIL_BUCKET)
                                                                        .sourceTexture(Oritech.id("block/fluid/fluid_gas_dark"))
                                                                        .flowingTexture(Oritech.id("block/fluid/fluid_gas_dark"))
-                                                                       .color(new Color(0.478f, 0.478f, 0.478f).argb());
+                                                                       .color(ColorHelper.argb(0.478f, 0.478f, 0.478f));
     
     public static final ArchitecturyFluidAttributes FUEL_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_FUEL, () -> FluidContent.STILL_FUEL)
                                                                         .blockSupplier(() -> FluidContent.STILL_FUEL_BLOCK)
                                                                         .bucketItemSupplier(() -> FluidContent.STILL_FUEL_BUCKET)
                                                                         .sourceTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
                                                                         .flowingTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
-                                                                        .color(new Color(0.176f, 0.239f, 0.282f).argb());
+                                                                        .color(ColorHelper.argb(0.176f, 0.239f, 0.282f));
     
     public static final ArchitecturyFluidAttributes BIOFUEL_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_BIOFUEL, () -> FluidContent.STILL_BIOFUEL)
                                                                            .blockSupplier(() -> FluidContent.STILL_BIOFUEL_BLOCK)
                                                                            .bucketItemSupplier(() -> FluidContent.STILL_BIOFUEL_BUCKET)
                                                                            .sourceTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
                                                                            .flowingTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
-                                                                           .color(new Color(0.25f, 0.316f, 0.086f).argb());
+                                                                           .color(ColorHelper.argb(0.25f, 0.316f, 0.086f));
     
     public static final ArchitecturyFluidAttributes STEAM_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_STEAM, () -> FluidContent.STILL_STEAM)
                                                                          .blockSupplier(() -> FluidContent.STILL_STEAM_BLOCK)
@@ -109,98 +109,98 @@ public class FluidContent {
                                                                          .sourceTexture(Oritech.id("block/fluid/fluid_steam"))
                                                                          .flowingTexture(Oritech.id("block/fluid/fluid_steam"))
                                                                          .lighterThanAir(true)
-                                                                         .color(Color.WHITE.argb());
+                                                                         .color(ColorHelper.WHITE);
     
     public static final ArchitecturyFluidAttributes HEAVY_OIL_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_HEAVY_OIL, () -> FluidContent.STILL_HEAVY_OIL)
                                                                              .blockSupplier(() -> FluidContent.STILL_HEAVY_OIL_BLOCK)
                                                                              .bucketItemSupplier(() -> FluidContent.STILL_HEAVY_OIL_BUCKET)
                                                                              .sourceTexture(Oritech.id("block/fluid/fluid_molten"))
                                                                              .flowingTexture(Oritech.id("block/fluid/fluid_molten"))
-                                                                             .color(new Color(0.135f, 0.135f, 0.135f).argb());
+                                                                             .color(ColorHelper.argb(0.135f, 0.135f, 0.135f));
     
     public static final ArchitecturyFluidAttributes DIESEL_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_DIESEL, () -> FluidContent.STILL_DIESEL)
                                                                           .blockSupplier(() -> FluidContent.STILL_DIESEL_BLOCK)
                                                                           .bucketItemSupplier(() -> FluidContent.STILL_DIESEL_BUCKET)
                                                                           .sourceTexture(Oritech.id("block/fluid/fluid_steam"))
                                                                           .flowingTexture(Oritech.id("block/fluid/fluid_steam"))
-                                                                          .color(new Color(0.735f, 0.735f, 0.235f).argb());
+                                                                          .color(ColorHelper.argb(0.735f, 0.735f, 0.235f));
     
     public static final ArchitecturyFluidAttributes NAPHTHA_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_NAPHTHA, () -> FluidContent.STILL_NAPHTHA)
                                                                            .blockSupplier(() -> FluidContent.STILL_NAPHTHA_BLOCK)
                                                                            .bucketItemSupplier(() -> FluidContent.STILL_NAPHTHA_BUCKET)
                                                                            .sourceTexture(Oritech.id("block/fluid/fluid_molten"))
                                                                            .flowingTexture(Oritech.id("block/fluid/fluid_molten"))
-                                                                           .color(new Color(0.949f, 0.929f, 0.745f).argb());
+                                                                           .color(ColorHelper.argb(0.949f, 0.929f, 0.745f));
     
     public static final ArchitecturyFluidAttributes SULFURIC_ACID_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_SULFURIC_ACID, () -> FluidContent.STILL_SULFURIC_ACID)
                                                                                  .blockSupplier(() -> FluidContent.STILL_SULFURIC_ACID_BLOCK)
                                                                                  .bucketItemSupplier(() -> FluidContent.STILL_SULFURIC_ACID_BUCKET)
                                                                                  .sourceTexture(Oritech.id("block/fluid/fluid_steam"))
                                                                                  .flowingTexture(Oritech.id("block/fluid/fluid_steam"))
-                                                                                 .color(new Color(0.398f, 1, 0.3f).argb());
+                                                                                 .color(ColorHelper.argb(0.398f, 1f, 0.3f));
     
     public static final ArchitecturyFluidAttributes SILICON_WASH_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_SILICON_WASH, () -> FluidContent.STILL_SILICON_WASH)
                                                                                 .blockSupplier(() -> FluidContent.STILL_SILICON_WASH_BLOCK)
                                                                                 .bucketItemSupplier(() -> FluidContent.STILL_SILICON_WASH_BUCKET)
                                                                                 .sourceTexture(Oritech.id("block/fluid/fluid_steam"))
                                                                                 .flowingTexture(Oritech.id("block/fluid/fluid_steam"))
-                                                                                .color(new Color(0.7f, 1f, 0.7f).argb());
+                                                                                .color(ColorHelper.argb(0.7f, 1f, 0.7f));
     
     public static final ArchitecturyFluidAttributes MINERAL_SLURRY_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_MINERAL_SLURRY, () -> FluidContent.STILL_MINERAL_SLURRY)
                                                                                   .blockSupplier(() -> FluidContent.STILL_MINERAL_SLURRY_BLOCK)
                                                                                   .bucketItemSupplier(() -> FluidContent.STILL_MINERAL_SLURRY_BUCKET)
                                                                                   .sourceTexture(Oritech.id("block/fluid/molten_metal"))
                                                                                   .flowingTexture(Oritech.id("block/fluid/molten_metal"))
-                                                                                  .color(new Color(0.627f, 0.849f, 1f).argb());
+                                                                                  .color(ColorHelper.argb(0.627f, 0.849f, 1f));
     
     public static final ArchitecturyFluidAttributes SHEOL_FIRE_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_SHEOL_FIRE, () -> FluidContent.STILL_SHEOL_FIRE)
                                                                               .blockSupplier(() -> FluidContent.STILL_SHEOL_FIRE_BLOCK)
                                                                               .bucketItemSupplier(() -> FluidContent.STILL_SHEOL_FIRE_BUCKET)
                                                                               .sourceTexture(Oritech.id("block/fluid/fluid_roiling_plasma"))
                                                                               .flowingTexture(Oritech.id("block/fluid/fluid_roiling_plasma"))
-                                                                              .color(new Color(1, 0.7f, 0.7f).argb());
+                                                                              .color(ColorHelper.argb(1f, 0.7f, 0.7f));
     
     public static final ArchitecturyFluidAttributes STRANGE_MATTER_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_STRANGE_MATTER, () -> FluidContent.STILL_STRANGE_MATTER)
                                                                                   .blockSupplier(() -> FluidContent.STILL_STRANGE_MATTER_BLOCK)
                                                                                   .bucketItemSupplier(() -> FluidContent.STILL_STRANGE_MATTER_BUCKET)
                                                                                   .sourceTexture(Oritech.id("block/fluid/fluid_strange_mixture"))
                                                                                   .flowingTexture(Oritech.id("block/fluid/fluid_strange_mixture"))
-                                                                                  .color(new Color(1, 1, 1).argb());
+                                                                                  .color(ColorHelper.argb(1f, 1f, 1f));
     
     public static final ArchitecturyFluidAttributes MOLTEN_ADAMANT_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_MOLTEN_ADAMANT, () -> FluidContent.STILL_MOLTEN_ADAMANT)
                                                                                   .blockSupplier(() -> FluidContent.STILL_MOLTEN_ADAMANT_BLOCK)
                                                                                   .bucketItemSupplier(() -> FluidContent.STILL_MOLTEN_ADAMANT_BUCKET)
                                                                                   .sourceTexture(Oritech.id("block/fluid/molten_metal"))
                                                                                   .flowingTexture(Oritech.id("block/fluid/molten_metal_flow"))
-                                                                                  .color(new Color(0.398f, 0.629f, 0.797f).argb());
+                                                                                  .color(ColorHelper.argb(0.398f, 0.629f, 0.797f));
     
     public static final ArchitecturyFluidAttributes MOLTEN_BIOSTEEL_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_MOLTEN_BIOSTEEL, () -> FluidContent.STILL_MOLTEN_BIOSTEEL)
                                                                                    .blockSupplier(() -> FluidContent.STILL_MOLTEN_BIOSTEEL_BLOCK)
                                                                                    .bucketItemSupplier(() -> FluidContent.STILL_MOLTEN_BIOSTEEL_BUCKET)
                                                                                    .sourceTexture(Oritech.id("block/fluid/molten_metal"))
                                                                                    .flowingTexture(Oritech.id("block/fluid/molten_metal_flow"))
-                                                                                   .color(new Color(0.145f, 0.344f, 0.176f).argb());
+                                                                                   .color(ColorHelper.argb(0.145f, 0.344f, 0.176f));
     
     public static final ArchitecturyFluidAttributes MOLTEN_DURATIUM_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_MOLTEN_DURATIUM, () -> FluidContent.STILL_MOLTEN_DURATIUM)
                                                                                    .blockSupplier(() -> FluidContent.STILL_MOLTEN_DURATIUM_BLOCK)
                                                                                    .bucketItemSupplier(() -> FluidContent.STILL_MOLTEN_DURATIUM_BUCKET)
                                                                                    .sourceTexture(Oritech.id("block/fluid/molten_metal"))
                                                                                    .flowingTexture(Oritech.id("block/fluid/molten_metal_flow"))
-                                                                                   .color(new Color(0.254f, 0.176f, 0.360f).argb());
+                                                                                   .color(ColorHelper.argb(0.254f, 0.176f, 0.360f));
     
     public static final ArchitecturyFluidAttributes MOLTEN_ENERGITE_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_MOLTEN_ENERGITE, () -> FluidContent.STILL_MOLTEN_ENERGITE)
                                                                                    .blockSupplier(() -> FluidContent.STILL_MOLTEN_ENERGITE_BLOCK)
                                                                                    .bucketItemSupplier(() -> FluidContent.STILL_MOLTEN_ENERGITE_BUCKET)
                                                                                    .sourceTexture(Oritech.id("block/fluid/molten_metal"))
                                                                                    .flowingTexture(Oritech.id("block/fluid/molten_metal_flow"))
-                                                                                   .color(new Color(0.879f, 0.300f, 1.0f).argb());
+                                                                                   .color(ColorHelper.argb(0.879f, 0.300f, 1.0f));
     
     public static final ArchitecturyFluidAttributes MOLTEN_FLUXITE_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_MOLTEN_FLUXITE, () -> FluidContent.STILL_MOLTEN_FLUXITE)
                                                                                   .blockSupplier(() -> FluidContent.STILL_MOLTEN_FLUXITE_BLOCK)
                                                                                   .bucketItemSupplier(() -> FluidContent.STILL_MOLTEN_FLUXITE_BUCKET)
                                                                                   .sourceTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
                                                                                   .flowingTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
-                                                                                  .color(new Color(0.453f, 0.195f, 0.648f).argb());
+                                                                                  .color(ColorHelper.argb(0.453f, 0.195f, 0.648f));
     
     public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(Oritech.MOD_ID, Registries.FLUID);
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Oritech.MOD_ID, Registries.BLOCK);

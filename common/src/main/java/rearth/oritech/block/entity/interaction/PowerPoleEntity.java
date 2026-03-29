@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
@@ -146,8 +147,8 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         var dist = target.distManhattan(worldPosition);
         
-        if (dist < Oritech.CONFIG.poleConfig.minRange() || dist > Oritech.CONFIG.poleConfig.maxRange()) {
-            player.sendSystemMessage(Component.translatable("message.oritech.target_designator.pole_dist_invalid", Oritech.CONFIG.poleConfig.minRange(), Oritech.CONFIG.poleConfig.maxRange(), dist));
+        if (dist < OritechConfig.poleConfig.minRange.get() || dist > OritechConfig.poleConfig.maxRange.get()) {
+            player.sendSystemMessage(Component.translatable("message.oritech.target_designator.pole_dist_invalid", OritechConfig.poleConfig.minRange.get(), OritechConfig.poleConfig.maxRange.get(), dist));
             return;
         }
         
@@ -413,12 +414,12 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     
     @Override
     public float getDisplayedEnergyTransfer() {
-        return Oritech.CONFIG.poleConfig.energyCapacity();
+        return OritechConfig.poleConfig.energyCapacity.get();
     }
     
     @Override
     public BarConfiguration getEnergyConfiguration() {
-        return new BarConfiguration(7, 6, 18, 54 + 18);
+        return new BarConfiguration(8, 6, 18, 54 + 18);
     }
     
     @Override
@@ -526,7 +527,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         @Override
         public long getCapacity() {
-            return Oritech.CONFIG.poleConfig.energyCapacity();
+            return OritechConfig.poleConfig.energyCapacity.get();
         }
         
         @Override
@@ -683,7 +684,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         protected void mergeNetworks(PoleNetwork netA, PoleNetwork netB) {
             
             // move all from netB to netA
-            netA.storedEnergy = Math.min(Oritech.CONFIG.poleConfig.energyCapacity(), netA.storedEnergy + netB.storedEnergy);
+            netA.storedEnergy = Math.min(OritechConfig.poleConfig.energyCapacity.get(), netA.storedEnergy + netB.storedEnergy);
             
             netA.poles.putAll(netB.poles);
             

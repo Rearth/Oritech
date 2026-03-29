@@ -18,12 +18,15 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.util.ComparatorOutputProvider;
 
 import java.util.UUID;
@@ -105,7 +108,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
             entity.moveTo(Vec3.atLowerCornerOf(targetPosition));
             entity.setUUID(UUID.randomUUID());
             clearMobEquipment(entity);
-            ParticleContent.SOUL_USED.spawn(level, targetPosition.getCenter(), maxSouls);
+            if (level instanceof ServerLevel sl) { var c = targetPosition.getCenter(); sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, c.x, c.y, c.z, maxSouls, 1.2, 1.2, 1.2, 0); }
             
             return entity;
         });
@@ -209,15 +212,13 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         collectedSouls++;
         
         var soulPath = worldPosition.getCenter().subtract(source);
-        var animData = new ParticleContent.SoulParticleData(soulPath, (int) getSoulTravelDuration(distance));
-        
-        ParticleContent.WANDERING_SOUL.spawn(level, source.add(0, 0.7f, 0), animData);
+        ParticleContent.WanderingSoul(level, source.add(0, 0.7f, 0), soulPath, (int) getSoulTravelDuration(distance));
         updateComparator();
         this.setChanged();
     }
     
     private int getSoulCost(int maxHp) {
-        return (int) (Math.sqrt(maxHp) + 0.5f) * Oritech.CONFIG.spawnerCostMultiplier();
+        return (int) (Math.sqrt(maxHp) + 0.5f) * OritechConfig.spawnerCostMultiplier.get();
     }
     
     public void onEntitySteppedOn(Entity entity) {
@@ -275,7 +276,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
                     // block type is a placeholder
                     if (!level.getBlockState(candidate).getBlock().equals(BlockContent.SPAWNER_CAGE_BLOCK)) {
                         hasCage = false;
-                        ParticleContent.DEBUG_BLOCK.spawn(level, Vec3.atLowerCornerOf(candidate));
+                        ParticleContent.DebugBlock(level, Vec3.atLowerCornerOf(candidate));
                     }
                     
                 }

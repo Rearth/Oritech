@@ -8,11 +8,6 @@
     }
   ],
   "type": "oritech:foundry",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:ingots/copper"
@@ -27,5 +22,5 @@
       "id": "techreborn:bronze_ingot"
     }
   ],
-  "time": 120
+  "time": 80
 }

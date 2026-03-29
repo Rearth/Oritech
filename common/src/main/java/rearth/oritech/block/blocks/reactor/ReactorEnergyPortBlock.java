@@ -1,6 +1,7 @@
 package rearth.oritech.block.blocks.reactor;
 
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.reactor.ReactorEnergyPortEntity;
 import java.util.List;
@@ -56,7 +57,7 @@ public class ReactorEnergyPortBlock extends BaseReactorBlock implements EntityBl
         var showExtra = Screen.hasControlDown();
         
         if (showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.reactor_energy_port.rate", Oritech.CONFIG.reactorMaxEnergyOutput()));
+            tooltip.add(Component.translatable("tooltip.oritech.reactor_energy_port.rate", OritechConfig.reactorMaxEnergyOutput.get()));
         }
         
     }

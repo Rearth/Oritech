@@ -1,18 +1,16 @@
 package rearth.oritech.init.world.features.uranium;
 
-import io.wispforest.endec.Endec;
-import io.wispforest.endec.impl.StructEndecBuilder;
-import io.wispforest.owo.serialization.endec.MinecraftEndecs;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
 public record UraniumPatchFeatureConfig(int number, ResourceLocation blockId, ResourceLocation crystalId) implements FeatureConfiguration {
     
-    public static final Endec<UraniumPatchFeatureConfig> URANIUM_FEATURE_ENDEC = StructEndecBuilder.of(
-      Endec.INT.fieldOf("number", UraniumPatchFeatureConfig::number),
-      MinecraftEndecs.IDENTIFIER.fieldOf("blockId", UraniumPatchFeatureConfig::blockId),
-      MinecraftEndecs.IDENTIFIER.fieldOf("crystalId", UraniumPatchFeatureConfig::crystalId),
-      UraniumPatchFeatureConfig::new
-    );
+    public static final Codec<UraniumPatchFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+      Codec.INT.fieldOf("number").forGetter(UraniumPatchFeatureConfig::number),
+      ResourceLocation.CODEC.fieldOf("blockId").forGetter(UraniumPatchFeatureConfig::blockId),
+      ResourceLocation.CODEC.fieldOf("crystalId").forGetter(UraniumPatchFeatureConfig::crystalId)
+    ).apply(instance, UraniumPatchFeatureConfig::new));
     
 }

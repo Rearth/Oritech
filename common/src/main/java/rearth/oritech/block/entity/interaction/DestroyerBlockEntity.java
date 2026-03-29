@@ -27,14 +27,15 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockFrameInteractionEntity;
 import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
+import net.minecraft.core.particles.ParticleTypes;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.FakeMachinePlayer;
 
@@ -284,9 +285,10 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             return;
         
         if (range > 1 && quarryTarget != BlockPos.ZERO) {
-            ParticleContent.QUARRY_DESTROY_EFFECT.spawn(level, Vec3.atCenterOf(quarryTarget).add(0, 0.5, 0), 3);
+            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, quarryTarget.getX() + 0.5, quarryTarget.getY() + 1.0, quarryTarget.getZ() + 0.5, 3, 0.4, 0.4, 0.4, 0);
         } else if (hasWorkAvailable(getCurrentTarget())) {
-            ParticleContent.BLOCK_DESTROY_EFFECT.spawn(level, Vec3.atLowerCornerOf(getCurrentTarget().below()), 4);
+            var bp = getCurrentTarget().below();
+            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
         }
     }
     
@@ -335,24 +337,24 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     public float getMoveTime() {
         var quarrySpeedBonus = range > 1 ? 0.15f : 1f;
-        return Oritech.CONFIG.destroyerConfig.moveDuration() * this.getSpeedMultiplier() * quarrySpeedBonus;
+        return OritechConfig.destroyerConfig.moveDuration.get() * this.getSpeedMultiplier() * quarrySpeedBonus;
     }
     
     @Override
     public float getWorkTime() {
         var quarrySpeedBonus = range > 1 ? 0.15f : 1f;
-        return (float) (Oritech.CONFIG.destroyerConfig.workDuration() * this.getSpeedMultiplier() * Math.pow(targetHardness, Oritech.CONFIG.blockBreakHardnessExponentialFactor()) * quarrySpeedBonus);
+        return (float) (OritechConfig.destroyerConfig.workDuration.get() * this.getSpeedMultiplier() * Math.pow(targetHardness, OritechConfig.blockBreakHardnessExponentialFactor.get()) * quarrySpeedBonus);
     }
     
     @Override
     public int getMoveEnergyUsage() {
-        return Oritech.CONFIG.destroyerConfig.moveEnergyUsage();
+        return OritechConfig.destroyerConfig.moveEnergyUsage.get();
     }
     
     @Override
     public int getOperationEnergyUsage() {
         var quarryCostBonus = range > 1 ? 4 : 1;
-        return Oritech.CONFIG.destroyerConfig.workEnergyUsage() * quarryCostBonus;
+        return OritechConfig.destroyerConfig.workEnergyUsage.get() * quarryCostBonus;
     }
     
     @Override

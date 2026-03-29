@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.pipes;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
@@ -32,9 +33,9 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
         isSuperConductor = state.getBlock().equals(BlockContent.SUPERCONDUCTOR_CONNECTION) || state.getBlock().equals(BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION);
         
         if (isSuperConductor) {
-            energyStorage = new SimpleEnergyStorage(Oritech.CONFIG.superConductorTransferRate(), Oritech.CONFIG.superConductorTransferRate(), Oritech.CONFIG.superConductorTransferRate());
+            energyStorage = new SimpleEnergyStorage(OritechConfig.superConductorTransferRate.get(), OritechConfig.superConductorTransferRate.get(), OritechConfig.superConductorTransferRate.get());
         } else {
-            energyStorage = new SimpleEnergyStorage(Oritech.CONFIG.energyPipeTransferRate(), Oritech.CONFIG.energyPipeTransferRate(), Oritech.CONFIG.energyPipeTransferRate());
+            energyStorage = new SimpleEnergyStorage(OritechConfig.energyPipeTransferRate.get(), OritechConfig.energyPipeTransferRate.get(), OritechConfig.energyPipeTransferRate.get());
         }
         
     }

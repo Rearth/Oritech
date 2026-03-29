@@ -3,6 +3,7 @@ package rearth.oritech.block.entity.pipes;
 import com.google.common.collect.Streams;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
@@ -24,8 +25,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     
-    public static final int MAX_TRANSFER_RATE = (int) (FluidStackHooks.bucketAmount() * Oritech.CONFIG.fluidPipeExtractAmountBuckets());
-    private static final int TRANSFER_PERIOD = Oritech.CONFIG.fluidPipeExtractIntervalDuration();
+    public static final int MAX_TRANSFER_RATE = (int) (FluidStackHooks.bucketAmount() * OritechConfig.fluidPipeExtractAmountBuckets.get());
+    private static final int TRANSFER_PERIOD = OritechConfig.fluidPipeExtractIntervalDuration.get();
     
     private List<CachedTarget<FluidApi.FluidStorage>> filteredFluidTargetsCached;
     

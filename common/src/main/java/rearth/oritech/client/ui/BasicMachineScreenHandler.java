@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class BasicMachineScreenHandler extends AbstractContainerMenu {
+public class BasicMachineScreenHandler extends AbstractContainerMenu implements MachineMenuHandler {
     
     @NotNull
     protected final Inventory playerInventory;
@@ -207,6 +207,11 @@ public class BasicMachineScreenHandler extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return this.inventory.stillValid(player);
+    }
+    
+    @Override
+    public BlockEntity getBlockEntity() {
+        return blockEntity;
     }
     
     public @NotNull BlockPos getBlockPos() {

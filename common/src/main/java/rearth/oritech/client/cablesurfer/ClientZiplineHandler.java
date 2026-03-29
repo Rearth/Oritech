@@ -8,9 +8,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.AttachmentApi;
 import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.ServerZiplineHandler;
 
@@ -82,7 +82,7 @@ public class ClientZiplineHandler {
         
         // force 3rd Person Camera
         previousCamera = Minecraft.getInstance().options.getCameraType();
-        if (previousCamera == CameraType.FIRST_PERSON && Oritech.CONFIG.ziplineCameraSwitch()) {
+        if (previousCamera == CameraType.FIRST_PERSON && OritechClientConfig.ziplineCameraSwitch.get()) {
             Minecraft.getInstance().options.setCameraType(CameraType.THIRD_PERSON_BACK);
         }
         
@@ -147,8 +147,8 @@ public class ClientZiplineHandler {
             directionMultiplier = -1;
         }
         
-        var maxSpeed = Oritech.CONFIG.maxZiplineSpeed();
-        var acceleration = Oritech.CONFIG.ziplineAcceleration();
+        var maxSpeed = OritechClientConfig.maxZiplineSpeed.get().floatValue();
+        var acceleration = OritechClientConfig.ziplineAcceleration.get().floatValue();
         
         // W -> Accelerate
         if (player.input.up) {
@@ -195,7 +195,7 @@ public class ClientZiplineHandler {
         var nextPlayerPos = ropePos.add(0, -HANG_OFFSET, 0);
         
         // auto dismount near end
-        if (Math.abs(currentSpeed) > 0.6 && Oritech.CONFIG.ziplineAutoJump()) {
+        if (Math.abs(currentSpeed) > 0.6 && OritechClientConfig.ziplineAutoJump.get()) {
             var blocksRemaining = (1.0f - progress) * totalDistance;
             if (directionMultiplier < 0) blocksRemaining = progress * totalDistance;
             
@@ -237,7 +237,7 @@ public class ClientZiplineHandler {
         active = false;
         
         // Restore Camera
-        if (previousCamera != null && Oritech.CONFIG.ziplineCameraSwitch()) {
+        if (previousCamera != null && OritechClientConfig.ziplineCameraSwitch.get()) {
             Minecraft.getInstance().options.setCameraType(previousCamera);
         }
         

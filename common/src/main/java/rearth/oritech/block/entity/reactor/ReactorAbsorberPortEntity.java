@@ -9,10 +9,11 @@ import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
@@ -100,13 +101,13 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMe
             availableFuel -= amount;
             
             if (level.getGameTime() % 5 == 0)
-                ParticleContent.COOLER_WORKING.spawn(level, worldPosition.getCenter().add(0, 0.5, 0), 1);
+                if (level instanceof ServerLevel sl) { var c = worldPosition.getCenter().add(0, 0.5, 0); sl.sendParticles(ParticleTypes.SNOWFLAKE, c.x, c.y, c.z, 1, 1.2, 1.2, 1.2, 0); }
         }
         
     }
     
     private void onFuelConsumed() {
-        ParticleContent.COOLER_WORKING.spawn(level, worldPosition.getCenter().add(0, 0.5, 0), 15);
+        if (level instanceof ServerLevel sl) { var c = worldPosition.getCenter().add(0, 0.5, 0); sl.sendParticles(ParticleTypes.SNOWFLAKE, c.x, c.y, c.z, 15, 1.2, 1.2, 1.2, 0); }
     }
     
     public void updateNetwork() {

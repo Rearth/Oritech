@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.storage;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -26,17 +27,17 @@ public class SmallStorageBlockEntity extends ExpandableEnergyStorageBlockEntity 
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.smallEnergyStorage.energyCapacity();
+        return OritechConfig.smallEnergyStorage.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.smallEnergyStorage.maxEnergyInsertion();
+        return OritechConfig.smallEnergyStorage.maxEnergyInsertion.get();
     }
     
     @Override
     public long getDefaultExtractionRate() {
-        return Oritech.CONFIG.smallEnergyStorage.maxEnergyExtraction();
+        return OritechConfig.smallEnergyStorage.maxEnergyExtraction.get();
     }
 
     @Override

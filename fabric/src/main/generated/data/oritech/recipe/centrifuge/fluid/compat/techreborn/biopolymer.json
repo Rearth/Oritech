@@ -12,7 +12,6 @@
     "amount": 20250,
     "fluid": "minecraft:water"
   },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "techreborn:compressed_plantball"

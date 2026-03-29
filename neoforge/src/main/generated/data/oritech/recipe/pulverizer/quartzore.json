@@ -1,10 +1,5 @@
 {
   "type": "oritech:pulverizer",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "minecraft:nether_quartz_ore"
@@ -16,5 +11,5 @@
       "id": "minecraft:quartz"
     }
   ],
-  "time": 120
+  "time": 100
 }

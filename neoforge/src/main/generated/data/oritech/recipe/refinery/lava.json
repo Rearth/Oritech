@@ -1,7 +1,6 @@
 {
   "type": "oritech:refinery",
   "fluidInput": {
-    "amount": 1000,
     "fluid": "minecraft:lava"
   },
   "fluidOutputs": [

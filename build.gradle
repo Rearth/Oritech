@@ -59,6 +59,8 @@ subprojects {
         maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
         // owo-lib
         maven { url = 'https://maven.wispforest.io/releases/' }
+        // Forge Config API Port
+        maven { url = 'https://raw.githubusercontent.com/Fuzss/modresources/main/maven/' }
     }
 
     dependencies {

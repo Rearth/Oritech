@@ -3,21 +3,21 @@ package rearth.oritech.api.recipe.util;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.material.Fluids;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.*;
 import rearth.oritech.init.FluidContent;
 
 import java.util.Arrays;
 import java.util.List;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.material.Fluids;
 
 public class MetalProcessingChainBuilder {
     private String metalName;
@@ -241,7 +241,7 @@ public class MetalProcessingChainBuilder {
         
         // ore block -> raw ores
         PulverizerRecipeBuilder.build().input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier).export(exporter, resourcePath + "ore/" + metalName);
-        var grinderOreRecipe = GrinderRecipeBuilder.build().input(ore).result(rawOreItem, 2).time(140).timeMultiplier(timeMultiplier);
+        var grinderOreRecipe = GrinderRecipeBuilder.build().input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier);
         if (rawOreByproduct != null)
             grinderOreRecipe.result(rawOreByproduct);
         grinderOreRecipe.export(exporter, resourcePath + "ore/" + metalName);
@@ -263,7 +263,7 @@ public class MetalProcessingChainBuilder {
               .result(firstNonNull(clumpItem, dustItem))
               .result(firstNonNullOptional(smallClumpItem, smallDustItem, nuggetItem), 3)
               .result(Optional.fromNullable(clumpByproduct), byproductAmount)
-              .time(140).timeMultiplier(timeMultiplier)
+              .timeMultiplier(timeMultiplier)
               .export(exporter, resourcePath + "raw/" + metalName);
         }
         

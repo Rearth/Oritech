@@ -1,5 +1,6 @@
 package rearth.oritech.block.blocks.reactor;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
 
@@ -60,7 +61,7 @@ public class NukeBlock extends Block {
     private void primeTnt(Level world, BlockPos pos) {
         if (!world.isClientSide) {
             
-            if (Oritech.CONFIG.boringNukes()) {
+            if (OritechConfig.boringNukes.get()) {
                 var center = pos.getCenter();
                 world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                 world.explode(null, center.x, center.y, center.z, 3, true, Level.ExplosionInteraction.TNT);

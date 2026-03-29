@@ -1,10 +1,12 @@
 package rearth.oritech.block.entity.processing;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.Geometry;
@@ -20,17 +22,17 @@ import net.minecraft.world.phys.Vec3;
 public class AssemblerBlockEntity extends MultiblockMachineEntity {
     
     public AssemblerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ASSEMBLER_ENTITY, pos, state, Oritech.CONFIG.processingMachines.assemblerData.energyPerTick());
+        super(BlockEntitiesContent.ASSEMBLER_ENTITY, pos, state, OritechConfig.processingMachines.assemblerData.energyPerTick.get());
     }
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.assemblerData.energyCapacity();
+        return OritechConfig.processingMachines.assemblerData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.assemblerData.maxEnergyInsertion();
+        return OritechConfig.processingMachines.assemblerData.maxEnergyInsertion.get();
     }
     
     @Override
@@ -63,7 +65,7 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
         var offsetLocal = Geometry.rotatePosition(new Vec3(0, 0.6, 0.5), facing);
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        ParticleContent.ASSEMBLER_WORKING.spawn(level, emitPosition, 1);
+        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.ENCHANTED_HIT, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
         
     }
     

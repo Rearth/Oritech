@@ -1,10 +1,5 @@
 {
   "type": "oritech:pulverizer",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:sandstone/blocks"
@@ -16,5 +11,5 @@
       "id": "minecraft:sand"
     }
   ],
-  "time": 120
+  "time": 100
 }

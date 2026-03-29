@@ -1,6 +1,5 @@
 package rearth.oritech.item.tools;
 
-import dev.architectury.platform.Platform;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -39,6 +38,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechPlatform;
 import rearth.oritech.api.energy.EnergyApi;
@@ -48,6 +48,7 @@ import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.PortableLaserRenderer;
 import rearth.oritech.init.ComponentContent;
+import net.minecraft.core.particles.ParticleTypes;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
@@ -67,7 +68,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static rearth.oritech.block.entity.interaction.LaserArmBlockEntity.BLOCK_BREAK_ENERGY;
 import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
 
 
@@ -95,7 +95,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         
         var stack = player.getItemInHand(hand);
-        var energyUsed = Oritech.CONFIG.portableLaserConfig.energyPerBoom();
+        var energyUsed = OritechConfig.portableLaserConfig.energyPerBoom.get();
         
         if (world.isClientSide) {
             if (getStoredEnergy(stack) > energyUsed && !player.isShiftKeyDown() && !isMiningEnabled(stack))
@@ -138,7 +138,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             
             if (canInteract)
                 world.explode(null, new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player),
-                  null, hit.getLocation(), Oritech.CONFIG.portableLaserConfig.explosionStrength(), false, Level.ExplosionInteraction.MOB);
+                  null, hit.getLocation(), OritechConfig.portableLaserConfig.explosionStrength.get(), false, Level.ExplosionInteraction.MOB);
             
             endPos = hit.getLocation();
         } else {
@@ -167,8 +167,8 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         Vec3 rightDir = new Vec3(rightX, 0, rightZ).normalize();
         
         var startPos = player.getEyePosition().add(endPos.subtract(player.getEyePosition()).scale(0.4f)).add(0, -0.5f, 0).add(rightDir.scale(0.3f));
-        ParticleContent.LASER_BOOM.spawn(world, startPos, endPos);
-        ParticleContent.MELTDOWN_IMMINENT.spawn(world, endPos, 6);
+        ParticleContent.LaserBoom(world, startPos, endPos);
+        if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, endPos.x, endPos.y, endPos.z, 6, 1, 1, 1, 0);
         
         return InteractionResultHolder.consume(stack);
     }
@@ -179,7 +179,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         if (!(stack.getItem() instanceof PortableLaserItem laserItem) || world == null) return;
         
-        var rfUsage = Oritech.CONFIG.portableLaserConfig.energyPerTick();
+        var rfUsage = OritechConfig.portableLaserConfig.energyPerTick.get();
         
         if (!laserItem.tryUseEnergy(stack, rfUsage, player)) {
             return;
@@ -207,11 +207,11 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             var canInteract = OritechPlatform.INSTANCE.canAttackBeDone(world, livingEntity, 20f, source);
             
             if (canInteract)
-                processEntityTarget(player, livingEntity, Oritech.CONFIG.portableLaserConfig.damageBase(), stack, world);
+                processEntityTarget(player, livingEntity, OritechConfig.portableLaserConfig.damageBase.get(), stack, world);
         }
         
         if (finalHit != null && finalHit.getType() != HitResult.Type.MISS && laserItem.isMiningEnabled(stack)) {
-            ParticleContent.LASER_BEAM_EFFECT.spawn(world, finalHit.getLocation());
+            if (world instanceof ServerLevel sl) { var loc = finalHit.getLocation(); sl.sendParticles(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z, 1, 0.4, 0.3, 0.4, 0); }
         }
         
     }
@@ -262,7 +262,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         if (blockState.is(TagContent.LASER_ACCELERATED)) {
             blockState.randomTick((ServerLevel) world, blockPos, world.random);
-            ParticleContent.ACCELERATING.spawn(world, Vec3.atLowerCornerOf(blockPos));
+            ParticleContent.Accelerating(world, Vec3.atLowerCornerOf(blockPos));
             stats = new Tuple<>(blockPos, -1);
         }
         
@@ -292,7 +292,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         }
         
         var currentInvestedEnergy = stats.getB();
-        var requiredBreakingEnergy = (int) (Math.sqrt(blockState.getDestroySpeed(world, blockPos)) * BLOCK_BREAK_ENERGY / Oritech.CONFIG.portableLaserConfig.blockBreakSpeed());
+        var requiredBreakingEnergy = (int) (Math.sqrt(blockState.getDestroySpeed(world, blockPos)) * OritechConfig.laserArmConfig.blockBreakEnergyBase.get() / OritechConfig.portableLaserConfig.blockBreakSpeed.get());
         var efficiencyLevel = getEnchantmentLevel(tool, Enchantments.EFFICIENCY);
         if (efficiencyLevel > 0) requiredBreakingEnergy = requiredBreakingEnergy / (efficiencyLevel + 1);
         
@@ -319,7 +319,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             var recipe = blockRecipe.value();
             var farmedCount = 1;
             dropped = List.of(new ItemStack(recipe.getResults().get(0).getItem(), farmedCount));
-            ParticleContent.CHARGING.spawn(world, Vec3.atLowerCornerOf(targetPos), 1);
+            if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
         
         // add stack to player inv, or spawn at block pos
@@ -442,17 +442,17 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return Oritech.CONFIG.portableLaserConfig.energyCapacity();
+        return OritechConfig.portableLaserConfig.energyCapacity.get();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return Oritech.CONFIG.portableLaserConfig.energyCapacity() / 80;
+        return OritechConfig.portableLaserConfig.energyCapacity.get() / 80;
     }
     
     @Override
     public long getEnergyMaxOutput(ItemStack stack) {
-        return Oritech.CONFIG.portableLaserConfig.energyCapacity() / 80;
+        return OritechConfig.portableLaserConfig.energyCapacity.get() / 80;
     }
     
     @Override

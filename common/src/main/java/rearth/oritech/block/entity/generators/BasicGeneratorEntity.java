@@ -1,6 +1,7 @@
 package rearth.oritech.block.entity.generators;
 
 import dev.architectury.registry.fuel.FuelRegistry;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -25,7 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
     
     public BasicGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BASIC_GENERATOR_ENTITY, pos, state, Oritech.CONFIG.generators.basicGeneratorData.energyPerTick());
+        super(BlockEntitiesContent.BASIC_GENERATOR_ENTITY, pos, state, OritechConfig.generators.basicGeneratorData.energyPerTick.get());
     }
     
     @Override
@@ -100,12 +101,12 @@ public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
     
     @Override
     public long getDefaultExtractionRate() {
-        return Oritech.CONFIG.generators.basicGeneratorData.maxEnergyExtraction();
+        return OritechConfig.generators.basicGeneratorData.maxEnergyExtraction.get();
     }
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.generators.basicGeneratorData.energyCapacity();
+        return OritechConfig.generators.basicGeneratorData.energyCapacity.get();
     }
     
     @Override

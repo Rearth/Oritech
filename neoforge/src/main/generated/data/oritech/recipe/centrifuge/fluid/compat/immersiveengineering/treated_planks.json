@@ -10,7 +10,6 @@
     "amount": 125,
     "fluid": "immersiveengineering:creosote"
   },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "minecraft:planks"

@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.generators;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -21,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     public FuelGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FUEL_GENERATOR_ENTITY, pos, state, Oritech.CONFIG.generators.fuelGeneratorData.energyPerTick());
+        super(BlockEntitiesContent.FUEL_GENERATOR_ENTITY, pos, state, OritechConfig.generators.fuelGeneratorData.energyPerTick.get());
     }
     
     @Override
@@ -60,12 +61,12 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     
     @Override
     public long getDefaultExtractionRate() {
-        return Oritech.CONFIG.generators.fuelGeneratorData.maxEnergyExtraction();
+        return OritechConfig.generators.fuelGeneratorData.maxEnergyExtraction.get();
     }
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.generators.fuelGeneratorData.energyCapacity();
+        return OritechConfig.generators.fuelGeneratorData.energyCapacity.get();
     }
     
     @Override

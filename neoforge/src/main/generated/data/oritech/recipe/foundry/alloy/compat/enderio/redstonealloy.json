@@ -6,11 +6,6 @@
     }
   ],
   "type": "oritech:foundry",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:dusts/redstone"
@@ -25,5 +20,5 @@
       "id": "enderio:redstone_alloy_ingot"
     }
   ],
-  "time": 120
+  "time": 80
 }
