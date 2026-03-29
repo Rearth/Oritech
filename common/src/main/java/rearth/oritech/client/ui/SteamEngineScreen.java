@@ -3,6 +3,7 @@ package rearth.oritech.client.ui;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import rearth.oritech.api.screen.Insets;
+import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.data.DisplayDataSource;
 import rearth.oritech.api.screen.data.FluidDisplayWidget;
 import rearth.oritech.api.screen.widgets.BoxWidget;
@@ -22,7 +23,7 @@ public class SteamEngineScreen extends UpgradableOritechScreen<UpgradableOritech
     }
     
     @Override
-    protected void addExtensionContent(List<rearth.oritech.api.screen.UIComponent> content) {
+    protected void addExtensionContent(List<UIComponent> content) {
         super.addExtensionContent(content);
 
         var steamEntity = ((SteamEngineEntity) menu.blockEntity);
