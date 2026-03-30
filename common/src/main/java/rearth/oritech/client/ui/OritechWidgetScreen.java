@@ -30,6 +30,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
 
     protected final List<UIComponent> components = new ArrayList<>();
     private final ResourceLocation backgroundTexture;
+    private UIComponent interactionTarget;
 
     protected OritechWidgetScreen(T handler, Inventory inventory, Component title, int imageWidth, int imageHeight) {
         this(handler, inventory, title, imageWidth, imageHeight, null);
@@ -53,6 +54,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
     protected void rebuildComponents() {
         clearWidgets();
         components.clear();
+        interactionTarget = null;
         this.leftPos = (this.width - this.imageWidth) / 2;
         this.topPos = (this.height - this.imageHeight) / 2;
         
@@ -165,16 +167,41 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int relX = (int) mouseX - leftPos;
         int relY = (int) mouseY - topPos;
+        interactionTarget = null;
 
         var sorted = new ArrayList<>(components);
         sorted.sort(Comparator.comparingInt(UIComponent::getZIndex).reversed());
 
         for (var c : sorted) {
-            if (c.isVisible() && (c.isMouseOver(relX, relY) || c instanceof OverlayWidget) && c.handleClick(relX, relY, button))
+            if (c.isVisible() && (c.isMouseOver(relX, relY) || c instanceof OverlayWidget) && c.handleClick(relX, relY, button)) {
+                interactionTarget = c;
                 return true;
+            }
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        int relX = (int) mouseX - leftPos;
+        int relY = (int) mouseY - topPos;
+
+        if (interactionTarget != null && interactionTarget.isVisible() && interactionTarget.handleDrag(relX, relY, dragX, dragY, button)) {
+            return true;
+        }
+
+        var sorted = new ArrayList<>(components);
+        sorted.sort(Comparator.comparingInt(UIComponent::getZIndex).reversed());
+
+        for (var c : sorted) {
+            if (c.isVisible() && (c == interactionTarget || c.isMouseOver(relX, relY) || c instanceof OverlayWidget) && c.handleDrag(relX, relY, dragX, dragY, button)) {
+                interactionTarget = c;
+                return true;
+            }
+        }
+
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     @Override
@@ -185,6 +212,8 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
         for (var c : components) {
             if (c.isVisible()) c.handleMouseRelease(relX, relY, button);
         }
+
+        interactionTarget = null;
 
         return super.mouseReleased(mouseX, mouseY, button);
     }

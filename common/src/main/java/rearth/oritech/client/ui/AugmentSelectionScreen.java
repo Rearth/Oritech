@@ -1,294 +1,279 @@
 package rearth.oritech.client.ui;
 
-import io.wispforest.owo.ui.base.BaseOwoScreen;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.LabelComponent;
-import io.wispforest.owo.ui.component.TextureComponent;
-import io.wispforest.owo.ui.container.Containers;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.*;
-import org.jetbrains.annotations.NotNull;
-import org.joml.Vector2f;
-import org.joml.Vector2i;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.api.Augment;
-
+import rearth.oritech.util.ColorHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 
-public class AugmentSelectionScreen extends BaseOwoScreen<FlowLayout> {
-    
-    private Component lastFocused;
-    private LabelComponent noOpButton;
-    private FlowLayout root;
-    
-    private final List<Component> augments = new ArrayList<>();
-    private final HashMap<Component, ResourceLocation> augmentIDs = new HashMap<>();
-    private final HashMap<Component, Float> augmentSizes = new HashMap<>();
-    
+public class AugmentSelectionScreen extends Screen {
+
+    private static final int LINE_COLOR = ColorHelper.argb(150 / 255f, 180 / 255f, 220 / 255f, 0.8f);
+    private static final int EXIT_COLOR = ColorHelper.argb(160 / 255f, 180 / 255f, 180 / 255f, 0.3f);
+    private static final int EXIT_HOVER_COLOR = ColorHelper.argb(160 / 255f, 180 / 255f, 220 / 255f, 0.5f);
+
+    private final List<SelectionEntry> augmentEntries = new ArrayList<>();
+    private final Map<ResourceLocation, Float> augmentSizes = new HashMap<>();
+    private SelectionEntry centerEntry;
+    private @Nullable SelectionEntry lastFocused;
+
+    public AugmentSelectionScreen() {
+        super(Component.empty());
+    }
+
     @Override
-    protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
-        return OwoUIAdapter.create(this, Containers::verticalFlow);
+    protected void init() {
+        super.init();
+        rebuildEntries();
     }
-    
-    @Override
-    protected void build(FlowLayout rootComponent) {
-        rootComponent.surface(Surface.VANILLA_TRANSLUCENT)
-          .horizontalAlignment(HorizontalAlignment.CENTER)
-          .verticalAlignment(VerticalAlignment.CENTER);
-        
-        this.root = rootComponent;
-        
-        addAugments(rootComponent);
-        
-        // add tooltip in bot left
-        var label = Components.label(net.minecraft.network.chat.Component.translatable("oritech.text.augment_toggle"));
-        rootComponent.child(label.positioning(Positioning.relative(2, 90)));
-    }
-    
-    @Override
-    public void tick() {
-        super.tick();
-        
-        // update noop text
-        if (lastFocused == noOpButton) {
-            noOpButton.text(net.minecraft.network.chat.Component.literal("Exit"));
-        } else if (lastFocused != null && lastFocused instanceof TextureComponent lastButton) {
-            var focusedAugmentId = augmentIDs.get(lastButton);
-            if (focusedAugmentId == null) return;
-            var focusedAugment = net.minecraft.network.chat.Component.translatable(PlayerModifierScreen.augmentKey(focusedAugmentId));
-            noOpButton.text(focusedAugment);
-        }
-        
-    }
-    
-    @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-        
-        if (augments.isEmpty()) return;
-        
-        var mousingOver = augments.stream().findFirst().get();
-        var minDist = Integer.MAX_VALUE;
-        
-        for (var augment : augments) {
-            var mousePos = new Vector2i(mouseX, mouseY);
-            var augmentPos = new Vector2i(augment.x() + augment.width() / 2, augment.y() + augment.height() / 2);
-            
-            var dist = mousePos.distance(augmentPos);
-            
-            if (augment == noOpButton) {
-                dist *= 2;  // give no op less prio
-            }
-            if (dist < minDist) {
-                minDist = (int) dist;
-                mousingOver = augment;
-            }
-        }
-        
-        lastFocused = mousingOver;
-        
-        var centerPos = new Vector2i(noOpButton.x() + noOpButton.width() / 2, noOpButton.y() + noOpButton.height() / 2);
-        var selectedPos = new Vector2i(lastFocused.x() + lastFocused.width() / 2, lastFocused.y() + lastFocused.height() / 2);
-        var mousePos = new Vector2i(mouseX, mouseY);
-        
-        var mouseLineColor = new Color(150 / 255f, 180 / 255f, 220 / 255f, 0.8f).argb();
-        drawLine(context, centerPos, selectedPos, mouseLineColor);
-        drawLine(context, selectedPos, mousePos, mouseLineColor);
-        
-        var screenSize = root.height();
-        var innerRadius = 0.175;
-        var outerRadius = 0.4;
-        var screenSizeX = root.width();
-        var screenSizeY = root.height();
-        var middleX = screenSizeX / 2f;
-        var middleY = screenSizeY / 2f;
-        
-        var augmentCount = augments.size() - 1;
-        var radSizePerElement = Math.toRadians((double) 360 / augmentCount) * 0.8f;
-        var screenMiddle = new Vector2i((int) middleX, (int) middleY);
-        
-        for (int i = 0; i < augments.size(); i++) {
-            var augment = augments.get(i);
-            var augmentId = augmentIDs.get(augment);
-            var augmentData = PlayerAugments.allAugments.get(augmentId);
-            if (augmentData == null) continue;
-            var isEnabled = augmentData.isEnabled(minecraft.player);
-            var active = mousingOver == augment;
-            
-            var color = new Color(180 / 255f, 30 / 255f, 30 / 255f, 0.3f).argb();  // red
-            if (isEnabled) {
-                color = new Color(30 / 255f, 180 / 255f, 30 / 255f, 0.3f).argb();  // green
-            }
-            if (active)
-                color = new Color(160 / 255f, 180 / 255f, 220 / 255f, 0.5f).argb(); // white
-            
-            var augmentRad = (i / (float) augmentCount) * 2 * Math.PI - Math.toRadians(90);
-            
-            var sizeTarget = 1f;
-            if (active) sizeTarget = 1.05f;
-            var lastSize = augmentSizes.getOrDefault(augment, 1f);
-            
-            var usedSize = Mth.lerp(0.15, lastSize, sizeTarget);
-            augmentSizes.put(augment, (float) usedSize);
-            
-            var activeInnerRadius = innerRadius / usedSize;
-            var activeOuterRadius = outerRadius * usedSize;
-            
-            if (i != augments.size() - 1)
-                drawPieSegmented(context, augmentRad, radSizePerElement, screenMiddle, activeInnerRadius, activeOuterRadius, screenSize, color, 16);
-            
-        }
-        
-        var centerSelected = mousingOver == noOpButton;
-        var color = new Color(160 / 255f, 180 / 255f, 180 / 255f, 0.3f).argb();
-        if (centerSelected) {
-            color = new Color(160 / 255f, 180 / 255f, 220 / 255f, 0.5f).argb();
-        }
-        drawPieSegmented(context, 0, Math.toRadians(360), screenMiddle, 0, innerRadius * 0.6, screenSize, color, 32);
-        
-    }
-    
-    private static void drawPieSegmented(GuiGraphics context, double augmentRad, double radSize, Vector2i screenMiddle, double innerRadius, double outerRadius, double screenSize, int color, int segmentCount) {
-        
-        // total size
-        var segmentSize = radSize / segmentCount;
-        var augmentRadBegin = augmentRad - radSize * 0.5f;
-        
-        for (int i = 0; i < segmentCount; i++) {
-            
-            var fromRad = augmentRadBegin + segmentSize * i;
-            var toRad = fromRad + segmentSize;
-            
-            var a = new Vector2i(screenMiddle).add(new Vector2i((int) (innerRadius * Math.cos(fromRad) * screenSize), (int) (innerRadius * Math.sin(fromRad) * screenSize)));
-            var b = new Vector2i(screenMiddle).add(new Vector2i((int) (outerRadius * Math.cos(fromRad) * screenSize), (int) (outerRadius * Math.sin(fromRad) * screenSize)));
-            var c = new Vector2i(screenMiddle).add(new Vector2i((int) (innerRadius * Math.cos(toRad) * screenSize), (int) (innerRadius * Math.sin(toRad) * screenSize)));
-            var d = new Vector2i(screenMiddle).add(new Vector2i((int) (outerRadius * Math.cos(toRad) * screenSize), (int) (outerRadius * Math.sin(toRad) * screenSize)));
-            drawRect(context, d, b, a, c, color);
-        }
-    }
-    
-    private static void drawLine(GuiGraphics context, Vector2i from, Vector2i to, int color) {
-        
-        if (from.distanceSquared(to) < 0.1) return;
-        
-        var matrices = context.pose();
-        matrices.pushPose();
-        
-        var pos = matrices.last().pose();
-        var normal = getNormalVector(from, to).normalize();
-        var offset = normal.mul(1);
-        var zIndex = 0;
-        
-        var buffer = context.bufferSource().getBuffer(RenderType.gui());
-        buffer.addVertex(pos, from.x - offset.x, from.y - offset.y, zIndex).setColor(color);
-        buffer.addVertex(pos, from.x + offset.x, from.y + offset.y, zIndex).setColor(color);
-        buffer.addVertex(pos, to.x + offset.x, to.y + offset.y, zIndex).setColor(color);
-        buffer.addVertex(pos, to.x - offset.x, to.y - offset.y, zIndex).setColor(color);
-        context.flush();
-        
-        matrices.popPose();
-    }
-    
-    private static void drawRect(GuiGraphics context, Vector2i a, Vector2i b, Vector2i c, Vector2i d, int color) {
-        
-        var matrices = context.pose();
-        matrices.pushPose();
-        
-        var pos = matrices.last().pose();
-        var zIndex = 0;
-        
-        var buffer = context.bufferSource().getBuffer(RenderType.gui());
-        buffer.addVertex(pos, a.x, a.y, zIndex).setColor(color);
-        buffer.addVertex(pos, b.x, b.y, zIndex).setColor(color);
-        buffer.addVertex(pos, c.x, c.y, zIndex).setColor(color);
-        buffer.addVertex(pos, d.x, d.y, zIndex).setColor(color);
-        context.flush();
-        
-        matrices.popPose();
-    }
-    
-    public static Vector2f getNormalVector(Vector2i point1, Vector2i point2) {
-        int dx = point2.x - point1.x;
-        int dy = point2.y - point1.y;
-        
-        // A 90-degree rotation can be achieved by swapping x and y and negating one of them
-        return new Vector2f(-dy, dx);
-    }
-    
-    private void addAugments(FlowLayout parent) {
-        
+
+    private void rebuildEntries() {
+        augmentEntries.clear();
+        augmentSizes.clear();
+
         var player = Objects.requireNonNull(this.minecraft).player;
-        
-        var augmentsToAdd = new ArrayList<Augment>();
-        
+        if (player == null) return;
+
+        var available = new ArrayList<Augment>();
         for (var augment : PlayerAugments.allAugments.values()) {
-            var isInstalled = augment.isInstalled(player);
-            var isToggleable = augment.toggleable;
-            
-            if (!isInstalled || !isToggleable) continue;
-            
-            augmentsToAdd.add(augment);
-            
+            if (augment.isInstalled(player) && augment.toggleable) {
+                available.add(augment);
+            }
         }
-        
-        var augmentCount = augmentsToAdd.size();
-        var radius = 30;
-        
-        var screenSizeX = this.width;
-        var screenSizeY = this.height;
-        var sideRelative = screenSizeY / (float) screenSizeX;
-        
-        for (int i = 0; i < augmentsToAdd.size(); i++) {
-            var augment = augmentsToAdd.get(i);
-            var angleRad = (i / (float) augmentCount) * 2 * Math.PI - Math.toRadians(90);
-            var offsetX = radius * Math.cos(angleRad);
-            var offsetY = radius * Math.sin(angleRad);
-            
-            final var id = augment.id;
-            var iconTexture = Oritech.id("textures/gui/" + id.getPath() + ".png");
-            var label = Components.texture(iconTexture, 0, 0, 24, 24, 24, 24);
-            label.positioning(Positioning.relative((int) (50 + offsetX * sideRelative), (int) (50 + offsetY)));
-            label.sizing(Sizing.fixed(screenSizeY / 12));
-            
-            augments.add(label);
-            parent.child(label);
-            augmentIDs.put(label, id);
-            augmentSizes.put(label, 1f);
-            
+
+        float radius = Math.min(width, height) * 0.28f;
+        int iconSize = Math.max(24, height / 12);
+        int centerX = width / 2;
+        int centerY = height / 2;
+
+        for (int i = 0; i < available.size(); i++) {
+            var augment = available.get(i);
+            double angle = (i / (double) available.size()) * Math.PI * 2 - Math.toRadians(90);
+            int x = (int) Math.round(centerX + Math.cos(angle) * radius);
+            int y = (int) Math.round(centerY + Math.sin(angle) * radius);
+            augmentEntries.add(new SelectionEntry(augment.id, Oritech.id("textures/gui/" + augment.id.getPath() + ".png"), x, y, iconSize));
+            augmentSizes.put(augment.id, 1f);
         }
-        
-        var noOpLabel = Components.label(net.minecraft.network.chat.Component.literal("Nothing"));
-        noOpLabel.positioning(Positioning.relative(50, 50));
-        augments.add(noOpLabel);
-        noOpButton = noOpLabel;
-        parent.child(noOpLabel);
-        
+
+        centerEntry = new SelectionEntry(null, null, centerX, centerY, iconSize);
     }
-    
+
+    @Override
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        renderTransparentBackground(graphics);
+
+        if (augmentEntries.isEmpty() || centerEntry == null) {
+            super.render(graphics, mouseX, mouseY, delta);
+            return;
+        }
+
+        var focused = findFocused(mouseX, mouseY);
+        lastFocused = focused;
+
+        drawBackdrop(graphics, focused);
+        drawFocusLines(graphics, focused, mouseX, mouseY);
+        drawAugmentIcons(graphics, focused);
+        drawLabels(graphics, focused);
+
+        super.render(graphics, mouseX, mouseY, delta);
+    }
+
+    private SelectionEntry findFocused(int mouseX, int mouseY) {
+        SelectionEntry focused = centerEntry;
+        int minDist = Integer.MAX_VALUE;
+
+        for (var entry : augmentEntries) {
+            int dist = squaredDistance(mouseX, mouseY, entry.centerX(), entry.centerY());
+            if (dist < minDist) {
+                minDist = dist;
+                focused = entry;
+            }
+        }
+
+        int centerDist = squaredDistance(mouseX, mouseY, centerEntry.centerX(), centerEntry.centerY()) * 2;
+        if (centerDist < minDist) {
+            focused = centerEntry;
+        }
+
+        return focused;
+    }
+
+    private void drawBackdrop(GuiGraphics graphics, SelectionEntry focused) {
+        int screenSize = Math.min(width, height);
+        double innerRadius = 0.175;
+        double outerRadius = 0.4;
+        int augmentCount = Math.max(1, augmentEntries.size());
+        double segmentSize = Math.toRadians(360d / augmentCount) * 0.8f;
+
+        for (int i = 0; i < augmentEntries.size(); i++) {
+            var entry = augmentEntries.get(i);
+            var augmentData = PlayerAugments.allAugments.get(entry.id());
+            if (augmentData == null) continue;
+
+            boolean active = focused == entry;
+            int color = ColorHelper.argb(180 / 255f, 30 / 255f, 30 / 255f, 0.3f);
+            if (augmentData.isEnabled(minecraft.player)) {
+                color = ColorHelper.argb(30 / 255f, 180 / 255f, 30 / 255f, 0.3f);
+            }
+            if (active) {
+                color = ColorHelper.argb(160 / 255f, 180 / 255f, 220 / 255f, 0.5f);
+            }
+
+            double angle = (i / (double) augmentCount) * Math.PI * 2 - Math.toRadians(90);
+            float lastSize = augmentSizes.getOrDefault(entry.id(), 1f);
+            float targetSize = active ? 1.05f : 1f;
+            float usedSize = Mth.lerp(0.15f, lastSize, targetSize);
+            augmentSizes.put(entry.id(), usedSize);
+
+            double activeInnerRadius = innerRadius / usedSize;
+            double activeOuterRadius = outerRadius * usedSize;
+            drawPieSegmented(graphics, angle, segmentSize, centerEntry.centerX(), centerEntry.centerY(), activeInnerRadius, activeOuterRadius, screenSize, color, 16);
+        }
+
+        int centerColor = focused == centerEntry ? EXIT_HOVER_COLOR : EXIT_COLOR;
+        drawPieSegmented(graphics, 0, Math.toRadians(360), centerEntry.centerX(), centerEntry.centerY(), 0, innerRadius * 0.6, screenSize, centerColor, 32);
+    }
+
+    private void drawFocusLines(GuiGraphics graphics, SelectionEntry focused, int mouseX, int mouseY) {
+        drawLine(graphics, centerEntry.centerX(), centerEntry.centerY(), focused.centerX(), focused.centerY(), LINE_COLOR, 0);
+        drawLine(graphics, focused.centerX(), focused.centerY(), mouseX, mouseY, LINE_COLOR, 0);
+    }
+
+    private void drawAugmentIcons(GuiGraphics graphics, SelectionEntry focused) {
+        for (var entry : augmentEntries) {
+            boolean active = focused == entry;
+            float scale = augmentSizes.getOrDefault(entry.id(), 1f);
+            int size = Math.round(entry.size() * scale);
+            int drawX = entry.centerX() - size / 2;
+            int drawY = entry.centerY() - size / 2;
+
+            if (active) {
+                graphics.fill(drawX - 2, drawY - 2, drawX + size + 2, drawY + size + 2, ColorHelper.argb(0.8f, 0.85f, 0.9f, 0.35f));
+            }
+
+            graphics.blit(entry.texture(), drawX, drawY, 0, 0, size, size, 24, 24);
+        }
+    }
+
+    private void drawLabels(GuiGraphics graphics, SelectionEntry focused) {
+        Component centerLabel = Component.literal("Exit");
+        if (focused.id() != null) {
+            centerLabel = Component.translatable(PlayerModifierScreen.augmentKey(focused.id()));
+        }
+
+        int labelWidth = minecraft.font.width(centerLabel);
+        graphics.drawString(minecraft.font, centerLabel, centerEntry.centerX() - labelWidth / 2, centerEntry.centerY() - 4, 0xFFE7EEF5, true);
+        graphics.drawString(minecraft.font, Component.translatable("oritech.text.augment_toggle"), 12, height - 20, 0xFFE7EEF5, true);
+    }
+
+    private static void drawPieSegmented(GuiGraphics graphics, double centerAngle, double angleSize,
+                                         int centerX, int centerY, double innerRadius, double outerRadius,
+                                         double screenSize, int color, int segments) {
+        double segmentSize = angleSize / segments;
+        double begin = centerAngle - angleSize * 0.5f;
+
+        for (int i = 0; i < segments; i++) {
+            double fromAngle = begin + segmentSize * i;
+            double toAngle = fromAngle + segmentSize;
+
+            int ax = centerX + (int) Math.round(innerRadius * Math.cos(fromAngle) * screenSize);
+            int ay = centerY + (int) Math.round(innerRadius * Math.sin(fromAngle) * screenSize);
+            int bx = centerX + (int) Math.round(outerRadius * Math.cos(fromAngle) * screenSize);
+            int by = centerY + (int) Math.round(outerRadius * Math.sin(fromAngle) * screenSize);
+            int cx = centerX + (int) Math.round(innerRadius * Math.cos(toAngle) * screenSize);
+            int cy = centerY + (int) Math.round(innerRadius * Math.sin(toAngle) * screenSize);
+            int dx = centerX + (int) Math.round(outerRadius * Math.cos(toAngle) * screenSize);
+            int dy = centerY + (int) Math.round(outerRadius * Math.sin(toAngle) * screenSize);
+
+            drawRect(graphics, dx, dy, bx, by, ax, ay, cx, cy, color);
+        }
+    }
+
+    private static void drawLine(GuiGraphics graphics, int fromX, int fromY, int toX, int toY, int color, float zIndex) {
+        if (fromX == toX && fromY == toY) return;
+
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        var pose = graphics.pose();
+        pose.pushPose();
+
+        var matrix = pose.last().pose();
+        double dx = toX - fromX;
+        double dy = toY - fromY;
+        double length = Math.sqrt(dx * dx + dy * dy);
+        if (length == 0) {
+            pose.popPose();
+            return;
+        }
+
+        float normalX = (float) (-dy / length);
+        float normalY = (float) (dx / length);
+
+        var buffer = graphics.bufferSource().getBuffer(RenderType.gui());
+        buffer.addVertex(matrix, fromX - normalX, fromY - normalY, zIndex).setColor(color);
+        buffer.addVertex(matrix, fromX + normalX, fromY + normalY, zIndex).setColor(color);
+        buffer.addVertex(matrix, toX + normalX, toY + normalY, zIndex).setColor(color);
+        buffer.addVertex(matrix, toX - normalX, toY - normalY, zIndex).setColor(color);
+        graphics.flush();
+
+        pose.popPose();
+    }
+
+    private static void drawRect(GuiGraphics graphics, int ax, int ay, int bx, int by, int cx, int cy, int dx, int dy, int color) {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        var pose = graphics.pose();
+        pose.pushPose();
+
+        var matrix = pose.last().pose();
+        var buffer = graphics.bufferSource().getBuffer(RenderType.gui());
+        buffer.addVertex(matrix, ax, ay, 0).setColor(color);
+        buffer.addVertex(matrix, bx, by, 0).setColor(color);
+        buffer.addVertex(matrix, cx, cy, 0).setColor(color);
+        buffer.addVertex(matrix, dx, dy, 0).setColor(color);
+        graphics.flush();
+
+        pose.popPose();
+    }
+
+    private static int squaredDistance(int x1, int y1, int x2, int y2) {
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+        return dx * dx + dy * dy;
+    }
+
     private void toggleAugment(ResourceLocation id) {
         NetworkManager.sendToServer(new PlayerAugments.AugmentPlayerTogglePacket(id));
     }
-    
+
     @Override
     public void onClose() {
-        
-        if (lastFocused != null && augmentIDs.containsKey(lastFocused)) {
-            var id = augmentIDs.get(lastFocused);
-            toggleAugment(id);
+        if (lastFocused != null && lastFocused.id() != null) {
+            toggleAugment(lastFocused.id());
         }
-        
+
         OritechClient.activeScreen = null;
         super.onClose();
     }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
+
+    private record SelectionEntry(@Nullable ResourceLocation id, @Nullable ResourceLocation texture, int centerX, int centerY, int size) {}
 }

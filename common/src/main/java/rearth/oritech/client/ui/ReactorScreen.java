@@ -1,13 +1,27 @@
 package rearth.oritech.client.ui;
 
-import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.LabelComponent;
-import io.wispforest.owo.ui.component.TextureComponent;
-import io.wispforest.owo.ui.container.Containers;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.*;
-import org.jetbrains.annotations.NotNull;
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Axis;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
+import rearth.oritech.api.screen.OritechSurface;
+import rearth.oritech.api.screen.UIComponent;
+import rearth.oritech.api.screen.widgets.LabelWidget;
+import rearth.oritech.api.screen.widgets.SurfaceWidget;
+import rearth.oritech.api.screen.widgets.TextureWidget;
 import rearth.oritech.block.blocks.reactor.ReactorAbsorberBlock;
 import rearth.oritech.block.blocks.reactor.ReactorHeatPipeBlock;
 import rearth.oritech.block.blocks.reactor.ReactorHeatVentBlock;
@@ -15,211 +29,128 @@ import rearth.oritech.block.blocks.reactor.ReactorRodBlock;
 import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
-import rearth.oritech.client.ui.components.ReactorBlockRenderComponent;
-import rearth.oritech.client.ui.components.ReactorPreviewContainer;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.util.TooltipHelper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.List;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.Tuple;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import rearth.oritech.util.TooltipHelper;
+public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
 
-import static rearth.oritech.client.ui.BasicMachineScreen.ORITECH_PANEL;
+    private LabelWidget productionLabel;
+    private LabelWidget hottestLabel;
+    private LabelWidget sumHeatLabel;
+    private LabelWidget statusLabel;
+    private TextureWidget energyIndicator;
+    private ReactorPreviewWidget previewWidget;
 
-
-public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScreenHandler> {
-    
-    private ArrayList<Tuple<Integer, ReactorBlockRenderComponent>> activeComponents;
-    private HashSet<ReactorBlockRenderComponent> activeOverlays;
-    private LabelComponent tooltipTitle;
-    private FlowLayout tooltipContainer;
-    private ReactorBlockRenderComponent selectedBlockOverlay;
-    private TextureComponent energyIndicator;
-    private LabelComponent productionLabel;
-    private LabelComponent hottestLabel;
-    private LabelComponent sumHeatLabel;
-    private LabelComponent statusLabel;
-    
     public ReactorScreen(ReactorScreenHandler handler, Inventory inventory, Component title) {
-        super(handler, inventory, title);
+        super(handler, inventory, title, 340, 200);
     }
-    
+
     @Override
-    protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
-        return OwoUIAdapter.create(this, Containers::verticalFlow);
+    protected void buildComponents() {
+        var panel = new SurfaceWidget(0, 0, imageWidth, imageHeight);
+        panel.withSurface(OritechSurface.PANEL);
+        panel.withZIndex(-10);
+        addComponent(panel);
+
+        previewWidget = new ReactorPreviewWidget(8, 16, 180, 164);
+        addComponent(previewWidget);
+        addStatsPanel();
+        addStatusPanel();
+        addEnergyBar();
+
+        var title = new LabelWidget(0, 4, imageWidth, 10, menu.reactorEntity.getBlockState().getBlock().getName());
+        title.withAlignment(LabelWidget.Alignment.CENTER);
+        title.withDarkColor();
+        addComponent(title);
     }
-    
-    @Override
-    protected void build(FlowLayout rootComponent) {
-        rootComponent
-          .surface(Surface.VANILLA_TRANSLUCENT)
-          .horizontalAlignment(HorizontalAlignment.CENTER)
-          .verticalAlignment(VerticalAlignment.CENTER);
-        
-        tooltipContainer = Containers.verticalFlow(Sizing.content(2), Sizing.content(2));
-        tooltipContainer.surface(Surface.VANILLA_TRANSLUCENT);
-        tooltipTitle = Components.label(Component.literal("My title!"));
-        tooltipContainer.child(tooltipTitle.margins(Insets.of(6)));
-        tooltipContainer.zIndex(3000);
-        tooltipContainer.padding(Insets.of(3));
-        tooltipTitle.zIndex(3001);
-        
-        var overlay = Containers.horizontalFlow(Sizing.fixed(340), Sizing.fixed(200));
-        rootComponent.child(overlay.surface(ORITECH_PANEL));
-        
-        addReactorComponentPreview(overlay);
-        addReactorStats(overlay);
-        addEnergyBar(overlay);
-        addReactorStatus(overlay);
-        
-        addTitle(overlay);
-        rootComponent.child(tooltipContainer.positioning(Positioning.absolute(0, 0)));
+
+    private void addStatsPanel() {
+        var panel = new SurfaceWidget(183, 16, 141, 54);
+        panel.withSurface(OritechSurface.PANEL_INSET);
+        panel.withZIndex(-8);
+        addComponent(panel);
+
+        productionLabel = new LabelWidget(189, 22, 129, 10,
+            Component.translatable("text.oritech.reactor.rf_production", TooltipHelper.getEnergyText(0)));
+        productionLabel.withBrightColor();
+        addComponent(productionLabel);
+
+        hottestLabel = new LabelWidget(189, 36, 129, 10,
+            Component.translatable("text.oritech.reactor.hottest_part", 0));
+        hottestLabel.withBrightColor();
+        addComponent(hottestLabel);
+
+        sumHeatLabel = new LabelWidget(189, 50, 129, 10,
+            Component.translatable("text.oritech.reactor.heat_production", 0));
+        sumHeatLabel.withBrightColor();
+        addComponent(sumHeatLabel);
     }
-    
-    private void addReactorStats(FlowLayout overlay) {
-        var container = Containers.verticalFlow(Sizing.fixed(141), Sizing.content(0));
-        
-        productionLabel = Components.label(Component.translatable("RF Production: %s RF/t", "50").withStyle(ChatFormatting.WHITE));
-        sumHeatLabel = Components.label(Component.translatable("Heat Production: %s RF/t", "50").withStyle(ChatFormatting.WHITE));
-        hottestLabel = Components.label(Component.translatable("Hottest Part: %s RF/t", "50").withStyle(ChatFormatting.WHITE));
-        
-        container.child(productionLabel.margins(Insets.of(4)));
-        container.child(hottestLabel.margins(Insets.of(4)));
-        container.child(sumHeatLabel.margins(Insets.of(4)));
-        
-        overlay.child(container.margins(Insets.of(8)).surface(Surface.PANEL_INSET).positioning(Positioning.absolute(183, 16)));
+
+    private void addStatusPanel() {
+        var panel = new SurfaceWidget(187, 75, 95, 24);
+        panel.withSurface(OritechSurface.PANEL_INSET);
+        panel.withZIndex(-8);
+        addComponent(panel);
+
+        statusLabel = new LabelWidget(191, 82, 87, 10, Component.translatable("text.oritech.reactor.idle").withStyle(ChatFormatting.BOLD));
+        statusLabel.withAlignment(LabelWidget.Alignment.CENTER);
+        statusLabel.withBrightColor();
+        addComponent(statusLabel);
     }
-    
-    private void addReactorStatus(FlowLayout overlay) {
-        
-        var container = Containers.verticalFlow(Sizing.fixed(95), Sizing.content(1));
-        
-        statusLabel = Components.label(Component.translatable("Stable").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
-        
-        container.child(statusLabel.horizontalTextAlignment(HorizontalAlignment.CENTER).horizontalSizing(Sizing.fill()).margins(Insets.of(4)));
-        
-        overlay.child(container.margins(Insets.of(4)).surface(Surface.PANEL_INSET).positioning(Positioning.absolute(187, 75)));
-        
+
+    private void addEnergyBar() {
+        int x = 294;
+        int y = 79;
+        int width = 36;
+        int height = 108;
+
+        var frame = new SurfaceWidget(x - 1, y - 1, width + 2, height + 2);
+        frame.withSurface(OritechSurface.PANEL_INSET);
+        frame.withZIndex(-8);
+        addComponent(frame);
+
+        addComponent(new TextureWidget(x, y, width, height,
+            OritechMachineScreen.GUI_COMPONENTS, 24, 0, 24, 96, 98, 96));
+
+        energyIndicator = new TextureWidget(x, y, width, height,
+            OritechMachineScreen.GUI_COMPONENTS, 0, 0, 24, 96, 98, 96);
+        addComponent(energyIndicator);
     }
-    
-    private BlockPos getPreviewMax() {
-        return menu.reactorEntity.areaMax.atY(menu.reactorEntity.areaMin.getY() + 1);
-    }
-    
-    private void addReactorComponentPreview(FlowLayout overlay) {
-        
-        var holoPreviewContainer = new ReactorPreviewContainer(Sizing.fixed(180), Sizing.fixed(164), FlowLayout.Algorithm.HORIZONTAL, this::onContainerMouseMove);
-        holoPreviewContainer.surface(Surface.PANEL_INSET);
-        holoPreviewContainer.margins(Insets.of(8));
-        
-        var totalSize = getPreviewMax().subtract(menu.reactorEntity.areaMin);
-        var leftCount = totalSize.getZ();
-        var rightCount = totalSize.getX();
-        var totalWidth = leftCount + rightCount + 3;
-        var middlePercentage = leftCount / (float) totalWidth;
-        var xOffset = middlePercentage * 170 + 10;
-        
-        var size = (int) (170 / (float) totalWidth * 2.2f);
-        
-        activeComponents = new ArrayList<>();
-        activeOverlays = new HashSet<>();
-        
-        BlockPos.betweenClosedStream(menu.reactorEntity.areaMin, getPreviewMax()).forEach(pos -> {
-            var state = menu.world.getBlockState(pos);
-            if (state.isAir()) return;
-            var offset = pos.subtract(menu.reactorEntity.areaMin);
-            var projectedPosX = offset.getX() * 0.43f - offset.getZ() * 0.43f;
-            var projectedPosY = offset.getX() * 0.224f + offset.getZ() * 0.224f + offset.getY() * 0.5f;
-            var zIndex = offset.getY() - offset.getX() - offset.getZ();
-            var preview = new ReactorBlockRenderComponent(null, menu.world.getBlockEntity(pos), zIndex, pos.immutable())
-                            .sizing(Sizing.fixed(size))
-                            .positioning(Positioning.absolute((int) (projectedPosX * size + xOffset), (int) (-projectedPosY * size) + 100));
-            if (offset.getY() == 1) {
-                activeComponents.add(new Tuple<>(-zIndex, (ReactorBlockRenderComponent) preview));
-            }
-            holoPreviewContainer.child(preview);
-            
-            if (state.getBlock() instanceof ReactorRodBlock || state.getBlock() instanceof ReactorHeatPipeBlock) {
-                var heatOverlay = new ReactorBlockRenderComponent(Blocks.AIR.defaultBlockState(), null, zIndex + 0.5f, pos.immutable())
-                                    .sizing(Sizing.fixed(size))
-                                    .positioning(Positioning.absolute((int) (projectedPosX * size + xOffset), (int) (-projectedPosY * size) + 100));
-                
-                holoPreviewContainer.child(heatOverlay);
-                activeOverlays.add((ReactorBlockRenderComponent) heatOverlay);
-            }
-            
-        });
-        
-        selectedBlockOverlay = (ReactorBlockRenderComponent) new ReactorBlockRenderComponent(Blocks.AIR.defaultBlockState(), null, 10 + 0.5f, BlockPos.ZERO)
-                                                               .sizing(Sizing.fixed(size))
-                                                               .positioning(Positioning.absolute(0, 0));
-        holoPreviewContainer.child(selectedBlockOverlay);
-        
-        activeComponents.sort(Comparator.comparingInt(Tuple::getA));
-        
-        overlay.child(holoPreviewContainer.positioning(Positioning.absolute(0, 16)));
-        
-    }
-    
+
     @Override
     protected void containerTick() {
         super.containerTick();
-        
+
         if (menu.reactorEntity.componentStats.isEmpty()) return;
-        
-        for (var overlay : activeOverlays) {
-            var data = getStatsAtPosition(overlay.pos);
-            
-            var isEmpty = data.storedHeat() <= 10;
-            if (isEmpty) {
-                overlay.state = Blocks.AIR.defaultBlockState();
-                continue;
-            }
-            
-            var res = BlockContent.REACTOR_COLD_INDICATOR_BLOCK.defaultBlockState();
-            
-            if (data.storedHeat() > 1000) {
-                res = BlockContent.REACTOR_HOT_INDICATOR_BLOCK.defaultBlockState();
-            } else if (data.storedHeat() > 200) {
-                res = BlockContent.REACTOR_MEDIUM_INDICATOR_BLOCK.defaultBlockState();
-            }
-            
-            overlay.state = res;
-        }
-        
-        var stackHeight = menu.reactorEntity.areaMax.getY() - menu.reactorEntity.areaMin.getY() - 1;
-        
-        // gather stats
-        var sumProducedEnergy = menu.reactorEntity.componentStats.values().stream()
-                                  .mapToInt(data -> data.receivedPulses() * ReactorControllerBlockEntity.RF_PER_PULSE * stackHeight).sum();
-        
-        
-        var sumProducedHeat = menu.reactorEntity.componentStats.values().stream()
-                                .filter(elem -> elem.receivedPulses() > 0)
-                                .mapToInt(ReactorControllerBlockEntity.ComponentStatistics::heatChanged).sum();
-        
-        var hottestComponent = menu.reactorEntity.componentStats.values().stream()
-                                 .mapToInt(ReactorControllerBlockEntity.ComponentStatistics::storedHeat)
-                                 .max().orElse(0);
-        
-        productionLabel.text(Component.translatable("text.oritech.reactor.rf_production", TooltipHelper.getEnergyText(sumProducedEnergy)));
-        hottestLabel.text(Component.translatable("text.oritech.reactor.hottest_part", hottestComponent));
-        sumHeatLabel.text(Component.translatable("text.oritech.reactor.heat_production", sumProducedHeat));
-        
-        // update status
-        var isActive = sumProducedEnergy + sumProducedHeat > 0;
-        var activeLabel = "idle";
-        var color = ChatFormatting.WHITE;
-        
+
+        int stackHeight = menu.reactorEntity.areaMax.getY() - menu.reactorEntity.areaMin.getY() - 1;
+
+        int sumProducedEnergy = menu.reactorEntity.componentStats.values().stream()
+            .mapToInt(data -> data.receivedPulses() * ReactorControllerBlockEntity.RF_PER_PULSE * stackHeight)
+            .sum();
+
+        int sumProducedHeat = menu.reactorEntity.componentStats.values().stream()
+            .filter(data -> data.receivedPulses() > 0)
+            .mapToInt(ReactorControllerBlockEntity.ComponentStatistics::heatChanged)
+            .sum();
+
+        int hottestComponent = menu.reactorEntity.componentStats.values().stream()
+            .mapToInt(ReactorControllerBlockEntity.ComponentStatistics::storedHeat)
+            .max()
+            .orElse(0);
+
+        productionLabel.setText(Component.translatable("text.oritech.reactor.rf_production", TooltipHelper.getEnergyText(sumProducedEnergy)));
+        hottestLabel.setText(Component.translatable("text.oritech.reactor.hottest_part", hottestComponent));
+        sumHeatLabel.setText(Component.translatable("text.oritech.reactor.heat_production", sumProducedHeat));
+
+        boolean isActive = sumProducedEnergy + sumProducedHeat > 0;
+        String activeLabel = "idle";
+        ChatFormatting color = ChatFormatting.WHITE;
+
         if (isActive) {
             if (hottestComponent < 100) {
                 activeLabel = "stable";
@@ -234,166 +165,256 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
                 color = ChatFormatting.DARK_RED;
             }
         }
-        
-        statusLabel.text(Component.translatable("text.oritech.reactor." + activeLabel).withStyle(ChatFormatting.BOLD).withStyle(color));
-        
+
+        statusLabel.setText(Component.translatable("text.oritech.reactor." + activeLabel).withStyle(ChatFormatting.BOLD).withStyle(color));
         updateEnergyBar();
-        
     }
-    
-    private void onContainerMouseMove(int mouseX, int mouseY) {
-        
-        var posX = mouseX;
-        var posY = mouseY;
-        
-        // check if self is on top of activeComponents
-        for (var component : activeComponents) {
-            var hit = component.getB().isInBoundingBox(mouseX, mouseY);
-            if (hit) {
-                var pos = component.getB().pos;
-                addStatsToTooltip(pos, menu.world.getBlockState(pos), tooltipContainer);
-                posX = component.getB().x();
-                posY = component.getB().y();
-                
-                selectedBlockOverlay.state = BlockContent.ADDON_INDICATOR_BLOCK.defaultBlockState();
-                selectedBlockOverlay.pos = pos;
-                selectedBlockOverlay.zIndex = component.getB().zIndex + 0.6f;
-                selectedBlockOverlay.positioning(component.getB().positioning().get());
-                
-                break;
-            }
-        }
-        
-        if (posX == mouseX) {   // move out of visible area
-            tooltipContainer.positioning(Positioning.absolute(-100, -500));
-            selectedBlockOverlay.state = Blocks.AIR.defaultBlockState();
-            return;
-        }
-        
-        var containerHeight = tooltipContainer.height();
-        
-        tooltipContainer.positioning(Positioning.absolute(posX - 30, posY - 5 - containerHeight));
-        
+
+    private void updateEnergyBar() {
+        long capacity = menu.reactorEntity.energyStorage.getCapacity();
+        long amount = menu.reactorEntity.energyStorage.getAmount();
+        float fillAmount = capacity <= 0 ? 0f : (float) amount / capacity;
+
+        energyIndicator.withTooltip(Component.translatable("tooltip.oritech.energy_indicator", amount, capacity));
+        energyIndicator.setVisibleArea(0, 108 - (int) (108 * fillAmount), 36, (int) (108 * fillAmount));
     }
-    
-    public void addStatsToTooltip(BlockPos pos, BlockState state, FlowLayout container) {
-        
-        container.clearChildren();
-        
-        var blockname = state.getBlock().getName();
-        container.child(Components.label(blockname.withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD)).margins(Insets.of(0, 3, 0, 0)));
-        
+
+    private List<Component> getStatsTooltip(BlockPos pos, BlockState state) {
+        var tooltip = new ArrayList<Component>();
+        tooltip.add(state.getBlock().getName().copy().withStyle(ChatFormatting.BOLD));
+
         var stats = getStatsAtPosition(pos);
-        if (stats.storedHeat() == -1) return;
-        
-        var stackHeight = menu.reactorEntity.areaMax.getY() - menu.reactorEntity.areaMin.getY() - 1;
+        if (stats.storedHeat() == -1) return tooltip;
+
+        int stackHeight = menu.reactorEntity.areaMax.getY() - menu.reactorEntity.areaMin.getY() - 1;
         var portPosition = pos.offset(0, stackHeight, 0);
         var portEntity = menu.world.getBlockEntity(portPosition);
-        if (portEntity != null && portEntity.isRemoved()) return;
-        
-        
+        if (portEntity != null && portEntity.isRemoved()) return tooltip;
+
         if (state.getBlock() instanceof ReactorRodBlock rodBlock) {
-            var rodCount = rodBlock.getRodCount();
-            var totalPulses = stats.receivedPulses();
-            var createdPulses = rodBlock.getInternalPulseCount();
-            var externalPulses = totalPulses - createdPulses;
-            var generatedEnergy = ReactorControllerBlockEntity.RF_PER_PULSE * totalPulses;
-            var generatedHeat = stats.heatChanged();
-            var heat = stats.storedHeat();
-            
-            if (totalPulses == 0) { // probably no fuel
-                createdPulses = 0;
-                externalPulses = 0;
+            int rodCount = rodBlock.getRodCount();
+            int totalPulses = stats.receivedPulses();
+            int createdPulses = totalPulses == 0 ? 0 : rodBlock.getInternalPulseCount();
+            int externalPulses = totalPulses - createdPulses;
+            int generatedEnergy = ReactorControllerBlockEntity.RF_PER_PULSE * totalPulses;
+            int generatedHeat = stats.heatChanged();
+            int heat = stats.storedHeat();
+
+            if (portEntity instanceof ReactorFuelPortEntity fuelPortEntity) {
+                tooltip.add(Component.translatable("text.oritech.reactor.rod_count", rodCount));
+                tooltip.add(Component.translatable("text.oritech.reactor.generated_pulses", createdPulses));
+                tooltip.add(Component.translatable("text.oritech.reactor.received_pulses", externalPulses));
+                tooltip.add(Component.translatable("text.oritech.reactor.generated_heat", generatedHeat));
+                tooltip.add(Component.translatable("text.oritech.reactor.generated_energy", generatedEnergy));
+                tooltip.add(Component.translatable("text.oritech.reactor.heat", heat));
+                tooltip.add(Component.translatable("text.oritech.reactor.fuel", fuelPortEntity.availableFuel, fuelPortEntity.currentFuelOriginalCapacity));
             }
-            
-            if (!(portEntity instanceof ReactorFuelPortEntity fuelPortEntity)) return;
-            var availableFuel = fuelPortEntity.availableFuel;
-            var maxFuel = fuelPortEntity.currentFuelOriginalCapacity;
-            
-            container.child(Components.label(Component.translatable("text.oritech.reactor.rod_count", rodCount).withStyle(ChatFormatting.WHITE)));
-            container.child(Components.label(Component.translatable("text.oritech.reactor.generated_pulses", createdPulses).withStyle(ChatFormatting.WHITE)));
-            container.child(Components.label(Component.translatable("text.oritech.reactor.received_pulses", externalPulses).withStyle(ChatFormatting.WHITE)));
-            container.child(Components.label(Component.translatable("text.oritech.reactor.generated_heat", generatedHeat).withStyle(ChatFormatting.WHITE)));
-            container.child(Components.label(Component.translatable("text.oritech.reactor.generated_energy", generatedEnergy).withStyle(ChatFormatting.WHITE)));
-            container.child(Components.label(Component.translatable("text.oritech.reactor.heat", heat).withStyle(ChatFormatting.WHITE)));
-            container.child(Components.label(Component.translatable("text.oritech.reactor.fuel", availableFuel, maxFuel).withStyle(ChatFormatting.WHITE)));
-        } else if (state.getBlock() instanceof ReactorHeatPipeBlock pipeBlock) {
-            container.child(Components.label(Component.translatable("text.oritech.reactor.collected_heat", stats.heatChanged()).withStyle(ChatFormatting.WHITE)));
-            container.child(Components.label(Component.translatable("text.oritech.reactor.heat", stats.storedHeat()).withStyle(ChatFormatting.WHITE)));
-        } else if (state.getBlock() instanceof ReactorHeatVentBlock pipeBlock) {
-            container.child(Components.label(Component.translatable("text.oritech.reactor.removed_heat", stats.heatChanged()).withStyle(ChatFormatting.WHITE)));
-        } else if (state.getBlock() instanceof ReactorAbsorberBlock absorberBlock) {
-            
-            if (!(portEntity instanceof ReactorAbsorberPortEntity absorberPortEntity)) return;
-            var availableFuel = absorberPortEntity.availableFuel;
-            var maxFuel = absorberPortEntity.currentFuelOriginalCapacity;
-            
-            container.child(Components.label(Component.translatable("text.oritech.reactor.absorbed_heat", stats.heatChanged()).withStyle(ChatFormatting.WHITE)));
-            container.child(Components.label(Component.translatable("text.oritech.reactor.absorbant", availableFuel, maxFuel).withStyle(ChatFormatting.WHITE)));
+        } else if (state.getBlock() instanceof ReactorHeatPipeBlock) {
+            tooltip.add(Component.translatable("text.oritech.reactor.collected_heat", stats.heatChanged()));
+            tooltip.add(Component.translatable("text.oritech.reactor.heat", stats.storedHeat()));
+        } else if (state.getBlock() instanceof ReactorHeatVentBlock) {
+            tooltip.add(Component.translatable("text.oritech.reactor.removed_heat", stats.heatChanged()));
+        } else if (state.getBlock() instanceof ReactorAbsorberBlock) {
+            if (portEntity instanceof ReactorAbsorberPortEntity absorberPortEntity) {
+                tooltip.add(Component.translatable("text.oritech.reactor.absorbed_heat", stats.heatChanged()));
+                tooltip.add(Component.translatable("text.oritech.reactor.absorbant", absorberPortEntity.availableFuel, absorberPortEntity.currentFuelOriginalCapacity));
+            }
         }
-        
+
+        return tooltip;
     }
-    
+
     public ReactorControllerBlockEntity.ComponentStatistics getStatsAtPosition(BlockPos pos) {
-        
-        if (menu.reactorEntity.componentStats.isEmpty())
+        if (menu.reactorEntity.componentStats.isEmpty()) {
             return ReactorControllerBlockEntity.ComponentStatistics.EMPTY;
-        
+        }
+
         var reactorMin = menu.reactorEntity.areaMin;
-        
         for (var entry : menu.reactorEntity.componentStats.entrySet()) {
             var localPos = entry.getKey();
             var worldPos = reactorMin.offset(localPos.x + 1, 1, localPos.y + 1);
             if (worldPos.equals(pos)) return entry.getValue();
         }
-        
+
         return ReactorControllerBlockEntity.ComponentStatistics.EMPTY;
     }
-    
-    private void addTitle(FlowLayout overlay) {
-        var blockTitle = menu.reactorEntity.getBlockState().getBlock().getName();
-        var label = Components.label(blockTitle);
-        label.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
-        label.sizing(Sizing.fixed(176), Sizing.content(2));
-        label.horizontalTextAlignment(HorizontalAlignment.CENTER);
-        label.zIndex(1);
-        overlay.child(label.positioning(Positioning.relative(50, 3)));
+
+    @Override
+    public boolean shouldCreateTitle() {
+        return false;
     }
-    
-    private void addEnergyBar(FlowLayout panel) {
-        
-        var config = new ScreenProvider.BarConfiguration(295, 80, 36, 108);
-        var insetSize = 1;
-        var tooltipText = Component.translatable("tooltip.oritech.energy_indicator", 10, 50);
-        
-        var frame = Containers.horizontalFlow(Sizing.fixed(config.width() + insetSize * 2), Sizing.fixed(config.height() + insetSize * 2));
-        frame.surface(Surface.PANEL_INSET);
-        frame.padding(Insets.of(insetSize));
-        frame.positioning(Positioning.absolute(config.x() - insetSize, config.y() - insetSize));
-        panel.child(frame);
-        
-        var indicator_background = Components.texture(BasicMachineScreen.GUI_COMPONENTS, 24, 0, 24, 96, 98, 96);
-        indicator_background.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
-        
-        energyIndicator = Components.texture(BasicMachineScreen.GUI_COMPONENTS, 0, 0, 24, (96), 98, 96);
-        energyIndicator.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
-        energyIndicator.positioning(Positioning.absolute(0, 0));
-        energyIndicator.tooltip(tooltipText);
-        
-        frame
-          .child(indicator_background)
-          .child(energyIndicator);
+
+    @Override
+    public BlockState getTitleState() {
+        return menu.reactorEntity.getBlockState();
     }
-    
-    protected void updateEnergyBar() {
-        
-        var capacity = menu.reactorEntity.energyStorage.getCapacity();
-        var amount = menu.reactorEntity.energyStorage.getAmount();
-        
-        var fillAmount = (float) amount / capacity;
-        var tooltipText = BasicMachineScreen.getEnergyTooltip(amount, capacity, 0, 0);
-        
-        energyIndicator.tooltip(tooltipText);
-        energyIndicator.visibleArea(PositionedRectangle.of(0, 96 - ((int) (96 * (fillAmount))), 24, (int) (96 * fillAmount)));
+
+    private final class ReactorPreviewWidget extends UIComponent {
+
+        private final List<PreviewEntry> blockEntries = new ArrayList<>();
+        private final List<PreviewEntry> hoverEntries = new ArrayList<>();
+        private final List<PreviewEntry> heatEntries = new ArrayList<>();
+        private @Nullable PreviewEntry hoveredEntry;
+        private final int blockSize;
+
+        private ReactorPreviewWidget(int x, int y, int width, int height) {
+            super(x, y, width, height);
+            this.surface = OritechSurface.PANEL_INSET;
+
+            var previewMax = menu.reactorEntity.areaMax.atY(menu.reactorEntity.areaMin.getY() + 1);
+            var totalSize = previewMax.subtract(menu.reactorEntity.areaMin);
+            int leftCount = totalSize.getZ();
+            int rightCount = totalSize.getX();
+            int totalWidth = leftCount + rightCount + 3;
+            float middlePercentage = leftCount / (float) totalWidth;
+            float xOffset = middlePercentage * 170 + 10;
+
+            this.blockSize = (int) (170 / (float) totalWidth * 2.2f);
+
+            BlockPos.betweenClosedStream(menu.reactorEntity.areaMin, previewMax).forEach(pos -> {
+                var state = menu.world.getBlockState(pos);
+                if (state.isAir()) return;
+
+                var offset = pos.subtract(menu.reactorEntity.areaMin);
+                float projectedPosX = offset.getX() * 0.43f - offset.getZ() * 0.43f;
+                float projectedPosY = offset.getX() * 0.224f + offset.getZ() * 0.224f + offset.getY() * 0.5f;
+                float zIndex = offset.getY() - offset.getX() - offset.getZ();
+                int drawX = (int) (projectedPosX * blockSize + xOffset);
+                int drawY = (int) (-projectedPosY * blockSize) + 100;
+
+                var entry = new PreviewEntry(pos.immutable(), menu.world.getBlockEntity(pos), zIndex, drawX, drawY);
+                blockEntries.add(entry);
+
+                if (offset.getY() == 1) {
+                    hoverEntries.add(entry);
+                }
+
+                if (state.getBlock() instanceof ReactorRodBlock || state.getBlock() instanceof ReactorHeatPipeBlock) {
+                    heatEntries.add(new PreviewEntry(pos.immutable(), null, zIndex + 0.5f, drawX, drawY));
+                }
+            });
+
+            blockEntries.sort(Comparator.comparingDouble(PreviewEntry::zIndex));
+            hoverEntries.sort(Comparator.comparingDouble(entry -> -entry.zIndex()));
+            heatEntries.sort(Comparator.comparingDouble(PreviewEntry::zIndex));
+        }
+
+        @Override
+        protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+            hoveredEntry = null;
+            for (var entry : hoverEntries) {
+                if (isInsideBlock(mouseX, mouseY, entry.drawX(), entry.drawY(), blockSize)) {
+                    hoveredEntry = entry;
+                    break;
+                }
+            }
+
+            for (var entry : blockEntries) {
+                renderBlock(graphics, entry.drawX(), entry.drawY(), blockSize, entry.zIndex(), null, entry.blockEntity(), entry.pos(), delta);
+            }
+
+            for (var entry : heatEntries) {
+                var state = resolveHeatState(entry.pos());
+                if (!state.isAir()) {
+                    renderBlock(graphics, entry.drawX(), entry.drawY(), blockSize, entry.zIndex(), state, null, entry.pos(), delta);
+                }
+            }
+
+            if (hoveredEntry != null) {
+                renderBlock(graphics, hoveredEntry.drawX(), hoveredEntry.drawY(), blockSize, hoveredEntry.zIndex() + 0.6f,
+                    BlockContent.ADDON_INDICATOR_BLOCK.defaultBlockState(), null, hoveredEntry.pos(), delta);
+                renderTooltipPanel(graphics, hoveredEntry.drawX(), hoveredEntry.drawY(), getStatsTooltip(hoveredEntry.pos(), menu.world.getBlockState(hoveredEntry.pos())));
+            }
+        }
+
+        private BlockState resolveHeatState(BlockPos pos) {
+            var data = getStatsAtPosition(pos);
+            if (data.storedHeat() <= 10) {
+                return Blocks.AIR.defaultBlockState();
+            }
+
+            if (data.storedHeat() > 1000) {
+                return BlockContent.REACTOR_HOT_INDICATOR_BLOCK.defaultBlockState();
+            }
+            if (data.storedHeat() > 200) {
+                return BlockContent.REACTOR_MEDIUM_INDICATOR_BLOCK.defaultBlockState();
+            }
+            return BlockContent.REACTOR_COLD_INDICATOR_BLOCK.defaultBlockState();
+        }
+
+        @Override
+        public boolean hasTooltip() {
+            return false;
+        }
+
+        private boolean isInsideBlock(int mouseX, int mouseY, int blockX, int blockY, int size) {
+            return mouseX >= blockX && mouseX < blockX + size && mouseY >= blockY && mouseY < blockY + size;
+        }
+
+        private void renderTooltipPanel(GuiGraphics graphics, int blockX, int blockY, List<Component> tooltip) {
+            if (tooltip.isEmpty()) return;
+
+            var font = Minecraft.getInstance().font;
+            int maxWidth = 0;
+            for (var line : tooltip) {
+                maxWidth = Math.max(maxWidth, font.width(line));
+            }
+
+            int panelWidth = maxWidth + 10;
+            int panelHeight = tooltip.size() * font.lineHeight + 8;
+            int tooltipX = Math.max(4, Math.min(width - panelWidth - 4, blockX - 24));
+            int tooltipY = Math.max(4, blockY - panelHeight - 6);
+
+            graphics.fill(tooltipX, tooltipY, tooltipX + panelWidth, tooltipY + panelHeight, 0xCC101418);
+            graphics.fill(tooltipX, tooltipY, tooltipX + panelWidth, tooltipY + 1, 0xFF9DB4C7);
+            graphics.fill(tooltipX, tooltipY + panelHeight - 1, tooltipX + panelWidth, tooltipY + panelHeight, 0xFF9DB4C7);
+            graphics.fill(tooltipX, tooltipY, tooltipX + 1, tooltipY + panelHeight, 0xFF9DB4C7);
+            graphics.fill(tooltipX + panelWidth - 1, tooltipY, tooltipX + panelWidth, tooltipY + panelHeight, 0xFF9DB4C7);
+
+            for (int index = 0; index < tooltip.size(); index++) {
+                graphics.drawString(font, tooltip.get(index), tooltipX + 5, tooltipY + 4 + index * font.lineHeight, 0xFFF2F6FA, false);
+            }
+        }
+
+        private void renderBlock(GuiGraphics graphics, int drawX, int drawY, int size, float zIndex,
+                                 @Nullable BlockState overrideState, @Nullable BlockEntity overrideEntity,
+                                 BlockPos worldPos, float delta) {
+            var client = Minecraft.getInstance();
+            var usedState = overrideState != null ? overrideState : menu.world.getBlockState(worldPos);
+            var usedEntity = overrideEntity;
+
+            graphics.pose().pushPose();
+            graphics.pose().translate(x + drawX + size / 2f, y + drawY + size / 2f, zIndex * 25 + 1000);
+            graphics.pose().scale(40 * size / 64f, -40 * size / 64f, 40);
+            graphics.pose().mulPose(Axis.XP.rotationDegrees(30));
+            graphics.pose().mulPose(Axis.YP.rotationDegrees(225));
+            graphics.pose().translate(-0.5f, -0.5f, -0.5f);
+
+            RenderSystem.runAsFancy(() -> {
+                var vertexConsumers = client.renderBuffers().bufferSource();
+                if (usedState.getRenderShape() != RenderShape.ENTITYBLOCK_ANIMATED) {
+                    client.getBlockRenderer().renderSingleBlock(
+                        usedState, graphics.pose(), vertexConsumers,
+                        LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY
+                    );
+                }
+
+                if (usedEntity != null) {
+                    var renderer = client.getBlockEntityRenderDispatcher().getRenderer(usedEntity);
+                    if (renderer != null) {
+                        renderer.render(usedEntity, delta, graphics.pose(), vertexConsumers,
+                            LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                    }
+                }
+
+                RenderSystem.setShaderLights(new Vector3f(-1.5f, -0.5f, 0), new Vector3f(0, -1, 0));
+                vertexConsumers.endBatch();
+                Lighting.setupFor3DItems();
+            });
+
+            graphics.pose().popPose();
+        }
     }
+
+    private record PreviewEntry(BlockPos pos, @Nullable BlockEntity blockEntity, float zIndex, int drawX, int drawY) {}
 }

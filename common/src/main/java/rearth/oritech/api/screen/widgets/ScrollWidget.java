@@ -30,6 +30,7 @@ public class ScrollWidget extends UIComponent {
     private int contentTotalHeight = 0;
     private boolean verticalScroll = true;
     private boolean horizontalScroll = false;
+    private boolean dragScrolling = false;
     private int scrollSpeed = 10;
     private int innerMargin = 4;
     
@@ -50,6 +51,11 @@ public class ScrollWidget extends UIComponent {
     
     public ScrollWidget withScrollSpeed(int speed) {
         this.scrollSpeed = speed;
+        return this;
+    }
+
+    public ScrollWidget withDragScrolling(boolean enabled) {
+        this.dragScrolling = enabled;
         return this;
     }
     
@@ -110,6 +116,24 @@ public class ScrollWidget extends UIComponent {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean handleDrag(double mouseX, double mouseY, double deltaX, double deltaY, int button) {
+        if (!dragScrolling || button != 0) return false;
+
+        int viewW = width - innerMargin * 2;
+        int viewH = height - innerMargin * 2;
+
+        if (horizontalScroll) {
+            scrollX = Mth.clamp((int) Math.round(scrollX - deltaX), 0, Math.max(0, contentTotalWidth - viewW));
+        }
+
+        if (verticalScroll) {
+            scrollY = Mth.clamp((int) Math.round(scrollY - deltaY), 0, Math.max(0, contentTotalHeight - viewH));
+        }
+
+        return horizontalScroll || verticalScroll;
     }
     
     public float getScrollX() { return scrollX; }
