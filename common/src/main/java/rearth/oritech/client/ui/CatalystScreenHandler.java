@@ -1,15 +1,16 @@
 package rearth.oritech.client.ui;
 
-import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
-
-import java.util.Objects;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import rearth.oritech.api.screen.data.DisplayDataSource;
+import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 
-public class CatalystScreenHandler extends BasicMachineScreenHandler {
+import java.util.Objects;
+
+public class CatalystScreenHandler extends OritechScreenHandler {
     
     public final EnchantmentCatalystBlockEntity catalyst;
     
@@ -27,8 +28,20 @@ public class CatalystScreenHandler extends BasicMachineScreenHandler {
         }
         
     }
+    
+    @Override
+    protected void addEnergyDisplay() {
+        // override to remove internal laser energy container and just add soul container
+        if (this.blockEntity instanceof EnchantmentCatalystBlockEntity catalystEntity) {
+            getDataDisplays().add(DisplayDataSource.CreateSoul(
+              catalystEntity.maxSouls,
+              () -> (long) catalystEntity.collectedSouls,
+              screenData.getEnergyConfiguration()));
+        }
+    }
 
     // Won't affect player dragging items into slots, but quick-move will only allow enchanted books in the first slot
+    @Override
     public int getMachineInvStartSlot(ItemStack stack) {
         return stack.is(Items.ENCHANTED_BOOK) ? 0 : 1;
     }

@@ -1,13 +1,5 @@
 package rearth.oritech.client.ui;
 
-import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.LabelComponent;
-import io.wispforest.owo.ui.container.Containers;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.container.OverlayContainer;
-import io.wispforest.owo.ui.container.ScrollContainer;
-import io.wispforest.owo.ui.core.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -17,154 +9,143 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.api.screen.OritechSurface;
+import rearth.oritech.api.screen.widgets.*;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
+import rearth.oritech.util.ColorHelper;
 
+public class EnchanterScreen extends OritechMachineScreen<EnchanterScreenHandler> {
 
-public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> {
-    
-    private ItemStack currentItem = null;
-    private FlowLayout detailsScrollPane;
-    private ButtonComponent openEnchantmentSelection;
-    private LabelComponent statisticsLabel;
-    
+    private ItemStack currentItem = ItemStack.EMPTY;
+    private ButtonWidget chooseButton;
+    private LabelWidget statisticsLabel;
+    private OverlayWidget selectionOverlay;
+
     public EnchanterScreen(EnchanterScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
-    
+
     @Override
     public boolean showExtensionPanel() {
         return false;
     }
-    
+
     @Override
-    public void fillOverlay(FlowLayout overlay) {
-        super.fillOverlay(overlay);
-        
-        openEnchantmentSelection = Components.button(Component.translatable("button.oritech.enchanter.bane_of_long_names"), this::onOpenClicked);
-        openEnchantmentSelection.positioning(Positioning.relative(54, 13));
-        openEnchantmentSelection.active(false);
-        openEnchantmentSelection.renderer(ORITECH_BUTTON_DARK);
-        overlay.child(openEnchantmentSelection);
-        
-        detailsScrollPane = Containers.verticalFlow(Sizing.content(2), Sizing.content(2));
-        detailsScrollPane.padding(Insets.of(2));
-        detailsScrollPane.margins(Insets.of(3));
-        
-        statisticsLabel = Components.label(Component.translatable("title.oritech.enchanter.catalysts_available", 1, 4));
-        statisticsLabel.positioning(Positioning.relative(54, 29));
-        overlay.child(statisticsLabel);
+    protected void addExtraComponents() {
+
+        chooseButton = ButtonWidget.darkPanel(40, 33, 110, 20,
+            Component.translatable("message.oritech.enchanter.insert_item"),
+            button -> onOpenClicked()).withTextColor(LabelWidget.BRIGHT_TEXT);
+
+        statisticsLabel = new LabelWidget(40, 20, 110, 20, Component.literal(" "));
+        statisticsLabel.withAlignment(LabelWidget.Alignment.CENTER);
+        statisticsLabel.withWrap(true);
+        statisticsLabel.withDarkColor();
+
+        addComponent(chooseButton);
+        addComponent(statisticsLabel);
     }
-    
-    private void onOpenClicked(ButtonComponent event) {
+
+    @Override
+    protected void tickExtra() {
+        var stack = menu.enchanter.inventory.getItem(0);
+        if (!ItemStack.isSameItemSameComponents(currentItem, stack)) {
+            currentItem = stack.copy();
+            onStackChanged();
+        }
+
+        Component description = Component.translatable("tooltip.oritech.enchanter_selection");
+        if (stack.isEmpty()) description = Component.translatable("message.oritech.enchanter.insert_item");
+        var selection = menu.enchanter.getSelectedEnchantment();
+        var hasSelection = selection != null;
+        if (hasSelection) {
+            description = selection.value().description();
+        }
+
+        var registry = menu.enchanter.getLevel().registryAccess().registryOrThrow(Registries.ENCHANTMENT);
+        var canBeEnchanted = registry.stream().anyMatch(elem -> elem.canEnchant(stack));
+        chooseButton.setActive(canBeEnchanted);
+        chooseButton.setLabel(description);
+
+        var statistics = menu.enchanter.statistics;
+        if (statistics.equals(EnchanterBlockEntity.EnchanterStatistics.EMPTY)) {
+            statisticsLabel.setText(Component.literal(" "));
+        } else {
+            statisticsLabel.setText(Component.translatable("title.oritech.enchanter.catalysts", statistics.availableCatalysts(), statistics.requiredCatalysts()).withStyle(ChatFormatting.DARK_GRAY));
+        }
+    }
+
+    private void onOpenClicked() {
+        menu.enchanter.selectedEnchantment = EnchanterBlockEntity.NONE_SELECTED;
         sendEnchantmentToServer(EnchanterBlockEntity.NONE_SELECTED);
         openSelectionPanel();
     }
-    
-    @Override
-    protected void containerTick() {
-        super.containerTick();
-        
-        var stack = this.menu.enchanter.inventory.getItem(0);
-        if (currentItem == null)
-            currentItem = stack;
-        
-        if (stack.getItem() != currentItem.getItem()) {
-            currentItem = stack;
-            onStackChanged();
-        }
-        
-        Component description = Component.translatable("message.oritech.enchanter.insert_item");
-        var hasSelection = this.menu.enchanter.getSelectedEnchantment() != null;
-        if (hasSelection) {
-            description = this.menu.enchanter.getSelectedEnchantment().value().description();
-        }
-        openEnchantmentSelection.setMessage(description);
-        
-        
-        var registry = menu.enchanter.getLevel().registryAccess().registryOrThrow(Registries.ENCHANTMENT);
-        var canBeEnchanted = registry.stream().anyMatch(elem -> elem.canEnchant(stack));
-        
-        openEnchantmentSelection.active(hasSelection && canBeEnchanted);
-        
-        var statistics = menu.enchanter.statistics;
-        if (statistics.equals(EnchanterBlockEntity.EnchanterStatistics.EMPTY)) {
-            statisticsLabel.text(Component.literal(" "));
-        } else {
-            statisticsLabel.text(Component.translatable("title.oritech.enchanter.catalysts", statistics.availableCatalysts(), statistics.requiredCatalysts()).withStyle(ChatFormatting.DARK_GRAY));
-        }
-        
-        this.progress_indicator.tooltip(Component.translatable("title.oritech.enchanter.souls_used", menu.enchanter.progress, menu.enchanter.maxProgress));
-        
-    }
-    
+
     private void onStackChanged() {
-        if (menu.enchanter.getSelectedEnchantment() != null) return;
-        openSelectionPanel();
-        
-    }
-    
-    private void openSelectionPanel() {
-        
-        var slotCount = this.menu.slots.size();
-        
-        for (int i = 0; i < slotCount; i++) {
-            this.disableSlot(i);
+        if (!currentItem.isEmpty() && menu.enchanter.getSelectedEnchantment() == null) {
+            openSelectionPanel();
+        } else if (currentItem.isEmpty()) {
+            closeSelectionOverlay();
         }
-        
-        // find enchantments
+    }
+
+    private void openSelectionPanel() {
+        closeSelectionOverlay();
+
         var registry = menu.enchanter.getLevel().registryAccess().registryOrThrow(Registries.ENCHANTMENT);
         var all = registry.stream().map(registry::wrapAsHolder).filter(entry -> entry.value().canEnchant(currentItem)).toList();
-        
         if (all.isEmpty()) return;
-        
-        detailsScrollPane.clearChildren();
-        
-        var title = Components.label(Component.translatable("tooltip.oritech.enchanter_selection"));
-        detailsScrollPane.child(title);
-        
-        var scrollPane = Containers.verticalScroll(Sizing.fixed(184), Sizing.fixed(200), detailsScrollPane);
-        scrollPane.padding(Insets.of(2));
-        var floatingPanel = new OverlayContainer<>(scrollPane) {
-            @Override
-            public void remove() {
-                super.remove();
-                for (int i = 0; i < slotCount; i++) {
-                    EnchanterScreen.this.enableSlot(i);
-                }
-            }
-        };
-        
-        // refresh gui
+
+        selectionOverlay = new OverlayWidget(imageWidth, imageHeight);
+        selectionOverlay.withBackgroundColor(ColorHelper.argb(0f, 0f, 0f, 0.45f));
+        selectionOverlay.withDismissHandler(this::closeSelectionOverlay);
+
+        int panelX = 10;
+        int panelY = 8;
+        int panelWidth = imageWidth - 20;
+        int panelHeight = imageHeight - 16;
+
+        var panel = new SurfaceWidget(panelX, panelY, panelWidth, panelHeight);
+        panel.withSurface(OritechSurface.PANEL);
+        selectionOverlay.addChild(panel);
+
+        var title = new LabelWidget(panelX + 8, panelY + 8, panelWidth - 16, 10, Component.translatable("tooltip.oritech.enchanter_selection"));
+        title.withAlignment(LabelWidget.Alignment.CENTER);
+        title.withDarkColor();
+        selectionOverlay.addChild(title);
+
+        var scroll = new ScrollWidget(panelX + 8, panelY + 24, panelWidth - 16, panelHeight - 32);
+        scroll.setContentDimensions(panelWidth - 24, all.size() * 26);
+        scroll.withSurface(OritechSurface.PANEL_DARK);
+        selectionOverlay.addChild(scroll);
+
+        int y = 0;
         for (var entry : all) {
-            var candidate = entry.value();
-            var button = Components.button(candidate.description().copy().withColor(BasicMachineScreen.GRAY_TEXT_COLOR), data -> onEnchantmentSelected(entry, floatingPanel));
-            button.sizing(Sizing.fill(), Sizing.fixed(25));
-            button.margins(Insets.of(1, 1, 0, 8));
-            button.renderer(ORITECH_BUTTON);
-            button.textShadow(false);
-            detailsScrollPane.child(button);
+            var button = ButtonWidget.darkPanel(0, y, panelWidth - 28, 22,
+                entry.value().description().copy().withColor(LabelWidget.BRIGHT_TEXT),
+                ignored -> onEnchantmentSelected(entry));
+            scroll.addChild(button);
+            y += 26;
         }
-        
-        scrollPane.surface(Surface.DARK_PANEL);
-        
-        
-        floatingPanel.zIndex(9800);
-        floatingPanel
-          .horizontalAlignment(HorizontalAlignment.CENTER)
-          .verticalAlignment(VerticalAlignment.CENTER);
-        
-        this.root.child(floatingPanel);
+
+        addComponent(selectionOverlay);
     }
-    
-    private void onEnchantmentSelected(Holder<Enchantment> entry, OverlayContainer<ScrollContainer<FlowLayout>> floatingPanel) {
-        this.menu.enchanter.selectedEnchantment = ResourceLocation.parse(entry.getRegisteredName());
-        sendEnchantmentToServer(ResourceLocation.parse(entry.getRegisteredName()));
-        floatingPanel.remove();
+
+    private void onEnchantmentSelected(Holder<Enchantment> entry) {
+        var selected = ResourceLocation.parse(entry.getRegisteredName());
+        menu.enchanter.selectedEnchantment = selected;
+        sendEnchantmentToServer(selected);
+        closeSelectionOverlay();
     }
-    
+
+    private void closeSelectionOverlay() {
+        if (selectionOverlay != null) {
+            removeComponent(selectionOverlay);
+            selectionOverlay = null;
+        }
+    }
+
     private void sendEnchantmentToServer(ResourceLocation selected) {
-        NetworkManager.sendToServer(new EnchanterBlockEntity.SelectEnchantingPacket(this.menu.blockPos, selected));
+        NetworkManager.sendToServer(new EnchanterBlockEntity.SelectEnchantingPacket(menu.blockPos, selected));
     }
-    
-    
 }

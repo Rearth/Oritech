@@ -8,6 +8,7 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
+import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
@@ -179,6 +180,10 @@ public abstract class DisplayDataSource {
             
 
             return Component.translatable("tooltip.oritech.progress_indicator", progressTicks, effectiveDurationTicks, recipeDurationTicks);
+        } else if (blockEntity instanceof EnchanterBlockEntity enchanterBlock && enchanterBlock.progress > 0) {
+            var maxTicks = enchanterBlock.maxProgress * 5;
+            var progress = enchanterBlock.progress * 5;
+            return Component.translatable("tooltip.oritech.progress_indicator", progress, maxTicks, maxTicks);
         }
 
         return Component.empty();
