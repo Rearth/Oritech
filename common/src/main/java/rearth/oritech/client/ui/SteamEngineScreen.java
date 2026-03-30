@@ -4,21 +4,18 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.UIComponent;
-import rearth.oritech.api.screen.data.DisplayDataSource;
-import rearth.oritech.api.screen.data.FluidDisplayWidget;
 import rearth.oritech.api.screen.widgets.BoxWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
-import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
 
-public class SteamEngineScreen extends UpgradableOritechScreen<UpgradableOritechScreenHandler> {
+public class SteamEngineScreen extends UpgradableOritechScreen<SteamEngineScreenHandler> {
     
     protected LabelWidget productionLabel;
     protected LabelWidget steamConsumptionLabel;
     
-    public SteamEngineScreen(UpgradableOritechScreenHandler handler, Inventory inventory, Component title) {
+    public SteamEngineScreen(SteamEngineScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
     
@@ -55,21 +52,6 @@ public class SteamEngineScreen extends UpgradableOritechScreen<UpgradableOritech
     }
     
     @Override
-    protected void addExtraComponents() {
-        super.addExtraComponents();
-
-        var steamEntity = (SteamEngineEntity) menu.blockEntity;
-        addComponent(new FluidDisplayWidget(DisplayDataSource.CreateFluid(
-            steamEntity.boilerStorage.getOutputContainer(),
-            getBoilerInConfig(),
-            menu.screenData)));
-        addComponent(new FluidDisplayWidget(DisplayDataSource.CreateFluid(
-            steamEntity.boilerStorage.getInputContainer(),
-            getBoilerOutConfig(),
-            menu.screenData)));
-    }
-
-    @Override
     protected void tickExtra() {
         super.tickExtra();
 
@@ -92,12 +74,4 @@ public class SteamEngineScreen extends UpgradableOritechScreen<UpgradableOritech
         steamConsumptionLabel.setText(Component.translatable("title.oritech.steam_consumption", totalSteamUsage));
     }
     
-    public ScreenProvider.BarConfiguration getBoilerInConfig() {
-        return menu.screenData.getFluidConfiguration();
-    }
-    
-    public ScreenProvider.BarConfiguration getBoilerOutConfig() {
-        var config = getBoilerInConfig();
-        return new ScreenProvider.BarConfiguration(config.x() - config.width() - 8, config.y(), config.width(), config.height());
-    }
 }

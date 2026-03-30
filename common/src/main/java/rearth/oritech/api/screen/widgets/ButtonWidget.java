@@ -104,7 +104,7 @@ public class ButtonWidget extends UIComponent {
             height + surfacePadding.vertical());
         
         var font = Minecraft.getInstance().font;
-        int textY = y + (height - 8) / 2 + (hovered ? 1 : 0) + (pressed ? 2 : 0);
+        int textY = y + (height - 8) / 2 + (hovered ? 1 : 0);
         int textX = x + (width - font.width(label)) / 2;
         graphics.drawString(font, label, textX, textY, active ? textColor : DISABLED_COLOR, textShadow);
     }

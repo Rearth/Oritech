@@ -30,7 +30,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
     public static final MenuType<UpgradableOritechScreenHandler> BASIC_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> LAVA_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> FUEL_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
-    public static final MenuType<UpgradableOritechScreenHandler> STEAM_ENGINE_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
+    public static final MenuType<SteamEngineScreenHandler> STEAM_ENGINE_SCREEN = MenuRegistry.ofExtended((SteamEngineScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> DESTROYER_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> PLACER_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> FERTILIZER_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));

@@ -253,6 +253,11 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     public MenuType<?> getScreenHandlerType() {
         return ModScreens.STEAM_ENGINE_SCREEN;
     }
+
+    @Override
+    public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+        return List.of(boilerStorage.getOutputContainer(), boilerStorage.getInputContainer());
+    }
     
     @Override
     public int getInventorySize() {

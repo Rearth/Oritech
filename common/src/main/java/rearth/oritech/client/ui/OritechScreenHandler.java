@@ -44,7 +44,7 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
     @NotNull
     public final ScreenProvider screenData;
     
-    private Set<DisplayDataSource> dataDisplays = new HashSet<>();
+    private final List<DisplayDataSource> dataDisplays = new ArrayList<>();
     public final List<FluidApi.SingleSlotStorage> fluidStorages;
     
     public BlockState machineBlock;
@@ -68,15 +68,10 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         if (this.inventory != null)
             this.inventory.startOpen(playerInventory.player);
         
-        if (screenData.showEnergy() && blockEntity instanceof EnergyApi.BlockProvider energyProvider) {
-            var storage = energyProvider.getEnergyStorage(null);
-            dataDisplays.add(DisplayDataSource.CreateEnergy(storage, screenData.getEnergyConfiguration(), screenData));
-        }
-        
-        if (screenData.showProgress())
-            dataDisplays.add(DisplayDataSource.CreateProgress(screenData, blockEntity));
-        
+        addEnergyDisplay();
+        addProgressDisplay();
         addFluidDisplay();
+        addAdditionalDisplays();
         
         fluidStorages = new ArrayList<>(screenData.getInteractableFluidStorages());
         
@@ -94,6 +89,21 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
             }
         }
     }
+
+    protected void addEnergyDisplay() {
+        if (screenData.showEnergy() && blockEntity instanceof EnergyApi.BlockProvider energyProvider) {
+            var storage = energyProvider.getEnergyStorage(null);
+            dataDisplays.add(DisplayDataSource.CreateEnergy(storage, screenData.getEnergyConfiguration(), screenData));
+        }
+    }
+
+    protected void addProgressDisplay() {
+        if (screenData.showProgress()) {
+            dataDisplays.add(DisplayDataSource.CreateProgress(screenData, blockEntity));
+        }
+    }
+
+    protected void addAdditionalDisplays() {}
     
     public Collection<DisplayDataSource> getDataDisplays() {
         return dataDisplays;
