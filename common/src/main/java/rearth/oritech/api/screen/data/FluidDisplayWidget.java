@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import rearth.oritech.Oritech;
@@ -22,6 +23,9 @@ import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.util.ColorHelper;
 import rearth.oritech.util.StackContext;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.function.Supplier;
 
 public class FluidDisplayWidget extends AbstractDataDisplayWidget {
@@ -31,8 +35,12 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
     private static final int FRAME_REGION_HEIGHT = 50;
     private static final int FLUID_BACKGROUND = ColorHelper.argb(0.06f, 0.18f, 0.24f);
     private static final int OVERLAY_COLOR = ColorHelper.argb(0.31f, 0.31f, 0.31f);
+    private static final int BURST_DROPLET_COUNT = 9;
+    private static final int MAX_ACTIVE_DROPLETS = 24;
 
     private final Supplier<FluidStack> fluidStackSupplier;
+    private final List<FluidBurstDroplet> activeDroplets = new ArrayList<>();
+    private final Random random = new Random();
     private TextureAtlasSprite fluidSprite;
     private int fluidColor;
     @Nullable
@@ -57,8 +65,12 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
             var carried = Minecraft.getInstance().player.containerMenu.getCarried();
             if (!carried.isEmpty()) {
                 var checkContext = new StackContext(carried.copy(), ignored -> {});
-                if (FluidApi.ITEM.find(checkContext) != null) {
+                var itemFluidStorage = FluidApi.ITEM.find(checkContext);
+                if (itemFluidStorage != null) {
                     boolean extract = (button == 1);
+                    if (canShowTransferBurst(itemFluidStorage, extract)) {
+                        spawnTransferBurst(extract, resolveBurstColor(itemFluidStorage, extract), mouseX, mouseY);
+                    }
                     NetworkManager.sendToServer(new OritechScreenHandler.FluidContainerInteractionPacket(blockPos, tankIndex, extract));
                     return true;
                 }
@@ -85,6 +97,8 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
             graphics.fill(cx, cy, cx + cw, cy + overlayHeight, OVERLAY_COLOR);
         }
 
+        renderTransferBurst(graphics, cx, cy, cw, ch);
+
         graphics.blit(GUI_COMPONENTS, cx, cy, cw, ch, 48, 0, FRAME_REGION_WIDTH, FRAME_REGION_HEIGHT, 98, 96);
     }
 
@@ -104,6 +118,99 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
     public void tick() {
         super.tick();
         updateFluidRenderData();
+        tickTransferBurst();
+    }
+
+    private boolean canShowTransferBurst(FluidApi.FluidStorage itemFluidStorage, boolean extract) {
+        if (extract) {
+            return getCurrentAmount() > 0;
+        }
+
+        return getCurrentAmount() < getCapacity()
+            && itemFluidStorage.supportsExtraction()
+            && !itemFluidStorage.getContent().isEmpty()
+            && !itemFluidStorage.getContent().getFirst().isEmpty();
+    }
+
+    private int resolveBurstColor(FluidApi.FluidStorage itemFluidStorage, boolean extract) {
+        if (extract) {
+            return fluidColor;
+        }
+
+        if (!itemFluidStorage.getContent().isEmpty()) {
+            var transferred = itemFluidStorage.getContent().getFirst();
+            if (!transferred.isEmpty()) {
+                return ColorHelper.makeOpaque(FluidStackHooks.getColor(transferred));
+            }
+        }
+
+        return fluidColor;
+    }
+
+    private void spawnTransferBurst(boolean extract, int burstColor, double mouseX, double mouseY) {
+        if (burstColor == ColorHelper.WHITE && fluidSprite == null && !extract) {
+            return;
+        }
+
+        activeDroplets.clear();
+
+        var width = contentWidth();
+        var height = contentHeight();
+        var spawnY = mouseY - 25 * (extract ? 1 : 1.3);
+
+        for (int index = 0; index < BURST_DROPLET_COUNT; index++) {
+            var spawnX = width * 0.5 + (random.nextDouble() - 0.5) * Math.max(4, width * 0.45);
+            var velocityX = (random.nextDouble() - 0.5) * 0.9;
+            var velocityY = extract
+                ? -(0.9 + random.nextDouble() * 1.2)
+                : 0.5 + random.nextDouble() * 1.1;
+            var size = 1.2 + random.nextDouble() * 1.8;
+            int lifetime = 7 + random.nextInt(5);
+
+            activeDroplets.add(new FluidBurstDroplet(spawnX, spawnY, velocityX, velocityY, size, lifetime, burstColor));
+        }
+
+        while (activeDroplets.size() > MAX_ACTIVE_DROPLETS) {
+            activeDroplets.removeFirst();
+        }
+    }
+
+    private void tickTransferBurst() {
+        if (activeDroplets.isEmpty()) {
+            return;
+        }
+
+        var width = contentWidth();
+        var height = contentHeight();
+        var iterator = activeDroplets.iterator();
+        while (iterator.hasNext()) {
+            var droplet = iterator.next();
+            droplet.tick();
+            if (droplet.isExpired(width, height)) {
+                iterator.remove();
+            }
+        }
+    }
+
+    private void renderTransferBurst(GuiGraphics graphics, int x, int y, int w, int h) {
+        if (activeDroplets.isEmpty()) {
+            return;
+        }
+
+        for (var droplet : activeDroplets) {
+            int drawX = x + Mth.floor(droplet.x);
+            int drawY = y + Mth.floor(droplet.y);
+            int drawSize = Math.max(1, Mth.ceil(droplet.size * droplet.alpha()));
+            if (drawX + drawSize < x || drawX >= x + w || drawY + drawSize < y || drawY >= y + h) {
+                continue;
+            }
+
+            int minX = Math.max(drawX, x);
+            int minY = Math.max(drawY, y);
+            int maxX = Math.min(drawX + drawSize, x + w);
+            int maxY = Math.min(drawY + drawSize, y + h);
+            graphics.fill(minX, minY, maxX, maxY, droplet.colorWithAlpha());
+        }
     }
 
     private void renderFluidSprite(GuiGraphics graphics, int x, int y, int w, int h) {
@@ -145,5 +252,48 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
         }
 
         BufferUploader.drawWithShader(buffer.buildOrThrow());
+    }
+
+    private static final class FluidBurstDroplet {
+
+        private final double size;
+        private final int maxLifetime;
+        private final int color;
+        private double x;
+        private double y;
+        private double velocityX;
+        private double velocityY;
+        private int lifetime;
+
+        private FluidBurstDroplet(double x, double y, double velocityX, double velocityY, double size, int maxLifetime, int color) {
+            this.x = x;
+            this.y = y;
+            this.velocityX = velocityX;
+            this.velocityY = velocityY;
+            this.size = size;
+            this.maxLifetime = maxLifetime;
+            this.color = color;
+        }
+
+        private void tick() {
+            x += velocityX;
+            y += velocityY;
+            velocityX *= 0.92;
+            velocityY = velocityY * 0.9 + 0.08;
+            lifetime++;
+        }
+
+        private boolean isExpired(int width, int height) {
+            return lifetime >= maxLifetime || x < -4 || x > width + 4 || y < -4 || y > height + 4;
+        }
+
+        private float alpha() {
+            return Mth.clamp(1f - (float) lifetime / maxLifetime, 0f, 1f);
+        }
+
+        private int colorWithAlpha() {
+            int alpha = Mth.clamp((int) (((color >>> 24) & 0xFF) * alpha()), 0, 255);
+            return (alpha << 24) | (color & 0x00FFFFFF);
+        }
     }
 }
