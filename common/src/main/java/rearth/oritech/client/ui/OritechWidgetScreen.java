@@ -170,7 +170,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
         sorted.sort(Comparator.comparingInt(UIComponent::getZIndex).reversed());
 
         for (var c : sorted) {
-            if (c.isVisible() && c.isMouseOver(relX, relY) && c.handleClick(relX, relY, button))
+            if (c.isVisible() && (c.isMouseOver(relX, relY) || c instanceof OverlayWidget) && c.handleClick(relX, relY, button))
                 return true;
         }
 

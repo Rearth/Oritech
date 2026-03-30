@@ -86,6 +86,31 @@ public class ScrollWidget extends UIComponent {
     public boolean handleMouseScroll(double mouseX, double mouseY, double scrollDelta) {
         return handleMouseScroll(mouseX, mouseY, scrollDelta, Screen.hasShiftDown());
     }
+
+    @Override
+    public boolean handleClick(double mouseX, double mouseY, int button) {
+        if (!isMouseOver(mouseX, mouseY)) return false;
+
+        double adjX = mouseX - (x + innerMargin) + scrollX;
+        double adjY = mouseY - (y + innerMargin) + scrollY;
+
+        var sorted = new ArrayList<>(children);
+        sorted.sort(Comparator.comparingInt(UIComponent::getZIndex).reversed());
+
+        for (var child : sorted) {
+            if (child.isVisible() && child.isMouseOver(adjX, adjY) && child.handleClick(adjX, adjY, button)) {
+                return true;
+            }
+        }
+
+        for (var child : sorted) {
+            if (child.isVisible() && child.isMouseOver(adjX, adjY)) {
+                return true;
+            }
+        }
+
+        return true;
+    }
     
     public float getScrollX() { return scrollX; }
     public float getScrollY() { return scrollY; }
