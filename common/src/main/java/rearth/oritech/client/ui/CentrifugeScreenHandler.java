@@ -3,7 +3,6 @@ package rearth.oritech.client.ui;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.data.DisplayDataSource;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.util.ScreenProvider;
@@ -18,23 +17,20 @@ public class CentrifugeScreenHandler extends UpgradableOritechScreenHandler {
     
     public CentrifugeScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(syncId, playerInventory, blockEntity);
+    }
+    
+    @Override
+    public void addFluidDisplay() {
+        if (!(blockEntity instanceof CentrifugeBlockEntity centrifugeEntity) || !centrifugeEntity.hasFluidAddon) return;
         
-        if (!(blockEntity instanceof CentrifugeBlockEntity centrifugeEntity)) {
-            Oritech.LOGGER.error("Opened centrifuge screen on non-centrifuge block, this should never happen");
-            return;
-        }
+        getDataDisplays().add(DisplayDataSource.CreateFluid(
+          centrifugeEntity.fluidContainer.getInputContainer(),
+          new ScreenProvider.BarConfiguration(28, 6, 21, 74),
+          this.screenData));
         
-        if (centrifugeEntity.hasFluidAddon) {
-            
-            getDataDisplays().add(DisplayDataSource.CreateFluid(
-              centrifugeEntity.fluidContainer.getInputContainer(),
-              new ScreenProvider.BarConfiguration(28, 6, 21, 74),
-              this.screenData));
-            
-            getDataDisplays().add(DisplayDataSource.CreateFluid(
-              centrifugeEntity.fluidContainer.getOutputContainer(),
-              this.screenData.getFluidConfiguration(),
-              this.screenData));
-        }
+        getDataDisplays().add(DisplayDataSource.CreateFluid(
+          centrifugeEntity.fluidContainer.getOutputContainer(),
+          this.screenData.getFluidConfiguration(),
+          this.screenData));
     }
 }

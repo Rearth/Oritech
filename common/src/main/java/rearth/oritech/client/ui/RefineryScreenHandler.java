@@ -1,19 +1,18 @@
 package rearth.oritech.client.ui;
 
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.block.entity.processing.RefineryBlockEntity;
-
 import java.util.Objects;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import rearth.oritech.api.screen.data.DisplayDataSource;
+import rearth.oritech.block.entity.processing.RefineryBlockEntity;
+import rearth.oritech.util.ScreenProvider;
 
-public class RefineryScreenHandler extends UpgradableMachineScreenHandler {
+public class RefineryScreenHandler extends UpgradableOritechScreenHandler {
     
-    protected final RefineryBlockEntity refinery;
-    protected FluidApi.SingleSlotStorage outputAContainer;
-    protected FluidApi.SingleSlotStorage outputBContainer;
-    protected FluidApi.SingleSlotStorage outputCContainer;
+    private static final ScreenProvider.BarConfiguration OUTPUT_A_CONFIG = new ScreenProvider.BarConfiguration(92, 6, 21, 74);
+    private static final ScreenProvider.BarConfiguration OUTPUT_B_CONFIG = new ScreenProvider.BarConfiguration(92 + 27, 6, 21, 74);
+    private static final ScreenProvider.BarConfiguration OUTPUT_C_CONFIG = new ScreenProvider.BarConfiguration(92 + 27 * 2, 6, 21, 74);
     
     public RefineryScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
         this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
@@ -21,17 +20,29 @@ public class RefineryScreenHandler extends UpgradableMachineScreenHandler {
     
     public RefineryScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(syncId, playerInventory, blockEntity);
-        
-        if (!(blockEntity instanceof RefineryBlockEntity refineryEntity)) {
-            throw new IllegalStateException("Opened centrifuge screen on non-centrifuge block, this should never happen");
+    }
+
+    @Override
+    public void addFluidDisplay() {
+        if (!(blockEntity instanceof RefineryBlockEntity refinery)) {
+            throw new IllegalStateException("Opened refinery screen on non-refinery block, this should never happen");
         }
-        
-        this.refinery = refineryEntity;
-        
-        this.mainFluidContainer = refineryEntity.ownStorage.getInputContainer();
-        this.outputAContainer = refineryEntity.ownStorage.getOutputContainer();
-        this.outputBContainer = refineryEntity.nodeA;
-        this.outputCContainer = refineryEntity.nodeB;
-        
+
+        getDataDisplays().add(DisplayDataSource.CreateFluid(
+            refinery.ownStorage.getInputContainer(),
+            this.screenData.getFluidConfiguration(),
+            this.screenData));
+        getDataDisplays().add(DisplayDataSource.CreateFluid(
+            refinery.ownStorage.getOutputContainer(),
+            OUTPUT_A_CONFIG,
+            this.screenData));
+        getDataDisplays().add(DisplayDataSource.CreateFluid(
+            refinery.nodeA,
+            OUTPUT_B_CONFIG,
+            this.screenData));
+        getDataDisplays().add(DisplayDataSource.CreateFluid(
+            refinery.nodeB,
+            OUTPUT_C_CONFIG,
+            this.screenData));
     }
 }

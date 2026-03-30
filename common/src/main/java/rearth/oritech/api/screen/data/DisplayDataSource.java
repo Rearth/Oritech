@@ -46,20 +46,36 @@ public abstract class DisplayDataSource {
     public static class FluidDataSource extends DisplayDataSource {
         
         private final Supplier<FluidStack> fluidSupplier;
+        private final FluidApi.SingleSlotStorage storage;
+        private int tankIndex;
         
-        private FluidDataSource(long capacity, Supplier<FluidStack> fluidSupplier, Supplier<Component> tooltipSupplier, ScreenProvider.BarConfiguration config) {
+        private FluidDataSource(FluidApi.SingleSlotStorage storage, long capacity, Supplier<FluidStack> fluidSupplier, Supplier<Component> tooltipSupplier, ScreenProvider.BarConfiguration config) {
             super(capacity, () -> fluidSupplier.get().getAmount(), tooltipSupplier, config);
+            this.storage = storage;
             this.fluidSupplier = fluidSupplier;
         }
         
         public Supplier<FluidStack> getFluidSupplier() {
             return fluidSupplier;
         }
+        
+        public FluidApi.SingleSlotStorage getStorage() {
+            return storage;
+        }
+        
+        public int getTankIndex() {
+            return tankIndex;
+        }
+        
+        public void setTankIndex(int tankIndex) {
+            this.tankIndex = tankIndex;
+        }
     }
     
     public static FluidDataSource CreateFluid(FluidApi.SingleSlotStorage storage, ScreenProvider.BarConfiguration config, ScreenProvider provider) {
         
         return new FluidDataSource(
+          storage,
           storage.getCapacity(),
           storage::getStack,
           () -> getFluidTooltip(storage.getStack()),

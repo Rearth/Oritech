@@ -1,22 +1,23 @@
 package rearth.oritech.client.ui;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
-import rearth.oritech.api.screen.widgets.ItemSlotWidget;
-import rearth.oritech.api.screen.widgets.LabelWidget;
-import rearth.oritech.api.screen.widgets.SurfaceWidget;
-import rearth.oritech.api.screen.widgets.TextureWidget;
+import rearth.oritech.api.screen.widgets.*;
 import rearth.oritech.block.entity.interaction.DronePortEntity;
+import rearth.oritech.util.ColorHelper;
 
 public class DroneScreen extends UpgradableOritechScreen<DroneScreenHandler> {
     
     public static final ResourceLocation CARD_SLOT = Oritech.id("textures/gui/modular/designator_arrow.png");
+
     private final DronePortEntity dronePort;
-    private SurfaceWidget messagePanel;
+    private OverlayWidget messageOverlay;
     private LabelWidget messageLabel;
     
     private String lastMessage = "";
@@ -29,22 +30,25 @@ public class DroneScreen extends UpgradableOritechScreen<DroneScreenHandler> {
     @Override
     protected void addExtraComponents() {
         super.addExtraComponents();
-        addComponent(new ItemSlotWidget(129, 26));
-        addComponent(new ItemSlotWidget(129, 62));
-        addComponent(new TextureWidget(128, 25, 18, 40, CARD_SLOT, 18, 40));
+        addComponent(new ItemSlotWidget(130, 26));
+        addComponent(new ItemSlotWidget(130, 62));
+        addComponent(new TextureWidget(129, 26, 18, 40, CARD_SLOT, 18, 40));
 
-        messagePanel = new SurfaceWidget(18, 16, 140, 22);
-        messagePanel.withSurface(OritechSurface.PANEL);
-        messagePanel.withZIndex(200);
-        addComponent(messagePanel);
+        messageOverlay = new OverlayWidget(width, height);
+        messageOverlay.setPosition(-leftPos, -topPos);
+        messageOverlay.withBackgroundColor(ColorHelper.argb(0.3f, 0.3f, 0.3f, 0.5f));
+        messageOverlay.withDismissHandler(() -> removeComponent(messageOverlay));
 
-        messageLabel = new LabelWidget(24, 23, 128, 10, Component.empty());
+        messageLabel = new LabelWidget(10, 23, 150, 40, Component.empty());
         messageLabel.withAlignment(LabelWidget.Alignment.CENTER);
+        messageLabel.withSurface(OritechSurface.PANEL);
+        messageLabel.withPadding(Insets.of(6));
+        messageLabel.withWrap(true);
         messageLabel.withDarkColor();
         messageLabel.withZIndex(201);
-        addComponent(messageLabel);
+        messageOverlay.addChild(messageLabel);
 
-        lastMessage = null;
+        lastMessage = dronePort.getStatusMessage();
         updateStatusMessage();
     }
 
@@ -60,11 +64,18 @@ public class DroneScreen extends UpgradableOritechScreen<DroneScreenHandler> {
 
         lastMessage = message;
         var hasMessage = !message.isBlank();
-        messagePanel.setVisible(hasMessage);
-        messageLabel.setVisible(hasMessage);
 
         if (hasMessage) {
-            messageLabel.setText(Component.translatable(message).withStyle(ChatFormatting.BLACK));
+            addComponent(messageOverlay);
+            var translated = Component.translatable(message).withStyle(ChatFormatting.BLACK);
+            messageLabel.setText(translated);
+
+            var lineCount = Math.max(1, Minecraft.getInstance().font.split(translated, messageLabel.getWidth()).size());
+            var textHeight = lineCount * Minecraft.getInstance().font.lineHeight;
+            var panelHeight = Math.max(22, textHeight + 14);
+
+            messageLabel.setHeight(textHeight);
+            messageLabel.setY(16 + Math.max(7, (panelHeight - textHeight) / 2));
         }
     }
 }

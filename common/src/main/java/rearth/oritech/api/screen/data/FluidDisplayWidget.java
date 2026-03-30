@@ -16,9 +16,11 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.util.ColorHelper;
+import rearth.oritech.util.StackContext;
 
 import java.util.function.Supplier;
 
@@ -35,6 +37,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
     private int fluidColor;
     @Nullable
     private final BlockPos blockPos;
+    private final int tankIndex;
 
     public FluidDisplayWidget(DisplayDataSource.FluidDataSource dataSource) {
         this(dataSource, null);
@@ -43,6 +46,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
     public FluidDisplayWidget(DisplayDataSource.FluidDataSource dataSource, @Nullable BlockPos blockPos) {
         super(dataSource);
         this.blockPos = blockPos;
+        this.tankIndex = dataSource.getTankIndex();
         this.fluidStackSupplier = dataSource.getFluidSupplier();
         updateFluidRenderData();
     }
@@ -52,9 +56,12 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
         if (blockPos != null && (button == 0 || button == 1)) {
             var carried = Minecraft.getInstance().player.containerMenu.getCarried();
             if (!carried.isEmpty()) {
-                boolean extract = (button == 1);
-                NetworkManager.sendToServer(new OritechScreenHandler.FluidContainerInteractionPacket(blockPos, extract));
-                return true;
+                var checkContext = new StackContext(carried.copy(), ignored -> {});
+                if (FluidApi.ITEM.find(checkContext) != null) {
+                    boolean extract = (button == 1);
+                    NetworkManager.sendToServer(new OritechScreenHandler.FluidContainerInteractionPacket(blockPos, tankIndex, extract));
+                    return true;
+                }
             }
         }
         return false;

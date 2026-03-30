@@ -204,6 +204,15 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     public BarConfiguration getFluidConfiguration() {
         return new BarConfiguration(28, 6, 21, 74);
     }
+
+    @Override
+    public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+        return List.of(
+            ownStorage.getInputContainer(),
+            ownStorage.getOutputContainer(),
+            nodeA,
+            nodeB);
+    }
     
     @Override
     public long getDefaultCapacity() {

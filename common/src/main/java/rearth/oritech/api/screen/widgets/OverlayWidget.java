@@ -1,7 +1,6 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.gui.GuiGraphics;
-import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.util.ColorHelper;
 
@@ -11,13 +10,15 @@ import java.util.List;
 
 /**
  * A modal overlay that renders content centered on screen, with a translucent background.
- * Can be dismissed by clicking outside the content area.
+ * Can be dismissed by clicking outside the content area with a custom onDismiss runnable.
  */
 public class OverlayWidget extends UIComponent {
     
     private final List<UIComponent> children = new ArrayList<>();
     private Runnable onDismiss;
     private int bgColor = ColorHelper.argb(0f, 0f, 0f, 0.5f);
+    private boolean consumeOutsideClicks = true;
+    private boolean consumeOutsideScroll = true;
     
     public OverlayWidget(int screenWidth, int screenHeight) {
         super(0, 0, screenWidth, screenHeight);
@@ -41,6 +42,16 @@ public class OverlayWidget extends UIComponent {
         this.bgColor = argb;
         return this;
     }
+
+    public OverlayWidget withConsumeOutsideClicks(boolean consumeOutsideClicks) {
+        this.consumeOutsideClicks = consumeOutsideClicks;
+        return this;
+    }
+
+    public OverlayWidget withConsumeOutsideScroll(boolean consumeOutsideScroll) {
+        this.consumeOutsideScroll = consumeOutsideScroll;
+        return this;
+    }
     
     @Override
     public boolean handleClick(double mouseX, double mouseY, int button) {
@@ -56,7 +67,7 @@ public class OverlayWidget extends UIComponent {
         }
         // Clicked outside content — dismiss
         if (onDismiss != null) onDismiss.run();
-        return true; // consume the click either way
+        return consumeOutsideClicks;
     }
     
     @Override
@@ -65,7 +76,7 @@ public class OverlayWidget extends UIComponent {
             if (child.isVisible() && child.handleMouseScroll(mouseX, mouseY, scrollDelta))
                 return true;
         }
-        return true; // consume scroll when overlay is open
+        return consumeOutsideScroll;
     }
     
     @Override

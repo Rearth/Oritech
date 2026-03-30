@@ -268,4 +268,10 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         if (!hasFluidAddon) return null;
         return fluidContainer;
     }
+    
+    @Override
+    public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+        if (!hasFluidAddon) return List.of();
+        return List.of(fluidContainer.getInputContainer(), fluidContainer.getOutputContainer());
+    }
 }

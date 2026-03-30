@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.FluidApi;
 
 import java.util.List;
 import java.util.Optional;
@@ -109,6 +110,22 @@ public interface ScreenProvider {
           Oritech.id("textures/gui/modular/arrow_empty.png"),
           Oritech.id("textures/gui/modular/arrow_full.png"),
           80, 35, 29, 16, true);
+    }
+    
+    /**
+     * Returns the list of fluid storages that can be interacted with via the GUI
+     * (e.g. by clicking with a bucket or portable tank on the fluid display).
+     * <p>
+     * The default implementation returns the main fluid storage if the block entity
+     * implements {@link FluidApi.BlockProvider} and has a single-slot storage.
+     * Override for multi-tank machines to return all interactable tanks.
+     */
+    default List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+        if (this instanceof FluidApi.BlockProvider bp) {
+            var storage = bp.getFluidStorage(null);
+            if (storage instanceof FluidApi.SingleSlotStorage single) return List.of(single);
+        }
+        return List.of();
     }
     
 }

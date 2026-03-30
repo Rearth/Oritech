@@ -45,6 +45,7 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
     public final ScreenProvider screenData;
     
     private Set<DisplayDataSource> dataDisplays = new HashSet<>();
+    public final List<FluidApi.SingleSlotStorage> fluidStorages;
     
     public BlockState machineBlock;
     public BlockEntity blockEntity;
@@ -77,6 +78,10 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         
         addFluidDisplay();
         
+        fluidStorages = new ArrayList<>(screenData.getInteractableFluidStorages());
+        
+        assignFluidTankIndices();
+        
         buildItemSlots();
     }
     
@@ -84,13 +89,32 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         if (blockEntity instanceof FluidApi.BlockProvider blockProvider) {
             var storage = blockProvider.getFluidStorage(null);
             if (storage instanceof SimpleFluidStorage singleSlotStorage) {
-                dataDisplays.add(DisplayDataSource.CreateFluid(singleSlotStorage, screenData.getFluidConfiguration(), screenData));
+                var source = DisplayDataSource.CreateFluid(singleSlotStorage, screenData.getFluidConfiguration(), screenData);
+                dataDisplays.add(source);
             }
         }
     }
     
     public Collection<DisplayDataSource> getDataDisplays() {
         return dataDisplays;
+    }
+    
+    /**
+     * Matches each FluidDataSource to its index in the fluidStorages list
+     * by comparing storage references. This enables the client to send
+     * the correct tank index when clicking a fluid display widget.
+     */
+    private void assignFluidTankIndices() {
+        for (var display : dataDisplays) {
+            if (display instanceof DisplayDataSource.FluidDataSource fluidSource) {
+                for (int i = 0; i < fluidStorages.size(); i++) {
+                    if (fluidStorages.get(i) == fluidSource.getStorage()) {
+                        fluidSource.setTankIndex(i);
+                        break;
+                    }
+                }
+            }
+        }
     }
     
     private void buildItemSlots() {
@@ -224,7 +248,7 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         super.broadcastChanges();
     }
     
-    public record FluidContainerInteractionPacket(BlockPos position, boolean extract) implements CustomPacketPayload {
+    public record FluidContainerInteractionPacket(BlockPos position, int tankIndex, boolean extract) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<FluidContainerInteractionPacket> PACKET_ID =
             new CustomPacketPayload.Type<>(Oritech.id("fluid_container_interaction"));
         
@@ -235,10 +259,8 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
     }
     
     public static void handleFluidContainerInteraction(FluidContainerInteractionPacket packet, Player player, RegistryAccess registryAccess) {
-        var level = player.level();
-        var blockEntity = level.getBlockEntity(packet.position());
-        
-        if (!(blockEntity instanceof FluidApi.BlockProvider tankProvider)) return;
+        if (!(player.containerMenu instanceof OritechScreenHandler handler)) return;
+        if (packet.tankIndex() < 0 || packet.tankIndex() >= handler.fluidStorages.size()) return;
         
         var carriedStack = player.containerMenu.getCarried();
         if (carriedStack.isEmpty()) return;
@@ -262,7 +284,7 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         var itemFluidStorage = FluidApi.ITEM.find(stackRef);
         if (itemFluidStorage == null) return;
         
-        var tankStorage = tankProvider.getFluidStorage(null);
+        var tankStorage = handler.fluidStorages.get(packet.tankIndex());
         
         if (packet.extract()) {
             // Right click: tank → item
