@@ -84,7 +84,7 @@ public class ParticleContent {
                 var count = Math.min((int) (payload.pos.distanceTo(payload.data1) * 0.6f + 1), 12);
                 spawnLineStaggered(ParticleTypes.SONIC_BOOM, world, payload.pos, payload.data1, count, 20);
             }
-            case CATALYST_CONNECTION -> spawnEnchantParticles(world, payload.data1, payload.data2, 0.7f);
+            case CATALYST_CONNECTION -> spawnEnchantParticles(world, payload.data2, payload.data1.add(0, 0.3f, 0), 0.3f);
             case BLACK_HOLE_EMISSION -> {
                 var dist = (int) payload.data1.distanceTo(payload.pos);
                 spawnLine(ParticleTypes.SCULK_CHARGE_POP, world, payload.pos, payload.data1, dist + world.random.nextInt(3), 0.2f);
@@ -144,9 +144,9 @@ public class ParticleContent {
     private static void spawnEnchantParticles(Level world, Vec3 source, Vec3 dest, float spread) {
         Vec3 diff = dest.subtract(source);
         world.addParticle(ParticleTypes.ENCHANT,
-            source.x + (world.random.nextDouble() - 0.5) * 2 * spread,
-            source.y + (world.random.nextDouble() - 0.5) * 2 * spread,
-            source.z + (world.random.nextDouble() - 0.5) * 2 * spread,
+            source.x + (world.random.nextDouble() - 0.3) * 2 * spread,
+            source.y + (world.random.nextDouble() - 0.3) * 2 * spread,
+            source.z + (world.random.nextDouble() - 0.3) * 2 * spread,
             diff.x, diff.y, diff.z);
     }
     

@@ -131,7 +131,10 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
             if (progress >= maxProgress) {
                 progress = 0;
                 finishEnchanting();
-                if (world instanceof ServerLevel sl) { var c = pos.getCenter(); sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, maxProgress + 10, 0.6, 0.6, 0.6, 0); }
+                if (world instanceof ServerLevel sl) {
+                    var target = pos.getCenter();
+                    sl.sendParticles(ParticleTypes.ENCHANTED_HIT, target.x, target.y, target.z, maxProgress + 10, 0.6, 0.6, 0.6, 0);
+                }
                 activeAnimation = "idle";
             }
         }
