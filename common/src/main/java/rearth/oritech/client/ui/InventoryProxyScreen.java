@@ -47,7 +47,7 @@ public class InventoryProxyScreen extends OritechWidgetScreen<InventoryProxyScre
             button.setActive(i != menu.selectedSlot);
         }
 
-        var hint = new LabelWidget(0, 90, 176, 10,
+        var hint = new LabelWidget(0, 85, 176, 10,
             Component.translatable("tooltip.oritech.addon_proxy_select"));
         hint.withAlignment(LabelWidget.Alignment.CENTER);
         hint.withDarkColor();
