@@ -34,7 +34,7 @@ public abstract class AbstractDataDisplayWidget extends UIComponent {
         } else {
             displayedAmount += (currentAmount - displayedAmount) * 0.15f;
             
-            if (Math.abs(currentAmount - displayedAmount) < 0.5f) {
+            if (Math.abs(currentAmount - displayedAmount) < 0.3f) {
                 displayedAmount = currentAmount;
             }
         }

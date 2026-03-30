@@ -157,7 +157,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
             }
         }
 
-        if (topHovered != null)
+        if (topHovered != null && !topHovered.getTooltip().isEmpty() && !topHovered.getTooltip().stream().allMatch(elem -> elem.getString().isBlank()))
             graphics.renderComponentTooltip(Minecraft.getInstance().font, topHovered.getTooltip(), mouseX, mouseY);
     }
 

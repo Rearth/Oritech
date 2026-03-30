@@ -88,7 +88,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
 
         graphics.fill(cx, cy, cx + cw, cy + ch, FLUID_BACKGROUND);
 
-        if (fluidSprite != null && getCurrentAmount() > 0) {
+        if (fluidSprite != null && getFillRatio() > 0) {
             renderFluidSprite(graphics, cx, cy, cw, ch);
         }
 
@@ -105,8 +105,8 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
     private void updateFluidRenderData() {
         var stack = fluidStackSupplier.get();
         if (stack == null || stack.isEmpty()) {
-            fluidSprite = null;
-            fluidColor = ColorHelper.WHITE;
+            // fluidSprite = null;
+            // fluidColor = ColorHelper.WHITE;
             return;
         }
 
@@ -156,7 +156,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
 
         var width = contentWidth();
         var height = contentHeight();
-        var spawnY = mouseY - 25 * (extract ? 1 : 1.3);
+        var spawnY = mouseY - 14 * (extract ? 1 : 1.3);
 
         for (int index = 0; index < BURST_DROPLET_COUNT; index++) {
             var spawnX = width * 0.5 + (random.nextDouble() - 0.5) * Math.max(4, width * 0.45);
