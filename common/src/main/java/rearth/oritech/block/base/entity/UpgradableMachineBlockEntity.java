@@ -14,14 +14,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.init.OritechConfig;
-import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ScreenProvider;
@@ -157,7 +156,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
+        return new UpgradableOritechScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

@@ -48,7 +48,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     
     // own storage is exposed through this multiblock, the other storages are exposed through the respective modules
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
-    public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(64 * FluidStackHooks.bucketAmount(), this::setChanged);
+    public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(8 * FluidStackHooks.bucketAmount(), this::setChanged);
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public final SimpleFluidStorage nodeA = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged);
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})

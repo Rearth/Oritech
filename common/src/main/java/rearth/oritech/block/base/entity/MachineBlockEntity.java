@@ -33,7 +33,7 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.*;
@@ -360,7 +360,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new BasicMachineScreenHandler(syncId, playerInventory, this);
+        return new OritechScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

@@ -105,6 +105,7 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
 
         for (var label : menu.screenData.getExtraExtensionLabels()) {
             var widget = new LabelWidget(0, 0, 60, 10, label.getA());
+            widget.withAlignment(LabelWidget.Alignment.CENTER);
             widget.withTooltip(label.getB());
             content.add(widget);
         }

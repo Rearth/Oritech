@@ -19,7 +19,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
@@ -31,12 +30,12 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.storage.SmallFluidTank;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.util.*;
 
 import java.util.List;
-import java.util.Objects;
 
 public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, ItemApi.BlockProvider, ComparatorOutputProvider,
                                                                        ScreenProvider, ExtendedMenuProvider {
@@ -201,7 +200,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new BasicMachineScreenHandler(syncId, playerInventory, this);
+        return new OritechScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

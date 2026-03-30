@@ -85,8 +85,8 @@ public abstract class DisplayDataSource {
     public static Component getFluidTooltip(FluidStack stack) {
         
         return stack.getAmount() > 0
-                            ? Component.translatable("tooltip.oritech.fluid_content", stack.getAmount() * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(stack).getString())
-                            : Component.translatable("tooltip.oritech.fluid_empty");
+                            ? Component.translatable("tooltip.oritech.tank_content", stack.getAmount() * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(stack).getString())
+                            : Component.translatable("tooltip.oritech.tank_empty");
     }
     
     public static class EnergyDataSource extends DisplayDataSource {
