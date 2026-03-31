@@ -58,13 +58,13 @@ public class EnergyStorageScreen extends UpgradableOritechScreen<UpgradableOrite
         addGrouped(extractionWidgets, outLastTick, outAvgSecond, outPeak);
 
         var toggleButton = ToggleWidget.of(panelXPos, 5,
-            Component.translatable("title.oritech.item_filter.toggle_energy_statistics").withColor(TEXT_COLOR),
+            Component.translatable("title.oritech.item_filter.toggle_energy_statistics").withColor(LabelWidget.DARK_TEXT),
             showingOutput,
             (button, value) -> {
                 showingOutput = value;
                 updatePanelVisibility();
             })
-            .withTextColor(TEXT_COLOR)
+            .withTextColor(LabelWidget.DARK_TEXT)
             .withTextShadow(false);
         addComponent(toggleButton);
 

@@ -115,10 +115,10 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
         if (!((MachineAddonController) menu.blockEntity).getConnectedAddons().isEmpty()) {
             // content.add(BoxWidget.filled(0, 0, 60, 1, SEPARATOR_COLOR));
             var addonBtn = ButtonWidget.panel(5, 0, 50, 14,
-                Component.translatable("button.oritech.machine.addons").withColor(TEXT_COLOR),
+                Component.translatable("button.oritech.machine.addons").withColor(LabelWidget.DARK_TEXT),
                 btn -> toggleAddonOverlay())
                              .withSurfacePadding(Insets.of(2, 0, 2, 0))
-                             .withTextColor(TEXT_COLOR);
+                             .withTextColor(LabelWidget.DARK_TEXT);
             content.add(addonBtn);
         }
     }

@@ -1,6 +1,8 @@
 package rearth.oritech.api.screen.widgets;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import rearth.oritech.api.screen.UIComponent;
@@ -56,12 +58,12 @@ public class ItemWidget extends UIComponent {
             graphics.pose().scale(scale, scale, 1f);
             graphics.renderItem(stack, 0, 0);
             if (showOverlay)
-                graphics.renderItemDecorations(net.minecraft.client.Minecraft.getInstance().font, stack, 0, 0);
+                graphics.renderItemDecorations(Minecraft.getInstance().font, stack, 0, 0);
             graphics.pose().popPose();
         } else {
             graphics.renderItem(stack, cx, cy);
             if (showOverlay)
-                graphics.renderItemDecorations(net.minecraft.client.Minecraft.getInstance().font, stack, cx, cy);
+                graphics.renderItemDecorations(Minecraft.getInstance().font, stack, cx, cy);
         }
     }
     
@@ -74,8 +76,8 @@ public class ItemWidget extends UIComponent {
     @Override
     public List<Component> getTooltip() {
         if (tooltipFromStack && stack != null && !stack.isEmpty()) {
-            return net.minecraft.client.gui.screens.Screen.getTooltipFromItem(
-                net.minecraft.client.Minecraft.getInstance(), stack);
+            return Screen.getTooltipFromItem(
+                Minecraft.getInstance(), stack);
         }
         return super.getTooltip();
     }

@@ -27,9 +27,8 @@ public class ShrinkerScreen extends UpgradableOritechScreen<UpgradableOritechScr
         shrinkButton = ButtonWidget.darkPanel(74, 38, 60, 14,
             Component.translatable("text.oritech.shrink"),
             event -> onShrinkPressed())
-                                      .withTextColor(TEXT_COLOR);
+                                      .withTextColor(LabelWidget.DARK_TEXT);
         shrinkButton.withSurfacePadding(Insets.of(3, 1, 5, 1));
-        shrinkButton.withTextColor(LabelWidget.BRIGHT_TEXT);
 
         if (this.menu.addonController.getConnectedAddons().isEmpty()) {
             shrinkButton.setActive(false);

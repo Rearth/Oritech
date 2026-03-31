@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.screen.widgets.ItemSlotWidget;
+import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.ToggleWidget;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 
@@ -62,15 +63,15 @@ public class ItemFilterScreen extends OritechWidgetScreen<ItemFilterScreenHandle
         
         whitelistButton = ToggleWidget.of(83, 18,
           Component.translatable("title.oritech.item_filter.whitelist"), data.useWhitelist(),
-          (button, state) -> toggleWhitelist()).withTextColor(TEXT_COLOR);
+          (button, state) -> toggleWhitelist()).withTextColor(LabelWidget.DARK_TEXT);
         
         nbtButton = ToggleWidget.of(83, 38,
           Component.translatable("title.oritech.item_filter.nbt"), data.useNbt(),
-          (button, state) -> toggleNbt()).withTextColor(TEXT_COLOR);
+          (button, state) -> toggleNbt()).withTextColor(LabelWidget.DARK_TEXT);
         
         componentButton = ToggleWidget.of(83, 58,
           Component.translatable("title.oritech.item_filter.component"), data.useComponents(),
-          (button, state) -> toggleComponent()).withTextColor(TEXT_COLOR);
+          (button, state) -> toggleComponent()).withTextColor(LabelWidget.DARK_TEXT);
         
         addComponent(whitelistButton);
         addComponent(nbtButton);

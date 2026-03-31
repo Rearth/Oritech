@@ -28,6 +28,11 @@ public class LabelWidget extends UIComponent {
         this.text = text;
     }
     
+    public static int getTextWidth(Component text) {
+        var font = Minecraft.getInstance().font;
+        return font.width(text);
+    }
+    
     /**
      * Auto-height label: height defaults to standard font line height (9px).
      */

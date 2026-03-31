@@ -74,7 +74,7 @@ public class RedstoneAddonScreen extends OritechWidgetScreen<RedstoneAddonScreen
         
         var slots = screenProvider.getGuiSlots();
         
-        addComponent(BoxWidget.filled(8, 100, 160, 1, OritechWidgetScreen.TEXT_COLOR));
+        addComponent(BoxWidget.filled(8, 100, 160, 1, LabelWidget.DARK_TEXT));
         
         var title = new LabelWidget(0, 116, 176, 10, Component.translatable("title.oritech.redstone_addon"));
         title.withAlignment(LabelWidget.Alignment.CENTER);

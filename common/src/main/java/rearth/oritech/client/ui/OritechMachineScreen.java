@@ -96,9 +96,9 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         var inputSlots = menu.screenData.getGuiSlots().stream().filter(slot -> !slot.output()).count();
         if (menu.screenData.inputOptionsEnabled() && inputSlots > 1) {
             cycleInputButton = ButtonWidget.panel(1, 0, 58, 14,
-                Component.translatable("button.oritech.input_mode_fill_matching_recipe").withColor(TEXT_COLOR),
+                Component.translatable("button.oritech.input_mode_fill_matching_recipe").withColor(LabelWidget.DARK_TEXT),
                 btn -> NetworkManager.sendToServer(new MachineBlockEntity.InventoryInputModeSelectorPacket(menu.blockPos)))
-                .withTextColor(TEXT_COLOR);
+                .withTextColor(LabelWidget.DARK_TEXT);
             cycleInputButton.withSurfacePadding(Insets.of(2, 1, 3, 1));
             content.add(cycleInputButton);
         }
@@ -205,7 +205,7 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
             cycleInputButton.withTooltip(Component.translatable("tooltip.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)));
         }
 
-        cycleInputButton.setLabel(Component.translatable("button.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)).withColor(TEXT_COLOR));
+        cycleInputButton.setLabel(Component.translatable("button.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)).withColor(LabelWidget.DARK_TEXT));
     }
 
     private void buildEquipmentPanel() {
