@@ -68,8 +68,16 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
                 var itemFluidStorage = FluidApi.ITEM.find(checkContext);
                 if (itemFluidStorage != null) {
                     boolean extract = (button == 1);
+                    if (fluidSprite == null && !itemFluidStorage.getContent().isEmpty()) {
+                        fluidSprite = FluidStackHooks.getStillTexture(FluidStack.create(itemFluidStorage.getContent().getFirst(), 1));
+                    }
                     if (canShowTransferBurst(itemFluidStorage, extract)) {
-                        spawnTransferBurst(extract, resolveBurstColor(itemFluidStorage, extract), mouseX, mouseY);
+                        spawnTransferBurst(
+                            extract,
+                            resolveBurstColor(itemFluidStorage, extract),
+                            mouseX,
+                            mouseY
+                        );
                     }
                     NetworkManager.sendToServer(new OritechScreenHandler.FluidContainerInteractionPacket(blockPos, tankIndex, extract));
                     return true;
@@ -148,10 +156,6 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
     }
 
     private void spawnTransferBurst(boolean extract, int burstColor, double mouseX, double mouseY) {
-        if (burstColor == ColorHelper.WHITE && fluidSprite == null && !extract) {
-            return;
-        }
-
         activeDroplets.clear();
 
         var width = contentWidth();
@@ -167,7 +171,38 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
             var size = 1.2 + random.nextDouble() * 1.8;
             int lifetime = 7 + random.nextInt(5);
 
-            activeDroplets.add(new FluidBurstDroplet(spawnX, spawnY, velocityX, velocityY, size, lifetime, burstColor));
+            float sampleU0 = 0f;
+            float sampleV0 = 0f;
+            float sampleU1 = 0f;
+            float sampleV1 = 0f;
+            var burstSprite = fluidSprite;
+            if (burstSprite != null) {
+                int spriteW = Math.max(burstSprite.contents().width(), 16);
+                int spriteH = Math.max(burstSprite.contents().height(), 16);
+                int sampleW = Mth.clamp(Mth.ceil((float) (size * (1.4 + random.nextDouble() * 0.8))), 1, spriteW);
+                int sampleH = Mth.clamp(Mth.ceil((float) (size * (1.2 + random.nextDouble() * 1.1))), 1, spriteH);
+                int sampleX = spriteW == sampleW ? 0 : random.nextInt(spriteW - sampleW + 1);
+                int sampleY = spriteH == sampleH ? 0 : random.nextInt(spriteH - sampleH + 1);
+
+                sampleU0 = Mth.lerp(sampleX / (float) spriteW, burstSprite.getU0(), burstSprite.getU1());
+                sampleV0 = Mth.lerp(sampleY / (float) spriteH, burstSprite.getV0(), burstSprite.getV1());
+                sampleU1 = Mth.lerp((sampleX + sampleW) / (float) spriteW, burstSprite.getU0(), burstSprite.getU1());
+                sampleV1 = Mth.lerp((sampleY + sampleH) / (float) spriteH, burstSprite.getV0(), burstSprite.getV1());
+            }
+
+            activeDroplets.add(new FluidBurstDroplet(
+                spawnX,
+                spawnY,
+                velocityX,
+                velocityY,
+                size,
+                lifetime,
+                burstColor,
+                sampleU0,
+                sampleV0,
+                sampleU1,
+                sampleV1
+            ));
         }
 
         while (activeDroplets.size() > MAX_ACTIVE_DROPLETS) {
@@ -209,7 +244,34 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
             int minY = Math.max(drawY, y);
             int maxX = Math.min(drawX + drawSize, x + w);
             int maxY = Math.min(drawY + drawSize, y + h);
-            graphics.fill(minX, minY, maxX, maxY, droplet.colorWithAlpha());
+            var burstSprite = fluidSprite;
+            if (burstSprite != null) {
+                float localMinX = (minX - drawX) / (float) drawSize;
+                float localMinY = (minY - drawY) / (float) drawSize;
+                float localMaxX = (maxX - drawX) / (float) drawSize;
+                float localMaxY = (maxY - drawY) / (float) drawSize;
+                float sampleU0 = Mth.lerp(localMinX, droplet.u0, droplet.u1);
+                float sampleV0 = Mth.lerp(localMinY, droplet.v0, droplet.v1);
+                float sampleU1 = Mth.lerp(localMaxX, droplet.u0, droplet.u1);
+                float sampleV1 = Mth.lerp(localMaxY, droplet.v0, droplet.v1);
+                float alpha = ((droplet.color >>> 24) & 0xFF) / 255f * droplet.alpha();
+                float red = ((droplet.color >> 16) & 0xFF) / 255f;
+                float green = ((droplet.color >> 8) & 0xFF) / 255f;
+                float blue = (droplet.color & 0xFF) / 255f;
+
+                RenderSystem.setShaderTexture(0, burstSprite.atlasLocation());
+                RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+
+                Matrix4f matrix = graphics.pose().last().pose();
+                var buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+                buffer.addVertex(matrix, minX, maxY, 0).setUv(sampleU0, sampleV1).setColor(red, green, blue, alpha);
+                buffer.addVertex(matrix, maxX, maxY, 0).setUv(sampleU1, sampleV1).setColor(red, green, blue, alpha);
+                buffer.addVertex(matrix, maxX, minY, 0).setUv(sampleU1, sampleV0).setColor(red, green, blue, alpha);
+                buffer.addVertex(matrix, minX, minY, 0).setUv(sampleU0, sampleV0).setColor(red, green, blue, alpha);
+                BufferUploader.drawWithShader(buffer.buildOrThrow());
+            } else {
+                graphics.fill(minX, minY, maxX, maxY, droplet.colorWithAlpha());
+            }
         }
     }
 
@@ -259,13 +321,17 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
         private final double size;
         private final int maxLifetime;
         private final int color;
+        private final float u0;
+        private final float v0;
+        private final float u1;
+        private final float v1;
         private double x;
         private double y;
         private double velocityX;
         private double velocityY;
         private int lifetime;
 
-        private FluidBurstDroplet(double x, double y, double velocityX, double velocityY, double size, int maxLifetime, int color) {
+        private FluidBurstDroplet(double x, double y, double velocityX, double velocityY, double size, int maxLifetime, int color, float u0, float v0, float u1, float v1) {
             this.x = x;
             this.y = y;
             this.velocityX = velocityX;
@@ -273,6 +339,10 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
             this.size = size;
             this.maxLifetime = maxLifetime;
             this.color = color;
+            this.u0 = u0;
+            this.v0 = v0;
+            this.u1 = u1;
+            this.v1 = v1;
         }
 
         private void tick() {
