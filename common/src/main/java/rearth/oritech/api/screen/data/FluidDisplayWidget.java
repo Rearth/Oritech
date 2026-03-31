@@ -95,7 +95,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
         int ch = contentHeight();
 
         graphics.fill(cx, cy, cx + cw, cy + ch, FLUID_BACKGROUND);
-
+        
         if (fluidSprite != null && getFillRatio() > 0) {
             renderFluidSprite(graphics, cx, cy, cw, ch);
         }
@@ -103,6 +103,16 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
         int overlayHeight = (int) (ch * (1f - getFillRatio()) * 0.98f);
         if (overlayHeight > 0) {
             graphics.fill(cx, cy, cx + cw, cy + overlayHeight, OVERLAY_COLOR);
+        }
+        
+        var carried = Minecraft.getInstance().player.containerMenu.getCarried();
+        if (isMouseOver(mouseX, mouseY) && !carried.isEmpty()) {
+            var checkContext = new StackContext(carried.copy(), ignored -> {});
+            var itemFluidStorage = FluidApi.ITEM.find(checkContext);
+            if (itemFluidStorage != null) {
+                var color = ColorHelper.argb(0.75f, 0.75f, 0.75f, 0.2f);
+                graphics.fill(cx - 1, cy - 1, cx + cw + 1, cy + ch + 1, color);
+            }
         }
 
         renderTransferBurst(graphics, cx, cy, cw, ch);
