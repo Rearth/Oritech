@@ -92,7 +92,7 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
             world.playSound(null, candidatePos, candidateState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.5f, 1f);
             world.addDestroyBlockEffect(candidatePos, candidateState);
             
-            if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, candidate.getX() + 0.5, candidate.getY() + 0.5, candidate.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
+            if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, candidatePos.getX() + 0.5, candidatePos.getY() + 0.5, candidatePos.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
             
             if (candidateState.is(BlockTags.LOGS)) break;
         }
