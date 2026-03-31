@@ -40,7 +40,7 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ComponentContent;
@@ -260,7 +260,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     
     @Override
     public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new UpgradableMachineScreenHandler(i, inventory, this);
+        return new UpgradableOritechScreenHandler(i, inventory, this);
     }
     
     @Override

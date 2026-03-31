@@ -32,7 +32,7 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.storage.SmallStorageBlock;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.OritechConfig;
 import rearth.oritech.util.*;
@@ -270,7 +270,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
+        return new UpgradableOritechScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

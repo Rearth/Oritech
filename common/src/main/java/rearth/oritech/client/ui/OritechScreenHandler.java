@@ -254,7 +254,7 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
     @Override
     public void broadcastChanges() {
         if (blockEntity instanceof NetworkedBlockEntity networkedBlockEntity)
-            networkedBlockEntity.sendUpdate(SyncType.GUI_TICK, (ServerPlayer) this.player());
+            networkedBlockEntity.sendUpdate(SyncType.GUI_TICK, (ServerPlayer) playerInventory.player);
         super.broadcastChanges();
     }
     

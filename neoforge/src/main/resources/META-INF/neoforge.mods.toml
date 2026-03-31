@@ -42,12 +42,6 @@ ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies.oritech]]
-modId = "owo"
-type = "required"
-ordering = "AFTER"
-side = "BOTH"
-
-[[dependencies.oritech]]
 modId = "geckolib"
 type = "required"
 ordering = "AFTER"

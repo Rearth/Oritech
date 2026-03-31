@@ -59,7 +59,7 @@ import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.init.BlockContent;
 import net.minecraft.core.particles.ParticleTypes;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -924,7 +924,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
+        return new UpgradableOritechScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

@@ -110,7 +110,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
             var checkContext = new StackContext(carried.copy(), ignored -> {});
             var itemFluidStorage = FluidApi.ITEM.find(checkContext);
             if (itemFluidStorage != null) {
-                var color = ColorHelper.argb(0.75f, 0.75f, 0.75f, 0.2f);
+                var color = ColorHelper.argb(0.75f, 0.75f, 0.75f, 0.05f);
                 graphics.fill(cx - 1, cy - 1, cx + cw + 1, cy + ch + 1, color);
             }
         }

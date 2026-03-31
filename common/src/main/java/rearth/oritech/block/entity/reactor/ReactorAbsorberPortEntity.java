@@ -9,7 +9,7 @@ import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import net.minecraft.core.particles.ParticleTypes;
@@ -130,7 +130,7 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMe
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new BasicMachineScreenHandler(syncId, playerInventory, this);
+        return new OritechScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

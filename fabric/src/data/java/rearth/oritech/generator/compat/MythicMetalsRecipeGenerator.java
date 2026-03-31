@@ -1,6 +1,5 @@
 package rearth.oritech.generator.compat;
 
-import io.wispforest.owo.util.ReflectionUtils;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -15,7 +14,11 @@ import rearth.oritech.api.recipe.GrinderRecipeBuilder;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 
-import static rearth.oritech.util.TagUtils.*;
+import java.lang.reflect.Modifier;
+import java.util.Locale;
+
+import static rearth.oritech.util.TagUtils.cItemTag;
+import static rearth.oritech.util.TagUtils.itemTag;
 
 public class MythicMetalsRecipeGenerator {
     private static final String PATH = "compat/mythicmetals/";
@@ -26,11 +29,25 @@ public class MythicMetalsRecipeGenerator {
     }
 
     public static void addMMFragmentRecipes(RecipeOutput exporter) {
-        ReflectionUtils.iterateAccessibleStaticFields(MythicItems.class, ItemSet.class, (itemSet, name, field) -> {
-            var rawOre = itemSet.getRawOre();
+        
+        for (var field : MythicItems.class.getDeclaredFields()) {
+            if (!Modifier.isStatic(field.getModifiers())) continue;
+            
+            ItemSet value;
+            try {
+                value = (ItemSet) field.get(null);
+            } catch (IllegalAccessException e) {
+                continue;
+            }
+            
+            if (value == null || !ItemSet.class.isAssignableFrom(value.getClass())) continue;
+            
+            var rawOre = value.getRawOre();
+            var name = field.getName().toLowerCase(Locale.ROOT);
             if (rawOre != null)
                 GrinderRecipeBuilder.build().input(TagKey.create(Registries.ITEM, RegistryHelper.id("ores/" + name))).result(rawOre, 2).export(exporter, "compat/mythicmetals/" + name);
-        });
+            
+        }
 
     }
 

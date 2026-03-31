@@ -5,7 +5,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * Common interface for machine screen handlers, allowing compat layers (EMI, REI, JEI)
- * to work with both old (BasicMachineScreenHandler) and new (OritechScreenHandler) handler types.
  */
 public interface MachineMenuHandler {
     BlockEntity getBlockEntity();

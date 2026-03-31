@@ -46,7 +46,6 @@
     "java": ">=21",
     "fabric-api": "*",
     "team_reborn_energy": ">=4.0.0",
-    "owo": "*",
     "geckolib": "*",
     "athena": "*"
   },

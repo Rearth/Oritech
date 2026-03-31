@@ -21,7 +21,6 @@ import rearth.oritech.block.entity.generators.FuelGeneratorEntity;
 import rearth.oritech.block.entity.generators.LavaGeneratorEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.*;
-import rearth.oritech.client.ui.BasicMachineScreen;
 import rearth.oritech.client.ui.ItemFilterScreen;
 import rearth.oritech.client.ui.OritechMachineScreen;
 import rearth.oritech.client.ui.PlayerModifierScreen;
@@ -144,7 +143,6 @@ public class OritechJeiPlugin implements IModPlugin {
     public void registerGuiHandlers(@NotNull IGuiHandlerRegistration registration) {
         IModPlugin.super.registerGuiHandlers(registration);
         
-        registration.addGenericGuiContainerHandler(BasicMachineScreen.class, new JeiExclusionZoneHandler());
         registration.addGenericGuiContainerHandler(ReactorScreen.class, new JeiExclusionZoneHandler());
         registration.addGenericGuiContainerHandler(PlayerModifierScreen.class, new JeiExclusionZoneHandler());
         registration.addGenericGuiContainerHandler(OritechMachineScreen.class, new IGuiContainerHandler<OritechMachineScreen<?>>() {

@@ -16,7 +16,6 @@ import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.processing.FragmentForgeBlockEntity;
 import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ColorHelper;
 import rearth.oritech.util.TooltipHelper;
 
@@ -111,16 +110,13 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
             content.add(dustLabel);
         }
         
-        // "View Addons" button (if addons exist)
-        if (!((MachineAddonController) menu.blockEntity).getConnectedAddons().isEmpty()) {
-            // content.add(BoxWidget.filled(0, 0, 60, 1, SEPARATOR_COLOR));
-            var addonBtn = ButtonWidget.panel(5, 0, 50, 14,
-                Component.translatable("button.oritech.machine.addons").withColor(LabelWidget.DARK_TEXT),
-                btn -> toggleAddonOverlay())
-                             .withSurfacePadding(Insets.of(2, 0, 2, 0))
-                             .withTextColor(LabelWidget.DARK_TEXT);
-            content.add(addonBtn);
-        }
+        // content.add(BoxWidget.filled(0, 0, 60, 1, SEPARATOR_COLOR));
+        var addonBtn = ButtonWidget.panel(5, 0, 50, 14,
+            Component.translatable("button.oritech.machine.addons").withColor(LabelWidget.DARK_TEXT),
+            btn -> toggleAddonOverlay())
+                         .withSurfacePadding(Insets.of(2, 0, 2, 0))
+                         .withTextColor(LabelWidget.DARK_TEXT);
+        content.add(addonBtn);
     }
     
     @Override
@@ -206,30 +202,30 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
             if (speed != 0) {
                 var label = new LabelWidget(statsX, statsY, 50, 10,
                   Component.translatable("title.oritech.machine_speed", (int) speed));
-                                label.withColor(SPEED_COLOR);
-                                label.withTooltip(Component.translatable("tooltip.oritech.machine_speed"));
+                label.withColor(SPEED_COLOR);
+                label.withTooltip(Component.translatable("tooltip.oritech.machine_speed"));
                 scroll.addChild(label);
                 statsX += 42;
             }
             if (efficiency != 0) {
                 var label = new LabelWidget(statsX, statsY, 50, 10,
                   Component.translatable("title.oritech.machine_efficiency", (int) efficiency));
-                                label.withColor(EFFICIENCY_COLOR);
-                                label.withTooltip(Component.translatable("tooltip.oritech.machine_efficiency"));
+                label.withColor(EFFICIENCY_COLOR);
+                label.withTooltip(Component.translatable("tooltip.oritech.machine_efficiency"));
                 scroll.addChild(label);
                 statsX += 42;
             }
             if (settings.addedCapacity() > 0) {
                 var label = new LabelWidget(statsX, statsY, 60, 10,
                   Component.translatable("title.oritech.machine.capacitor_added_capacity", TooltipHelper.getEnergyText(settings.addedCapacity())));
-                                label.withColor(CAPACITY_COLOR);
+                label.withColor(CAPACITY_COLOR);
                 scroll.addChild(label);
                 statsX += 62;
             }
             if (settings.addedInsert() > 0) {
                 var label = new LabelWidget(statsX, statsY, 60, 10,
                   Component.translatable("title.oritech.machine.capacitor_added_throughput", TooltipHelper.getEnergyText(settings.addedInsert())));
-                                label.withColor(THROUGHPUT_COLOR);
+                label.withColor(THROUGHPUT_COLOR);
                 scroll.addChild(label);
             }
             
@@ -242,9 +238,9 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
         }
         
         if (addonBlocks.isEmpty()) {
-            scroll.addChild(new LabelWidget(6, 0, 190, 10,
+            scroll.addChild(new LabelWidget(12, 0, 190, 10,
               Component.translatable("title.oritech.machine.no_addons")));
-            yOffset = 12;
+            yOffset = 15;
         }
         
         var background = new SurfaceWidget(0, 0, 194, yOffset);

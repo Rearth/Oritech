@@ -9,7 +9,7 @@ import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -135,7 +135,7 @@ public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuPr
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new BasicMachineScreenHandler(syncId, playerInventory, this);
+        return new OritechScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

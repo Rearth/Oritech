@@ -1,10 +1,5 @@
 package rearth.oritech.init.compat.rei.Screens;
 
-import io.wispforest.owo.compat.rei.ReiUIAdapter;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.container.Containers;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.*;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
@@ -21,6 +16,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.init.compat.rei.OritechDisplay;
 import rearth.oritech.init.recipes.OritechRecipeType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OritechReiLaserDisplay implements DisplayCategory<Display> {
@@ -46,32 +42,29 @@ public class OritechReiLaserDisplay implements DisplayCategory<Display> {
     
     @Override
     public List<Widget> setupDisplay(Display display, Rectangle bounds) {
-        var adapter = new ReiUIAdapter<>(bounds, Containers::verticalFlow);
-        var root = adapter.rootComponent();
+        var widgets = new ArrayList<Widget>();
+        var oDisplay = (OritechDisplay) display;
+        var x = bounds.x;
+        var y = bounds.y;
         
-        root.horizontalAlignment(HorizontalAlignment.CENTER)
-          .surface(Surface.PANEL)
-          .padding(Insets.of(4));
+        // background
+        widgets.add(Widgets.createRecipeBase(bounds));
         
-        fillDisplay(root, (OritechDisplay) display, adapter);
+        // laser background texture
+        widgets.add(Widgets.createTexturedWidget(LASER_RECIPE_OVERLAY, x + 5, y + 5, 0, 0, 80, 80, 300, 300, 300, 300));
+
+        // input slot
+        widgets.add(Widgets.createSlot(new Point(x + 80, y + 15))
+            .entries(oDisplay.getInputEntries().get(0)).markInput());
         
-        adapter.prepare();
-        return List.of(adapter);
-    }
-    
-    public void fillDisplay(FlowLayout root, OritechDisplay display, ReiUIAdapter<FlowLayout> adapter) {
+        // arrow
+        widgets.add(Widgets.createArrow(new Point(x + 105, y + 15)));
         
-        var particleBackground = Components.texture(LASER_RECIPE_OVERLAY, 0, 0, 300, 300, 300, 300);
+        // output slot
+        widgets.add(Widgets.createSlot(new Point(x + 135, y + 15))
+            .entries(oDisplay.getOutputEntries().get(0)).markOutput());
         
-        root.child(
-          adapter.wrap(Widgets.createSlot(new Point(0, 0)).entries(display.getInputEntries().get(0)).markInput()).positioning(Positioning.absolute(80, 15)));
-        
-        root.child(
-          adapter.wrap(Widgets.createSlot(new Point(0, 0)).entries(display.getOutputEntries().get(0)).markOutput()).positioning(Positioning.absolute(135, 15)));
-        
-        root.child(adapter.wrap(Widgets.createArrow(new Point(0, 0))).positioning(Positioning.absolute(105, 15)));
-        root.child(particleBackground.sizing(Sizing.fixed(80)).positioning(Positioning.absolute(5, 5)));
-        
+        return widgets;
     }
     
     @Override
@@ -88,5 +81,4 @@ public class OritechReiLaserDisplay implements DisplayCategory<Display> {
     public Renderer getIcon() {
         return EntryStacks.of(icon);
     }
-    
 }

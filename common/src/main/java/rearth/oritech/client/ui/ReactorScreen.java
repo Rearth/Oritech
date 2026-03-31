@@ -16,8 +16,6 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
@@ -46,7 +44,6 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
     private static final float PREVIEW_ISO_X = 0.43f;
     private static final float PREVIEW_ISO_Y = 0.224f;
     private static final float PREVIEW_ISO_HEIGHT = 0.5f;
-    private static final float PREVIEW_BLOCK_SCALE = 40f / 64f;
 
     private LabelWidget productionLabel;
     private LabelWidget hottestLabel;
@@ -259,16 +256,14 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         return menu.reactorEntity.getBlockState();
     }
 
-    private final class ReactorPreviewWidget extends UIComponent {
 
+    private final class ReactorPreviewWidget extends UIComponent {
         private static final Comparator<PreviewEntry> PREVIEW_RENDER_ORDER = Comparator
             .comparingDouble(PreviewEntry::zIndex)
             .thenComparingInt(PreviewEntry::drawY)
             .thenComparingInt(PreviewEntry::drawX);
-        private static final Comparator<PreviewEntry> PREVIEW_HOVER_ORDER = PREVIEW_RENDER_ORDER.reversed();
 
         private final List<PreviewEntry> blockEntries = new ArrayList<>();
-        private final List<PreviewEntry> hoverEntries = new ArrayList<>();
         private final List<PreviewEntry> heatEntries = new ArrayList<>();
         private @Nullable PreviewEntry hoveredEntry;
         private final int blockSize;
@@ -296,18 +291,13 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
                 var offset = pos.subtract(menu.reactorEntity.areaMin);
                 blockEntries.add(entry);
 
-                if (offset.getY() == 1) {
-                    hoverEntries.add(entry);
-                }
-
                 var state = menu.world.getBlockState(pos);
                 if (state.getBlock() instanceof ReactorRodBlock || state.getBlock() instanceof ReactorHeatPipeBlock) {
-                    heatEntries.add(new PreviewEntry(pos.immutable(), null, entry.zIndex() + 0.5f, entry.drawX(), entry.drawY(), entry.hoverBounds()));
+                    heatEntries.add(new PreviewEntry(pos.immutable(), null, entry.zIndex() + 0.5f, entry.drawX(), entry.drawY()));
                 }
             });
 
             blockEntries.sort(PREVIEW_RENDER_ORDER);
-            hoverEntries.sort(PREVIEW_HOVER_ORDER);
             heatEntries.sort(PREVIEW_RENDER_ORDER);
         }
 
@@ -371,8 +361,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
                 menu.world.getBlockEntity(pos),
                 zIndex,
                 drawX,
-                drawY,
-                createHoverBounds(drawX, drawY)
+                drawY
             );
         }
 
@@ -383,34 +372,15 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
 
             float localMouseX = (float) mouseX - x;
             float localMouseY = (float) mouseY - y;
-            for (var entry : hoverEntries) {
-                if (entry.hoverBounds().contains(localMouseX, localMouseY)) {
+            for (int i = blockEntries.size() - 1; i >= 0; i--) {
+                var entry = blockEntries.get(i);
+                var yLevel = entry.pos.getY() - menu.reactorEntity.areaMin.getY();
+                if (yLevel == 1 && localMouseX >= entry.drawX() && localMouseX <= entry.drawX() + blockSize &&
+                    localMouseY >= entry.drawY() && localMouseY <= entry.drawY() + blockSize) {
                     return entry;
                 }
             }
-
             return null;
-        }
-
-        private HoverBounds createHoverBounds(int drawX, int drawY) {
-            Matrix4f transform = new Matrix4f()
-                .translate(drawX + blockSize / 2f, drawY + blockSize / 2f, 0f)
-                .scale(PREVIEW_BLOCK_SCALE * blockSize, -PREVIEW_BLOCK_SCALE * blockSize, 40f)
-                .rotate(Axis.XP.rotationDegrees(30))
-                .rotate(Axis.YP.rotationDegrees(225))
-                .translate(-0.5f, -0.5f, -0.5f);
-
-            return new HoverBounds(
-                projectPoint(transform, 0f, 1f, 0f),
-                projectPoint(transform, 1f, 1f, 0f),
-                projectPoint(transform, 1f, 1f, 1f),
-                projectPoint(transform, 0f, 1f, 1f)
-            );
-        }
-
-        private Vector2f projectPoint(Matrix4f transform, float x, float y, float z) {
-            Vector3f projected = transform.transformPosition(new Vector3f(x, y, z));
-            return new Vector2f(projected.x, projected.y);
         }
 
         private void renderTooltipPanel(GuiGraphics graphics, int blockX, int blockY, List<Component> tooltip) {
@@ -426,7 +396,9 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             int panelHeight = tooltip.size() * font.lineHeight + 8;
             int tooltipX = Math.max(4, Math.min(width - panelWidth - 4, blockX - 24));
             int tooltipY = Math.max(4, blockY - panelHeight - 6);
-
+            
+            graphics.pose().pushPose();
+            graphics.pose().translate(0, 0, 3000);
             graphics.fill(tooltipX, tooltipY, tooltipX + panelWidth, tooltipY + panelHeight, 0xCC101418);
             graphics.fill(tooltipX, tooltipY, tooltipX + panelWidth, tooltipY + 1, 0xFF9DB4C7);
             graphics.fill(tooltipX, tooltipY + panelHeight - 1, tooltipX + panelWidth, tooltipY + panelHeight, 0xFF9DB4C7);
@@ -436,6 +408,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             for (int index = 0; index < tooltip.size(); index++) {
                 graphics.drawString(font, tooltip.get(index), tooltipX + 5, tooltipY + 4 + index * font.lineHeight, 0xFFF2F6FA, false);
             }
+            graphics.pose().popPose();
         }
 
         private void renderBlock(GuiGraphics graphics, int drawX, int drawY, int size, float zIndex,
@@ -478,31 +451,5 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         }
     }
 
-    private record PreviewEntry(BlockPos pos, @Nullable BlockEntity blockEntity, float zIndex, int drawX, int drawY, HoverBounds hoverBounds) {}
-
-    private record HoverBounds(Vector2f north, Vector2f east, Vector2f south, Vector2f west) {
-
-        private boolean contains(float mouseX, float mouseY) {
-            boolean hasPositive = false;
-            boolean hasNegative = false;
-            Vector2f[] corners = {north, east, south, west};
-
-            for (int index = 0; index < corners.length; index++) {
-                Vector2f start = corners[index];
-                Vector2f end = corners[(index + 1) % corners.length];
-                float cross = (end.x - start.x) * (mouseY - start.y) - (end.y - start.y) * (mouseX - start.x);
-                if (cross > 0.001f) {
-                    hasPositive = true;
-                } else if (cross < -0.001f) {
-                    hasNegative = true;
-                }
-
-                if (hasPositive && hasNegative) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-    }
+    private record PreviewEntry(BlockPos pos, @Nullable BlockEntity blockEntity, float zIndex, int drawX, int drawY) {}
 }

@@ -43,7 +43,7 @@ import rearth.oritech.api.networking.UpdatableField;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.util.InventoryInputMode;
@@ -340,7 +340,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     
     @Override
     public @Nullable AbstractContainerMenu createMenu(int containerId, @NotNull Inventory playerInventory, @NotNull Player player) {
-        return new UpgradableMachineScreenHandler(containerId, playerInventory, this);
+        return new UpgradableOritechScreenHandler(containerId, playerInventory, this);
     }
     
     @Override

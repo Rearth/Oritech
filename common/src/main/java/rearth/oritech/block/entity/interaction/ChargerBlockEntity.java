@@ -15,7 +15,7 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -151,7 +151,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new BasicMachineScreenHandler(syncId, playerInventory, this);
+        return new OritechScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

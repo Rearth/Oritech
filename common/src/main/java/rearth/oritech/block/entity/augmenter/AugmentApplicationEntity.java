@@ -40,7 +40,7 @@ import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.OritechConfig;
@@ -440,7 +440,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         this.sendUpdate(SyncType.GUI_OPEN);
         var dist = player.distanceToSqr(this.worldPosition.getBottomCenter());
         if (dist > 1 || screenInvOverride)
-            return new BasicMachineScreenHandler(syncId, playerInventory, this);
+            return new OritechScreenHandler(syncId, playerInventory, this);
         
         return new PlayerModifierScreenHandler(syncId, playerInventory, this);
     }

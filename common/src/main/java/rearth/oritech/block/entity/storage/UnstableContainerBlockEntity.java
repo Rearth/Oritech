@@ -35,7 +35,7 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.storage.UnstableContainerBlock;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.OritechConfig;
@@ -414,6 +414,6 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     
     @Override
     public @Nullable AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
+        return new UpgradableOritechScreenHandler(syncId, playerInventory, this);
     }
 }

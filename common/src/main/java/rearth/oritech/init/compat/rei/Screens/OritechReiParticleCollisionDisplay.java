@@ -1,13 +1,5 @@
 package rearth.oritech.init.compat.rei.Screens;
 
-import io.wispforest.owo.compat.rei.ReiUIAdapter;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.container.Containers;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.HorizontalAlignment;
-import io.wispforest.owo.ui.core.Insets;
-import io.wispforest.owo.ui.core.Positioning;
-import io.wispforest.owo.ui.core.Surface;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
@@ -24,6 +16,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.init.compat.rei.OritechDisplay;
 import rearth.oritech.init.recipes.OritechRecipeType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OritechReiParticleCollisionDisplay implements DisplayCategory<Display> {
@@ -39,38 +32,35 @@ public class OritechReiParticleCollisionDisplay implements DisplayCategory<Displ
     
     @Override
     public List<Widget> setupDisplay(Display display, Rectangle bounds) {
-        var adapter = new ReiUIAdapter<>(bounds, Containers::verticalFlow);
-        var root = adapter.rootComponent();
+        var widgets = new ArrayList<Widget>();
+        var oDisplay = (OritechDisplay) display;
+        var x = bounds.x;
+        var y = bounds.y;
         
-        root.horizontalAlignment(HorizontalAlignment.CENTER)
-          .surface(Surface.PANEL)
-          .padding(Insets.of(4));
+        // background
+        widgets.add(Widgets.createRecipeBase(bounds));
         
-        fillDisplay(root, (OritechDisplay) display, adapter);
+        // particle collision overlay
+        widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, delta) ->
+            graphics.blit(PARTICLE_RECIPE_OVERLAY, x + 60, y + 17, 0, 0, 36, 24, 36, 24)));
         
-        adapter.prepare();
-        return List.of(adapter);
-    }
-    
-    public void fillDisplay(FlowLayout root, OritechDisplay display, ReiUIAdapter<FlowLayout> adapter) {
+        // input slots
+        widgets.add(Widgets.createSlot(new Point(x + 42, y + 20))
+            .entries(oDisplay.getInputEntries().get(0)).markInput());
+        widgets.add(Widgets.createSlot(new Point(x + 96, y + 20))
+            .entries(oDisplay.getInputEntries().get(1)).markInput());
         
-        var particleBackground = Components.texture(PARTICLE_RECIPE_OVERLAY, 0, 0, 36, 24, 36, 24);
-        root.child(particleBackground.positioning(Positioning.absolute(60, 17)));
+        // output slot
+        widgets.add(Widgets.createSlot(new Point(x + 70, y + 20))
+            .entries(oDisplay.getOutputEntries().get(0)).markOutput());
         
-        root.child(
-          adapter.wrap(Widgets.createSlot(new Point(0, 0)).entries(display.getInputEntries().get(0)).markInput()).positioning(Positioning.absolute(42, 20)));
-        root.child(
-          adapter.wrap(Widgets.createSlot(new Point(0, 0)).entries(display.getInputEntries().get(1)).markInput()).positioning(Positioning.absolute(96, 20)));
+        // collision speed label
+        widgets.add(Widgets.createLabel(
+            new Point(x + 6, y + bounds.height - 12),
+            Component.translatable("emi.title.oritech.collisionspeed", oDisplay.getEntry().value().getTime())
+        ).leftAligned().color(0xFFFFFF).noShadow());
         
-        root.child(
-          adapter.wrap(Widgets.createSlot(new Point(0, 0)).entries(display.getOutputEntries().get(0)).markOutput()).positioning(Positioning.absolute(70, 20)));
-        
-        // data
-        root.child(
-          Components.label(Component.translatable("emi.title.oritech.collisionspeed", display.getEntry().value().getTime())).lineHeight(7)
-            .positioning(Positioning.relative(0, 97))
-        );
-        
+        return widgets;
     }
     
     @Override
@@ -87,5 +77,4 @@ public class OritechReiParticleCollisionDisplay implements DisplayCategory<Displ
     public Renderer getIcon() {
         return EntryStacks.of(icon);
     }
-    
 }
