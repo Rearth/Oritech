@@ -208,6 +208,7 @@
   "tooltip.oritech.augmenter.2": "Hold [%s] to configure installed augments.",
   "oritech.text.augment_toggle": "Release while hovering over an augment to toggle.",
   "oritech.text.augment_ingredient_tip": "Accepts any:",
+  "oritech.text.augment_toggle_title": "[Toggle Oritech Augment]",
   "title.oritech.item_filter.whitelist": "Lista Bianca",
   "title.oritech.item_filter.component": "Components",
   "title.oritech.item_filter.nbt": "NBT",
