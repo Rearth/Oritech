@@ -16,6 +16,8 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
@@ -37,6 +39,14 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
+
+    private static final float PREVIEW_DRAW_WIDTH = 170f;
+    private static final float PREVIEW_HORIZONTAL_MARGIN = 10f;
+    private static final float PREVIEW_BASELINE_Y = 100f;
+    private static final float PREVIEW_ISO_X = 0.43f;
+    private static final float PREVIEW_ISO_Y = 0.224f;
+    private static final float PREVIEW_ISO_HEIGHT = 0.5f;
+    private static final float PREVIEW_BLOCK_SCALE = 40f / 64f;
 
     private LabelWidget productionLabel;
     private LabelWidget hottestLabel;
@@ -251,6 +261,12 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
 
     private final class ReactorPreviewWidget extends UIComponent {
 
+        private static final Comparator<PreviewEntry> PREVIEW_RENDER_ORDER = Comparator
+            .comparingDouble(PreviewEntry::zIndex)
+            .thenComparingInt(PreviewEntry::drawY)
+            .thenComparingInt(PreviewEntry::drawX);
+        private static final Comparator<PreviewEntry> PREVIEW_HOVER_ORDER = PREVIEW_RENDER_ORDER.reversed();
+
         private final List<PreviewEntry> blockEntries = new ArrayList<>();
         private final List<PreviewEntry> hoverEntries = new ArrayList<>();
         private final List<PreviewEntry> heatEntries = new ArrayList<>();
@@ -267,47 +283,37 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             int rightCount = totalSize.getX();
             int totalWidth = leftCount + rightCount + 3;
             float middlePercentage = leftCount / (float) totalWidth;
-            float xOffset = middlePercentage * 170 + 10;
+            float xOffset = middlePercentage * PREVIEW_DRAW_WIDTH + PREVIEW_HORIZONTAL_MARGIN;
 
-            this.blockSize = (int) (170 / (float) totalWidth * 2.2f);
+            this.blockSize = Math.max(1, Math.round(PREVIEW_DRAW_WIDTH / totalWidth * 2.2f));
 
             BlockPos.betweenClosedStream(menu.reactorEntity.areaMin, previewMax).forEach(pos -> {
-                var state = menu.world.getBlockState(pos);
-                if (state.isAir()) return;
+                var entry = createPreviewEntry(pos, xOffset);
+                if (entry == null) {
+                    return;
+                }
 
                 var offset = pos.subtract(menu.reactorEntity.areaMin);
-                float projectedPosX = offset.getX() * 0.43f - offset.getZ() * 0.43f;
-                float projectedPosY = offset.getX() * 0.224f + offset.getZ() * 0.224f + offset.getY() * 0.5f;
-                float zIndex = offset.getY() - offset.getX() - offset.getZ();
-                int drawX = (int) (projectedPosX * blockSize + xOffset);
-                int drawY = (int) (-projectedPosY * blockSize) + 100;
-
-                var entry = new PreviewEntry(pos.immutable(), menu.world.getBlockEntity(pos), zIndex, drawX, drawY);
                 blockEntries.add(entry);
 
                 if (offset.getY() == 1) {
                     hoverEntries.add(entry);
                 }
 
+                var state = menu.world.getBlockState(pos);
                 if (state.getBlock() instanceof ReactorRodBlock || state.getBlock() instanceof ReactorHeatPipeBlock) {
-                    heatEntries.add(new PreviewEntry(pos.immutable(), null, zIndex + 0.5f, drawX, drawY));
+                    heatEntries.add(new PreviewEntry(pos.immutable(), null, entry.zIndex() + 0.5f, entry.drawX(), entry.drawY(), entry.hoverBounds()));
                 }
             });
 
-            blockEntries.sort(Comparator.comparingDouble(PreviewEntry::zIndex));
-            hoverEntries.sort(Comparator.comparingDouble(entry -> -entry.zIndex()));
-            heatEntries.sort(Comparator.comparingDouble(PreviewEntry::zIndex));
+            blockEntries.sort(PREVIEW_RENDER_ORDER);
+            hoverEntries.sort(PREVIEW_HOVER_ORDER);
+            heatEntries.sort(PREVIEW_RENDER_ORDER);
         }
 
         @Override
         protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-            hoveredEntry = null;
-            for (var entry : hoverEntries) {
-                if (isInsideBlock(mouseX, mouseY, entry.drawX(), entry.drawY(), blockSize)) {
-                    hoveredEntry = entry;
-                    break;
-                }
-            }
+            hoveredEntry = findHoveredEntry(mouseX, mouseY);
 
             for (var entry : blockEntries) {
                 renderBlock(graphics, entry.drawX(), entry.drawY(), blockSize, entry.zIndex(), null, entry.blockEntity(), entry.pos(), delta);
@@ -347,8 +353,64 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             return false;
         }
 
-        private boolean isInsideBlock(int mouseX, int mouseY, int blockX, int blockY, int size) {
-            return mouseX >= blockX && mouseX < blockX + size && mouseY >= blockY && mouseY < blockY + size;
+        private @Nullable PreviewEntry createPreviewEntry(BlockPos pos, float xOffset) {
+            var state = menu.world.getBlockState(pos);
+            if (state.isAir()) {
+                return null;
+            }
+
+            var offset = pos.subtract(menu.reactorEntity.areaMin);
+            float projectedPosX = offset.getX() * PREVIEW_ISO_X - offset.getZ() * PREVIEW_ISO_X;
+            float projectedPosY = offset.getX() * PREVIEW_ISO_Y + offset.getZ() * PREVIEW_ISO_Y + offset.getY() * PREVIEW_ISO_HEIGHT;
+            float zIndex = offset.getY() - offset.getX() - offset.getZ();
+            int drawX = Math.round(projectedPosX * blockSize + xOffset);
+            int drawY = Math.round(PREVIEW_BASELINE_Y - projectedPosY * blockSize);
+
+            return new PreviewEntry(
+                pos.immutable(),
+                menu.world.getBlockEntity(pos),
+                zIndex,
+                drawX,
+                drawY,
+                createHoverBounds(drawX, drawY)
+            );
+        }
+
+        private @Nullable PreviewEntry findHoveredEntry(int mouseX, int mouseY) {
+            if (!isMouseOver(mouseX, mouseY)) {
+                return null;
+            }
+
+            float localMouseX = (float) mouseX - x;
+            float localMouseY = (float) mouseY - y;
+            for (var entry : hoverEntries) {
+                if (entry.hoverBounds().contains(localMouseX, localMouseY)) {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+
+        private HoverBounds createHoverBounds(int drawX, int drawY) {
+            Matrix4f transform = new Matrix4f()
+                .translate(drawX + blockSize / 2f, drawY + blockSize / 2f, 0f)
+                .scale(PREVIEW_BLOCK_SCALE * blockSize, -PREVIEW_BLOCK_SCALE * blockSize, 40f)
+                .rotate(Axis.XP.rotationDegrees(30))
+                .rotate(Axis.YP.rotationDegrees(225))
+                .translate(-0.5f, -0.5f, -0.5f);
+
+            return new HoverBounds(
+                projectPoint(transform, 0f, 1f, 0f),
+                projectPoint(transform, 1f, 1f, 0f),
+                projectPoint(transform, 1f, 1f, 1f),
+                projectPoint(transform, 0f, 1f, 1f)
+            );
+        }
+
+        private Vector2f projectPoint(Matrix4f transform, float x, float y, float z) {
+            Vector3f projected = transform.transformPosition(new Vector3f(x, y, z));
+            return new Vector2f(projected.x, projected.y);
         }
 
         private void renderTooltipPanel(GuiGraphics graphics, int blockX, int blockY, List<Component> tooltip) {
@@ -416,5 +478,31 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         }
     }
 
-    private record PreviewEntry(BlockPos pos, @Nullable BlockEntity blockEntity, float zIndex, int drawX, int drawY) {}
+    private record PreviewEntry(BlockPos pos, @Nullable BlockEntity blockEntity, float zIndex, int drawX, int drawY, HoverBounds hoverBounds) {}
+
+    private record HoverBounds(Vector2f north, Vector2f east, Vector2f south, Vector2f west) {
+
+        private boolean contains(float mouseX, float mouseY) {
+            boolean hasPositive = false;
+            boolean hasNegative = false;
+            Vector2f[] corners = {north, east, south, west};
+
+            for (int index = 0; index < corners.length; index++) {
+                Vector2f start = corners[index];
+                Vector2f end = corners[(index + 1) % corners.length];
+                float cross = (end.x - start.x) * (mouseY - start.y) - (end.y - start.y) * (mouseX - start.x);
+                if (cross > 0.001f) {
+                    hasPositive = true;
+                } else if (cross < -0.001f) {
+                    hasNegative = true;
+                }
+
+                if (hasPositive && hasNegative) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
 }
