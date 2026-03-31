@@ -208,6 +208,7 @@
   "tooltip.oritech.augmenter.2": "Przytrzymaj [%s], aby skonfigurować zainstalowane augmenty.",
   "oritech.text.augment_toggle": "Puść, najeżdżając na augment, aby przełączyć.",
   "oritech.text.augment_ingredient_tip": "Akceptuje dowolne:",
+  "oritech.text.augment_toggle_title": "[Toggle Oritech Augment]",
   "title.oritech.item_filter.whitelist": "Biała lista",
   "title.oritech.item_filter.component": "Komponenty",
   "title.oritech.item_filter.nbt": "NBT",
