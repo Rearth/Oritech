@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.LabelWidget;
@@ -63,7 +64,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         panel.withZIndex(-10);
         addComponent(panel);
 
-        previewWidget = new ReactorPreviewWidget(8, 16, 180, 164);
+        previewWidget = new ReactorPreviewWidget(6, 16, 175, 164);
         addComponent(previewWidget);
         addStatsPanel();
         addStatusPanel();
@@ -76,7 +77,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
     }
 
     private void addStatsPanel() {
-        var panel = new SurfaceWidget(183, 16, 141, 54);
+        var panel = new SurfaceWidget(183, 16, 148, 54);
         panel.withSurface(OritechSurface.PANEL_INSET);
         panel.withZIndex(-8);
         addComponent(panel);
@@ -98,22 +99,18 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
     }
 
     private void addStatusPanel() {
-        var panel = new SurfaceWidget(187, 75, 95, 24);
-        panel.withSurface(OritechSurface.PANEL_INSET);
-        panel.withZIndex(-8);
-        addComponent(panel);
-
-        statusLabel = new LabelWidget(191, 82, 87, 10, Component.translatable("text.oritech.reactor.idle").withStyle(ChatFormatting.BOLD));
+        statusLabel = new LabelWidget(183, 80, 87, 10, Component.translatable("text.oritech.reactor.idle").withStyle(ChatFormatting.BOLD));
         statusLabel.withAlignment(LabelWidget.Alignment.CENTER);
+        statusLabel.withSurface(OritechSurface.PANEL_INSET).withPadding(Insets.of(6, 0, 4, 0));
         statusLabel.withBrightColor();
         addComponent(statusLabel);
     }
 
     private void addEnergyBar() {
         int x = 294;
-        int y = 79;
+        int y = 75;
         int width = 36;
-        int height = 108;
+        int height = 110;
 
         var frame = new SurfaceWidget(x - 1, y - 1, width + 2, height + 2);
         frame.withSurface(OritechSurface.PANEL_INSET);
