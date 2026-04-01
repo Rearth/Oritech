@@ -389,7 +389,7 @@
   "title.oritech.machine.addon_fortune": "Удача %d",
   "tooltip.oritech.machine.addon_fortune": "Кількість додатків удачі. 3 — ефективний максимум",
   "tooltip.oritech.machine.addon_silk_touch": "Коли аддон Шовковий дотик і аддон Фортуна встановлені одночасно, Шовковий дотик має пріоритет.",
-  "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many machine\naddons can be added to this block.\n\nUse better cores to increase this.\n\nCurrent quality progress: %s",
+  "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many addon\nextenders can be added to this block.\n\nUse better cores to increase this.\n\nCurrent quality progress: %s",
   "tooltip.oritech.thousand_abbrev": "Тис.",
   "tooltip.oritech.million_abbrev": "Млн.",
   "tooltip.oritech.billion_abbrev": "Млрд.",
