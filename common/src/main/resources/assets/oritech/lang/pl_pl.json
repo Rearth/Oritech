@@ -389,7 +389,7 @@
   "title.oritech.machine.addon_fortune": "%d Szczęście",
   "tooltip.oritech.machine.addon_fortune": "Liczba dodatków plonów. 3 to maksymalna skuteczność",
   "tooltip.oritech.machine.addon_silk_touch": "Gdy dodatek Jedwabnego Dotyku i Dodatek Fortuny są zainstalowane jednocześnie, Jedwabny Dotyk ma priorytet.",
-  "tooltip.oritech.machine.quality": "Jakość Maszyny: %d\n\nKontroluje ile dodatków maszynowych\nmoże być dodanych do tego bloku.\n\nUżyj lepszych rdzeni, aby to zwiększyć.\n\nObecny postęp jakości: %s",
+  "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many addon\nextenders can be added to this block.\n\nUse better cores to increase this.\n\nCurrent quality progress: %s",
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
   "tooltip.oritech.billion_abbrev": "B",
