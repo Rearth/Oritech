@@ -389,7 +389,7 @@
   "title.oritech.machine.addon_fortune": "%d 幸運",
   "tooltip.oritech.machine.addon_fortune": "生成量アドオンの数です。最大値は3です。",
   "tooltip.oritech.machine.addon_silk_touch": "シルクタッチアドオンと幸運アドオンが同時にインストールされると、シルクタッチが優先されます。",
-  "tooltip.oritech.machine.quality": "機械の品質： %d\n\nこのブロックに追加できるアドオンエクステンダーの数を決める要素です。\n\nより良いコアを使用することで品質を向上できます。\n\n詳細な現在の品質の段階： %s",
+  "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many addon\nextenders can be added to this block.\n\nUse better cores to increase this.\n\nCurrent quality progress: %s",
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
   "tooltip.oritech.billion_abbrev": "B",
