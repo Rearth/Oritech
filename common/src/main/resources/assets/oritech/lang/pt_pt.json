@@ -389,7 +389,7 @@
   "title.oritech.machine.addon_fortune": "%d Fortuna",
   "tooltip.oritech.machine.addon_fortune": "Contagem de addon de rendimento. 3 é o máximo efetivo",
   "tooltip.oritech.machine.addon_silk_touch": "Quando o addon de Toque Suave e o addon de Fortuna são instalados ao mesmo tempo, o Toque Suave tem prioridade.",
-  "tooltip.oritech.machine.quality": "Qualidade da Máquina: %d\n\nControla quantos addons de máquina\npodem ser adicionados a este bloco.\n\nUse melhores núcleos para aumentar isso\n\nProgresso atual da qualidade: %s",
+  "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many addon\nextenders can be added to this block.\n\nUse better cores to increase this.\n\nCurrent quality progress: %s",
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
   "tooltip.oritech.billion_abbrev": "B",
