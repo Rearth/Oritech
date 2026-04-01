@@ -1,6 +1,5 @@
 package rearth.oritech.client.ui;
 
-import java.util.Objects;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -8,7 +7,9 @@ import rearth.oritech.api.screen.data.DisplayDataSource;
 import rearth.oritech.block.entity.processing.RefineryBlockEntity;
 import rearth.oritech.util.ScreenProvider;
 
-public class RefineryScreenHandler extends UpgradableOritechScreenHandler {
+import java.util.Objects;
+
+public class RefineryScreenHandler extends OritechScreenHandler {
     
     private static final ScreenProvider.BarConfiguration OUTPUT_A_CONFIG = new ScreenProvider.BarConfiguration(92, 6, 21, 74);
     private static final ScreenProvider.BarConfiguration OUTPUT_B_CONFIG = new ScreenProvider.BarConfiguration(92 + 27, 6, 21, 74);

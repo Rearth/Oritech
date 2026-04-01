@@ -144,7 +144,7 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
         int centerY = -topPos + height / 2;
         
         // 3D block preview
-        var preview = new BlockPreviewWidget(centerX - 186 / 2, centerY - 115, 186, 90);
+        var preview = new BlockPreviewWidget(centerX - 186 / 2, centerY - 125, 186, 100);
         preview.withSurface(OritechSurface.PANEL);
         preview.withPadding(Insets.of(4));
         preview.withRotationSpeed(0.2f);

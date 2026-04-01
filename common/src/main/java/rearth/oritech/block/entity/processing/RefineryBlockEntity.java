@@ -202,7 +202,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     
     @Override
     public BarConfiguration getFluidConfiguration() {
-        return new BarConfiguration(28, 6, 21, 74);
+        return new BarConfiguration(30, 6, 21, 74);
     }
 
     @Override
@@ -318,6 +318,11 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     @Override
     public List<Tuple<Component, Component>> getExtraExtensionLabels() {
         return List.of(new Tuple<>(Component.literal("\uD83D\uDCE6: " + moduleCount), Component.translatable("tooltip.oritech.refinery_module_count")));
+    }
+    
+    @Override
+    public BarConfiguration getEnergyConfiguration() {
+        return new BarConfiguration(8, 7, 18, 71);
     }
     
     public FluidApi.SingleSlotStorage getOutputStorage(int i) {

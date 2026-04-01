@@ -14,6 +14,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import rearth.oritech.api.screen.UIComponent;
+import rearth.oritech.util.Geometry;
+import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,14 +75,16 @@ public class BlockPreviewWidget extends UIComponent {
         float maxZ = Float.NEGATIVE_INFINITY;
 
         for (var entry : blocks) {
-            var offset = entry.offset();
-            minX = Math.min(minX, offset.getX() - 0.5f);
-            maxX = Math.max(maxX, offset.getX() + 0.5f);
-            minY = Math.min(minY, offset.getY() - 0.5f);
-            maxY = Math.max(maxY, offset.getY() + 0.5f);
-            minZ = Math.min(minZ, offset.getZ() - 0.5f);
-            maxZ = Math.max(maxZ, offset.getZ() + 0.5f);
+            for (var offset : getPreviewPositions(entry)) {
+                minX = Math.min(minX, offset.getX() - 0.5f);
+                maxX = Math.max(maxX, offset.getX() + 0.5f);
+                minY = Math.min(minY, offset.getY() - 0.5f);
+                maxY = Math.max(maxY, offset.getY() + 0.5f);
+                minZ = Math.min(minZ, offset.getZ() - 0.5f);
+                maxZ = Math.max(maxZ, offset.getZ() + 0.5f);
+            }
         }
+        
 
         centerX = (minX + maxX) * 0.5f;
         centerY = (minY + maxY) * 0.5f;
@@ -90,29 +94,30 @@ public class BlockPreviewWidget extends UIComponent {
         float verticalRadius = 0f;
 
         for (var entry : blocks) {
-            var offset = entry.offset();
-            float blockMinX = offset.getX() - 0.5f;
-            float blockMaxX = offset.getX() + 0.5f;
-            float blockMinY = offset.getY() - 0.5f;
-            float blockMaxY = offset.getY() + 0.5f;
-            float blockMinZ = offset.getZ() - 0.5f;
-            float blockMaxZ = offset.getZ() + 0.5f;
+            for (var offset : getPreviewPositions(entry)) {
+                float blockMinX = offset.getX() - 0.5f;
+                float blockMaxX = offset.getX() + 0.5f;
+                float blockMinY = offset.getY() - 0.5f;
+                float blockMaxY = offset.getY() + 0.5f;
+                float blockMinZ = offset.getZ() - 0.5f;
+                float blockMaxZ = offset.getZ() + 0.5f;
 
-            float[] xValues = {blockMinX, blockMaxX};
-            float[] yValues = {blockMinY, blockMaxY};
-            float[] zValues = {blockMinZ, blockMaxZ};
+                float[] xValues = {blockMinX, blockMaxX};
+                float[] yValues = {blockMinY, blockMaxY};
+                float[] zValues = {blockMinZ, blockMaxZ};
 
-            // Fit against the full Y rotation by checking the furthest block corners from the origin.
-            for (float x : xValues) {
-                for (float y : yValues) {
-                    for (float z : zValues) {
-                        float centeredX = x - centerX;
-                        float centeredY = y - centerY;
-                        float centeredZ = z - centerZ;
-                        float horizontalDistance = (float) Math.hypot(centeredX, centeredZ);
-                        horizontalRadius = Math.max(horizontalRadius, horizontalDistance);
-                        verticalRadius = Math.max(verticalRadius,
-                            Math.abs(centeredY) * X_ROTATION_COS + horizontalDistance * X_ROTATION_SIN);
+                // Fit against the full Y rotation by checking the furthest block corners from the origin.
+                for (float x : xValues) {
+                    for (float y : yValues) {
+                        for (float z : zValues) {
+                            float centeredX = x - centerX;
+                            float centeredY = y - centerY;
+                            float centeredZ = z - centerZ;
+                            float horizontalDistance = (float) Math.hypot(centeredX, centeredZ);
+                            horizontalRadius = Math.max(horizontalRadius, horizontalDistance);
+                            verticalRadius = Math.max(verticalRadius,
+                                Math.abs(centeredY) * X_ROTATION_COS + horizontalDistance * X_ROTATION_SIN);
+                        }
                     }
                 }
             }
@@ -195,5 +200,19 @@ public class BlockPreviewWidget extends UIComponent {
         float widthScale = availableWidth * 0.5f / maxHorizontalRadius;
         float heightScale = availableHeight * 0.5f / maxVerticalRadius;
         return Math.min(widthScale, heightScale) * SCALE_MARGIN;
+    }
+
+    private List<Vec3i> getPreviewPositions(BlockEntry entry) {
+        var positions = new ArrayList<Vec3i>();
+        positions.add(entry.offset());
+
+        if (entry.entity() instanceof MultiblockMachineController multiblock) {
+            var facing = multiblock.getFacingForMultiblock();
+            for (var relativeOffset : multiblock.getCorePositions()) {
+                positions.add(Geometry.rotatePosition(relativeOffset, facing).offset(entry.offset()));
+            }
+        }
+
+        return positions;
     }
 }

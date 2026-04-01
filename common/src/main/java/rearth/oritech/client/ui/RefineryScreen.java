@@ -8,7 +8,7 @@ import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.block.entity.processing.RefineryBlockEntity;
 import rearth.oritech.util.ColorHelper;
 
-public class RefineryScreen extends UpgradableOritechScreen<RefineryScreenHandler> {
+public class RefineryScreen extends OritechMachineScreen<RefineryScreenHandler> {
 
     public RefineryScreen(RefineryScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
