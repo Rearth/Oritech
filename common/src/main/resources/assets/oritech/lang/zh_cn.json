@@ -389,7 +389,7 @@
   "title.oritech.machine.addon_fortune": "%d 时运",
   "tooltip.oritech.machine.addon_fortune": "产量插件数量。有效的最大值为3",
   "tooltip.oritech.machine.addon_silk_touch": "当时运插件和精准采集插件同时安装时，精准采集优先",
-  "tooltip.oritech.machine.quality": "机器品质：%d\n\n决定能添加到该方块的机器插件层数。\n\n用更好的核心来提升此项\n\n当前品质进度：%s",
+  "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many addon\nextenders can be added to this block.\n\nUse better cores to increase this.\n\nCurrent quality progress: %s",
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
   "tooltip.oritech.billion_abbrev": "B",
