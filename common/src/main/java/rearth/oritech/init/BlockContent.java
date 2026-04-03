@@ -145,6 +145,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @UseGeoBlockItem(scale = 0.3f)
     public static final Block REFINERY_BLOCK = new RefineryBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.3f)
+    public static final Block ARCANE_REFINERY_BLOCK = new ArcaneRefineryBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    @UseGeoBlockItem(scale = 0.3f)
     public static final Block REFINERY_MODULE_BLOCK = new RefineryModuleBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block BIO_GENERATOR_BLOCK = new BioGeneratorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
