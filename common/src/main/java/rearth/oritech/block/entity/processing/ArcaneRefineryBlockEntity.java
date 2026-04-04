@@ -34,7 +34,7 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
+import rearth.oritech.client.ui.ArcaneRefineryScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.TagContent;
@@ -111,13 +111,28 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
                 // use all energy, calculate progression based on amount (and arcane factor)
                 var steps = getAndDrainProgress();
                 
+                System.out.println(steps);
+                
                 // increase progress
                 progress += steps;
                 
-                if (checkCraftingFinished(activeRecipe)) {
+                var craftCount = 0;
+                
+                var recipeTime = activeRecipe.getTime();
+                while (progress > recipeTime && canOutputRecipe(activeRecipe) && getRecipe().isPresent() && getRecipe().get().value().equals(activeRecipe)) {
                     craftItem(activeRecipe, getOutputView(), getInputView());
-                    resetProgress();
+                    progress -= recipeTime;
+                    craftCount++;
                 }
+                
+                System.out.println("crafted: " + craftCount);
+                
+                // if input/output can't catch up / match speed, ensure we don't queue up progress
+                if (progress > recipeTime) {
+                    progress = 0;
+                }
+                
+                spawnWorkParticles();
                 
                 setChanged();
             }
@@ -188,7 +203,7 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
         energyStorage.setAmount(0);
         
         // (remapped from 0-1 to 1-8)
-        var energyFactor = (sculkFactor.result * 8) + 1;
+        var energyFactor = (arcaneFactor.result * 8) + 1;
         availableEnergy *= energyFactor;
         
         return (int) Math.round(0.2f * Math.pow(availableEnergy, 0.5f));
@@ -306,16 +321,15 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
         return true;
     }
     
-    // todo
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new UpgradableOritechScreenHandler(syncId, playerInventory, this);
+        return new ArcaneRefineryScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
     public BarConfiguration getFluidConfiguration() {
-        return new BarConfiguration(30, 6, 21, 74);
+        return new BarConfiguration(7, 6 + 22, 18, 52);
     }
     
     @Override
@@ -333,18 +347,16 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
         return RecipeContent.REFINERY;
     }
     
-    @Override
-    protected void useEnergy() {
-        super.useEnergy();
+    private void spawnWorkParticles() {
         
-        if (level.random.nextFloat() > 0.8) return;
+        if (level.random.nextFloat() > 0.4) return;
         // emit particles
         var facing = getFacing();
-        var offsetLocal = Geometry.rotatePosition(new Vec3(0.3, 0.5, 0.3), facing);
+        var offsetLocal = Geometry.rotatePosition(new Vec3(0.3, 0.5, -0.3), facing);
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
         if (level instanceof ServerLevel sl)
-            sl.sendParticles(ParticleTypes.SNOWFLAKE, emitPosition.x, emitPosition.y, emitPosition.z, 1, 1.2, 1.2, 1.2, 0);
+            sl.sendParticles(ParticleTypes.SOUL, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.5, 0.5, 0.5, 0);
         
     }
     
@@ -356,8 +368,8 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 62, 8),
-          new GuiSlot(1, 62, 61, true));
+          new GuiSlot(0, 8, 8),
+          new GuiSlot(1, 65 + 1, 6 + 74 - 22 + 4, true));
     }
     
     @Override
@@ -372,6 +384,11 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
     
     @Override
     public boolean inputOptionsEnabled() {
+        return false;
+    }
+    
+    @Override
+    public boolean showExpansionPanel() {
         return false;
     }
     
@@ -398,7 +415,7 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
         return new ArrowConfiguration(
           Oritech.id("textures/gui/modular/arrow_empty.png"),
           Oritech.id("textures/gui/modular/arrow_full.png"),
-          54, 35, 29, 16, true);
+          30, 35, 29, 16, true);
     }
     
     // x = back, // z = left
@@ -412,8 +429,6 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
         return ownStorage;
     }
     
-    
-    // todo
     @Override
     public List<Tuple<Component, Component>> getExtraExtensionLabels() {
         return super.getExtraExtensionLabels();
