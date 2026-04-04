@@ -1,0 +1,32 @@
+---
+title: 机器框架
+id: oritech:machine_frame_block
+type: block
+custom:
+    最大框架长度: "64 格"
+---
+
+机器框架是Oritech大型
+工业机器的结构基础。
+它作为多个复杂多方块结构的底座框架。
+
+<center>
+<ModAsset location="oritech:area/machine_frame" width={512} />
+</center>
+
+机器框架总是建造成矩形，上方连接一个或多个龙门机器。框架内部不能有方块。
+
+---
+
+**应用**
+
+建筑以下机器需要它：
+- **[方块破坏器](@oritech:destroyer_block)**
+- **[方块放置器](@oritech:placer_block)**
+- **[方块施肥器](@oritech:fertilizer_block)**
+
+这些机器始终作用于框架下方的方块，且机器可以安装在框架的任意位置，包括框架角落。
+
+多个兼容的机器可以在同一框架上运行。它们轮流遍历框架区域，不需要为每个都建造专用框架。
+
+大多数基于框架的机器都可以通过常规方式安装插件，速度升级插件可同时提升移动速度和工作速度。

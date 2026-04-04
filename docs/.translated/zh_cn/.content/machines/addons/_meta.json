@@ -1,0 +1,21 @@
+{
+  "capacitor_addon_extender.mdx": "储能扩展坞",
+  "machine_extender.mdx": "机器扩展坞",
+  "machine_capacitor_addon.mdx": "机器容量插件",
+  "machine_acceptor_addon.mdx": "机器适配器插件",
+  "machine_speed_addon.mdx": "速度升级插件",
+  "machine_efficiency_addon.mdx": "效率升级插件",
+  "machine_ultimate_addon.mdx": "协同矩阵插件",
+  "machine_burst_addon.mdx": "脉冲超频插件",
+  "machine_processing_addon.mdx": "辅助加工室插件",
+  "machine_fluid_addon.mdx": "流体处理插件",
+  "machine_inventory_proxy_addon.mdx": "物品栏代理插件",
+  "machine_redstone_addon.mdx": "控制单元插件",
+  "steam_boiler_addon.mdx": "蒸汽锅炉插件",
+  "machine_hunter_addon.mdx": "生物校位插件",
+  "quarry_addon.mdx": "矿场插件",
+  "crop_filter_addon.mdx": "作物过滤器插件",
+  "machine_yield_addon.mdx": "产量升级插件",
+  "machine_silk_touch_addon.mdx": "精准采集插件",
+  "machine_combi_addon.mdx": "机器之心"
+}

@@ -1,0 +1,16 @@
+{
+  "world": "世界生成",
+  "biomass.mdx": "生物质",
+  "silicon.mdx": "硅",
+  "plastic_sheet.mdx": "塑料",
+  "steel_ingot.mdx": "钢",
+  "nickel_ingot.mdx": "镍",
+  "electrum_ingot.mdx": "琥珀金",
+  "platinum_ingot.mdx": "铂",
+  "duratium_ingot.mdx": "昶铂",
+  "adamant_ingot.mdx": "精镍",
+  "biosteel_ingot.mdx": "有机钢",
+  "energite_ingot.mdx": "辐镍晶",
+  "fluxite.mdx": "辐水晶",
+  "prometheum_ingot.mdx": "钷"
+}

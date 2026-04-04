@@ -1,0 +1,33 @@
+---
+id: oritech:power_pole_block
+type: block
+title: 输能杆(Energy Transmission Pole)
+custom:
+    RF容量: "1,000,000"
+    距离: "50-1,000 格"
+---
+输能杆用于远距离输送能量。
+它们通常建造在高架平台上，且只能与其他输能杆连接。
+<center>
+<ModAsset location="oritech:area/power_pole" width={512} />
+</center>
+
+要连接它们，请使用[目标标识器](@oritech:target_designator)物品，先Shift+右击第一根输能杆，
+然后对第二根输能杆Shift+右击。单根输能杆可连接任意数量的输能杆。
+任何相互连接的输能杆会共享能量，允许你构建大型网络。
+
+能量可以从输能杆网络中任意输能杆输入和输出。
+能量从绿色端口输入，从红色端口输出。
+整个网络的最大传输速率为1M RF/t。
+
+<Callout variant="info">
+    输能杆专为远距离能量传输设计，但传输距离并非无限。
+    它们需要至少相隔50格方块才能连接，最大连接距离为1000格方块。
+</Callout>
+
+使用[管道扳手](@oritech:wrench)可沿输能杆线缆滑行。
+只需手持扳手点击线缆即可。
+
+<center>
+<ModAsset location="oritech:area/cable_ziplining" width={800} />
+</center>

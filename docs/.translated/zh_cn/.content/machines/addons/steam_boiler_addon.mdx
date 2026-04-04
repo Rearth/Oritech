@@ -1,0 +1,26 @@
+---
+title: 蒸汽锅炉插件
+id: oritech:steam_boiler_addon
+type: block
+---
+
+蒸汽锅炉插件将
+发电机从直接发电转化为生产蒸汽。
+
+<center>
+<ModAsset location="oritech:area/steam_power" width={1000} />
+</center>
+
+---
+
+**生产蒸汽**
+
+当安装在发电机上（如
+[燃料发电机](@oritech:fuel_generator_block)），它将使
+机器消耗燃料和水产出高压蒸汽，
+而非产出RF。
+
+水必须泵送到蒸汽锅炉插件，产出的蒸汽可以
+被提取或用于驱动
+[蒸汽机](@oritech:steam_engine_block)或其他蒸汽驱动系统。
+这对于大规模能源网络通常更加高效。

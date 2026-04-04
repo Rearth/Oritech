@@ -1,0 +1,29 @@
+---
+id: oritech:steel_ingot
+title: 钢
+type: item
+related_items: ["oritech:steel_dust", "oritech:steel_block"]
+---
+
+钢是一种中级合金，用于制作[机器框架](@oritech:machine_frame_block)、
+[物流管道](@oritech:item_pipe)和各种其他组件。
+
+钢可以在合成方格中使用铁和煤炭制作：
+
+<CraftingRecipe
+    slots={[
+        'minecraft:iron_ingot',
+        'minecraft:iron_ingot',
+        '',
+        'minecraft:coal',
+        'minecraft:coal',
+        '',
+        '',
+        '',
+        ''
+    ]}
+    result="oritech:steel_ingot"
+    count={1}
+/>
+
+[铸造器](@oritech:foundry_block)可以用更少的铁和煤炭生成更多钢。

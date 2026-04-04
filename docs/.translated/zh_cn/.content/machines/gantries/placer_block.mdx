@@ -1,0 +1,24 @@
+---
+title: 方块放置器
+id: oritech:placer_block
+type: block
+custom:
+    RF容量: "100,000"
+    最大RF输入: "5,000"
+    移动消耗: "8 RF"
+    工作消耗: "64 RF"
+    插件槽位: "1"
+---
+
+方块放置器将其物品栏的方块放置到[机器框架](@oritech:machine_frame_block)下层。
+
+<center>
+<ModAsset location="oritech:area/block_placer" width={700} />
+</center>
+
+它还可用于在农田上播种或放置树苗。机器会在放置前检查该位置
+是否适合该物品。
+
+这种有效性检查使其在作物和树场自动化中十分可靠，因为无效目标会被跳过，而不会浪费物品。
+
+如果多个放置器共享同一个框架，它们会像其他龙门机器一样轮流遍历同一片工作区域。
