@@ -607,6 +607,7 @@
   "block.oritech.pulverizer_block": "磨粉机",
   "block.oritech.fragment_forge_block": "粉碎工厂",
   "block.oritech.assembler_block": "装配器",
+  "block.oritech.arcane_refinery_block": "Tainted Refinery",
   "block.oritech.refinery_block": "精炼厂",
   "block.oritech.refinery_module_block": "精炼厂罐室模块",
   "block.oritech.carbon_plating_block": "碳强化护板",
