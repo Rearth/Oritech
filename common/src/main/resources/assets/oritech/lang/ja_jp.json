@@ -607,6 +607,7 @@
   "block.oritech.pulverizer_block": "粉砕機",
   "block.oritech.fragment_forge_block": "フラグメントフォージ",
   "block.oritech.assembler_block": "組み立て機",
+  "block.oritech.arcane_refinery_block": "Tainted Refinery",
   "block.oritech.refinery_block": "精製機",
   "block.oritech.refinery_module_block": "精製チャンバーモジュール",
   "block.oritech.carbon_plating_block": "カーボン強化ブロック",
