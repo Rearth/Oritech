@@ -607,6 +607,7 @@
   "block.oritech.pulverizer_block": "Подрібнювач",
   "block.oritech.fragment_forge_block": "Фрагментна кузня",
   "block.oritech.assembler_block": "Збирач",
+  "block.oritech.arcane_refinery_block": "Tainted Refinery",
   "block.oritech.refinery_block": "Нафтопереробний завод",
   "block.oritech.refinery_module_block": "Модуль камери нафтопереробного заводу",
   "block.oritech.carbon_plating_block": "Блок вуглецевої обшивки",
