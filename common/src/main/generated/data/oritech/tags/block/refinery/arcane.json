@@ -1,0 +1,22 @@
+{
+  "values": [
+    "minecraft:enchanting_table",
+    "minecraft:bookshelf",
+    "minecraft:chiseled_bookshelf",
+    "minecraft:end_rod",
+    "minecraft:amethyst_block",
+    "minecraft:budding_amethyst",
+    "minecraft:small_amethyst_bud",
+    "minecraft:medium_amethyst_bud",
+    "minecraft:large_amethyst_bud",
+    "minecraft:amethyst_cluster",
+    "minecraft:soul_torch",
+    "minecraft:soul_lantern",
+    "minecraft:soul_campfire",
+    "minecraft:crying_obsidian",
+    "minecraft:respawn_anchor",
+    "oritech:arcane_augment_station",
+    "oritech:enchanter_block",
+    "oritech:enchantment_catalyst_block"
+  ]
+}
