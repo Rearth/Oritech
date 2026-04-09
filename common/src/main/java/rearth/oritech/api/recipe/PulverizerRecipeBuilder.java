@@ -26,6 +26,8 @@ public class PulverizerRecipeBuilder extends OritechRecipeBuilder {
         super.export(exporter, suffix);
 
         if (addToGrinder)
-            GrinderRecipeBuilder.build().input(inputs).result(results).export(exporter, suffix);
+            // Grinder defaults to 20% more time (rounded to the nearest half second) than pulverizer, but can have more addons and often gets better results
+            // To have a different time, build the grinder recipe separately instead of using the .addToGrinder() method on the pulverizer recipe builder
+            GrinderRecipeBuilder.build().input(inputs).result(results).time((int)(Math.round(this.time * 1.2 / 10.0) * 10)).export(exporter, suffix);
     }
 }

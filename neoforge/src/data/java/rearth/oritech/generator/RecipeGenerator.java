@@ -6,7 +6,8 @@ import java.util.concurrent.CompletableFuture;
 
 import appeng.api.ids.AEConstants;
 import blusunrize.immersiveengineering.ImmersiveEngineering;
-import com.enderio.core.EnderCore;
+import com.enderio.endergy.common.EnderIOEndergy;
+import com.enderio.enderio.EnderIO;
 import com.glodblock.github.extendedae.ExtendedAE;
 import com.simibubi.create.Create;
 import cy.jdkdigital.productivemetalworks.ProductiveMetalworks;
@@ -31,6 +32,7 @@ import rearth.oritech.init.TagContent;
 import rearth.oritech.generator.compat.ActuallyAdditionsRecipeGenerator;
 import rearth.oritech.generator.compat.AppliedEnergistics2RecipeGenerator;
 import rearth.oritech.generator.compat.CreateRecipeGenerator;
+import rearth.oritech.generator.compat.EndergyRecipeGenerator;
 import rearth.oritech.generator.compat.EnderIORecipeGenerator;
 import rearth.oritech.generator.compat.EnergizedPowerRecipeGenerator;
 import rearth.oritech.generator.compat.EvilCraftRecipeGenerator;
@@ -70,7 +72,8 @@ public class RecipeGenerator extends RecipeProvider implements IConditionBuilder
         ActuallyAdditionsRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(ActuallyAdditions.MODID)));
         AppliedEnergistics2RecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(AEConstants.MOD_ID)));
         CreateRecipeGenerator.generateRecipes(this, packOutput, registries, exporter.withConditions(this.modLoaded(Create.ID)));
-        EnderIORecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(EnderCore.MOD_ID)), this);
+        EndergyRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(EnderIOEndergy.MOD_ID)));
+        EnderIORecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(EnderIO.MOD_ID)), this);
         EnergizedPowerRecipeGenerator.generateRecipes(this, exporter.withConditions(this.modLoaded(EPAPI.MOD_ID)));
         EvilCraftRecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(org.cyclops.evilcraft.Reference.MOD_ID)));
         ExtendedAERecipeGenerator.generateRecipes(exporter.withConditions(this.modLoaded(ExtendedAE.MODID)));

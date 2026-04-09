@@ -2,7 +2,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:mod_loaded",
-      "modid": "endercore"
+      "modid": "enderio"
     }
   ],
   "type": "oritech:foundry",
@@ -16,7 +16,7 @@
       "tag": "c:ingots/electrum"
     },
     {
-      "tag": "c:dusts/glowstone"
+      "item": "enderio:conductive_alloy_ingot"
     }
   ],
   "results": [
@@ -25,5 +25,5 @@
       "id": "enderio:energetic_alloy_ingot"
     }
   ],
-  "time": 120
+  "time": 150
 }

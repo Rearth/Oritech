@@ -10,7 +10,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import rearth.oritech.generator.DataMapGenerator;
 import rearth.oritech.generator.RecipeGenerator;
-import rearth.oritech.generator.loot.FireCraftingLootProvider;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +26,5 @@ public class OritechDataGenerator {
 
         generator.addProvider(event.includeServer(), new RecipeGenerator(packOutput, lookupProvider));
         generator.addProvider(event.includeServer(), new DataMapGenerator(packOutput, lookupProvider));
-        generator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(FireCraftingLootProvider::new, LootContextParamSets.EMPTY)), lookupProvider));
     }
 }

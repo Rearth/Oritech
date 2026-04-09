@@ -2,7 +2,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:mod_loaded",
-      "modid": "endercore"
+      "modid": "enderio"
     }
   ],
   "type": "oritech:foundry",
@@ -21,9 +21,9 @@
   ],
   "results": [
     {
-      "count": 1,
+      "count": 2,
       "id": "enderio:pulsating_alloy_ingot"
     }
   ],
-  "time": 120
+  "time": 150
 }

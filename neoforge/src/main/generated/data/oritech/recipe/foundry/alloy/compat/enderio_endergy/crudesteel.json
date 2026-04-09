@@ -2,7 +2,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:mod_loaded",
-      "modid": "endercore"
+      "modid": "enderio_endergy"
     }
   ],
   "type": "oritech:foundry",
@@ -13,17 +13,17 @@
   "fluidOutputs": [],
   "ingredients": [
     {
-      "item": "enderio:energetic_alloy_ingot"
+      "item": "enderio:conduit_binder_composite"
     },
     {
-      "tag": "c:ender_pearls"
+      "tag": "c:cobblestones/normal"
     }
   ],
   "results": [
     {
       "count": 1,
-      "id": "enderio:vibrant_alloy_ingot"
+      "id": "enderio_endergy:crude_steel_ingot"
     }
   ],
-  "time": 120
+  "time": 180
 }
