@@ -43,6 +43,7 @@ import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
+import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -141,6 +142,7 @@ public class NetworkManager {
         registerToServer(PlayerAugments.AugmentPlayerTogglePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerTogglePacket.class), PlayerAugments::receiveToggleAugment);
         registerToServer(ShrinkerBlockEntity.ShrinkerPlayerUsePacket.PACKET_ID, getAutoCodec(ShrinkerBlockEntity.ShrinkerPlayerUsePacket.class), ShrinkerBlockEntity::onPlayerUse);
         registerToServer(OritechScreenHandler.FluidContainerInteractionPacket.PACKET_ID, getAutoCodec(OritechScreenHandler.FluidContainerInteractionPacket.class), OritechScreenHandler::handleFluidContainerInteraction);
+        registerToServer(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.PACKET_ID, getAutoCodec(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.class), TaintedRefineryBlockEntity::handleTankPacket);
         
         
         registerToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);

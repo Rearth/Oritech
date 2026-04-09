@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "oritech:arcane_refinery_block"
+          "name": "oritech:tainted_refinery_block"
         }
       ],
       "rolls": 1.0

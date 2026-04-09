@@ -4,23 +4,22 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import rearth.oritech.util.ColorHelper;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
-import rearth.oritech.block.entity.processing.RefineryBlockEntity;
-import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.cache.object.BakedGeoModel;
-import software.bernie.geckolib.renderer.GeoBlockRenderer;
-
-import java.util.HashMap;
-import java.util.Map;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
+import rearth.oritech.block.entity.processing.RefineryBlockEntity;
+import rearth.oritech.util.ColorHelper;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.renderer.GeoBlockRenderer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
     
@@ -48,7 +47,7 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> ext
         var inputStack = animatable.ownStorage.getInStack();
         if (!inputStack.isEmpty()) {
             // render in stack
-            renderFluidCube(new Vec3(-24 / 16f, 3 / 16f, 11 / 16f), new Vector3f(12 / 16f, 25 / 16f, 28 / 16f), inputStack, animatable.ownStorage.getCapacity(), consumer, poseStack, packedLight, packedOverlay, -1, lastHeight);
+            renderFluidCube(new Vector3f(-24 / 16f, 3 / 16f, 11 / 16f), new Vector3f(12 / 16f, 25 / 16f, 28 / 16f), inputStack, animatable.ownStorage.getCapacity(), consumer, poseStack, packedLight, packedOverlay, -1, lastHeight);
         }
         
         var moduleCount = animatable.getModuleCount();
@@ -64,18 +63,18 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> ext
         
     }
     
-    private static Tuple<Vec3, Vector3f> getTankCoordinates(int i) {
+    private static Tuple<Vector3f, Vector3f> getTankCoordinates(int i) {
         return switch (i) {
-            case 0 -> new Tuple<>(new Vec3(-22 / 16f, 9 / 16f, -5 / 16f), new Vector3f(7 / 16f, 15 / 16f, 10 / 16f));
+            case 0 -> new Tuple<>(new Vector3f(-22 / 16f, 9 / 16f, -5 / 16f), new Vector3f(7 / 16f, 15 / 16f, 10 / 16f));
             case 1 ->
-              new Tuple<>(new Vec3(-21 / 16f, 0 / 16f + 2, -5 / 16f), new Vector3f(26 / 16f, 14 / 16f, 26 / 16f));
+              new Tuple<>(new Vector3f(-21 / 16f, 0 / 16f + 2, -5 / 16f), new Vector3f(26 / 16f, 14 / 16f, 26 / 16f));
             case 2 ->
-              new Tuple<>(new Vec3(-21 / 16f, 0 / 16f + 3, -5 / 16f), new Vector3f(26 / 16f, 14 / 16f, 26 / 16f));
+              new Tuple<>(new Vector3f(-21 / 16f, 0 / 16f + 3, -5 / 16f), new Vector3f(26 / 16f, 14 / 16f, 26 / 16f));
             default -> throw new IllegalStateException("Tried to access invalid tank for renderer: " + i);
         };
     }
     
-    private static void renderFluidCube(Vec3 min, Vector3f size, FluidStack drawnStack, Long tankCapacity, VertexConsumer consumer, PoseStack matrices, int light, int overlay, int index, VisualTankHeights lastHeight) {
+    private static void renderFluidCube(Vector3f min, Vector3f size, FluidStack drawnStack, Long tankCapacity, VertexConsumer consumer, PoseStack matrices, int light, int overlay, int index, VisualTankHeights lastHeight) {
         var fluid = drawnStack.getFluid();
         var fill = drawnStack.getAmount() / (float) tankCapacity;
         

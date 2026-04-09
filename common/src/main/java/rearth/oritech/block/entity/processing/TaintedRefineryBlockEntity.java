@@ -4,14 +4,12 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Vec3i;
+import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Inventory;
@@ -34,7 +32,8 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.ArcaneRefineryScreenHandler;
+import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.client.ui.TaintedRefineryScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.TagContent;
@@ -47,23 +46,27 @@ import rearth.oritech.util.InventorySlotAssignment;
 import java.util.*;
 
 // todo:
-// screen
-// renderer (fluid contents + status / variant)
-// name (tainted refinery)
+// screen X
+// renderer (fluid contents + status / variant) X
+// name (tainted refinery) X
 // texture colors X
 // processing logic X
-// fluid output selection
+// fluid output selection X
 // environment scanning X
 //  - sculk increases yield X
 //  - arcane increases energy efficiency (and thus speed) X
 // bonus calculation X
-// increased energy intake, falloff scaling related to speed (max 50M, capacity scales with actual used speed, takes in 0 when not active)
-// Custom widget for energy intake.
-// energy intake, arcane, sculk progress sliders like in buddy drones?
-// occasional particle intake from surround bonus blocks
+// increased energy intake, falloff scaling related to speed (max 50M, capacity scales with actual used speed, takes in 0 when not active) X
+// Custom widget for energy intake. X
+// energy intake, arcane, sculk progress sliders like in buddy drones? X
+// occasional particle intake from surround bonus blocks X
+// transformation process
+// complex plating
 // recipe viewer category for supported blocks
+// sculk refinery color variant glowing green vines
+// wiki
 
-public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
+public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(16 * FluidStackHooks.bucketAmount(), this::setChanged);
@@ -76,8 +79,11 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public int selectedOutput = 0;  // can be 0, 1 or 2 (clickable/changeable via gui). Non-matching outputs are ignored
     
-    public ArcaneRefineryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ARCANE_REFINERY_ENTITY, pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN, SyncType.SPARSE_TICK, SyncType.INITIAL})
+    public long lastTickRFUsed = 0;
+    
+    public TaintedRefineryBlockEntity(BlockPos pos, BlockState state) {
+        super(BlockEntitiesContent.TAINTED_REFINERY_ENTITY, pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
     }
     
     @Override
@@ -85,6 +91,8 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
         
         // enabled later in this method if working
         energyStorage.setMaxInsert(0);
+        
+        lastTickRFUsed = 0;
         
         if (!isActive(state) || disabledViaRedstone) return;
         
@@ -98,6 +106,7 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
             
             // allow more energy in when working
             energyStorage.setMaxInsert(getDefaultInsertRate());
+            lastTickRFUsed = energyStorage.getAmount();
             
             // reset when recipe was switched while running
             if (currentRecipe != recipeCandidate.get().value()) resetProgress();
@@ -111,21 +120,21 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
                 // use all energy, calculate progression based on amount (and arcane factor)
                 var steps = getAndDrainProgress();
                 
-                System.out.println(steps);
+                // System.out.println(steps);
                 
                 // increase progress
                 progress += steps;
                 
                 var craftCount = 0;
                 
-                var recipeTime = activeRecipe.getTime();
+                var recipeTime = activeRecipe.getTime() * 2;
                 while (progress > recipeTime && canOutputRecipe(activeRecipe) && getRecipe().isPresent() && getRecipe().get().value().equals(activeRecipe)) {
                     craftItem(activeRecipe, getOutputView(), getInputView());
                     progress -= recipeTime;
                     craftCount++;
                 }
                 
-                System.out.println("crafted: " + craftCount);
+                // System.out.println("crafted: " + craftCount);
                 
                 // if input/output can't catch up / match speed, ensure we don't queue up progress
                 if (progress > recipeTime) {
@@ -156,10 +165,14 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
         return List.of(results.getFirst().copyWithCount(results.getFirst().getCount() * getOutputMultiplier()));
     }
     
-    private int getOutputMultiplier() {
+    public int getOutputMultiplier() {
         // range 1-3 based on sculk factor as yield
         return (int) (1 + (sculkFactor.result * 2.1f));
         
+    }
+
+    public float getArcaneEnergyMultiplier() {
+        return (arcaneFactor.result * 8) + 1;
     }
     
     private void craftFluids(OritechRecipe activeRecipe) {
@@ -198,15 +211,28 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
         
     }
     
+    @Override
+    public int getRecipeDuration() {
+        return super.getRecipeDuration() * 2;
+    }
+    
     private int getAndDrainProgress() {
         var availableEnergy = (float) energyStorage.getAmount();
         energyStorage.setAmount(0);
         
         // (remapped from 0-1 to 1-8)
-        var energyFactor = (arcaneFactor.result * 8) + 1;
+        var energyFactor = getArcaneEnergyMultiplier();
         availableEnergy *= energyFactor;
         
-        return (int) Math.round(0.2f * Math.pow(availableEnergy, 0.5f));
+       return getEnergyInputMapped((int) availableEnergy);
+    }
+    
+    public int getEnergyInputMapped(long amount) {
+        return Math.round(getEnergyFactor(amount));
+    }
+    
+    public float getEnergyFactor(long amount) {
+        return (float) (0.2f * Math.pow(amount, 0.45f));
     }
     
     // todo
@@ -274,10 +300,10 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
             var elemState = level.getBlockState(pos);
             if (elemState.is(TagContent.REFINERY_SCULK_BLOCKS) && isVisible(pos)) {
                 differentSculkTypes.add(elemState.getBlock());
-                sculkPositions.add(pos);
+                sculkPositions.add(pos.immutable());
             } else if (elemState.is(TagContent.REFINERY_ARCANE_BLOCKS) && isVisible(pos)) {
                 differentArcaneTypes.add(elemState.getBlock());
-                arcanePositions.add(pos);
+                arcanePositions.add(pos.immutable());
                 
             }
         }
@@ -324,7 +350,7 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new ArcaneRefineryScreenHandler(syncId, playerInventory, this);
+        return new TaintedRefineryScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
@@ -334,12 +360,12 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
     
     @Override
     public long getDefaultCapacity() {
-        return 50_000_000;
+        return 500_000_000;
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return 50_000_000;
+        return 500_000_000;
     }
     
     @Override
@@ -349,14 +375,20 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
     
     private void spawnWorkParticles() {
         
-        if (level.random.nextFloat() > 0.4) return;
+        if (level.random.nextFloat() > 0.2) return;
         // emit particles
         var facing = getFacing();
         var offsetLocal = Geometry.rotatePosition(new Vec3(0.3, 0.5, -0.3), facing);
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        if (level instanceof ServerLevel sl)
+        if (level instanceof ServerLevel sl) {
             sl.sendParticles(ParticleTypes.SOUL, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.5, 0.5, 0.5, 0);
+        }
+        
+        var spawnFromCandidates = new ArrayList<>(sculkFactor.sources);
+        spawnFromCandidates.addAll(arcaneFactor.sources);
+        var spawnFrom = spawnFromCandidates.get(level.random.nextInt(spawnFromCandidates.size()));
+        ParticleContent.CatalystConnection(level, spawnFrom.getCenter(), emitPosition);
         
     }
     
@@ -369,12 +401,12 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
     public List<GuiSlot> getGuiSlots() {
         return List.of(
           new GuiSlot(0, 8, 8),
-          new GuiSlot(1, 65 + 1, 6 + 74 - 22 + 4, true));
+          new GuiSlot(1, 67 + 1, 8, true));
     }
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.ARCANE_REFINERY_SCREEN;
+        return ModScreens.TAINTED_REFINERY_SCREEN;
     }
     
     @Override
@@ -442,6 +474,34 @@ public class ArcaneRefineryBlockEntity extends MultiblockMachineEntity implement
     @Override
     public ColorVariant getDefaultColor() {
         return super.getDefaultColor();
+    }
+    
+    @Override
+    public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+        return List.of(ownStorage.getInputContainer(), ownStorage.getOutputContainer());
+    }
+    
+    public static void handleTankPacket(TaintedRefineryBlockEntity.RefineryTankSelectorPacket payload, Player user, RegistryAccess registryAccess) {
+        var level = user.level();
+        if (level == null) return;
+        var refineryCandidate = level.getBlockEntity(payload.position(), BlockEntitiesContent.TAINTED_REFINERY_ENTITY);
+        if (refineryCandidate.isEmpty()) return;
+        
+        var refinery = refineryCandidate.get();
+        refinery.selectedOutput = payload.slot();
+        refinery.setChanged();
+        
+    }
+    
+    // Client -> Server (e.g. from UI interactions)
+    public record RefineryTankSelectorPacket(BlockPos position, int slot) implements CustomPacketPayload {
+        
+        public static final CustomPacketPayload.Type<RefineryTankSelectorPacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("refinery_slot"));
+        
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return PACKET_ID;
+        }
     }
     
     public record EnvironmentFactor(float result, int variants, List<BlockPos> sources) {

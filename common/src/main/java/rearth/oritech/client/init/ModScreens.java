@@ -45,7 +45,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
     public static final MenuType<PlayerModifierScreenHandler> MODIFIER_SCREEN = MenuRegistry.ofExtended((PlayerModifierScreenHandler::new));
     public static final MenuType<RedstoneAddonScreenHandler> REDSTONE_ADDON_SCREEN = MenuRegistry.ofExtended((RedstoneAddonScreenHandler::new));
     public static final MenuType<RefineryScreenHandler> REFINERY_SCREEN = MenuRegistry.ofExtended((RefineryScreenHandler::new));
-    public static final MenuType<ArcaneRefineryScreenHandler> ARCANE_REFINERY_SCREEN = MenuRegistry.ofExtended((ArcaneRefineryScreenHandler::new));
+    public static final MenuType<TaintedRefineryScreenHandler> TAINTED_REFINERY_SCREEN = MenuRegistry.ofExtended((TaintedRefineryScreenHandler::new));
     
     public static final MenuType<DroneScreenHandler> DRONE_SCREEN = MenuRegistry.ofExtended((DroneScreenHandler::new));
     public static final MenuType<CentrifugeScreenHandler> CENTRIFUGE_SCREEN = MenuRegistry.ofExtended((CentrifugeScreenHandler::new));
@@ -62,7 +62,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
         MenuRegistry.registerScreenFactory(FUEL_PORT_SCREEN, OritechMachineScreen<OritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(AUGMENTER_INV_SCREEN, OritechMachineScreen<OritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(REFINERY_SCREEN, RefineryScreen::new);
-        MenuRegistry.registerScreenFactory(ARCANE_REFINERY_SCREEN, ArcaneRefineryScreen::new);
+        MenuRegistry.registerScreenFactory(TAINTED_REFINERY_SCREEN, TaintedRefineryScreen::new);
         
         MenuRegistry.registerScreenFactory(PULVERIZER_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(GRINDER_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);

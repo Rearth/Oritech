@@ -74,7 +74,7 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     @AssignSidedFluid
     @AssignSidedInventory
     @AssignSidedEnergy
-    public static final BlockEntityType<ArcaneRefineryBlockEntity> ARCANE_REFINERY_ENTITY = BlockEntityType.Builder.of(ArcaneRefineryBlockEntity::new, BlockContent.ARCANE_REFINERY_BLOCK).build(null);
+    public static final BlockEntityType<TaintedRefineryBlockEntity> TAINTED_REFINERY_ENTITY = BlockEntityType.Builder.of(TaintedRefineryBlockEntity::new, BlockContent.TAINTED_REFINERY_BLOCK).build(null);
     
     @AssignSidedFluid
     public static final BlockEntityType<RefineryModuleBlockEntity> REFINERY_MODULE_ENTITY = BlockEntityType.Builder.of(RefineryModuleBlockEntity::new, BlockContent.REFINERY_MODULE_BLOCK).build(null);
