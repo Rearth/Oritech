@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -24,6 +25,8 @@ import net.neoforged.neoforge.client.event.RenderHighlightEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
@@ -39,11 +42,13 @@ import rearth.oritech.init.EntitiesContent;
 @Mod(value = Oritech.MOD_ID, dist = Dist.CLIENT)
 public class OritechClientNeoForge {
     
-    public OritechClientNeoForge(IEventBus eventBus) {
+    public OritechClientNeoForge(IEventBus eventBus, ModContainer container) {
         
         eventBus.register(new EventHandler());
         
         OritechClient.initialize();
+        
+        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
     
     @EventBusSubscriber(modid = Oritech.MOD_ID, value = Dist.CLIENT)

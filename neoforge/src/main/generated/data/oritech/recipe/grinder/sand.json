@@ -1,10 +1,5 @@
 {
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "minecraft:gravel"
@@ -16,5 +11,5 @@
       "id": "minecraft:sand"
     }
   ],
-  "time": 140
+  "time": 120
 }

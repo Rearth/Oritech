@@ -10,8 +10,6 @@
     "amount": 100,
     "fluid": "industrialforegoing:biofuel"
   },
-  "fluidOutputs": [],
   "ingredients": [],
-  "results": [],
-  "time": 60
+  "results": []
 }

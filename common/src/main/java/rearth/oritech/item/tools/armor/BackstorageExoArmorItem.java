@@ -1,5 +1,6 @@
 package rearth.oritech.item.tools.armor;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
@@ -66,17 +67,17 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEner
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return Oritech.CONFIG.exoChestplate.energyCapacity();
+        return OritechConfig.exoChestplate.energyCapacity.get();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return Oritech.CONFIG.exoChestplate.chargeSpeed();
+        return OritechConfig.exoChestplate.chargeSpeed.get();
     }
     
     @Override
     public long getEnergyMaxOutput(ItemStack stack) {
-        return Oritech.CONFIG.exoChestplate.energyUsage();
+        return OritechConfig.exoChestplate.energyUsage.get();
     }
     
     @Override

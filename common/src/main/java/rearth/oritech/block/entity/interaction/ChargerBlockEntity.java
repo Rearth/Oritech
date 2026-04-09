@@ -3,6 +3,7 @@ package rearth.oritech.block.entity.interaction;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -14,9 +15,10 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventorySlotAssignment;
@@ -44,7 +46,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
                                                                  ScreenProvider, ExtendedMenuProvider {
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.charger.energyCapacity(), Oritech.CONFIG.charger.maxEnergyInsertion(), Oritech.CONFIG.charger.maxEnergyExtraction(), this::setChanged);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.charger.energyCapacity.get(), OritechConfig.charger.maxEnergyInsertion.get(), OritechConfig.charger.maxEnergyExtraction.get(), this::setChanged);
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::setChanged);
@@ -84,7 +86,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
         }
         
         if (fluidStorage.getAmount() != startFluid || energyStorage.amount != startEnergy) {
-            ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.getCenter().add(0.1, 0.1, 0), 1);
+            if (world instanceof ServerLevel sl) { var c = pos.getCenter().add(0.1, 0.1, 0); sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 1, 0.6, 0.6, 0.6, 0); }
         }
         
     }
@@ -149,7 +151,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new BasicMachineScreenHandler(syncId, playerInventory, this);
+        return new OritechScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

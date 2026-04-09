@@ -1,27 +1,6 @@
 package rearth.oritech.block.base.entity;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
-import rearth.oritech.api.lookup.BlockLookupCache;
-import rearth.oritech.api.networking.NetworkedBlockEntity;
-import rearth.oritech.api.networking.SyncField;
-import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.blocks.storage.SmallStorageBlock;
-import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.util.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -40,6 +19,27 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.lookup.BlockLookupCache;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.block.blocks.storage.SmallStorageBlock;
+import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.OritechConfig;
+import rearth.oritech.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockEntity implements EnergyApi.BlockProvider, ItemApi.BlockProvider, MachineAddonController,
                                                                                           ScreenProvider, ExtendedMenuProvider {
@@ -110,7 +110,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
         
         if (!inventory.getItem(0).getItem().equals(ItemContent.OVERCHARGED_CRYSTAL)) return;
         
-        energyStorage.amount = Math.min(energyStorage.capacity, energyStorage.amount + Oritech.CONFIG.overchargedCrystalChargeRate());
+        energyStorage.amount = Math.min(energyStorage.capacity, energyStorage.amount + OritechConfig.overchargedCrystalChargeRate.get());
     }
     
     private void outputEnergy() {
@@ -270,12 +270,12 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
+        return new UpgradableOritechScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
     public List<GuiSlot> getGuiSlots() {
-        return List.of(new GuiSlot(0, 30, 42));
+        return List.of(new GuiSlot(0, 40, 38));
     }
     
     @Override

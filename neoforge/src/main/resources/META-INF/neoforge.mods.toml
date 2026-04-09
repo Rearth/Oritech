@@ -11,7 +11,8 @@ authors = "Me! - Rearth"
 description = '''
 Simple tech mod.
 '''
-#logoFile = ""
+
+logoFile = "assets/oritech/icon.png"
 
 [[dependencies.oritech]]
 modId = "neoforge"
@@ -41,14 +42,14 @@ ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies.oritech]]
-modId = "owo"
+modId = "geckolib"
 type = "required"
 ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies.oritech]]
-modId = "geckolib"
-type = "required"
+modId = "oracle_index"
+type = "optional"
 ordering = "AFTER"
 side = "BOTH"
 

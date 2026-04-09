@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechPlatform;
 import rearth.oritech.api.fluid.FluidApi;
@@ -40,23 +41,23 @@ import java.util.Optional;
 public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
     @SyncField({SyncType.GUI_TICK, SyncType.INITIAL})
-    public final SimpleInOutFluidStorage fluidContainer = new SimpleInOutFluidStorage(Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidStackHooks.bucketAmount(), this::setChanged);
+    public final SimpleInOutFluidStorage fluidContainer = new SimpleInOutFluidStorage(OritechConfig.processingMachines.centrifugeData.tankSizeInBuckets.get() * FluidStackHooks.bucketAmount(), this::setChanged);
     
     @SyncField({SyncType.GUI_OPEN, SyncType.INITIAL})
     public boolean hasFluidAddon = false;
     
     public CentrifugeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.CENTRIFUGE_ENTITY, pos, state, Oritech.CONFIG.processingMachines.centrifugeData.energyPerTick());
+        super(BlockEntitiesContent.CENTRIFUGE_ENTITY, pos, state, OritechConfig.processingMachines.centrifugeData.energyPerTick.get());
     }
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.centrifugeData.energyCapacity();
+        return OritechConfig.processingMachines.centrifugeData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.centrifugeData.maxEnergyInsertion();
+        return OritechConfig.processingMachines.centrifugeData.maxEnergyInsertion.get();
     }
     
     @Override
@@ -266,5 +267,11 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
         if (!hasFluidAddon) return null;
         return fluidContainer;
+    }
+    
+    @Override
+    public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+        if (!hasFluidAddon) return List.of();
+        return List.of(fluidContainer.getInputContainer(), fluidContainer.getOutputContainer());
     }
 }

@@ -1,7 +1,6 @@
 {
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 81000,
     "fluid": "#c:naphtha"
   },
   "fluidOutputs": [

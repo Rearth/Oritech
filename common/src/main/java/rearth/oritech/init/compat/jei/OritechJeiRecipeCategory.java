@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.client.ui.OritechMachineScreen;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.InventorySlotAssignment;
@@ -28,8 +29,6 @@ import rearth.oritech.util.ScreenProvider;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-
-import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 
 
 public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> {
@@ -60,7 +59,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
         
         this.arrow = helper.createAnimatedRecipeArrow(40);
         this.background = helper.getSlotDrawable();
-        this.fluidBackground = helper.drawableBuilder(GUI_COMPONENTS, 48, 0, 14, 50).setTextureSize(98, 96).build();
+        this.fluidBackground = helper.drawableBuilder(OritechMachineScreen.GUI_COMPONENTS, 48, 0, 14, 50).setTextureSize(98, 96).build();
         
     }
     
@@ -70,7 +69,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
         
         this.arrow = helper.createAnimatedRecipeArrow(40);
         this.background = helper.getSlotDrawable();
-        this.fluidBackground = helper.drawableBuilder(GUI_COMPONENTS, 48, 0, 14, 50).setTextureSize(98, 96).build();
+        this.fluidBackground = helper.drawableBuilder(OritechMachineScreen.GUI_COMPONENTS, 48, 0, 14, 50).setTextureSize(98, 96).build();
         
         this.slots = slots;
         this.slotOffsets = slotOffsets;

@@ -9,12 +9,10 @@
   ],
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 81000,
     "fluid": "techreborn:oil"
   },
   "fluidOutputs": [
     {
-      "amount": 81000,
       "fluid": "oritech:still_fuel"
     }
   ],

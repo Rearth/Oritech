@@ -1,9 +1,5 @@
 package rearth.oritech.client.ui;
 
-import io.wispforest.endec.Endec;
-import io.wispforest.endec.impl.StructEndecBuilder;
-import io.wispforest.owo.serialization.CodecUtils;
-import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -12,6 +8,7 @@ import rearth.oritech.util.ScreenProvider;
 import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -32,8 +29,12 @@ public class InventoryProxyScreenHandler extends AbstractContainerMenu {
     protected final ScreenProvider controllerScreen;
     
     public record InvProxyData(BlockPos ownPos, BlockPos controllerPos, int slot) {
-        public static final Endec<InvProxyData> PACKET_ENDEC = StructEndecBuilder.of(MinecraftEndecs.BLOCK_POS.fieldOf("ownPos", InvProxyData::ownPos), MinecraftEndecs.BLOCK_POS.fieldOf("controllerPos", InvProxyData::controllerPos), Endec.INT.fieldOf("slot", InvProxyData::slot), InvProxyData::new);
-        public static final StreamCodec<FriendlyByteBuf, InvProxyData> PACKET_CODEC = CodecUtils.toPacketCodec(PACKET_ENDEC);
+        public static final StreamCodec<FriendlyByteBuf, InvProxyData> PACKET_CODEC = StreamCodec.composite(
+          BlockPos.STREAM_CODEC, InvProxyData::ownPos,
+          BlockPos.STREAM_CODEC, InvProxyData::controllerPos,
+          ByteBufCodecs.INT, InvProxyData::slot,
+          InvProxyData::new
+        );
     }
     
     public InventoryProxyScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {

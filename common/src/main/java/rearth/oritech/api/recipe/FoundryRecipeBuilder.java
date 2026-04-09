@@ -8,7 +8,7 @@ public class FoundryRecipeBuilder extends OritechRecipeBuilder {
     
     private FoundryRecipeBuilder() {
         super(RecipeContent.FOUNDRY, resourcePath);
-        this.time = 120;
+        this.time = 80;
     }
 
     public static OritechRecipeBuilder build() {

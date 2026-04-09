@@ -2,6 +2,7 @@ package rearth.oritech.item.other;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
@@ -48,7 +49,7 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
     
     @Override
     public FluidApi.SingleSlotStorage getFluidStorage(ItemStack stack) {
-        return new SimpleItemFluidStorage(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), stack);
+        return new SimpleItemFluidStorage(OritechConfig.portableTankCapacityBuckets.get() * FluidStackHooks.bucketAmount(), stack);
     }
     
     @Override
@@ -72,7 +73,7 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
     @Override
     public int getBarWidth(ItemStack stack) {
         
-        var capacity = Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount();
+        var capacity = OritechConfig.portableTankCapacityBuckets.get() * FluidStackHooks.bucketAmount();
         var fillAmount = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()).getAmount();
         
         return Math.round((fillAmount * 100f / capacity) * MAX_BAR_WIDTH) / 100;

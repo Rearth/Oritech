@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.synth.ImprovedNoise;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 
 public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
@@ -73,7 +74,7 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
         }
         
         // fountain up
-        if (Oritech.CONFIG.easyFindFeatures()) {
+        if (OritechConfig.easyFindFeatures.get()) {
             for (int i = 0; i < height; i++) {
                 world.setBlock(surfacePos.above(i), state, 0x10);
             }

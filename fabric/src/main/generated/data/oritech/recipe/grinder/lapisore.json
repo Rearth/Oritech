@@ -1,10 +1,5 @@
 {
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "minecraft:lapis_ores"
@@ -16,5 +11,5 @@
       "id": "minecraft:lapis_lazuli"
     }
   ],
-  "time": 60
+  "time": 40
 }

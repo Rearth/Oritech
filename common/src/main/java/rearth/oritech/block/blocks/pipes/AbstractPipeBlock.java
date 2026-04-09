@@ -17,12 +17,11 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
+import rearth.oritech.client.init.OritechClientConfig;
 
 public abstract class AbstractPipeBlock extends Block {
     
-    private static final Boolean USE_ACCURATE_OUTLINES = Oritech.CONFIG.tightCableHitboxes();
     protected VoxelShape[] boundingShapes;
     
     public AbstractPipeBlock(Properties settings) {
@@ -34,7 +33,7 @@ public abstract class AbstractPipeBlock extends Block {
     
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        if (!USE_ACCURATE_OUTLINES)
+        if (!(OritechClientConfig.CLIENT_SPEC.isLoaded() && OritechClientConfig.tightCableHitboxes.get()))
             return super.getShape(state, world, pos, context);
         return getShape(state);
     }

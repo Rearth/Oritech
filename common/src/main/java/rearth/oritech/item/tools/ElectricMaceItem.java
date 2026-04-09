@@ -1,16 +1,5 @@
 package rearth.oritech.item.tools;
 
-import org.jetbrains.annotations.NotNull;
-import rearth.oritech.Oritech;
-import rearth.oritech.init.SoundContent;
-import rearth.oritech.item.tools.harvesting.ChainsawItem;
-import rearth.oritech.item.tools.util.OritechEnergyItem;
-import rearth.oritech.util.TooltipHelper;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.particles.ParticleOptions;
@@ -35,11 +24,21 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+import rearth.oritech.Oritech;
+import rearth.oritech.init.OritechConfig;
+import rearth.oritech.init.SoundContent;
+import rearth.oritech.item.tools.harvesting.ChainsawItem;
+import rearth.oritech.item.tools.util.OritechEnergyItem;
+import rearth.oritech.util.TooltipHelper;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     
-    private static final int BASE_ATTACK_DAMAGE = Oritech.CONFIG.electricMace.baseDamage();
-    private static final int RF_USAGE = Oritech.CONFIG.electricMace.energyUsage();
     
     public static final Map<Long, Runnable> PENDING_LIGHTNING_HITS = new HashMap<>();
     
@@ -50,7 +49,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     public static ItemAttributeModifiers createAttributes() {
         return ItemAttributeModifiers
                  .builder()
-                 .add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, BASE_ATTACK_DAMAGE, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
+                 .add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, 8, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
                  .add(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, -3.4F, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
                  .add(Attributes.SAFE_FALL_DISTANCE, new AttributeModifier(Oritech.id("mace_fall_protection"), 10, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
                  .add(Attributes.ENTITY_INTERACTION_RANGE, new AttributeModifier(Oritech.id("mace_reach"), 3, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
@@ -62,11 +61,11 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
         
         var bonus = 0f;
         
-        var usedEnergy = tryUseEnergy(stack, RF_USAGE, null);
+        var usedEnergy = tryUseEnergy(stack, OritechConfig.electricMace.energyUsage.get(), null);
         if (usedEnergy && canSmashAttack(attacker)) {
             attacker.level().playSound(null, target.blockPosition(), SoundContent.ELECTRIC_SHOCK, SoundSource.PLAYERS);
             attacker.resetFallDistance();
-            bonus = getAttackDamageBonus(target, BASE_ATTACK_DAMAGE, new DamageSource(attacker.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), attacker));
+            bonus = getAttackDamageBonus(target, getAttackDamage(), new DamageSource(attacker.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), attacker));
         }
         
         
@@ -75,13 +74,13 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
                 return;
             
             player.getCooldowns().addCooldown(this, 40);
-            createLightningAttack(serverWorld, player, target, stack, (int) (BASE_ATTACK_DAMAGE / 2f + bonus / 2f));
+            createLightningAttack(serverWorld, player, target, stack, (int) (getAttackDamage() / 2f + bonus / 2f));
         }
     }
     
     private void createLightningAttack(ServerLevel world, Player attacker, LivingEntity target, ItemStack stack, int damage) {
         
-        var usedEnergy = tryUseEnergy(stack, RF_USAGE * Oritech.CONFIG.electricMace.lightningCostMultiplier(), null);
+        var usedEnergy = tryUseEnergy(stack, OritechConfig.electricMace.energyUsage.get() * OritechConfig.electricMace.lightningCostMultiplier.get(), null);
         if (usedEnergy && attacker.level() instanceof ServerLevel serverWorld) {
             
             var playerPos = attacker.getEyePosition();
@@ -129,11 +128,11 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
                 float fallDist = livingEntity.fallDistance;
                 float damage;
                 if (fallDist <= 3.0F) {
-                    damage = BASE_ATTACK_DAMAGE * fallDist;
+                    damage = getAttackDamage() * fallDist;
                 } else if (fallDist <= 8.0F) {
-                    damage = BASE_ATTACK_DAMAGE * 4 + 4.0F * (fallDist - 3.0F);
+                    damage = getAttackDamage() * 4 + 4.0F * (fallDist - 3.0F);
                 } else {
-                    damage = BASE_ATTACK_DAMAGE * 6 + fallDist - 8.0F;
+                    damage = getAttackDamage() * 6 + fallDist - 8.0F;
                 }
                 
                 var world = livingEntity.level();
@@ -190,7 +189,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return Oritech.CONFIG.electricMace.energyCapacity();
+        return OritechConfig.electricMace.energyCapacity.get();
     }
     
     @Override
@@ -214,6 +213,10 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     
     public boolean shouldCauseBlockBreakReset(@NotNull ItemStack oldStack, @NotNull ItemStack newStack) {
         return false;
+    }
+    
+    private int getAttackDamage() {
+        return 8;
     }
     
     /**

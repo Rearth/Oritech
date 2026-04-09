@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.util.MultiblockMachineController;
@@ -147,7 +148,7 @@ public class PowerPoleBlock extends Block implements EntityBlock {
         if (showExtra) {
             tooltip.add(Component.translatable("tooltip.oritech.power_pole.1").withStyle(ChatFormatting.GRAY));
             tooltip.add(Component.translatable("tooltip.oritech.power_pole.2").withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("tooltip.oritech.power_pole.3", Oritech.CONFIG.poleConfig.minRange(), Oritech.CONFIG.poleConfig.maxRange(), TooltipHelper.getEnergyText(Oritech.CONFIG.poleConfig.energyCapacity())).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.oritech.power_pole.3", OritechConfig.poleConfig.minRange.get(), OritechConfig.poleConfig.maxRange.get(), TooltipHelper.getEnergyText(OritechConfig.poleConfig.energyCapacity.get())).withStyle(ChatFormatting.GRAY));
         }
     }
 }

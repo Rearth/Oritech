@@ -2,6 +2,7 @@ package rearth.oritech.item.tools.armor;
 
 import dev.architectury.fluid.FluidStack;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
@@ -131,32 +132,32 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     
     @Override
     public float getSpeed() {
-        return Oritech.CONFIG.basicJetpack.speed();
+        return OritechConfig.basicJetpack.speed.get().floatValue();
     }
     
     @Override
     public int getRfUsage() {
-        return Oritech.CONFIG.basicJetpack.energyUsage();
+        return OritechConfig.basicJetpack.energyUsage.get();
     }
     
     @Override
     public int getFuelUsage() {
-        return Oritech.CONFIG.basicJetpack.fuelUsage();
+        return OritechConfig.basicJetpack.fuelUsage.get();
     }
     
     @Override
     public long getFuelCapacity() {
-        return Oritech.CONFIG.basicJetpack.fuelCapacity();
+        return OritechConfig.basicJetpack.fuelCapacity.get();
     }
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return Oritech.CONFIG.basicJetpack.energyCapacity();
+        return OritechConfig.basicJetpack.energyCapacity.get();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return Oritech.CONFIG.basicJetpack.chargeSpeed();
+        return OritechConfig.basicJetpack.chargeSpeed.get();
     }
     
     public static void receiveUsagePacket(JetpackUsageUpdatePacket packet, Player player, RegistryAccess dynamicRegistryManager) {

@@ -1,10 +1,5 @@
 package rearth.oritech.client.ui;
 
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.LabelComponent;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.PositionedRectangle;
-import io.wispforest.owo.ui.core.Positioning;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -12,22 +7,19 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.screen.widgets.LabelWidget;
+import rearth.oritech.api.screen.widgets.TextureWidget;
 
-public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
+public class CatalystScreen extends OritechMachineScreen<CatalystScreenHandler> {
     
     public static final ResourceLocation GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components_souls.png");
     public static final ResourceLocation BOOK_SLOT = Oritech.id("textures/gui/modular/book_slot_background.png");
     
-    private LabelComponent costLabel;
-    private LabelComponent stabilizationLabel;
+    private LabelWidget costLabel;
+    private LabelWidget stabilizationLabel;
     
     public CatalystScreen(CatalystScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
-    }
-    
-    @Override
-    public ResourceLocation getGuiComponents() {
-        return GUI_COMPONENTS;
     }
     
     @Override
@@ -36,35 +28,28 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
     }
     
     @Override
-    public void fillOverlay(FlowLayout overlay) {
-        super.fillOverlay(overlay);
-        
-        costLabel = Components.label(Component.translatable("message.oritech.catalyst.cost", 0));
-        stabilizationLabel = Components.label(Component.translatable("title.oritech.catalyst.stable"));
-        overlay.child(costLabel.positioning(Positioning.absolute(56, 58)));
-        overlay.child(stabilizationLabel.positioning(Positioning.absolute(108, 39)));
-        
+    protected void addExtraComponents() {
+        costLabel = new LabelWidget(56, 58, 40, 10, Component.translatable("message.oritech.catalyst.cost", 0));
+        costLabel.withDarkColor();
+        costLabel.setVisible(false);
+
+        stabilizationLabel = new LabelWidget(101, 39, 60, 10, Component.translatable("title.oritech.catalyst.stable"));
+        stabilizationLabel.withDarkColor();
+
         var slotConfig = menu.screenData.getGuiSlots().getFirst();
-        overlay.child(Components.texture(BOOK_SLOT, 0, 0, 16, 16, 16, 16).positioning(Positioning.absolute(slotConfig.x(), slotConfig.y())));
-        
+        addComponent(new TextureWidget(slotConfig.x(), slotConfig.y(), 16, 16, BOOK_SLOT, 16, 16));
+        addComponent(costLabel);
+        addComponent(stabilizationLabel);
     }
     
     @Override
-    protected void containerTick() {
-        super.containerTick();
-        
+    protected void tickExtra() {
         var cost = menu.catalyst.getDisplayedCost();
-        costLabel.text(Component.translatable("message.oritech.catalyst.cost", cost).withStyle(ChatFormatting.BLACK));
-        
-        if (cost == 0) {
-            costLabel.zIndex(-5);
-        } else {
-            costLabel.zIndex(1);
-        }
-        
+        costLabel.setText(Component.translatable("message.oritech.catalyst.cost", cost).withStyle(ChatFormatting.BLACK));
+        costLabel.setVisible(cost > 0);
+
         var result = getStabilizationTitle();
-        stabilizationLabel.text(result.withStyle(ChatFormatting.BLACK));
-        
+        stabilizationLabel.setText(result.withStyle(ChatFormatting.BLACK));
     }
     
     @NotNull
@@ -95,22 +80,5 @@ public class CatalystScreen extends BasicMachineScreen<CatalystScreenHandler> {
             }
         }
         return result;
-    }
-    
-    @Override
-    protected void updateEnergyBar() {
-        
-        var capacity = menu.catalyst.maxSouls;
-        var amount = menu.catalyst.collectedSouls;
-        
-        var fillAmount = (float) amount / capacity;
-        var tooltipText = getSoulTooltip(amount, capacity);
-        
-        energyIndicator.tooltip(tooltipText);
-        energyIndicator.visibleArea(PositionedRectangle.of(0, 96 - ((int) (96 * (fillAmount))), 24, (int) (96 * fillAmount)));
-    }
-    
-    public Component getSoulTooltip(long amount, long max) {
-        return Component.translatable("tooltip.oritech.spawner.collected_souls", amount, max);
     }
 }

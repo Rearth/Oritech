@@ -10,6 +10,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import oshi.util.tuples.Pair;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.accelerator.AcceleratorPassthroughBlock;
 import rearth.oritech.block.blocks.accelerator.AcceleratorRingBlock;
@@ -288,11 +289,11 @@ public class AcceleratorParticleLogic {
     }
     
     public static float getMaxGateDist(float speed) {
-        return (float) Math.clamp(Math.sqrt(speed) / 2, 2, Oritech.CONFIG.maxGateDist());
+        return (float) Math.clamp(Math.sqrt(speed) / 2, 2, OritechConfig.maxGateDist.get());
     }
     
     public static float getRequiredBendDist(float speed) {
-        return (float) (Math.sqrt(speed) / Oritech.CONFIG.bendFactor());
+        return (float) (Math.sqrt(speed) / OritechConfig.bendFactor.get());
     }
     
     public static float getParticleBendDist(float distA, float distB) {
@@ -386,7 +387,7 @@ public class AcceleratorParticleLogic {
     }
     
     public static void resetNearbyCache(BlockPos pos) {
-        var toRemove = cachedGates.keySet().stream().filter(blockPos -> blockPos.getA().distManhattan(pos) < Oritech.CONFIG.maxGateDist() + 1).toList();
+        var toRemove = cachedGates.keySet().stream().filter(blockPos -> blockPos.getA().distManhattan(pos) < OritechConfig.maxGateDist.get() + 1).toList();
         toRemove.forEach(cachedGates::remove);
     }
     

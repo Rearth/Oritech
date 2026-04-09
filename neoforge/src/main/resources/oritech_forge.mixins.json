@@ -7,7 +7,6 @@
     "ExtendMachineRenderBounds"
   ],
   "mixins": [
-    "NetworkWarningShutupMixin"
   ],
   "injectors": {
     "defaultRequire": 1

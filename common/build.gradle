@@ -51,11 +51,8 @@ dependencies {
     annotationProcessor 'io.github.llamalad7:mixinextras-common:0.3.5'
     // Oracle Index
     compileOnly "curse.maven:oracle-index-1206582:7590938"
-    // owo-lib
-    compileOnlyApi "io.wispforest:owo-lib-neoforge:$owo_neo_version"
-    annotationProcessor "io.wispforest:owo-lib-neoforge:$owo_neo_version"
-    accessTransformers "io.wispforest:owo-lib-neoforge:$owo_neo_version"
-    interfaceInjectionData "io.wispforest:owo-lib-neoforge:$owo_neo_version"
+    // Forge Config API Port (common module - NeoForge API)
+    compileOnlyApi "fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforgeapi:$forge_config_api_port_version"
     // REI
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
 

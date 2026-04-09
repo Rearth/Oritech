@@ -1,10 +1,17 @@
 package rearth.oritech.block.entity.processing;
 
-import rearth.oritech.Oritech;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -13,18 +20,11 @@ import rearth.oritech.util.InventorySlotAssignment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     public AtomicForgeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ATOMIC_FORGE_ENTITY, pos, state, Oritech.CONFIG.processingMachines.atomicForgeData.energyPerTick());
+        super(BlockEntitiesContent.ATOMIC_FORGE_ENTITY, pos, state, OritechConfig.processingMachines.atomicForgeData.energyPerTick.get());
     }
     
     @Override
@@ -53,7 +53,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
         
         // also adjust energy storage when getting recipe
         if (result.isPresent()) {
-            energyStorage.setCapacity((long) Oritech.CONFIG.processingMachines.atomicForgeData.energyPerTick() * result.get().value().getTime());
+            energyStorage.setCapacity((long) OritechConfig.processingMachines.atomicForgeData.energyPerTick.get() * result.get().value().getTime());
         } else {
             energyStorage.setCapacity(1);
             energyStorage.setAmount(0);
@@ -73,7 +73,17 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public BarConfiguration getEnergyConfiguration() {
-        return new BarConfiguration(7, 7, 18, 71);
+        return new BarConfiguration(8, 7, 18, 71);
+    }
+    
+    @Override
+    public boolean showEnergyTransfer() {
+        return false;
+    }
+    
+    @Override
+    public boolean showEnergyUsage() {
+        return false;
     }
     
     @Override
@@ -83,12 +93,12 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.atomicForgeData.energyCapacity();
+        return OritechConfig.processingMachines.atomicForgeData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.atomicForgeData.maxEnergyInsertion();
+        return OritechConfig.processingMachines.atomicForgeData.maxEnergyInsertion.get();
     }
     
     @Override

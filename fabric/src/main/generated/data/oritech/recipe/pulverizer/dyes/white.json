@@ -1,10 +1,5 @@
 {
   "type": "oritech:pulverizer",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:raw_materials/dyes/white"
@@ -16,5 +11,5 @@
       "id": "minecraft:white_dye"
     }
   ],
-  "time": 120
+  "time": 100
 }

@@ -3,7 +3,9 @@ package rearth.oritech.block.base.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -12,13 +14,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ScreenProvider;
@@ -52,8 +54,12 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     
     public void consumeBurstTicks() {
         // consume burst tick with each tick that we progress (which uses energy once)
+        var wasThrottled = isBurstThrottled();
         remainingBurstTicks -= 2;
         remainingBurstTicks = Math.max(remainingBurstTicks, -addonData.maxBurstTicks());
+        if (!wasThrottled && isBurstThrottled()) {
+            spawnOverheatSmoke();
+        }
     }
     
     @Override
@@ -150,7 +156,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
+        return new UpgradableOritechScreenHandler(syncId, playerInventory, this);
     }
     
     @Override
@@ -170,12 +176,21 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     public boolean isBurstThrottled() {
         return remainingBurstTicks < 0;
     }
+
+    private void spawnOverheatSmoke() {
+        if (!(level instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        var smokePos = worldPosition.getCenter().add(0, 0.35, 0);
+        serverLevel.sendParticles(ParticleTypes.SMOKE, smokePos.x, smokePos.y, smokePos.z, 5, 0.15, 0.1, 0.15, 0.01);
+    }
     
     public float getBurstBonus() {
         if (isBurstAvailable()) {
-            return 1 / Oritech.CONFIG.addonConfig.burstAddonSpeedMultiplier();
+            return 1 / OritechConfig.addonConfig.burstAddonSpeedMultiplier.get().floatValue();
         } else if(isBurstThrottled()) {
-            return Oritech.CONFIG.addonConfig.burstAddonThrottleMultiplier();
+            return OritechConfig.addonConfig.burstAddonThrottleMultiplier.get().floatValue();
         } else {
             return 1f;
         }

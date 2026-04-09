@@ -13,11 +13,6 @@
     }
   ],
   "type": "oritech:pulverizer",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:raw_materials/tin"
@@ -33,5 +28,5 @@
       "id": "mekanism:nugget_tin"
     }
   ],
-  "time": 120
+  "time": 100
 }

@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -39,7 +40,7 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ComponentContent;
@@ -103,7 +104,6 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         
         if (currentRedstone && !wasRedstoneActive) {
             // recently enabled redstone
-            System.out.println("triggered redstone shrink");
             doShrink();
         }
         
@@ -137,8 +137,11 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
                 serverWorld.playSound(null, worldPosition, SoundEvents.SMALL_AMETHYST_BUD_PLACE, SoundSource.BLOCKS, 2f, 0.5f);
             }
         }
+        
         triggerAnim("machine", "work");
         
+        initAddons();
+        this.sendUpdate(SyncType.GUI_OPEN);
     }
     
     @Override
@@ -256,7 +259,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     
     @Override
     public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new UpgradableMachineScreenHandler(i, inventory, this);
+        return new UpgradableOritechScreenHandler(i, inventory, this);
     }
     
     @Override
@@ -318,12 +321,12 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.addonConfig.addonShrinkerRF();
+        return OritechConfig.addonConfig.addonShrinkerRF.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.addonConfig.addonShrinkerRF() / 60;
+        return OritechConfig.addonConfig.addonShrinkerRF.get() / 60;
     }
     
     @Override
@@ -422,6 +425,12 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         var candidate = world.getBlockEntity(packet.pos(), BlockEntitiesContent.SHRINKER_BLOCK_ENTITY);
         candidate.ifPresent(ShrinkerBlockEntity::doShrink);
         
+    }
+    
+    @Override
+    public int receivedRedstoneSignal() {
+        if (wasRedstoneActive) return 15;
+        return level.getBestNeighborSignal(worldPosition);
     }
     
     @Override

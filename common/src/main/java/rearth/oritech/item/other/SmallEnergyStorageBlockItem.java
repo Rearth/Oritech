@@ -1,5 +1,6 @@
 package rearth.oritech.item.other;
 
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
@@ -45,7 +46,7 @@ public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyApi.
     @Override
     public int getBarWidth(ItemStack stack) {
         
-        var capacity = Oritech.CONFIG.smallEnergyStorage.energyCapacity();
+        var capacity = OritechConfig.smallEnergyStorage.energyCapacity.get();
         var fillAmount = stack.getOrDefault(EnergyApi.ITEM.getEnergyComponent(), 0L);
         
         return Math.round((fillAmount * 100f / capacity) * MAX_BAR_WIDTH) / 100;
@@ -53,6 +54,6 @@ public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyApi.
     
     @Override
     public EnergyApi.EnergyStorage getEnergyStorage(ItemStack stack) {
-        return new SimpleEnergyItemStorage(Oritech.CONFIG.smallEnergyStorage.maxEnergyInsertion(), Oritech.CONFIG.smallEnergyStorage.maxEnergyExtraction(), Oritech.CONFIG.smallEnergyStorage.energyCapacity(), stack);
+        return new SimpleEnergyItemStorage(OritechConfig.smallEnergyStorage.maxEnergyInsertion.get(), OritechConfig.smallEnergyStorage.maxEnergyExtraction.get(), OritechConfig.smallEnergyStorage.energyCapacity.get(), stack);
     }
 }

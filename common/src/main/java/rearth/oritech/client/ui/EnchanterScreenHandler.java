@@ -1,13 +1,12 @@
 package rearth.oritech.client.ui;
 
-import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
-
 import java.util.Objects;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 
-public class EnchanterScreenHandler extends BasicMachineScreenHandler {
+public class EnchanterScreenHandler extends OritechScreenHandler {
     
     protected final EnchanterBlockEntity enchanter;
     

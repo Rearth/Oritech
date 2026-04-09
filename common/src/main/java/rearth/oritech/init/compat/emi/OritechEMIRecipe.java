@@ -7,22 +7,21 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.api.widget.WidgetHolder;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
+import rearth.oritech.client.ui.OritechMachineScreen;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
-
-import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 
 
 public class OritechEMIRecipe extends BasicEmiRecipe {
@@ -114,7 +113,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
             var isFluid = input.getEmiStacks().stream().anyMatch(stack -> stack.getKey() instanceof Fluid);
             if (isFluid && input.getAmount() > 0) {
                 widgets.addTank(input, 10, 6, 18, 50, (int) input.getAmount()).drawBack(false);
-                widgets.addTexture(GUI_COMPONENTS, 10, 6, 18, 50, 48, 0, 14, 50, 98, 96);
+                widgets.addTexture(OritechMachineScreen.GUI_COMPONENTS, 10, 6, 18, 50, 48, 0, 14, 50, 98, 96);
             } else {
                 var pos = slots.get(slotOffsets.inputStart() + i);
                 var usedY = Math.max(2, pos.y() - offsetY);
@@ -133,7 +132,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
             var isFluid = result.getEmiStacks().stream().anyMatch(stack -> stack.getKey() instanceof Fluid);
             if (isFluid && result.getAmount() > 0) {
                 widgets.addTank(result, tankStartX + tankCount * 20, 6, 18, 50, (int) result.getAmount()).drawBack(false).recipeContext(this);
-                widgets.addTexture(GUI_COMPONENTS, tankStartX + tankCount * 20, 6, 18, 50, 48, 0, 14, 50, 98, 96);
+                widgets.addTexture(OritechMachineScreen.GUI_COMPONENTS, tankStartX + tankCount * 20, 6, 18, 50, 48, 0, 14, 50, 98, 96);
                 tankCount++;
             } else {
                 var pos = slots.get(slotOffsets.outputStart() + i);

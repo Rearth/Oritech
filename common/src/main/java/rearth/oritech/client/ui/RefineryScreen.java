@@ -1,71 +1,48 @@
 package rearth.oritech.client.ui;
 
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.Positioning;
-import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.api.screen.OritechSurface;
+import rearth.oritech.api.screen.widgets.LabelWidget;
+import rearth.oritech.api.screen.widgets.SurfaceWidget;
+import rearth.oritech.block.entity.processing.RefineryBlockEntity;
+import rearth.oritech.util.ColorHelper;
 
-public class RefineryScreen extends UpgradableMachineScreen<RefineryScreenHandler> {
-    
-    private final FluidDisplay outADisplay;
-    private final FluidDisplay outBDisplay;
-    private final FluidDisplay outCDisplay;
-    
-    private static final ScreenProvider.BarConfiguration outAConfig = new ScreenProvider.BarConfiguration(92, 6, 21, 74);
-    private static final ScreenProvider.BarConfiguration outBConfig = new ScreenProvider.BarConfiguration(92 + 27, 6, 21, 74);
-    private static final ScreenProvider.BarConfiguration outCConfig = new ScreenProvider.BarConfiguration(92 + 27 * 2, 6, 21, 74);
-    
+public class RefineryScreen extends OritechMachineScreen<RefineryScreenHandler> {
+
     public RefineryScreen(RefineryScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
-        
-        outADisplay = initFluidDisplay(handler.outputAContainer, outAConfig);
-        outBDisplay = initFluidDisplay(handler.outputBContainer, outBConfig);
-        outCDisplay = initFluidDisplay(handler.outputCContainer, outCConfig);
     }
-    
+
     @Override
-    public void fillOverlay(FlowLayout overlay) {
-        super.fillOverlay(overlay);
-        
-        addFluidDisplay(overlay, outADisplay);
-        updateFluidDisplay(outADisplay);
-        
-        addFluidDisplay(overlay, outBDisplay);
-        updateFluidDisplay(outBDisplay);
-        
-        addFluidDisplay(overlay, outCDisplay);
-        updateFluidDisplay(outCDisplay);
-        
-        var moduleCount = menu.refinery.getModuleCount();
+    protected void addExtraComponents() {
+        super.addExtraComponents();
+
+        var refinery = (RefineryBlockEntity) menu.blockEntity;
+        var moduleCount = refinery.getModuleCount();
+
         if (moduleCount < 1) {
-            var blocker = Components.button(Component.literal("\uD83D\uDEAB"), event -> {});
-            blocker.positioning(Positioning.absolute(outBConfig.x(), outBConfig.y()));
-            blocker.sizing(Sizing.fixed(outBConfig.width()), Sizing.fixed(outBConfig.height()));
-            blocker.active(false);
-            blocker.zIndex(5);
-            overlay.child(blocker);
+            var blocker = new SurfaceWidget(92 + 27, 6, 21, 74, OritechSurface.PANEL_DARK);
+            blocker.withTooltip(Component.translatable("tooltip.oritech.refinery_module_missing")).withZIndex(1);
+            addComponent(blocker);
+            
+            var icon = new LabelWidget(92 + 27, 6 + 30, 21, Component.literal("❌"))
+                         .withAlignment(LabelWidget.Alignment.CENTER)
+                         .withColor(ColorHelper.argb(0.1f, 0.1f, 0.1f))
+                         .withZIndex(1);
+            addComponent(icon);
         }
+        
         if (moduleCount < 2) {
-            var blocker = Components.button(Component.literal("\uD83D\uDEAB"), event -> {});
-            blocker.positioning(Positioning.absolute(outCConfig.x(), outCConfig.y()));
-            blocker.sizing(Sizing.fixed(outCConfig.width()), Sizing.fixed(outCConfig.height()));
-            blocker.tooltip(Component.translatable("tooltip.oritech.module_2_missing"));
-            blocker.active(false);
-            overlay.child(blocker);
+            var blocker = new SurfaceWidget(92 + 27 * 2, 6, 21, 74, OritechSurface.PANEL_DARK);
+            blocker.withTooltip(Component.translatable("tooltip.oritech.refinery_module_missing")).withZIndex(1);
+            addComponent(blocker);
+            
+            var icon = new LabelWidget(92 + 27 * 2, 6 + 30, 21, Component.literal("❌"))
+                         .withAlignment(LabelWidget.Alignment.CENTER)
+                         .withColor(ColorHelper.argb(0.1f, 0.1f, 0.1f))
+                         .withZIndex(1);
+            addComponent(icon);
         }
-        
-    }
-    
-    @Override
-    protected void containerTick() {
-        
-        updateFluidDisplay(outADisplay);
-        updateFluidDisplay(outBDisplay);
-        updateFluidDisplay(outCDisplay);
-        
-        super.containerTick();
     }
 }

@@ -4,7 +4,6 @@
     "amount": 20250,
     "fluid": "oritech:still_mineral_slurry"
   },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "oritech:polymer_resin"

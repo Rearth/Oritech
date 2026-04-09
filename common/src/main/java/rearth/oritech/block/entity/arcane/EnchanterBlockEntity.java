@@ -1,7 +1,26 @@
 package rearth.oritech.block.entity.arcane;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import io.wispforest.owo.util.VectorRandomUtils;
+import net.minecraft.core.*;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -16,7 +35,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.EnchanterScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
-
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventorySlotAssignment;
@@ -32,29 +51,6 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
 
 public class EnchanterBlockEntity extends NetworkedBlockEntity
   implements ItemApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity, ScreenProvider, ExtendedMenuProvider {
@@ -121,20 +117,24 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         
         maxProgress = getEnchantmentCost(getSelectedEnchantment().value(), existingLevel + 1);
         
-        if (canProgress(existingLevel + 1)) {
+        if (canProgress(existingLevel + 1) && world.getGameTime() % 5 == 0) {
             this.setChanged();
             energyStorage.amount -= (long) getDisplayedEnergyUsage();
             progress++;
             activeAnimation = "working";
             
             var center = pos.getCenter();
-            var offset = VectorRandomUtils.getRandomOffset(world, center, 4f);
-            ParticleContent.WEED_KILLER.spawn(world, center, new ParticleContent.LineData(center, offset));
+            var r = world.random;
+            var offset = center.add(r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f);
+            ParticleContent.WeedKiller(world, center, offset);
             
             if (progress >= maxProgress) {
                 progress = 0;
                 finishEnchanting();
-                ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.getCenter(), maxProgress + 10);
+                if (world instanceof ServerLevel sl) {
+                    var target = pos.getCenter();
+                    sl.sendParticles(ParticleTypes.ENCHANTED_HIT, target.x, target.y, target.z, maxProgress + 10, 0.6, 0.6, 0.6, 0);
+                }
                 activeAnimation = "idle";
             }
         }
@@ -199,7 +199,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         statistics = new EnchanterStatistics(requiredCatalysts, cachedCatalysts.size());
         
         for (var catalyst : cachedCatalysts) {
-            ParticleContent.CATALYST_CONNECTION.spawn(level, worldPosition.getCenter(), new ParticleContent.LineData(catalyst.getBlockPos().getCenter(), worldPosition.above().getCenter()));
+            ParticleContent.CatalystConnection(level, catalyst.getBlockPos().getCenter(), worldPosition.above().getCenter());
         }
         
         if (cachedCatalysts.size() < requiredCatalysts) return false;
@@ -216,7 +216,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
     
     private int getEnchantmentCost(Enchantment enchantment, int targetLevel) {
-        return enchantment.getAnvilCost() * targetLevel * Oritech.CONFIG.enchanterCostMultiplier() + 1;
+        return enchantment.getAnvilCost() * targetLevel * OritechConfig.enchanterCostMultiplier.get() + 1;
     }
     
     @Override
@@ -299,7 +299,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     
     @Override
     public BarConfiguration getEnergyConfiguration() {
-        return new BarConfiguration(7, 7, 18, 71);
+        return new BarConfiguration(8, 7, 18, 71);
     }
     
     @Override
@@ -341,6 +341,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         var blockEntity = player.level().getBlockEntity(packet.self);
         if (blockEntity instanceof EnchanterBlockEntity enchanterBlock) {
             enchanterBlock.selectedEnchantment = packet.enchantmentId;
+            enchanterBlock.setChanged();
         }
     }
     

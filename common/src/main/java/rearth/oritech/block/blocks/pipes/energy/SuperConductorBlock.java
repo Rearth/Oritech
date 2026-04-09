@@ -1,6 +1,7 @@
 package rearth.oritech.block.blocks.pipes.energy;
 
 import org.apache.commons.lang3.function.TriFunction;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
@@ -76,7 +77,7 @@ public class SuperConductorBlock extends GenericPipeBlock {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         var text = Component.translatable("tooltip.oritech.energy_max_transfer").withStyle(ChatFormatting.GRAY)
-            .append(Component.translatable("tooltip.oritech.energy_transfer_rate", Oritech.CONFIG.superConductorTransferRate()).withStyle(ChatFormatting.GOLD));
+            .append(Component.translatable("tooltip.oritech.energy_transfer_rate", OritechConfig.superConductorTransferRate.get()).withStyle(ChatFormatting.GOLD));
         tooltip.add(text);
         tooltip.add(Component.translatable("tooltip.oritech.superconductor").withStyle(ChatFormatting.GRAY));
         super.appendHoverText(stack, context, tooltip, options);

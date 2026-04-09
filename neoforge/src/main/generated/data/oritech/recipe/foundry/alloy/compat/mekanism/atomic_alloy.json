@@ -6,11 +6,6 @@
     }
   ],
   "type": "oritech:foundry",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "mekanism:alloys/reinforced"
@@ -25,5 +20,5 @@
       "id": "mekanism:alloy_atomic"
     }
   ],
-  "time": 120
+  "time": 80
 }

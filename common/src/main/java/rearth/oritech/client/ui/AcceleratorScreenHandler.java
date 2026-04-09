@@ -1,13 +1,12 @@
 package rearth.oritech.client.ui;
 
-import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
-
 import java.util.Objects;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 
-public class AcceleratorScreenHandler extends BasicMachineScreenHandler {
+public class AcceleratorScreenHandler extends OritechScreenHandler {
     
     protected final AcceleratorControllerBlockEntity accelerator;
     

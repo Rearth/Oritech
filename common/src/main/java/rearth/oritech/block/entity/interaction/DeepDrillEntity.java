@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -24,6 +25,8 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.*;
@@ -52,7 +55,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     // config
     
     // storage
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.deepDrillConfig.energyCapacity(), getMaxRfInput(), 0, this::setChanged);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.deepDrillConfig.energyCapacity.get(), getMaxRfInput(), 0, this::setChanged);
     
     public final SimpleInventoryStorage inventory = createInventoryStorage();
     
@@ -110,11 +113,11 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
             setChanged();
             
             var particlePos = getCenter(0);
-            ParticleContent.FURNACE_BURNING.spawn(world, Vec3.atLowerCornerOf(particlePos), 1);
+            if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, particlePos.getX() + 0.5, particlePos.getY() + 0.5, particlePos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
         
         // try increasing faster if too much energy is provided
-        for (int i = 0; i < Oritech.CONFIG.deepDrillConfig.stepsPerOre(); i++) {
+        for (int i = 0; i < OritechConfig.deepDrillConfig.stepsPerOre.get(); i++) {
             if (energyStorage.amount >= energyPerStep) {
                 progress++;
                 energyStorage.amount -= energyPerStep;
@@ -123,9 +126,9 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
             }
         }
         
-        if (progress >= Oritech.CONFIG.deepDrillConfig.stepsPerOre()) {
+        if (progress >= OritechConfig.deepDrillConfig.stepsPerOre.get()) {
             craftResult(world, pos);
-            progress -= Oritech.CONFIG.deepDrillConfig.stepsPerOre();
+            progress -= OritechConfig.deepDrillConfig.stepsPerOre.get();
             this.setChanged();
         }
         
@@ -147,7 +150,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
                     var target = center.offset(x, y, z);
                     var targetState = level.getBlockState(target);
                     if (targetState.is(TagContent.RESOURCE_NODES)) {
-                        if (manual) ParticleContent.DEBUG_BLOCK.spawn(level, Vec3.atLowerCornerOf(target));
+                        if (manual) ParticleContent.DebugBlock(level, Vec3.atLowerCornerOf(target));
                         targetedOre.add(targetState.getBlock());
                         break;
                     } else if (!targetState.isAir()) break;
@@ -290,7 +293,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     }
     
     public int getRfPerStep() {
-        return Oritech.CONFIG.deepDrillConfig.energyPerStep();
+        return OritechConfig.deepDrillConfig.energyPerStep.get();
     }
     
     @Override

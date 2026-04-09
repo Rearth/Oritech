@@ -1,7 +1,7 @@
 package rearth.oritech.init;
 
 import dev.architectury.registry.registries.RegistrySupplier;
-import io.wispforest.owo.registration.reflect.BlockRegistryContainer.NoBlockItem;
+import rearth.oritech.util.registry.NoBlockItem;
 import net.minecraft.core.Registry;
 import net.minecraft.core.dispenser.ShulkerBoxDispenseBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -145,6 +145,9 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @UseGeoBlockItem(scale = 0.3f)
     public static final Block REFINERY_BLOCK = new RefineryBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.3f)
+    @NoAutoDrop
+    public static final Block TAINTED_REFINERY_BLOCK = new TaintedRefineryBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(7f, 2000f).noOcclusion());
+    @UseGeoBlockItem(scale = 0.3f)
     public static final Block REFINERY_MODULE_BLOCK = new RefineryModuleBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block BIO_GENERATOR_BLOCK = new BioGeneratorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
@@ -157,7 +160,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block STEAM_ENGINE_BLOCK = new SteamEngineBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.7f)
-    public static final Block BIG_SOLAR_PANEL_BLOCK = new BigSolarPanelBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), Oritech.CONFIG.generators.solarGeneratorData.energyPerTick());
+    public static final Block BIG_SOLAR_PANEL_BLOCK = new BigSolarPanelBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block POWERED_FURNACE_BLOCK = new PoweredFurnaceBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().lightLevel(state -> state.getValue(BlockStateProperties.LIT) ? 15 : 0));
     @UseGeoBlockItem(scale = 0.5f)
@@ -234,11 +237,11 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @NoBlockItem
     public static final Block MACHINE_CORE_HIDDEN = new MachineCoreBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(80, 1900f).noOcclusion().forceSolidOn(), 1);
     
-    public static final Block MACHINE_SPEED_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withSpeedMultiplier(Oritech.CONFIG.addonConfig.speedAddonSpeed()).withEfficiencyMultiplier(Oritech.CONFIG.addonConfig.speedAddonEfficiency()).withBoundingShape(MachineAddonBlock.MACHINE_SPEED_ADDON_SHAPE));
-    public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withEfficiencyMultiplier(Oritech.CONFIG.addonConfig.efficiencyAddonEfficiency()).withBoundingShape(MachineAddonBlock.MACHINE_EFFICIENCY_ADDON_SHAPE));
-    public static final Block MACHINE_ULTIMATE_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withSpeedMultiplier(Oritech.CONFIG.addonConfig.ultimateAddonSpeed()).withEfficiencyMultiplier(Oritech.CONFIG.addonConfig.ultimateAddonEfficiency()).withBoundingShape(MachineAddonBlock.MACHINE_ULTIMATE_ADDON_SHAPE));
+    public static final Block MACHINE_SPEED_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withSpeedMultiplier(OritechStartupConfig.speedAddonSpeed.get().floatValue()).withEfficiencyMultiplier(OritechStartupConfig.speedAddonEfficiency.get().floatValue()).withBoundingShape(MachineAddonBlock.MACHINE_SPEED_ADDON_SHAPE));
+    public static final Block MACHINE_EFFICIENCY_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withEfficiencyMultiplier(OritechStartupConfig.efficiencyAddonEfficiency.get().floatValue()).withBoundingShape(MachineAddonBlock.MACHINE_EFFICIENCY_ADDON_SHAPE));
+    public static final Block MACHINE_ULTIMATE_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withSpeedMultiplier(OritechStartupConfig.ultimateAddonSpeed.get().floatValue()).withEfficiencyMultiplier(OritechStartupConfig.ultimateAddonEfficiency.get().floatValue()).withBoundingShape(MachineAddonBlock.MACHINE_ULTIMATE_ADDON_SHAPE));
     public static final Block QUARRY_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.QUARRY_ADDON_SHAPE));
-    public static final Block MACHINE_PROCESSING_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withEfficiencyMultiplier(Oritech.CONFIG.addonConfig.chamberAddonEfficiency()).withChambers(1).withBoundingShape(MachineAddonBlock.MACHINE_PROCESSING_ADDON_SHAPE));
+    public static final Block MACHINE_PROCESSING_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withEfficiencyMultiplier(OritechStartupConfig.chamberAddonEfficiency.get().floatValue()).withChambers(1).withBoundingShape(MachineAddonBlock.MACHINE_PROCESSING_ADDON_SHAPE));
     public static final Block MACHINE_FLUID_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_FLUID_ADDON_SHAPE));
     public static final Block MACHINE_YIELD_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_YIELD_ADDON_SHAPE));
     public static final Block CROP_FILTER_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.CROP_FILTER_ADDON_SHAPE));
@@ -251,7 +254,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block STEAM_BOILER_ADDON = new SteamBoilerAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.STEAM_BOILER_ADDON_SHAPE));
     public static final Block MACHINE_REDSTONE_ADDON = new RedstoneAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_REDSTONE_ADDON_SHAPE));
     public static final Block MACHINE_SILK_TOUCH_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_SILK_TOUCH_ADDON_SHAPE));
-    public static final Block MACHINE_BURST_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBurstTicks(Oritech.CONFIG.addonConfig.burstAddonTicks()).withBoundingShape(MachineAddonBlock.MACHINE_BURST_ADDON_SHAPE)); // todo config settings
+    public static final Block MACHINE_BURST_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBurstTicks(OritechStartupConfig.burstAddonTicks.get()).withBoundingShape(MachineAddonBlock.MACHINE_BURST_ADDON_SHAPE)); // todo config settings
     
     @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.none)
@@ -466,7 +469,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
             EnergyApi.ITEM.registerForItem(() -> item);
             
             var variantStack = new ItemStack(item);
-            variantStack.set(EnergyApi.ITEM.getEnergyComponent(), Oritech.CONFIG.smallEnergyStorage.energyCapacity());
+            variantStack.set(EnergyApi.ITEM.getEnergyComponent(), 1_000_000L);
             ItemGroups.add(targetGroup, variantStack);
             
         } else {

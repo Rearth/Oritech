@@ -1,6 +1,7 @@
 package rearth.oritech.init.world.features.resourcenode;
 
 import com.mojang.serialization.Codec;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 
 import java.util.List;
@@ -52,7 +53,7 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
         if (!solidBlockFound || boulderPos.getY() < (deepNodePos.getY() + 10))
             return false;
 
-        if (Oritech.CONFIG.easyFindFeatures())
+        if (OritechConfig.easyFindFeatures.get())
             placeSurfaceBoulder(boulderPos, context);
         placeBedrockNode(deepNodePos, context);
         Oritech.LOGGER.debug("placing resource node at " + boulderPos + " with deep " + deepNodePos);

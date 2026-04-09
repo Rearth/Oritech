@@ -16,15 +16,15 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
+import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipe;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     @SyncField(SyncType.GUI_OPEN)
     public boolean isProducingSteam = false;
     @SyncField(SyncType.GUI_TICK)
-    public final SimpleInOutFluidStorage boilerStorage = new SimpleInOutFluidStorage((long) (Oritech.CONFIG.generators.steamEngineData.steamBoilerCapacityBuckets() * FluidStackHooks.bucketAmount()), this::setChanged) {
+    public final SimpleInOutFluidStorage boilerStorage = new SimpleInOutFluidStorage((long) (OritechConfig.generators.steamEngineData.steamBoilerCapacityBuckets.get() * FluidStackHooks.bucketAmount()), this::setChanged) {
         @Override
         public long insert(FluidStack toInsert, boolean simulate) {
             if (!boilerAcceptsInput(toInsert.getFluid())) return 0L;
@@ -109,7 +109,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             for (int i = 0; i < activeRecipe.getInputs().size(); i++) {
                 var taken = ContainerHelper.removeItem(getInputView(), i, 1);  // amount is not configurable, because ingredient doesn't parse amount in recipe
             }
-            pendingOutputs = activeRecipe.getResults();
+            pendingOutputs = new ArrayList<>(activeRecipe.getResults());
             
             setChanged();
             
@@ -170,7 +170,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         if (isProducingSteam) {
             // yes this will void excess steam. Generators will only stop producing when the RF storage is full, not the steam storage
             // this is by design and supposed to be one of the negatives of steam production
-            produced *= Oritech.CONFIG.generators.steamEngineData.rfToSteamRatio();
+            produced *= OritechConfig.generators.steamEngineData.rfToSteamRatio.get();
             produced *= SteamEngineEntity.STEAM_AMOUNT_MULTIPLIER;
             
             var extracted = boilerStorage.getInputContainer().extract(FluidStack.create(Fluids.WATER.getSource(), Math.round(produced)), false);
@@ -279,6 +279,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         if (currentMaxBurnTime <= 0) return 1;
         var recipeTicks = currentMaxBurnTime;
         var animationTicks = 60f;    // 3s, length which all animations are defined as
-        return animationTicks / recipeTicks * Oritech.CONFIG.generators.animationSpeedMultiplier();
+        return animationTicks / recipeTicks * OritechConfig.generators.animationSpeedMultiplier.get().floatValue();
     }
 }

@@ -4,7 +4,6 @@
     "amount": 250,
     "fluid": "minecraft:water"
   },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "oritech:solid_biofuel"

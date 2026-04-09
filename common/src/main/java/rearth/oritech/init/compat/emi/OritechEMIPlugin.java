@@ -6,6 +6,11 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.widget.Bounds;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.generators.BioGeneratorEntity;
 import rearth.oritech.block.entity.generators.FuelGeneratorEntity;
@@ -14,6 +19,7 @@ import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.ItemFilterScreen;
+import rearth.oritech.client.ui.OritechWidgetScreen;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -21,10 +27,6 @@ import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 
 @EmiEntrypoint
 public class OritechEMIPlugin implements EmiPlugin {
@@ -69,6 +71,13 @@ public class OritechEMIPlugin implements EmiPlugin {
         registry.addRecipeHandler(ModScreens.REFINERY_SCREEN, new EmiTransferHandler<>(RecipeContent.REFINERY.getIdentifier()));
 
         registry.addDragDropHandler(ItemFilterScreen.class, new EmiItemFilterDragDropHandler());
+        
+        registry.addGenericExclusionArea((screen, consumer) -> {
+            if (!(screen instanceof OritechWidgetScreen<?> oritechScreen)) return;
+            
+            oritechScreen.getExclusionZones().forEach(elem -> consumer.accept(new Bounds(elem.getX(), elem.getY(), elem.getWidth(), elem.getHeight())));
+        });
+        
     }
     
     private void registerOritechCategory(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType, ItemLike machine,  Class<? extends MachineBlockEntity> screenProviderSource) {

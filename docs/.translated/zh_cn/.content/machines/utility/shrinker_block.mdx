@@ -1,0 +1,42 @@
+---
+title: 插件铰接器
+id: oritech:shrinker_block
+type: block
+custom:
+    RF容量: "50,000,000"
+    最大RF输入: "833,333"
+    需要机器核心: "4"
+    插件槽位: "1"
+---
+
+插件铰接器是一种多方块结构，用于
+将多个机器插件压缩成一个方块。
+它允许你将各种插件组合成
+[机器之心](@oritech:machine_combi_addon)。
+
+<center>
+<ModAsset location="oritech:area/shrinker_area" width={512} />
+</center>
+
+---
+
+**压缩流程**
+
+要使用铰接器，必须通过扩展坞连接你想要组合的插件。
+机器必需满能量才能运行。
+通过界面激活，或为**中心**提供
+红石信号，铰接器会消耗世界上的实体方块，
+并在其物品栏输出一个组合方块。
+
+<center>
+<ModAsset location="oritech:area/shrinker_setup_area" width={512} />
+</center>
+
+<Callout variant="warning">
+    压缩是不可逆的。只有影响机器属性的插件
+    （如速度、效率或产量）才能被铰接。
+    需要直接交互的插件（蒸汽锅炉、控制单元、
+    物品栏代理、生物校位）无法被压缩。
+    此外，“机器之心”不能和
+    其他插件一起用，只能是唯一安装的插件。
+</Callout>

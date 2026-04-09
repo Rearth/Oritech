@@ -1,81 +1,62 @@
 package rearth.oritech.client.ui;
 
-import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
-import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.container.Containers;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.*;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.api.screen.OritechSurface;
+import rearth.oritech.api.screen.widgets.ButtonWidget;
+import rearth.oritech.api.screen.widgets.ItemSlotWidget;
+import rearth.oritech.api.screen.widgets.LabelWidget;
+import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
 
-import static rearth.oritech.client.ui.BasicMachineScreen.*;
-
-public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, InventoryProxyScreenHandler> {
+public class InventoryProxyScreen extends OritechWidgetScreen<InventoryProxyScreenHandler> {
     
-    private final List<ButtonComponent> buttons = new ArrayList<>();
+    private final List<ButtonWidget> buttons = new ArrayList<>();
     
     public InventoryProxyScreen(InventoryProxyScreenHandler handler, Inventory inventory, Component title) {
-        super(handler, inventory, title);
+        super(handler, inventory, title, 176, 100);
     }
-    
+
     @Override
-    protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
-        return OwoUIAdapter.create(this, Containers::verticalFlow);
-    }
-    
-    @Override
-    protected void build(FlowLayout rootComponent) {
-        rootComponent
-          .surface(Surface.VANILLA_TRANSLUCENT)
-          .horizontalAlignment(HorizontalAlignment.CENTER)
-          .verticalAlignment(VerticalAlignment.CENTER);
-        
-        var overlay = Containers.horizontalFlow(Sizing.fixed(176), Sizing.fixed(100));
-        var spacer = Containers.horizontalFlow(Sizing.fixed(176), Sizing.fixed(166 - 100 + 5));
-        
-        rootComponent.child(overlay.surface(ORITECH_PANEL));
-        rootComponent.child(spacer);
-        
+    protected void buildComponents() {
+        buttons.clear();
+
+        var panel = new SurfaceWidget(0, 0, 176, 100);
+        panel.withSurface(OritechSurface.PANEL);
+        panel.withZIndex(-10);
+        addComponent(panel);
+
         for (var slot : Objects.requireNonNull(menu.controllerScreen).getGuiSlots()) {
-            var button = Components.button(Component.literal(" "), elem -> {
-                setActiveSlot(slot.index());
-            });
-            button.renderer(ORITECH_BUTTON);
+            addComponent(new ItemSlotWidget(slot.x(), slot.y()));
+
+            var button = ButtonWidget.panel(slot.x() + 3, slot.y() + 3, 10, 10,
+                Component.literal(""),
+                elem -> setActiveSlot(slot.index()));
             buttons.add(button);
-            overlay.child(getItemFrame(slot.x(), slot.y()));
-            overlay.child(button.sizing(Sizing.fixed(10)).positioning(Positioning.absolute(slot.x() + 3, slot.y() + 3)));
+            addComponent(button);
         }
         
         for (int i = 0; i < buttons.size(); i++) {
             var button = buttons.get(i);
-            button.active = i != menu.selectedSlot;
+            button.setActive(i != menu.selectedSlot);
         }
-        
-        addTitle(overlay);
-        
-        var hint = Components.label(Component.translatable("tooltip.oritech.addon_proxy_select"));
-        hint.horizontalTextAlignment(HorizontalAlignment.CENTER);
-        hint.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
-        hint.sizing(Sizing.fixed(176), Sizing.content(2));
-        overlay.child(hint.positioning(Positioning.relative(50, 90)));
+
+        var hint = new LabelWidget(0, 85, 176, 10,
+            Component.translatable("tooltip.oritech.addon_proxy_select"));
+        hint.withAlignment(LabelWidget.Alignment.CENTER);
+        hint.withDarkColor();
+        addComponent(hint);
     }
     
-    private void addTitle(FlowLayout overlay) {
-        var blockTitle = menu.addonEntity.getBlockState().getBlock().getName();
-        var label = Components.label(blockTitle);
-        label.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
-        label.sizing(Sizing.fixed(176), Sizing.content(2));
-        label.horizontalTextAlignment(HorizontalAlignment.CENTER);
-        label.zIndex(1);
-        overlay.child(label.positioning(Positioning.relative(50, 2)));
+    @Override
+    public BlockState getTitleState() {
+        return menu.addonEntity.getBlockState();
     }
     
     private void setActiveSlot(int slot) {
@@ -84,7 +65,7 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
         
         for (int i = 0; i < buttons.size(); i++) {
             var button = buttons.get(i);
-            button.active = i != slot;
+            button.setActive(i != slot);
         }
         
         // sync to client entity

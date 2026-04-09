@@ -4,7 +4,6 @@
     "amount": 20250,
     "fluid": "minecraft:water"
   },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "minecraft:dirt"

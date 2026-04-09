@@ -4,8 +4,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.TickEvent;
-import io.wispforest.endec.impl.ReflectiveEndecBuilder;
-import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -42,17 +40,12 @@ public final class Oritech {
     
     public static final String MOD_ID = "oritech";
     public static final Logger LOGGER = LoggerFactory.getLogger("oritech");
-    public static final OritechConfig CONFIG = OritechConfig.createAndLoad();
     
     public static final Multimap<ResourceLocation, Runnable> EVENT_MAP = initEventMap();
     public static Set<Pair<ItemLike, Float>> COMPOSTABLES_DATA = new HashSet<>();
     
     public static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
-    }
-    
-    static {
-        ReflectiveEndecBuilder.SHARED_INSTANCE.register(MinecraftEndecs.IDENTIFIER, ResourceLocation.class);
     }
     
     public static void initialize() {

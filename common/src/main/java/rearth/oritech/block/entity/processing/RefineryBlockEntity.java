@@ -6,8 +6,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -27,10 +29,12 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.RefineryScreenHandler;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -46,7 +50,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     
     // own storage is exposed through this multiblock, the other storages are exposed through the respective modules
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
-    public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(64 * FluidStackHooks.bucketAmount(), this::setChanged);
+    public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(8 * FluidStackHooks.bucketAmount(), this::setChanged);
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public final SimpleFluidStorage nodeA = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged);
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
@@ -56,7 +60,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     private int moduleCount;    // range 0-2
     
     public RefineryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REFINERY_ENTITY, pos, state, Oritech.CONFIG.processingMachines.refineryData.energyPerTick());
+        super(BlockEntitiesContent.REFINERY_ENTITY, pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
     }
     
     @Override
@@ -200,17 +204,26 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     
     @Override
     public BarConfiguration getFluidConfiguration() {
-        return new BarConfiguration(28, 6, 21, 74);
+        return new BarConfiguration(30, 6, 21, 74);
+    }
+    
+    @Override
+    public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+        return List.of(
+          ownStorage.getInputContainer(),
+          ownStorage.getOutputContainer(),
+          nodeA,
+          nodeB);
     }
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.refineryData.energyCapacity();
+        return OritechConfig.processingMachines.refineryData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.refineryData.maxEnergyInsertion();
+        return OritechConfig.processingMachines.refineryData.maxEnergyInsertion.get();
     }
     
     @Override
@@ -228,7 +241,8 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         var offsetLocal = Geometry.rotatePosition(new Vec3(0.3, 0.5, 0.3), facing);
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        ParticleContent.COOLER_WORKING.spawn(level, emitPosition, 1);
+        if (level instanceof ServerLevel sl)
+            sl.sendParticles(ParticleTypes.SNOWFLAKE, emitPosition.x, emitPosition.y, emitPosition.z, 1, 1.2, 1.2, 1.2, 0);
         
     }
     
@@ -309,6 +323,11 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         return List.of(new Tuple<>(Component.literal("\uD83D\uDCE6: " + moduleCount), Component.translatable("tooltip.oritech.refinery_module_count")));
     }
     
+    @Override
+    public BarConfiguration getEnergyConfiguration() {
+        return new BarConfiguration(8, 7, 18, 71);
+    }
+    
     public FluidApi.SingleSlotStorage getOutputStorage(int i) {
         if (i == 0) return ownStorage.getOutputContainer();
         if (i == 1) return nodeA;
@@ -319,6 +338,43 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     @Override
     public ColorVariant getDefaultColor() {
         return ColorVariant.FLUXITE;
+    }
+    
+    // checks if there is an arcane catalyst nearby with at least 1 soul in it
+    public Optional<EnchantmentCatalystBlockEntity> getNearbyNonEmptyCatalyst() {
+        
+        for (var checkPos : BlockPos.withinManhattan(worldPosition, 6, 5, 6)) {
+            var checkState = level.getBlockState(checkPos);
+            if (checkState.getBlock().equals(BlockContent.ENCHANTMENT_CATALYST_BLOCK)) {
+                var checkEntity = level.getBlockEntity(checkPos, BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY);
+                if (checkEntity.isPresent() && checkEntity.get().collectedSouls > 0) return checkEntity;
+            }
+        }
+        
+        return Optional.empty();
+    }
+    
+    public void taintTransform() {
+        
+        // remove main cores
+        for (var coreBlock : getConnectedCores()) {
+            level.removeBlock(coreBlock, false);
+        }
+        
+        // remove tanks (indexed 1 + 2)
+        for (int i = 1; i <= moduleCount; i++) {
+            var tankCandidatePos = worldPosition.above(1 + i);
+            var tankEntityCandidate = level.getBlockEntity(tankCandidatePos, BlockEntitiesContent.REFINERY_MODULE_ENTITY);
+            if (tankEntityCandidate.isPresent()) {
+                var tankEntity = tankEntityCandidate.get();
+                for (var coreBlock : tankEntity.getConnectedCores())
+                    level.removeBlock(coreBlock, false);
+                
+                level.removeBlock(tankCandidatePos, false);
+            }
+        }
+        
+        level.removeBlock(worldPosition, false);
     }
 }
     

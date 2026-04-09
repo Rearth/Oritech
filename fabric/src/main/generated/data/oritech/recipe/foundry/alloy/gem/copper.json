@@ -1,10 +1,5 @@
 {
   "type": "oritech:foundry",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "oritech:copper_gem"
@@ -19,5 +14,5 @@
       "id": "minecraft:copper_ingot"
     }
   ],
-  "time": 120
+  "time": 80
 }

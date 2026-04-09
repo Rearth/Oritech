@@ -1,33 +1,6 @@
 package rearth.oritech.block.entity.augmenter;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
-import rearth.oritech.api.networking.NetworkedBlockEntity;
-import rearth.oritech.api.networking.SyncField;
-import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.base.block.MultiblockMachine;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
-import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
-import rearth.oritech.client.ui.PlayerModifierScreenHandler;
-import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.SoundContent;
-import rearth.oritech.init.recipes.AugmentDataRecipe;
-
-import rearth.oritech.util.*;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.util.GeckoLibUtil;
-
-import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -54,13 +27,40 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.block.base.block.MultiblockMachine;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
+import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.ui.OritechScreenHandler;
+import rearth.oritech.client.ui.PlayerModifierScreenHandler;
+import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
+import rearth.oritech.init.SoundContent;
+import rearth.oritech.init.recipes.AugmentDataRecipe;
+import rearth.oritech.util.*;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.util.GeckoLibUtil;
+
+import java.util.*;
 
 public class AugmentApplicationEntity extends NetworkedBlockEntity implements MultiblockMachineController, GeoBlockEntity,
                                                                        ExtendedMenuProvider, ItemApi.BlockProvider, EnergyApi.BlockProvider, ScreenProvider {
     
     // config
-    public static long maxEnergyTransfer = Oritech.CONFIG.augmenterMaxEnergy() / 10;
-    public static long maxEnergyStored = Oritech.CONFIG.augmenterMaxEnergy();
+    public static long maxEnergyTransfer = OritechConfig.augmenterMaxEnergy.get() / 10;
+    public static long maxEnergyStored = OritechConfig.augmenterMaxEnergy.get();
     
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
@@ -440,7 +440,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         this.sendUpdate(SyncType.GUI_OPEN);
         var dist = player.distanceToSqr(this.worldPosition.getBottomCenter());
         if (dist > 1 || screenInvOverride)
-            return new BasicMachineScreenHandler(syncId, playerInventory, this);
+            return new OritechScreenHandler(syncId, playerInventory, this);
         
         return new PlayerModifierScreenHandler(syncId, playerInventory, this);
     }
@@ -469,6 +469,16 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     @Override
     public float getDisplayedEnergyUsage() {
         return 0;
+    }
+    
+    @Override
+    public boolean showEnergyUsage() {
+        return false;
+    }
+    
+    @Override
+    public boolean showEnergyTransfer() {
+        return false;
     }
     
     @Override

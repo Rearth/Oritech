@@ -2,8 +2,23 @@ package rearth.oritech.block.entity.generators;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.platform.Platform;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -11,8 +26,8 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -23,20 +38,6 @@ import rearth.oritech.util.InventorySlotAssignment;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Vec3i;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Tuple;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.phys.Vec3;
 
 // progress is abused to sync active speed.
 public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements FluidApi.BlockProvider {
@@ -71,7 +72,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     public SteamEngineSyncPacket clientStats;
     
     public SteamEngineEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.STEAM_ENGINE_ENTITY, pos, state, Oritech.CONFIG.generators.steamEngineData.steamToRfRatio());
+        super(BlockEntitiesContent.STEAM_ENGINE_ENTITY, pos, state, OritechConfig.generators.steamEngineData.steamToRfRatio.get());
         clientStats = new SteamEngineSyncPacket(pos, 1f, 1f, 0, 0, 0);
     }
     
@@ -100,9 +101,9 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         var waterTank = boilerStorage.getOutputContainer();
         
         // optional config stops (energy full / water full)
-        if (energyStorage.getAmount() >= energyStorage.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnEnergyFull())
+        if (energyStorage.getAmount() >= energyStorage.getCapacity() && OritechConfig.generators.steamEngineData.stopOnEnergyFull.get())
             return;
-        if (waterTank.getStack().getAmount() >= waterTank.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnWaterFull())
+        if (waterTank.getStack().getAmount() >= waterTank.getCapacity() && OritechConfig.generators.steamEngineData.stopOnWaterFull.get())
             return;
         
         // if not recipe is currently set, or it does not match the steam tank, search for a recipe
@@ -204,7 +205,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         var offsetLocal = Geometry.rotatePosition(new Vec3(0, 0, -0.5), facing);
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        ParticleContent.STEAM_ENGINE_WORKING.spawn(level, emitPosition, 1);
+        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.CLOUD, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
     }
     
     private float getSteamEnergyEfficiency(float x) {
@@ -252,6 +253,11 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     public MenuType<?> getScreenHandlerType() {
         return ModScreens.STEAM_ENGINE_SCREEN;
     }
+
+    @Override
+    public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+        return List.of(boilerStorage.getOutputContainer(), boilerStorage.getInputContainer());
+    }
     
     @Override
     public int getInventorySize() {
@@ -260,12 +266,12 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.generators.steamEngineData.energyCapacity();
+        return OritechConfig.generators.steamEngineData.energyCapacity.get();
     }
     
     @Override
     public long getDefaultExtractionRate() {
-        return Oritech.CONFIG.generators.steamEngineData.maxEnergyExtraction();
+        return OritechConfig.generators.steamEngineData.maxEnergyExtraction.get();
     }
     
     @Override
@@ -299,6 +305,11 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
+    public boolean showEnergyUsage() {
+        return false;
+    }
+    
+    @Override
     public List<Vec3i> getAddonSlots() {
         return List.of();
     }
@@ -329,7 +340,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     public static Fluid getUsedSteamFluid() {
         if (USED_STEAM_FLUID == null) {
-            USED_STEAM_FLUID = BuiltInRegistries.FLUID.get(ResourceLocation.parse(Oritech.CONFIG.generators.steamId()));
+            USED_STEAM_FLUID = BuiltInRegistries.FLUID.get(ResourceLocation.parse(OritechConfig.generators.steamId.get()));
         }
         
         return USED_STEAM_FLUID;

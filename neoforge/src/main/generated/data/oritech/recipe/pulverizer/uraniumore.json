@@ -1,10 +1,5 @@
 {
   "type": "oritech:pulverizer",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "oritech:deepslate_uranium_ore"
@@ -16,5 +11,5 @@
       "id": "oritech:raw_uranium"
     }
   ],
-  "time": 120
+  "time": 100
 }

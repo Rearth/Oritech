@@ -1,10 +1,5 @@
 {
   "type": "oritech:pulverizer",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:nuggets/nickel"
@@ -16,5 +11,5 @@
       "id": "oritech:small_nickel_dust"
     }
   ],
-  "time": 120
+  "time": 100
 }

@@ -59,7 +59,7 @@ public class WeedKiller extends Item {
                             open.add(target);
                             world.setBlockAndUpdate(target, Blocks.AIR.defaultBlockState());
                             
-                            ParticleContent.WEED_KILLER.spawn(world, target.getCenter(), new ParticleContent.LineData(candidate.getCenter(), target.getCenter()));
+                            ParticleContent.WeedKiller(world, candidate.getCenter(), target.getCenter());
                             
                             try {
                                 Thread.sleep(50);

@@ -1,12 +1,12 @@
 package rearth.oritech.client.ui;
 
-import io.wispforest.owo.client.screens.SlotGenerator;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
@@ -33,8 +33,23 @@ public class ItemFilterScreenHandler extends AbstractContainerMenu {
         this.blockPos = blockEntity.getBlockPos();
         this.blockEntity = (ItemFilterBlockEntity) blockEntity;
         
-        SlotGenerator.begin(this::addSlot, 8, 84)
-          .playerInventory(playerInventory);
+        addPlayerInventory(playerInventory, 8, 84);
+    }
+    
+    /**
+     * Adds the standard player inventory slots (27 main + 9 hotbar).
+     */
+    protected void addPlayerInventory(Inventory playerInventory, int startX, int startY) {
+        // Main inventory (3 rows of 9, slot indices 9-35)
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 9; col++) {
+                this.addSlot(new Slot(playerInventory, col + row * 9 + 9, startX + col * 18, startY + row * 18));
+            }
+        }
+        // Hotbar (1 row of 9, slot indices 0-8)
+        for (int col = 0; col < 9; col++) {
+            this.addSlot(new Slot(playerInventory, col, startX + col * 18, startY + 58));
+        }
     }
     
     @Override

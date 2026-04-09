@@ -24,17 +24,18 @@ import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.storage.SmallFluidTank;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.ui.BasicMachineScreenHandler;
+import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.util.*;
 
 import java.util.List;
-import java.util.Objects;
 
 public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, ItemApi.BlockProvider, ComparatorOutputProvider,
                                                                        ScreenProvider, ExtendedMenuProvider {
@@ -42,12 +43,12 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     private int lastComparatorOutput = 0;
     public final boolean isCreative;
     
-    private ApiLookupCache<FluidApi.FluidStorage> downLookupCache;
+    private BlockLookupCache<FluidApi.FluidStorage> cachedOutputTarget;
     
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::setChanged, new InventorySlotAssignment(0, 2, 2, 1));
     
     @SyncField({SyncType.TICK, SyncType.INITIAL})
-    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), this::setChanged);
+    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(OritechConfig.portableTankCapacityBuckets.get() * FluidStackHooks.bucketAmount(), this::setChanged);
     
     public SmallTankEntity(BlockPos pos, BlockState state, boolean isCreative) {
         super(isCreative ? BlockEntitiesContent.CREATIVE_TANK_ENTITY : BlockEntitiesContent.SMALL_TANK_ENTITY, pos, state);
@@ -94,15 +95,12 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     private void outputToBelow() {
         if (isCreative) return;
         
-        if (downLookupCache == null) {
-            downLookupCache = ApiLookupCache.create(
-              worldPosition.below(),
-              Direction.UP, Objects.requireNonNull(level),
-              ((world1, targetPos, targetState, targetEntity, direction) -> FluidApi.BLOCK.find(world1, targetPos, targetState, targetEntity, direction)));
-            
+        
+        if (cachedOutputTarget == null) {
+            cachedOutputTarget = FluidApi.BLOCK.createCache(level, worldPosition.below(), Direction.UP);
         }
         
-        var tankCandidate = downLookupCache.lookup();
+        var tankCandidate = cachedOutputTarget.find();
         
         if (!(tankCandidate instanceof SimpleFluidStorage belowTank)) return;
         var ownTank = this.fluidStorage;
@@ -202,7 +200,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
-        return new BasicMachineScreenHandler(syncId, playerInventory, this);
+        return new OritechScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

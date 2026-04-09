@@ -4,7 +4,6 @@
     "amount": 40500,
     "fluid": "minecraft:water"
   },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "oritech:polymer_resin"

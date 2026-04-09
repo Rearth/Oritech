@@ -90,11 +90,6 @@ dependencies {
     compileOnly("mezz.jei:jei-$minecraft_version-neoforge:$jei_version") { transitive = false }
     // Oracle Index
     compileOnly "curse.maven:oracle-index-1206582:7590938"
-    // owo-lib
-    api "io.wispforest:owo-lib-neoforge:$owo_neo_version"
-    annotationProcessor "io.wispforest:owo-lib-neoforge:$owo_neo_version"
-    accessTransformers "io.wispforest:owo-lib-neoforge:$owo_neo_version"
-    interfaceInjectionData "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     // REI
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
 
@@ -191,6 +186,8 @@ publishMods {
         requires("geckolib")
         requires("athena-ctm")
         requires("architectury-api")
+        optional("oracle-index")
+
 
         announcementTitle = "Neoforge Version on Modrinth"
     }
@@ -205,6 +202,7 @@ publishMods {
         requires("geckolib")
         requires("athena")
         requires("architectury-api")
+        optional("oracle-index")
 
         javaVersions.add(JavaVersion.VERSION_21)
         clientRequired = true

@@ -6,11 +6,6 @@
     }
   ],
   "type": "oritech:pulverizer",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:ingots/steel"
@@ -22,5 +17,5 @@
       "id": "mekanism:dust_steel"
     }
   ],
-  "time": 120
+  "time": 100
 }

@@ -9,11 +9,6 @@
     }
   ],
   "type": "oritech:centrifuge",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:clumps/uranium"

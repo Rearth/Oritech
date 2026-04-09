@@ -1,0 +1,18 @@
+{
+  "nuke.mdx": "曼哈顿模块",
+  "low_yield_nuke.mdx": "低当量核爆炸装置",
+  "uranium_pellet.mdx": "铀处理",
+  "reactor_controller.mdx": "核反应堆控制面板",
+  "reactor_wall.mdx": "反应堆墙",
+  "reactor_absorber_port.mdx": "反应堆冷却剂吸收器口",
+  "reactor_condenser.mdx": "反应堆热量吸收器",
+  "reactor_heat_pipe.mdx": "反应堆热量管道",
+  "reactor_vent.mdx": "反应堆散热口",
+  "reactor_reflector.mdx": "反应堆中子反射器",
+  "reactor_rod.mdx": "反应堆棒",
+  "reactor_double_rod.mdx": "双联反应堆棒",
+  "reactor_quad_rod.mdx": "四联反应堆棒",
+  "reactor_fuel_port.mdx": "反应堆燃料口",
+  "reactor_energy_port.mdx": "反应堆能量端口",
+  "reactor_redstone_port.mdx": "反应堆红石端口"
+}

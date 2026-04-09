@@ -8,11 +8,6 @@
     }
   ],
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "mythicmetals:ores/prometheum"
@@ -24,5 +19,5 @@
       "id": "mythicmetals:raw_prometheum"
     }
   ],
-  "time": 60
+  "time": 40
 }

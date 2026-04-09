@@ -143,6 +143,10 @@ public class TagContent {
     public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_LOW = oritechBlockTag("unstable_container/low");
     public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_MEDIUM = oritechBlockTag("unstable_container/medium");
     public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_HIGH = oritechBlockTag("unstable_container/high");
+    
+    // arcane refinery
+    public static final TagKey<Block> REFINERY_ARCANE_BLOCKS = oritechBlockTag("refinery/arcane");
+    public static final TagKey<Block> REFINERY_SCULK_BLOCKS = oritechBlockTag("refinery/sculk");
 
     // recyclables
     public static final TagKey<Item> RECYCLES_TO_NETHERITE_SCRAP = oritechItemTag("recyclable/netherite_scrap");

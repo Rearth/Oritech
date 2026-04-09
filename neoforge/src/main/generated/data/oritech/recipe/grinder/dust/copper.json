@@ -1,10 +1,5 @@
 {
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:ingots/copper"
@@ -16,5 +11,5 @@
       "id": "oritech:copper_dust"
     }
   ],
-  "time": 140
+  "time": 40
 }
