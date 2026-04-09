@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -24,6 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.OritechPlatform;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
@@ -34,6 +36,7 @@ import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.TaintedRefineryScreenHandler;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.TagContent;
@@ -60,7 +63,7 @@ import java.util.*;
 // Custom widget for energy intake. X
 // energy intake, arcane, sculk progress sliders like in buddy drones? X
 // occasional particle intake from surround bonus blocks X
-// transformation process
+// transformation process X
 // complex plating
 // recipe viewer category for supported blocks
 // sculk refinery color variant glowing green vines
@@ -80,7 +83,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     public int selectedOutput = 0;  // can be 0, 1 or 2 (clickable/changeable via gui). Non-matching outputs are ignored
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN, SyncType.SPARSE_TICK, SyncType.INITIAL})
-    public long lastTickRFUsed = 0;
+    public long lastTickRFUsed = 0; // needed mainly for client UI
     
     public TaintedRefineryBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.TAINTED_REFINERY_ENTITY, pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
@@ -152,6 +155,29 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         }
     }
     
+    public void afterCreation() {
+        if (level == null || !(level instanceof ServerLevel serverLevel)) return;
+        
+        for (var targetMachinePosition : getCorePositions()) {
+            var rotatedPos = Geometry.rotatePosition(targetMachinePosition, getFacingForMultiblock());
+            var checkPos = worldPosition.offset(rotatedPos);
+            var checkState = level.getBlockState(checkPos);
+            
+            if (checkState.hasBlockEntity()) {
+                if (checkState.hasProperty(MachineCoreBlock.USED) && checkState.getValue(MachineCoreBlock.USED)) {
+                    Oritech.LOGGER.warn("Unable to auto-create tainted refinery, blocked by block entity. This should never happen");
+                    continue;
+                }
+            }
+            
+            level.setBlockAndUpdate(checkPos, BlockContent.MACHINE_CORE_HIDDEN.defaultBlockState());
+            OritechPlatform.INSTANCE.resetCapabilities(serverLevel, checkPos);
+            
+        }
+        
+        initMultiblock(getBlockState());
+    }
+    
     @Override
     protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
         super.craftItem(activeRecipe, outputInventory, inputInventory);
@@ -170,7 +196,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         return (int) (1 + (sculkFactor.result * 2.1f));
         
     }
-
+    
     public float getArcaneEnergyMultiplier() {
         return (arcaneFactor.result * 8) + 1;
     }
@@ -224,7 +250,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         var energyFactor = getArcaneEnergyMultiplier();
         availableEnergy *= energyFactor;
         
-       return getEnergyInputMapped((int) availableEnergy);
+        return getEnergyInputMapped((int) availableEnergy);
     }
     
     public int getEnergyInputMapped(long amount) {
@@ -235,7 +261,6 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         return (float) (0.2f * Math.pow(amount, 0.45f));
     }
     
-    // todo
     @Override
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.saveAdditional(nbt, registryLookup);
@@ -304,16 +329,12 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
             } else if (elemState.is(TagContent.REFINERY_ARCANE_BLOCKS) && isVisible(pos)) {
                 differentArcaneTypes.add(elemState.getBlock());
                 arcanePositions.add(pos.immutable());
-                
             }
         }
         
         sculkFactor = calculateEnvFactor(sculkPositions.size(), differentSculkTypes.size(), targetCount, targetTypes, sculkPositions);
         arcaneFactor = calculateEnvFactor(arcanePositions.size(), differentArcaneTypes.size(), targetCount, targetTypes, arcanePositions);
         setChanged();
-        
-        System.out.println("sculk: " + sculkFactor);
-        System.out.println("arcane: " + arcaneFactor);
         
     }
     
@@ -474,6 +495,31 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     @Override
     public ColorVariant getDefaultColor() {
         return super.getDefaultColor();
+    }
+    
+    @Override
+    public void onCoreBroken(BlockPos corePos) {
+        onBroken(corePos);
+    }
+    
+    @Override
+    public void onControllerBroken() {
+        onBroken(worldPosition);
+    }
+    
+    private void onBroken(BlockPos eventSource) {
+        
+        for (var corePos : getConnectedCores()) {
+            if (corePos.equals(eventSource)) continue;
+            level.removeBlock(corePos, false);
+        }
+        
+        if (!eventSource.equals(worldPosition)) {
+            var spawnAt = this.worldPosition.getCenter().add(0, 1, 0);
+            level.addFreshEntity(new ItemEntity(level, spawnAt.x, spawnAt.y, spawnAt.z, new ItemStack(BlockContent.REFINERY_BLOCK)));
+            level.removeBlock(worldPosition, false);
+        }
+        
     }
     
     @Override

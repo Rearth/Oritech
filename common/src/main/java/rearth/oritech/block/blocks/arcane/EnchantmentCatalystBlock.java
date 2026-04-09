@@ -15,6 +15,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -28,11 +29,15 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.blocks.processing.RefineryBlock;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
 public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock implements EntityBlock {
     
@@ -118,6 +123,28 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
         }
         
         return super.playerWillDestroy(world, pos, state, player);
+    }
+    
+    @Override
+    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
+        
+        var ownState = level.getBlockEntity(pos, BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY);
+        if (ownState.isEmpty() || ownState.get().collectedSouls <= 0) {
+            super.onExplosionHit(state, level, pos, explosion, dropConsumer);
+            return;
+        }
+        
+        // find nearby refinery, trigger it first
+        for (var checkPos : BlockPos.withinManhattan(pos, 6, 5, 6)) {
+            var checkState = level.getBlockState(checkPos);
+            if (checkState.getBlock().equals(BlockContent.REFINERY_BLOCK)) {
+                var checkEntity = level.getBlockEntity(checkPos, BlockEntitiesContent.REFINERY_ENTITY);
+                if (checkEntity.isPresent() && checkState.getBlock() instanceof RefineryBlock refineryBlock) refineryBlock.onExplosionHit(checkState, level, checkPos, explosion, dropConsumer);
+            }
+        }
+        
+        
+        super.onExplosionHit(state, level, pos, explosion, dropConsumer);
     }
     
     @Override

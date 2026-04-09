@@ -1,26 +1,18 @@
 package rearth.oritech.block.entity.reactor;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
-import rearth.oritech.OritechPlatform;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
-import rearth.oritech.block.blocks.reactor.NuclearExplosionBlock;
-import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.SoundContent;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -29,7 +21,14 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import rearth.oritech.OritechPlatform;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.block.blocks.reactor.NuclearExplosionBlock;
+import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.SoundContent;
 import rearth.oritech.util.FakeMachinePlayer;
+
+import java.util.*;
 
 public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTicker<NuclearExplosionEntity> {
 
@@ -244,7 +243,6 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
                 var entityDist = entity.distanceToSqr(pos.getCenter());
                 var distPercentage = entityDist / radiusSq;
                 var damage = radiusSq / distPercentage; // closer entities take much more damage
-                System.out.println(entityDist + ":" + damage);
                 entity.hurt(new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.EXPLOSION)), (float) damage);
             });
 

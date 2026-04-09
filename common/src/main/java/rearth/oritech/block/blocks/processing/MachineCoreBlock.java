@@ -85,8 +85,20 @@ public class MachineCoreBlock extends Block implements EntityBlock {
     
     @Override
     protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
-        onBlockRemoved(state, world, pos);
-        super.onExplosionHit(state, world, pos, explosion, stackMerger);
+        
+        if (state.getValue(USED)) {
+            var controller = getControllerPos(world, pos);
+            var controllerState = world.getBlockState(controller);
+            if (controllerState.getBlock() instanceof RefineryBlock refineryBlock) {
+                refineryBlock.onExplosionHit(controllerState, world, controller, explosion, stackMerger);
+                return;
+            }
+        }
+        
+        if (state.getBlock().getExplosionResistance() < 1000 && explosion.radius() < 10) {    // workaround for arcane refinery transformation
+            onBlockRemoved(state, world, pos);
+            super.onExplosionHit(state, world, pos, explosion, stackMerger);
+        }
     }
     
     private static void onBlockRemoved(BlockState state, LevelAccessor world, BlockPos pos) {

@@ -104,7 +104,6 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         
         if (currentRedstone && !wasRedstoneActive) {
             // recently enabled redstone
-            System.out.println("triggered redstone shrink");
             doShrink();
         }
         

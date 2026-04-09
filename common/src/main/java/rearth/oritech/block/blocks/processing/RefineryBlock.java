@@ -1,17 +1,27 @@
 package rearth.oritech.block.blocks.processing;
 
-import org.jetbrains.annotations.NotNull;
-import rearth.oritech.block.base.block.MultiblockMachine;
-import rearth.oritech.block.entity.processing.RefineryBlockEntity;
-import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.jetbrains.annotations.NotNull;
+import rearth.oritech.block.base.block.MultiblockMachine;
+import rearth.oritech.block.entity.processing.RefineryBlockEntity;
+import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.BlockEntitiesContent;
+
+import java.util.List;
+import java.util.function.BiConsumer;
 
 public class RefineryBlock extends MultiblockMachine implements EntityBlock {
     
@@ -33,5 +43,40 @@ public class RefineryBlock extends MultiblockMachine implements EntityBlock {
         if (showExtra) {
             tooltip.add(Component.translatable("tooltip.oritech.refinery_block").withStyle(ChatFormatting.GRAY));
         }
+    }
+    
+    @Override
+    public void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+        
+        var refineryEntity = world.getBlockEntity(pos, BlockEntitiesContent.REFINERY_ENTITY);
+        
+        if (world.isClientSide() || refineryEntity.isEmpty()) {
+            super.onExplosionHit(state, world, pos, explosion, stackMerger);
+            return;
+        }
+        
+        var crystalCandidate = refineryEntity.get().getNearbyNonEmptyCatalyst();
+        if (crystalCandidate.isEmpty()) {
+            super.onExplosionHit(state, world, pos, explosion, stackMerger);
+            return;
+        }
+        
+        refineryEntity.get().taintTransform();
+        
+        // custom merger to void refinery self drop
+        super.onExplosionHit(state, world, pos, explosion, ((itemStack, blockPos) -> {}));
+        
+        // create + init refinery
+        world.setBlockAndUpdate(pos,
+          BlockContent.TAINTED_REFINERY_BLOCK.defaultBlockState()
+            .setValue(BlockStateProperties.HORIZONTAL_FACING, state.getValue(BlockStateProperties.HORIZONTAL_FACING))
+        );
+        
+        if (world.getBlockEntity(pos) instanceof TaintedRefineryBlockEntity taintedRefinery) taintedRefinery.afterCreation();
+        
+        // todo particles released from catalyst to refinery (along random offset paths?)
+        
+        crystalCandidate.get().doExplosion();
+        
     }
 }

@@ -56,6 +56,8 @@ public class BlockLootGenerator extends FabricBlockLootTableProvider {
         dropOther(BlockContent.SUPERCONDUCTOR_CONNECTION, BlockContent.SUPERCONDUCTOR);
         dropOther(BlockContent.SUPERCONDUCTOR_CONNECTION, BlockContent.SUPERCONDUCTOR);
         
+        dropOther(BlockContent.TAINTED_REFINERY_BLOCK, BlockContent.REFINERY_BLOCK);
+        
         dropOther(BlockContent.FRAMED_ITEM_PIPE_CONNECTION, BlockContent.FRAMED_ITEM_PIPE);
         dropOther(BlockContent.FRAMED_FLUID_PIPE_CONNECTION, BlockContent.FRAMED_FLUID_PIPE);
         dropOther(BlockContent.FRAMED_ENERGY_PIPE_CONNECTION, BlockContent.FRAMED_ENERGY_PIPE);

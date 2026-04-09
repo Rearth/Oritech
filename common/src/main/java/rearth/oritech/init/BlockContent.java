@@ -145,7 +145,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @UseGeoBlockItem(scale = 0.3f)
     public static final Block REFINERY_BLOCK = new RefineryBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.3f)
-    public static final Block TAINTED_REFINERY_BLOCK = new TaintedRefineryBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    @NoAutoDrop
+    public static final Block TAINTED_REFINERY_BLOCK = new TaintedRefineryBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(7f, 2000f).noOcclusion());
     @UseGeoBlockItem(scale = 0.3f)
     public static final Block REFINERY_MODULE_BLOCK = new RefineryModuleBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.7f)
