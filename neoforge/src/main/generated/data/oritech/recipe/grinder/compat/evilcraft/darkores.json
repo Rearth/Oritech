@@ -6,11 +6,6 @@
     }
   ],
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "evilcraft:dark_ores"
@@ -26,5 +21,5 @@
       "id": "evilcraft:dark_gem_crushed"
     }
   ],
-  "time": 140
+  "time": 120
 }

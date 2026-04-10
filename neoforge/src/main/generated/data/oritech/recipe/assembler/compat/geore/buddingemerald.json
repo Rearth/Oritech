@@ -6,11 +6,6 @@
     }
   ],
   "type": "oritech:assembler",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "geore:emerald_shard"

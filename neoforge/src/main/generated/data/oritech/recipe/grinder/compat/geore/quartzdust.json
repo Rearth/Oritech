@@ -6,11 +6,6 @@
     }
   ],
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "item": "geore:quartz_shard"
@@ -22,5 +17,5 @@
       "id": "oritech:quartz_dust"
     }
   ],
-  "time": 140
+  "time": 120
 }

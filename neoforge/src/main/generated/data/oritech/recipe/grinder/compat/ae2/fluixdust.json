@@ -6,11 +6,6 @@
     }
   ],
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:gems/fluix"
@@ -22,5 +17,5 @@
       "id": "ae2:fluix_dust"
     }
   ],
-  "time": 140
+  "time": 120
 }

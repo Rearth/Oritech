@@ -6,11 +6,6 @@
     }
   ],
   "type": "oritech:grinder",
-  "fluidInput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:ores/mithril"
@@ -22,5 +17,5 @@
       "id": "irons_spellbooks:raw_mithril"
     }
   ],
-  "time": 140
+  "time": 120
 }

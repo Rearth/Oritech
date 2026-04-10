@@ -10,7 +10,6 @@
     "amount": 10,
     "fluid": "evilcraft:blood"
   },
-  "fluidOutputs": [],
   "ingredients": [
     {
       "tag": "c:sands/colorless"
