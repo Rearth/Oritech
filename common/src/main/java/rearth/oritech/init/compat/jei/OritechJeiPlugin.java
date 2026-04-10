@@ -26,6 +26,7 @@ import rearth.oritech.client.ui.OritechMachineScreen;
 import rearth.oritech.client.ui.PlayerModifierScreen;
 import rearth.oritech.client.ui.ReactorScreen;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -67,6 +68,10 @@ public class OritechJeiPlugin implements IModPlugin {
         registration.addRecipeCategories(new OritechJeiParticleCollisionRecipe(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new OritechJeiLaserRecipe(registration.getJeiHelpers().getGuiHelper()));
         
+        // tainted refinery info categories
+        registration.addRecipeCategories(new OritechJeiTaintedRefineryCreation(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new OritechJeiTaintedRefineryBonuses(registration.getJeiHelpers().getGuiHelper()));
+        
     }
     
     private void registerOritechCategory(IRecipeCategoryRegistration registration, OritechRecipeType type, Block block, Class<? extends MachineBlockEntity> machineClass) {
@@ -102,6 +107,13 @@ public class OritechJeiPlugin implements IModPlugin {
         registerRecipe(registration, RecipeContent.LASER);
         registerRecipe(registration, RecipeContent.REACTOR);
         
+        // tainted refinery synthetic recipes
+        registration.addRecipes(OritechJeiTaintedRefineryCreation.RECIPE_TYPE, List.of(new OritechJeiTaintedRefineryCreation.CreationInfo()));
+        registration.addRecipes(OritechJeiTaintedRefineryBonuses.RECIPE_TYPE, List.of(
+            OritechJeiTaintedRefineryBonuses.BonusInfo.fromTag(TagContent.REFINERY_SCULK_BLOCKS, "sculk"),
+            OritechJeiTaintedRefineryBonuses.BonusInfo.fromTag(TagContent.REFINERY_ARCANE_BLOCKS, "arcane")
+        ));
+        
     }
     
     public void registerRecipe(IRecipeRegistration registration, OritechRecipeType type) {
@@ -133,6 +145,11 @@ public class OritechJeiPlugin implements IModPlugin {
         registerCatalyst(registration, RecipeContent.PARTICLE_COLLISION, BlockContent.ACCELERATOR_CONTROLLER);
         registerCatalyst(registration, RecipeContent.LASER, BlockContent.LASER_ARM_BLOCK);
         registerCatalyst(registration, RecipeContent.REACTOR, BlockContent.REACTOR_CONTROLLER);
+        
+        // tainted refinery catalysts
+        registration.addRecipeCatalyst(BlockContent.REFINERY_BLOCK, OritechJeiTaintedRefineryCreation.RECIPE_TYPE);
+        registration.addRecipeCatalyst(BlockContent.ENCHANTMENT_CATALYST_BLOCK, OritechJeiTaintedRefineryCreation.RECIPE_TYPE);
+        registration.addRecipeCatalyst(BlockContent.TAINTED_REFINERY_BLOCK, OritechJeiTaintedRefineryBonuses.RECIPE_TYPE);
     }
     
     private void registerCatalyst(IRecipeCatalystRegistration registration, OritechRecipeType type, Block block) {

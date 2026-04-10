@@ -9,7 +9,9 @@ import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.util.EntryStacks;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.generators.BioGeneratorEntity;
 import rearth.oritech.block.entity.generators.FuelGeneratorEntity;
 import rearth.oritech.block.entity.generators.LavaGeneratorEntity;
@@ -17,9 +19,12 @@ import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.client.ui.OritechWidgetScreen;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.init.compat.rei.Screens.OritechReiDisplay;
 import rearth.oritech.init.compat.rei.Screens.OritechReiLaserDisplay;
 import rearth.oritech.init.compat.rei.Screens.OritechReiParticleCollisionDisplay;
+import rearth.oritech.init.compat.rei.Screens.OritechReiTaintedRefineryBonusesDisplay;
+import rearth.oritech.init.compat.rei.Screens.OritechReiTaintedRefineryCreationDisplay;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -55,6 +60,16 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerOritechCategory(registry, RecipeContent.PARTICLE_COLLISION, BlockContent.ACCELERATOR_CONTROLLER, OritechReiParticleCollisionDisplay::new);
         registerOritechCategory(registry, RecipeContent.LASER, BlockContent.LASER_ARM_BLOCK, OritechReiLaserDisplay::new);
         registerOritechCategory(registry, RecipeContent.REACTOR, BlockContent.REACTOR_CONTROLLER, (recipeType, icon) -> new OritechReiDisplay(recipeType, icon, false, List.of(new ScreenProvider.GuiSlot(0, 55, 35)), new InventorySlotAssignment(0, 1, 1, 0)));
+        
+        // tainted refinery info categories
+        var creationCategoryId = CategoryIdentifier.of(Oritech.id("tainted_refinery_creation"));
+        registry.add(new OritechReiTaintedRefineryCreationDisplay(creationCategoryId, BlockContent.TAINTED_REFINERY_BLOCK));
+        registry.addWorkstations(creationCategoryId, EntryStacks.of(BlockContent.REFINERY_BLOCK));
+        registry.addWorkstations(creationCategoryId, EntryStacks.of(BlockContent.ENCHANTMENT_CATALYST_BLOCK));
+        
+        var bonusesCategoryId = CategoryIdentifier.of(Oritech.id("tainted_refinery_bonuses"));
+        registry.add(new OritechReiTaintedRefineryBonusesDisplay(bonusesCategoryId, BlockContent.TAINTED_REFINERY_BLOCK));
+        registry.addWorkstations(bonusesCategoryId, EntryStacks.of(BlockContent.TAINTED_REFINERY_BLOCK));
         
         // workstations
         registerOriWorkstation(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK);
@@ -97,6 +112,18 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerMachineRecipeType(registry, RecipeContent.PARTICLE_COLLISION);
         registerMachineRecipeType(registry, RecipeContent.LASER);
         registerMachineRecipeType(registry, RecipeContent.REACTOR);
+        
+        // tainted refinery synthetic displays
+        var creationCategoryId = CategoryIdentifier.of(Oritech.id("tainted_refinery_creation"));
+        registry.add(new TaintedRefineryInfoDisplay(
+            creationCategoryId,
+            List.of(new ItemStack(BlockContent.REFINERY_BLOCK), new ItemStack(BlockContent.ENCHANTMENT_CATALYST_BLOCK)),
+            List.of(new ItemStack(BlockContent.TAINTED_REFINERY_BLOCK))
+        ));
+        
+        var bonusesCategoryId = CategoryIdentifier.of(Oritech.id("tainted_refinery_bonuses"));
+        registry.add(new TaintedRefineryInfoDisplay(bonusesCategoryId, TagContent.REFINERY_SCULK_BLOCKS, "sculk"));
+        registry.add(new TaintedRefineryInfoDisplay(bonusesCategoryId, TagContent.REFINERY_ARCANE_BLOCKS, "arcane"));
     }
 
     @Override

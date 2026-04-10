@@ -11,6 +11,7 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.generators.BioGeneratorEntity;
 import rearth.oritech.block.entity.generators.FuelGeneratorEntity;
@@ -21,6 +22,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.ItemFilterScreen;
 import rearth.oritech.client.ui.OritechWidgetScreen;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
@@ -57,6 +59,10 @@ public class OritechEMIPlugin implements EmiPlugin {
         // others
         registerParticleAccelerator(registry, manager, RecipeContent.PARTICLE_COLLISION);
         registerLaser(registry, manager, RecipeContent.LASER);
+        
+        // tainted refinery info categories
+        registerTaintedRefineryCreation(registry);
+        registerTaintedRefineryBonuses(registry);
         
         registry.addWorkstation(VanillaEmiRecipeCategories.SMELTING, EmiStack.of(BlockContent.POWERED_FURNACE_BLOCK));
         
@@ -129,6 +135,28 @@ public class OritechEMIPlugin implements EmiPlugin {
           .map(entry -> new OritechEMIParticleCollisionRecipe(entry, category))
           .forEach(registry::addRecipe);
         
+    }
+    
+    private void registerTaintedRefineryCreation(EmiRegistry registry) {
+        var icon = EmiStack.of(BlockContent.TAINTED_REFINERY_BLOCK);
+        var id = Oritech.id("tainted_refinery_creation");
+        var category = new EmiRecipeCategory(id, icon);
+        
+        registry.addCategory(category);
+        registry.addWorkstation(category, EmiStack.of(BlockContent.REFINERY_BLOCK));
+        registry.addWorkstation(category, EmiStack.of(BlockContent.ENCHANTMENT_CATALYST_BLOCK));
+        registry.addRecipe(new OritechEmiTaintedRefineryCreation(category));
+    }
+    
+    private void registerTaintedRefineryBonuses(EmiRegistry registry) {
+        var icon = EmiStack.of(BlockContent.TAINTED_REFINERY_BLOCK);
+        var id = Oritech.id("tainted_refinery_bonuses");
+        var category = new EmiRecipeCategory(id, icon);
+        
+        registry.addCategory(category);
+        registry.addWorkstation(category, icon);
+        registry.addRecipe(new OritechEmiTaintedRefineryBonuses(category, TagContent.REFINERY_SCULK_BLOCKS, "sculk", "emi.description.oritech.tainted_bonus.sculk"));
+        registry.addRecipe(new OritechEmiTaintedRefineryBonuses(category, TagContent.REFINERY_ARCANE_BLOCKS, "arcane", "emi.description.oritech.tainted_bonus.arcane"));
     }
     
     private void registerLaser(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType) {

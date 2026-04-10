@@ -65,8 +65,8 @@ import java.util.*;
 // occasional particle intake from surround bonus blocks X
 // transformation process X
 // complex plating X
-// recipe viewer category for supported blocks (and transformation)
-// sculk refinery color variant glowing green vines
+// recipe viewer category for supported blocks (and transformation) X
+// sculk+netherite refinery color variant glowing green vines X
 // wiki
 
 public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
