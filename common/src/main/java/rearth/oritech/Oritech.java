@@ -16,6 +16,7 @@ import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
+import rearth.oritech.block.blocks.processing.RefineryBlock;
 import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
@@ -66,6 +67,8 @@ public final class Oritech {
         TickEvent.SERVER_POST.register(elem -> AcceleratorParticleLogic.onTickEnd());
         TickEvent.SERVER_POST.register(elem -> AddonBlockEntity.completeInits());
         TickEvent.SERVER_POST.register(elem -> ElectricMaceItem.processLightningEvents(elem.overworld()));
+        
+        TickEvent.SERVER_PRE.register(elem -> RefineryBlock.updateTaintEvents());
         
         TickEvent.PLAYER_POST.register(ServerZiplineHandler::onPlayerTick);
         

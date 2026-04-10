@@ -20,10 +20,14 @@ import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 
+import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Queue;
 import java.util.function.BiConsumer;
 
 public class RefineryBlock extends MultiblockMachine implements EntityBlock {
+    
+    public static Queue<Runnable> DELAYED_TAINT_EVENTS = new ArrayDeque<>();
     
     public RefineryBlock(Properties settings) {
         super(settings);
@@ -62,21 +66,38 @@ public class RefineryBlock extends MultiblockMachine implements EntityBlock {
         }
         
         refineryEntity.get().taintTransform();
+        var color = refineryEntity.get().currentColor;
         
         // custom merger to void refinery self drop
         super.onExplosionHit(state, world, pos, explosion, ((itemStack, blockPos) -> {}));
         
-        // create + init refinery
-        world.setBlockAndUpdate(pos,
-          BlockContent.TAINTED_REFINERY_BLOCK.defaultBlockState()
-            .setValue(BlockStateProperties.HORIZONTAL_FACING, state.getValue(BlockStateProperties.HORIZONTAL_FACING))
-        );
-        
-        if (world.getBlockEntity(pos) instanceof TaintedRefineryBlockEntity taintedRefinery) taintedRefinery.afterCreation();
-        
-        // todo particles released from catalyst to refinery (along random offset paths?)
-        
+        // explode crystal
         crystalCandidate.get().doExplosion();
         
+        var targetPos = pos.immutable();
+        
+        // run in next tick to avoid explosion block weirdness
+        DELAYED_TAINT_EVENTS.add(() -> {
+            // create + init refinery
+            world.setBlockAndUpdate(targetPos,
+              BlockContent.TAINTED_REFINERY_BLOCK.defaultBlockState()
+                .setValue(BlockStateProperties.HORIZONTAL_FACING, state.getValue(BlockStateProperties.HORIZONTAL_FACING))
+            );
+            
+            if (world.getBlockEntity(targetPos) instanceof TaintedRefineryBlockEntity taintedRefinery) {
+                taintedRefinery.afterCreation();
+                taintedRefinery.assignColor(color);
+            }
+        });
+        
+        // idea / potential todo: particles released from catalyst to refinery (along random offset paths?)
+        
+    }
+    
+    public static void updateTaintEvents() {
+        for (var elem : DELAYED_TAINT_EVENTS) {
+            elem.run();;
+        }
+        DELAYED_TAINT_EVENTS.clear();
     }
 }

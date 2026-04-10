@@ -64,8 +64,8 @@ import java.util.*;
 // energy intake, arcane, sculk progress sliders like in buddy drones? X
 // occasional particle intake from surround bonus blocks X
 // transformation process X
-// complex plating
-// recipe viewer category for supported blocks
+// complex plating X
+// recipe viewer category for supported blocks (and transformation)
 // sculk refinery color variant glowing green vines
 // wiki
 
