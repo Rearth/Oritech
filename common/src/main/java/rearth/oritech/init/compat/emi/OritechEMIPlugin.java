@@ -37,21 +37,25 @@ public class OritechEMIPlugin implements EmiPlugin {
         
         var manager = registry.getRecipeManager();
         
-        registerOritechCategory(registry, manager, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK, PulverizerBlockEntity.class);
-        registerOritechCategory(registry, manager, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK, FragmentForgeBlockEntity.class);
-        registerOritechCategory(registry, manager, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK, AssemblerBlockEntity.class);
-        registerOritechCategory(registry, manager, RecipeContent.FOUNDRY, BlockContent.FOUNDRY_BLOCK, FoundryBlockEntity.class);
-        registerOritechCategory(registry, manager, RecipeContent.COOLER, BlockContent.COOLER_BLOCK, CoolerBlockEntity.class);
-        registerOritechCategory(registry, manager, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK, CentrifugeBlockEntity.class);
-        registerOritechCategory(registry, manager, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK, CentrifugeBlockEntity.class);
-        registerOritechCategory(registry, manager, RecipeContent.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE_BLOCK, AtomicForgeBlockEntity.class);
-        registerOritechCategory(registry, manager, RecipeContent.REFINERY, BlockContent.REFINERY_BLOCK, RefineryBlockEntity.class);
+        registerOritechCategory(registry, manager, RecipeContent.PULVERIZER, PulverizerBlockEntity.class, BlockContent.PULVERIZER_BLOCK);
+        registerOritechCategory(registry, manager, RecipeContent.GRINDER, FragmentForgeBlockEntity.class, BlockContent.FRAGMENT_FORGE_BLOCK);
+        registerOritechCategory(registry, manager, RecipeContent.ASSEMBLER, AssemblerBlockEntity.class, BlockContent.ASSEMBLER_BLOCK);
+        registerOritechCategory(registry, manager, RecipeContent.FOUNDRY, FoundryBlockEntity.class, BlockContent.FOUNDRY_BLOCK);
+        registerOritechCategory(registry, manager, RecipeContent.COOLER, CoolerBlockEntity.class, BlockContent.COOLER_BLOCK);
+        registerOritechCategory(registry, manager, RecipeContent.CENTRIFUGE, CentrifugeBlockEntity.class, BlockContent.CENTRIFUGE_BLOCK);
+        registerOritechCategory(registry, manager, RecipeContent.CENTRIFUGE_FLUID, CentrifugeBlockEntity.class, BlockContent.CENTRIFUGE_BLOCK);
+        registerOritechCategory(registry, manager, RecipeContent.ATOMIC_FORGE, AtomicForgeBlockEntity.class, BlockContent.ATOMIC_FORGE_BLOCK);
+        registerOritechCategory(registry, manager, RecipeContent.REFINERY, RefineryBlockEntity.class, BlockContent.REFINERY_BLOCK, BlockContent.TAINTED_REFINERY_BLOCK);
+        
+        // tainted refinery also processes refinery recipes
+        var refineryCategory = new EmiRecipeCategory(RecipeContent.REFINERY.getIdentifier(), EmiStack.of(BlockContent.REFINERY_BLOCK));
+        registry.addWorkstation(refineryCategory, EmiStack.of(BlockContent.TAINTED_REFINERY_BLOCK));
         
         // generators
-        registerOritechCategory(registry, manager, RecipeContent.BIO_GENERATOR, BlockContent.BIO_GENERATOR_BLOCK, BioGeneratorEntity.class);
-        registerOritechCategory(registry, manager, RecipeContent.FUEL_GENERATOR, BlockContent.FUEL_GENERATOR_BLOCK, FuelGeneratorEntity.class);
-        registerOritechCategory(registry, manager, RecipeContent.LAVA_GENERATOR, BlockContent.LAVA_GENERATOR_BLOCK, LavaGeneratorEntity.class);
-        registerOritechCategory(registry, manager, RecipeContent.STEAM_ENGINE, BlockContent.STEAM_ENGINE_BLOCK, SteamEngineEntity.class);
+        registerOritechCategory(registry, manager, RecipeContent.BIO_GENERATOR, BioGeneratorEntity.class, BlockContent.BIO_GENERATOR_BLOCK);
+        registerOritechCategory(registry, manager, RecipeContent.FUEL_GENERATOR, FuelGeneratorEntity.class, BlockContent.FUEL_GENERATOR_BLOCK);
+        registerOritechCategory(registry, manager, RecipeContent.LAVA_GENERATOR, LavaGeneratorEntity.class, BlockContent.LAVA_GENERATOR_BLOCK);
+        registerOritechCategory(registry, manager, RecipeContent.STEAM_ENGINE, SteamEngineEntity.class, BlockContent.STEAM_ENGINE_BLOCK);
         
         // reactor
         registerCustom(registry, manager, RecipeContent.REACTOR, BlockContent.REACTOR_CONTROLLER, List.of(new ScreenProvider.GuiSlot(0, 55, 35)), new InventorySlotAssignment(0, 1, 1, 0));
@@ -86,15 +90,19 @@ public class OritechEMIPlugin implements EmiPlugin {
         
     }
     
-    private void registerOritechCategory(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType, ItemLike machine,  Class<? extends MachineBlockEntity> screenProviderSource) {
-        var icon = EmiStack.of(machine);
+    private void registerOritechCategory(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType, Class<? extends MachineBlockEntity> screenProviderSource, ItemLike... machines) {
+        
+        var firstMachine = machines[0];
+        var icon = EmiStack.of(firstMachine);
         var category = new EmiRecipeCategory(recipeType.getIdentifier(), icon);
         
         registry.addCategory(category);
-        registry.addWorkstation(category, icon);
+        for (var machine : machines) {
+            registry.addWorkstation(category, EmiStack.of(machine));
+        }
         
         var blockState = Blocks.STONE.defaultBlockState();
-        if (machine instanceof Block blockItem)
+        if (firstMachine instanceof Block blockItem)
             blockState = blockItem.defaultBlockState();
         var finalBlockState = blockState;
         

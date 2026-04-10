@@ -48,27 +48,6 @@ import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.*;
 
-// todo:
-// screen X
-// renderer (fluid contents + status / variant) X
-// name (tainted refinery) X
-// texture colors X
-// processing logic X
-// fluid output selection X
-// environment scanning X
-//  - sculk increases yield X
-//  - arcane increases energy efficiency (and thus speed) X
-// bonus calculation X
-// increased energy intake, falloff scaling related to speed (max 50M, capacity scales with actual used speed, takes in 0 when not active) X
-// Custom widget for energy intake. X
-// energy intake, arcane, sculk progress sliders like in buddy drones? X
-// occasional particle intake from surround bonus blocks X
-// transformation process X
-// complex plating X
-// recipe viewer category for supported blocks (and transformation) X
-// sculk+netherite refinery color variant glowing green vines X
-// wiki
-
 public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
@@ -229,7 +208,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     private FluidStack calculateOutputFluid(OritechRecipe recipe) {
         
         var fluidOutputs = recipe.getFluidOutputs();
-        if (fluidOutputs.size() >= selectedOutput) {
+        if (fluidOutputs.size() > selectedOutput && !fluidOutputs.isEmpty()) {
             var result = fluidOutputs.get(selectedOutput);
             return result.copyWithAmount(result.getAmount() * getOutputMultiplier());
         }
@@ -476,7 +455,6 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     public List<Vec3i> getAddonSlots() {
         return List.of();
     }
-    
     @Override
     public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
         return ownStorage;

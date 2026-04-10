@@ -77,6 +77,7 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerOriWorkstation(registry, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK);
         registerOriWorkstation(registry, RecipeContent.FOUNDRY, BlockContent.FOUNDRY_BLOCK);
         registerOriWorkstation(registry, RecipeContent.REFINERY, BlockContent.REFINERY_BLOCK);
+        registerOriWorkstation(registry, RecipeContent.REFINERY, BlockContent.TAINTED_REFINERY_BLOCK);
         registerOriWorkstation(registry, RecipeContent.COOLER, BlockContent.COOLER_BLOCK);
         registerOriWorkstation(registry, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK);
         registerOriWorkstation(registry, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK);

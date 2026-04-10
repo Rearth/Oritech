@@ -373,7 +373,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     @Override
     public float getProgress() {
-        return (float) progress / (currentRecipe.getTime() * getSpeedMultiplier());
+        return (float) progress / (getRecipeDuration() * getSpeedMultiplier());
     }
     
     public void setProgress(int progress) {

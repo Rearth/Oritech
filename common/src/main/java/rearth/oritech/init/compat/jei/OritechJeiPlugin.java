@@ -130,7 +130,7 @@ public class OritechJeiPlugin implements IModPlugin {
         registerCatalyst(registration, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK);
         registerCatalyst(registration, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK);
         registerCatalyst(registration, RecipeContent.FOUNDRY, BlockContent.FOUNDRY_BLOCK);
-        registerCatalyst(registration, RecipeContent.REFINERY, BlockContent.REFINERY_BLOCK);
+        registerCatalyst(registration, RecipeContent.REFINERY, BlockContent.REFINERY_BLOCK, BlockContent.TAINTED_REFINERY_BLOCK);
         registerCatalyst(registration, RecipeContent.COOLER, BlockContent.COOLER_BLOCK);
         registerCatalyst(registration, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK);
         registerCatalyst(registration, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK);
@@ -152,8 +152,10 @@ public class OritechJeiPlugin implements IModPlugin {
         registration.addRecipeCatalyst(BlockContent.TAINTED_REFINERY_BLOCK, OritechJeiTaintedRefineryBonuses.RECIPE_TYPE);
     }
     
-    private void registerCatalyst(IRecipeCatalystRegistration registration, OritechRecipeType type, Block block) {
-        registration.addRecipeCatalyst(block, RecipeType.create(type.getIdentifier().getNamespace(), type.getIdentifier().getPath(), OritechRecipe.class));
+    private void registerCatalyst(IRecipeCatalystRegistration registration, OritechRecipeType type, Block... blocks) {
+        var recipeType = RecipeType.create(type.getIdentifier().getNamespace(), type.getIdentifier().getPath(), OritechRecipe.class);
+        for (var block : blocks)
+            registration.addRecipeCatalyst(block, recipeType);
     }
     
     @Override

@@ -1,0 +1,100 @@
+---
+title: Tainted Refinery
+id: oritech:tainted_refinery_block
+type: block
+---
+
+The Tainted Refinery is a corrupted version of the standard [Refinery](@oritech:refinery_block), created through a volatile transformation process.
+It processes the same refinery recipes but operates on a fundamentally different power mode.
+It accepts virtually unlimited energy with diminishing returns, and its output and energy efficiency can be dramatically increased by surrounding it with the right blocks.
+
+<center>
+<ModAsset location="oritech:area/tainted_refinery_area" width={500} />
+</center>
+
+---
+
+## Creation
+
+The Tainted Refinery cannot be crafted. It is created in-world by **exploding a Refinery** while a
+charged [Enchantment Catalyst](@oritech:enchantment_catalyst_block) is nearby (within 6 blocks).
+
+The catalyst must contain at least one soul. When the explosion hits the refinery, the catalyst detonates, the refinery is consumed, and a Tainted Refinery appears in its place.
+The refinery's facing is preserved. The multiblock structure sets itself up automatically, no manual core placement is needed.
+
+<Callout variant="warning">
+    The area around the explosion should be clear. If the core positions of the Tainted Refinery are obstructed, construction may partially fail.
+</Callout>
+
+---
+
+## Energy Model
+
+Unlike normal machines with a fixed RF/t draw, the Tainted Refinery has a **dynamic energy intake**.
+
+- It only accepts energy while actively processing a recipe. When idle, its intake is zero.
+- It consumes **all stored energy each tick** and converts it into processing progress.
+- Higher energy input gives more progress per tick, but with **diminishing returns**. The relationship follows a power curve:
+
+> progress = 0.2 × energy^0.45
+
+This means doubling your energy input does not double your speed. The machine rewards steady high-throughput power but does not punish you harshly for fluctuations.
+Its maximum intake is 500M RF/t, so you can feed it as much as your infrastructure allows. You might want to limit the power input by using a portable energy storage.
+
+---
+
+## Output Selection
+
+The Tainted Refinery operates on standard refinery recipes, which may produce multiple different fluid outputs. However, it **only outputs one fluid at a time**.
+
+The desired output slot can be selected through a button in the GUI (slot 1, 2 or 3). Any fluid outputs that do not match the selected slot are discarded.
+Choose the output you need before starting production.
+
+---
+
+## Environment Bonuses
+
+The Tainted Refinery scans its surroundings (within 16 blocks, manhattan distance) for specific block types. These blocks must have **line of sight** to the refinery.
+Solid blocks in the way will obstruct them.
+
+There are two categories of bonus blocks:
+
+### Sculk Blocks -> Yield Bonus
+
+Sculk-themed blocks increase the **output multiplier**, ranging from 1x to 3x. This affects both item and fluid outputs.
+
+Valid blocks include: Sculk, Sculk Catalyst, Sculk Sensor, Calibrated Sculk Sensor, Sculk Shrieker, Sculk Vein, Spawner, Infested Stone variants,
+Spawner Cage, and Spawner Controller.
+
+### Arcane Blocks -> Energy Efficiency
+
+Arcane-themed blocks increase the **energy scaling factor**, ranging from 1x to 9x. This multiplier is applied to the energy before the diminishing-returns curve,
+effectively making each RF worth much more.
+
+Valid blocks include: Enchanting Table, Bookshelf, Chiseled Bookshelf, End Rod, Amethyst Block, Budding Amethyst, Amethyst Buds and Clusters, Soul Torch,
+Soul Lantern, Soul Campfire, Crying Obsidian, Respawn Anchor, Arcane Augment Station, Enchanter, and Enchantment Catalyst.
+
+<Callout variant="info">
+    Valid blocks for these categories can be viewed / checked ingame using a recipe viewer like JEI, REI or EMI.
+</Callout>
+
+### Optimization
+
+For maximum effect, you want **16 blocks** of each type, spread across **at least 4 different block types** within each category.
+Having fewer than 4 types applies a penalty, though you can compensate by placing more blocks.
+
+> factor = min(1, blockCount / 16 × typeCount / 4)
+
+The environment is scanned when the multiblock is first assembled. Breaking and reassembling the refinery triggers a rescan.
+
+<Callout variant="info">
+    Both bonus categories and their current strength are displayed in the refinery GUI as meter bars.
+    You can also see the current output multiplier and energy scaling values in the tooltips.
+</Callout>
+
+---
+
+## Breaking
+
+When any part of the Tainted Refinery multiblock is broken, the entire structure is dismantled.
+A regular [Refinery](@oritech:refinery_block) item is dropped. There is no Tainted Refinery item obtainable in survival. The only way to get a new one is through the explosion ritual again.
