@@ -413,6 +413,8 @@
   "tooltip.oritech.tainted_refinery.sculk_output": "Output multiplier: x%s",
   "tooltip.oritech.tainted_refinery.arcane_boost": "Energy scaling: %s",
   "label.oritech.tainted_refinery.output_slot": "Slot: %s",
+  "label.oritech.energy_storage.limit": "Output Limit",
+  "tooltip.oritech.rf_rate": "%s RF/t",
   "tooltip.oritech.tainted_refinery.output_slot": "The tainted refinery operates on normal refinery recipes. However, it'll only output one of the resulting fluids.\nThe desired slot can be selected with this button.",
   "title.oritech.steam_production": "🛞 %s su/t",
   "tooltip.oritech.steam_production": "Cantidad de gotas de vapor producidas por tick. El exceso se perderá cuando el almacenamiento esté lleno.",
