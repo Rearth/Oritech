@@ -413,6 +413,8 @@
   "tooltip.oritech.tainted_refinery.sculk_output": "Множитель выхода: x%s",
   "tooltip.oritech.tainted_refinery.arcane_boost": "Масштабирование энергии: %s",
   "label.oritech.tainted_refinery.output_slot": "Слот: %s",
+  "label.oritech.energy_storage.limit": "Output Limit",
+  "tooltip.oritech.rf_rate": "%s RF/t",
   "tooltip.oritech.tainted_refinery.output_slot": "Испорченный нефтеперерабатывающий завод работает с обычными рецептам переработки, но производит только одну из жидкостей в качестве результата.\nЖелаемый слот можно выбрать этой кнопкой.",
   "title.oritech.steam_production": "🛞 %s su/t",
   "tooltip.oritech.steam_production": "Количество паровых капель, производимых за тик. Любой избыток будет потерян при заполнении хранилища.",
