@@ -46,6 +46,7 @@ public class LimitedEnergyStorageScreen extends EnergyStorageScreen<LimitedEnerg
         NetworkManager.sendToServer(new ExpandableEnergyStorageBlockEntity.StorageLimitPacket(menu.blockPos, value));
     }
     
+    // basically generates multiples of 2 and 5 that can be selected from
     private static int[] createNiceRateSteps(int maxValue) {
         var values = new TreeSet<Integer>();
         values.add(0);
