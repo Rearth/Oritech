@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.init.OritechConfig;
+import rearth.oritech.init.OritechStartupConfig;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public class DrillItem extends DiggerItem implements OritechEnergyItem {
     }
     
     private long getEnergyUsageMultiplier() {
-        return OritechConfig.basicDrill.energyUsage.get();
+        return OritechStartupConfig.basicDrill.energyUsage.get();
     }
     
     @Override
@@ -98,11 +98,11 @@ public class DrillItem extends DiggerItem implements OritechEnergyItem {
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return OritechConfig.basicDrill.energyCapacity.get();
+        return OritechStartupConfig.basicDrill.energyCapacity.get();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return OritechConfig.basicDrill.chargeSpeed.get();
+        return OritechStartupConfig.basicDrill.chargeSpeed.get();
     }
 }

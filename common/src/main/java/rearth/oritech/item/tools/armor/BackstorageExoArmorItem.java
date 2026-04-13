@@ -1,14 +1,5 @@
 package rearth.oritech.item.tools.armor;
 
-import rearth.oritech.init.OritechConfig;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
-import rearth.oritech.item.tools.util.OritechEnergyItem;
-import rearth.oritech.util.StackContext;
-import rearth.oritech.util.TooltipHelper;
-
-import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -20,6 +11,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
+import rearth.oritech.init.OritechStartupConfig;
+import rearth.oritech.item.tools.util.OritechEnergyItem;
+import rearth.oritech.util.StackContext;
+import rearth.oritech.util.TooltipHelper;
+
+import java.util.List;
 
 import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
 
@@ -67,17 +66,17 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEner
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return OritechConfig.exoChestplate.energyCapacity.get();
+        return OritechStartupConfig.exoChestplate.energyCapacity.get();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return OritechConfig.exoChestplate.chargeSpeed.get();
+        return OritechStartupConfig.exoChestplate.chargeSpeed.get();
     }
     
     @Override
     public long getEnergyMaxOutput(ItemStack stack) {
-        return OritechConfig.exoChestplate.energyUsage.get();
+        return OritechStartupConfig.exoChestplate.energyUsage.get();
     }
     
     @Override

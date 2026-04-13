@@ -1,6 +1,5 @@
 package rearth.oritech.item.tools.armor;
 
-import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 
 import java.util.List;
@@ -14,6 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import rearth.oritech.init.OritechStartupConfig;
 
 public class JetpackExoArmorItem extends BackstorageExoArmorItem implements BaseJetpackItem {
     public JetpackExoArmorItem(Holder<ArmorMaterial> material, Type type, Item.Properties settings) {
@@ -63,31 +63,31 @@ public class JetpackExoArmorItem extends BackstorageExoArmorItem implements Base
     
     @Override
     public float getSpeed() {
-        return OritechConfig.exoJetpack.speed.get().floatValue();
+        return OritechStartupConfig.exoJetpack.speed.get().floatValue();
     }
     
     @Override
     public int getRfUsage() {
-        return OritechConfig.exoJetpack.energyUsage.get();
+        return OritechStartupConfig.exoJetpack.energyUsage.get();
     }
     
     @Override
     public int getFuelUsage() {
-        return OritechConfig.exoJetpack.fuelUsage.get();
+        return OritechStartupConfig.exoJetpack.fuelUsage.get();
     }
     
     @Override
     public long getFuelCapacity() {
-        return OritechConfig.exoJetpack.fuelCapacity.get();
+        return OritechStartupConfig.exoJetpack.fuelCapacity.get();
     }
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return OritechConfig.exoJetpack.energyCapacity.get();
+        return OritechStartupConfig.exoJetpack.energyCapacity.get();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return OritechConfig.exoJetpack.chargeSpeed.get();
+        return OritechStartupConfig.exoJetpack.chargeSpeed.get();
     }
 }

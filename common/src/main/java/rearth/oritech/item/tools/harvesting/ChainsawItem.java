@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -18,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.interaction.TreefellerBlockEntity;
 import rearth.oritech.init.OritechConfig;
+import rearth.oritech.init.OritechStartupConfig;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 
 import java.util.List;
@@ -59,7 +59,7 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
     }
     
     private long getEnergyUsageMultiplier() {
-        return OritechConfig.chainSaw.energyUsage.get();
+        return OritechStartupConfig.chainSaw.energyUsage.get();
     }
     
     @Override
@@ -130,11 +130,11 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return OritechConfig.chainSaw.energyCapacity.get();
+        return OritechStartupConfig.chainSaw.energyCapacity.get();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return OritechConfig.chainSaw.chargeSpeed.get();
+        return OritechStartupConfig.chainSaw.chargeSpeed.get();
     }
 }

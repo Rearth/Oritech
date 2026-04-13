@@ -2,11 +2,11 @@ package rearth.oritech.item.tools.armor;
 
 import dev.architectury.fluid.FluidStack;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
 import rearth.oritech.init.ComponentContent;
+import rearth.oritech.init.OritechStartupConfig;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -132,32 +132,32 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     
     @Override
     public float getSpeed() {
-        return OritechConfig.basicJetpack.speed.get().floatValue();
+        return OritechStartupConfig.basicJetpack.speed.get().floatValue();
     }
     
     @Override
     public int getRfUsage() {
-        return OritechConfig.basicJetpack.energyUsage.get();
+        return OritechStartupConfig.basicJetpack.energyUsage.get();
     }
     
     @Override
     public int getFuelUsage() {
-        return OritechConfig.basicJetpack.fuelUsage.get();
+        return OritechStartupConfig.basicJetpack.fuelUsage.get();
     }
     
     @Override
     public long getFuelCapacity() {
-        return OritechConfig.basicJetpack.fuelCapacity.get();
+        return OritechStartupConfig.basicJetpack.fuelCapacity.get();
     }
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return OritechConfig.basicJetpack.energyCapacity.get();
+        return OritechStartupConfig.basicJetpack.energyCapacity.get();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return OritechConfig.basicJetpack.chargeSpeed.get();
+        return OritechStartupConfig.basicJetpack.chargeSpeed.get();
     }
     
     public static void receiveUsagePacket(JetpackUsageUpdatePacket packet, Player player, RegistryAccess dynamicRegistryManager) {

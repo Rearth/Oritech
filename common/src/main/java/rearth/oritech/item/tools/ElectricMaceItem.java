@@ -26,7 +26,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
-import rearth.oritech.init.OritechConfig;
+import rearth.oritech.init.OritechStartupConfig;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.item.tools.harvesting.ChainsawItem;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
@@ -61,7 +61,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
         
         var bonus = 0f;
         
-        var usedEnergy = tryUseEnergy(stack, OritechConfig.electricMace.energyUsage.get(), null);
+        var usedEnergy = tryUseEnergy(stack, OritechStartupConfig.electricMace.energyUsage.get(), null);
         if (usedEnergy && canSmashAttack(attacker)) {
             attacker.level().playSound(null, target.blockPosition(), SoundContent.ELECTRIC_SHOCK, SoundSource.PLAYERS);
             attacker.resetFallDistance();
@@ -80,7 +80,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     
     private void createLightningAttack(ServerLevel world, Player attacker, LivingEntity target, ItemStack stack, int damage) {
         
-        var usedEnergy = tryUseEnergy(stack, OritechConfig.electricMace.energyUsage.get() * OritechConfig.electricMace.lightningCostMultiplier.get(), null);
+        var usedEnergy = tryUseEnergy(stack, OritechStartupConfig.electricMace.energyUsage.get() * OritechStartupConfig.electricMace.lightningCostMultiplier.get(), null);
         if (usedEnergy && attacker.level() instanceof ServerLevel serverWorld) {
             
             var playerPos = attacker.getEyePosition();
@@ -189,7 +189,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return OritechConfig.electricMace.energyCapacity.get();
+        return OritechStartupConfig.electricMace.energyCapacity.get();
     }
     
     @Override

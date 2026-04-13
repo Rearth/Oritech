@@ -77,10 +77,9 @@ public class ToolsContent implements ArchitecturyRegistryContainer<Item> {
         ItemGroups.add(targetGroup, value);
         
         if (EnergyApi.ITEM != null && value instanceof OritechEnergyItem energyItem) {
-//            var variantStack = new ItemStack(value);
-//            // todo fix config value get before loaded
-//            variantStack.set(EnergyApi.ITEM.getEnergyComponent(), energyItem.getEnergyCapacity(variantStack));
-//            ItemGroups.add(targetGroup, variantStack);
+            var variantStack = new ItemStack(value);
+            variantStack.set(EnergyApi.ITEM.getEnergyComponent(), energyItem.getEnergyCapacity(variantStack));
+            ItemGroups.add(targetGroup, variantStack);
             
             EnergyApi.ITEM.registerForItem(() -> value);
         }

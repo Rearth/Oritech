@@ -9,10 +9,10 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
 import rearth.oritech.client.renderers.util.BeamRenderer;
+import rearth.oritech.init.OritechStartupConfig;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.PortableLaserItem;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
@@ -48,7 +48,7 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         if (!OritechClient.laserActive && singleShotAge > 10) return;
         
         if (!heldStack.getItem().equals(ToolsContent.PORTABLE_LASER)) return;
-        if (animatable.getStoredEnergy(heldStack) < OritechConfig.portableLaserConfig.energyPerTick.get()) return;
+        if (animatable.getStoredEnergy(heldStack) < OritechStartupConfig.portableLaserConfig.energyPerTick.get()) return;
         
         // at this point we know a laser is held and fired
         

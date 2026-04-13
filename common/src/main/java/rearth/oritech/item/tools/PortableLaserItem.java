@@ -49,6 +49,7 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.PortableLaserRenderer;
 import rearth.oritech.init.ComponentContent;
 import net.minecraft.core.particles.ParticleTypes;
+import rearth.oritech.init.OritechStartupConfig;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
@@ -95,7 +96,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         
         var stack = player.getItemInHand(hand);
-        var energyUsed = OritechConfig.portableLaserConfig.energyPerBoom.get();
+        var energyUsed = OritechStartupConfig.portableLaserConfig.energyPerBoom.get();
         
         if (world.isClientSide) {
             if (getStoredEnergy(stack) > energyUsed && !player.isShiftKeyDown() && !isMiningEnabled(stack))
@@ -138,7 +139,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             
             if (canInteract)
                 world.explode(null, new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player),
-                  null, hit.getLocation(), OritechConfig.portableLaserConfig.explosionStrength.get(), false, Level.ExplosionInteraction.MOB);
+                  null, hit.getLocation(), OritechStartupConfig.portableLaserConfig.explosionStrength.get(), false, Level.ExplosionInteraction.MOB);
             
             endPos = hit.getLocation();
         } else {
@@ -179,7 +180,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         if (!(stack.getItem() instanceof PortableLaserItem laserItem) || world == null) return;
         
-        var rfUsage = OritechConfig.portableLaserConfig.energyPerTick.get();
+        var rfUsage = OritechStartupConfig.portableLaserConfig.energyPerTick.get();
         
         if (!laserItem.tryUseEnergy(stack, rfUsage, player)) {
             return;
@@ -207,7 +208,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             var canInteract = OritechPlatform.INSTANCE.canAttackBeDone(world, livingEntity, 20f, source);
             
             if (canInteract)
-                processEntityTarget(player, livingEntity, OritechConfig.portableLaserConfig.damageBase.get(), stack, world);
+                processEntityTarget(player, livingEntity, OritechStartupConfig.portableLaserConfig.damageBase.get(), stack, world);
         }
         
         if (finalHit != null && finalHit.getType() != HitResult.Type.MISS && laserItem.isMiningEnabled(stack)) {
@@ -292,7 +293,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         }
         
         var currentInvestedEnergy = stats.getB();
-        var requiredBreakingEnergy = (int) (Math.sqrt(blockState.getDestroySpeed(world, blockPos)) * OritechConfig.laserArmConfig.blockBreakEnergyBase.get() / OritechConfig.portableLaserConfig.blockBreakSpeed.get());
+        var requiredBreakingEnergy = (int) (Math.sqrt(blockState.getDestroySpeed(world, blockPos)) * OritechConfig.laserArmConfig.blockBreakEnergyBase.get() / OritechStartupConfig.portableLaserConfig.blockBreakSpeed.get());
         var efficiencyLevel = getEnchantmentLevel(tool, Enchantments.EFFICIENCY);
         if (efficiencyLevel > 0) requiredBreakingEnergy = requiredBreakingEnergy / (efficiencyLevel + 1);
         
@@ -442,17 +443,17 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return OritechConfig.portableLaserConfig.energyCapacity.get();
+        return OritechStartupConfig.portableLaserConfig.energyCapacity.get();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return OritechConfig.portableLaserConfig.energyCapacity.get() / 80;
+        return OritechStartupConfig.portableLaserConfig.energyCapacity.get() / 80;
     }
     
     @Override
     public long getEnergyMaxOutput(ItemStack stack) {
-        return OritechConfig.portableLaserConfig.energyCapacity.get() / 80;
+        return OritechStartupConfig.portableLaserConfig.energyCapacity.get() / 80;
     }
     
     @Override

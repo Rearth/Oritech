@@ -1,5 +1,6 @@
 package rearth.oritech.init;
 
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class OritechStartupConfig {
@@ -38,11 +39,87 @@ public class OritechStartupConfig {
     public static final ModConfigSpec.IntValue burstAddonTicks = STARTUP
         .comment("Burst time in ticks per addon")
         .defineInRange("burstAddonTicks", 240, 0, Integer.MAX_VALUE);
+
+    public static final JetpackConfig basicJetpack = new JetpackConfig(OritechStartupConfig.STARTUP, "basicJetpack", 100_000, 4 * FluidStackHooks.bucketAmount(), 128, (int) (10 * (FluidStackHooks.bucketAmount() / 1000)), 1024, 0.4);
+    public static final JetpackConfig exoJetpack = new JetpackConfig(OritechStartupConfig.STARTUP, "exoJetpack", 5_000_000, 32 * FluidStackHooks.bucketAmount(), 256, (int) (15 * (FluidStackHooks.bucketAmount() / 1000)), 10_000, 1.5);
+    public static final JetpackConfig elytraJetpack = new JetpackConfig(OritechStartupConfig.STARTUP, "elytraJetpack", 100_000, 4 * FluidStackHooks.bucketAmount(), 128, (int) (10 * (FluidStackHooks.bucketAmount() / 1000)), 1024, 0.6);
+    public static final JetpackConfig exoElytraJetpack = new JetpackConfig(OritechStartupConfig.STARTUP, "exoElytraJetpack", 5_000_000, 32 * FluidStackHooks.bucketAmount(), 256, (int) (15 * (FluidStackHooks.bucketAmount() / 1000)), 10_000, 1.4);
+    public static final ToolConfig exoChestplate = new ToolConfig(OritechStartupConfig.STARTUP, "exoChestplate", 5_000_000, 10_000, 10_000);
+    public static final ToolConfig basicDrill = new ToolConfig(OritechStartupConfig.STARTUP, "basicDrill", 10_000, 10, 512);
+    public static final ToolConfig chainSaw = new ToolConfig(OritechStartupConfig.STARTUP, "chainSaw", 10_000, 10, 512);
+    public static final ElectricMaceConfig electricMace = new ElectricMaceConfig(OritechStartupConfig.STARTUP);
+    public static final PortableLaserConfig portableLaserConfig = new PortableLaserConfig(OritechStartupConfig.STARTUP);
     
-    // Solar panel energy per tick - must be startup because it is baked into the block at registration time
-    public static final ModConfigSpec.IntValue solarEnergyPerTick = STARTUP
-        .comment("Big solar panel base energy production per tick in RF")
-        .defineInRange("solarEnergyPerTick", 32, 0, Integer.MAX_VALUE);
-    
+    // finish constructing everything, this must be at end
     public static final ModConfigSpec STARTUP_SPEC = OritechStartupConfig.STARTUP.build();
+    
+    public static class JetpackConfig {
+        public final ModConfigSpec.LongValue energyCapacity;
+        public final ModConfigSpec.LongValue fuelCapacity;
+        public final ModConfigSpec.IntValue energyUsage;
+        public final ModConfigSpec.IntValue fuelUsage;
+        public final ModConfigSpec.IntValue chargeSpeed;
+        public final ModConfigSpec.DoubleValue speed;
+        
+        JetpackConfig(ModConfigSpec.Builder b, String name, long defCap, long defFuelCap, int defUsage, int defFuelUsage, int defCharge, double defSpeed) {
+            b.push(name);
+            energyCapacity = b.defineInRange("energyCapacity", defCap, 0L, Long.MAX_VALUE);
+            fuelCapacity = b.defineInRange("fuelCapacity", defFuelCap, 0L, Long.MAX_VALUE);
+            energyUsage = b.defineInRange("energyUsage", defUsage, 0, Integer.MAX_VALUE);
+            fuelUsage = b.defineInRange("fuelUsage", defFuelUsage, 0, Integer.MAX_VALUE);
+            chargeSpeed = b.defineInRange("chargeSpeed", defCharge, 0, Integer.MAX_VALUE);
+            speed = b.comment("Flight speed multiplier").defineInRange("speed", defSpeed, 0.0, 100.0);
+            b.pop();
+        }
+    }
+    
+    public static class ToolConfig {
+        public final ModConfigSpec.LongValue energyCapacity;
+        public final ModConfigSpec.LongValue energyUsage;
+        public final ModConfigSpec.IntValue chargeSpeed;
+        
+        ToolConfig(ModConfigSpec.Builder b, String name, long defCap, long defUsage, int defCharge) {
+            b.push(name);
+            energyCapacity = b.defineInRange("energyCapacity", defCap, 0L, Long.MAX_VALUE);
+            energyUsage = b.defineInRange("energyUsage", defUsage, 0L, Long.MAX_VALUE);
+            chargeSpeed = b.defineInRange("chargeSpeed", defCharge, 0, Integer.MAX_VALUE);
+            b.pop();
+        }
+    }
+    
+    public static class ElectricMaceConfig {
+        public final ModConfigSpec.LongValue energyCapacity;
+        public final ModConfigSpec.IntValue energyUsage;
+        public final ModConfigSpec.IntValue chargeSpeed;
+        public final ModConfigSpec.IntValue lightningCostMultiplier;
+        
+        ElectricMaceConfig(ModConfigSpec.Builder b) {
+            b.push("electricMace");
+            energyCapacity = b.defineInRange("energyCapacity", 500_000L, 0L, Long.MAX_VALUE);
+            energyUsage = b.comment("RF consumed per hit").worldRestart().defineInRange("energyUsage", 2048, 0, Integer.MAX_VALUE);
+            chargeSpeed = b.defineInRange("chargeSpeed", 50_000, 0, Integer.MAX_VALUE);
+            lightningCostMultiplier = b.comment("Lightning attack RF usage multiplier").defineInRange("lightningCostMultiplier", 8, 0, Integer.MAX_VALUE);
+            b.pop();
+        }
+    }
+    
+    public static class PortableLaserConfig {
+        public final ModConfigSpec.LongValue energyCapacity;
+        public final ModConfigSpec.IntValue energyPerTick;
+        public final ModConfigSpec.IntValue energyPerBoom;
+        public final ModConfigSpec.DoubleValue blockBreakSpeed;
+        public final ModConfigSpec.IntValue damageBase;
+        public final ModConfigSpec.IntValue explosionStrength;
+        
+        PortableLaserConfig(ModConfigSpec.Builder b) {
+            b.push("portableLaserConfig");
+            energyCapacity = b.defineInRange("energyCapacity", 5_000_000L, 0L, Long.MAX_VALUE);
+            energyPerTick = b.comment("RF consumed per tick while firing").defineInRange("energyPerTick", 4096, 0, Integer.MAX_VALUE);
+            energyPerBoom = b.comment("RF consumed per explosion").defineInRange("energyPerBoom", 100_000, 0, Integer.MAX_VALUE);
+            blockBreakSpeed = b.comment("Block breaking speed multiplier").defineInRange("blockBreakSpeed", 0.125, 0.0, 100.0);
+            damageBase = b.comment("Base damage to entities").defineInRange("damageBase", 4, 0, Integer.MAX_VALUE);
+            explosionStrength = b.comment("Explosion power").defineInRange("explosionStrength", 6, 0, Integer.MAX_VALUE);
+            b.pop();
+        }
+    }
 }

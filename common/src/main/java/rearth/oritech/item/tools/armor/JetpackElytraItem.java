@@ -1,9 +1,9 @@
 package rearth.oritech.item.tools.armor;
 
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
+import rearth.oritech.init.OritechStartupConfig;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -144,31 +144,31 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     
     @Override
     public float getSpeed() {
-        return OritechConfig.elytraJetpack.speed.get().floatValue();
+        return OritechStartupConfig.elytraJetpack.speed.get().floatValue();
     }
     
     @Override
     public int getRfUsage() {
-        return (int) OritechConfig.elytraJetpack.energyUsage.get();
+        return (int) OritechStartupConfig.elytraJetpack.energyUsage.get();
     }
     
     @Override
     public int getFuelUsage() {
-        return OritechConfig.elytraJetpack.fuelUsage.get();
+        return OritechStartupConfig.elytraJetpack.fuelUsage.get();
     }
     
     @Override
     public long getFuelCapacity() {
-        return OritechConfig.elytraJetpack.fuelCapacity.get();
+        return OritechStartupConfig.elytraJetpack.fuelCapacity.get();
     }
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return OritechConfig.elytraJetpack.energyCapacity.get();
+        return OritechStartupConfig.elytraJetpack.energyCapacity.get();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return OritechConfig.elytraJetpack.chargeSpeed.get();
+        return OritechStartupConfig.elytraJetpack.chargeSpeed.get();
     }
 }
