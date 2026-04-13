@@ -12,7 +12,7 @@ import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.init.BlockContent;
 
-public class PowerPoleScreen extends EnergyStorageScreen {
+public class PowerPoleScreen extends EnergyStorageScreen<UpgradableOritechScreenHandler> {
     
     public PowerPoleScreen(UpgradableOritechScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);

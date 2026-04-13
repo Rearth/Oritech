@@ -134,7 +134,7 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         }
         
         // Player inventory (3 rows of 9, starting at x=8, y=84)
-        addPlayerInventory(playerInventory, 8, 84);
+        addPlayerInventory(playerInventory, 8, 84 + (isTall() ? 20 : 0));
         
         // Armor slots (optional): 4 armor + 1 offhand
         if (screenData.showArmor()) {
@@ -154,6 +154,10 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
                 armorSlots.add(slot.index);
             }
         }
+    }
+    
+    public boolean isTall() {
+        return false;
     }
     
     public void addMachineSlot(int inventorySlot, int x, int y, boolean output) {

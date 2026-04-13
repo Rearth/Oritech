@@ -21,7 +21,7 @@ import rearth.oritech.util.TooltipHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EnergyStorageScreen extends UpgradableOritechScreen<UpgradableOritechScreenHandler> {
+public abstract class EnergyStorageScreen<T extends UpgradableOritechScreenHandler> extends UpgradableOritechScreen<T> {
     
     private LabelWidget inAvgSecond;
     private LabelWidget inLastTick;
@@ -34,29 +34,29 @@ public class EnergyStorageScreen extends UpgradableOritechScreen<UpgradableOrite
     private final List<UIComponent> extractionWidgets = new ArrayList<>();
     private boolean showingOutput;
     
-    public EnergyStorageScreen(UpgradableOritechScreenHandler handler, Inventory inventory, Component title) {
+    public EnergyStorageScreen(T handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
     
     @Override
     protected void addExtraComponents() {
         super.addExtraComponents();
-
+        
         var panelXPos = 74;
-
+        
         addStatsPanel(insertionWidgets, panelXPos, 23, 94, 56);
         inLastTick = createPanelLabel(panelXPos + 6, 29, "title.oritech.energy.inLastTick.tooltip");
         inAvgSecond = createPanelLabel(panelXPos + 6, 41, "title.oritech.energy.inAvgSecond.tooltip");
         inPeak = createPanelLabel(panelXPos + 6, 53, "title.oritech.energy.inPeak.tooltip");
         inSources = createPanelLabel(panelXPos + 6, 65, "title.oritech.energy.inSources.tooltip");
         addGrouped(insertionWidgets, inLastTick, inAvgSecond, inPeak, inSources);
-
+        
         addStatsPanel(extractionWidgets, panelXPos, 23, 94, 44);
         outLastTick = createPanelLabel(panelXPos + 6, 29, "title.oritech.energy.outLastTick.tooltip");
         outAvgSecond = createPanelLabel(panelXPos + 6, 41, "title.oritech.energy.outAvgSecond.tooltip");
         outPeak = createPanelLabel(panelXPos + 6, 53, "title.oritech.energy.outPeak.tooltip");
         addGrouped(extractionWidgets, outLastTick, outAvgSecond, outPeak);
-
+        
         var toggleButton = ToggleWidget.of(panelXPos, 5,
             Component.translatable("title.oritech.item_filter.toggle_energy_statistics").withColor(LabelWidget.DARK_TEXT),
             showingOutput,
@@ -64,57 +64,61 @@ public class EnergyStorageScreen extends UpgradableOritechScreen<UpgradableOrite
                 showingOutput = value;
                 updatePanelVisibility();
             })
-            .withTextColor(LabelWidget.DARK_TEXT)
-            .withTextShadow(false);
+                             .withTextColor(LabelWidget.DARK_TEXT)
+                             .withTextShadow(false);
         addComponent(toggleButton);
-
+        
+        addUnstableContainerPanel();
+        
+        updatePanelVisibility();
+    }
+    
+    private void addUnstableContainerPanel() {
         if (this.menu.blockEntity instanceof UnstableContainerBlockEntity unstableContainer) {
             var container = (DynamicEnergyStorage) unstableContainer.getEnergyStorageForMultiblock(null);
             var capacity = container.maxInsert;
             var capacityMultiplier = capacity / (UnstableContainerBlockEntity.BASE_CAPACITY * unstableContainer.qualityMultiplier);   // in percent, exponential
             var tooltipText = List.of(
-                Component.translatable("tooltip.oritech.unstable_laser_tooltip"),
-                Component.translatable("tooltip.oritech.unstable_laser_tooltip.2"));
-
+              Component.translatable("tooltip.oritech.unstable_laser_tooltip"),
+              Component.translatable("tooltip.oritech.unstable_laser_tooltip.2"));
+            
             var laserIcon = new ItemWidget(36, 6, 22, new ItemStack(BlockContent.LASER_ARM_BLOCK.asItem()));
             laserIcon.withTooltip(tooltipText.toArray(Component[]::new));
             laserIcon.withShowOverlay(false);
             laserIcon.withTooltipFromStack(false);
             var laserLabel = new LabelWidget(27, 30, 40, 9,
-                Component.literal("x" + String.format("%.1f", capacityMultiplier)));
+              Component.literal("x" + String.format("%.1f", capacityMultiplier)));
             laserLabel.withTooltip(tooltipText.toArray(Component[]::new));
             laserLabel.withAlignment(LabelWidget.Alignment.CENTER);
-
+            
             addInsetInfoBox(27, 5,
-                laserIcon,
-                laserLabel);
-
+              laserIcon,
+              laserLabel);
+            
             var containedTooltipText = Component.translatable("tooltip.oritech.unstable_contained_tooltip");
             var containedIcon = new ItemWidget(38, 46, 20, new ItemStack(unstableContainer.capturedBlock.getBlock().asItem()));
             containedIcon.withTooltip(containedTooltipText);
             containedIcon.withTooltipFromStack(false);
             var containedLabel = new LabelWidget(27, 69, 40, 9,
-                Component.literal("x" + unstableContainer.qualityMultiplier));
+              Component.literal("x" + unstableContainer.qualityMultiplier));
             containedLabel.withTooltip(containedTooltipText);
             containedLabel.withAlignment(LabelWidget.Alignment.CENTER);
             addInsetInfoBox(27, 44,
-                containedIcon,
-                containedLabel);
+              containedIcon,
+              containedLabel);
         }
-
-        updatePanelVisibility();
     }
     
     @Override
     protected void tickExtra() {
         super.tickExtra();
-
+        
         var entity = this.menu.blockEntity;
         var statistics = getStatistics(entity);
         if (statistics == null) return;
-
+        
         var updateAll = this.menu.worldAccess.getGameTime() % 4 == 0;
-
+        
         if (updateAll) {
             inAvgSecond.setText(Component.translatable("title.oritech.energy.inAvgSecond", TooltipHelper.getEnergyText((long) statistics.avgInsertSecond())));
             inSources.setText(Component.translatable("title.oritech.energy.inSources", statistics.insertionCountLastTick()));
@@ -122,7 +126,7 @@ public class EnergyStorageScreen extends UpgradableOritechScreen<UpgradableOrite
             outAvgSecond.setText(Component.translatable("title.oritech.energy.outAvgSecond", TooltipHelper.getEnergyText((long) statistics.avgExtractSecond())));
             outPeak.setText(Component.translatable("title.oritech.energy.outPeak", TooltipHelper.getEnergyText(statistics.maxExtractSecond())));
         }
-
+        
         inLastTick.setText(Component.translatable("title.oritech.energy.inLastTick", TooltipHelper.getEnergyText(statistics.insertedLastTickTotal())));
         outLastTick.setText(Component.translatable("title.oritech.energy.outLastTick", TooltipHelper.getEnergyText(statistics.extractedLastTickTotal())));
     }
@@ -138,20 +142,20 @@ public class EnergyStorageScreen extends UpgradableOritechScreen<UpgradableOrite
         }
         return super.getTitleIcon();
     }
-
+    
     private void addStatsPanel(List<UIComponent> group, int x, int y, int width, int height) {
         var panel = new SurfaceWidget(x, y, width, height);
         panel.withSurface(OritechSurface.PANEL_INSET);
         group.add(panel);
         addComponent(panel);
     }
-
+    
     private LabelWidget createPanelLabel(int x, int y, String tooltipKey) {
         var label = new LabelWidget(x, y, 84, 9, Component.literal(""));
         label.withTooltip(Component.translatable(tooltipKey));
         return label;
     }
-
+    
     private void addInsetInfoBox(int x, int y, UIComponent icon, UIComponent label) {
         var panel = new SurfaceWidget(x, y, 40, 35);
         panel.withSurface(OritechSurface.PANEL_INSET);
@@ -159,14 +163,14 @@ public class EnergyStorageScreen extends UpgradableOritechScreen<UpgradableOrite
         addComponent(icon);
         addComponent(label);
     }
-
+    
     private void addGrouped(List<UIComponent> group, UIComponent... widgets) {
         for (var widget : widgets) {
             group.add(widget);
             addComponent(widget);
         }
     }
-
+    
     private void updatePanelVisibility() {
         for (var widget : insertionWidgets)
             widget.setVisible(!showingOutput);

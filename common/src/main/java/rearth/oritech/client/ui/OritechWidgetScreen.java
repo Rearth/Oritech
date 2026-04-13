@@ -28,7 +28,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
     public static final int SEPARATOR_COLOR = ColorHelper.argb(0.8f, 0.8f, 0.8f);
     
     protected final List<UIComponent> components = new ArrayList<>();
-    private final ResourceLocation backgroundTexture;
+    protected ResourceLocation backgroundTexture;
     private UIComponent interactionTarget;
     
     protected OritechWidgetScreen(T handler, Inventory inventory, Component title, int imageWidth, int imageHeight) {

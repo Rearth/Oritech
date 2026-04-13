@@ -1,13 +1,11 @@
 package rearth.oritech.block.base.entity;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Vec3i;
+import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -20,6 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -59,9 +58,26 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(1, this::setChanged);
     
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
+    public int rfOutputOverride = -1;
+    
     //own storage
-    @SyncField(SyncType.GUI_TICK)
-    public final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::setChanged);
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
+    public final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(
+      getDefaultCapacity(),
+      getDefaultInsertRate(),
+      getDefaultExtractionRate(),
+      this::setChanged) {
+        @Override
+        public long extract(long amount, boolean simulate) {
+            
+            if (rfOutputOverride > 0) {
+                amount = Math.min(rfOutputOverride, amount);
+            }
+            
+            return super.extract(amount, simulate);
+        }
+    };
     
     private final EnergyApi.EnergyStorage outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
@@ -156,6 +172,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
         nbt.putLong("energy_stored", energyStorage.amount);
         ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putBoolean("redstone", redstonePowered);
+        nbt.putInt("rfOutputOverride", rfOutputOverride);
     }
     
     @Override
@@ -166,6 +183,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
         energyStorage.amount = nbt.getLong("energy_stored");
         ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         redstonePowered = nbt.getBoolean("redstone");
+        rfOutputOverride = nbt.getInt("rfOutputOverride");
     }
     
     @Override
@@ -348,5 +366,31 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     public String currentRedstoneEffect() {
         if (receivedRedstoneSignal() > 0) return "tooltip.oritech.redstone_disabled_storage";
         return "tooltip.oritech.redstone_enabled_direct";
+    }
+    
+    @Override
+    public BarConfiguration getEnergyConfiguration() {
+        return new BarConfiguration(8, 24, 17, 54 + 20);
+    }
+    
+    public static void handleLimitPacket(StorageLimitPacket payload, Player user, RegistryAccess registryAccess) {
+        var level = user.level();
+        if (level == null) return;
+        var storageCandidate = level.getBlockEntity(payload.position());
+        if (!(storageCandidate instanceof ExpandableEnergyStorageBlockEntity storageEntity)) return;
+        
+        storageEntity.rfOutputOverride = payload.limit();
+        storageEntity.setChanged();
+        
+    }
+    
+    public record StorageLimitPacket(BlockPos position, int limit) implements CustomPacketPayload {
+        
+        public static final CustomPacketPayload.Type<StorageLimitPacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("storage_limit"));
+        
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return PACKET_ID;
+        }
     }
 }

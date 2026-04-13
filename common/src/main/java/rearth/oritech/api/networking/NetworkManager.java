@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechPlatform;
+import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
@@ -143,6 +144,7 @@ public class NetworkManager {
         registerToServer(ShrinkerBlockEntity.ShrinkerPlayerUsePacket.PACKET_ID, getAutoCodec(ShrinkerBlockEntity.ShrinkerPlayerUsePacket.class), ShrinkerBlockEntity::onPlayerUse);
         registerToServer(OritechScreenHandler.FluidContainerInteractionPacket.PACKET_ID, getAutoCodec(OritechScreenHandler.FluidContainerInteractionPacket.class), OritechScreenHandler::handleFluidContainerInteraction);
         registerToServer(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.PACKET_ID, getAutoCodec(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.class), TaintedRefineryBlockEntity::handleTankPacket);
+        registerToServer(ExpandableEnergyStorageBlockEntity.StorageLimitPacket.PACKET_ID, getAutoCodec(ExpandableEnergyStorageBlockEntity.StorageLimitPacket.class), ExpandableEnergyStorageBlockEntity::handleLimitPacket);
         
         
         registerToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);

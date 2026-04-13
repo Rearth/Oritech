@@ -1,7 +1,6 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -14,7 +13,7 @@ import java.util.function.Supplier;
 /**
  * Bedrock-styled labeled progress bar with quarter markers and an end-cap marker.
  */
-public class ProgressSliderWidget extends UIComponent {
+public class ProgressBarWidget extends UIComponent {
     
     public static final int PRESET_GREEN = -12810969;
     public static final int PRESET_ORANGE = -1012726;
@@ -39,13 +38,13 @@ public class ProgressSliderWidget extends UIComponent {
     private boolean textShadow;
     private boolean pulsing;
     
-    public ProgressSliderWidget(int x, int y, int width, Component title,
-                                Supplier<Float> fillSupplier, IntSupplier fillColorSupplier) {
+    public ProgressBarWidget(int x, int y, int width, Component title,
+                             Supplier<Float> fillSupplier, IntSupplier fillColorSupplier) {
         this(x, y, width, DEFAULT_HEIGHT, title, fillSupplier, fillColorSupplier);
     }
     
-    public ProgressSliderWidget(int x, int y, int width, int height, Component title,
-                                Supplier<Float> fillSupplier, IntSupplier fillColorSupplier) {
+    public ProgressBarWidget(int x, int y, int width, int height, Component title,
+                             Supplier<Float> fillSupplier, IntSupplier fillColorSupplier) {
         super(x, y, width, height);
         this.title = title;
         this.fillSupplier = fillSupplier;
@@ -76,33 +75,33 @@ public class ProgressSliderWidget extends UIComponent {
         this.fillColorSupplier = fillColorSupplier;
     }
     
-    public ProgressSliderWidget withTextColor(int textColor) {
+    public ProgressBarWidget withTextColor(int textColor) {
         this.textColor = textColor;
         return this;
     }
     
-    public ProgressSliderWidget withTextShadow(boolean textShadow) {
+    public ProgressBarWidget withTextShadow(boolean textShadow) {
         this.textShadow = textShadow;
         return this;
     }
     
-    public ProgressSliderWidget withPulsing(boolean pulsing) {
+    public ProgressBarWidget withPulsing(boolean pulsing) {
         this.pulsing = pulsing;
         return this;
     }
     
     @Override
     protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        Font font = Minecraft.getInstance().font;
-        int cx = contentX();
-        int cy = contentY();
-        int cw = contentWidth();
-        int ch = contentHeight();
+        var font = Minecraft.getInstance().font;
+        var cx = contentX();
+        var cy = contentY();
+        var cw = contentWidth();
+        var ch = contentHeight();
         
-        int titleRowHeight = font.lineHeight;
-        int barHeight = 7;
-        int barY = cy + Math.max(0, ch - barHeight);
-        int titleY = cy + Math.max(0, (titleRowHeight - font.lineHeight) / 2);
+        var titleRowHeight = font.lineHeight;
+        var barHeight = 7;
+        var barY = cy + Math.max(0, ch - barHeight);
+        var titleY = cy + Math.max(0, (titleRowHeight - font.lineHeight) / 2);
         
         if (title != null) {
             graphics.drawString(font, title, cx, titleY, textColor, textShadow);
@@ -118,23 +117,23 @@ public class ProgressSliderWidget extends UIComponent {
         
         graphics.fill(x, y, x + width, y + height, BAR_OUTLINE);
         
-        int innerX = x + 1;
-        int innerY = y + 1;
-        int innerWidth = width - 2;
-        int innerHeight = height - 2;
+        var innerX = x + 1;
+        var innerY = y + 1;
+        var innerWidth = width - 2;
+        var innerHeight = height - 2;
         if (innerWidth <= 0 || innerHeight <= 0) {
             return;
         }
         
         graphics.fill(innerX, innerY, innerX + innerWidth, innerY + innerHeight, BAR_BACKGROUND);
         
-        float fill = getFillAmount();
+        var fill = getFillAmount();
         if (fill > 0f) {
-            int filledWidth = Mth.clamp(Math.round(innerWidth * fill), 1, innerWidth);
-            int fillColor = fillColorSupplier != null ? fillColorSupplier.getAsInt() : PRESET_GREEN;
+            var filledWidth = Mth.clamp(Math.round(innerWidth * fill), 1, innerWidth);
+            var fillColor = fillColorSupplier != null ? fillColorSupplier.getAsInt() : PRESET_GREEN;
             graphics.fill(innerX, innerY, innerX + filledWidth, innerY + innerHeight, fillColor);
             
-            int endMarkerX = innerX + Mth.clamp((int) Math.floor((innerWidth) * fill), 0, innerWidth - 1);
+            var endMarkerX = innerX + Mth.clamp((int) Math.floor((innerWidth) * fill), 0, innerWidth - 1);
             var endMarkerColor = BAR_END_MARKER;
             if (pulsing) {
                 var time = System.currentTimeMillis();
@@ -154,7 +153,7 @@ public class ProgressSliderWidget extends UIComponent {
             return;
         }
         
-        int markerX = x + Mth.clamp(Math.round((width - 1) * progress), 0, width - 1);
+        var markerX = x + Mth.clamp(Math.round((width - 1) * progress), 0, width - 1);
         graphics.fill(markerX, y, markerX + 1, y + height, BAR_MARKER);
     }
     
@@ -163,7 +162,7 @@ public class ProgressSliderWidget extends UIComponent {
             return 0f;
         }
         
-        Float suppliedFill = fillSupplier.get();
+        var suppliedFill = fillSupplier.get();
         if (suppliedFill == null || suppliedFill.isNaN() || suppliedFill.isInfinite()) {
             return 0f;
         }

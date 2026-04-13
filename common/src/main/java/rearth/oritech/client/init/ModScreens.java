@@ -23,7 +23,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
     public static final MenuType<UpgradableOritechScreenHandler> ASSEMBLER_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> FOUNDRY_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> COOLER_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
-    public static final MenuType<UpgradableOritechScreenHandler> STORAGE_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
+    public static final MenuType<LimitedEnergyStorageScreenHandler> STORAGE_SCREEN = MenuRegistry.ofExtended((LimitedEnergyStorageScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> POWER_POLE_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> POWERED_FURNACE_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> BIO_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
@@ -74,7 +74,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
         MenuRegistry.registerScreenFactory(LAVA_GENERATOR_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(FUEL_GENERATOR_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(BASIC_GENERATOR_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        MenuRegistry.registerScreenFactory(STORAGE_SCREEN, EnergyStorageScreen::new);
+        MenuRegistry.registerScreenFactory(STORAGE_SCREEN, LimitedEnergyStorageScreen::new);
         MenuRegistry.registerScreenFactory(POWER_POLE_SCREEN, PowerPoleScreen::new);
         MenuRegistry.registerScreenFactory(DESTROYER_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(PLACER_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);

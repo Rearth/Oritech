@@ -32,6 +32,7 @@ import java.util.Optional;
 public class OritechMachineScreen<T extends OritechScreenHandler> extends OritechWidgetScreen<T> {
 
     public static final ResourceLocation BACKGROUND = Oritech.id("textures/gui/modular/gui_base.png");
+    public static final ResourceLocation BACKGROUND_TALL = Oritech.id("textures/gui/modular/gui_base_tall.png");
     public static final ResourceLocation GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
 
     protected ButtonWidget cycleInputButton;

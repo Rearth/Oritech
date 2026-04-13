@@ -6,7 +6,7 @@ import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.screen.widgets.BoxWidget;
 import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
-import rearth.oritech.api.screen.widgets.ProgressSliderWidget;
+import rearth.oritech.api.screen.widgets.ProgressBarWidget;
 import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
 import rearth.oritech.util.ColorHelper;
 import rearth.oritech.util.TooltipHelper;
@@ -16,9 +16,9 @@ import java.util.Locale;
 
 public class TaintedRefineryScreen extends OritechMachineScreen<TaintedRefineryScreenHandler> {
     
-    private ProgressSliderWidget energyIntakeBar;
-    private ProgressSliderWidget sculkBar;
-    private ProgressSliderWidget arcaneBar;
+    private ProgressBarWidget energyIntakeBar;
+    private ProgressBarWidget sculkBar;
+    private ProgressBarWidget arcaneBar;
     
     public TaintedRefineryScreen(TaintedRefineryScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
@@ -36,7 +36,7 @@ public class TaintedRefineryScreen extends OritechMachineScreen<TaintedRefineryS
         var barHeight = 18;
         var barSpacing = 7;
         
-        energyIntakeBar = new ProgressSliderWidget(
+        energyIntakeBar = new ProgressBarWidget(
           panelX,
           panelY,
           panelWidth,
@@ -45,12 +45,12 @@ public class TaintedRefineryScreen extends OritechMachineScreen<TaintedRefineryS
           this::getEnergyProgress,
           () -> {
               var energyProgress = this.getEnergyProgress();
-              if (energyProgress > 0.5) return ProgressSliderWidget.PRESET_GREEN;
-              if (energyProgress > 0.2) return ProgressSliderWidget.PRESET_ORANGE;
-              return ProgressSliderWidget.PRESET_RED;
+              if (energyProgress > 0.5) return ProgressBarWidget.PRESET_GREEN;
+              if (energyProgress > 0.2) return ProgressBarWidget.PRESET_ORANGE;
+              return ProgressBarWidget.PRESET_RED;
           }).withTextColor(LabelWidget.DARK_TEXT).withPulsing(true);
         
-        sculkBar = new ProgressSliderWidget(
+        sculkBar = new ProgressBarWidget(
           panelX,
           panelY + barHeight + barSpacing,
           panelWidth,
@@ -59,14 +59,14 @@ public class TaintedRefineryScreen extends OritechMachineScreen<TaintedRefineryS
           () -> refinery.sculkFactor.result(),
           () -> ColorHelper.argb(144 / 255f, 22 / 255f, 181 / 255f)).withTextColor(LabelWidget.DARK_TEXT);
         
-        arcaneBar = new ProgressSliderWidget(
+        arcaneBar = new ProgressBarWidget(
           panelX,
           panelY + (barHeight + barSpacing) * 2,
           panelWidth,
           barHeight,
           Component.translatable("title.oritech.tainted_refinery.arcane_meter"),
           () -> refinery.arcaneFactor.result(),
-          () -> ProgressSliderWidget.PRESET_BLUE).withTextColor(LabelWidget.DARK_TEXT);
+          () -> ProgressBarWidget.PRESET_BLUE).withTextColor(LabelWidget.DARK_TEXT);
         
         addComponent(energyIntakeBar);
         addComponent(sculkBar);
