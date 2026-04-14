@@ -154,7 +154,6 @@ publishMods {
         minecraftVersions.add("1.21.1")
         minecraftVersions.add("1.21")
 
-        requires("owo-lib")
         requires("geckolib")
         requires("athena-ctm")
         requires("fabric-api")
@@ -170,7 +169,6 @@ publishMods {
         minecraftVersions.add("1.21.1")
         minecraftVersions.add("1.21")
 
-        requires("owo-lib")
         requires("geckolib")
         requires("athena")
         requires("fabric-api")
