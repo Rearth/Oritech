@@ -383,7 +383,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.STORAGE_SCREEN;
+        return ModScreens.UNSTABLE_CONTAINER_SCREEN;
     }
     
     @Override

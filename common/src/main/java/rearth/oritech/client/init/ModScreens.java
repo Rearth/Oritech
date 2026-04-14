@@ -25,6 +25,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
     public static final MenuType<UpgradableOritechScreenHandler> COOLER_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<LimitedEnergyStorageScreenHandler> STORAGE_SCREEN = MenuRegistry.ofExtended((LimitedEnergyStorageScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> POWER_POLE_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
+    public static final MenuType<UpgradableOritechScreenHandler> UNSTABLE_CONTAINER_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> POWERED_FURNACE_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> BIO_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
     public static final MenuType<UpgradableOritechScreenHandler> BASIC_GENERATOR_SCREEN = MenuRegistry.ofExtended((UpgradableOritechScreenHandler::new));
@@ -76,6 +77,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
         MenuRegistry.registerScreenFactory(BASIC_GENERATOR_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(STORAGE_SCREEN, LimitedEnergyStorageScreen::new);
         MenuRegistry.registerScreenFactory(POWER_POLE_SCREEN, PowerPoleScreen::new);
+        MenuRegistry.registerScreenFactory(UNSTABLE_CONTAINER_SCREEN, UnstableContainerScreen::new);
         MenuRegistry.registerScreenFactory(DESTROYER_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(PLACER_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
         MenuRegistry.registerScreenFactory(FERTILIZER_SCREEN, UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
