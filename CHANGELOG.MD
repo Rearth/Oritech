@@ -1,3 +1,4 @@
+**This update removes owo-lib, and changes the configs to the forge-config-api system. Existing config changes need to be migrated manually, sorry about that**
 - Add tainted refinery, a more specialized but different version of the refinery that ties in with the other arcane things of the mod
 - Remove owo-lib dependency. This was a huge internal refactor. Configs, particles, recipe serialization, all UIs, and much more have been fully reworked for this.
 - Move to forge-config api for config management (available on fabric via forge-config-api-port). Sadly this will break all existing configs / they need to be migrated.
