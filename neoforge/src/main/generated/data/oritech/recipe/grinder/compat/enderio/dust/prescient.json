@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "enderio"
+    }
+  ],
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "item": "enderio:prescient_crystal"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "enderio:prescient_powder"
+    }
+  ],
+  "time": 140
+}

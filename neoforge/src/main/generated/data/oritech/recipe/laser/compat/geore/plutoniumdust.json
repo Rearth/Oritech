@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "geore"
+    }
+  ],
+  "type": "oritech:laser",
+  "ingredients": [
+    {
+      "item": "geore:uranium_cluster"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:plutonium_dust"
+    }
+  ],
+  "time": 1
+}

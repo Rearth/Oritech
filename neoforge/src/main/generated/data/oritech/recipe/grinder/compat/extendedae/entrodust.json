@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "extendedae"
+    }
+  ],
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "tag": "c:gems/entro"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "extendedae:entro_dust"
+    }
+  ],
+  "time": 120
+}

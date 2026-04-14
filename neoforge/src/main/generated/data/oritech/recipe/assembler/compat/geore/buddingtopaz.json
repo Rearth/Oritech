@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "geore"
+    }
+  ],
+  "type": "oritech:assembler",
+  "ingredients": [
+    {
+      "item": "geore:topaz_shard"
+    },
+    {
+      "item": "geore:topaz_shard"
+    },
+    {
+      "item": "oritech:enderic_compound"
+    },
+    {
+      "item": "oritech:overcharged_crystal"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "geore:budding_topaz"
+    }
+  ],
+  "time": 120
+}

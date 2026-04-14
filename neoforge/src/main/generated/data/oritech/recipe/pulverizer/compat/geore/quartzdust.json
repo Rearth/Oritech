@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "geore"
+    }
+  ],
+  "type": "oritech:pulverizer",
+  "ingredients": [
+    {
+      "item": "geore:quartz_shard"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "oritech:quartz_dust"
+    }
+  ],
+  "time": 100
+}

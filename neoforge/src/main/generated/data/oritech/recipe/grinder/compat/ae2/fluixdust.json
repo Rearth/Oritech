@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ae2"
+    }
+  ],
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "tag": "c:gems/fluix"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "ae2:fluix_dust"
+    }
+  ],
+  "time": 120
+}

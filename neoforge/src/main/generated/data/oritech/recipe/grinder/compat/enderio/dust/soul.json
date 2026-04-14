@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "enderio"
+    }
+  ],
+  "type": "oritech:grinder",
+  "ingredients": [
+    {
+      "item": "enderio:soularium_ingot"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "enderio:soul_powder"
+    }
+  ],
+  "time": 140
+}

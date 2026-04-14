@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "enderio_endergy"
+    }
+  ],
+  "type": "oritech:foundry",
+  "ingredients": [
+    {
+      "item": "enderio:end_steel_ingot"
+    },
+    {
+      "item": "minecraft:popped_chorus_fruit"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "enderio_endergy:melodic_alloy_ingot"
+    }
+  ],
+  "time": 720
+}

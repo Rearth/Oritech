@@ -18,6 +18,7 @@ import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.AtomicForgeRecipeBuilder;
 import rearth.oritech.api.recipe.FoundryRecipeBuilder;
+import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
 import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.api.recipe.util.RecipeHelpers;
 import rearth.oritech.init.ItemContent;
@@ -95,7 +96,10 @@ public class MekanismRecipeGenerator {
         RecipeHelpers.addDustRecipe(exporter, of(Tags.Items.INGOTS_NETHERITE), MekanismItems.NETHERITE_DUST.asItem(), "compat/mekanism/dust/netherite");
         RecipeHelpers.addDustRecipe(exporter, of(MekanismTags.Items.INGOTS_REFINED_OBSIDIAN), MekanismItems.REFINED_OBSIDIAN_DUST.asItem(), "compat/mekanism/dust/refined_obsidian");
         RecipeHelpers.addDustRecipe(exporter, of(TagContent.STEEL_INGOTS), MekanismItems.STEEL_DUST.asItem(), "compat/mekanism/dust/steel");
-        RecipeHelpers.addDustRecipe(exporter, of(Tags.Items.OBSIDIANS), MekanismItems.OBSIDIAN_DUST.asItem(), "compat/mekanism/dust/obsidian");
+
+        // obsidian dust from obsidian
+        // EnderIO and Mekanism recipes are both equivalent, and both mods can use either obsidian dust. Loading both recipes shouldn't be a problem.
+        PulverizerRecipeBuilder.build().input(Tags.Items.OBSIDIANS).result(MekanismItems.OBSIDIAN_DUST.asItem(), 4).time(140).addToGrinder().export(exporter, "compat/mekanism/dust/obsidian");
     }
     
     private static void addMetalProcessing(IConditionBuilder conditionBuilder, RecipeOutput exporter) {

@@ -2,7 +2,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:mod_loaded",
-      "modid": "endercore"
+      "modid": "enderio"
     }
   ],
   "type": "oritech:foundry",
@@ -20,5 +20,5 @@
       "id": "enderio:soularium_ingot"
     }
   ],
-  "time": 80
+  "time": 180
 }

@@ -2,23 +2,23 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:mod_loaded",
-      "modid": "endercore"
+      "modid": "enderio_endergy"
     }
   ],
   "type": "oritech:foundry",
   "ingredients": [
     {
-      "tag": "c:ingots/copper"
+      "item": "enderio:conduit_binder_composite"
     },
     {
-      "tag": "c:silicon"
+      "tag": "c:cobblestones/normal"
     }
   ],
   "results": [
     {
       "count": 1,
-      "id": "enderio:copper_alloy_ingot"
+      "id": "enderio_endergy:crude_steel_ingot"
     }
   ],
-  "time": 80
+  "time": 180
 }

@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.Tags;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.recipe.CentrifugeRecipeBuilder;
 import rearth.oritech.api.recipe.LaserRecipeBuilder;
 import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
 import rearth.oritech.init.ItemContent;
@@ -23,7 +24,12 @@ public class AppliedEnergistics2RecipeGenerator {
 
         PulverizerRecipeBuilder.build().input(AEBlocks.SKY_STONE_BLOCK).result(AEItems.SKY_DUST.get()).addToGrinder().export(exporter, PATH + "skydust");
         PulverizerRecipeBuilder.build().input(cItemTag("gems/certus_quartz")).result(AEItems.CERTUS_QUARTZ_DUST.get()).addToGrinder().export(exporter, PATH + "certusdust");
+        PulverizerRecipeBuilder.build().input(cItemTag("gems/fluix")).result(AEItems.FLUIX_DUST.get()).addToGrinder().export(exporter, PATH + "fluixdust");
 
+        // enderic compound from ender pearl dust
+        CentrifugeRecipeBuilder.build().input(AEItems.ENDER_DUST).result(ItemContent.ENDERIC_COMPOUND, 2).export(exporter, PATH + "endericcompound");
+
+        // fluxite in AE2 charger
         exporter.accept(Oritech.id(PATH + "charger/fluxite"), new ChargerRecipe(Ingredient.of(Tags.Items.GEMS_AMETHYST), new ItemStack(ItemContent.FLUXITE)), null);
     }
 }
