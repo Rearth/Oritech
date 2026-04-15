@@ -19,6 +19,8 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -26,7 +28,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.block.entity.processing.RefineryModuleBlockEntity;
-
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.List;
@@ -133,5 +134,16 @@ public class RefineryModuleBlock extends HorizontalDirectionalBlock implements E
         super.appendHoverText(stack, context, tooltip, options);
         tooltip.add(Component.translatable("tooltip.oritech.refinery_module").withStyle(ChatFormatting.GRAY));
         addMachineTooltip(tooltip, this, this);
+    }
+    
+    
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> {
+            if (blockEntity instanceof BlockEntityTicker ticker)
+                ticker.tick(world1, pos, state1, blockEntity);
+        };
     }
 }
