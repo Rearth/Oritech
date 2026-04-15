@@ -194,7 +194,8 @@ public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implement
         
         if ((content.isFluidEqual(toInsert) && content.isComponentEqual(toInsert))) {
             // types match
-            var inserted = Math.min(toInsert.getAmount(), capacity - content.getAmount());
+            var remainingSpace = Math.max(0, capacity - content.getAmount());   // should not be needed, but if due to config changes or stuff capacity is smaller than amount, we get issues
+            var inserted = Math.min(toInsert.getAmount(), remainingSpace);
             
             if (!simulate)
                 content.grow(inserted);
