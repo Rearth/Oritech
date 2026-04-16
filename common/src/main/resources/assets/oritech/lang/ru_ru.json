@@ -483,7 +483,7 @@
       "translate": "item.oritech.motor",
       "color": "#ff830e"
     },
-    " чтобы труба вытягивала предметы из всех слотов."
+    "Чтобы труба вытягивала предметы из всех слотов."
   ],
   "tooltip.oritech.item_pipe.4": "Вкладывает в ближайший доступный инвентарь.",
   "title.oritech.machine.addon_looting": "Добыча %d",
