@@ -389,7 +389,7 @@
   "title.oritech.machine.addon_fortune": "Fortuna %d",
   "tooltip.oritech.machine.addon_fortune": "Rendimento del numero di estensioni. 3 è il massimo effettivo",
   "tooltip.oritech.machine.addon_silk_touch": "When Silk Touch addon and Fortune Addon are installed at the same time, Silk Touch takes priority.",
-  "tooltip.oritech.machine.quality": "\n",
+  "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many addon\nextenders can be added to this block.\n\nUse better cores to increase this.\n\nCurrent quality progress: %s",
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
   "tooltip.oritech.billion_abbrev": "B",
