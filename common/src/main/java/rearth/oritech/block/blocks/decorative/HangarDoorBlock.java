@@ -30,8 +30,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.decorative.HangarDoorBlockEntity;
-import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.SoundContent;
 
 import java.util.ArrayDeque;
@@ -209,7 +209,7 @@ public class HangarDoorBlock extends Block implements EntityBlock {
 
         var blockEntity = world.getBlockEntity(anchorPos);
         if (blockEntity instanceof HangarDoorBlockEntity hangarDoor && hangarDoor.shouldPlaySoundAgain()) {
-            world.playSound(null, anchorPos, SoundContent.PRESS, SoundSource.BLOCKS, OritechClientConfig.machineVolumeMultiplier.get().floatValue() * 0.18f, 1.15f);
+            world.playSound(null, anchorPos, SoundContent.PRESS, SoundSource.BLOCKS, OritechConfig.machineVolumeMultiplier.get().floatValue() * 0.18f, 1.15f);
         }
 
         for (var connectedAnchorPos : connectedAnchors) {

@@ -4,23 +4,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class OritechClientConfig {
     // Client config
-    public static final ModConfigSpec.Builder CLIENT = new ModConfigSpec.Builder();
-    
-    public static final ModConfigSpec.BooleanValue tightMachineAddonHitboxes = OritechClientConfig.CLIENT
-                                                                                 .comment("Use tighter hitboxes for machine addons")
-                                                                                 .define("tightMachineAddonHitboxes", true);
-    
-    public static final ModConfigSpec.BooleanValue tightMachineFrameHitboxes = OritechClientConfig.CLIENT
-                                                                                 .comment("Use tighter hitboxes for machine frames")
-                                                                                 .define("tightMachineFrameHitboxes", false);
-    
-    public static final ModConfigSpec.BooleanValue tightCableHitboxes = OritechClientConfig.CLIENT
-                                                                          .comment("Use tighter hitboxes for cables")
-                                                                          .define("tightCableHitboxes", true);
-    
-    public static final ModConfigSpec.DoubleValue machineVolumeMultiplier = OritechClientConfig.CLIENT
-                                                                              .comment("Machine sound volume multiplier")
-                                                                              .defineInRange("machineVolumeMultiplier", 1.0, 0.0, 10.0);
+    private static final ModConfigSpec.Builder CLIENT = new ModConfigSpec.Builder();
     
     public static final ModConfigSpec.BooleanValue showMachinePreview = OritechClientConfig.CLIENT
                                                                           .comment("Render multiblock placement preview")

@@ -28,9 +28,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.OritechConfig;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.decorative.TechDoorBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.SoundContent;
@@ -85,7 +83,7 @@ public class TechDoorBlock extends HorizontalDirectionalBlock implements EntityB
         var entity = (TechDoorBlockEntity) world.getBlockEntity(pos);
         
         if (entity.shouldPlaySoundAgain())
-            world.playSound(null, pos, SoundContent.PRESS, SoundSource.BLOCKS, OritechClientConfig.machineVolumeMultiplier.get().floatValue() * 0.18f, 1.3f);
+            world.playSound(null, pos, SoundContent.PRESS, SoundSource.BLOCKS, OritechConfig.machineVolumeMultiplier.get().floatValue() * 0.18f, 1.3f);
         
         world.setBlockAndUpdate(pos, state.setValue(OPENED, isPowered));
         world.setBlockAndUpdate(pos.above(), aboveState.setValue(OPENED, isPowered));

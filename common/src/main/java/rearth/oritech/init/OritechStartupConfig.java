@@ -50,6 +50,17 @@ public class OritechStartupConfig {
     public static final ElectricMaceConfig electricMace = new ElectricMaceConfig(OritechStartupConfig.STARTUP);
     public static final PortableLaserConfig portableLaserConfig = new PortableLaserConfig(OritechStartupConfig.STARTUP);
     
+    
+    public static final ModConfigSpec.BooleanValue tightMachineAddonHitboxes = STARTUP
+                                                                                 .comment("Use tighter hitboxes for machine addons")
+                                                                                 .define("tightMachineAddonHitboxes", true);
+    public static final ModConfigSpec.BooleanValue tightMachineFrameHitboxes = STARTUP
+                                                                                 .comment("Use tighter hitboxes for machine frames")
+                                                                                 .define("tightMachineFrameHitboxes", false);
+    public static final ModConfigSpec.BooleanValue tightCableHitboxes = STARTUP
+                                                                          .comment("Use tighter hitboxes for cables")
+                                                                          .define("tightCableHitboxes", true);
+    
     // finish constructing everything, this must be at end
     public static final ModConfigSpec STARTUP_SPEC = OritechStartupConfig.STARTUP.build();
     

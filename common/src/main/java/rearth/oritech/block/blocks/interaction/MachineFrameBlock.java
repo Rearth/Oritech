@@ -20,8 +20,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
-import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.OritechConfig;
+import rearth.oritech.init.OritechStartupConfig;
 import rearth.oritech.init.TagContent;
 
 import java.util.List;
@@ -79,7 +79,7 @@ public class MachineFrameBlock extends Block {
     
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        if (!(OritechClientConfig.CLIENT_SPEC.isLoaded() && OritechClientConfig.tightMachineFrameHitboxes.get()))
+        if (!OritechStartupConfig.tightMachineFrameHitboxes.get())
             return super.getShape(state, world, pos, context);
         return getShape(state);
     }

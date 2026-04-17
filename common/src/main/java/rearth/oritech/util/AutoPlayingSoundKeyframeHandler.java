@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import rearth.oritech.client.init.OritechClientConfig;
+import rearth.oritech.init.OritechConfig;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.keyframe.event.SoundKeyframeEvent;
@@ -59,7 +59,7 @@ public class AutoPlayingSoundKeyframeHandler<A extends GeoAnimatable> implements
             var random = Minecraft.getInstance().level.random;
             
             var volume = segments.length > 1 ? Float.parseFloat(segments[1]) : 1f;
-            volume *= (float) (OritechClientConfig.machineVolumeMultiplier.get() * getPitchRandomMultiplier(random) * volumeFalloff * 0.5f);
+            volume *= (float) (OritechConfig.machineVolumeMultiplier.get() * getPitchRandomMultiplier(random) * volumeFalloff * 0.5f);
             var pitch = segments.length > 2 ? Float.parseFloat(segments[2]) : 1f;
             pitch *= speed * getPitchRandomMultiplier(random);
             var source = SoundSource.BLOCKS;

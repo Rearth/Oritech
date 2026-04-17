@@ -33,8 +33,8 @@ import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.addons.EnergyAcceptorAddonBlockEntity;
-import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.OritechStartupConfig;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.TooltipHelper;
@@ -201,7 +201,7 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
     
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        if (!(OritechClientConfig.CLIENT_SPEC.isLoaded() && OritechClientConfig.tightMachineAddonHitboxes.get()) || !addonSettings.needsSupport() || addonSettings.boundingShape() == null)
+        if (!OritechStartupConfig.tightMachineAddonHitboxes.get() || !addonSettings.needsSupport() || addonSettings.boundingShape() == null)
             return super.getShape(state, world, pos, context);
         
         return addonSettings.boundingShape()[state.getValue(FACING).ordinal()][state.getValue(FACE).ordinal()];

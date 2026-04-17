@@ -18,7 +18,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
-import rearth.oritech.client.init.OritechClientConfig;
+import rearth.oritech.init.OritechStartupConfig;
 
 public abstract class AbstractPipeBlock extends Block {
     
@@ -33,7 +33,7 @@ public abstract class AbstractPipeBlock extends Block {
     
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        if (!(OritechClientConfig.CLIENT_SPEC.isLoaded() && OritechClientConfig.tightCableHitboxes.get()))
+        if (!OritechStartupConfig.tightCableHitboxes.get())
             return super.getShape(state, world, pos, context);
         return getShape(state);
     }
