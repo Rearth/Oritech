@@ -387,8 +387,11 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         
         var spawnFromCandidates = new ArrayList<>(sculkFactor.sources);
         spawnFromCandidates.addAll(arcaneFactor.sources);
-        var spawnFrom = spawnFromCandidates.get(level.random.nextInt(spawnFromCandidates.size()));
-        ParticleContent.CatalystConnection(level, spawnFrom.getCenter(), emitPosition);
+        
+        if (!spawnFromCandidates.isEmpty()) {
+            var spawnFrom = spawnFromCandidates.get(level.random.nextInt(spawnFromCandidates.size()));
+            ParticleContent.CatalystConnection(level, spawnFrom.getCenter(), emitPosition);
+        }
         
     }
     
