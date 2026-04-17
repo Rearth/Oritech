@@ -1,0 +1,2 @@
+- Fix dedicated servers trying to use client configs and causing all kinds of issues
+- Fix arcane refinery crash when trying to spawn env particles when no env is found
