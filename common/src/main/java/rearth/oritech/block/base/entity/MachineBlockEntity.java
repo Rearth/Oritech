@@ -222,12 +222,19 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
         
+        if (inputEmpty())
+            return Optional.empty();
+        
         // check if old recipe fits
         if (currentRecipe != null && currentRecipe != OritechRecipe.DUMMY) {
             if (currentRecipe.matches(getInputInventory(), level)) return Optional.of(new RecipeHolder<>(currentRecipe.getOriType().getIdentifier(), currentRecipe));
         }
         
         return level.getRecipeManager().getRecipeFor(getOwnRecipeType(), getInputInventory(), level);
+    }
+    
+    protected boolean inputEmpty() {
+        return getInputView().isEmpty() || getInputView().stream().allMatch(ItemStack::isEmpty);
     }
     
     protected abstract OritechRecipeType getOwnRecipeType();

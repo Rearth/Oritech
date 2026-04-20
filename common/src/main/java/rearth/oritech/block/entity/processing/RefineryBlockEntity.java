@@ -109,6 +109,8 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     @Override
     protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
         
+        if (inputEmpty()) return Optional.empty();
+        
         // get recipes matching input items
         var candidates = Objects.requireNonNull(level).getRecipeManager().getRecipesFor(getOwnRecipeType(), getInputInventory(), level);
         // filter out recipes based on input tank. Have the ones with input items first.
@@ -122,6 +124,12 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         }
         
         return Optional.empty();
+    }
+    
+    @Override
+    protected boolean inputEmpty() {
+        var fluidEmpty = ownStorage.getInStack().isEmpty();
+        return fluidEmpty && super.inputEmpty();
     }
     
     @Override

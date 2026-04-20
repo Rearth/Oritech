@@ -2,6 +2,17 @@ package rearth.oritech.block.base.entity;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
@@ -14,17 +25,6 @@ import rearth.oritech.util.StackContext;
 
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluids;
 
 public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGeneratorBlockEntity implements FluidApi.BlockProvider {
     
@@ -110,7 +110,14 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     // gets all recipe of target type, and only checks for matching liquids
     @Override
     protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
+        if (inputEmpty()) return Optional.empty();
         return getRecipe(fluidStorage);
+    }
+    
+    @Override
+    protected boolean inputEmpty() {
+        var fluidEmpty = fluidStorage.getStack().isEmpty();
+        return fluidEmpty && super.inputEmpty();
     }
     
     protected Optional<RecipeHolder<OritechRecipe>> getRecipe(SimpleFluidStorage checkedTank) {

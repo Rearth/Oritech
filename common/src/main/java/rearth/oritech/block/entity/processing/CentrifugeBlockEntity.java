@@ -16,8 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.init.OritechConfig;
-import rearth.oritech.Oritech;
 import rearth.oritech.OritechPlatform;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
@@ -29,6 +27,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.CentrifugeScreenHandler;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -85,6 +84,8 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     @Override
     protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
         
+        if (inputEmpty()) return Optional.empty();
+        
         if (!hasFluidAddon)
             return super.getRecipe();
         
@@ -97,6 +98,12 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         }
         
         return getNormalRecipe();
+    }
+    
+    @Override
+    protected boolean inputEmpty() {
+        var fluidEmpty = fluidContainer.getInStack().isEmpty();
+        return fluidEmpty && super.inputEmpty();
     }
     
     // this is provided as fallback for fluid centrifuges that may still process normal stuff

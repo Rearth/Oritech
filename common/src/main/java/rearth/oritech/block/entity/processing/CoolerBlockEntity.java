@@ -5,7 +5,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -13,8 +15,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.init.OritechConfig;
-import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
@@ -23,9 +23,8 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.TagContent;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -89,6 +88,8 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     @Override
     protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
         
+        if (inputEmpty()) return Optional.empty();
+        
         // get recipes matching input items
         var candidates = Objects.requireNonNull(level).getRecipeManager().getRecipesFor(getOwnRecipeType(), getInputInventory(), level);
         // filter out recipes based on input tank
@@ -98,6 +99,12 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
         }
         
         return super.getRecipe();
+    }
+    
+    @Override
+    protected boolean inputEmpty() {
+        var fluidEmpty = fluidStorage.getStack().isEmpty();
+        return fluidEmpty && super.inputEmpty();
     }
     
     @Override
