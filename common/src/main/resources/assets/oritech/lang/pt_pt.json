@@ -1250,7 +1250,7 @@
   "oritech.configuration.augmenterMaxEnergy": "Energia Máxima da Estação Cibernética",
   "oritech.configuration.itemPipeTransferAmount": "Quantidade de Transferência do Tubo de Item",
   "oritech.configuration.blackHoleTachyonEnergy": "Energia de Táquions de Buracos Negros",
-  "oritech.configuration.ziplineAutoJump": "Ativar Pulo Automático no Fim da Tirolesa",
+  "oritech.configuration.ziplineAutoJump": "Ativar Pulo Automático no fim da Tirolesa",
   "oritech.configuration.chamberAddonEfficiency": "Eficiência do Addon de Câmara",
   "oritech.configuration.portableLaserConfig": "Canhão Elétrico Endérico",
   "oritech.configuration.clientSettings": "Apenas cliente",
