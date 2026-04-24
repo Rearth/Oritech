@@ -322,50 +322,11 @@
   "tooltip.oritech.portable_laser.status.begin": "採掘モード：",
   "tooltip.oritech.portable_laser.status.shot_mining_error": "採掘モードが有効なので、弾は発射されませんでした。",
   "tooltip.oritech.portable_laser.status.hint": "（スニーク＋右クリックで切り替え）",
-  "tooltip.oritech.capture_item_desc_1": [
-    {
-      "text": "神秘的で小さい知能を持つ飛行生物の頭脳を捕獲できます。",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.intelligence_item": [
-    {
-      "text": "一部のエンティティを捕獲することで入手できます。\n捕らえるにはこれを使用：",
-      "italic": true,
-      "color": "gray"
-    },
-    {
-      "translate": "item.oritech.dubios_container",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_2": [
-    {
-      "text": "アレイ",
-      "color": "#26d0ff",
-      "italic": true
-    },
-    {
-      "text": "はこの条件に合うかもしれません。常にアイテムを奪おうとしてる",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_3": [
-    {
-      "text": "ので捕獲しにくいですが、探せば似たような性質の生物がいるかも知れません。",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "title.oritech.redstone_addon": [
-    {
-      "text": "対象にするスロットを選択してください",
-      "color": "dark_gray"
-    }
-  ],
+  "tooltip.oritech.intelligence_item": "Gained by capturing a viable entity with the Dubious Container",
+  "tooltip.oritech.capture_item_desc_1": "Can capture the brain of a small, magical intelligent flying creature. The",
+  "tooltip.oritech.capture_item_desc_2": "Allay might fit that description. Although they always try to take the item",
+  "tooltip.oritech.capture_item_desc_3": "from you. Perhaps you might also find another similar entity to capture.",
+  "title.oritech.redstone_addon": "Please select a target slot",
   "tooltip.oritech.redstone_output_power": "コンパレーターでエネルギー貯蔵量を測定できます。",
   "title.oritech.redstone_output_power": "電力測定",
   "tooltip.oritech.redstone_output_slot": "コンパレーターで選択したスロットを測定できます。",
@@ -477,14 +438,7 @@
   "tooltip.oritech.pump_redstone": "レッドストーン信号で無効にできます。",
   "tooltip.oritech.item_pipe.1": "右クリックで搬出の切り替えができます。",
   "tooltip.oritech.item_pipe.2": "空ではない最初のスロットからのみ抽出されます。",
-  "tooltip.oritech.item_pipe.3": [
-    "すべてのスロットから取り出せるようにするには、",
-    {
-      "translate": "item.oritech.motor",
-      "color": "#ff830e"
-    },
-    "を手に持ちクリックしてアップグレードします。"
-  ],
+  "tooltip.oritech.item_pipe.3": "Click it with a Motor item to upgrade the pipe to extract from all slots.",
   "tooltip.oritech.item_pipe.4": "最も近くにある使用可能なインベントリーに送ります。",
   "title.oritech.machine.addon_looting": "%d ドロップ増加",
   "tooltip.oritech.machine.addon_looting": "生成量アドオンの数です。最大値は3です。",
@@ -582,12 +536,7 @@
   "block.oritech.banana_block": "バナナブロック",
   "block.oritech.power_pole_block": "エネルギー送電ポール",
   "block.oritech.machine_burst_addon": "バーストアドオン",
-  "block.oritech.machine_combi_addon": [
-    {
-      "text": "ハートオブマシーン（アドオン）",
-      "color": "#cc66ff"
-    }
-  ],
+  "block.oritech.machine_combi_addon": "Heart of the Machine (Addon)",
   "block.oritech.shrinker_block": "アドオン結合機",
   "block.oritech.machine_frame_block": "マシンフレーム",
   "block.oritech.low_yield_nuke": "低出力核爆発装置",
@@ -642,12 +591,7 @@
   "block.oritech.cooler_block": "工業用冷凍機",
   "block.oritech.particle_collector_block": "タキオンコレクター",
   "block.oritech.centrifuge_block": "遠心分離機",
-  "block.oritech.atomic_forge_block": [
-    {
-      "text": "アトミックフォージ",
-      "color": "#e30c82"
-    }
-  ],
+  "block.oritech.atomic_forge_block": "Atomic Forge",
   "block.oritech.bio_generator_block": "バイオ発電機",
   "block.oritech.lava_generator_block": "溶岩発電機",
   "block.oritech.steam_engine_block": "スチームエンジン",
@@ -765,42 +709,17 @@
   "block.oritech.raw_uranium_block": "ウラニウムの原石ブロック",
   "block.oritech.uranium_dust_block": "ウラニウムブロック",
   "block.oritech.raw_platinum_block": "プラチナの原石ブロック",
-  "block.oritech.black_hole_block": [
-    {
-      "text": "Black Hole",
-      "color": "#cc66ff"
-    }
-  ],
-  "block.oritech.enchantment_catalyst_block": [
-    {
-      "text": "アーケインカタリスト",
-      "color": "#cc66ff"
-    }
-  ],
-  "block.oritech.enchanter_block": [
-    {
-      "text": "エンチャンター制御器",
-      "color": "#cc66ff"
-    }
-  ],
-  "block.oritech.spawner_controller_block": [
-    {
-      "text": "スポナーコントローラー",
-      "color": "#cc66ff"
-    }
-  ],
+  "block.oritech.black_hole_block": "Black Hole",
+  "block.oritech.enchantment_catalyst_block": "Arcane Catalyst",
+  "block.oritech.enchanter_block": "Stabilized Enchanter",
+  "block.oritech.spawner_controller_block": "Spawner Controller",
   "block.oritech.spawner_cage_block": "スポナーケージ",
   "block.oritech.wither_crop_block": "ソウルフラワー",
   "block.oritech.accelerator_ring": "粒子加速器ガイドリング",
   "block.oritech.accelerator_motor": "粒子加速器リニアモーター",
   "block.oritech.accelerator_controller": "粒子加速器",
   "block.oritech.accelerator_sensor": "粒子加速器センサー",
-  "block.oritech.reactor_controller": [
-    {
-      "text": "原子炉コントロールパネル",
-      "color": "#D22B2B"
-    }
-  ],
+  "block.oritech.reactor_controller": "Nuclear Reactor Controller",
   "block.oritech.reactor_wall": "原子炉用ウォール",
   "block.oritech.reactor_rod": "シングル燃料棒",
   "block.oritech.reactor_double_rod": "ダブル燃料棒",
@@ -815,18 +734,8 @@
   "block.oritech.reactor_redstone_port": "原子炉用レッドストーンポート",
   "block.oritech.augment_application_block": "サイバネティックオーグメントセンター",
   "block.oritech.simple_augment_station": "サイバネティック研究ステーション",
-  "block.oritech.advanced_augment_station": [
-    {
-      "text": "量子研究ステーション",
-      "color": "#40f5ef"
-    }
-  ],
-  "block.oritech.arcane_augment_station": [
-    {
-      "text": "アーケイン研究ステーション",
-      "color": "#cc66ff"
-    }
-  ],
+  "block.oritech.advanced_augment_station": "Quantum Research Station",
+  "block.oritech.arcane_augment_station": "Arcane Research Station",
   "item.oritech.banana": "バナナ",
   "item.oritech.weed_killer": "除草剤",
   "item.oritech.target_designator": "対象指定器",
@@ -892,18 +801,8 @@
   "item.oritech.energite_ingot": "エナジャイトインゴット",
   "item.oritech.energite_dust": "エナジャイトダスト",
   "item.oritech.electric_mace": "エレキメイス",
-  "item.oritech.prometheum_ingot": [
-    {
-      "text": "プロメテウム",
-      "color": "#ffd505"
-    }
-  ],
-  "item.oritech.portable_laser": [
-    {
-      "text": "エンダリックレールガン",
-      "color": "#ffd505"
-    }
-  ],
+  "item.oritech.prometheum_ingot": "Prometheum",
+  "item.oritech.portable_laser": "Enderic Railgun",
   "item.oritech.steel_ingot": "スチールインゴット",
   "item.oritech.steel_dust": "スチールダスト",
   "item.oritech.coal_dust": "石炭ダスト",
@@ -986,18 +885,8 @@
   "fluid.oritech.still_sheol_fire": "シェオルファイア",
   "fluid.oritech.still_strange_matter": "奇妙な物質",
   "item.oritech.wrench": "パイプレンチ",
-  "item.oritech.promethium_axe": [
-    {
-      "text": "プロメテウムバトルアックス",
-      "color": "#ffd505"
-    }
-  ],
-  "item.oritech.promethium_pickaxe": [
-    {
-      "text": "プロメテウムピッケル",
-      "color": "#ffd505"
-    }
-  ],
+  "item.oritech.promethium_axe": "Prometheum Battleaxe",
+  "item.oritech.promethium_pickaxe": "Prometheum Pickaxe",
   "message.oritech.catalyst.cost": "コスト： %d",
   "message.oritech.steamengine.controller_link": "このスチームエンジンはメインエンジンに連結されています(ハイライトされたブロックを参照してください)。メインエンジンを使用してください。",
   "message.oritech.deep_drill.ore_placement": "マシンは鉱石資源ノード上に配置する必要があります。",
@@ -1252,7 +1141,7 @@
   "oritech.configuration.blackHoleTachyonEnergy": "Energy of Tachyons from Black Holes",
   "oritech.configuration.ziplineAutoJump": "Enable Auto Jump at Zipline End",
   "oritech.configuration.chamberAddonEfficiency": "Chamber Addon Efficiency",
-  "oritech.configuration.portableLaserConfig": "エンダリックレールガン",
+  "oritech.configuration.portableLaserConfig": "Enderic Railgun",
   "oritech.configuration.clientSettings": "Client only",
   "oritech.configuration.speed": "Flight Speed Multiplier",
   "oritech.configuration.reactor": "Nuclear Reactor",
