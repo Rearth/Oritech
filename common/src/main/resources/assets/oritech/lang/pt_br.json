@@ -322,50 +322,11 @@
   "tooltip.oritech.portable_laser.status.begin": "Modo de Mineração: ",
   "tooltip.oritech.portable_laser.status.shot_mining_error": "Nenhum tiro disparado, o modo de mineração está ativado.",
   "tooltip.oritech.portable_laser.status.hint": " (Agachar + Clique com o Botão Direito para alternar)",
-  "tooltip.oritech.capture_item_desc_1": [
-    {
-      "text": "Pode capturar o cérebro de uma pequena criatura voadora mágica e inteligente. O",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.intelligence_item": [
-    {
-      "text": "Obtido ao capturar uma entidade viável com o ",
-      "italic": true,
-      "color": "gray"
-    },
-    {
-      "translate": "item.oritech.dubios_container",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_2": [
-    {
-      "text": "Allay",
-      "color": "#26d0ff",
-      "italic": true
-    },
-    {
-      "text": " pode se encaixar nessa descrição. Embora eles sempre tentem pegar o item",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_3": [
-    {
-      "text": "de você. Talvez você também encontre outra entidade semelhante para capturar.",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "title.oritech.redstone_addon": [
-    {
-      "text": "Por favor, selecione um espaço alvo",
-      "color": "dark_gray"
-    }
-  ],
+  "tooltip.oritech.intelligence_item": "Gained by capturing a viable entity with the Dubious Container",
+  "tooltip.oritech.capture_item_desc_1": "Can capture the brain of a small, magical intelligent flying creature. The",
+  "tooltip.oritech.capture_item_desc_2": "Allay might fit that description. Although they always try to take the item",
+  "tooltip.oritech.capture_item_desc_3": "from you. Perhaps you might also find another similar entity to capture.",
+  "title.oritech.redstone_addon": "Please select a target slot",
   "tooltip.oritech.redstone_output_power": "Comparadores medirão o armazenamento de energia",
   "title.oritech.redstone_output_power": "Medida de Energia",
   "tooltip.oritech.redstone_output_slot": "Comparadores medirão o espaço do inventário selecionado",
@@ -477,14 +438,7 @@
   "tooltip.oritech.pump_redstone": "Pode ser desativado com um sinal de redstone.",
   "tooltip.oritech.item_pipe.1": "Clique com o botão direito para alternar a extração.",
   "tooltip.oritech.item_pipe.2": "Só extrai do primeiro espaço não vazio.",
-  "tooltip.oritech.item_pipe.3": [
-    "Clique nele com um ",
-    {
-      "translate": "item.oritech.motor",
-      "color": "#ff830e"
-    },
-    " Item para atualizar o tubo para extrair de todos os slots."
-  ],
+  "tooltip.oritech.item_pipe.3": "Click it with a Motor item to upgrade the pipe to extract from all slots.",
   "tooltip.oritech.item_pipe.4": "Deposita no inventário disponível mais próximo.",
   "title.oritech.machine.addon_looting": "%d Pilhagem",
   "tooltip.oritech.machine.addon_looting": "Contagem de addon de rendimento. 3 é o máximo efetivo",
@@ -582,12 +536,7 @@
   "block.oritech.banana_block": "Bloco de Banana",
   "block.oritech.power_pole_block": "Poste de Transmissão de Energia",
   "block.oritech.machine_burst_addon": "Addon de Rajada",
-  "block.oritech.machine_combi_addon": [
-    {
-      "text": "Coração da Máquina (Addon)",
-      "color": "#cc66ff"
-    }
-  ],
+  "block.oritech.machine_combi_addon": "Heart of the Machine (Addon)",
   "block.oritech.shrinker_block": "Addon de Cortador",
   "block.oritech.machine_frame_block": "Estrutura de Máquina",
   "block.oritech.low_yield_nuke": "Dispositivo de Explosão Nuclear de Baixo Rendimento",
@@ -642,12 +591,7 @@
   "block.oritech.cooler_block": "Resfriador Industrial",
   "block.oritech.particle_collector_block": "Absorvedor de Táquions",
   "block.oritech.centrifuge_block": "Centrífuga",
-  "block.oritech.atomic_forge_block": [
-    {
-      "text": "Forja Atômica",
-      "color": "#e30c82"
-    }
-  ],
+  "block.oritech.atomic_forge_block": "Atomic Forge",
   "block.oritech.bio_generator_block": "Gerador Biológico",
   "block.oritech.lava_generator_block": "Gerador a Lava",
   "block.oritech.steam_engine_block": "Motor a Vapor",
@@ -765,42 +709,17 @@
   "block.oritech.raw_uranium_block": "Bloco de Urânio Bruto",
   "block.oritech.uranium_dust_block": "Bloco de Urânio",
   "block.oritech.raw_platinum_block": "Bloco de Platina Bruta",
-  "block.oritech.black_hole_block": [
-    {
-      "text": "Buraco Negro",
-      "color": "#cc66ff"
-    }
-  ],
-  "block.oritech.enchantment_catalyst_block": [
-    {
-      "text": "Catalisador Arcano",
-      "color": "#cc66ff"
-    }
-  ],
-  "block.oritech.enchanter_block": [
-    {
-      "text": "Encantador Estabilizado",
-      "color": "#cc66ff"
-    }
-  ],
-  "block.oritech.spawner_controller_block": [
-    {
-      "text": "Controlador de Spawner",
-      "color": "#cc66ff"
-    }
-  ],
+  "block.oritech.black_hole_block": "Buraco Negro",
+  "block.oritech.enchantment_catalyst_block": "Arcane Catalyst",
+  "block.oritech.enchanter_block": "Stabilized Enchanter",
+  "block.oritech.spawner_controller_block": "Spawner Controller",
   "block.oritech.spawner_cage_block": "Gaiola de Gerador",
   "block.oritech.wither_crop_block": "Flores da Alma",
   "block.oritech.accelerator_ring": "Anel Guia do Acelerador de Partículas",
   "block.oritech.accelerator_motor": "Motor Linear do Acelerador de Partículas",
   "block.oritech.accelerator_controller": "Acelerador de Partículas",
   "block.oritech.accelerator_sensor": "Sensor do Acelerador de Partículas",
-  "block.oritech.reactor_controller": [
-    {
-      "text": "Painel de Controle do Reator Nuclear",
-      "color": "#D22B2B"
-    }
-  ],
+  "block.oritech.reactor_controller": "Nuclear Reactor Controller",
   "block.oritech.reactor_wall": "Parede do Reator",
   "block.oritech.reactor_rod": "Vareta de Reator Única",
   "block.oritech.reactor_double_rod": "Vareta de Reator Dupla",
@@ -815,18 +734,8 @@
   "block.oritech.reactor_redstone_port": "Porta de Redstone do Reator",
   "block.oritech.augment_application_block": "Centro de Aumentação Cibernética",
   "block.oritech.simple_augment_station": "Estação de Pesquisa Cibernética",
-  "block.oritech.advanced_augment_station": [
-    {
-      "text": "Estação de Pesquisa Quântica",
-      "color": "#40f5ef"
-    }
-  ],
-  "block.oritech.arcane_augment_station": [
-    {
-      "text": "Estação de Pesquisa Arcana",
-      "color": "#cc66ff"
-    }
-  ],
+  "block.oritech.advanced_augment_station": "Quantum Research Station",
+  "block.oritech.arcane_augment_station": "Arcane Research Station",
   "item.oritech.banana": "Banana",
   "item.oritech.weed_killer": "Mata-mato",
   "item.oritech.target_designator": "Designador de Alvo",
@@ -892,18 +801,8 @@
   "item.oritech.energite_ingot": "Barra de Energita",
   "item.oritech.energite_dust": "Pó de Energita",
   "item.oritech.electric_mace": "Maça Elétrica",
-  "item.oritech.prometheum_ingot": [
-    {
-      "text": "Promécio",
-      "color": "#ffd505"
-    }
-  ],
-  "item.oritech.portable_laser": [
-    {
-      "text": "Canhão Elétrico Endérico",
-      "color": "#ffd505"
-    }
-  ],
+  "item.oritech.prometheum_ingot": "Prometheum",
+  "item.oritech.portable_laser": "Enderic Railgun",
   "item.oritech.steel_ingot": "Barra de Aço",
   "item.oritech.steel_dust": "Pó de Aço",
   "item.oritech.coal_dust": "Pó de Carvão",
@@ -986,18 +885,8 @@
   "fluid.oritech.still_sheol_fire": "Fogo de Sheol",
   "fluid.oritech.still_strange_matter": "Matéria Estranha",
   "item.oritech.wrench": "Chave de Tubo",
-  "item.oritech.promethium_axe": [
-    {
-      "text": "Machado de Batalha de Promécio",
-      "color": "#ffd505"
-    }
-  ],
-  "item.oritech.promethium_pickaxe": [
-    {
-      "text": "Picareta de Promécio",
-      "color": "#ffd505"
-    }
-  ],
+  "item.oritech.promethium_axe": "Prometheum Battleaxe",
+  "item.oritech.promethium_pickaxe": "Prometheum Pickaxe",
   "message.oritech.catalyst.cost": "Custo: %d",
   "message.oritech.steamengine.controller_link": "O motor a vapor está encadeado ao motor principal (veja o bloco destacado). Use apenas o motor principal.",
   "message.oritech.deep_drill.ore_placement": "A máquina deve ser colocada sobre nós de minério",
@@ -1252,7 +1141,7 @@
   "oritech.configuration.blackHoleTachyonEnergy": "Energia de Táquions de Buracos Negros",
   "oritech.configuration.ziplineAutoJump": "Ativar Pulo Automático no Fim da Tirolesa",
   "oritech.configuration.chamberAddonEfficiency": "Eficiência do Addon de Câmara",
-  "oritech.configuration.portableLaserConfig": "Canhão Elétrico Endérico",
+  "oritech.configuration.portableLaserConfig": "Enderic Railgun",
   "oritech.configuration.clientSettings": "Apenas cliente",
   "oritech.configuration.speed": "Multiplicador de Velocidade de Voo",
   "oritech.configuration.reactor": "Reator Nuclear",
