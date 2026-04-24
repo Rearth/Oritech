@@ -2,15 +2,17 @@ package rearth.oritech.util.registry;
 
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
-import rearth.oritech.Oritech;
-
-import java.lang.reflect.Field;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
+
+import java.lang.reflect.Field;
 
 public interface ArchitecturyBlockRegistryContainer extends ArchitecturyRegistryContainer<Block> {
     
@@ -27,13 +29,16 @@ public interface ArchitecturyBlockRegistryContainer extends ArchitecturyRegistry
     }
     
     @Override
-    default void postProcessField(String namespace, Block value, String identifier, Field field, RegistrySupplier<Block> supplier) {
-        if (field.isAnnotationPresent(NoBlockItem.class)) return;
-        ITEM_REGISTRY.register(identifier, () -> createBlockItem(value, identifier));
-    }
+    void postProcessField(String namespace, Block value, String identifier, Field field, RegistrySupplier<Block> supplier);
     
-    default BlockItem createBlockItem(Block block, String identifier) {
-        return new BlockItem(block, new Item.Properties());
+    default BlockItem createBlockItem(Block block, @Nullable Rarity rarity, String identifier) {
+        var properties = new Item.Properties();
+        if (rarity != null) {
+            properties = properties.rarity(rarity);
+        }
+        
+        
+        return new BlockItem(block, properties);
     }
     
     static void finishItemRegister() {

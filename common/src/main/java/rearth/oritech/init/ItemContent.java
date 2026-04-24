@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import oshi.util.tuples.Pair;
 import rearth.oritech.Oritech;
 import rearth.oritech.item.UnstableContainerItem;
@@ -93,7 +94,7 @@ public class ItemContent implements ArchitecturyRegistryContainer<Item> {
     public static final Item ELECTRUM_DUST = new Item(new Item.Properties());
     public static final Item ENERGITE_INGOT = new Item(new Item.Properties());
     public static final Item ENERGITE_DUST = new Item(new Item.Properties());
-    public static final Item PROMETHEUM_INGOT = new Item(new Item.Properties());
+    public static final Item PROMETHEUM_INGOT = new Item(new Item.Properties().rarity(Rarity.EPIC));
     public static final Item STEEL_INGOT = new Item(new Item.Properties());
     public static final Item STEEL_DUST = new Item(new Item.Properties());
     //endregion

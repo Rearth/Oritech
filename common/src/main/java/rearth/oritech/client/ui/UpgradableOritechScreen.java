@@ -115,7 +115,7 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
         
         // Steam label
         if (menu.blockEntity instanceof UpgradableGeneratorBlockEntity generatorBlock && generatorBlock.isProducingSteam) {
-            steamProductionLabel = new LabelWidget(0, 0, 60, 10, Component.translatable("title.oritech.steam_production", generatorBlock));
+            steamProductionLabel = new LabelWidget(0, 0, 60, 10, Component.translatable("title.oritech.steam_production", generatorBlock.getDisplayedEnergyUsage()));
             steamProductionLabel.withTooltip(Component.translatable("tooltip.oritech.steam_production"));
             steamProductionLabel.withAlignment(LabelWidget.Alignment.CENTER);
             content.add(steamProductionLabel);

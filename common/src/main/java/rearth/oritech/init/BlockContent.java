@@ -1,7 +1,6 @@
 package rearth.oritech.init;
 
 import dev.architectury.registry.registries.RegistrySupplier;
-import rearth.oritech.util.registry.NoBlockItem;
 import net.minecraft.core.Registry;
 import net.minecraft.core.dispenser.ShulkerBoxDispenseBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -9,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
@@ -43,6 +43,7 @@ import rearth.oritech.item.OritechGeoItem;
 import rearth.oritech.item.other.SmallEnergyStorageBlockItem;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
+import rearth.oritech.util.registry.NoBlockItem;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -141,6 +142,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block CENTRIFUGE_BLOCK = new CentrifugeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.3f)
+    @ItemRarity(Rarity.RARE)
     public static final Block ATOMIC_FORGE_BLOCK = new AtomicForgeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.3f)
     public static final Block REFINERY_BLOCK = new RefineryBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
@@ -205,9 +207,12 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block PIPE_BOOSTER_BLOCK = new PipeBoosterBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     
     @UseGeoBlockItem(scale = 0.7f)
+    @ItemRarity(Rarity.RARE)
     public static final Block ENCHANTMENT_CATALYST_BLOCK = new EnchantmentCatalystBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.7f)
+    @ItemRarity(Rarity.RARE)
     public static final Block ENCHANTER_BLOCK = new EnchanterBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    @ItemRarity(Rarity.RARE)
     public static final Block SPAWNER_CONTROLLER_BLOCK = new SpawnerControllerBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @NoAutoDrop
     public static final Block WITHER_CROP_BLOCK = new WitheredCropBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.WHEAT));
@@ -219,6 +224,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block ACCELERATOR_MOTOR = new AcceleratorMotorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().lightLevel(item -> 5));
     public static final Block ACCELERATOR_CONTROLLER = new AcceleratorControllerBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final Block ACCELERATOR_SENSOR = new AcceleratorSensorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    @ItemRarity(Rarity.EPIC)
     public static final Block BLACK_HOLE_BLOCK = new BlackHoleBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.END_PORTAL).lightLevel(item -> 12).noOcclusion().forceSolidOn());
     
     public static final Block PARTICLE_COLLECTOR_BLOCK = new ParticleCollectorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).noOcclusion());
@@ -258,9 +264,11 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     
     @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.none)
+    @ItemRarity(Rarity.EPIC)
     public static final Block MACHINE_COMBI_ADDON = new CombiAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_COMBI_ADDON_SHAPE));
     
     //region reactor
+    @ItemRarity(Rarity.UNCOMMON)
     public static final Block REACTOR_CONTROLLER = new ReactorControllerBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).lightLevel(state -> 5));
     public static final Block REACTOR_WALL = new ReactorWallBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.NETHERITE_BLOCK).strength(10, 1800));
     public static final Block REACTOR_ROD = new ReactorRodBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().lightLevel(state -> state.getValue(BlockStateProperties.LIT) ? 15 : 3), 1, 1);
@@ -473,7 +481,12 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
             ItemGroups.add(targetGroup, variantStack);
             
         } else {
-            Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(namespace, identifier), createBlockItem(value, identifier));
+            Rarity rarity = null;
+            if (field.isAnnotationPresent(ItemRarity.class)) {
+                rarity = field.getAnnotation(ItemRarity.class).value();
+            }
+            
+            Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(namespace, identifier), createBlockItem(value, rarity, identifier));
         }
         
         if (!field.isAnnotationPresent(NoAutoDrop.class)) {
@@ -499,6 +512,12 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @Target({ElementType.FIELD})
     public @interface UseGeoBlockItem {
         float scale(); // scale
+    }
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    public @interface ItemRarity {
+        Rarity value(); // scale
     }
     
     @Retention(RetentionPolicy.RUNTIME)

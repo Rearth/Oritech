@@ -52,14 +52,14 @@ public class ToolsContent implements ArchitecturyRegistryContainer<Item> {
     public static final Item JETPACK_ELYTRA = new JetpackElytraItem(JETPACK_MATERIAL, ArmorItem.Type.CHESTPLATE, JETPACK_SETTINGS);
     public static final Item JETPACK_EXO_ELYTRA = new JetpackExoElytraItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, JETPACK_SETTINGS);
     
-    public static final Item PORTABLE_LASER = new PortableLaserItem(UNBREAKING_SETTINGS);
+    public static final Item PORTABLE_LASER = new PortableLaserItem(UNBREAKING_SETTINGS.rarity(Rarity.EPIC));
     public static final Item ELECTRIC_MACE = new ElectricMaceItem(UNBREAKING_SETTINGS.attributes(ElectricMaceItem.createAttributes()).rarity(Rarity.EPIC));
     
     public static final Item CHAINSAW = new ChainsawItem(ELECTRIC_MATERIAL, ELECTRIC_SETTINGS.attributes(AxeItem.createAttributes(ELECTRIC_MATERIAL, 5f, -2.4f)));
     public static final Item HAND_DRILL = new DrillItem(ELECTRIC_MATERIAL, TagContent.DRILL_MINEABLE, ELECTRIC_SETTINGS.attributes(PickaxeItem.createAttributes(ELECTRIC_MATERIAL, 1f, -2.4f)));
     
-    public static final Item PROMETHIUM_AXE = new PromethiumAxeItem(PROMETHIUM_MATERIAL, UNBREAKING_SETTINGS.attributes(PromethiumPickaxeItem.createPromethiumAttributes(PROMETHIUM_MATERIAL, 12f, -2.1f, 2)));
-    public static final Item PROMETHIUM_PICKAXE = new PromethiumPickaxeItem(PROMETHIUM_MATERIAL, TagContent.DRILL_MINEABLE, UNBREAKING_SETTINGS.attributes(PromethiumPickaxeItem.createPromethiumAttributes(PROMETHIUM_MATERIAL, 3f, -2.4f, 2)));
+    public static final Item PROMETHIUM_AXE = new PromethiumAxeItem(PROMETHIUM_MATERIAL, UNBREAKING_SETTINGS.rarity(Rarity.EPIC).attributes(PromethiumPickaxeItem.createPromethiumAttributes(PROMETHIUM_MATERIAL, 12f, -2.1f, 2)));
+    public static final Item PROMETHIUM_PICKAXE = new PromethiumPickaxeItem(PROMETHIUM_MATERIAL, TagContent.DRILL_MINEABLE, UNBREAKING_SETTINGS.rarity(Rarity.EPIC).attributes(PromethiumPickaxeItem.createPromethiumAttributes(PROMETHIUM_MATERIAL, 3f, -2.4f, 2)));
     
     @Override
     public ResourceKey<Registry<Item>> getRegistryType() {
