@@ -1,0 +1,5 @@
+- Improve performance of idle machine blocks on servers
+- Fix prometheum pickaxe able to bypass claim protections
+- Fix steam producing generators using wrong UI
+- Fix some fluid interaction errors
+- Fix translations / language files not loading on fabric without owo lib
