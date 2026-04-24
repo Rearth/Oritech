@@ -11,11 +11,13 @@ import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.*;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.processing.FragmentForgeBlockEntity;
 import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.util.ColorHelper;
 import rearth.oritech.util.TooltipHelper;
 
@@ -33,6 +35,7 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
     public LabelWidget speedLabel;
     public LabelWidget efficiencyLabel;
     public LabelWidget burstLabel;
+    public LabelWidget steamProductionLabel;
     public OverlayWidget addonOverlay;
     
     public UpgradableOritechScreen(T handler, Inventory inventory, Component title) {
@@ -108,6 +111,14 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
             dustLabel.withTooltip(Component.translatable("tooltip.oritech.pulverizer_dust_combine"));
             dustLabel.withAlignment(LabelWidget.Alignment.CENTER);
             content.add(dustLabel);
+        }
+        
+        // Steam label
+        if (menu.blockEntity instanceof UpgradableGeneratorBlockEntity generatorBlock && generatorBlock.isProducingSteam) {
+            steamProductionLabel = new LabelWidget(0, 0, 60, 10, Component.translatable("title.oritech.steam_production", generatorBlock));
+            steamProductionLabel.withTooltip(Component.translatable("tooltip.oritech.steam_production"));
+            steamProductionLabel.withAlignment(LabelWidget.Alignment.CENTER);
+            content.add(steamProductionLabel);
         }
         
         // content.add(BoxWidget.filled(0, 0, 60, 1, SEPARATOR_COLOR));
@@ -298,6 +309,12 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
                 burstLabel.setText(Component.translatable("title.oritech." + burstKey));
                 burstLabel.setTooltip(List.of(Component.translatable("title.oritech." + burstKey + ".tooltip", burstTicks)));
             }
+        }
+        
+        if (steamProductionLabel != null && menu.blockEntity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
+            var productionRate = menu.screenData.getDisplayedEnergyUsage() * OritechConfig.generators.steamEngineData.rfToSteamRatio.get();
+            productionRate = Math.min(productionRate, generatorBlock.boilerStorage.getInputContainer().getStack().getAmount());
+            steamProductionLabel.setText(Component.translatable("title.oritech.steam_production", String.format("%.0f", productionRate)));
         }
     }
     

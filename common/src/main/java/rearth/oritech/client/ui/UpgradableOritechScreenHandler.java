@@ -5,8 +5,11 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.screen.data.DisplayDataSource;
+import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.MachineAddonController;
+import rearth.oritech.util.ScreenProvider;
 
 import java.util.Objects;
 
@@ -30,6 +33,20 @@ public class UpgradableOritechScreenHandler extends OritechScreenHandler {
         }
         
         this.worldAccess = playerInventory.player.level();
+    }
+    
+    @Override
+    public void addFluidDisplay() {
+        super.addFluidDisplay();
+        
+        if (blockEntity instanceof UpgradableGeneratorBlockEntity generatorBlock && generatorBlock.isProducingSteam) {
+            var in = DisplayDataSource.CreateFluid(generatorBlock.boilerStorage.getInputContainer(), new ScreenProvider.BarConfiguration(8, 24, 16, 54), generatorBlock);
+            getDataDisplays().add(in);
+            
+            var out = DisplayDataSource.CreateFluid(generatorBlock.boilerStorage.getOutputContainer(), new ScreenProvider.BarConfiguration(8 + 19, 24, 16, 54), generatorBlock);
+            getDataDisplays().add(out);
+        }
+        
     }
     
     @Override

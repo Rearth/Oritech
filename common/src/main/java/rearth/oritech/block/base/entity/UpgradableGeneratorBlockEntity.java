@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
@@ -47,7 +48,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             return super.insert(toInsert, simulate);
         }
     };
-
+    
     private List<BlockLookupCache<EnergyApi.EnergyStorage>> cachedOutputTargets = List.of();
     
     // speed multiplier increases output rate and reduces burn time by same percentage
@@ -88,7 +89,8 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     
     protected void tryConsumeInput() {
         
-        if (isProducingSteam && (boilerStorage.getInStack().getAmount() == 0 || boilerStorage.getOutStack().getAmount() >= boilerStorage.getCapacity())) return;
+        if (isProducingSteam && (boilerStorage.getInStack().getAmount() == 0 || boilerStorage.getOutStack().getAmount() >= boilerStorage.getCapacity()))
+            return;
         
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty())
@@ -180,6 +182,18 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         }
     }
     
+    @Override
+    public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+        if (!isProducingSteam)
+            return super.getInteractableFluidStorages();
+        
+        var result = new ArrayList<>(super.getInteractableFluidStorages());
+        result.add(boilerStorage.getInputContainer());
+        result.add(boilerStorage.getOutputContainer());
+        
+        return result;
+    }
+    
     // returns energy production in this case
     @Override
     protected float calculateEnergyUsage() {
@@ -222,13 +236,13 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         if (energyStorage.getAmount() <= 0) return;
         
         var moved = 0L;
-
+        
         if (cachedOutputTargets.isEmpty()) {
             cachedOutputTargets = getOutputTargets(worldPosition, level).stream()
                                     .map(target -> EnergyApi.BLOCK.createCache(level, target.getA(), target.getB()))
                                     .toList();
         }
-
+        
         for (var target : cachedOutputTargets) {
             var candidate = target.find();
             if (candidate != null)
@@ -240,7 +254,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         
     }
     
-    public boolean boilerAcceptsInput(Fluid fluid ){
+    public boolean boilerAcceptsInput(Fluid fluid) {
         return fluid.equals(Fluids.WATER);
     }
     
@@ -269,7 +283,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     
     @Override
     public boolean showEnergy() {
-        if (this.energyStorage.maxExtract <= 0 && !isProducingSteam) return false;
+        if (isProducingSteam) return false;
         return super.showEnergy();
     }
     
