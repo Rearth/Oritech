@@ -2,11 +2,6 @@ package rearth.oritech.api.fluid;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import rearth.oritech.Oritech;
-import rearth.oritech.init.ComponentContent;
-import rearth.oritech.util.StackContext;
-
-import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.InteractionHand;
@@ -14,6 +9,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import rearth.oritech.Oritech;
+import rearth.oritech.init.ComponentContent;
+import rearth.oritech.util.StackContext;
+
+import java.util.function.Supplier;
 
 public interface ItemFluidApi {
     
@@ -27,7 +27,7 @@ public interface ItemFluidApi {
     
     static boolean tryFluidBlockItemInteraction(ItemStack stack, Level world, BlockPos pos, Player player, InteractionHand hand) {
         var blockEntity = world.getBlockEntity(pos);
-        if (!(blockEntity instanceof FluidApi.BlockProvider tankEntity)) {
+        if (!(blockEntity instanceof FluidApi.BlockProvider tankEntity && tankEntity.getFluidStorage(null) != null)) {
             return false;
         }
         
