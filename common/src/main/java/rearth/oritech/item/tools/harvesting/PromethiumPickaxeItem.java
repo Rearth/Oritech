@@ -36,6 +36,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.OritechPlatform;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.TagContent;
@@ -163,6 +164,10 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
                 // drop stacks before breaking additional block, because world.breakBlock doesn't apply item enchantments if drop is enabled
                 // this will ONLY apply item enchantments that affect block drops, and will not apply enchants like vein mining
                 var offsetState = world.getBlockState(offsetPos);
+                
+                var canInteract = OritechPlatform.INSTANCE.canPlayerBreakBlock(world, offsetPos, offsetState, player);
+                if (!canInteract) continue;
+                
                 var offsetEntity = world.getBlockEntity(offsetPos);
                 Block.dropResources(offsetState, world, offsetPos, offsetEntity, player, handStack);
                 offsetState.getBlock().playerWillDestroy(world, offsetPos, offsetState, player);
