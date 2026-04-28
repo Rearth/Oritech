@@ -1,1 +1,0 @@
-- Fix rarity annotation crash on fabric
