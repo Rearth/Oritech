@@ -12,7 +12,7 @@
   "advancements.oritech.foundry": "熔于一炉",
   "advancements.oritech.foundry.description": "获得一个铸造器，开始铸造强大的合金。炼金术之巅峰！",
   "advancements.oritech.assembler": "流水作业",
-  "advancements.oritech.assembler.description": "获得一个自动装配机并开始合成物品。现在可都合在一起了！",
+  "advancements.oritech.assembler.description": "获得一个装配器并开始合成物品。现在可都合在一起了！",
   "advancements.oritech.exo_boots": "仙履轻缘",
   "advancements.oritech.exo_boots.description": "合成外骨骼靴子，与摔落伤害说再见。重力？从未听说过！",
   "advancements.oritech.exo_legs": "腿部特训",
@@ -322,50 +322,11 @@
   "tooltip.oritech.portable_laser.status.begin": "挖掘模式： ",
   "tooltip.oritech.portable_laser.status.shot_mining_error": "未射击，采矿模式已启用。",
   "tooltip.oritech.portable_laser.status.hint": " （潜行并右键以切换）",
-  "tooltip.oritech.capture_item_desc_1": [
-    {
-      "text": "可以捕获一种会飞的小型魔法智能生物的大脑。",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.intelligence_item": [
-    {
-      "text": "以捕获一个可行的实体来获取，需使用 ",
-      "italic": true,
-      "color": "gray"
-    },
-    {
-      "translate": "item.oritech.dubios_container",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_2": [
-    {
-      "text": "悦灵",
-      "color": "#26d0ff",
-      "italic": true
-    },
-    {
-      "text": " 也许很符合描述。尽管它们总想把这个物品从你手中",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "tooltip.oritech.capture_item_desc_3": [
-    {
-      "text": "拿走。或许你应该再捕获另一个类似的生物。",
-      "italic": true,
-      "color": "gray"
-    }
-  ],
-  "title.oritech.redstone_addon": [
-    {
-      "text": "请选择目标槽位",
-      "color": "dark_gray"
-    }
-  ],
+  "tooltip.oritech.intelligence_item": "Gained by capturing a viable entity with the Dubious Container",
+  "tooltip.oritech.capture_item_desc_1": "Can capture the brain of a small, magical intelligent flying creature. The",
+  "tooltip.oritech.capture_item_desc_2": "Allay might fit that description. Although they always try to take the item",
+  "tooltip.oritech.capture_item_desc_3": "from you. Perhaps you might also find another similar entity to capture.",
+  "title.oritech.redstone_addon": "Please select a target slot",
   "tooltip.oritech.redstone_output_power": "比较器将会测量能量储量",
   "title.oritech.redstone_output_power": "能量测量",
   "tooltip.oritech.redstone_output_slot": "比较器将会测量选中的物品槽",
@@ -477,14 +438,7 @@
   "tooltip.oritech.pump_redstone": "可以被红石信号禁用。",
   "tooltip.oritech.item_pipe.1": "右键切换至提取模式",
   "tooltip.oritech.item_pipe.2": "仅从首个非空槽位提取。",
-  "tooltip.oritech.item_pipe.3": [
-    "使用 ",
-    {
-      "translate": "item.oritech.motor",
-      "color": "#ff830e"
-    },
-    " 用于升级管道，使其能够从所有槽位提取物品。"
-  ],
+  "tooltip.oritech.item_pipe.3": "Click it with a Motor item to upgrade the pipe to extract from all slots.",
   "tooltip.oritech.item_pipe.4": "存入最近的可用物品栏。",
   "title.oritech.machine.addon_looting": "%d 掠夺",
   "tooltip.oritech.machine.addon_looting": "产量插件数量。有效的最大值为3",
@@ -582,12 +536,7 @@
   "block.oritech.banana_block": "香蕉块",
   "block.oritech.power_pole_block": "Energy Transmission Pole",
   "block.oritech.machine_burst_addon": "脉冲超频插件",
-  "block.oritech.machine_combi_addon": [
-    {
-      "text": "机器之心（插件）",
-      "color": "#cc66ff"
-    }
-  ],
+  "block.oritech.machine_combi_addon": "Heart of the Machine (Addon)",
   "block.oritech.shrinker_block": "插件绞接器",
   "block.oritech.machine_frame_block": "机器框架",
   "block.oritech.low_yield_nuke": "低当量核爆炸装置",
@@ -642,12 +591,7 @@
   "block.oritech.cooler_block": "工业冷却器",
   "block.oritech.particle_collector_block": "速子吸收器",
   "block.oritech.centrifuge_block": "离心机",
-  "block.oritech.atomic_forge_block": [
-    {
-      "text": "原子锻造器",
-      "color": "#e30c82"
-    }
-  ],
+  "block.oritech.atomic_forge_block": "Atomic Forge",
   "block.oritech.bio_generator_block": "生物质能发电机",
   "block.oritech.lava_generator_block": "熔岩发电机",
   "block.oritech.steam_engine_block": "蒸汽机",
@@ -765,42 +709,17 @@
   "block.oritech.raw_uranium_block": "粗铀块",
   "block.oritech.uranium_dust_block": "铀块",
   "block.oritech.raw_platinum_block": "粗铂块",
-  "block.oritech.black_hole_block": [
-    {
-      "text": "Black Hole",
-      "color": "#cc66ff"
-    }
-  ],
-  "block.oritech.enchantment_catalyst_block": [
-    {
-      "text": "奥术触媒",
-      "color": "#cc66ff"
-    }
-  ],
-  "block.oritech.enchanter_block": [
-    {
-      "text": "稳定附魔器",
-      "color": "#cc66ff"
-    }
-  ],
-  "block.oritech.spawner_controller_block": [
-    {
-      "text": "刷怪器控制器",
-      "color": "#cc66ff"
-    }
-  ],
+  "block.oritech.black_hole_block": "黑洞",
+  "block.oritech.enchantment_catalyst_block": "Arcane Catalyst",
+  "block.oritech.enchanter_block": "Stabilized Enchanter",
+  "block.oritech.spawner_controller_block": "Spawner Controller",
   "block.oritech.spawner_cage_block": "刷怪器笼",
   "block.oritech.wither_crop_block": "灵魂之花",
   "block.oritech.accelerator_ring": "粒子加速器导向环",
   "block.oritech.accelerator_motor": "粒子加速器直线型马达",
   "block.oritech.accelerator_controller": "粒子加速器",
   "block.oritech.accelerator_sensor": "粒子加速器传感器",
-  "block.oritech.reactor_controller": [
-    {
-      "text": "核反应堆控制面板",
-      "color": "#D22B2B"
-    }
-  ],
+  "block.oritech.reactor_controller": "Nuclear Reactor Controller",
   "block.oritech.reactor_wall": "反应堆墙",
   "block.oritech.reactor_rod": "单反应堆棒",
   "block.oritech.reactor_double_rod": "双联反应堆棒",
@@ -815,18 +734,8 @@
   "block.oritech.reactor_redstone_port": "反应堆红石端口",
   "block.oritech.augment_application_block": "赛博改造中心",
   "block.oritech.simple_augment_station": "赛博研究站",
-  "block.oritech.advanced_augment_station": [
-    {
-      "text": "量子研究站",
-      "color": "#40f5ef"
-    }
-  ],
-  "block.oritech.arcane_augment_station": [
-    {
-      "text": "奥术研究站",
-      "color": "#cc66ff"
-    }
-  ],
+  "block.oritech.advanced_augment_station": "Quantum Research Station",
+  "block.oritech.arcane_augment_station": "Arcane Research Station",
   "item.oritech.banana": "香蕉",
   "item.oritech.weed_killer": "除草剂",
   "item.oritech.target_designator": "目标标识器",
@@ -892,18 +801,8 @@
   "item.oritech.energite_ingot": "辐镍晶锭",
   "item.oritech.energite_dust": "辐镍晶粉",
   "item.oritech.electric_mace": "电动重锤",
-  "item.oritech.prometheum_ingot": [
-    {
-      "text": "钷",
-      "color": "#ffd505"
-    }
-  ],
-  "item.oritech.portable_laser": [
-    {
-      "text": "末影电磁炮",
-      "color": "#ffd505"
-    }
-  ],
+  "item.oritech.prometheum_ingot": "Prometheum",
+  "item.oritech.portable_laser": "Enderic Railgun",
   "item.oritech.steel_ingot": "钢锭",
   "item.oritech.steel_dust": "钢粉",
   "item.oritech.coal_dust": "煤粉",
@@ -986,18 +885,8 @@
   "fluid.oritech.still_sheol_fire": "地狱火",
   "fluid.oritech.still_strange_matter": "奇异物质",
   "item.oritech.wrench": "管道扳手",
-  "item.oritech.promethium_axe": [
-    {
-      "text": "钷战斧",
-      "color": "#ffd505"
-    }
-  ],
-  "item.oritech.promethium_pickaxe": [
-    {
-      "text": "钷镐",
-      "color": "#ffd505"
-    }
-  ],
+  "item.oritech.promethium_axe": "Prometheum Battleaxe",
+  "item.oritech.promethium_pickaxe": "Prometheum Pickaxe",
   "message.oritech.catalyst.cost": "消耗：%d",
   "message.oritech.steamengine.controller_link": "蒸汽机已连锁至主引擎（见高亮方块）。请仅使用主引擎。",
   "message.oritech.deep_drill.ore_placement": "机器必须被放置在资源节点上",
@@ -1113,13 +1002,13 @@
   "text.oritech.cancel": "取消",
   "text.oritech.augmenter_creative_tooltip": "创造模式下，你可以无资源限制地研究/应用植入体。",
   "text.oritech.redstone_power": "等级：%s",
-  "oritech.configuration.augments": "Player Augmentation",
-  "oritech.configuration.processingMachines": "Processing Machines",
-  "oritech.configuration.easyFindFeatures": "Easily findable features",
-  "oritech.configuration.assemblerData": "Assembler Config",
-  "oritech.configuration.catalystBaseSouls": "Catalyst Base Soul Capacity",
-  "oritech.configuration.coolerData": "Cooler Config",
-  "oritech.configuration.unstableContainerBaseCapacity": "Unstable Container Base RF Storage Capacity",
+  "oritech.configuration.augments": "植入体改造",
+  "oritech.configuration.processingMachines": "处理机器",
+  "oritech.configuration.easyFindFeatures": "“便于发现”配置",
+  "oritech.configuration.assemblerData": "装配器配置",
+  "oritech.configuration.catalystBaseSouls": "触媒基础灵魂容量",
+  "oritech.configuration.coolerData": "冷却器配置",
+  "oritech.configuration.unstableContainerBaseCapacity": "不稳定容器基础RF存储容量",
   "oritech.configuration.ziplineAcceleration": "Zipline Acceleration",
   "oritech.configuration.fuelGeneratorData": "Fuel Generator Config",
   "oritech.configuration.refineryData": "Refinery Config",
@@ -1252,7 +1141,7 @@
   "oritech.configuration.blackHoleTachyonEnergy": "Energy of Tachyons from Black Holes",
   "oritech.configuration.ziplineAutoJump": "Enable Auto Jump at Zipline End",
   "oritech.configuration.chamberAddonEfficiency": "Chamber Addon Efficiency",
-  "oritech.configuration.portableLaserConfig": "末影电磁炮",
+  "oritech.configuration.portableLaserConfig": "Enderic Railgun",
   "oritech.configuration.clientSettings": "Client only",
   "oritech.configuration.speed": "Flight Speed Multiplier",
   "oritech.configuration.reactor": "Nuclear Reactor",
@@ -1260,13 +1149,13 @@
   "oritech.configuration.equipment": "Equipment",
   "oritech.configuration.fragmentForgeData": "Fragment Forge Config",
   "oritech.configuration.itemPipeIntervalDuration": "Item Pipe Interval Duration",
-  "oritech.configuration.ventBaseRate": "Vent Base Rate",
-  "oritech.configuration.stopOnWaterFull": "Stop On Water Full",
-  "oritech.configuration.fuelUsage": "Fuel Usage",
-  "oritech.configuration.catalystHyperExpFactor": "Hyper Enchanting Exp Factor",
+  "oritech.configuration.ventBaseRate": "散热口散热基率",
+  "oritech.configuration.stopOnWaterFull": "在水满时停止",
+  "oritech.configuration.fuelUsage": "燃料使用量",
+  "oritech.configuration.catalystHyperExpFactor": "超附指数因子",
   "oritech.configuration.electricMace": "电动重锤",
-  "oritech.configuration.energyPerStep": "Energy Per Step",
-  "oritech.configuration.blackHole": "Black Hole",
+  "oritech.configuration.energyPerStep": "每步能量",
+  "oritech.configuration.blackHole": "黑洞",
   "oritech.configuration.damageTickBase": "Damage Per Tick Base",
   "tag.item.c.carbon_fibre": "碳纤维",
   "tag.item.c.dusts.adamant": "精镍粉",
