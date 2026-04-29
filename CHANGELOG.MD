@@ -1,2 +1,0 @@
-- Update translations from crowdin
-- Fix promethium pickaxe crash with recursive permission checks on neoforge
