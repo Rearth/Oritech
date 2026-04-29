@@ -59,6 +59,8 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
     
     private static final RawAnimation AREA_ANIM = RawAnimation.begin().thenLoop("area");
     private static final RawAnimation SILK_ANIM = RawAnimation.begin().thenLoop("silk_touch");
+    // Permission checks post another break event; Promethium should ignore that nested probe.
+    private static final ThreadLocal<Boolean> CHECKING_OFFSET_BREAK_PERMISSION = ThreadLocal.withInitial(() -> false);
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
     public PromethiumPickaxeItem(Tier toolMaterial, TagKey<Block> effectiveBlocks, Properties settings) {
@@ -152,6 +154,7 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
     // area mode: breaks 3x3 blocks unless player is sneaking
     // silk touch mode: adds a temporary silk touch, which is then removed in the after break event
     public static EventResult preMine(Level world, BlockPos pos, BlockState state, ServerPlayer player, @Nullable IntValue xp) {
+        if (CHECKING_OFFSET_BREAK_PERMISSION.get()) return EventResult.pass();
         
         var handStack = player.getMainHandItem();
         if (handStack == null || !handStack.is(ToolsContent.PROMETHIUM_PICKAXE)) return EventResult.pass();
@@ -165,7 +168,7 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
                 // this will ONLY apply item enchantments that affect block drops, and will not apply enchants like vein mining
                 var offsetState = world.getBlockState(offsetPos);
                 
-                var canInteract = OritechPlatform.INSTANCE.canPlayerBreakBlock(world, offsetPos, offsetState, player);
+                var canInteract = canBreakOffsetBlock(world, offsetPos, offsetState, player);
                 if (!canInteract) continue;
                 
                 var offsetEntity = world.getBlockEntity(offsetPos);
@@ -185,6 +188,17 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
         }
         
         return EventResult.pass();
+    }
+
+    // to avoid recusion on neoforge
+    private static boolean canBreakOffsetBlock(Level world, BlockPos offsetPos, BlockState offsetState, ServerPlayer player) {
+        var wasCheckingOffsetBreakPermission = CHECKING_OFFSET_BREAK_PERMISSION.get();
+        CHECKING_OFFSET_BREAK_PERMISSION.set(true);
+        try {
+            return OritechPlatform.INSTANCE.canPlayerBreakBlock(world, offsetPos, offsetState, player);
+        } finally {
+            CHECKING_OFFSET_BREAK_PERMISSION.set(wasCheckingOffsetBreakPermission);
+        }
     }
     
     public static ItemAttributeModifiers createPromethiumAttributes(Tier tier, float attackDamage, float attackSpeed, float range) {
