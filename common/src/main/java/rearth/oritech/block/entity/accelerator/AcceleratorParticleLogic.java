@@ -146,7 +146,7 @@ public class AcceleratorParticleLogic {
 
     private BlockState getCachedGate(BlockPos pos)
     {
-        BlockState state = cachedGateStates.get(pos);
+        var state = cachedGateStates.get(pos);
         if (state != null)
             return state;
         state = world.getBlockState(pos);
