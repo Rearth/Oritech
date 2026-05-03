@@ -146,6 +146,7 @@ public class AcceleratorParticleLogic {
 
     private BlockState getCachedGate(BlockPos pos)
     {
+        // tries to get a block state that was cached, if possible
         var state = cachedGateStates.get(pos);
         if (state != null)
             return state;
