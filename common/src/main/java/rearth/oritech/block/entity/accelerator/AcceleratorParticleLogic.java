@@ -5,6 +5,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -26,6 +27,7 @@ public class AcceleratorParticleLogic {
     private final AcceleratorControllerBlockEntity entity;
     
     private static final Map<CompPair<BlockPos, Vec3i>, BlockPos> cachedGates = new HashMap<>();    // stores the next gate for a combo of source gate and direction
+    private static final Map<BlockPos, BlockState> cachedGateStates = new HashMap<>(); // caches the block states where gates are to not have to call world.getBlockState 1 billion times per tick
     private static final Map<BlockPos, BlockPos> activeParticles = new HashMap<>(); // stores relations between position of particle -> position of controller
     
     public AcceleratorParticleLogic(BlockPos pos, ServerLevel world, AcceleratorControllerBlockEntity entity) {
@@ -122,7 +124,7 @@ public class AcceleratorParticleLogic {
                 }
                 
                 // handle gate interaction (e.g. motor or sensor)
-                var gateBlock = world.getBlockState(reachedGate).getBlock();
+                var gateBlock = getCachedGate(reachedGate).getBlock();
                 if (gateBlock.equals(BlockContent.ACCELERATOR_MOTOR)) {
                     entity.handleParticleMotorInteraction(reachedGate);
                 } else if (gateBlock.equals(BlockContent.ACCELERATOR_SENSOR) && world.getBlockEntity(reachedGate) instanceof AcceleratorSensorBlockEntity sensorEntity) {
@@ -140,6 +142,16 @@ public class AcceleratorParticleLogic {
         }
         
         entity.onParticleMoved(renderedTrail);
+    }
+
+    private BlockState getCachedGate(BlockPos pos)
+    {
+        BlockState state = cachedGateStates.get(pos);
+        if (state != null)
+            return state;
+        state = world.getBlockState(pos);
+        cachedGateStates.put(pos, state);
+        return state;
     }
     
     private void calculateCollision(ActiveParticle particle, ArrayList<BlockPos> foundCollisions, Pair<ActiveParticle, AcceleratorControllerBlockEntity> collidedWith) {
@@ -250,7 +262,7 @@ public class AcceleratorParticleLogic {
         var incomingStraight = incomingPath.getX() == 0 || incomingPath.getZ() == 0;
         var incomingDir = new Vec3i(Math.clamp(incomingPath.getX(), -1, 1), 0, Math.clamp(incomingPath.getZ(), -1, 1));
         
-        var targetState = world.getBlockState(nextGate);
+        var targetState = getCachedGate(nextGate);
         var targetBlock = targetState.getBlock();
         
         // go straight through motors and sensors
@@ -384,11 +396,17 @@ public class AcceleratorParticleLogic {
     public static void resetCachedGate(BlockPos pos) {
         var toRemove = cachedGates.entrySet().stream().filter(elem -> elem.getKey().getA().equals(pos) || elem.getValue().equals(pos)).map(Map.Entry::getKey).toList();
         toRemove.forEach(cachedGates::remove);
+
+        var toRemove2 = cachedGateStates.entrySet().stream().filter(elem -> elem.getKey().equals(pos)).toList();
+        toRemove2.forEach(cachedGateStates::remove);
     }
     
     public static void resetNearbyCache(BlockPos pos) {
         var toRemove = cachedGates.keySet().stream().filter(blockPos -> blockPos.getA().distManhattan(pos) < OritechConfig.maxGateDist.get() + 1).toList();
         toRemove.forEach(cachedGates::remove);
+
+        var toRemove2 = cachedGateStates.keySet().stream().filter(blockPos -> blockPos.distManhattan(pos) < OritechConfig.maxGateDist.get() + 1).toList();
+        toRemove2.forEach(cachedGateStates::remove);
     }
     
     public static final class CompPair<A, B> extends Tuple<A, B> {
@@ -414,13 +432,13 @@ public class AcceleratorParticleLogic {
     
     public static final class ActiveParticle {
         public Vec3 position;
-        public float velocity;
+        public long velocity;
         public BlockPos nextGate;
         public BlockPos lastGate;
         public float lastBendDistance = 15000;
         public float lastBendDistance2 = 15000;
         
-        public ActiveParticle(Vec3 position, float velocity, BlockPos nextGate, BlockPos lastGate) {
+        public ActiveParticle(Vec3 position, long velocity, BlockPos nextGate, BlockPos lastGate) {
             this.position = position;
             this.velocity = velocity;
             this.nextGate = nextGate;

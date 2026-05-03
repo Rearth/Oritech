@@ -89,7 +89,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         
         if (particle != null && activeItemParticle != null && activeItemParticle != ItemStack.EMPTY) {
             var data = new CompoundTag();
-            data.putFloat("speed", particle.velocity);
+            data.putLong("speed", particle.velocity);
             data.putFloat("posX", (float) particle.position.x);
             data.putFloat("posY", (float) particle.position.y);
             data.putFloat("posZ", (float) particle.position.z);
@@ -109,7 +109,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         
         if (nbt.contains("particle")) {
             var data = nbt.getCompound("particle");
-            var speed = data.getFloat("speed");
+            var speed = data.getLong("speed");
             var posX = data.getFloat("posX");
             var posY = data.getFloat("posY");
             var posZ = data.getFloat("posZ");
@@ -163,7 +163,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         this.setChanged();
     }
     
-    public void onParticleCollided(float relativeSpeed, Vec3 collision, AcceleratorControllerBlockEntity secondControllerEntity) {
+    public void onParticleCollided(long relativeSpeed, Vec3 collision, AcceleratorControllerBlockEntity secondControllerEntity) {
         
         // create end portal area when two ender pearls collide, nether portal for two firecharges
         if (relativeSpeed > OritechConfig.endPortalRequiredSpeed.get() && activeItemParticle.getItem().equals(Items.ENDER_PEARL) && secondControllerEntity.activeItemParticle.getItem().equals(Items.ENDER_PEARL)) {
@@ -219,7 +219,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     
     }
     
-    private boolean tryCraftResult(float speed, ItemStack inputA, ItemStack inputB) {
+    private boolean tryCraftResult(long speed, ItemStack inputA, ItemStack inputB) {
         
         if (inputA == null || inputA.isEmpty() || inputB == null || inputB.isEmpty()) return false;
         
@@ -349,7 +349,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     // returns the amount of moment used
-    public float handleParticleEntityCollision(BlockPos checkPos, AcceleratorParticleLogic.ActiveParticle particle, float remainingMomentum, LivingEntity mob) {
+    public float handleParticleEntityCollision(BlockPos checkPos, AcceleratorParticleLogic.ActiveParticle particle, long remainingMomentum, LivingEntity mob) {
         
         var maxApplicableDamage = mob.getHealth();
         var inflictedDamage = Math.min(remainingMomentum, maxApplicableDamage);
@@ -361,7 +361,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         return inflictedDamage;
     }
     
-    public float handleParticleBlockCollision(BlockPos checkPos, AcceleratorParticleLogic.ActiveParticle particle, float remainingMomentum, BlockState hitState) {
+    public float handleParticleBlockCollision(BlockPos checkPos, AcceleratorParticleLogic.ActiveParticle particle, long remainingMomentum, BlockState hitState) {
         
         var blockHardness = hitState.getDestroySpeed(level, checkPos);
         
@@ -520,7 +520,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     public record LastEventPacket(BlockPos position,
                                   ParticleEvent lastEvent,
 // for no gate found events, we can calculate the acceptable dist based on speed
-                                  float lastEventSpeed,
+                                  long lastEventSpeed,
 // this is particle speed usually, and collision speed for collisions
                                   BlockPos lastEventPosition,  // where it collided/exited
                                   float minBendDist,   // acceptable dist can be calculated from dist
