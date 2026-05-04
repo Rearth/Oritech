@@ -1,13 +1,6 @@
 package rearth.oritech.block.entity.augmenter;
 
 import dev.architectury.registry.menu.MenuRegistry;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.attachment.AttachmentApi;
-import rearth.oritech.block.entity.augmenter.api.Augment;
-import rearth.oritech.init.recipes.RecipeContent;
-
-import java.util.HashMap;
-import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -15,6 +8,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeManager;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.attachment.AttachmentApi;
+import rearth.oritech.block.entity.augmenter.api.Augment;
+import rearth.oritech.init.recipes.RecipeContent;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PlayerAugments {
     
@@ -28,11 +28,23 @@ public class PlayerAugments {
     
     public static void serverTickAugments(ServerPlayer player) {
         
+        var data = AttachmentApi.getAttachmentValue(player, Augment.ACTIVE_AUGMENTS_DATA);
+        
         for (var augment : allAugments.values()) {
-            var data = AttachmentApi.getAttachmentValue(player, Augment.ACTIVE_AUGMENTS_DATA);
             if (augment.isEnabled(data)) {
                 if (player.serverLevel().getGameTime() % augment.refreshInterval() == 0)
                     augment.refreshServer(player);
+            }
+        }
+    }
+
+    public static void refreshActiveAugments(ServerPlayer player) {
+
+        var data = AttachmentApi.getAttachmentValue(player, Augment.ACTIVE_AUGMENTS_DATA);
+
+        for (var augment : allAugments.values()) {
+            if (augment.isEnabled(data)) {
+                augment.refreshServer(player);
             }
         }
     }

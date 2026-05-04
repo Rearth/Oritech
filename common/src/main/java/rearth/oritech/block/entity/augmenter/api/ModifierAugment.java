@@ -43,6 +43,6 @@ public class ModifierAugment extends Augment {
     
     @Override
     public int refreshInterval() {
-        return 6000; // doesn't need to happen often, as these effects are applied permanently
+        return 3000; // doesn't need to happen often, as these effects are applied permanently
     }
 }

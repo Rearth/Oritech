@@ -6,6 +6,8 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -14,6 +16,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -24,6 +27,7 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.OritechConfig;
@@ -59,6 +63,13 @@ public final class OritechModNeoForge {
         @SubscribeEvent
         public static void onEquipmentChanged(LivingEquipmentChangeEvent event) {
             ArmorEventHandler.processEvent(event.getEntity(), event.getSlot(), event.getFrom(), event.getTo());
+        }
+
+        @SubscribeEvent(priority = EventPriority.LOWEST)
+        public static void onPlayerClone(PlayerEvent.Clone event) {
+            if (event.getEntity() instanceof ServerPlayer player) {
+                PlayerAugments.refreshActiveAugments(player);
+            }
         }
     }
     

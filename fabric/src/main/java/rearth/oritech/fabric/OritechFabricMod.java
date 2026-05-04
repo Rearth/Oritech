@@ -4,12 +4,14 @@ import dev.architectury.fluid.FluidStack;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.EntityElytraEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.neoforged.fml.config.ModConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.OritechStartupConfig;
@@ -43,6 +45,13 @@ public final class OritechFabricMod implements ModInitializer {
     
     public static void registerFabricEvents() {
         ServerEntityEvents.EQUIPMENT_CHANGE.register(ArmorEventHandler::processEvent);
+        
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
+            // delayed via execute by a bit to prevent race conditions with augment loading (which fabric internally also does via this callback)
+            newPlayer.server.execute(() -> PlayerAugments.refreshActiveAugments(newPlayer));
+
+        });
+        
         EntityElytraEvents.CUSTOM.register(((entity, tickElytra) -> {
             var chestStack = entity.getItemBySlot(EquipmentSlot.CHEST);
             if (chestStack.getItem() instanceof JetpackElytraItem jetpackElytraItem) {
