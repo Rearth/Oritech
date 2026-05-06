@@ -1147,7 +1147,7 @@
   "oritech.configuration.reactor": "核反应堆",
   "oritech.configuration.elytraJetpack": "鞘翅喷气背包",
   "oritech.configuration.equipment": "Equipment",
-  "oritech.configuration.fragmentForgeData": "Fragment Forge Config",
+  "oritech.configuration.fragmentForgeData": "粉碎工厂配置",
   "oritech.configuration.itemPipeIntervalDuration": "Item Pipe Interval Duration",
   "oritech.configuration.ventBaseRate": "散热口散热基率",
   "oritech.configuration.stopOnWaterFull": "在水满时停止",
