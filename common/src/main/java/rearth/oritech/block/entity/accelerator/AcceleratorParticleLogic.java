@@ -11,11 +11,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import oshi.util.tuples.Pair;
-import rearth.oritech.init.OritechConfig;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.accelerator.AcceleratorPassthroughBlock;
 import rearth.oritech.block.blocks.accelerator.AcceleratorRingBlock;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.util.Geometry;
 
 import java.util.*;
@@ -143,16 +142,10 @@ public class AcceleratorParticleLogic {
         
         entity.onParticleMoved(renderedTrail);
     }
-
-    private BlockState getCachedGate(BlockPos pos)
-    {
-        // tries to get a block state that was cached, if possible
-        var state = cachedGateStates.get(pos);
-        if (state != null)
-            return state;
-        state = world.getBlockState(pos);
-        cachedGateStates.put(pos, state);
-        return state;
+    
+    // tries to get a block state that was cached, if possible
+    private BlockState getCachedGate(BlockPos pos) {
+        return cachedGateStates.computeIfAbsent(pos, world::getBlockState);
     }
     
     private void calculateCollision(ActiveParticle particle, ArrayList<BlockPos> foundCollisions, Pair<ActiveParticle, AcceleratorControllerBlockEntity> collidedWith) {
@@ -397,15 +390,15 @@ public class AcceleratorParticleLogic {
     public static void resetCachedGate(BlockPos pos) {
         var toRemove = cachedGates.entrySet().stream().filter(elem -> elem.getKey().getA().equals(pos) || elem.getValue().equals(pos)).map(Map.Entry::getKey).toList();
         toRemove.forEach(cachedGates::remove);
-
-        var toRemove2 = cachedGateStates.entrySet().stream().filter(elem -> elem.getKey().equals(pos)).toList();
+        
+        var toRemove2 = cachedGateStates.keySet().stream().filter(pos::equals).toList();
         toRemove2.forEach(cachedGateStates::remove);
     }
     
     public static void resetNearbyCache(BlockPos pos) {
         var toRemove = cachedGates.keySet().stream().filter(blockPos -> blockPos.getA().distManhattan(pos) < OritechConfig.maxGateDist.get() + 1).toList();
         toRemove.forEach(cachedGates::remove);
-
+        
         var toRemove2 = cachedGateStates.keySet().stream().filter(blockPos -> blockPos.distManhattan(pos) < OritechConfig.maxGateDist.get() + 1).toList();
         toRemove2.forEach(cachedGateStates::remove);
     }

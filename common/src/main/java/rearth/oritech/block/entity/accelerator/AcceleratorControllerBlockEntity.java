@@ -3,6 +3,7 @@ package rearth.oritech.block.entity.accelerator;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.*;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -28,7 +29,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.init.OritechConfig;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.InOutInventoryStorage;
@@ -37,8 +37,8 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.AcceleratorScreenHandler;
 import rearth.oritech.init.BlockContent;
-import net.minecraft.core.particles.ParticleTypes;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.OritechConfig;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.*;
@@ -123,7 +123,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     private void initParticleLogic() {
-        if (particleLogic == null) particleLogic = new AcceleratorParticleLogic(worldPosition, (ServerLevel) level, this);
+        if (particleLogic == null)
+            particleLogic = new AcceleratorParticleLogic(worldPosition, (ServerLevel) level, this);
     }
     
     public void injectParticle() {
@@ -183,7 +184,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var particleCount = Math.pow(relativeSpeed, 0.5) / 2f + 1;
         createCollisionParticles((int) relativeSpeed, collision, (int) particleCount);
         
-        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.GUST, collision.x, collision.y, collision.z, 1, 0, 0, 0, 0);
+        if (level instanceof ServerLevel sl)
+            sl.sendParticles(ParticleTypes.GUST, collision.x, collision.y, collision.z, 1, 0, 0, 0, 0);
         this.setChanged();
     }
     
@@ -216,7 +218,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             
             // System.out.println("caught: " + caughtParticles + " of " + shotCount);
         }
-    
+        
     }
     
     private boolean tryCraftResult(long speed, ItemStack inputA, ItemStack inputB) {
@@ -356,7 +358,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         mob.hurt(level.damageSources().magic(), remainingMomentum);
         var position = mob.getBoundingBox().getCenter();
         position = new Vec3(position.x, particle.position.y, position.z);
-        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SONIC_BOOM, position.x, position.y, position.z, 1, 0.3, 0.3, 0.3, 0);
+        if (level instanceof ServerLevel sl)
+            sl.sendParticles(ParticleTypes.SONIC_BOOM, position.x, position.y, position.z, 1, 0.3, 0.3, 0.3, 0);
         
         return inflictedDamage;
     }
@@ -384,7 +387,10 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     private void createBlackHole(BlockPos checkPos) {
-        if (level instanceof ServerLevel sl) { var c = checkPos.getCenter(); sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, 30, 1, 1, 1, 0); }
+        if (level instanceof ServerLevel sl) {
+            var c = checkPos.getCenter();
+            sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, 30, 1, 1, 1, 0);
+        }
         
         var center = checkPos.getCenter();
         level.explode(null, center.x, center.y, center.z, 10, false, Level.ExplosionInteraction.BLOCK);
