@@ -1,12 +1,12 @@
 package rearth.oritech.api.screen.data;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rearth.oritech.Oritech;
 
 public class EnergyDisplayWidget extends AbstractDataDisplayWidget {
     
-    private static final ResourceLocation GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
+    private static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
     private static final int REGION_WIDTH = 24;
     private static final int REGION_HEIGHT = 96;
     

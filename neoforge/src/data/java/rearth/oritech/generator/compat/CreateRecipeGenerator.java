@@ -17,7 +17,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -59,7 +59,7 @@ public class CreateRecipeGenerator {
     private static void offerBlasting(RecipeOutput exporter, Item input, Item result, float xp, int cookTime, String suffix) {
         SimpleCookingRecipeBuilder.blasting(of(input), RecipeCategory.MISC, result, xp, cookTime)
             .unlockedBy(RecipeProvider.getHasName(input), RecipeProvider.has(input))
-            .save(exporter, ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "blasting/" + PATH + suffix));
+            .save(exporter, Identifier.fromNamespaceAndPath(Oritech.MOD_ID, "blasting/" + PATH + suffix));
     }
 
     private static void addCentrifuging(RecipeOutput exporter) {

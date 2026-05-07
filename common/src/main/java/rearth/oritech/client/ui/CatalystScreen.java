@@ -3,7 +3,7 @@ package rearth.oritech.client.ui;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
@@ -12,8 +12,8 @@ import rearth.oritech.api.screen.widgets.TextureWidget;
 
 public class CatalystScreen extends OritechMachineScreen<CatalystScreenHandler> {
     
-    public static final ResourceLocation GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components_souls.png");
-    public static final ResourceLocation BOOK_SLOT = Oritech.id("textures/gui/modular/book_slot_background.png");
+    public static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components_souls.png");
+    public static final Identifier BOOK_SLOT = Oritech.id("textures/gui/modular/book_slot_background.png");
     
     private LabelWidget costLabel;
     private LabelWidget stabilizationLabel;

@@ -1,7 +1,7 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.UIComponent;
 
@@ -12,7 +12,7 @@ import rearth.oritech.api.screen.UIComponent;
  */
 public class ItemSlotWidget extends UIComponent {
     
-    public static final ResourceLocation ITEM_SLOT_TEXTURE = Oritech.id("textures/gui/modular/itemslot.png");
+    public static final Identifier ITEM_SLOT_TEXTURE = Oritech.id("textures/gui/modular/itemslot.png");
     
     public ItemSlotWidget(int x, int y) {
         super(x - 1, y - 1, 18, 18); // slots are 16px content, frame is 18px with 1px border

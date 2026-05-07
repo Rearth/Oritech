@@ -4,7 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -132,7 +132,7 @@ public class EnchanterScreen extends OritechMachineScreen<EnchanterScreenHandler
     }
 
     private void onEnchantmentSelected(Holder<Enchantment> entry) {
-        var selected = ResourceLocation.parse(entry.getRegisteredName());
+        var selected = Identifier.parse(entry.getRegisteredName());
         menu.enchanter.selectedEnchantment = selected;
         sendEnchantmentToServer(selected);
         closeSelectionOverlay();
@@ -145,7 +145,7 @@ public class EnchanterScreen extends OritechMachineScreen<EnchanterScreenHandler
         }
     }
 
-    private void sendEnchantmentToServer(ResourceLocation selected) {
+    private void sendEnchantmentToServer(Identifier selected) {
         NetworkManager.sendToServer(new EnchanterBlockEntity.SelectEnchantingPacket(menu.blockPos, selected));
     }
 }

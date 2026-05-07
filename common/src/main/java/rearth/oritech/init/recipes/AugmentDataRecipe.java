@@ -13,7 +13,7 @@ import rearth.oritech.util.SizedIngredient;
 import java.util.List;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
@@ -29,8 +29,8 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
     
     private final List<SizedIngredient> researchCost;
     private final List<SizedIngredient> applyCost;
-    private final List<ResourceLocation> requirements;
-    private final ResourceLocation requiredStation;
+    private final List<Identifier> requirements;
+    private final Identifier requiredStation;
     private final int uiX;
     private final int uiY;
     private final int time;
@@ -47,8 +47,8 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
       boolean toggleable,
       List<SizedIngredient> researchCost,
       List<SizedIngredient> applyCost,
-      List<ResourceLocation> requirements,
-      ResourceLocation requiredStation,
+      List<Identifier> requirements,
+      Identifier requiredStation,
       int uiX,
       int uiY,
       int time,
@@ -75,8 +75,8 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
       boolean toggleable,
       List<SizedIngredient> researchCost,
       List<SizedIngredient> applyCost,
-      List<ResourceLocation> requirements,
-      ResourceLocation requiredStation,
+      List<Identifier> requirements,
+      Identifier requiredStation,
       int uiX,
       int uiY,
       int time,
@@ -138,7 +138,7 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
         return toggleable;
     }
     
-    public Augment createAugment(ResourceLocation recipeId) {
+    public Augment createAugment(Identifier recipeId) {
         if (customAugmentDefinition != null) {
             var customId = customAugmentDefinition.customAugmentId;
             return CustomAugmentsCollection.getById(customId);
@@ -176,11 +176,11 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
         return time;
     }
     
-    public ResourceLocation getRequiredStation() {
+    public Identifier getRequiredStation() {
         return requiredStation;
     }
     
-    public List<ResourceLocation> getRequirements() {
+    public List<Identifier> getRequirements() {
         return requirements;
     }
     
@@ -217,26 +217,26 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
     }
     
     // used to apply an effect, similar to potion effects
-    public record EffectDefinition(ResourceLocation potionEffectId, int effectStrength) {
+    public record EffectDefinition(Identifier potionEffectId, int effectStrength) {
         public static final Codec<EffectDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-          ResourceLocation.CODEC.fieldOf("potionEffectId").forGetter(EffectDefinition::potionEffectId),
+          Identifier.CODEC.fieldOf("potionEffectId").forGetter(EffectDefinition::potionEffectId),
           Codec.INT.fieldOf("effectStrength").forGetter(EffectDefinition::effectStrength)
         ).apply(instance, EffectDefinition::new));
     }
     
     // apply a stat modification. The attributeOperationType type can be either "add_value=0", "add_multiplied_base=1" or "add_multiplied_total=2"
-    public record ModifierDefinition(ResourceLocation entityAttributeId, int attributeOperationType, float amount) {
+    public record ModifierDefinition(Identifier entityAttributeId, int attributeOperationType, float amount) {
         public static final Codec<ModifierDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-          ResourceLocation.CODEC.fieldOf("entityAttributeId").forGetter(ModifierDefinition::entityAttributeId),
+          Identifier.CODEC.fieldOf("entityAttributeId").forGetter(ModifierDefinition::entityAttributeId),
           Codec.INT.fieldOf("attributeOperationType").forGetter(ModifierDefinition::attributeOperationType),
           Codec.FLOAT.fieldOf("amount").forGetter(ModifierDefinition::amount)
         ).apply(instance, ModifierDefinition::new));
     }
     
     // apply a custom modification, that implements custom functionality.
-    public record CustomAugmentDefinition(ResourceLocation customAugmentId) {
+    public record CustomAugmentDefinition(Identifier customAugmentId) {
         public static final Codec<CustomAugmentDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-          ResourceLocation.CODEC.fieldOf("customAugmentId").forGetter(CustomAugmentDefinition::customAugmentId)
+          Identifier.CODEC.fieldOf("customAugmentId").forGetter(CustomAugmentDefinition::customAugmentId)
         ).apply(instance, CustomAugmentDefinition::new));
     }
     

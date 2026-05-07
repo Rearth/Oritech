@@ -1,7 +1,7 @@
 package rearth.oritech.init;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -110,7 +110,7 @@ public class TagContent {
     // c stuff
     public static final TagKey<Block> CONVENTIONAL_ORES = cBlockTag("ores");
     public static final TagKey<Item> CONVENTIONAL_FERTILIZER = cItemTag("fertilizers");
-    public static final TagKey<Biome> CONVENTIONAL_COLD = TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("c", "is_cold"));
+    public static final TagKey<Biome> CONVENTIONAL_COLD = TagKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("c", "is_cold"));
     
     // reactor
     public static final TagKey<Block> REACTOR_WALL_BLOCKS = oritechBlockTag("reactor_wall_blocks");

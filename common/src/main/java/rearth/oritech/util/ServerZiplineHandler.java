@@ -6,7 +6,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import rearth.oritech.Oritech;
@@ -22,7 +22,7 @@ public class ServerZiplineHandler {
     
     public static final Attachment<Boolean> ZIPLINING_STATE = new Attachment<>() {
         @Override
-        public ResourceLocation identifier() {
+        public Identifier identifier() {
             return Oritech.id("ziplining");
         }
         

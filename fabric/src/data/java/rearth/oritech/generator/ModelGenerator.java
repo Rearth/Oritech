@@ -12,7 +12,7 @@ import net.minecraft.data.models.blockstates.Variant;
 import net.minecraft.data.models.blockstates.VariantProperties;
 import net.minecraft.data.models.model.ModelLocationUtils;
 import net.minecraft.data.models.model.ModelTemplates;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
@@ -203,7 +203,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.METAL_GIRDER_BLOCK);
         blockStateModelGenerator.blockStateOutput.accept(createWallMountedState(BlockContent.CEILING_LIGHT));
         blockStateModelGenerator.blockStateOutput.accept(createWallMountedState(BlockContent.CEILING_LIGHT_HANGING));
-        blockStateModelGenerator.blockStateOutput.accept(createButtonBlockState(BlockContent.TECH_BUTTON, ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "block/tech_button"), ResourceLocation.fromNamespaceAndPath(Oritech.MOD_ID, "block/tech_button_on")));
+        blockStateModelGenerator.blockStateOutput.accept(createButtonBlockState(BlockContent.TECH_BUTTON, Identifier.fromNamespaceAndPath(Oritech.MOD_ID, "block/tech_button"), Identifier.fromNamespaceAndPath(Oritech.MOD_ID, "block/tech_button_on")));
         registerLever(BlockContent.TECH_LEVER, blockStateModelGenerator);
         
         blockStateModelGenerator.createTrivialCube(BlockContent.STEEL_BLOCK);
@@ -288,7 +288,7 @@ public class ModelGenerator extends FabricModelProvider {
     }
     
     // same as original method in BlockStateModelGenerator but without uvlock
-    public static BlockStateGenerator createButtonBlockState(Block buttonBlock, ResourceLocation regularModelId, ResourceLocation pressedModelId) {
+    public static BlockStateGenerator createButtonBlockState(Block buttonBlock, Identifier regularModelId, Identifier pressedModelId) {
         return MultiVariantGenerator.multiVariant(buttonBlock)
                  .with(PropertyDispatch.property(BlockStateProperties.POWERED)
                                .select(false,
@@ -311,8 +311,8 @@ public class ModelGenerator extends FabricModelProvider {
     
     // basically the original registerLever, but with parameters
     public static void registerLever(Block block, BlockModelGenerators generator) {
-        ResourceLocation identifier2 = ModelLocationUtils.getModelLocation(block);
-        ResourceLocation identifier = ModelLocationUtils.getModelLocation(block, "_on");
+        Identifier identifier2 = ModelLocationUtils.getModelLocation(block);
+        Identifier identifier = ModelLocationUtils.getModelLocation(block, "_on");
         generator.createSimpleFlatItemModel(block);
         generator.blockStateOutput.accept(
           MultiVariantGenerator.multiVariant(block)

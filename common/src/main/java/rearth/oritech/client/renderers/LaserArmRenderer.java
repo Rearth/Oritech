@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -34,7 +34,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         super(new LaserArmModel<>(modelPath));
     }
     
-    public static final ResourceLocation BEAM_TEXTURE = ResourceLocation.withDefaultNamespace("textures/block/white_concrete.png");
+    public static final Identifier BEAM_TEXTURE = Identifier.withDefaultNamespace("textures/block/white_concrete.png");
     private static final Vec3 BEAM_START_OFFSET = new Vec3(0, 1.65, 0);
     
     public static final int GLOW_COLOR_START = 0x998AF2DF;

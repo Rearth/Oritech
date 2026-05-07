@@ -14,7 +14,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -28,7 +28,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class EnergyPipeBlock extends GenericPipeBlock {
     
-    public static HashMap<ResourceLocation, GenericPipeInterfaceEntity.PipeNetworkData> ENERGY_PIPE_DATA = new HashMap<>();
+    public static HashMap<Identifier, GenericPipeInterfaceEntity.PipeNetworkData> ENERGY_PIPE_DATA = new HashMap<>();
     
     public EnergyPipeBlock(Properties settings) {
         super(settings);

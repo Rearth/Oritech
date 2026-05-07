@@ -7,7 +7,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -30,7 +30,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class BlockLootGenerator extends FabricBlockLootTableProvider {
     
-    public static final ResourceKey<LootTable> JUNGLE_LEAVES_LOOT = ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.withDefaultNamespace("jungle_leaves"));
+    public static final ResourceKey<LootTable> JUNGLE_LEAVES_LOOT = ResourceKey.create(Registries.LOOT_TABLE, Identifier.withDefaultNamespace("jungle_leaves"));
     
     public BlockLootGenerator(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
         super(dataOutput, registryLookup);

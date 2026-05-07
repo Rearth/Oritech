@@ -3,7 +3,7 @@ package rearth.oritech.client.ui;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.Insets;
@@ -14,7 +14,7 @@ import rearth.oritech.util.ColorHelper;
 
 public class DroneScreen extends UpgradableOritechScreen<DroneScreenHandler> {
     
-    public static final ResourceLocation CARD_SLOT = Oritech.id("textures/gui/modular/designator_arrow.png");
+    public static final Identifier CARD_SLOT = Oritech.id("textures/gui/modular/designator_arrow.png");
 
     private final DronePortEntity dronePort;
     private OverlayWidget messageOverlay;

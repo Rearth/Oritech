@@ -9,7 +9,7 @@ import rearth.oritech.init.BlockContent;
 import java.util.HashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -21,7 +21,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class FluidPipeBlock extends GenericPipeBlock {
     
-    public static HashMap<ResourceLocation, GenericPipeInterfaceEntity.PipeNetworkData> FLUID_PIPE_DATA = new HashMap<>();
+    public static HashMap<Identifier, GenericPipeInterfaceEntity.PipeNetworkData> FLUID_PIPE_DATA = new HashMap<>();
 
     public FluidPipeBlock(Properties settings) {
         super(settings);

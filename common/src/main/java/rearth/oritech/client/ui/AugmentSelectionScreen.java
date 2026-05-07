@@ -6,7 +6,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -25,7 +25,7 @@ public class AugmentSelectionScreen extends Screen {
     private static final int EXIT_HOVER_COLOR = ColorHelper.argb(160 / 255f, 180 / 255f, 220 / 255f, 0.5f);
     
     private final List<SelectionEntry> augmentEntries = new ArrayList<>();
-    private final Map<ResourceLocation, Float> augmentSizes = new HashMap<>();
+    private final Map<Identifier, Float> augmentSizes = new HashMap<>();
     private SelectionEntry centerEntry;
     private @Nullable SelectionEntry lastFocused;
     
@@ -252,7 +252,7 @@ public class AugmentSelectionScreen extends Screen {
         return dx * dx + dy * dy;
     }
     
-    private void toggleAugment(ResourceLocation id) {
+    private void toggleAugment(Identifier id) {
         NetworkManager.sendToServer(new PlayerAugments.AugmentPlayerTogglePacket(id));
     }
     
@@ -271,7 +271,7 @@ public class AugmentSelectionScreen extends Screen {
         return false;
     }
     
-    private record SelectionEntry(@Nullable ResourceLocation id, @Nullable ResourceLocation texture, int centerX,
+    private record SelectionEntry(@Nullable Identifier id, @Nullable Identifier texture, int centerX,
                                   int centerY, int size) {
     }
 }

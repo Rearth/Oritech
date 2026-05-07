@@ -3,7 +3,7 @@ package rearth.oritech.api.screen.widgets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.util.ColorHelper;
@@ -16,10 +16,10 @@ import java.util.function.BiConsumer;
  */
 public class ToggleWidget extends UIComponent {
     
-    private static final ResourceLocation TOGGLE_ON = Oritech.id("textures/gui/modular/toggle_on.png");
-    private static final ResourceLocation TOGGLE_ON_HOVER = Oritech.id("textures/gui/modular/toggle_on_hover.png");
-    private static final ResourceLocation TOGGLE_OFF = Oritech.id("textures/gui/modular/toggle_off.png");
-    private static final ResourceLocation TOGGLE_OFF_HOVER = Oritech.id("textures/gui/modular/toggle_off_hover.png");
+    private static final Identifier TOGGLE_ON = Oritech.id("textures/gui/modular/toggle_on.png");
+    private static final Identifier TOGGLE_ON_HOVER = Oritech.id("textures/gui/modular/toggle_on_hover.png");
+    private static final Identifier TOGGLE_OFF = Oritech.id("textures/gui/modular/toggle_off.png");
+    private static final Identifier TOGGLE_OFF_HOVER = Oritech.id("textures/gui/modular/toggle_off_hover.png");
     
     private static final int TOGGLE_WIDTH = 30;
     private static final int TOGGLE_HEIGHT = 16;
@@ -74,7 +74,7 @@ public class ToggleWidget extends UIComponent {
     protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         boolean hovered = isMouseOver(mouseX, mouseY);
         
-        ResourceLocation texture;
+        Identifier texture;
         if (value) texture = hovered ? TOGGLE_ON_HOVER : TOGGLE_ON;
         else texture = hovered ? TOGGLE_OFF_HOVER : TOGGLE_OFF;
         

@@ -2,7 +2,7 @@ package rearth.oritech.util;
 
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.MenuType;
@@ -29,7 +29,7 @@ public interface ScreenProvider {
     record BarConfiguration(int x, int y, int width, int height) {
     }
     
-    record ArrowConfiguration(ResourceLocation empty, ResourceLocation full, int x, int y, int width, int height,
+    record ArrowConfiguration(Identifier empty, Identifier full, int x, int y, int width, int height,
                               boolean horizontal) {
     }
     

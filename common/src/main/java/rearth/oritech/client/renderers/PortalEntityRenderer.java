@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.TheEndPortalRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rearth.oritech.util.PortalEntity;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
@@ -43,7 +43,7 @@ public class PortalEntityRenderer extends GeoEntityRenderer<PortalEntity> {
             
             if (!bone.getName().equals("portal")) return;
             
-            var layer = RenderType.create("portal_swirl", DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS, 1536, false, false, RenderType.CompositeState.builder().setShaderState(RenderStateShard.RENDERTYPE_END_GATEWAY_SHADER).setTextureState(RenderStateShard.MultiTextureStateShard.builder().add(TheEndPortalRenderer.END_SKY_LOCATION, false, false).add(ResourceLocation.withDefaultNamespace("textures/environment/moon_phases.png"), false, false).build()).createCompositeState(false));
+            var layer = RenderType.create("portal_swirl", DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS, 1536, false, false, RenderType.CompositeState.builder().setShaderState(RenderStateShard.RENDERTYPE_END_GATEWAY_SHADER).setTextureState(RenderStateShard.MultiTextureStateShard.builder().add(TheEndPortalRenderer.END_SKY_LOCATION, false, false).add(Identifier.withDefaultNamespace("textures/environment/moon_phases.png"), false, false).build()).createCompositeState(false));
             
             var consumer = bufferSource.getBuffer(layer);
             

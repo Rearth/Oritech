@@ -8,7 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -70,11 +70,11 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
-    public static final ResourceLocation NONE_SELECTED = ResourceLocation.parse("o:empty");
+    public static final Identifier NONE_SELECTED = Identifier.parse("o:empty");
     
     @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
     @NotNull
-    public ResourceLocation selectedEnchantment = NONE_SELECTED;
+    public Identifier selectedEnchantment = NONE_SELECTED;
     @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
     public int progress;
     @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
@@ -168,7 +168,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         energyStorage.amount = nbt.getLong("energy");
         
         if (nbt.contains("selected")) {
-            selectedEnchantment = ResourceLocation.parse(nbt.getString("selected"));
+            selectedEnchantment = Identifier.parse(nbt.getString("selected"));
         }
     }
     
@@ -345,7 +345,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         }
     }
     
-    public record SelectEnchantingPacket(BlockPos self, ResourceLocation enchantmentId) implements CustomPacketPayload {
+    public record SelectEnchantingPacket(BlockPos self, Identifier enchantmentId) implements CustomPacketPayload {
         
         public static final CustomPacketPayload.Type<SelectEnchantingPacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("selected_enchant"));
         

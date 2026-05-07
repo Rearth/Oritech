@@ -8,7 +8,7 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -61,11 +61,11 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
         
     }
     
-    private BlockState getRandomBlockFromList(List<ResourceLocation> list, RandomSource random) {
+    private BlockState getRandomBlockFromList(List<Identifier> list, RandomSource random) {
         return BuiltInRegistries.BLOCK.get(getRandomFromList(list, random)).defaultBlockState();
     }
     
-    private ResourceLocation getRandomFromList(List<ResourceLocation> list, RandomSource random) {
+    private Identifier getRandomFromList(List<Identifier> list, RandomSource random) {
         return list.get(random.nextInt(list.size()));
     }
     

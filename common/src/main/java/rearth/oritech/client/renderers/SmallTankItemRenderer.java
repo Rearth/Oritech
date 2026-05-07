@@ -8,9 +8,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.resources.model.ModelIdentifier;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import rearth.oritech.init.OritechConfig;
@@ -20,15 +20,15 @@ import rearth.oritech.api.fluid.FluidApi;
 public class SmallTankItemRenderer {
     
     private BakedModel tankVisualModel;
-    private final ResourceLocation TANK_VISUAL_MODEL_ID;
+    private final Identifier TANK_VISUAL_MODEL_ID;
     
-    public SmallTankItemRenderer(ResourceLocation tankVisualModelId) {
+    public SmallTankItemRenderer(Identifier tankVisualModelId) {
         TANK_VISUAL_MODEL_ID = tankVisualModelId;
     }
     
     public void loadModels() {
         if (tankVisualModel == null) {
-            this.tankVisualModel = Minecraft.getInstance().getModelManager().getModel(new ModelResourceLocation(TANK_VISUAL_MODEL_ID, ""));
+            this.tankVisualModel = Minecraft.getInstance().getModelManager().getModel(new ModelIdentifier(TANK_VISUAL_MODEL_ID, ""));
             if (this.tankVisualModel == Minecraft.getInstance().getModelManager().getMissingModel()) {
                 this.tankVisualModel = null; // Ensure it's null if missing
                 Oritech.LOGGER.warn("Unable to load model for portable tank renderer: {}. Model not found.", TANK_VISUAL_MODEL_ID);

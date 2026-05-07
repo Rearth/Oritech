@@ -1,7 +1,7 @@
 package rearth.oritech.block.entity.augmenter.api;
 
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
@@ -12,7 +12,7 @@ public class ModifierAugment extends Augment {
     private final float amount;
     private final AttributeModifier.Operation operation;
     
-    public ModifierAugment(ResourceLocation id, Holder<Attribute> targetAttribute, AttributeModifier.Operation operation, float amount, boolean toggleable) {
+    public ModifierAugment(Identifier id, Holder<Attribute> targetAttribute, AttributeModifier.Operation operation, float amount, boolean toggleable) {
         super(id, toggleable);
         this.targetAttribute = targetAttribute;
         this.amount = amount;

@@ -5,7 +5,7 @@ import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
@@ -31,9 +31,9 @@ import java.util.Optional;
 
 public class OritechMachineScreen<T extends OritechScreenHandler> extends OritechWidgetScreen<T> {
 
-    public static final ResourceLocation BACKGROUND = Oritech.id("textures/gui/modular/gui_base.png");
-    public static final ResourceLocation BACKGROUND_TALL = Oritech.id("textures/gui/modular/gui_base_tall.png");
-    public static final ResourceLocation GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
+    public static final Identifier BACKGROUND = Oritech.id("textures/gui/modular/gui_base.png");
+    public static final Identifier BACKGROUND_TALL = Oritech.id("textures/gui/modular/gui_base_tall.png");
+    public static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
 
     protected ButtonWidget cycleInputButton;
 
@@ -235,13 +235,13 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         addComponent(equipBg);
     }
 
-    protected ResourceLocation getEquipmentSlotTexture(int armorSlot) {
+    protected Identifier getEquipmentSlotTexture(int armorSlot) {
         return switch (armorSlot) {
-            case 0 -> ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_boots.png");
-            case 1 -> ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_leggings.png");
-            case 2 -> ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_chestplate.png");
-            case 3 -> ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_helmet.png");
-            case 4 -> ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/empty_slot_axe.png");
+            case 0 -> Identifier.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_boots.png");
+            case 1 -> Identifier.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_leggings.png");
+            case 2 -> Identifier.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_chestplate.png");
+            case 3 -> Identifier.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_helmet.png");
+            case 4 -> Identifier.fromNamespaceAndPath("minecraft", "textures/item/empty_slot_axe.png");
             default -> null;
         };
     }
@@ -250,7 +250,7 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         if (!OritechClientConfig.enableHelpButton.get()) return;
 
         var hasOracleLib = Platform.isModLoaded("oracle_index");
-        Optional<ResourceLocation> linkTarget = hasOracleLib ? getHelpBookLink() : Optional.empty();
+        Optional<Identifier> linkTarget = hasOracleLib ? getHelpBookLink() : Optional.empty();
         if (hasOracleLib && linkTarget.isEmpty()) return;
 
         var button = ButtonWidget.darkPanel(-10, imageHeight - 13, 14, 14,
@@ -266,7 +266,7 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private void onOracleButtonClick(boolean enabled, Optional<ResourceLocation> target) {
+    private void onOracleButtonClick(boolean enabled, Optional<Identifier> target) {
         if (!enabled || target.isEmpty()) {
             Oritech.LOGGER.info("Oracle Index mod is missing. Install it here: https://www.curseforge.com/minecraft/mc-mods/oracle-index (or from modrinth)");
             return;
@@ -274,9 +274,9 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         OracleClient.openScreen("oritech", target.get(), this);
     }
 
-    private Optional<ResourceLocation> getHelpBookLink() {
+    private Optional<Identifier> getHelpBookLink() {
         if (menu.screenData.getWikiLink().isPresent())
-            return Optional.of(ResourceLocation.fromNamespaceAndPath(Oracle.MOD_ID, "books/oritech/" + menu.screenData.getWikiLink().get() + ".mdx"));
+            return Optional.of(Identifier.fromNamespaceAndPath(Oracle.MOD_ID, "books/oritech/" + menu.screenData.getWikiLink().get() + ".mdx"));
 
         var blockItem = menu.machineBlock.getBlock().asItem();
         var itemId = BuiltInRegistries.ITEM.getKey(blockItem);
@@ -318,11 +318,11 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         return zones;
     }
 
-    public ResourceLocation getBackground() {
+    public Identifier getBackground() {
         return BACKGROUND;
     }
 
-    public ResourceLocation getGuiComponents() {
+    public Identifier getGuiComponents() {
         return GUI_COMPONENTS;
     }
     

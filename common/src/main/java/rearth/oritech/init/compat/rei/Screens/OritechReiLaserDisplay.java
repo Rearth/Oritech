@@ -10,7 +10,7 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ItemLike;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.compat.rei.OritechDisplay;
@@ -23,7 +23,7 @@ public class OritechReiLaserDisplay implements DisplayCategory<Display> {
     
     protected final OritechRecipeType recipeType;
     protected final ItemLike icon;
-    public static final ResourceLocation LASER_RECIPE_OVERLAY = Oritech.id("textures/gui/modular/laser_recipe_background.png");
+    public static final Identifier LASER_RECIPE_OVERLAY = Oritech.id("textures/gui/modular/laser_recipe_background.png");
     
     public OritechReiLaserDisplay(OritechRecipeType recipeType, ItemLike icon) {
         this.recipeType = recipeType;

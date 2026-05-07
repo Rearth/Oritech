@@ -2,7 +2,7 @@ package rearth.oritech.client.ui;
 
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import rearth.oritech.Oritech;
@@ -25,7 +25,7 @@ import java.util.List;
 
 public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> extends OritechMachineScreen<T> {
     
-    private static final ResourceLocation MACHINE_CORE_CENTER = Oritech.id("textures/gui/modular/machine_core/center.png");
+    private static final Identifier MACHINE_CORE_CENTER = Oritech.id("textures/gui/modular/machine_core/center.png");
     
     private static final int SPEED_COLOR = ColorHelper.argb(33 / 255f, 158 / 255f, 188 / 255f);
     private static final int EFFICIENCY_COLOR = ColorHelper.argb(142 / 255f, 202 / 255f, 230 / 255f);
@@ -324,7 +324,7 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
         return Component.translatable("tooltip.oritech.machine.quality", effectiveQuality, quality);
     }
     
-    private ResourceLocation getRingIdentifier(int level) {
+    private Identifier getRingIdentifier(int level) {
         return Oritech.id("textures/gui/modular/machine_core/ring_" + level + ".png");
     }
     

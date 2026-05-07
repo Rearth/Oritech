@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.LivingEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
@@ -41,7 +41,7 @@ public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerCon
                 matrices.translate(0.0F, -1.501F, 0.0F);
                 matrices.scale(0.9f, 0.9f, 0.9f);
                 var model = livingEntityRenderer.getModel();
-                var renderLayer = RenderType.beaconBeam(ResourceLocation.withDefaultNamespace("textures/entity/beacon_beam.png"), true);
+                var renderLayer = RenderType.beaconBeam(Identifier.withDefaultNamespace("textures/entity/beacon_beam.png"), true);
                 // var renderLayer = RenderLayer.getEndGateway();   // yeah this is fun
                 var vertexConsumer = vertexConsumers.getBuffer(renderLayer);
                 model.renderToBuffer(matrices, vertexConsumer, light, overlay, color);

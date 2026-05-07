@@ -12,7 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 
 public class FluidDisplayWidget extends AbstractDataDisplayWidget {
 
-    private static final ResourceLocation GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
+    private static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
     private static final int FRAME_REGION_WIDTH = 14;
     private static final int FRAME_REGION_HEIGHT = 50;
     private static final int FLUID_BACKGROUND = ColorHelper.argb(0.06f, 0.18f, 0.24f);

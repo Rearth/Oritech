@@ -1,6 +1,6 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.ColorableMachine;
@@ -15,7 +15,7 @@ public class MachineModel<T extends BlockEntity & GeoAnimatable> extends Default
     }
     
     @Override
-    public ResourceLocation getTextureResource(T animatable) {
+    public Identifier getTextureResource(T animatable) {
         
         if (animatable instanceof ColorableMachine colorableMachine && colorableMachine.supportRecoloring()) {
             var color = colorableMachine.getCurrentColor();
@@ -25,14 +25,14 @@ public class MachineModel<T extends BlockEntity & GeoAnimatable> extends Default
             
             var colorFileSuffix = color.toString().toLowerCase(Locale.ROOT);
             
-            return ResourceLocation.fromNamespaceAndPath(base.getNamespace(), base.getPath().replace("models", "models/colored").replace(".png", "_" + colorFileSuffix + ".png"));
+            return Identifier.fromNamespaceAndPath(base.getNamespace(), base.getPath().replace("models", "models/colored").replace(".png", "_" + colorFileSuffix + ".png"));
         } else {
             return super.getTextureResource(animatable);
         }
     }
     
     
-    public ResourceLocation getBaseTexturePath(T animatable) {
+    public Identifier getBaseTexturePath(T animatable) {
             return super.getTextureResource(animatable);
     }
 }

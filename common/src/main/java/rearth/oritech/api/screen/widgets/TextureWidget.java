@@ -1,7 +1,7 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rearth.oritech.api.screen.UIComponent;
 
 /**
@@ -10,7 +10,7 @@ import rearth.oritech.api.screen.UIComponent;
  */
 public class TextureWidget extends UIComponent {
     
-    public final ResourceLocation texture;
+    public final Identifier texture;
     public int u, v;
     public int regionWidth, regionHeight;
     public int textureWidth, textureHeight;
@@ -20,7 +20,7 @@ public class TextureWidget extends UIComponent {
     private boolean hasClip = false;
     
     public TextureWidget(int x, int y, int width, int height,
-                         ResourceLocation texture, int u, int v,
+                         Identifier texture, int u, int v,
                          int regionWidth, int regionHeight,
                          int textureWidth, int textureHeight) {
         super(x, y, width, height);
@@ -37,7 +37,7 @@ public class TextureWidget extends UIComponent {
      * Convenience for textures where regionSize == textureSize (single-image textures).
      */
     public TextureWidget(int x, int y, int width, int height,
-                         ResourceLocation texture, int regionWidth, int regionHeight) {
+                         Identifier texture, int regionWidth, int regionHeight) {
         this(x, y, width, height, texture, 0, 0, regionWidth, regionHeight, regionWidth, regionHeight);
     }
     

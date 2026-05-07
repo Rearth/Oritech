@@ -4,7 +4,7 @@ import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class PlayerAugments {
     
-    public static final Map<ResourceLocation, Augment> allAugments = new HashMap<>();
+    public static final Map<Identifier, Augment> allAugments = new HashMap<>();
     
     // this is called after recipe manager init / recipe reload
     public static void loadAllAugments(RecipeManager manager) {
@@ -93,7 +93,7 @@ public class PlayerAugments {
         RESEARCH, ADD, REMOVE, NONE, NEEDS_INIT
     }
     
-    public record AugmentInstallTriggerPacket(BlockPos position, ResourceLocation id, int operationId) implements CustomPacketPayload {
+    public record AugmentInstallTriggerPacket(BlockPos position, Identifier id, int operationId) implements CustomPacketPayload {
         
         public static final CustomPacketPayload.Type<AugmentInstallTriggerPacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("aug_install"));
         
@@ -123,7 +123,7 @@ public class PlayerAugments {
         }
     }
     
-    public record AugmentPlayerTogglePacket(ResourceLocation id) implements CustomPacketPayload {
+    public record AugmentPlayerTogglePacket(Identifier id) implements CustomPacketPayload {
         
         public static final CustomPacketPayload.Type<AugmentPlayerTogglePacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("aug_toggle"));
         

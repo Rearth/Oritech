@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
@@ -16,7 +16,7 @@ import rearth.oritech.util.Geometry;
 
 public class PowerPoleCableRenderer implements BlockEntityRenderer<PowerPoleEntity> {
     
-    public static final ResourceLocation CABLE_TEXTURE = ResourceLocation.withDefaultNamespace("textures/block/white_concrete.png");
+    public static final Identifier CABLE_TEXTURE = Identifier.withDefaultNamespace("textures/block/white_concrete.png");
     
     public static final int CABLE_SEGMENT_COUNT = 12;
     

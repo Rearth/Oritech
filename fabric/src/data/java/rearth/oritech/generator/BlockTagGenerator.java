@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -136,14 +136,14 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .forceAddTag(ConventionalBlockTags.GLASS_PANES)
           .forceAddTag(ConventionalBlockTags.BUDS);
         getOrCreateTagBuilder(ConventionalBlockTags.BUDS)
-          .addOptional(ResourceLocation.fromNamespaceAndPath("clutter", "small_onyx_bud"))
-          .addOptional(ResourceLocation.fromNamespaceAndPath("clutter", "medium_onyx_bud"))
-          .addOptional(ResourceLocation.fromNamespaceAndPath("clutter", "large_onyx_bud"));
+          .addOptional(Identifier.fromNamespaceAndPath("clutter", "small_onyx_bud"))
+          .addOptional(Identifier.fromNamespaceAndPath("clutter", "medium_onyx_bud"))
+          .addOptional(Identifier.fromNamespaceAndPath("clutter", "large_onyx_bud"));
         
         getOrCreateTagBuilder(TagContent.LASER_ACCELERATED)
           .forceAddTag(ConventionalBlockTags.BUDDING_BLOCKS);
         getOrCreateTagBuilder(ConventionalBlockTags.BUDDING_BLOCKS)
-          .addOptional(ResourceLocation.fromNamespaceAndPath("clutter", "budding_onyx"));
+          .addOptional(Identifier.fromNamespaceAndPath("clutter", "budding_onyx"));
 
         getOrCreateTagBuilder(TagContent.CUTTER_LOGS_MINEABLE)
         // using forceAddTag because the datagen wasn't recognizing the vanilla LOGS, LEAVES, and WART_BLOCKS tags

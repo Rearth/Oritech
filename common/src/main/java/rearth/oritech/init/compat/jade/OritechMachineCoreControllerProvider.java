@@ -3,7 +3,7 @@ package rearth.oritech.init.compat.jade;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import snownee.jade.api.BlockAccessor;
@@ -16,7 +16,7 @@ public enum OritechMachineCoreControllerProvider implements IBlockComponentProvi
 
     INSTANCE;
 
-    private static final ResourceLocation ID = Oritech.id("machine_core_controller");
+    private static final Identifier ID = Oritech.id("machine_core_controller");
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -37,7 +37,7 @@ public enum OritechMachineCoreControllerProvider implements IBlockComponentProvi
     }
 
     @Override
-    public ResourceLocation getUid() {
+    public Identifier getUid() {
         return ID;
     }
         

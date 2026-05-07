@@ -1,7 +1,7 @@
 package rearth.oritech.api.screen;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Renders a 9-patch (9-slice) texture at any size by stretching/tiling the center
@@ -15,12 +15,12 @@ import net.minecraft.resources.ResourceLocation;
  * </pre>
  * Corners stay fixed-size, edges stretch in one axis, center stretches in both.
  */
-public record NinePatchRenderer(ResourceLocation texture, int texWidth, int texHeight, int cornerWidth, int cornerHeight) {
+public record NinePatchRenderer(Identifier texture, int texWidth, int texHeight, int cornerWidth, int cornerHeight) {
     
     /**
      * Default used by all Oritech bedrock panels: 16x16 texture, 4x4 corners.
      */
-    public NinePatchRenderer(ResourceLocation texture) {
+    public NinePatchRenderer(Identifier texture) {
         this(texture, 16, 16, 4, 4);
     }
     

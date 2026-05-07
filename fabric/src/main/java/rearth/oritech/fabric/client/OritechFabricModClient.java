@@ -7,7 +7,7 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -75,7 +75,7 @@ public final class OritechFabricModClient implements ClientModInitializer {
         
         private final SmallTankItemRenderer itemRenderer;
         
-        private TankItemRenderer(ResourceLocation modelId) {
+        private TankItemRenderer(Identifier modelId) {
             this.itemRenderer = new SmallTankItemRenderer(modelId);
         }
         

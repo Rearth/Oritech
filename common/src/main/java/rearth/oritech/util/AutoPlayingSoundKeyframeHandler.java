@@ -3,7 +3,7 @@ package rearth.oritech.util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 public class AutoPlayingSoundKeyframeHandler<A extends GeoAnimatable> implements AnimationController.SoundKeyframeHandler<A> {
     
     private final Supplier<Float> speedSupplier;
-    private final Map<ResourceLocation, Long> lastPlayedAt = new HashMap<>();
+    private final Map<Identifier, Long> lastPlayedAt = new HashMap<>();
     
     public AutoPlayingSoundKeyframeHandler(Supplier<Float> speedSupplier) {
         this.speedSupplier = speedSupplier;
@@ -37,7 +37,7 @@ public class AutoPlayingSoundKeyframeHandler<A extends GeoAnimatable> implements
     @Override
     public void handle(SoundKeyframeEvent<A> event) {
         var segments = event.getKeyframeData().getSound().split("\\|");
-        var sound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(segments[0]));
+        var sound = BuiltInRegistries.SOUND_EVENT.get(Identifier.parse(segments[0]));
         
         if (sound != null) {
             

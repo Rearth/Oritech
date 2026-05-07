@@ -1,6 +1,6 @@
 package rearth.oritech.api.recipe;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class FoundryRecipeBuilder extends OritechRecipeBuilder {
@@ -16,7 +16,7 @@ public class FoundryRecipeBuilder extends OritechRecipeBuilder {
     }
 
     @Override
-    public void validate(ResourceLocation id) throws IllegalStateException {
+    public void validate(Identifier id) throws IllegalStateException {
         if ((inputs == null || inputs.size() < 2) || (results == null || results.isEmpty()))
             throw new IllegalStateException("wrong number of inputs and results for recipe " + id + " (type " + type + ")");
     }

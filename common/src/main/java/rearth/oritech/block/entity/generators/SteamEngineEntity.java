@@ -9,7 +9,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.inventory.MenuType;
@@ -340,7 +340,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     public static Fluid getUsedSteamFluid() {
         if (USED_STEAM_FLUID == null) {
-            USED_STEAM_FLUID = BuiltInRegistries.FLUID.get(ResourceLocation.parse(OritechConfig.generators.steamId.get()));
+            USED_STEAM_FLUID = BuiltInRegistries.FLUID.get(Identifier.parse(OritechConfig.generators.steamId.get()));
         }
         
         return USED_STEAM_FLUID;

@@ -17,7 +17,7 @@ import net.minecraft.advancements.critereon.MinMaxBounds.Ints;
 import net.minecraft.advancements.critereon.PlayerTrigger;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
@@ -38,7 +38,7 @@ public class AdvancementGenerator extends FabricAdvancementProvider {
     @Override
     public void generateAdvancement(HolderLookup.Provider registryLookup, Consumer<AdvancementHolder> consumer) {
 
-        var background = ResourceLocation.parse("textures/gui/advancements/backgrounds/adventure.png");
+        var background = Identifier.parse("textures/gui/advancements/backgrounds/adventure.png");
         
         var rootAdvancement = Advancement.Builder.advancement()
                                 .display(

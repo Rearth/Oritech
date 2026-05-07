@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.LivingEntity;
@@ -116,7 +116,7 @@ public class TechDoorBlock extends HorizontalDirectionalBlock implements EntityB
         var belowState = world.getBlockState(pos.below());
         var aboveState = world.getBlockState(pos.above());
         var belowValid = belowState.isFaceSturdy(world, pos.below(), Direction.UP);
-        var aboveValid = aboveState.is(Blocks.AIR) || aboveState.is(TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "replaceable")));
+        var aboveValid = aboveState.is(Blocks.AIR) || aboveState.is(TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "replaceable")));
         return belowValid && aboveValid;
     }
     

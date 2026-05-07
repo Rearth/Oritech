@@ -5,7 +5,7 @@ import com.google.common.collect.Multimap;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.ItemLike;
 import org.slf4j.Logger;
@@ -42,11 +42,11 @@ public final class Oritech {
     public static final String MOD_ID = "oritech";
     public static final Logger LOGGER = LoggerFactory.getLogger("oritech");
     
-    public static final Multimap<ResourceLocation, Runnable> EVENT_MAP = initEventMap();
+    public static final Multimap<Identifier, Runnable> EVENT_MAP = initEventMap();
     public static Set<Pair<ItemLike, Float>> COMPOSTABLES_DATA = new HashSet<>();
     
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
     
     public static void initialize() {
@@ -99,9 +99,9 @@ public final class Oritech {
         LOGGER.info("Oritech registrations complete");
     }
     
-    public static Multimap<ResourceLocation, Runnable> initEventMap() {
+    public static Multimap<Identifier, Runnable> initEventMap() {
         
-        Multimap<ResourceLocation, Runnable> res = ArrayListMultimap.create();
+        Multimap<Identifier, Runnable> res = ArrayListMultimap.create();
         res.put(Registries.FLUID.location(), FluidContent::registerFluids);
         res.put(Registries.BLOCK.location(), FluidContent::registerBlocks);
         res.put(Registries.ITEM.location(), FluidContent::registerItems);
@@ -120,7 +120,7 @@ public final class Oritech {
         res.put(Registries.CREATIVE_MODE_TAB.location(), () -> ArchitecturyRegistryContainer.register(ItemGroups.class, MOD_ID, false));
         res.put(Registries.RECIPE_SERIALIZER.location(), ArchitecturyRecipeRegistryContainer::finishSerializerRegister);
         res.put(Registries.LOOT_FUNCTION_TYPE.location(), FluidContent::registerItemsToGroups);
-        res.put(ResourceLocation.fromNamespaceAndPath("neoforge", "attachment_types"), () -> {
+        res.put(Identifier.fromNamespaceAndPath("neoforge", "attachment_types"), () -> {
             Augment.registerAttachmentTypes();
             ServerZiplineHandler.registerAttachments();
         });   // this works just fine on fabric aswell, as they key is not really relevant there.
@@ -134,7 +134,7 @@ public final class Oritech {
             
             var regKey = world.dimension().location();
             
-            var dataId = "energy_" + regKey.getNamespace() + "_" + regKey.getPath();
+            var dataId = "energy_" + regKey + "_" + regKey.getPath();
             var result = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, dataId);
             EnergyPipeBlock.ENERGY_PIPE_DATA.put(regKey, result);
             

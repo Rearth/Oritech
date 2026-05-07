@@ -13,7 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * <p>
  * Used for input to recipes. The amount defaults to 1 bucket.
  */
-public record FluidIngredient(Either<TagKey<Fluid>, ResourceLocation> fluidContent,
+public record FluidIngredient(Either<TagKey<Fluid>, Identifier> fluidContent,
                               long amount) implements Predicate<FluidStack> {
     
     // A FluidIngredient should have a "fluid" which can be an identifier with a namespace or a tag beginning in #
@@ -39,19 +39,19 @@ public record FluidIngredient(Either<TagKey<Fluid>, ResourceLocation> fluidConte
       Codec.either(
         Codec.STRING.comapFlatMap(
           s -> s.startsWith("#")
-            ? DataResult.success(TagKey.create(Registries.FLUID, ResourceLocation.parse(s.substring(1))))
+            ? DataResult.success(TagKey.create(Registries.FLUID, Identifier.parse(s.substring(1))))
             : DataResult.error(() -> "Not a tag: " + s),
           tag -> "#" + tag.location()
         ),
-        ResourceLocation.CODEC
+        Identifier.CODEC
       ).fieldOf("fluid").forGetter(FluidIngredient::fluidContent),
       Codec.LONG.optionalFieldOf("amount", FluidStack.bucketAmount()).forGetter(FluidIngredient::amount)
     ).apply(instance, FluidIngredient::new));
     
-    public static final StreamCodec<ByteBuf, TagKey<Fluid>> FLUID_TAG_KEY_CODEC = ResourceLocation.STREAM_CODEC.map(id -> TagKey.create(Registries.FLUID, id), TagKey::location);
+    public static final StreamCodec<ByteBuf, TagKey<Fluid>> FLUID_TAG_KEY_CODEC = Identifier.STREAM_CODEC.map(id -> TagKey.create(Registries.FLUID, id), TagKey::location);
     
-    public static final StreamCodec<RegistryFriendlyByteBuf, Either<TagKey<Fluid>, ResourceLocation>> FLUID_CONTENT_CODEC =
-      ByteBufCodecs.either(FLUID_TAG_KEY_CODEC, ResourceLocation.STREAM_CODEC);
+    public static final StreamCodec<RegistryFriendlyByteBuf, Either<TagKey<Fluid>, Identifier>> FLUID_CONTENT_CODEC =
+      ByteBufCodecs.either(FLUID_TAG_KEY_CODEC, Identifier.STREAM_CODEC);
     
     public static final StreamCodec<RegistryFriendlyByteBuf, FluidIngredient> PACKET_CODEC =
       StreamCodec.composite(
@@ -62,7 +62,7 @@ public record FluidIngredient(Either<TagKey<Fluid>, ResourceLocation> fluidConte
     
     public static final FluidIngredient EMPTY = new FluidIngredient();
     
-    public FluidIngredient(Either<TagKey<Fluid>, ResourceLocation> fluidContent, long amount) {
+    public FluidIngredient(Either<TagKey<Fluid>, Identifier> fluidContent, long amount) {
         this.fluidContent = fluidContent;
         this.amount = amount;
     }
@@ -74,7 +74,7 @@ public record FluidIngredient(Either<TagKey<Fluid>, ResourceLocation> fluidConte
     
     // All with* methods will return a copy of the record with updated fluid content
     // If the fluid amount is zero when a non-empty fluid is set, it will default the amount to 1 bucket
-    public FluidIngredient withContent(ResourceLocation fluidId) {
+    public FluidIngredient withContent(Identifier fluidId) {
         return new FluidIngredient(
           Either.right(fluidId),
           (amount == 0 && BuiltInRegistries.FLUID.get(fluidId) != Fluids.EMPTY) ? FluidStack.bucketAmount() : amount);
@@ -112,7 +112,7 @@ public record FluidIngredient(Either<TagKey<Fluid>, ResourceLocation> fluidConte
     }
     
     public Component name() {
-        ResourceLocation fluidId = fluidContent.map(tag -> tag.location(), id -> id);
+        Identifier fluidId = fluidContent.map(tag -> tag.location(), id -> id);
         return hasTag()
                  ? Component.nullToEmpty("#" + fluidId.getNamespace() + ":" + fluidId.getPath())
                  : Component.translatable("fluid." + fluidContent.map(tag -> tag.location(), id -> id).toLanguageKey());
@@ -124,7 +124,7 @@ public record FluidIngredient(Either<TagKey<Fluid>, ResourceLocation> fluidConte
     }
     
     public boolean matchesFluid(Fluid fluid) {
-        BuiltInRegistries.FLUID.get(ResourceLocation.parse("")).isSame(fluid);
+        BuiltInRegistries.FLUID.get(Identifier.parse("")).isSame(fluid);
         return fluidContent.map(tag -> BuiltInRegistries.FLUID.wrapAsHolder(fluid).is(tag), id -> BuiltInRegistries.FLUID.get(id).isSame(fluid));
     }
     

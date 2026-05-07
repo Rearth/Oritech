@@ -1,13 +1,13 @@
 package rearth.oritech.api.screen.data;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rearth.oritech.Oritech;
 
 public class ProgressDisplayWidget extends AbstractDataDisplayWidget {
 
-    private static final ResourceLocation EMPTY_ARROW = Oritech.id("textures/gui/modular/arrow_empty.png");
-    private static final ResourceLocation FULL_ARROW = Oritech.id("textures/gui/modular/arrow_full.png");
+    private static final Identifier EMPTY_ARROW = Oritech.id("textures/gui/modular/arrow_empty.png");
+    private static final Identifier FULL_ARROW = Oritech.id("textures/gui/modular/arrow_full.png");
     private static final int REGION_WIDTH = 29;
     private static final int REGION_HEIGHT = 16;
 

@@ -5,7 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -28,14 +28,14 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
     public static final int SEPARATOR_COLOR = ColorHelper.argb(0.8f, 0.8f, 0.8f);
     
     protected final List<UIComponent> components = new ArrayList<>();
-    protected ResourceLocation backgroundTexture;
+    protected Identifier backgroundTexture;
     private UIComponent interactionTarget;
     
     protected OritechWidgetScreen(T handler, Inventory inventory, Component title, int imageWidth, int imageHeight) {
         this(handler, inventory, title, imageWidth, imageHeight, null);
     }
     
-    protected OritechWidgetScreen(T handler, Inventory inventory, Component title, int imageWidth, int imageHeight, ResourceLocation backgroundTexture) {
+    protected OritechWidgetScreen(T handler, Inventory inventory, Component title, int imageWidth, int imageHeight, Identifier backgroundTexture) {
         super(handler, inventory, title);
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
@@ -254,7 +254,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
         components.remove(component);
     }
     
-    protected ResourceLocation getBackgroundTexture() {
+    protected Identifier getBackgroundTexture() {
         return backgroundTexture;
     }
     

@@ -12,7 +12,7 @@ import java.util.List;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -29,8 +29,8 @@ public class AugmentRecipeBuilder {
     
     private List<SizedIngredient> researchCosts;
     private List<SizedIngredient> applyCosts;
-    private List<ResourceLocation> requirements;
-    private ResourceLocation requiredStation;
+    private List<Identifier> requirements;
+    private Identifier requiredStation;
     private int uiX;
     private int uiY;
     private int time;
@@ -126,21 +126,21 @@ public class AugmentRecipeBuilder {
         return applyCost(applyCost, 1);
     }
     
-    public AugmentRecipeBuilder requirement(List<ResourceLocation> requirements) {
+    public AugmentRecipeBuilder requirement(List<Identifier> requirements) {
         if (this.requirements == null)
             this.requirements = new ArrayList<>();
         this.requirements.addAll(requirements);
         return this;
     }
     
-    public AugmentRecipeBuilder requirement(ResourceLocation requirement) {
+    public AugmentRecipeBuilder requirement(Identifier requirement) {
         if (this.requirements == null)
             this.requirements = new ArrayList<>();
         this.requirements.add(requirement);
         return this;
     }
     
-    public AugmentRecipeBuilder requiredStation(ResourceLocation requiredStation) {
+    public AugmentRecipeBuilder requiredStation(Identifier requiredStation) {
         this.requiredStation = requiredStation;
         return this;
     }
@@ -185,12 +185,12 @@ public class AugmentRecipeBuilder {
         return this;
     }
     
-    public AugmentRecipeBuilder customAugmentDefinition(ResourceLocation customAugmentId) {
+    public AugmentRecipeBuilder customAugmentDefinition(Identifier customAugmentId) {
         this.customAugmentDefinition = new AugmentDataRecipe.CustomAugmentDefinition(customAugmentId);
         return this;
     }
     
-    private void validate(ResourceLocation id) throws IllegalStateException {
+    private void validate(Identifier id) throws IllegalStateException {
         if (researchCosts == null || researchCosts.isEmpty())
             throw new IllegalStateException("Research costs expected for recipe " + id + " (type " + type + ")");
         if (applyCosts == null || applyCosts.isEmpty())

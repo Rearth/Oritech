@@ -12,7 +12,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -29,7 +29,7 @@ public class OritechRecipeType implements RecipeSerializer<OritechRecipe>, Recip
       Codec.INT.optionalFieldOf("time", 60).forGetter(OritechRecipe::getTime),
       Ingredient.CODEC_NONEMPTY.listOf().fieldOf("ingredients").forGetter(OritechRecipe::getInputs),
       ItemStack.CODEC.listOf().fieldOf("results").forGetter(OritechRecipe::getResults),
-      ResourceLocation.CODEC.xmap(identifier1 -> (OritechRecipeType) BuiltInRegistries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type").forGetter(OritechRecipe::getOriType),
+      Identifier.CODEC.xmap(identifier1 -> (OritechRecipeType) BuiltInRegistries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier).fieldOf("type").forGetter(OritechRecipe::getOriType),
       FluidIngredient.CODEC.optionalFieldOf("fluidInput", FluidIngredient.EMPTY).forGetter(OritechRecipe::getFluidInput),
       FLUID_STACK_CODEC.listOf().optionalFieldOf("fluidOutputs", List.of()).forGetter(OritechRecipe::getFluidOutputs)
     ).apply(instance, OritechRecipe::new));
@@ -38,19 +38,19 @@ public class OritechRecipeType implements RecipeSerializer<OritechRecipe>, Recip
       ByteBufCodecs.INT, OritechRecipe::getTime,
       Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::getInputs,
       ItemStack.OPTIONAL_LIST_STREAM_CODEC, OritechRecipe::getResults,
-      ResourceLocation.STREAM_CODEC.map(identifier1 -> (OritechRecipeType) BuiltInRegistries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier), OritechRecipe::getOriType,
+      Identifier.STREAM_CODEC.map(identifier1 -> (OritechRecipeType) BuiltInRegistries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier), OritechRecipe::getOriType,
       FluidIngredient.PACKET_CODEC, OritechRecipe::getFluidInput,
       NetworkManager.FLUID_STACK_STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::getFluidOutputs,
       OritechRecipe::new
     );
     
-    private final ResourceLocation identifier;
+    private final Identifier identifier;
     
-    public ResourceLocation getIdentifier() {
+    public Identifier getIdentifier() {
         return identifier;
     }
     
-    public OritechRecipeType(ResourceLocation identifier) {
+    public OritechRecipeType(Identifier identifier) {
         this.identifier = identifier;
     }
     

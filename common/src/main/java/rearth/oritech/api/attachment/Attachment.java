@@ -5,11 +5,11 @@ import java.util.function.Supplier;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface Attachment<A> {
     
-    ResourceLocation identifier();
+    Identifier identifier();
     
     Codec<A> persistenceCodec();
     

@@ -17,7 +17,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -91,7 +91,7 @@ public class OritechPlatformFabric implements OritechPlatform {
     
     // Attachment
 
-    private static final Map<ResourceLocation, AttachmentType<?>> REGISTERED_TYPES = new HashMap<>();
+    private static final Map<Identifier, AttachmentType<?>> REGISTERED_TYPES = new HashMap<>();
 
     @Override
     public <T> void register(Attachment<T> attachment) {

@@ -7,7 +7,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -60,7 +60,7 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     }
     
     @Override
-    public ResourceLocation getModel() {
+    public Identifier getModel() {
         return Oritech.id("armor/exo_armor_jetpack");
     }
     

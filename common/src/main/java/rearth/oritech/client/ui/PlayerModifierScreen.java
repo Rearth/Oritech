@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,7 +42,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
     private static final int BLOCKER_COLOR = ColorHelper.argb(0.3f, 0.4f, 0.4f, 0.78f);
     private static final int LINE_COLOR = ColorHelper.argb(0.1f, 0.15f, 0.2f, 1f);
     
-    private final Map<ResourceLocation, AugmentNodeWidget> augmentNodes = new LinkedHashMap<>();
+    private final Map<Identifier, AugmentNodeWidget> augmentNodes = new LinkedHashMap<>();
     private final List<DependencyLine> dependencyLines = new ArrayList<>();
     private final List<LabelWidget> researchLabels = new ArrayList<>();
     
@@ -284,7 +284,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         }
     }
     
-    private List<Component> buildNodeTooltip(ResourceLocation augmentId, AugmentDataRecipe recipe,
+    private List<Component> buildNodeTooltip(Identifier augmentId, AugmentDataRecipe recipe,
                                              PlayerAugments.AugmentApplicatorOperation operation,
                                              List<Component> missingRequirements) {
         var tooltip = new ArrayList<Component>();
@@ -320,7 +320,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         return PlayerAugments.AugmentApplicatorOperation.RESEARCH;
     }
     
-    private void onAugmentClick(ResourceLocation id, PlayerAugments.AugmentApplicatorOperation operation, boolean confirmed) {
+    private void onAugmentClick(Identifier id, PlayerAugments.AugmentApplicatorOperation operation, boolean confirmed) {
         if (!confirmed) {
             showAugmentDialog(id, operation);
             return;
@@ -352,7 +352,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         NetworkManager.sendToServer(new PlayerAugments.OpenAugmentScreenPacket(this.menu.blockPos));
     }
     
-    private void showAugmentDialog(ResourceLocation id, PlayerAugments.AugmentApplicatorOperation operation) {
+    private void showAugmentDialog(Identifier id, PlayerAugments.AugmentApplicatorOperation operation) {
         removeDialogOverlay();
         
         var recipeEntry = this.menu.blockEntity.getLevel().getRecipeManager().byKey(id);
@@ -580,7 +580,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         return menu.blockEntity != null ? menu.blockEntity.getBlockState() : BlockContent.AUGMENT_APPLICATION_BLOCK.defaultBlockState();
     }
     
-    public static String augmentKey(ResourceLocation id) {
+    public static String augmentKey(Identifier id) {
         return "oritech.text." + id.getPath().replace('/', '.');
     }
     
@@ -603,12 +603,12 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
     
     private final class AugmentNodeWidget extends UIComponent {
         
-        private final ResourceLocation augmentId;
-        private final ResourceLocation iconTexture;
+        private final Identifier augmentId;
+        private final Identifier iconTexture;
         private PlayerAugments.AugmentApplicatorOperation operation = PlayerAugments.AugmentApplicatorOperation.NEEDS_INIT;
         private boolean blocked;
         
-        private AugmentNodeWidget(int x, int y, ResourceLocation augmentId) {
+        private AugmentNodeWidget(int x, int y, Identifier augmentId) {
             super(x, y, NODE_SIZE, NODE_SIZE);
             this.augmentId = augmentId;
             this.iconTexture = Oritech.id("textures/gui/" + augmentId.getPath() + ".png");

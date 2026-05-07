@@ -2,12 +2,12 @@ package rearth.oritech.util.registry;
 
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 
-@SuppressWarnings({"UnstableApiUsage"})
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
 public interface ArchitecturyRegistryContainer<T> {
     
     ResourceKey<Registry<T>> getRegistryType();

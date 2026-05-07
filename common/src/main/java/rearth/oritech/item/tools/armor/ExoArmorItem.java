@@ -20,7 +20,7 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -98,7 +98,7 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
         });
     }
     
-    public ResourceLocation getModel() {
+    public Identifier getModel() {
         return Oritech.id("armor/exo_armor");
     }
     

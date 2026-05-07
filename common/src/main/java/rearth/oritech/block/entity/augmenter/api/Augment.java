@@ -14,32 +14,32 @@ import rearth.oritech.api.networking.NetworkManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 // all events / methods here are called just on the server (except for refreshClient()). However the augments are also present and loaded
 // on the client with all their data and recipe.
 public abstract class Augment {
     
-    public static final Attachment<Map<ResourceLocation, AugmentState>> ACTIVE_AUGMENTS_DATA = new Attachment<>() {
+    public static final Attachment<Map<Identifier, AugmentState>> ACTIVE_AUGMENTS_DATA = new Attachment<>() {
         @Override
-        public ResourceLocation identifier() {
+        public Identifier identifier() {
             return Oritech.id("playeraugments");
         }
         
         @Override
-        public Codec<Map<ResourceLocation, AugmentState>> persistenceCodec() {
-            return Codec.unboundedMap(ResourceLocation.CODEC, AugmentState.CODEC);
+        public Codec<Map<Identifier, AugmentState>> persistenceCodec() {
+            return Codec.unboundedMap(Identifier.CODEC, AugmentState.CODEC);
         }
         
         @SuppressWarnings("unchecked")
         @Override
-        public StreamCodec<ByteBuf, Map<ResourceLocation, AugmentState>> networkCodec() {
-            return ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, NetworkManager.getAutoCodec(AugmentState.class));
+        public StreamCodec<ByteBuf, Map<Identifier, AugmentState>> networkCodec() {
+            return ByteBufCodecs.map(HashMap::new, Identifier.STREAM_CODEC, NetworkManager.getAutoCodec(AugmentState.class));
         }
         
         @Override
-        public Supplier<Map<ResourceLocation, AugmentState>> initializer() {
+        public Supplier<Map<Identifier, AugmentState>> initializer() {
             return HashMap::new;
         }
     };
@@ -49,10 +49,10 @@ public abstract class Augment {
         AttachmentApi.register(CustomAugmentsCollection.PORTAL_TARGET_TYPE);
     }
     
-    public final ResourceLocation id;
+    public final Identifier id;
     public final boolean toggleable;
     
-    protected Augment(ResourceLocation id, boolean toggleable) {
+    protected Augment(Identifier id, boolean toggleable) {
         this.id = id;
         this.toggleable = toggleable;
     }
@@ -84,7 +84,7 @@ public abstract class Augment {
         return isEnabled(data);
     }
     
-    public boolean isEnabled(Map<ResourceLocation, AugmentState> playerData) {
+    public boolean isEnabled(Map<Identifier, AugmentState> playerData) {
         var state = playerData.getOrDefault(id, AugmentState.NOT_INSTALLED);
         return state.equals(AugmentState.ENABLED);
     }

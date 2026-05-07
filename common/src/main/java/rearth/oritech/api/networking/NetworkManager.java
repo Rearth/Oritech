@@ -13,7 +13,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
@@ -105,7 +105,7 @@ public class NetworkManager {
         registerCodec(ByteBufCodecs.BYTE, Byte.class, byte.class);
         registerCodec(ByteBufCodecs.SHORT, Short.class, short.class);
         registerCodec(ByteBufCodecs.STRING_UTF8, String.class);
-        registerCodec(ResourceLocation.STREAM_CODEC, ResourceLocation.class);
+        registerCodec(Identifier.STREAM_CODEC, Identifier.class);
         registerCodec(BlockPos.STREAM_CODEC, BlockPos.class);
         registerCodec(ItemStack.OPTIONAL_STREAM_CODEC, ItemStack.class);
         registerCodec(VEC2I_PACKED_CODEC, Vector2i.class);
@@ -375,7 +375,7 @@ public class NetworkManager {
         return false;
     }
     
-    public record MessagePayload(BlockPos pos, ResourceLocation targetEntityType, SyncType syncType,
+    public record MessagePayload(BlockPos pos, Identifier targetEntityType, SyncType syncType,
                                  byte[] message) implements CustomPacketPayload {
         @Override
         public net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
@@ -387,13 +387,13 @@ public class NetworkManager {
         public static final StreamCodec<RegistryFriendlyByteBuf, MessagePayload> PACKET_CODEC = new StreamCodec<>() {
             @Override
             public MessagePayload decode(RegistryFriendlyByteBuf buf) {
-                return new MessagePayload(BlockPos.STREAM_CODEC.decode(buf), ResourceLocation.STREAM_CODEC.decode(buf), SyncType.PACKET_CODEC.decode(buf), ByteBufCodecs.BYTE_ARRAY.decode(buf));
+                return new MessagePayload(BlockPos.STREAM_CODEC.decode(buf), Identifier.STREAM_CODEC.decode(buf), SyncType.PACKET_CODEC.decode(buf), ByteBufCodecs.BYTE_ARRAY.decode(buf));
             }
             
             @Override
             public void encode(RegistryFriendlyByteBuf buf, MessagePayload value) {
                 BlockPos.STREAM_CODEC.encode(buf, value.pos);
-                ResourceLocation.STREAM_CODEC.encode(buf, value.targetEntityType);
+                Identifier.STREAM_CODEC.encode(buf, value.targetEntityType);
                 SyncType.PACKET_CODEC.encode(buf, value.syncType);
                 ByteBufCodecs.BYTE_ARRAY.encode(buf, value.message);
             }
@@ -408,12 +408,12 @@ public class NetworkManager {
     public static StreamCodec<RegistryFriendlyByteBuf, BlockState> SIMPLE_BLOCK_STATE_PACKET_CODEC = new StreamCodec<>() {
         @Override
         public BlockState decode(RegistryFriendlyByteBuf buf) {
-            return BuiltInRegistries.BLOCK.get(ResourceLocation.STREAM_CODEC.decode(buf)).defaultBlockState();
+            return BuiltInRegistries.BLOCK.get(Identifier.STREAM_CODEC.decode(buf)).defaultBlockState();
         }
         
         @Override
         public void encode(RegistryFriendlyByteBuf buf, BlockState value) {
-            ResourceLocation.STREAM_CODEC.encode(buf, BuiltInRegistries.BLOCK.getKey(value.getBlock()));
+            Identifier.STREAM_CODEC.encode(buf, BuiltInRegistries.BLOCK.getKey(value.getBlock()));
         }
     };
     

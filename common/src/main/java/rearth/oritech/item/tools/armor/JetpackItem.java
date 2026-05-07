@@ -25,7 +25,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -171,7 +171,7 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
         
         stack.set(EnergyApi.ITEM.getEnergyComponent(), packet.energyStored);
         if (packet.fluidAmount > 0)
-            stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(BuiltInRegistries.FLUID.get(ResourceLocation.parse(packet.fluidType)), packet.fluidAmount));
+            stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(BuiltInRegistries.FLUID.get(Identifier.parse(packet.fluidType)), packet.fluidAmount));
     }
     
     public record JetpackUsageUpdatePacket(long energyStored, String fluidType, long fluidAmount) implements CustomPacketPayload {

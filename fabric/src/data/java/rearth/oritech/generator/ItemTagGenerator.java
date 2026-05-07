@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.fabricmc.fabric.api.tag.convention.v2.TagUtil;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Items;
@@ -37,22 +37,22 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         // clumps - added for Create and Mekanism compat support
         // Adding Create "crushed" ores as clumps, because they essentially are
         getOrCreateTagBuilder(TagContent.CLUMPS)
-          .add(ItemContent.COPPER_CLUMP).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_copper"))
-          .add(ItemContent.IRON_CLUMP).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_iron"))
-          .add(ItemContent.GOLD_CLUMP).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_gold"))
-          .add(ItemContent.NICKEL_CLUMP).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_nickel"))
-          .add(ItemContent.PLATINUM_CLUMP).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_platinum"))
-          .addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_zinc"));
+          .add(ItemContent.COPPER_CLUMP).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_copper"))
+          .add(ItemContent.IRON_CLUMP).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_iron"))
+          .add(ItemContent.GOLD_CLUMP).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_gold"))
+          .add(ItemContent.NICKEL_CLUMP).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_nickel"))
+          .add(ItemContent.PLATINUM_CLUMP).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_platinum"))
+          .addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_zinc"));
         
-        getOrCreateTagBuilder(getClumpTag("copper")).add(ItemContent.COPPER_CLUMP).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_copper"));
-        getOrCreateTagBuilder(getClumpTag("iron")).add(ItemContent.IRON_CLUMP).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_iron"));
-        getOrCreateTagBuilder(getClumpTag("gold")).add(ItemContent.GOLD_CLUMP).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_gold"));
-        getOrCreateTagBuilder(getClumpTag("nickel")).add(ItemContent.NICKEL_CLUMP).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_nickel"));
-        getOrCreateTagBuilder(getClumpTag("platinum")).add(ItemContent.PLATINUM_CLUMP).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_platinum"));
+        getOrCreateTagBuilder(getClumpTag("copper")).add(ItemContent.COPPER_CLUMP).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_copper"));
+        getOrCreateTagBuilder(getClumpTag("iron")).add(ItemContent.IRON_CLUMP).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_iron"));
+        getOrCreateTagBuilder(getClumpTag("gold")).add(ItemContent.GOLD_CLUMP).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_gold"));
+        getOrCreateTagBuilder(getClumpTag("nickel")).add(ItemContent.NICKEL_CLUMP).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_nickel"));
+        getOrCreateTagBuilder(getClumpTag("platinum")).add(ItemContent.PLATINUM_CLUMP).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_platinum"));
         // for compat
-        getOrCreateTagBuilder(getClumpTag("zinc")).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_zinc"));
-        getOrCreateTagBuilder(getClumpTag("uranium")).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_uranium"));
-        getOrCreateTagBuilder(getClumpTag("osmium")).addOptional(ResourceLocation.fromNamespaceAndPath("create", "crushed_raw_osmium"));
+        getOrCreateTagBuilder(getClumpTag("zinc")).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_zinc"));
+        getOrCreateTagBuilder(getClumpTag("uranium")).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_uranium"));
+        getOrCreateTagBuilder(getClumpTag("osmium")).addOptional(Identifier.fromNamespaceAndPath("create", "crushed_raw_osmium"));
         
         // dusts
         getOrCreateTagBuilder(ConventionalItemTags.DUSTS)
@@ -114,14 +114,14 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(ConventionalItemTags.GEMS)
           .add(ItemContent.FLUXITE);
         
-        getOrCreateTagBuilder(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "gems/fluxite")))
+        getOrCreateTagBuilder(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "gems/fluxite")))
           .add(ItemContent.FLUXITE);
         
         getOrCreateTagBuilder(TagContent.NICKEL_ORES).add(BlockContent.NICKEL_ORE.asItem(), BlockContent.DEEPSLATE_NICKEL_ORE.asItem());
         getOrCreateTagBuilder(TagContent.PLATINUM_ORES).add(BlockContent.DEEPSLATE_PLATINUM_ORE.asItem(), BlockContent.ENDSTONE_PLATINUM_ORE.asItem());
         getOrCreateTagBuilder(TagContent.URANIUM_ORES).add(BlockContent.DEEPSLATE_URANIUM_ORE.asItem())
-          .addOptional(ResourceLocation.fromNamespaceAndPath("immersiveengineering", "ore_uranium"))
-          .addOptional(ResourceLocation.fromNamespaceAndPath("immersiveengineering", "deepslate_ore_uranium"));
+          .addOptional(Identifier.fromNamespaceAndPath("immersiveengineering", "ore_uranium"))
+          .addOptional(Identifier.fromNamespaceAndPath("immersiveengineering", "deepslate_ore_uranium"));
         
         getOrCreateTagBuilder(TagContent.STEEL_INGOTS).add(ItemContent.STEEL_INGOT).add(ItemContent.BIOSTEEL_INGOT);
         getOrCreateTagBuilder(TagContent.QUARTZ_DUSTS).add(ItemContent.QUARTZ_DUST);
@@ -146,7 +146,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(TagContent.URANIUM_RAW_MATERIALS).add(ItemContent.RAW_URANIUM);
         
         getOrCreateTagBuilder(TagContent.FEEDER_BLACKLIST)
-          .addOptional(ResourceLocation.fromNamespaceAndPath("relics", "infinity_ham"));
+          .addOptional(Identifier.fromNamespaceAndPath("relics", "infinity_ham"));
         
         getOrCreateTagBuilder(cItemTag("bananas")).add(ItemContent.BANANA);
         getOrCreateTagBuilder(cItemTag("foods/fruit")).add(ItemContent.BANANA);
@@ -156,14 +156,14 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         // biomass
         getOrCreateTagBuilder(TagContent.BIOMATTER)
           .addOptionalTag(ItemTags.VILLAGER_PLANTABLE_SEEDS)
-          .addOptionalTag(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "seeds")))
+          .addOptionalTag(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "seeds")))
           .addOptionalTag(ItemTags.SAPLINGS)
           .addOptionalTag(ConventionalItemTags.FOODS)
           .addOptionalTag(ConventionalItemTags.CROPS)
-          .addOptionalTag(ResourceLocation.fromNamespaceAndPath("farmersdelight", "wild_crops"))
-          .addOptionalTag(ResourceLocation.fromNamespaceAndPath("createaddition", "plant_foods"))
-          .addOptional(ResourceLocation.fromNamespaceAndPath("enderio", "plant_matter_green"))
-          .addOptional(ResourceLocation.fromNamespaceAndPath("enderio", "plant_matter_brown"))
+          .addOptionalTag(Identifier.fromNamespaceAndPath("farmersdelight", "wild_crops"))
+          .addOptionalTag(Identifier.fromNamespaceAndPath("createaddition", "plant_foods"))
+          .addOptional(Identifier.fromNamespaceAndPath("enderio", "plant_matter_green"))
+          .addOptional(Identifier.fromNamespaceAndPath("enderio", "plant_matter_brown"))
           .add(BlockContent.WITHER_CROP_BLOCK.asItem())
           .add(ItemContent.BANANA.asItem())
           .add(Items.WHEAT)
@@ -204,7 +204,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         
         getOrCreateTagBuilder(TagContent.BIOMASS)
           .add(ItemContent.BIOMASS)
-          .addOptional(ResourceLocation.fromNamespaceAndPath("techreborn", "plantball"));
+          .addOptional(Identifier.fromNamespaceAndPath("techreborn", "plantball"));
         getOrCreateTagBuilder(TagContent.BIOMASS_BLOCK)
           .add(BlockContent.BIOMASS_BLOCK.asItem());
         
@@ -257,7 +257,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.PLASTIC_SHEET);
         getOrCreateTagBuilder(cItemTag("plastics"))
           .add(ItemContent.PLASTIC_SHEET);
-        getOrCreateTagBuilder(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("pneumaticcraft", "plastic_sheets")))
+        getOrCreateTagBuilder(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("pneumaticcraft", "plastic_sheets")))
           .add(ItemContent.PLASTIC_SHEET);
         
         // carbon fibre
@@ -388,7 +388,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(getStorageBlockTag("uranium_dust"))
           .add(BlockContent.URANIUM_DUST_BLOCK.asItem());
         
-        getOrCreateTagBuilder(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("industrialforegoing", "bioreactor")))
+        getOrCreateTagBuilder(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("industrialforegoing", "bioreactor")))
           .addTag(TagContent.BIOMASS);
         
         getOrCreateTagBuilder(TagContent.MACHINE_PAINTS)

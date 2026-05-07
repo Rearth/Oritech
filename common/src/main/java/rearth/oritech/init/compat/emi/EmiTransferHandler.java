@@ -9,16 +9,16 @@ import rearth.oritech.client.ui.MachineMenuHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 public class EmiTransferHandler<S extends AbstractContainerMenu & MachineMenuHandler> implements StandardRecipeHandler<S> {
     
-    private final ResourceLocation categoryId;
+    private final Identifier categoryId;
     
-    public EmiTransferHandler(ResourceLocation categoryId) {
+    public EmiTransferHandler(Identifier categoryId) {
         this.categoryId = categoryId;
     }
     

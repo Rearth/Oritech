@@ -10,7 +10,7 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ItemLike;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.compat.rei.OritechDisplay;
@@ -23,7 +23,7 @@ public class OritechReiParticleCollisionDisplay implements DisplayCategory<Displ
     
     protected final OritechRecipeType recipeType;
     protected final ItemLike icon;
-    public static final ResourceLocation PARTICLE_RECIPE_OVERLAY = Oritech.id("textures/gui/modular/particle_recipe_overlay.png");
+    public static final Identifier PARTICLE_RECIPE_OVERLAY = Oritech.id("textures/gui/modular/particle_recipe_overlay.png");
     
     public OritechReiParticleCollisionDisplay(OritechRecipeType recipeType, ItemLike icon) {
         this.recipeType = recipeType;

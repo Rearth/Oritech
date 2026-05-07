@@ -15,7 +15,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -70,7 +70,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    public final Set<ResourceLocation> researchedAugments = new HashSet<>();
+    public final Set<Identifier> researchedAugments = new HashSet<>();
     // working state
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public final HashMap<Integer, ResearchState> availableStations = new HashMap<>();
@@ -147,7 +147,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         
     }
     
-    public void researchAugment(ResourceLocation augment, boolean creative, Player player) {
+    public void researchAugment(Identifier augment, boolean creative, Player player) {
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -208,7 +208,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         this.setChanged();
     }
     
-    public void installAugmentToPlayer(ResourceLocation augment, Player player) {
+    public void installAugmentToPlayer(Identifier augment, Player player) {
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -255,7 +255,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         player.level().playSound(null, player.blockPosition(), SoundContent.SHORT_SERVO, SoundSource.BLOCKS);
     }
     
-    public void removeAugmentFromPlayer(ResourceLocation augment, Player player) {
+    public void removeAugmentFromPlayer(Identifier augment, Player player) {
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -267,7 +267,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         this.setChanged();
     }
     
-    public static void toggleAugmentForPlayer(ResourceLocation augment, Player player) {
+    public static void toggleAugmentForPlayer(Identifier augment, Player player) {
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -284,7 +284,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         augmentInstance.toggle(player);
     }
     
-    public boolean hasPlayerAugment(ResourceLocation augment, Player player) {
+    public boolean hasPlayerAugment(Identifier augment, Player player) {
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -330,7 +330,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             if (availableStations.containsKey(i) && availableStations.get(i) != null && availableStations.get(i).type.equals(candidateState.getBlock()))
                 continue;
             
-            var newState = new ResearchState(candidateState.getBlock(), false, ResourceLocation.parse(""), -1, -1);
+            var newState = new ResearchState(candidateState.getBlock(), false, Identifier.parse(""), -1, -1);
             
             availableStations.put(i, newState);
         }
@@ -515,14 +515,14 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         
         public Block type;
         public boolean working;
-        public ResourceLocation selectedResearch;
+        public Identifier selectedResearch;
         public int workTime;
         public long researchStartedAt;
         
         public static StreamCodec<RegistryFriendlyByteBuf, ResearchState> PACKET_CODEC = StreamCodec.composite(
-          ResourceLocation.STREAM_CODEC.map(BuiltInRegistries.BLOCK::get, BuiltInRegistries.BLOCK::getKey), ResearchState::getType,
+          Identifier.STREAM_CODEC.map(BuiltInRegistries.BLOCK::get, BuiltInRegistries.BLOCK::getKey), ResearchState::getType,
           ByteBufCodecs.BOOL, ResearchState::getWorking,
-          ResourceLocation.STREAM_CODEC, ResearchState::getSelectedResearch,
+          Identifier.STREAM_CODEC, ResearchState::getSelectedResearch,
           ByteBufCodecs.INT, ResearchState::getWorkTime,
           ByteBufCodecs.VAR_LONG, ResearchState::getResearchStartedAt,
           ResearchState::new
@@ -536,7 +536,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             return workTime;
         }
         
-        public ResourceLocation getSelectedResearch() {
+        public Identifier getSelectedResearch() {
             return selectedResearch;
         }
         
@@ -548,7 +548,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             return working;
         }
         
-        public ResearchState(Block type, boolean working, ResourceLocation selectedResearch, int workTime, long researchStartedAt) {
+        public ResearchState(Block type, boolean working, Identifier selectedResearch, int workTime, long researchStartedAt) {
             this.type = type;
             this.working = working;
             this.selectedResearch = selectedResearch;

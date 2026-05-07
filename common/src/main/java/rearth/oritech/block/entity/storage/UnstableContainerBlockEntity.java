@@ -10,7 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -169,8 +169,8 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
         qualityMultiplier = nbt.getFloat("quality");
         
         var blockId = nbt.getString("captured");
-        if (!blockId.isBlank() && BuiltInRegistries.BLOCK.containsKey(ResourceLocation.parse(blockId)))
-            capturedBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(blockId)).defaultBlockState();
+        if (!blockId.isBlank() && BuiltInRegistries.BLOCK.containsKey(Identifier.parse(blockId)))
+            capturedBlock = BuiltInRegistries.BLOCK.get(Identifier.parse(blockId)).defaultBlockState();
         
     }
     

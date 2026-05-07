@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.resources.PlayerSkin;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -110,12 +110,12 @@ public class OritechClientNeoForge {
             
 //            FluidContent.FLUID_ATTRIBUTES.forEach(attribute -> event.registerFluidType(new IClientFluidTypeExtensions() {
 //                @Override
-//                public @NotNull ResourceLocation getStillTexture() {
+//                public @NotNull Identifier getStillTexture() {
 //                    return attribute.getSourceTexture();
 //                }
 //
 //                @Override
-//                public @NotNull ResourceLocation getFlowingTexture() {
+//                public @NotNull Identifier getFlowingTexture() {
 //                    return attribute.getFlowingTexture();
 //                }
 //
@@ -136,7 +136,7 @@ public class OritechClientNeoForge {
         
         private final SmallTankItemRenderer itemRenderer;
         
-        public TankItemRenderer(ResourceLocation modelId) {
+        public TankItemRenderer(Identifier modelId) {
             super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
             this.itemRenderer = new SmallTankItemRenderer(modelId);
         }
@@ -151,7 +151,7 @@ public class OritechClientNeoForge {
     private static class TankItemExtensions implements IClientItemExtensions {
         private final TankItemRenderer renderer;
         
-        private TankItemExtensions(ResourceLocation modelId) {
+        private TankItemExtensions(Identifier modelId) {
             this.renderer = new TankItemRenderer(modelId);
         }
         

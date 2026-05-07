@@ -11,7 +11,7 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +29,7 @@ public class OritechJeiLaserRecipe implements IRecipeCategory<OritechRecipe> {
     public final IDrawableStatic background;
     public final IDrawableStatic laserBackground;
     
-    public static final ResourceLocation LASER_RECIPE_OVERLAY = Oritech.id("textures/gui/modular/laser_recipe_background_jei.png");
+    public static final Identifier LASER_RECIPE_OVERLAY = Oritech.id("textures/gui/modular/laser_recipe_background_jei.png");
     
     public OritechJeiLaserRecipe(IGuiHelper helper) {
         this.type = RecipeContent.LASER;

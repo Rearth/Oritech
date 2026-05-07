@@ -14,7 +14,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
@@ -56,7 +56,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
                                                                        ScreenProvider, EnergyApi.BlockProvider {
     
     // stores data per dimension
-    public static final HashMap<ResourceLocation, PoleNetworkData> POLE_NETWORK_DATA = new HashMap<>();
+    public static final HashMap<Identifier, PoleNetworkData> POLE_NETWORK_DATA = new HashMap<>();
     
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();

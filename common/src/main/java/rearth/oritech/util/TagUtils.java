@@ -1,7 +1,7 @@
 package rearth.oritech.util;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -32,7 +32,7 @@ public class TagUtils {
     }
 
     public static TagKey<Item> itemTag(String namespace, String path) {
-        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(namespace, path));
+        return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(namespace, path));
     }
 
     public static TagKey<Item> cItemTag(String path) {
@@ -40,7 +40,7 @@ public class TagUtils {
     }
 
     public static TagKey<Block> cBlockTag(String path) {
-        return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(C_TAG_NAMESPACE, path));
+        return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(C_TAG_NAMESPACE, path));
     }
 
     public static TagKey<Item> oritechItemTag(String path) {
@@ -56,7 +56,7 @@ public class TagUtils {
     }
 
     public static TagKey<Fluid> fluidTag(String namespace, String path) {        
-        return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(namespace, path));
+        return TagKey.create(Registries.FLUID, Identifier.fromNamespaceAndPath(namespace, path));
     }
 
     public static TagKey<Fluid> oritechFluidTag(String path) {

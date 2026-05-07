@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -31,11 +31,11 @@ import net.minecraft.world.phys.AABB;
 public class CustomAugmentsCollection {
     
     // for other modders: If you want to use a custom augment from a recipe, you need to add it to this map before world load!
-    public static final Map<ResourceLocation, Augment> CUSTOM_AUGMENTS = new HashMap<>();
+    public static final Map<Identifier, Augment> CUSTOM_AUGMENTS = new HashMap<>();
     
     public static final Attachment<GlobalPos> PORTAL_TARGET_TYPE = new Attachment<>() {
         @Override
-        public ResourceLocation identifier() {
+        public Identifier identifier() {
             return Oritech.id("portal_target");
         }
         
@@ -55,7 +55,7 @@ public class CustomAugmentsCollection {
         }
     };
     
-    public static Augment getById(ResourceLocation id) {
+    public static Augment getById(Identifier id) {
         return CUSTOM_AUGMENTS.get(id);
     }
     

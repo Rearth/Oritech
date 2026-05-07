@@ -3,7 +3,7 @@ package rearth.oritech.client.renderers;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -23,7 +23,7 @@ public class ShrinkerBlockRenderer extends DynamicGeoBlockRenderer<ShrinkerBlock
     }
     
     @Override
-    protected @Nullable ResourceLocation getTextureOverrideForBone(GeoBone bone, ShrinkerBlockEntity animatable, float partialTick) {
+    protected @Nullable Identifier getTextureOverrideForBone(GeoBone bone, ShrinkerBlockEntity animatable, float partialTick) {
         
         if (bone.getName().startsWith("moving")) {
             return Oritech.id("textures/block/fluid/fluid_strange_mixture.png");
