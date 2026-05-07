@@ -81,7 +81,7 @@ public class ChargerBlock extends HorizontalDirectionalBlock implements EntityBl
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             var entity = (ChargerBlockEntity) world.getBlockEntity(pos);
             var stacks = entity.inventory.heldStacks;
             for (var stack : stacks) {

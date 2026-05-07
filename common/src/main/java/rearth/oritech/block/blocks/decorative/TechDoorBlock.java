@@ -70,7 +70,7 @@ public class TechDoorBlock extends HorizontalDirectionalBlock implements EntityB
     public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
         
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         
         var isOpen = state.getValue(OPENED);
         var isPowered = world.hasNeighborSignal(pos) || world.hasNeighborSignal(pos.above());
@@ -122,13 +122,13 @@ public class TechDoorBlock extends HorizontalDirectionalBlock implements EntityB
     
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
-        if (!world.isClientSide)
+        if (!world.isClientSide())
             world.setBlockAndUpdate(pos.above(), BlockContent.TECH_DOOR_HINGE.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
     }
     
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        if (!world.isClientSide)
+        if (!world.isClientSide())
             world.setBlockAndUpdate(pos.above(), Blocks.AIR.defaultBlockState());
         
         return super.playerWillDestroy(world, pos, state, player);

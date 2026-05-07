@@ -1,11 +1,10 @@
 package rearth.oritech;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.ItemLike;
 import org.slf4j.Logger;
@@ -30,11 +29,11 @@ import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.util.ServerZiplineHandler;
-import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRecipeRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public final class Oritech {
@@ -42,7 +41,7 @@ public final class Oritech {
     public static final String MOD_ID = "oritech";
     public static final Logger LOGGER = LoggerFactory.getLogger("oritech");
     
-    public static final Multimap<Identifier, Runnable> EVENT_MAP = initEventMap();
+    public static final List<RegistryStep> REGISTRY_STEPS = initRegistrySteps();
     public static Set<Pair<ItemLike, Float>> COMPOSTABLES_DATA = new HashSet<>();
     
     public static Identifier id(String path) {
@@ -72,8 +71,6 @@ public final class Oritech {
         
         TickEvent.PLAYER_POST.register(ServerZiplineHandler::onPlayerTick);
         
-        ComponentContent.COMPONENTS.register();
-        
         // for player augment ticks
         TickEvent.SERVER_PRE.register(event -> event.getAllLevels().forEach(world -> world.players().forEach(PlayerAugments::serverTickAugments)));
         LOGGER.info("Oritech initialization complete");
@@ -83,56 +80,64 @@ public final class Oritech {
     public static void runAllRegistries() {
         
         LOGGER.info("Running Oritech registrations...");
-        
-        // fluids need to be first
-        LOGGER.debug("Registering fluids");
-        EVENT_MAP.get(Registries.FLUID.location()).forEach(Runnable::run);
-        
-        for (var type : EVENT_MAP.keySet()) {
-            if (type.equals(Registries.FLUID.location()) || type.equals(Registries.CREATIVE_MODE_TAB.location()))
-                continue;
-            EVENT_MAP.get(type).forEach(Runnable::run);
-        }
-        
-        LOGGER.debug("Registering item groups");
-        EVENT_MAP.get(Registries.CREATIVE_MODE_TAB.location()).forEach(Runnable::run);
+        REGISTRY_STEPS.forEach(RegistryStep::run);
         LOGGER.info("Oritech registrations complete");
     }
+
+    public static void runRegistry(Identifier registryId) {
+        REGISTRY_STEPS.stream()
+          .filter(step -> step.registryId().equals(registryId))
+          .forEach(RegistryStep::run);
+    }
     
-    public static Multimap<Identifier, Runnable> initEventMap() {
-        
-        Multimap<Identifier, Runnable> res = ArrayListMultimap.create();
-        res.put(Registries.FLUID.location(), FluidContent::registerFluids);
-        res.put(Registries.BLOCK.location(), FluidContent::registerBlocks);
-        res.put(Registries.ITEM.location(), FluidContent::registerItems);
-        res.put(Registries.ITEM.location(), () -> ArchitecturyRegistryContainer.register(ItemContent.class, MOD_ID, false));
-        res.put(Registries.BLOCK.location(), () -> ArchitecturyRegistryContainer.register(BlockContent.class, MOD_ID, false));
-        res.put(Registries.ITEM.location(), ArchitecturyBlockRegistryContainer::finishItemRegister);
-        res.put(Registries.BLOCK_ENTITY_TYPE.location(), () -> ArchitecturyRegistryContainer.register(BlockEntitiesContent.class, MOD_ID, false));
-        res.put(Registries.SOUND_EVENT.location(), () -> ArchitecturyRegistryContainer.register(SoundContent.class, MOD_ID, false));
-        res.put(Registries.ITEM.location(), () -> ArchitecturyRegistryContainer.register(ToolsContent.class, MOD_ID, false));
-        res.put(Registries.FEATURE.location(), () -> ArchitecturyRegistryContainer.register(FeatureContent.class, MOD_ID, false));
-        res.put(Registries.LOOT_FUNCTION_TYPE.location(), () -> ArchitecturyRegistryContainer.register(LootContent.class, MOD_ID, false));
-        res.put(Registries.ENTITY_TYPE.location(), () -> ArchitecturyRegistryContainer.register(EntitiesContent.class, MOD_ID, false));
-        res.put(Registries.ITEM.location(), ToolsContent::registerEventHandlers);
-        res.put(Registries.MENU.location(), () -> ArchitecturyRegistryContainer.register(ModScreens.class, MOD_ID, false));
-        res.put(Registries.RECIPE_TYPE.location(), () -> ArchitecturyRegistryContainer.register(RecipeContent.class, MOD_ID, false));
-        res.put(Registries.CREATIVE_MODE_TAB.location(), () -> ArchitecturyRegistryContainer.register(ItemGroups.class, MOD_ID, false));
-        res.put(Registries.RECIPE_SERIALIZER.location(), ArchitecturyRecipeRegistryContainer::finishSerializerRegister);
-        res.put(Registries.LOOT_FUNCTION_TYPE.location(), FluidContent::registerItemsToGroups);
-        res.put(Identifier.fromNamespaceAndPath("neoforge", "attachment_types"), () -> {
-            Augment.registerAttachmentTypes();
-            ServerZiplineHandler.registerAttachments();
-        });   // this works just fine on fabric aswell, as they key is not really relevant there.
-        
-        return res;
+    public static List<RegistryStep> initRegistrySteps() {
+        return List.of(
+          registry(Registries.DATA_COMPONENT_TYPE, ComponentContent::register),
+          registry(Registries.FLUID, FluidContent::registerFluids),
+          registry(Registries.BLOCK, FluidContent::registerBlocks),
+          registry(Registries.ITEM, FluidContent::registerItems),
+          registry(Registries.ITEM, ToolsContent::register),
+          registry(Registries.ITEM, ItemContent::registerItems),
+          registry(Registries.BLOCK, BlockContent::registerBlocks),
+          registry(Registries.BLOCK_ENTITY_TYPE, BlockEntitiesContent::register),
+          registry(Registries.SOUND_EVENT, SoundContent::register),
+          registry(Registries.FEATURE, FeatureContent::register),
+          registry(Registries.LOOT_FUNCTION_TYPE, LootContent::register),
+          registry(Registries.ENTITY_TYPE, EntitiesContent::register),
+          registry(Registries.ITEM, ToolsContent::registerEventHandlers),
+          registry(Registries.MENU, ModScreens::register),
+          registry(Registries.RECIPE_TYPE, () -> ArchitecturyRegistryContainer.register(RecipeContent.class, MOD_ID, false)),
+          registry(Registries.RECIPE_SERIALIZER, ArchitecturyRecipeRegistryContainer::finishSerializerRegister),
+          registry(Identifier.fromNamespaceAndPath("neoforge", "attachment_types"), () -> {
+              Augment.registerAttachmentTypes();
+              ServerZiplineHandler.registerAttachments();
+          }),
+                    registry(Registries.CREATIVE_MODE_TAB, FluidContent::registerItemsToGroups),
+          registry(Registries.CREATIVE_MODE_TAB, ItemGroups::register)
+        );
+    }
+
+    private static RegistryStep registry(ResourceKey<?> registryKey, Runnable action) {
+        return registry(registryKey.identifier(), action);
+    }
+
+    private static RegistryStep registry(Identifier registryId, Runnable action) {
+        return new RegistryStep(registryId, action);
+    }
+
+    public record RegistryStep(Identifier registryId, Runnable action) {
+
+        public void run() {
+            LOGGER.debug("Registering {}", registryId);
+            action.run();
+        }
     }
     
     private static void onServerStarted(MinecraftServer minecraftServer) {
         minecraftServer.getAllLevels().forEach(world -> {
-            if (world.isClientSide) return;
+            if (world.isClientSide()) return;
             
-            var regKey = world.dimension().location();
+            var regKey = world.dimension().identifier();
             
             var dataId = "energy_" + regKey + "_" + regKey.getPath();
             var result = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, dataId);

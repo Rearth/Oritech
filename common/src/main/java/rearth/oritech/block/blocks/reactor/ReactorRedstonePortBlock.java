@@ -42,7 +42,7 @@ public class ReactorRedstonePortBlock extends BaseReactorBlock {
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (world.isClientSide) return InteractionResult.SUCCESS;
+        if (world.isClientSide()) return InteractionResult.SUCCESS;
         
         var lastMode = state.getValue(PORT_MODE);
         var cycledMode = (lastMode + 1) % 3;

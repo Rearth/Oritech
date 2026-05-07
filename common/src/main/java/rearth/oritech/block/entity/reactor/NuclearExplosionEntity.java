@@ -52,7 +52,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
 
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, NuclearExplosionEntity blockEntity) {
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
 
         var initialRadius = size;
 

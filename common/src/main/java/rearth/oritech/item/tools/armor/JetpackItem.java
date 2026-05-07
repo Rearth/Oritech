@@ -59,7 +59,7 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
         
-        if (world.isClientSide)
+        if (world.isClientSide())
             tickJetpack(stack, entity, world);
     }
     

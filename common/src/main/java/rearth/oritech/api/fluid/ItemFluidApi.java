@@ -54,7 +54,7 @@ public interface ItemFluidApi {
         
         var fluidStorage = tankEntity.getFluidStorage(null);
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             if (candidate.getContent().getFirst().isEmpty()) { // from tank to item
                 var moved = FluidApi.transferLastIncludingInputs(fluidStorage, candidate, FluidStackHooks.bucketAmount() * 8, false);
                 Oritech.LOGGER.debug("moved to item {} {}", moved, stackRef.getValue());

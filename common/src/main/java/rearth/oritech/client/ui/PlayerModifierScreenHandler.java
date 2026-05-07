@@ -46,7 +46,7 @@ public class PlayerModifierScreenHandler extends AbstractContainerMenu {
         this.machineBlock = blockEntity.getBlockState();
         this.blockEntity = (AugmentApplicationEntity) blockEntity;
         
-        if (blockEntity.getLevel().isClientSide)
+        if (blockEntity.getLevel().isClientSide())
             this.blockEntity.loadAvailableStations(this.player);    // this should yield the same result on the client, so instead of syncing them we just call it on the client again
         
     }

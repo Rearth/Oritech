@@ -164,7 +164,7 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
         if (isAreaEnabled(handStack)) {
             // break additional blocks
             for (var offsetPos : getOffsetBlocks(world, player, pos)) {
-                // drop stacks before breaking additional block, because world.breakBlock doesn't apply item enchantments if drop is enabled
+                // drop itemStacks before breaking additional block, because world.breakBlock doesn't apply item enchantments if drop is enabled
                 // this will ONLY apply item enchantments that affect block drops, and will not apply enchants like vein mining
                 var offsetState = world.getBlockState(offsetPos);
                 

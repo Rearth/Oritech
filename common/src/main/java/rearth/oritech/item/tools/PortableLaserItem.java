@@ -98,7 +98,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         var stack = player.getItemInHand(hand);
         var energyUsed = OritechStartupConfig.portableLaserConfig.energyPerBoom.get();
         
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             if (getStoredEnergy(stack) > energyUsed && !player.isShiftKeyDown() && !isMiningEnabled(stack))
                 lastSingleShot = world.getGameTime();
             

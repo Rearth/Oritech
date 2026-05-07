@@ -21,7 +21,7 @@ public class AcceleratorSensorBlockEntity extends BlockEntity implements BlockEn
     
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, AcceleratorSensorBlockEntity blockEntity) {
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         
         if (measuredSpeed != 0) {
             var age = world.getGameTime() - measuredTime;

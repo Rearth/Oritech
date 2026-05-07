@@ -46,7 +46,7 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     @Override
     public DataComponentType<Long> getEnergyComponent() {
-        return OritechModNeoForge.EventHandler.NEO_ENERGY_COMPONENT.get();
+        return ComponentContent.ENERGY.get();
     }
     
     public void registerEvent(RegisterCapabilitiesEvent event) {

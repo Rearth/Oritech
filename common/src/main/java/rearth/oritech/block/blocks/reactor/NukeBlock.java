@@ -53,13 +53,13 @@ public class NukeBlock extends Block {
     }
     
     public void wasExploded(Level world, BlockPos pos, Explosion explosion) {
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             primeTnt(world, pos);
         }
     }
     
     private void primeTnt(Level world, BlockPos pos) {
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             
             if (OritechConfig.boringNukes.get()) {
                 var center = pos.getCenter();
@@ -88,12 +88,12 @@ public class NukeBlock extends Block {
             }
             
             player.awardStat(Stats.ITEM_USED.get(item));
-            return ItemInteractionResult.sidedSuccess(world.isClientSide);
+            return ItemInteractionResult.sidedSuccess(world.isClientSide());
         }
     }
     
     protected void onProjectileHit(Level world, BlockState state, BlockHitResult hit, Projectile projectile) {
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             var blockPos = hit.getBlockPos();
             if (projectile.isOnFire() && projectile.mayInteract(world, blockPos)) {
                 primeTnt(world, blockPos);

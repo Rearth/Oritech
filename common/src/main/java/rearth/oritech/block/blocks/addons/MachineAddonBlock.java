@@ -104,7 +104,7 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
         // if addon extender, check if its connected to a machine, if so then init it
         // if machine then init it
         
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         
         var directions = new ArrayList<>(List.of(Direction.values()));
         

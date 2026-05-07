@@ -70,7 +70,7 @@ public class PumpBlock extends Block implements EntityBlock {
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             var pumpEntity = world.getBlockEntity(pos, BlockEntitiesContent.PUMP_BLOCK);
             pumpEntity.ifPresent(pumpBlockEntity -> pumpBlockEntity.onUsed(player));
         }
@@ -80,7 +80,7 @@ public class PumpBlock extends Block implements EntityBlock {
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             // break all trunk blocks below
             var checkPos = pos.below();
             while (world.getBlockState(checkPos).getBlock().equals(BlockContent.PUMP_TRUNK_BLOCK)) {

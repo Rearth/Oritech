@@ -61,7 +61,7 @@ public class PowerPoleBlock extends Block implements EntityBlock {
     @Override
     public @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, Level world, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hit) {
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             
             var entity = world.getBlockEntity(pos);
             

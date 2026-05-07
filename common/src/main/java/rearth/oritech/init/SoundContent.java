@@ -1,47 +1,41 @@
 package rearth.oritech.init;
 
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
-import rearth.oritech.Oritech;
-import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
+import dev.architectury.registry.registries.RegistrySupplier;
+import rearth.oritech.util.registry.OritechDeferredRegistry;
 
-public class SoundContent implements ArchitecturyRegistryContainer<SoundEvent> {
+public class SoundContent {
     
-    public static final SoundEvent CABLE_MOVING = SoundEvent.createVariableRangeEvent(Oritech.id("cable_moving"));
-    public static final SoundEvent SERVO_NOISES = SoundEvent.createVariableRangeEvent(Oritech.id("servo_noises"));
-    public static final SoundEvent MECHANICAL_CLICK = SoundEvent.createVariableRangeEvent(Oritech.id("mechanical_click"));
-    public static final SoundEvent WELDING1 = SoundEvent.createVariableRangeEvent(Oritech.id("welding1"));
-    public static final SoundEvent WELDING2 = SoundEvent.createVariableRangeEvent(Oritech.id("welding2"));
-    public static final SoundEvent SAW_WORKING = SoundEvent.createVariableRangeEvent(Oritech.id("saw_working"));
-    public static final SoundEvent DYNAMO = SoundEvent.createVariableRangeEvent(Oritech.id("dynamo"));
-    public static final SoundEvent FURNACE_BURN = SoundEvent.createVariableRangeEvent(Oritech.id("furnace_burn"));
-    public static final SoundEvent GRINDER_WORKING = SoundEvent.createVariableRangeEvent(Oritech.id("grinder_working"));
-    public static final SoundEvent LAVA_BUBBLES = SoundEvent.createVariableRangeEvent(Oritech.id("lava_bubbles"));
-    public static final SoundEvent LIQUID_FLOW = SoundEvent.createVariableRangeEvent(Oritech.id("liquid_flow"));
-    public static final SoundEvent QUADCOPTER_FLYING = SoundEvent.createVariableRangeEvent(Oritech.id("quadcopter_flying"));
-    public static final SoundEvent QUADCOPTER_TAKEOFF = SoundEvent.createVariableRangeEvent(Oritech.id("quadcopter_takeoff"));
-    public static final SoundEvent SIZZLING_SOUND = SoundEvent.createVariableRangeEvent(Oritech.id("sizzling_sound"));
-    public static final SoundEvent SQUISH = SoundEvent.createVariableRangeEvent(Oritech.id("squish"));
-    public static final SoundEvent PRESS = SoundEvent.createVariableRangeEvent(Oritech.id("press"));
-    public static final SoundEvent PARTICLE_MOVING = SoundEvent.createVariableRangeEvent(Oritech.id("particle_moving"));
-    public static final SoundEvent SHORT_SERVO = SoundEvent.createVariableRangeEvent(Oritech.id("short_servo"));
-    public static final SoundEvent WRENCH_TURN = SoundEvent.createVariableRangeEvent(Oritech.id("wrench_turn"));
-    public static final SoundEvent REACTOR = SoundEvent.createVariableRangeEvent(Oritech.id("reactor"));
-    public static final SoundEvent REACTOR_LOADING = SoundEvent.createVariableRangeEvent(Oritech.id("reactor_loading"));
-    public static final SoundEvent REACTOR_WARNING = SoundEvent.createVariableRangeEvent(Oritech.id("reactor_warning"));
-    public static final SoundEvent NUKE_EXPLOSION = SoundEvent.createVariableRangeEvent(Oritech.id("nuke_explosion"));
-    public static final SoundEvent ELECTRIC_SHOCK = SoundEvent.createVariableRangeEvent(Oritech.id("electric_shock"));
-    public static final SoundEvent BEDROCK_EXTRACTOR = SoundEvent.createVariableRangeEvent(Oritech.id("bedrock_extractor"));
+    public static final OritechDeferredRegistry<SoundEvent> SOUNDS = OritechDeferredRegistry.create(Registries.SOUND_EVENT);
     
-    @Override
-    public Class<SoundEvent> getTargetFieldType() {
-        return SoundEvent.class;
-    }
+    public static final RegistrySupplier<SoundEvent> CABLE_MOVING = SOUNDS.register("cable_moving", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("cable_moving")));
+    public static final RegistrySupplier<SoundEvent> SERVO_NOISES = SOUNDS.register("servo_noises", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("servo_noises")));
+    public static final RegistrySupplier<SoundEvent> MECHANICAL_CLICK = SOUNDS.register("mechanical_click", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("mechanical_click")));
+    public static final RegistrySupplier<SoundEvent> WELDING1 = SOUNDS.register("welding1", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("welding1")));
+    public static final RegistrySupplier<SoundEvent> WELDING2 = SOUNDS.register("welding2", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("welding2")));
+    public static final RegistrySupplier<SoundEvent> SAW_WORKING = SOUNDS.register("saw_working", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("saw_working")));
+    public static final RegistrySupplier<SoundEvent> DYNAMO = SOUNDS.register("dynamo", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("dynamo")));
+    public static final RegistrySupplier<SoundEvent> FURNACE_BURN = SOUNDS.register("furnace_burn", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("furnace_burn")));
+    public static final RegistrySupplier<SoundEvent> GRINDER_WORKING = SOUNDS.register("grinder_working", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("grinder_working")));
+    public static final RegistrySupplier<SoundEvent> LAVA_BUBBLES = SOUNDS.register("lava_bubbles", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("lava_bubbles")));
+    public static final RegistrySupplier<SoundEvent> LIQUID_FLOW = SOUNDS.register("liquid_flow", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("liquid_flow")));
+    public static final RegistrySupplier<SoundEvent> QUADCOPTER_FLYING = SOUNDS.register("quadcopter_flying", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("quadcopter_flying")));
+    public static final RegistrySupplier<SoundEvent> QUADCOPTER_TAKEOFF = SOUNDS.register("quadcopter_takeoff", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("quadcopter_takeoff")));
+    public static final RegistrySupplier<SoundEvent> SIZZLING_SOUND = SOUNDS.register("sizzling_sound", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("sizzling_sound")));
+    public static final RegistrySupplier<SoundEvent> SQUISH = SOUNDS.register("squish", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("squish")));
+    public static final RegistrySupplier<SoundEvent> PRESS = SOUNDS.register("press", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("press")));
+    public static final RegistrySupplier<SoundEvent> PARTICLE_MOVING = SOUNDS.register("particle_moving", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("particle_moving")));
+    public static final RegistrySupplier<SoundEvent> SHORT_SERVO = SOUNDS.register("short_servo", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("short_servo")));
+    public static final RegistrySupplier<SoundEvent> WRENCH_TURN = SOUNDS.register("wrench_turn", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("wrench_turn")));
+    public static final RegistrySupplier<SoundEvent> REACTOR = SOUNDS.register("reactor", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("reactor")));
+    public static final RegistrySupplier<SoundEvent> REACTOR_LOADING = SOUNDS.register("reactor_loading", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("reactor_loading")));
+    public static final RegistrySupplier<SoundEvent> REACTOR_WARNING = SOUNDS.register("reactor_warning", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("reactor_warning")));
+    public static final RegistrySupplier<SoundEvent> NUKE_EXPLOSION = SOUNDS.register("nuke_explosion", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("nuke_explosion")));
+    public static final RegistrySupplier<SoundEvent> ELECTRIC_SHOCK = SOUNDS.register("electric_shock", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("electric_shock")));
+    public static final RegistrySupplier<SoundEvent> BEDROCK_EXTRACTOR = SOUNDS.register("bedrock_extractor", () -> SoundEvent.createVariableRangeEvent(SOUNDS.id("bedrock_extractor")));
     
-    @Override
-    public ResourceKey<Registry<SoundEvent>> getRegistryType() {
-        return Registries.SOUND_EVENT;
+    public static void register() {
+        SOUNDS.register();
     }
 }

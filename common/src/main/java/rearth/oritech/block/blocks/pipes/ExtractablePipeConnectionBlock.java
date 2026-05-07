@@ -35,7 +35,7 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         if (player.isHolding(ItemContent.WRENCH)) return InteractionResult.PASS;
-        if (world.isClientSide) return InteractionResult.SUCCESS;
+        if (world.isClientSide()) return InteractionResult.SUCCESS;
         
         var interactDir = getInteractDirection(state, pos, player);
         if (!hasMachineInDirection(interactDir, world, pos, apiValidationFunction()))

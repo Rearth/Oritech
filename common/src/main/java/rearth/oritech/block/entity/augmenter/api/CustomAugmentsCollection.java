@@ -192,7 +192,7 @@ public class CustomAugmentsCollection {
         @Override
         public void toggle(Player player) {
             var world = player.level();
-            if (world.isClientSide) return;
+            if (world.isClientSide()) return;
             
             var hitResult = player.pick(6, 0, false);
             var spawnPos = hitResult.getLocation();

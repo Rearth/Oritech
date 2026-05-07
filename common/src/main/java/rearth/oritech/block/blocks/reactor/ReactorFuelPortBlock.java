@@ -46,7 +46,7 @@ public class ReactorFuelPortBlock extends BaseReactorBlock implements EntityBloc
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             var entity = (ReactorFuelPortEntity) world.getBlockEntity(pos);
             var stacks = entity.inventory.heldStacks;
             for (var stack : stacks) {

@@ -44,13 +44,13 @@ public class TechDoorBlockHinge extends HorizontalDirectionalBlock {
         super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
         
         // forward the event to bottom block
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         world.neighborChanged(pos.below(), sourceBlock, sourcePos);
     }
     
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             var belowState = world.getBlockState(pos.below());
             if (!player.isCreative())
                 Block.dropResources(belowState, world, pos.below());

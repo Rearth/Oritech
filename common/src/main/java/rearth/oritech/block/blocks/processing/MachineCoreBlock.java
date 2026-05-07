@@ -124,7 +124,7 @@ public class MachineCoreBlock extends Block implements EntityBlock {
         
         if (!state.getValue(USED)) return InteractionResult.PASS;
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             var controllerPos = getControllerPos(world, pos);
             var controllerBlock = world.getBlockState(controllerPos);
             var controllerEntity = world.getBlockEntity(controllerPos);
@@ -145,7 +145,7 @@ public class MachineCoreBlock extends Block implements EntityBlock {
         
         if (!state.getValue(USED)) super.useItemOn(stack, state, world, pos, player, hand, hit);
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             var controllerPos = getControllerPos(world, pos);
             var controllerBlock = world.getBlockState(controllerPos);
             if (controllerBlock.getBlock() instanceof MachineBlock machineBlock) {

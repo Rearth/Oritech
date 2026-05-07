@@ -91,7 +91,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, EnchantmentCatalystBlockEntity blockEntity) {
         
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         
         // check if powered, and adjust soul capacity
         if (energyStorage.getAmount() > 0) {

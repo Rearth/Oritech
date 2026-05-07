@@ -61,7 +61,7 @@ public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
     public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
         
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         
         var isPowered = world.hasNeighborSignal(pos);
         var lastRedstone = state.getValue(REDSTONE_STATE);

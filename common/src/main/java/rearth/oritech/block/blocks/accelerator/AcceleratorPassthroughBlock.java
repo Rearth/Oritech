@@ -49,7 +49,7 @@ public class AcceleratorPassthroughBlock extends HorizontalDirectionalBlock {
     
     @Override
     protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             AcceleratorParticleLogic.resetNearbyCache(pos);
         }
     }

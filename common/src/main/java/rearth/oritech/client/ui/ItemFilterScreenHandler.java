@@ -77,7 +77,7 @@ public class ItemFilterScreenHandler extends AbstractContainerMenu {
         
         var newData = new ItemFilterBlockEntity.FilterData(data.useNbt(), data.useWhitelist(), data.useComponents(), newItems);
         blockEntity.setFilterSettings(newData);
-        if (Objects.requireNonNull(blockEntity.getLevel()).isClientSide) {
+        if (Objects.requireNonNull(blockEntity.getLevel()).isClientSide()) {
             if (player instanceof LocalPlayer clientPlayer && clientPlayer.minecraft.screen instanceof ItemFilterScreen filterScreen) {
                 filterScreen.updateItemFilters();
             }

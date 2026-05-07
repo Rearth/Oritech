@@ -1,7 +1,7 @@
 package rearth.oritech.init.world;
 
 import dev.architectury.registry.level.biome.BiomeModifications;
-import net.minecraft.core.Registry;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BiomeTags;
@@ -15,15 +15,17 @@ import rearth.oritech.init.world.features.resourcenode.ResourceNodeFeature;
 import rearth.oritech.init.world.features.resourcenode.ResourceNodeFeatureConfig;
 import rearth.oritech.init.world.features.uranium.UraniumPatchFeature;
 import rearth.oritech.init.world.features.uranium.UraniumPatchFeatureConfig;
-import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
+import rearth.oritech.util.registry.OritechDeferredRegistry;
 
 // this currently only works on fabric (see https://github.com/Rearth/Oritech/pull/359 & https://github.com/architectury/architectury-api/issues/480)
 // when adding/changing features, make sure to update the neo json files aswell
-public class FeatureContent implements ArchitecturyRegistryContainer<Feature<?>> {
+public class FeatureContent {
+
+    public static final OritechDeferredRegistry<Feature<?>> FEATURES = OritechDeferredRegistry.create(Registries.FEATURE);
     
-    public static final Feature<OilSpringFeatureConfig> OIL_SPRING = new OilSpringFeature(OilSpringFeatureConfig.CODEC);
-    public static final Feature<ResourceNodeFeatureConfig> RESOURCE_NODE = new ResourceNodeFeature(ResourceNodeFeatureConfig.CODEC);
-    public static final Feature<UraniumPatchFeatureConfig> URANIUM_PATCH = new UraniumPatchFeature(UraniumPatchFeatureConfig.CODEC);
+    public static final RegistrySupplier<Feature<?>> OIL_SPRING = FEATURES.register("oil_spring", () -> new OilSpringFeature(OilSpringFeatureConfig.CODEC));
+    public static final RegistrySupplier<Feature<?>> RESOURCE_NODE = FEATURES.register("resource_node", () -> new ResourceNodeFeature(ResourceNodeFeatureConfig.CODEC));
+    public static final RegistrySupplier<Feature<?>> URANIUM_PATCH = FEATURES.register("uranium_patch", () -> new UraniumPatchFeature(UraniumPatchFeatureConfig.CODEC));
     
     public static void initialize() {
         
@@ -85,14 +87,7 @@ public class FeatureContent implements ArchitecturyRegistryContainer<Feature<?>>
         }
     }
     
-    @Override
-    public ResourceKey<Registry<Feature<?>>> getRegistryType() {
-        return Registries.FEATURE;
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    public Class<Feature<?>> getTargetFieldType() {
-        return (Class<Feature<?>>) (Object) Feature.class;
+    public static void register() {
+        FEATURES.register();
     }
 }

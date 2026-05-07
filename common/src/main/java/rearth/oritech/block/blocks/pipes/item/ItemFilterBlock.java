@@ -78,7 +78,7 @@ public class ItemFilterBlock extends Block implements EntityBlock {
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
                 MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
@@ -121,7 +121,7 @@ public class ItemFilterBlock extends Block implements EntityBlock {
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             var entity = (ItemFilterBlockEntity) world.getBlockEntity(pos);
             var stacks = entity.inventory.heldStacks;
             for (var stack : stacks) {

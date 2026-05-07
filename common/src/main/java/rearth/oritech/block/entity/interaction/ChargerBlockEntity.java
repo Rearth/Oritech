@@ -61,7 +61,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
     
     @Override
     public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         
         // stop if no input is given, or it's a stackable item
         if (inventory.getItem(0).isEmpty() || inventory.getItem(0).getCount() > 1) return;

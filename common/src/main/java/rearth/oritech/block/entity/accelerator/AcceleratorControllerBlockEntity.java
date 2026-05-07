@@ -69,7 +69,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, AcceleratorControllerBlockEntity blockEntity) {
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         initParticleLogic();
         
         // try insert item as particle

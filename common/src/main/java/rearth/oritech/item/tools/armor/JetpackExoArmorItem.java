@@ -23,7 +23,7 @@ public class JetpackExoArmorItem extends BackstorageExoArmorItem implements Base
     @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             tickJetpack(stack, entity, world);
         } else {
             super.inventoryTick(stack, world, entity, slot, selected);

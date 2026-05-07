@@ -76,7 +76,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
             MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
             
@@ -108,7 +108,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
             var candidate = FluidApi.ITEM.find(stackRef);
             if (candidate != null) {
                 
-                if (!world.isClientSide) {
+                if (!world.isClientSide()) {
                     if (candidate.getContent().getFirst().isEmpty()) { // from tank to item
                         var moved = FluidApi.transferFirst(tankEntity.fluidStorage, candidate, tankEntity.fluidStorage.getCapacity(), false);
                         Oritech.LOGGER.debug("moved to item {} {}", moved, stackRef.getValue());

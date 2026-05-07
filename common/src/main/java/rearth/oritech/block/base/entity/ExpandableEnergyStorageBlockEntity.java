@@ -111,7 +111,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     
     @Override
     public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         
         energyStorage.tick((int) world.getGameTime());
         

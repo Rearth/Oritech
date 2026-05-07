@@ -232,7 +232,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
                 dropped = Block.getDrops(targetState, (ServerLevel) level, targetPosition, targetEntity, null, new ItemStack(Items.SHEARS));
             }
             
-            // only proceed if all stacks fit
+            // only proceed if all itemStacks fit
             for (var stack : dropped) {
                 if (this.inventory.insert(stack, true) != stack.getCount()) return;
             }

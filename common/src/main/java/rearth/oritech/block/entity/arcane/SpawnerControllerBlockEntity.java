@@ -58,7 +58,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, SpawnerControllerBlockEntity blockEntity) {
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
 
         if (networkDirty) {
             updateNetwork();

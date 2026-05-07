@@ -71,7 +71,7 @@ public class HangarDoorBlock extends Block implements EntityBlock {
 
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
 
         // create segment blocks
         var segmentDirection = getSegmentDirection(state);
@@ -88,7 +88,7 @@ public class HangarDoorBlock extends Block implements EntityBlock {
     public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
 
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         updateDoorState(world, pos, state);
     }
 
@@ -109,7 +109,7 @@ public class HangarDoorBlock extends Block implements EntityBlock {
 
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             removeHelpers(world, pos, state);
         }
 
@@ -118,7 +118,7 @@ public class HangarDoorBlock extends Block implements EntityBlock {
 
     @Override
     protected void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.is(newState.getBlock()) && !world.isClientSide) {
+        if (!state.is(newState.getBlock()) && !world.isClientSide()) {
             removeHelpers(world, pos, state);
         }
 

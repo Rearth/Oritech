@@ -52,7 +52,7 @@ public class HangarDoorHelperBlock extends Block {
 
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             var anchorPos = HangarDoorBlock.getAnchorPos(pos, state);
             var anchorState = world.getBlockState(anchorPos);
             if (anchorState.is(BlockContent.HANGAR_DOOR)) {

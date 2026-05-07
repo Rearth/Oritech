@@ -94,7 +94,7 @@ public abstract class AbstractPipeBlock extends Block {
     
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        if (!player.isCreative() && !world.isClientSide) {
+        if (!player.isCreative() && !world.isClientSide()) {
             onBlockRemoved(pos, state, world);
         }
         return super.playerWillDestroy(world, pos, state, player);

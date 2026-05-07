@@ -29,7 +29,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     // this should never be used in child classes, always use serverTick / clientTick
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             clientTick(world, pos, state, blockEntity);
             return;
         }

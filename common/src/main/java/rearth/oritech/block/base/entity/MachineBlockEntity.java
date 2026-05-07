@@ -168,7 +168,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         }
         
         // remove inputs. Each input is 1 ingredient.
-        var startOffset = 0;    // used so when multiple matching stacks are available, they're drained somewhat evenly
+        var startOffset = 0;    // used so when multiple matching itemStacks are available, they're drained somewhat evenly
         for (var removedIng : inputs) {
             // try to find current ingredient
             for (int i = 0; i < inputInventory.size(); i++) {

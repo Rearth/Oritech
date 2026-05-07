@@ -92,7 +92,7 @@ public class SmallStorageBlock extends Block implements EntityBlock {
     public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
         
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         
         var isPowered = world.hasNeighborSignal(pos);
         
@@ -104,7 +104,7 @@ public class SmallStorageBlock extends Block implements EntityBlock {
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             
             var entity = world.getBlockEntity(pos);
             if (!(entity instanceof MachineAddonController machineEntity)) {
@@ -177,7 +177,7 @@ public class SmallStorageBlock extends Block implements EntityBlock {
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             var entity = world.getBlockEntity(pos);
             if (entity instanceof MachineAddonController machineEntity) {
                 machineEntity.resetAddons();

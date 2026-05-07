@@ -55,7 +55,7 @@ public class LargeStorageBlock extends SmallStorageBlock {
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             
             var entity = world.getBlockEntity(pos);
             if (!(entity instanceof MultiblockMachineController machineEntity)) {

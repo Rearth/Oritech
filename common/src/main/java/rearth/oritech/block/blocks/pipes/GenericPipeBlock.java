@@ -222,7 +222,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
     
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        if (!player.isCreative() && !world.isClientSide) {
+        if (!player.isCreative() && !world.isClientSide()) {
             onBlockRemoved(pos, state, world);
         }
         return super.playerWillDestroy(world, pos, state, player);

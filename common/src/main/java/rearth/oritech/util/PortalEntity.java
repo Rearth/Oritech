@@ -43,7 +43,7 @@ public class PortalEntity extends Entity implements GeoEntity {
     
     @Override
     public void playerTouch(Player player) {
-        if (level().isClientSide) return;
+        if (level().isClientSide()) return;
 
         if (target != null) {
             if (!(player instanceof ServerPlayer serverPlayer)) return;
@@ -72,7 +72,7 @@ public class PortalEntity extends Entity implements GeoEntity {
     @Override
     public void tick() {
         var world = this.level();
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         
         tickCount++;
         

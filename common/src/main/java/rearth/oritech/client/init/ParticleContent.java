@@ -59,7 +59,7 @@ public class ParticleContent {
     private static void sendParticle(Level world, Payload payload) {
         if (world instanceof ServerLevel sl) {
             NetworkManager.sendNearby(sl, payload.pos, 64, payload);
-        } else if (world.isClientSide) {
+        } else if (world.isClientSide()) {
             handleOnClient(payload, world, null);
         }
     }

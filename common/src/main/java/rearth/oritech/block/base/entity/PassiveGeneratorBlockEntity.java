@@ -26,7 +26,7 @@ public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements
     
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, PassiveGeneratorBlockEntity blockEntity) {
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         
         if (isProducing()) {
             var producedAmount = getProductionRate();

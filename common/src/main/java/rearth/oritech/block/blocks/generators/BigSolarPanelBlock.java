@@ -50,7 +50,7 @@ public class BigSolarPanelBlock extends PassiveGeneratorBlock {
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             
             var entity = world.getBlockEntity(pos);
             if (!(entity instanceof BigSolarPanelEntity solarPanel)) {

@@ -46,7 +46,7 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
     
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, ParticleCollectorBlockEntity blockEntity) {
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         
         
         if (energyStorage.amount <= 0) return;

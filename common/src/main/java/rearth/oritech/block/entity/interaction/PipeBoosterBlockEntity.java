@@ -45,7 +45,7 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
     
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, PipeBoosterBlockEntity blockEntity) {
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         
         if (!setPipe && (world.getGameTime() & 25) == 0) {
             // try find pipe entity behind

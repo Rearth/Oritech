@@ -50,7 +50,7 @@ public class DelegatingFluidStorage extends FluidApi.FluidStorage {
     
     public void setContent(List<FluidStack> content) {
         if (canUseBackend()) {
-            // extract all, then insert new stacks
+            // extract all, then insert new itemStacks
             var targetStorage = backingStorage.get();
             if (targetStorage instanceof FluidApi.SingleSlotStorage singleSlotContainer && content.size() == 1) {
                 singleSlotContainer.setStack(content.getFirst());
