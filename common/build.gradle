@@ -5,13 +5,16 @@ plugins {
 neoForge {
     // only apply NeoForm to use Vanilla mode (no loader)
     neoFormVersion = "$minecraft_version-$neoform_version"
-    parchment {
-        minecraftVersion = minecraft_version
-        mappingsVersion = parchment_mappings
-    }
 
-    validateAccessTransformers = true
+    validateAccessTransformers = false
     interfaceInjectionData.from file('src/main/resources/interfaces.json').absolutePath
+}
+
+// temporary during migration
+sourceSets.main.java {
+    exclude 'rearth/oritech/init/compat/emi/**'
+    exclude 'rearth/oritech/init/compat/jade/**'
+    exclude 'rearth/oritech/init/compat/rei/**'
 }
 
 configurations {
@@ -34,13 +37,9 @@ artifacts {
 
 dependencies {
     // Architectury API
-    compileOnlyApi "dev.architectury:architectury-neoforge:$architectury_api_version"
-    // EMI
-    compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
+    compileOnlyApi rootProject.localArchitecturyJar('neoforge')
     // GeckoLib
-    compileOnlyApi "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
-    // Jade
-    compileOnly "curse.maven:jade-324717:6853386"
+    compileOnlyApi "com.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
     // JEI
     compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}") { transitive = false }
     // Mixin
@@ -49,12 +48,8 @@ dependencies {
     // Mixin Extras
     compileOnly 'io.github.llamalad7:mixinextras-common:0.3.5'
     annotationProcessor 'io.github.llamalad7:mixinextras-common:0.3.5'
-    // Oracle Index
-    compileOnly "curse.maven:oracle-index-1206582:7590938"
     // Forge Config API Port (common module - NeoForge API)
     compileOnlyApi "fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforgeapi:$forge_config_api_port_version"
-    // REI
-    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
 
     // ftb filters
     compileOnly("dev.ftb.mods:ftb-filter-system-neoforge:$ftb_filters_version") { transitive = false }

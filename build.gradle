@@ -1,13 +1,13 @@
 plugins {
-    id 'net.neoforged.moddev' version '2.0.107' apply false
-    id 'fabric-loom' version '1.9-SNAPSHOT' apply false
+    id 'net.neoforged.moddev' version '2.0.141' apply false
+    id 'net.fabricmc.fabric-loom' version '1.17.0-alpha.8' apply false
     id "me.modmuss50.mod-publish-plugin" version "0.8.0" apply false
     id 'org.moddedmc.wiki.toolkit' version '0.4.1'
 }
 
 // all projects including the root project
 allprojects {
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'me.modmuss50.mod-publish-plugin'
 
     base {
@@ -16,9 +16,9 @@ allprojects {
 
     java {
         withSourcesJar()
-        toolchain.languageVersion = JavaLanguageVersion.of(21)
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        toolchain.languageVersion = JavaLanguageVersion.of(25)
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
     }
 }
 
@@ -47,6 +47,8 @@ subprojects {
         
         // Architectury API, REI
         maven { url = "https://maven.architectury.dev/" }
+        // JEI
+        maven { url = "https://maven.blamejared.com" }
         // Athena (CTM)
         maven { url = "https://maven.teamresourceful.com/repository/maven-public/" }
         // EMI
@@ -180,7 +182,7 @@ publishMods {
     github {
         accessToken = providers.environmentVariable("GITHUB_TOKEN")
         repository = "Rearth/Oritech"
-        commitish = "1.21"
+        commitish = "26.1"
         changelog = file("./CHANGELOG.MD").getText()
         type = STABLE
         tagName = "v${project.version}"
@@ -188,4 +190,15 @@ publishMods {
         // Allow the release to be initially created without any files.
         allowEmptyFiles = true
     }
+}
+
+ext.localArchitecturyJar = { String loader ->
+    def architecturyDir = file(architectury_local_dir)
+    def jarFile = file("${architecturyDir}/${loader}/build/libs/architectury-${architectury_api_version}-${loader}.jar")
+
+    if (!jarFile.exists()) {
+        throw new GradleException("Missing local Architectury ${loader} jar: ${jarFile}")
+    }
+
+    return files(jarFile)
 }

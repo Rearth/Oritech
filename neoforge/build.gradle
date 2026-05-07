@@ -4,13 +4,9 @@ plugins {
 
 neoForge {
     version = neoforge_version
-    parchment {
-        minecraftVersion = minecraft_version
-        mappingsVersion = parchment_mappings
-    }
 
     accessTransformers.from project(':common').file('src/main/resources/META-INF/accesstransformer.cfg').absolutePath
-    validateAccessTransformers = true
+    validateAccessTransformers = false
     interfaceInjectionData.from project(':common').file('src/main/resources/interfaces.json').absolutePath
 
     runs {
@@ -24,7 +20,7 @@ neoForge {
 
         // datagen run config for NeoForge recipes
         data {
-            data()
+            serverData()
             sourceSet = sourceSets.data
 
             programArguments.addAll '--all', '--mod', mod_id, '--output', file('src/main/generated/').absolutePath
@@ -56,6 +52,10 @@ neoForge {
     }
 }
 
+sourceSets.main.java {
+    exclude 'rearth/oritech/neoforge/client/ReiPluginNeoForge.java'
+}
+
 // create a runtime-only configuration that published to POM
 configurations {
     localRuntime {
@@ -77,97 +77,77 @@ repositories {
 
 dependencies {
     // Architectury API
-    api "dev.architectury:architectury-neoforge:$architectury_api_version"
-    // EMI
-    compileOnly "dev.emi:emi-neoforge:${emi_version}"
+    api rootProject.localArchitecturyJar('neoforge')
     // GeckoLib
-    api "software.bernie.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
-    // GrandPower
-    api jarJar("dev.technici4n:GrandPower:3.0.2") { transitive = false }
-    // Jade
-    compileOnly "curse.maven:jade-324717:5846105"
+    api "com.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
+    interfaceInjectionData "com.geckolib:geckolib-neoforge-$minecraft_version:$geckolib_version"
     // JEI
     compileOnly("mezz.jei:jei-$minecraft_version-neoforge:$jei_version") { transitive = false }
-    // Oracle Index
-    compileOnly "curse.maven:oracle-index-1206582:7590938"
-    // REI
-    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
 
     /// runtime-only
     compileOnly 'org.ow2.asm:asm-tree:9.8'
-
-    // This adds the ASM library to the runtime classpath for all runs (client, server, data)
-    additionalRuntimeClasspath 'org.ow2.asm:asm-tree:9.8'
+    runtimeOnly 'org.ow2.asm:asm-tree:9.8'
 
     // filters (optional addon)
     compileOnly("dev.ftb.mods:ftb-filter-system-neoforge:$ftb_filters_version") { transitive = false }
 
-    runtimeOnly "curse.maven:jade-324717:5846105"
-
     // recipe viewer runtime
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
-        case "emi": localRuntime "dev.emi:emi-neoforge:$emi_version"; break
+        case "emi": println("EMI is disabled until a 26.1-compatible artifact is available."); break
         case "jei": localRuntime "mezz.jei:jei-$minecraft_version-neoforge:$jei_version"; break
-        case "rei": localRuntime "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.754"; break
+        case "rei": println("REI is disabled until a 26.1-compatible artifact is available."); break
         case "disabled": break
         default: println("Unknown recipe viewer specified: $recipe_viewer. Must be EMI, REI, JEI, or disabled.")
     }
     // Athena (CTM)
-    runtimeOnly "earth.terrarium.athena:athena-neoforge-1.21:4.0.0"
-    // Applied Energistics 2
-    localRuntime "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
-    localRuntime "curse.maven:guideme-1173950:$guideme_version_id"
-    // Mekanism
-    localRuntime "curse.maven:mekanism-268560:5680395"
-    // Spark
-    localRuntime "curse.maven:spark-361579:5759671"
-
-    localRuntime "org.sinytra:wiki-exporter-neoforge:2.2.1+1.21.1"
+    runtimeOnly "earth.terrarium.athena:athena-neoforge-26.1:4.7.3"
 
     /// datagen-only
 
-    // Actually Additions
-    dataImplementation "curse.maven:actually-additions-228404:$actually_additions_version_id"
-    dataRuntimeOnly "curse.maven:curios-309927:$curios_version_id"
-    // Applied Energistics 2
-    dataImplementation "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
-    dataRuntimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
-    // Create
-    dataImplementation "curse.maven:create-328085:$create_version_id"
-    dataCompileOnly "com.tterrag.registrate:Registrate:$registrate_version"
-    // Endergy
-    dataImplementation "com.enderio:endergy:$endergy_version"
-    // EnderIO
-    dataImplementation "com.enderio:enderio:$enderio_version"
-    // Energized Power
-    dataImplementation "curse.maven:energized-power-782147:$energized_power_neo_version_id"
-    // EvilCraft
-    dataImplementation "curse.maven:evilcraft-74610:$evilcraft_version_id"
-    dataRuntimeOnly "curse.maven:cyclops-core-232758:$cyclopscore_version_id"
-    // Extended AE
-    dataImplementation "curse.maven:ex-pattern-provider-892005:$extendedae_version_id"
-    dataRuntimeOnly "curse.maven:glodium-957920:$glodium_version_id"
-    // GeOre
-    dataImplementation "curse.maven:geore-530544:$geore_version_id"    
-    // Immersive Engineering
-    dataImplementation "curse.maven:immersive-engineering-231951:$immersive_engineering_version_id"
-    // Industrial Foregoing
-    dataImplementation "curse.maven:industrial-foregoing-266515:$industrial_foregoing_version_id"
-    dataImplementation "curse.maven:titanium-287342:$titanium_version_id"
-    // Iron's Spells 'n Spellbooks
-    dataImplementation "curse.maven:irons-spells-n-spellbooks-855414:$irons_spells_version_id"
-    dataRuntimeOnly "curse.maven:playeranimator-658587:$player_animator_version_id"
-    dataRuntimeOnly "curse.maven:caelus-308989:$caelus_version_id"
-    // Mekanism
-    dataImplementation "curse.maven:mekanism-268560:6486993"
-    dataImplementation "curse.maven:mekanism-generators-268566:6486996"
-    // PneumaticCraft: Repressurized
-    dataImplementation "curse.maven:pneumaticcraft-repressurized-281849:$pneumaticcraft_version_id"
-    // Powah!
-    dataImplementation "curse.maven:powah-rearchitected-633483:$powah_version_id"
-    dataRuntimeOnly "me.shedaniel.cloth:cloth-config-neoforge:$cloth_config_version"
-    // Productive Metalworks
-    dataImplementation "curse.maven:productive-metalworks-1184570:$productive_metalworks_version_id"
+    if (enable_datagen_deps.toBoolean()) {
+        // Actually Additions
+        dataImplementation "curse.maven:actually-additions-228404:$actually_additions_version_id"
+        dataRuntimeOnly "curse.maven:curios-309927:$curios_version_id"
+        // Applied Energistics 2
+        dataImplementation "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
+        dataRuntimeOnly "curse.maven:guideme-1173950:$guideme_version_id"
+        // Create
+        dataImplementation "curse.maven:create-328085:$create_version_id"
+        dataCompileOnly "com.tterrag.registrate:Registrate:$registrate_version"
+        // Endergy
+        dataImplementation "com.enderio:endergy:$endergy_version"
+        // EnderIO
+        dataImplementation "com.enderio:enderio:$enderio_version"
+        // Energized Power
+        dataImplementation "curse.maven:energized-power-782147:$energized_power_neo_version_id"
+        // EvilCraft
+        dataImplementation "curse.maven:evilcraft-74610:$evilcraft_version_id"
+        dataRuntimeOnly "curse.maven:cyclops-core-232758:$cyclopscore_version_id"
+        // Extended AE
+        dataImplementation "curse.maven:ex-pattern-provider-892005:$extendedae_version_id"
+        dataRuntimeOnly "curse.maven:glodium-957920:$glodium_version_id"
+        // GeOre
+        dataImplementation "curse.maven:geore-530544:$geore_version_id"
+        // Immersive Engineering
+        dataImplementation "curse.maven:immersive-engineering-231951:$immersive_engineering_version_id"
+        // Industrial Foregoing
+        dataImplementation "curse.maven:industrial-foregoing-266515:$industrial_foregoing_version_id"
+        dataImplementation "curse.maven:titanium-287342:$titanium_version_id"
+        // Iron's Spells 'n Spellbooks
+        dataImplementation "curse.maven:irons-spells-n-spellbooks-855414:$irons_spells_version_id"
+        dataRuntimeOnly "curse.maven:playeranimator-658587:$player_animator_version_id"
+        dataRuntimeOnly "curse.maven:caelus-308989:$caelus_version_id"
+        // Mekanism
+        dataImplementation "curse.maven:mekanism-268560:6486993"
+        dataImplementation "curse.maven:mekanism-generators-268566:6486996"
+        // PneumaticCraft: Repressurized
+        dataImplementation "curse.maven:pneumaticcraft-repressurized-281849:$pneumaticcraft_version_id"
+        // Powah!
+        dataImplementation "curse.maven:powah-rearchitected-633483:$powah_version_id"
+        dataRuntimeOnly "me.shedaniel.cloth:cloth-config-neoforge:$cloth_config_version"
+        // Productive Metalworks
+        dataImplementation "curse.maven:productive-metalworks-1184570:$productive_metalworks_version_id"
+    }
 }
 
 publishMods {
@@ -179,8 +159,7 @@ publishMods {
     modrinth {
         accessToken = providers.environmentVariable("MODRINTH_API_KEY")
         projectId = "4sYI62kA"
-        minecraftVersions.add("1.21.1")
-        minecraftVersions.add("1.21")
+        minecraftVersions.add("26.1.2")
 
         requires("geckolib")
         requires("athena-ctm")
@@ -194,15 +173,14 @@ publishMods {
     curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
         projectId = "1030830"
-        minecraftVersions.add("1.21.1")
-        minecraftVersions.add("1.21")
+        minecraftVersions.add("26.1.2")
 
         requires("geckolib")
         requires("athena")
         requires("architectury-api")
         optional("oracle-index")
 
-        javaVersions.add(JavaVersion.VERSION_21)
+        javaVersions.add(JavaVersion.VERSION_25)
         clientRequired = true
         serverRequired = true
 

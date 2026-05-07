@@ -17,21 +17,21 @@ logoFile = "assets/oritech/icon.png"
 [[dependencies.oritech]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.1.200,)"
+versionRange = "[26.1.2,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.oritech]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21,)"
+versionRange = "[26.1.2,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.oritech]]
 modId = "architectury"
 type = "required"
-versionRange = "[13.0.2,)"
+versionRange = "[19.0.2,)"
 ordering = "AFTER"
 side = "BOTH"
 
