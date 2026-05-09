@@ -1,6 +1,7 @@
 package rearth.oritech.api.recipe;
 
 import com.google.common.base.Optional;
+import dev.architectury.registry.registries.RegistrySupplier;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -9,11 +10,11 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.FluidIngredient;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.List;
 
 public abstract class OritechRecipeBuilder {
 
-    protected final OritechRecipeType type;
+    protected final RegistrySupplier<RecipeType<OritechRecipe>> type;
     protected List<Ingredient> inputs;
     protected List<ItemStack> results;
     protected FluidIngredient fluidInput;
@@ -31,7 +32,7 @@ public abstract class OritechRecipeBuilder {
     protected boolean addToGrinder;
     private final String resourcePath;
 
-    protected OritechRecipeBuilder(OritechRecipeType type, String resourcePath) {
+    protected OritechRecipeBuilder(RegistrySupplier<RecipeType<OritechRecipe>> type, String resourcePath) {
         this.type = type;
         this.resourcePath = resourcePath;
         this.fluidOutputs = new ArrayList<>();
@@ -163,12 +164,12 @@ public abstract class OritechRecipeBuilder {
         exporter.accept(
           id,
           new OritechRecipe(
-            (int)(time * timeMultiplier),
             inputs != null ? inputs : List.of(),
             results != null ? results : List.of(),
-            type,
             fluidInput != null ? fluidInput : FluidIngredient.EMPTY,
-            fluidOutputs != null ? fluidOutputs : List.of()),
+                        fluidOutputs != null ? fluidOutputs : List.of(),
+                        (int)(time * timeMultiplier),
+                        type.get()),
           null);
     }
     

@@ -1,9 +1,8 @@
 package rearth.oritech.api.recipe;
 
-import org.jetbrains.annotations.Nullable;
+import dev.architectury.registry.registries.RegistrySupplier;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.recipes.AugmentDataRecipe;
-import rearth.oritech.init.recipes.AugmentDataRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.SizedIngredient;
 
@@ -19,10 +18,11 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 
 public class AugmentRecipeBuilder {
-    private final AugmentDataRecipeType type;
+    private final RegistrySupplier<RecipeType<AugmentDataRecipe>> type;
     private final String resourcePath;
     
     private boolean toggleable;
@@ -36,12 +36,9 @@ public class AugmentRecipeBuilder {
     private int time;
     private long rfCost;
     
-    // 2 of these 3 should always be null
-    private @Nullable AugmentDataRecipe.EffectDefinition effectDefinition;
-    private @Nullable AugmentDataRecipe.ModifierDefinition modifierDefinition;
-    private @Nullable AugmentDataRecipe.CustomAugmentDefinition customAugmentDefinition;
+    private AugmentDataRecipe.AugmentDefinition definition;
     
-    private AugmentRecipeBuilder(AugmentDataRecipeType type, String resourcePath) {
+    private AugmentRecipeBuilder(RegistrySupplier<RecipeType<AugmentDataRecipe>> type, String resourcePath) {
         this.type = type;
         this.resourcePath = resourcePath;
     }
@@ -176,17 +173,17 @@ public class AugmentRecipeBuilder {
     }
     
     public AugmentRecipeBuilder effectDefinition(Holder<MobEffect> entry, int amplifier) {
-        this.effectDefinition = new AugmentDataRecipe.EffectDefinition(BuiltInRegistries.MOB_EFFECT.getKey(entry.value()), amplifier);
+        this.definition = new AugmentDataRecipe.EffectDefinition(BuiltInRegistries.MOB_EFFECT.getKey(entry.value()), amplifier);
         return this;
     }
     
     public AugmentRecipeBuilder modifierDefinition(Holder<Attribute> entry, float amount, AttributeModifier.Operation op) {
-        this.modifierDefinition = new AugmentDataRecipe.ModifierDefinition(BuiltInRegistries.ATTRIBUTE.getKey(entry.value()), op.id(), amount);
+        this.definition = new AugmentDataRecipe.ModifierDefinition(BuiltInRegistries.ATTRIBUTE.getKey(entry.value()), op.id(), amount);
         return this;
     }
     
     public AugmentRecipeBuilder customAugmentDefinition(Identifier customAugmentId) {
-        this.customAugmentDefinition = new AugmentDataRecipe.CustomAugmentDefinition(customAugmentId);
+        this.definition = new AugmentDataRecipe.CustomAugmentDefinition(customAugmentId);
         return this;
     }
     
@@ -198,30 +195,25 @@ public class AugmentRecipeBuilder {
         if (requiredStation == null)
             throw new IllegalStateException("required station expected for recipe " + id + " (type " + type + ")");
         
-        // ensure exactly one type is set
-        if ((effectDefinition != null ? 1 : 0) + (modifierDefinition != null ? 1 : 0) + (customAugmentDefinition != null ? 1 : 0) != 1) {
-            throw new IllegalStateException("Exactly one of effectDefinition, modifierDefinition, or customAugmentDefinition must be set for recipe " + id + " (type " + type + ")");
-        }
+        if (definition == null)
+            throw new IllegalStateException("Augment definition expected for recipe " + id + " (type " + type + ")");
     }
     
     public void export(RecipeOutput exporter, String suffix) {
         var id = Oritech.id(resourcePath + "/" + suffix);
         validate(id);
         
-        exporter.accept(id, new AugmentDataRecipe(
-          type,
-          toggleable,
-          researchCosts,
-          applyCosts,
-          requirements != null ? requirements : List.of(),
-          requiredStation,
-          uiX,
-          uiY,
-          time,
-          rfCost,
-          effectDefinition,
-          modifierDefinition,
-          customAugmentDefinition
-        ), null);
+                exporter.accept(id, new AugmentDataRecipe(
+                    toggleable,
+                    researchCosts,
+                    applyCosts,
+                    requirements != null ? requirements : List.of(),
+                    requiredStation,
+                    uiX,
+                    uiY,
+                    time,
+                    rfCost,
+                    definition
+                ), null);
     }
 }

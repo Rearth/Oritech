@@ -124,8 +124,8 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
             var recipeEntry = menu.player.level().getRecipeManager().byKey(augmentId);
             if (recipeEntry.isEmpty() || !(recipeEntry.get().value() instanceof AugmentDataRecipe recipe)) continue;
             
-            int x = GRAPH_LEFT_OFFSET + recipe.getUiX() * 4 - NODE_SIZE / 2;
-            int y = (int) (recipe.getUiY() / 100f * graphHeight) - NODE_SIZE / 2;
+            int x = GRAPH_LEFT_OFFSET + recipe.uiX() * 4 - NODE_SIZE / 2;
+            int y = (int) (recipe.uiY() / 100f * graphHeight) - NODE_SIZE / 2;
             maxY = Math.max(maxY, y + NODE_SIZE + 12);
             
             var node = new AugmentNodeWidget(x, y, augmentId);
@@ -139,7 +139,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
             if (recipeEntry.isEmpty() || !(recipeEntry.get().value() instanceof AugmentDataRecipe recipe)) continue;
             
             var fromNode = augmentNodes.get(augmentId);
-            for (var dependencyId : recipe.getRequirements()) {
+            for (var dependencyId : recipe.requirements()) {
                 var dependencyNode = augmentNodes.get(dependencyId);
                 if (dependencyNode == null) continue;
                 dependencyLines.add(new DependencyLine(fromNode.centerX(), fromNode.centerY(), dependencyNode.centerX(), dependencyNode.centerY()));
@@ -261,14 +261,14 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
             var missingRequirements = new ArrayList<Component>();
             var hasRequirements = true;
             
-            for (var requirementId : augmentRecipe.getRequirements()) {
+            for (var requirementId : augmentRecipe.requirements()) {
                 if (!this.menu.blockEntity.researchedAugments.contains(requirementId)) {
                     hasRequirements = false;
                     missingRequirements.add(Component.translatable(augmentKey(requirementId)).withStyle(ChatFormatting.ITALIC, ChatFormatting.RED));
                 }
             }
             
-            var requiredStationBlock = BuiltInRegistries.BLOCK.get(augmentRecipe.getRequiredStation());
+            var requiredStationBlock = BuiltInRegistries.BLOCK.get(augmentRecipe.requiredStation());
             var hasResearchStation = this.menu.blockEntity.availableStations.values().stream()
                                        .filter(Objects::nonNull)
                                        .anyMatch(station -> station.type.equals(requiredStationBlock));
@@ -301,8 +301,8 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         }
         
         if (operation == PlayerAugments.AugmentApplicatorOperation.RESEARCH) {
-            tooltip.add(Component.translatable("oritech.text.augment_research_time", recipe.getTime() / 20));
-            tooltip.add(Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(recipe.getRfCost())));
+            tooltip.add(Component.translatable("oritech.text.augment_research_time", recipe.time() / 20));
+            tooltip.add(Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(recipe.rfCost())));
         }
         
         if (!missingRequirements.isEmpty()) {
@@ -362,7 +362,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         boolean hasResources = true;
         boolean hasEnergy = true;
         
-        var requiredStationBlock = BuiltInRegistries.BLOCK.get(recipe.getRequiredStation());
+        var requiredStationBlock = BuiltInRegistries.BLOCK.get(recipe.requiredStation());
         boolean hasRequiredStation = false;
         for (int i = 0; i < 3; i++) {
             var station = this.menu.blockEntity.availableStations.getOrDefault(i, null);
@@ -374,8 +374,8 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         }
         
         var shownCost = operation == PlayerAugments.AugmentApplicatorOperation.ADD
-                          ? recipe.getApplyCost()
-                          : recipe.getResearchCost();
+                          ? recipe.applyCost()
+                          : recipe.researchCost();
         
         if (operation != PlayerAugments.AugmentApplicatorOperation.REMOVE) {
             for (var wantedInput : shownCost) {
@@ -391,7 +391,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         }
         
         if (operation == PlayerAugments.AugmentApplicatorOperation.RESEARCH) {
-            hasEnergy = this.menu.blockEntity.getEnergyStorageForMultiblock(null).getAmount() >= recipe.getRfCost();
+            hasEnergy = this.menu.blockEntity.getEnergyStorageForMultiblock(null).getAmount() >= recipe.rfCost();
         }
         
         var overlay = new OverlayWidget(width, height).withDismissHandler(this::removeDialogOverlay);
@@ -425,9 +425,9 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         
         if (operation == PlayerAugments.AugmentApplicatorOperation.RESEARCH) {
             cursorY = addWrappedLabel(dialogChildren, panelX + 12, cursorY, contentWidth,
-              Component.translatable("oritech.text.augment_research_time", recipe.getTime() / 20), LabelWidget.Alignment.LEFT);
+              Component.translatable("oritech.text.augment_research_time", recipe.time() / 20), LabelWidget.Alignment.LEFT);
             cursorY = addWrappedLabel(dialogChildren, panelX + 12, cursorY, contentWidth,
-              Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(recipe.getRfCost())), LabelWidget.Alignment.LEFT);
+              Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(recipe.rfCost())), LabelWidget.Alignment.LEFT);
         }
         
         if (operation != PlayerAugments.AugmentApplicatorOperation.REMOVE) {

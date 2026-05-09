@@ -29,7 +29,6 @@ import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.util.ServerZiplineHandler;
-import rearth.oritech.util.registry.ArchitecturyRecipeRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
 import java.util.HashSet;
@@ -106,8 +105,8 @@ public final class Oritech {
           registry(Registries.ENTITY_TYPE, EntitiesContent::register),
           registry(Registries.ITEM, ToolsContent::registerEventHandlers),
           registry(Registries.MENU, ModScreens::register),
-          registry(Registries.RECIPE_TYPE, () -> ArchitecturyRegistryContainer.register(RecipeContent.class, MOD_ID, false)),
-          registry(Registries.RECIPE_SERIALIZER, ArchitecturyRecipeRegistryContainer::finishSerializerRegister),
+          registry(Registries.RECIPE_TYPE, RecipeContent::registerTypes),
+          registry(Registries.RECIPE_SERIALIZER, RecipeContent::registerSerializers),
           registry(Identifier.fromNamespaceAndPath("neoforge", "attachment_types"), () -> {
               Augment.registerAttachmentTypes();
               ServerZiplineHandler.registerAttachments();

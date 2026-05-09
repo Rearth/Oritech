@@ -161,10 +161,10 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         
         var recipe = (AugmentDataRecipe) level.getRecipeManager().byKey(augment).get().value();
         
-        var extracted = energyStorage.extract(recipe.getRfCost(), false);
+        var extracted = energyStorage.extract(recipe.rfCost(), false);
         
         // remove available resources
-        for (var wantedInput : recipe.getResearchCost()) {
+        for (var wantedInput : recipe.researchCost()) {
             var type = wantedInput.ingredient();
             var missingCount = wantedInput.count();
             
@@ -195,12 +195,12 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             if (station.working) continue;
             
             
-            if (!BuiltInRegistries.BLOCK.getKey(station.type).equals(recipe.getRequiredStation())) continue;
+            if (!BuiltInRegistries.BLOCK.getKey(station.type).equals(recipe.requiredStation())) continue;
             
             station.selectedResearch = augment;
             station.working = true;
             station.researchStartedAt = level.getGameTime();
-            station.workTime = creative ? 5 : recipe.getTime();
+            station.workTime = creative ? 5 : recipe.time();
             
             break;
             
@@ -223,7 +223,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         var recipe = (AugmentDataRecipe) level.getRecipeManager().byKey(augment).get().value();
         
         // remove available resources
-        for (var wantedInput : recipe.getApplyCost()) {
+        for (var wantedInput : recipe.applyCost()) {
             var type = wantedInput.ingredient();
             var missingCount = wantedInput.count();
             

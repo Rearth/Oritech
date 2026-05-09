@@ -1,157 +1,140 @@
 package rearth.oritech.init.recipes;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.block.entity.augmenter.api.CustomAugmentsCollection;
 import rearth.oritech.block.entity.augmenter.api.EffectAugment;
 import rearth.oritech.block.entity.augmenter.api.ModifierAugment;
 import rearth.oritech.util.SizedIngredient;
 
+import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeInput;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.Level;
 
-public class AugmentDataRecipe implements Recipe<RecipeInput> {
+public record AugmentDataRecipe(boolean toggleable, List<SizedIngredient> researchCost, List<SizedIngredient> applyCost,
+                                List<Identifier> requirements, Identifier requiredStation, int uiX, int uiY, int time,
+                                long rfCost,
+                                rearth.oritech.init.recipes.AugmentDataRecipe.AugmentDefinition definition) implements Recipe<AugmentDataRecipeInput> {
     
-    private final boolean toggleable;
-    private final AugmentDataRecipeType type;
+    public static final MapCodec<AugmentDataRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+      Codec.BOOL.fieldOf("toggleable").forGetter(AugmentDataRecipe::toggleable),
+      SizedIngredient.CODEC.codec().listOf().fieldOf("researchCost").forGetter(AugmentDataRecipe::researchCost),
+      SizedIngredient.CODEC.codec().listOf().fieldOf("applyCost").forGetter(AugmentDataRecipe::applyCost),
+      Identifier.CODEC.listOf().fieldOf("requirements").forGetter(AugmentDataRecipe::requirements),
+      Identifier.CODEC.fieldOf("requiredStation").forGetter(AugmentDataRecipe::requiredStation),
+      Codec.INT.fieldOf("uiX").forGetter(AugmentDataRecipe::uiX),
+      Codec.INT.fieldOf("uiY").forGetter(AugmentDataRecipe::uiY),
+      Codec.INT.fieldOf("time").forGetter(AugmentDataRecipe::time),
+      Codec.LONG.fieldOf("rfCost").forGetter(AugmentDataRecipe::rfCost),
+      AugmentDefinition.CODEC.fieldOf("effect").forGetter(AugmentDataRecipe::definition)
+    ).apply(instance, AugmentDataRecipe::new));
     
-    private final List<SizedIngredient> researchCost;
-    private final List<SizedIngredient> applyCost;
-    private final List<Identifier> requirements;
-    private final Identifier requiredStation;
-    private final int uiX;
-    private final int uiY;
-    private final int time;
-    private final long rfCost;
+    public static final StreamCodec<RegistryFriendlyByteBuf, AugmentDataRecipe> STREAM_CODEC = StreamCodec.composite(
+      ByteBufCodecs.BOOL, AugmentDataRecipe::toggleable,
+      SizedIngredient.PACKET_CODEC.apply(ByteBufCodecs.list()), AugmentDataRecipe::researchCost,
+      SizedIngredient.PACKET_CODEC.apply(ByteBufCodecs.list()), AugmentDataRecipe::applyCost,
+      Identifier.STREAM_CODEC.apply(ByteBufCodecs.list()), AugmentDataRecipe::requirements,
+      Identifier.STREAM_CODEC, AugmentDataRecipe::requiredStation,
+      ByteBufCodecs.INT, AugmentDataRecipe::uiX,
+      ByteBufCodecs.INT, AugmentDataRecipe::uiY,
+      ByteBufCodecs.INT, AugmentDataRecipe::time,
+      ByteBufCodecs.VAR_LONG, AugmentDataRecipe::rfCost,
+      AugmentDefinition.STREAM_CODEC, AugmentDataRecipe::definition,
+      AugmentDataRecipe::new
+    );
     
-    // 2 of these 3 should always be null
-    private final @Nullable EffectDefinition effectDefinition;
-    private final @Nullable ModifierDefinition modifierDefinition;
-    private final @Nullable CustomAugmentDefinition customAugmentDefinition;
-    
-    // this shitty either variant is needed because neoforge datagen wont work with the normal null values
-    public AugmentDataRecipe(
-      AugmentDataRecipeType type,
-      boolean toggleable,
-      List<SizedIngredient> researchCost,
-      List<SizedIngredient> applyCost,
-      List<Identifier> requirements,
-      Identifier requiredStation,
-      int uiX,
-      int uiY,
-      int time,
-      long rfCost,
-      Either<Either<EffectDefinition, ModifierDefinition>, CustomAugmentDefinition> effect) {
-        
-        this(type,
-          toggleable,
-          researchCost,
-          applyCost,
-          requirements,
-          requiredStation,
-          uiX,
-          uiY,
-          time,
-          rfCost,
-          effect.left().isPresent() ? effect.left().get().left().isPresent() ? effect.left().get().left().get() : null : null,
-          effect.left().isPresent() ? effect.left().get().right().isPresent() ? effect.left().get().right().get() : null : null,
-          effect.right().isPresent() ? effect.right().get() : null);
+    @Override
+    public boolean matches(AugmentDataRecipeInput input, Level world) {
+        return switch (input.mode()) {
+            case RESEARCH -> matchesResearchCost(input);
+            case APPLY -> matchesApplyCost(input);
+        };
     }
     
-    public AugmentDataRecipe(
-      AugmentDataRecipeType type,
-      boolean toggleable,
-      List<SizedIngredient> researchCost,
-      List<SizedIngredient> applyCost,
-      List<Identifier> requirements,
-      Identifier requiredStation,
-      int uiX,
-      int uiY,
-      int time,
-      long rfCost,
-      @Nullable EffectDefinition effectDefinition,
-      @Nullable ModifierDefinition modifierDefinition,
-      @Nullable CustomAugmentDefinition customAugmentDefinition) {
-        
-        this.toggleable = toggleable;
-        this.researchCost = researchCost;
-        this.applyCost = applyCost;
-        this.requirements = requirements;
-        this.requiredStation = requiredStation;
-        this.uiX = uiX;
-        this.uiY = uiY;
-        this.time = time;
-        this.rfCost = rfCost;
-        this.effectDefinition = effectDefinition;
-        this.modifierDefinition = modifierDefinition;
-        this.customAugmentDefinition = customAugmentDefinition;
-        this.type = type;
+    public boolean matchesResearchCost(AugmentDataRecipeInput input) {
+        return OritechRecipe.itemsMatch(expandSizedIngredients(researchCost), input);
+    }
+    
+    public boolean matchesApplyCost(AugmentDataRecipeInput input) {
+        return OritechRecipe.itemsMatch(expandSizedIngredients(applyCost), input);
+    }
+    
+    private static List<Ingredient> expandSizedIngredients(List<SizedIngredient> sizedIngredients) {
+        var ingredients = new ArrayList<Ingredient>();
+        for (var sizedIngredient : sizedIngredients) {
+            for (int count = 0; count < sizedIngredient.count(); count++) {
+                ingredients.add(sizedIngredient.ingredient());
+            }
+        }
+        return ingredients;
     }
     
     @Override
-    public boolean matches(RecipeInput input, Level world) {
-        throw new UnsupportedOperationException();
-    }
-    
-    @Override
-    public ItemStack assemble(RecipeInput input, HolderLookup.Provider lookup) {
+    public ItemStack assemble(AugmentDataRecipeInput augmentDataRecipeInput) {
+        Oritech.LOGGER.warn("Tried to assemble oritech recipe");
         return ItemStack.EMPTY;
     }
     
     @Override
-    public boolean canCraftInDimensions(int width, int height) {
+    public boolean isSpecial() {
+        return true;
+    }
+    
+    @Override
+    public boolean showNotification() {
         return false;
     }
     
     @Override
-    public ItemStack getResultItem(HolderLookup.Provider registriesLookup) {
-        return ItemStack.EMPTY;
+    public String group() {
+        return "";
     }
     
     @Override
-    public RecipeSerializer<?> getSerializer() {
-        return type;
+    public RecipeSerializer<? extends Recipe<AugmentDataRecipeInput>> getSerializer() {
+        return RecipeContent.AUGMENT_DATA_SERIALIZER.get();
     }
     
     @Override
-    public RecipeType<?> getType() {
-        return type;
+    public RecipeType<? extends Recipe<AugmentDataRecipeInput>> getType() {
+        return RecipeContent.AUGMENT_DATA.get();
     }
     
-    public AugmentDataRecipeType getOriType() {
-        return type;
+    @Override
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
     }
     
-    public boolean isToggleable() {
-        return toggleable;
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return RecipeBookCategories.CRAFTING_MISC;
     }
     
     public Augment createAugment(Identifier recipeId) {
-        if (customAugmentDefinition != null) {
+        if (definition instanceof CustomAugmentDefinition customAugmentDefinition) {
             var customId = customAugmentDefinition.customAugmentId;
             return CustomAugmentsCollection.getById(customId);
-        } else if (effectDefinition != null) {
+        } else if (definition instanceof EffectDefinition effectDefinition) {
             return new EffectAugment(
               recipeId,
               this.toggleable,
-              BuiltInRegistries.MOB_EFFECT.getHolder(effectDefinition.potionEffectId).orElseThrow(),
+              BuiltInRegistries.MOB_EFFECT.get(effectDefinition.potionEffectId).orElseThrow(),
               effectDefinition.effectStrength);
-        } else if (modifierDefinition != null) {
+        } else if (definition instanceof ModifierDefinition modifierDefinition) {
             return new ModifierAugment(
               recipeId,
-              BuiltInRegistries.ATTRIBUTE.getHolder(modifierDefinition.entityAttributeId).orElseThrow(),
+              BuiltInRegistries.ATTRIBUTE.get(modifierDefinition.entityAttributeId).orElseThrow(),
               AttributeModifier.Operation.BY_ID.apply(modifierDefinition.attributeOperationType()),
               modifierDefinition.amount(),
               this.toggleable);
@@ -160,84 +143,90 @@ public class AugmentDataRecipe implements Recipe<RecipeInput> {
         }
     }
     
-    public List<SizedIngredient> getResearchCost() {
-        return researchCost;
-    }
-    
-    public List<SizedIngredient> getApplyCost() {
-        return applyCost;
-    }
-    
-    public long getRfCost() {
-        return rfCost;
-    }
-    
-    public int getTime() {
-        return time;
-    }
-    
-    public Identifier getRequiredStation() {
-        return requiredStation;
-    }
-    
-    public List<Identifier> getRequirements() {
-        return requirements;
-    }
-    
-    public int getUiX() {
-        return uiX;
-    }
-    
-    public int getUiY() {
-        return uiY;
-    }
-    
-    public @Nullable EffectDefinition getEffectDefinition() {
-        return effectDefinition;
-    }
-    
-    public @Nullable CustomAugmentDefinition getCustomAugmentDefinition() {
-        return customAugmentDefinition;
-    }
-    
-    public @Nullable ModifierDefinition getModifierDefinition() {
-        return modifierDefinition;
-    }
-    
-    public Either<Either<EffectDefinition, ModifierDefinition>, CustomAugmentDefinition> getDefinition() {
-        if (effectDefinition != null) {
-            return Either.left(Either.left(effectDefinition));
-        } else if (modifierDefinition != null) {
-            return Either.left(Either.right(modifierDefinition));
-        } else if (customAugmentDefinition != null) {
-            return Either.right(customAugmentDefinition);
+    public sealed
+    interface AugmentDefinition permits EffectDefinition, ModifierDefinition, CustomAugmentDefinition {
+        Codec<AugmentDefinition> CODEC = Codec.STRING.dispatch("type", AugmentDefinition::type, AugmentDefinition::codecFor);
+        
+        String type();
+        
+        private static MapCodec<? extends AugmentDefinition> codecFor(String type) {
+            return switch (type) {
+                case "effect" -> EffectDefinition.MAP_CODEC;
+                case "modifier" -> ModifierDefinition.MAP_CODEC;
+                case "custom" -> CustomAugmentDefinition.MAP_CODEC;
+                default -> throw new IllegalArgumentException("Unknown augment definition type: " + type);
+            };
         }
         
-        throw new IllegalStateException("Either effect, modifier or custom augment needs to be set!");
+        StreamCodec<RegistryFriendlyByteBuf, AugmentDefinition> STREAM_CODEC = StreamCodec.of(
+          (buf, definition) -> {
+              if (definition instanceof CustomAugmentDefinition customAugmentDefinition) {
+                  buf.writeByte(2);
+                  Identifier.STREAM_CODEC.encode(buf, customAugmentDefinition.customAugmentId());
+              } else if (definition instanceof ModifierDefinition modifierDefinition) {
+                  buf.writeByte(1);
+                  Identifier.STREAM_CODEC.encode(buf, modifierDefinition.entityAttributeId());
+                  buf.writeInt(modifierDefinition.attributeOperationType());
+                  buf.writeFloat(modifierDefinition.amount());
+              } else if (definition instanceof EffectDefinition effectDefinition) {
+                  buf.writeByte(0);
+                  Identifier.STREAM_CODEC.encode(buf, effectDefinition.potionEffectId());
+                  buf.writeInt(effectDefinition.effectStrength());
+              } else {
+                  throw new IllegalStateException("Unknown augment definition type: " + definition.getClass());
+              }
+          },
+          buf -> {
+              var kind = buf.readByte();
+              if (kind == 2) return new CustomAugmentDefinition(Identifier.STREAM_CODEC.decode(buf));
+              if (kind == 1)
+                  return new ModifierDefinition(Identifier.STREAM_CODEC.decode(buf), buf.readInt(), buf.readFloat());
+              return new EffectDefinition(Identifier.STREAM_CODEC.decode(buf), buf.readInt());
+          }
+        );
     }
     
     // used to apply an effect, similar to potion effects
-    public record EffectDefinition(Identifier potionEffectId, int effectStrength) {
-        public static final Codec<EffectDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public record EffectDefinition(Identifier potionEffectId, int effectStrength) implements AugmentDefinition {
+        public static final MapCodec<EffectDefinition> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
           Identifier.CODEC.fieldOf("potionEffectId").forGetter(EffectDefinition::potionEffectId),
           Codec.INT.fieldOf("effectStrength").forGetter(EffectDefinition::effectStrength)
         ).apply(instance, EffectDefinition::new));
+        public static final Codec<EffectDefinition> CODEC = MAP_CODEC.codec();
+        
+        @Override
+        public String type() {
+            return "effect";
+        }
     }
     
     // apply a stat modification. The attributeOperationType type can be either "add_value=0", "add_multiplied_base=1" or "add_multiplied_total=2"
-    public record ModifierDefinition(Identifier entityAttributeId, int attributeOperationType, float amount) {
-        public static final Codec<ModifierDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public record ModifierDefinition(Identifier entityAttributeId, int attributeOperationType,
+                                     float amount) implements AugmentDefinition {
+        public static final MapCodec<ModifierDefinition> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
           Identifier.CODEC.fieldOf("entityAttributeId").forGetter(ModifierDefinition::entityAttributeId),
           Codec.INT.fieldOf("attributeOperationType").forGetter(ModifierDefinition::attributeOperationType),
           Codec.FLOAT.fieldOf("amount").forGetter(ModifierDefinition::amount)
         ).apply(instance, ModifierDefinition::new));
+        public static final Codec<ModifierDefinition> CODEC = MAP_CODEC.codec();
+        
+        @Override
+        public String type() {
+            return "modifier";
+        }
     }
     
     // apply a custom modification, that implements custom functionality.
-    public record CustomAugmentDefinition(Identifier customAugmentId) {
-        public static final Codec<CustomAugmentDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public record CustomAugmentDefinition(Identifier customAugmentId) implements AugmentDefinition {
+        public static final MapCodec<CustomAugmentDefinition> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
           Identifier.CODEC.fieldOf("customAugmentId").forGetter(CustomAugmentDefinition::customAugmentId)
         ).apply(instance, CustomAugmentDefinition::new));
+        public static final Codec<CustomAugmentDefinition> CODEC = MAP_CODEC.codec();
+        
+        @Override
+        public String type() {
+            return "custom";
+        }
     }
     
 }

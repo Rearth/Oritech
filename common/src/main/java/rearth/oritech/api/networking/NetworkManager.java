@@ -47,7 +47,6 @@ import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.JetpackItem;
 import rearth.oritech.util.ServerZiplineHandler;
@@ -63,6 +62,7 @@ public class NetworkManager {
     private static final Map<Integer, List<Field>> CACHED_FIELDS = new HashMap<Integer, List<Field>>();
     
     // these two are basically copies of the architectury built-in fluid stack codecs, but using the OPTIONAL_STREAM_CODEC to allow for empty fluid itemStacks
+    // todo check if this is still needed with the update
     public static Codec<FluidStack> FLUID_STACK_CODEC;
     public static StreamCodec<RegistryFriendlyByteBuf, FluidStack> FLUID_STACK_STREAM_CODEC;
     
@@ -114,7 +114,7 @@ public class NetworkManager {
         registerCodec(FLUID_STACK_STREAM_CODEC, FluidStack.class);
         registerCodec(ByteBufCodecs.COMPOUND_TAG, CompoundTag.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
-        registerCodec(OritechRecipeType.PACKET_CODEC, OritechRecipe.class);
+        registerCodec(OritechRecipe.STREAM_CODEC, OritechRecipe.class);
         registerCodec(LaserArmBlockEntity.LASER_TARGET_PACKET_CODEC, LivingEntity.class);
         registerCodec(AugmentApplicationEntity.ResearchState.PACKET_CODEC, AugmentApplicationEntity.ResearchState.class);
         
