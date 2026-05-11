@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluids;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
-import rearth.oritech.init.OritechConfig;
+import rearth.oritech.config.OritechConfig;
 
 import java.util.List;
 

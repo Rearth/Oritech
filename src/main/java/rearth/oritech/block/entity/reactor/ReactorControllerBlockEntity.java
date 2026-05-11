@@ -31,7 +31,7 @@ import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.client.ui.ReactorScreenHandler;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.OritechConfig;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.util.Geometry;
 

@@ -12,7 +12,7 @@ import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.OritechConfig;
+import rearth.oritech.config.OritechConfig;
 
 import java.util.ArrayList;
 import java.util.Collections;

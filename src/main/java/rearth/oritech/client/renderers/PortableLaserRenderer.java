@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
 import rearth.oritech.client.renderers.util.BeamRenderer;
-import rearth.oritech.init.OritechStartupConfig;
+import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.PortableLaserItem;
 import software.bernie.geckolib.cache.object.BakedGeoModel;

@@ -28,7 +28,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
-import rearth.oritech.init.OritechConfig;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.TooltipHelper;
 

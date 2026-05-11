@@ -16,7 +16,7 @@ import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.PassiveGeneratorBlockEntity;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.OritechConfig;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.MultiblockMachineController;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;

@@ -25,7 +25,7 @@ import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.OritechConfig;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 

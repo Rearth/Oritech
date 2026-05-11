@@ -1,4 +1,4 @@
-package rearth.oritech.init;
+package rearth.oritech.config;
 
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.neoforged.neoforge.common.ModConfigSpec;

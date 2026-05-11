@@ -8,7 +8,7 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import rearth.oritech.Oritech;
-import rearth.oritech.init.OritechStartupConfig;
+import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.world.features.oil.OilSpringFeature;
 import rearth.oritech.init.world.features.oil.OilSpringFeatureConfig;
 import rearth.oritech.init.world.features.resourcenode.ResourceNodeFeature;

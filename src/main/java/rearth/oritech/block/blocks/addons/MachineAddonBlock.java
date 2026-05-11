@@ -34,7 +34,7 @@ import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.addons.EnergyAcceptorAddonBlockEntity;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.OritechStartupConfig;
+import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.TooltipHelper;

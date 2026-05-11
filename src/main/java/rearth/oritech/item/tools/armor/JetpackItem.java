@@ -21,7 +21,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
 import rearth.oritech.init.ComponentContent;
-import rearth.oritech.init.OritechStartupConfig;
+import rearth.oritech.config.OritechStartupConfig;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;

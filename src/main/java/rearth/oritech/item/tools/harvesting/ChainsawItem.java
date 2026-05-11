@@ -18,8 +18,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.interaction.TreefellerBlockEntity;
-import rearth.oritech.init.OritechConfig;
-import rearth.oritech.init.OritechStartupConfig;
+import rearth.oritech.config.OritechConfig;
+import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 
 import java.util.List;

@@ -25,6 +25,7 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.*;
 
 import java.util.List;

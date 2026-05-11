@@ -1,4 +1,4 @@
-package rearth.oritech.init;
+package rearth.oritech.config;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 

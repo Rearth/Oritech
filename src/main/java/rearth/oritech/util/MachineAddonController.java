@@ -15,7 +15,7 @@ import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.addons.CombiAddonEntity;
-import rearth.oritech.init.OritechConfig;
+import rearth.oritech.config.OritechConfig;
 
 import java.util.*;
 

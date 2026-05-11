@@ -15,7 +15,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import rearth.oritech.Oritech;
-import rearth.oritech.init.OritechStartupConfig;
+import rearth.oritech.config.OritechStartupConfig;
 
 import java.util.List;
 

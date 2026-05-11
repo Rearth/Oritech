@@ -19,7 +19,7 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.block.FrameInteractionBlock;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.OritechConfig;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.Geometry;
 
 import java.util.ArrayDeque;

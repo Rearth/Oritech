@@ -18,7 +18,6 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.resource.NeoForgeReloadListeners;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -34,12 +33,17 @@ import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.init.OritechConfig;
-import rearth.oritech.init.OritechStartupConfig;
+import rearth.oritech.config.OritechConfig;
+import rearth.oritech.config.OritechStartupConfig;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.util.ServerZiplineHandler;
 import rearth_neosample.oritech.OritechNeo;
+
+// todos: compostables
+
 
 @Mod(OritechNeo.MODID)
 public final class Oritech {
@@ -53,6 +57,7 @@ public final class Oritech {
     
     public Oritech(IEventBus modEventBus, ModContainer modContainer) {
         
+        // runtime events
         var neoEventBus = NeoForge.EVENT_BUS;
         neoEventBus.addListener(this::onServerStarted);
         neoEventBus.addListener(this::onServerTickPost);
@@ -60,11 +65,16 @@ public final class Oritech {
         neoEventBus.addListener(this::onPlayerTickPost);
         neoEventBus.addListener(this::addServerReloadListeners);
         
+        // registration events
         modEventBus.addListener(this::commonSetup);
         
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, OritechConfig.COMMON_SPEC);
         modContainer.registerConfig(ModConfig.Type.STARTUP, OritechStartupConfig.STARTUP_SPEC);
+        
+        // registrations
+        ItemContent.ITEMS.register(modEventBus);
+        BlockContent.BLOCKS.register(modEventBus);
     }
     
     private void commonSetup(FMLCommonSetupEvent event) {
