@@ -73,13 +73,20 @@ public final class Oritech {
         // registrations
         ItemContent.ITEMS.register(modEventBus);
         BlockContent.BLOCKS.register(modEventBus);
+        BlockContent.BLOCK_ITEMS.register(modEventBus);
         ToolsContent.EQUIPMENT.register(modEventBus);
+        
         ItemGroups.TABS.register(modEventBus);
         SoundContent.SOUND_EVENTS.register(modEventBus);
         LootContent.LOOT_FUNCTIONS.register(modEventBus);
         
+        FluidContent.FLUID_TYPES.register(modEventBus);
+        FluidContent.FLUIDS.register(modEventBus);
+        FluidContent.FLUID_BLOCKS.register(modEventBus);
+        FluidContent.BUCKET_ITEMS.register(modEventBus);
+        
         // post processing / extra registrations
-        ItemContent.AddBlockItems();
+        BlockContent.AddBlockItems();
     }
     
     private void commonSetup(FMLCommonSetupEvent event) {

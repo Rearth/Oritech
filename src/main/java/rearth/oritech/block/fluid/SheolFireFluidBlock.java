@@ -1,6 +1,5 @@
 package rearth.oritech.block.fluid;
 
-import dev.architectury.core.block.ArchitecturyLiquidBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
@@ -9,13 +8,14 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
-public class SheolFireFluidBlock extends ArchitecturyLiquidBlock {
+public class SheolFireFluidBlock extends LiquidBlock {
     
     public SheolFireFluidBlock(Supplier<? extends FlowingFluid> fluid, Properties properties) {
         super(fluid, properties);

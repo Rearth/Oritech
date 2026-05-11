@@ -162,38 +162,6 @@ public class ItemContent {
     public static final DeferredItem<Item> SMALL_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.SMALL_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item> CREATIVE_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.CREATIVE_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
     
-    public static final List<Pair<DeferredItem<BlockItem>, Groups>> BLOCK_ITEMS = new ArrayList<>();
-    
-    @SuppressWarnings("unchecked")
-    public static void AddBlockItems() {
-        
-        for (var field : BlockContent.class.getDeclaredFields()) {
-            if (!Modifier.isStatic(field.getModifiers())) continue;
-            if (!Modifier.isPublic(field.getModifiers())) continue;
-            if (!DeferredBlock.class.isAssignableFrom(field.getType())) continue;
-            
-            try {
-                field.setAccessible(true);
-                var value = (DeferredBlock<Block>) field.get(null);
-                var identifier = field.getName().toLowerCase(java.util.Locale.ROOT);
-                
-                if (field.isAnnotationPresent(BlockContent.NoBlockItem.class)) continue;
-                
-                var fieldGroup = Groups.MACHINES;
-                
-                if (field.isAnnotationPresent(ItemContent.ItemGroupTarget.class)) {
-                    fieldGroup = field.getAnnotation(ItemContent.ItemGroupTarget.class).value();
-                }
-                
-                var blockItem = ITEMS.registerSimpleBlockItem(value);
-                BLOCK_ITEMS.add(new Pair<>(blockItem, fieldGroup));
-                
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Failed to access field: " + field.getName(), e);
-            }
-        }
-        
-    }
     
     public enum Groups {
         MACHINES, COMPONENTS, EQUIPMENT, DECORATIVE, NONE

@@ -1,41 +1,37 @@
 package rearth.oritech.init;
 
-import dev.architectury.core.block.ArchitecturyLiquidBlock;
-import dev.architectury.core.fluid.ArchitecturyFlowingFluid;
-import dev.architectury.core.fluid.ArchitecturyFluidAttributes;
-import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
-import dev.architectury.core.item.ArchitecturyBucketItem;
-import dev.architectury.platform.Platform;
-import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.fluids.BaseFlowingFluid;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.fluid.SheolFireFluidBlock;
-import rearth.oritech.util.ColorHelper;
-import rearth.oritech.util.registry.OritechBlockRegistry;
-import rearth.oritech.util.registry.OritechDeferredRegistry;
-
-import java.util.List;
 
 public class FluidContent {
-    
+
     // fluid usage:
     /*  (crude oil = oil)
     crude oil -> heavy oil, light naphtha, sulfuric acid
     crude oil + clay catalyst beads -> light naphtha, diesel, sulfuric acid
     heavy oil + sand -> diesel, light naphtha, sulfuric acid
-    
+
     lava -> steam, sulfuric acid, sheol fire
     lava + enderic compound -> sulfuric acid, sheol fire, strange matter
-    
+
     biofuel + clay catalyst beads -> diesel, light naphtha
-    
+
     new fluids:
     - crude oil (existing oil):
       - burns very shortly in fuel generator
@@ -63,293 +59,102 @@ public class FluidContent {
       - used in item creation? todo
     - strange matter:
       - used to "fill" dubious containers in centrifuge
-      
+
     new items:
     - reinforced carbon sheeting: new machine plating type? Dark.
     - hyper-tensile filaments: used for advanced chips / ai chips
     - ion thruster: used in particle accelerator motor, jetpacks, augments?
     - clay catalyst beads: used to augment refinery recipes in some cases
-    
+
     new crafts:
     - clay catalyst beads: crafted/assembled. Made from sand and clay, high result counts. done
     - battery / adv battery in centrifuge with sulfuric acid. done
     - reinforced carbon plating: made in refinery from light naphtha. Used as netherite replacement in some stuff? Used for carbon plating block. done
     - ion thruster from reinforced carbon sheeting, advanced battery and flux gate. done.
-    
+
     // open concepts:
     - processing involving uranium
     - something with yeast / potatoes?
-     
+
      */
-    
-    public static final ArchitecturyFluidAttributes OIL_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_OIL, () -> FluidContent.STILL_OIL)
-                                                                       .blockSupplier(() -> FluidContent.STILL_OIL_BLOCK)
-                                                                       .bucketItemSupplier(() -> FluidContent.STILL_OIL_BUCKET)
-                                                                       .sourceTexture(Oritech.id("block/fluid/fluid_gas_dark"))
-                                                                       .flowingTexture(Oritech.id("block/fluid/fluid_gas_dark"))
-                                                                       .color(ColorHelper.argb(0.478f, 0.478f, 0.478f));
-    
-    public static final ArchitecturyFluidAttributes FUEL_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_FUEL, () -> FluidContent.STILL_FUEL)
-                                                                        .blockSupplier(() -> FluidContent.STILL_FUEL_BLOCK)
-                                                                        .bucketItemSupplier(() -> FluidContent.STILL_FUEL_BUCKET)
-                                                                        .sourceTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
-                                                                        .flowingTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
-                                                                        .color(ColorHelper.argb(0.176f, 0.239f, 0.282f));
-    
-    public static final ArchitecturyFluidAttributes BIOFUEL_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_BIOFUEL, () -> FluidContent.STILL_BIOFUEL)
-                                                                           .blockSupplier(() -> FluidContent.STILL_BIOFUEL_BLOCK)
-                                                                           .bucketItemSupplier(() -> FluidContent.STILL_BIOFUEL_BUCKET)
-                                                                           .sourceTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
-                                                                           .flowingTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
-                                                                           .color(ColorHelper.argb(0.25f, 0.316f, 0.086f));
-    
-    public static final ArchitecturyFluidAttributes STEAM_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_STEAM, () -> FluidContent.STILL_STEAM)
-                                                                         .blockSupplier(() -> FluidContent.STILL_STEAM_BLOCK)
-                                                                         .bucketItemSupplier(() -> FluidContent.STILL_STEAM_BUCKET)
-                                                                         .sourceTexture(Oritech.id("block/fluid/fluid_steam"))
-                                                                         .flowingTexture(Oritech.id("block/fluid/fluid_steam"))
-                                                                         .lighterThanAir(true)
-                                                                         .color(ColorHelper.WHITE);
-    
-    public static final ArchitecturyFluidAttributes HEAVY_OIL_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_HEAVY_OIL, () -> FluidContent.STILL_HEAVY_OIL)
-                                                                             .blockSupplier(() -> FluidContent.STILL_HEAVY_OIL_BLOCK)
-                                                                             .bucketItemSupplier(() -> FluidContent.STILL_HEAVY_OIL_BUCKET)
-                                                                             .sourceTexture(Oritech.id("block/fluid/fluid_molten"))
-                                                                             .flowingTexture(Oritech.id("block/fluid/fluid_molten"))
-                                                                             .color(ColorHelper.argb(0.135f, 0.135f, 0.135f));
-    
-    public static final ArchitecturyFluidAttributes DIESEL_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_DIESEL, () -> FluidContent.STILL_DIESEL)
-                                                                          .blockSupplier(() -> FluidContent.STILL_DIESEL_BLOCK)
-                                                                          .bucketItemSupplier(() -> FluidContent.STILL_DIESEL_BUCKET)
-                                                                          .sourceTexture(Oritech.id("block/fluid/fluid_steam"))
-                                                                          .flowingTexture(Oritech.id("block/fluid/fluid_steam"))
-                                                                          .color(ColorHelper.argb(0.735f, 0.735f, 0.235f));
-    
-    public static final ArchitecturyFluidAttributes NAPHTHA_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_NAPHTHA, () -> FluidContent.STILL_NAPHTHA)
-                                                                           .blockSupplier(() -> FluidContent.STILL_NAPHTHA_BLOCK)
-                                                                           .bucketItemSupplier(() -> FluidContent.STILL_NAPHTHA_BUCKET)
-                                                                           .sourceTexture(Oritech.id("block/fluid/fluid_molten"))
-                                                                           .flowingTexture(Oritech.id("block/fluid/fluid_molten"))
-                                                                           .color(ColorHelper.argb(0.949f, 0.929f, 0.745f));
-    
-    public static final ArchitecturyFluidAttributes SULFURIC_ACID_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_SULFURIC_ACID, () -> FluidContent.STILL_SULFURIC_ACID)
-                                                                                 .blockSupplier(() -> FluidContent.STILL_SULFURIC_ACID_BLOCK)
-                                                                                 .bucketItemSupplier(() -> FluidContent.STILL_SULFURIC_ACID_BUCKET)
-                                                                                 .sourceTexture(Oritech.id("block/fluid/fluid_steam"))
-                                                                                 .flowingTexture(Oritech.id("block/fluid/fluid_steam"))
-                                                                                 .color(ColorHelper.argb(0.398f, 1f, 0.3f));
-    
-    public static final ArchitecturyFluidAttributes SILICON_WASH_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_SILICON_WASH, () -> FluidContent.STILL_SILICON_WASH)
-                                                                                .blockSupplier(() -> FluidContent.STILL_SILICON_WASH_BLOCK)
-                                                                                .bucketItemSupplier(() -> FluidContent.STILL_SILICON_WASH_BUCKET)
-                                                                                .sourceTexture(Oritech.id("block/fluid/fluid_steam"))
-                                                                                .flowingTexture(Oritech.id("block/fluid/fluid_steam"))
-                                                                                .color(ColorHelper.argb(0.7f, 1f, 0.7f));
-    
-    public static final ArchitecturyFluidAttributes MINERAL_SLURRY_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_MINERAL_SLURRY, () -> FluidContent.STILL_MINERAL_SLURRY)
-                                                                                  .blockSupplier(() -> FluidContent.STILL_MINERAL_SLURRY_BLOCK)
-                                                                                  .bucketItemSupplier(() -> FluidContent.STILL_MINERAL_SLURRY_BUCKET)
-                                                                                  .sourceTexture(Oritech.id("block/fluid/molten_metal"))
-                                                                                  .flowingTexture(Oritech.id("block/fluid/molten_metal"))
-                                                                                  .color(ColorHelper.argb(0.627f, 0.849f, 1f));
-    
-    public static final ArchitecturyFluidAttributes SHEOL_FIRE_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_SHEOL_FIRE, () -> FluidContent.STILL_SHEOL_FIRE)
-                                                                              .blockSupplier(() -> FluidContent.STILL_SHEOL_FIRE_BLOCK)
-                                                                              .bucketItemSupplier(() -> FluidContent.STILL_SHEOL_FIRE_BUCKET)
-                                                                              .sourceTexture(Oritech.id("block/fluid/fluid_roiling_plasma"))
-                                                                              .flowingTexture(Oritech.id("block/fluid/fluid_roiling_plasma"))
-                                                                              .color(ColorHelper.argb(1f, 0.7f, 0.7f));
-    
-    public static final ArchitecturyFluidAttributes STRANGE_MATTER_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_STRANGE_MATTER, () -> FluidContent.STILL_STRANGE_MATTER)
-                                                                                  .blockSupplier(() -> FluidContent.STILL_STRANGE_MATTER_BLOCK)
-                                                                                  .bucketItemSupplier(() -> FluidContent.STILL_STRANGE_MATTER_BUCKET)
-                                                                                  .sourceTexture(Oritech.id("block/fluid/fluid_strange_mixture"))
-                                                                                  .flowingTexture(Oritech.id("block/fluid/fluid_strange_mixture"))
-                                                                                  .color(ColorHelper.argb(1f, 1f, 1f));
-    
-    public static final ArchitecturyFluidAttributes MOLTEN_ADAMANT_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_MOLTEN_ADAMANT, () -> FluidContent.STILL_MOLTEN_ADAMANT)
-                                                                                  .blockSupplier(() -> FluidContent.STILL_MOLTEN_ADAMANT_BLOCK)
-                                                                                  .bucketItemSupplier(() -> FluidContent.STILL_MOLTEN_ADAMANT_BUCKET)
-                                                                                  .sourceTexture(Oritech.id("block/fluid/molten_metal"))
-                                                                                  .flowingTexture(Oritech.id("block/fluid/molten_metal_flow"))
-                                                                                  .color(ColorHelper.argb(0.398f, 0.629f, 0.797f));
-    
-    public static final ArchitecturyFluidAttributes MOLTEN_BIOSTEEL_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_MOLTEN_BIOSTEEL, () -> FluidContent.STILL_MOLTEN_BIOSTEEL)
-                                                                                   .blockSupplier(() -> FluidContent.STILL_MOLTEN_BIOSTEEL_BLOCK)
-                                                                                   .bucketItemSupplier(() -> FluidContent.STILL_MOLTEN_BIOSTEEL_BUCKET)
-                                                                                   .sourceTexture(Oritech.id("block/fluid/molten_metal"))
-                                                                                   .flowingTexture(Oritech.id("block/fluid/molten_metal_flow"))
-                                                                                   .color(ColorHelper.argb(0.145f, 0.344f, 0.176f));
-    
-    public static final ArchitecturyFluidAttributes MOLTEN_DURATIUM_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_MOLTEN_DURATIUM, () -> FluidContent.STILL_MOLTEN_DURATIUM)
-                                                                                   .blockSupplier(() -> FluidContent.STILL_MOLTEN_DURATIUM_BLOCK)
-                                                                                   .bucketItemSupplier(() -> FluidContent.STILL_MOLTEN_DURATIUM_BUCKET)
-                                                                                   .sourceTexture(Oritech.id("block/fluid/molten_metal"))
-                                                                                   .flowingTexture(Oritech.id("block/fluid/molten_metal_flow"))
-                                                                                   .color(ColorHelper.argb(0.254f, 0.176f, 0.360f));
-    
-    public static final ArchitecturyFluidAttributes MOLTEN_ENERGITE_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_MOLTEN_ENERGITE, () -> FluidContent.STILL_MOLTEN_ENERGITE)
-                                                                                   .blockSupplier(() -> FluidContent.STILL_MOLTEN_ENERGITE_BLOCK)
-                                                                                   .bucketItemSupplier(() -> FluidContent.STILL_MOLTEN_ENERGITE_BUCKET)
-                                                                                   .sourceTexture(Oritech.id("block/fluid/molten_metal"))
-                                                                                   .flowingTexture(Oritech.id("block/fluid/molten_metal_flow"))
-                                                                                   .color(ColorHelper.argb(0.879f, 0.300f, 1.0f));
-    
-    public static final ArchitecturyFluidAttributes MOLTEN_FLUXITE_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_MOLTEN_FLUXITE, () -> FluidContent.STILL_MOLTEN_FLUXITE)
-                                                                                  .blockSupplier(() -> FluidContent.STILL_MOLTEN_FLUXITE_BLOCK)
-                                                                                  .bucketItemSupplier(() -> FluidContent.STILL_MOLTEN_FLUXITE_BUCKET)
-                                                                                  .sourceTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
-                                                                                  .flowingTexture(Oritech.id("block/fluid/fluid_strange_pale_2"))
-                                                                                  .color(ColorHelper.argb(0.453f, 0.195f, 0.648f));
-    
-    public static final OritechDeferredRegistry<Fluid> FLUIDS = OritechDeferredRegistry.create(Registries.FLUID);
-    public static final OritechBlockRegistry BLOCKS = new OritechBlockRegistry();
-    
-    public static final List<ArchitecturyFluidAttributes> FLUID_ATTRIBUTES = Platform.isModLoaded("productivemetalworks")
-                                                                               ? List.of(OIL_ATTRIBUTES, FUEL_ATTRIBUTES, BIOFUEL_ATTRIBUTES, STEAM_ATTRIBUTES, DIESEL_ATTRIBUTES, HEAVY_OIL_ATTRIBUTES, NAPHTHA_ATTRIBUTES, SULFURIC_ACID_ATTRIBUTES, SILICON_WASH_ATTRIBUTES, MINERAL_SLURRY_ATTRIBUTES, SHEOL_FIRE_ATTRIBUTES, STRANGE_MATTER_ATTRIBUTES, MOLTEN_ADAMANT_ATTRIBUTES, MOLTEN_BIOSTEEL_ATTRIBUTES, MOLTEN_DURATIUM_ATTRIBUTES, MOLTEN_ENERGITE_ATTRIBUTES, MOLTEN_FLUXITE_ATTRIBUTES)
-                                                                               : List.of(OIL_ATTRIBUTES, FUEL_ATTRIBUTES, BIOFUEL_ATTRIBUTES, STEAM_ATTRIBUTES, DIESEL_ATTRIBUTES, HEAVY_OIL_ATTRIBUTES, NAPHTHA_ATTRIBUTES, SULFURIC_ACID_ATTRIBUTES, SILICON_WASH_ATTRIBUTES, MINERAL_SLURRY_ATTRIBUTES, SHEOL_FIRE_ATTRIBUTES, STRANGE_MATTER_ATTRIBUTES);
-    
-    // oil
-    public static final RegistrySupplier<FlowingFluid> STILL_OIL = FLUIDS.register("still_oil", () -> cast(new ArchitecturyFlowingFluid.Source(OIL_ATTRIBUTES)));
-    public static final RegistrySupplier<FlowingFluid> FLOWING_OIL = FLUIDS.register("flowing_oil", () -> cast(new ArchitecturyFlowingFluid.Flowing(OIL_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_OIL_BLOCK = BLOCKS.register("still_oil_block", () -> new ArchitecturyLiquidBlock(STILL_OIL, BLOCKS.properties("still_oil_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))));
-    public static final RegistrySupplier<Item> STILL_OIL_BUCKET = ItemContent.registerItem("still_oil_bucket", new ArchitecturyBucketItem(STILL_OIL, ItemContent.ITEMS.properties("still_oil_bucket").stacksTo(1).craftRemainder(Items.BUCKET)));
-    
-    // fuel
-    public static final RegistrySupplier<FlowingFluid> STILL_FUEL = FLUIDS.register("still_fuel", () -> cast(new ArchitecturyFlowingFluid.Source(FUEL_ATTRIBUTES)));
-    public static final RegistrySupplier<FlowingFluid> FLOWING_FUEL = FLUIDS.register("flowing_fuel", () -> cast(new ArchitecturyFlowingFluid.Flowing(FUEL_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_FUEL_BLOCK = BLOCKS.register("still_fuel_block", () -> new ArchitecturyLiquidBlock(STILL_FUEL, BLOCKS.properties("still_fuel_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))));
-    public static final RegistrySupplier<Item> STILL_FUEL_BUCKET = ItemContent.registerItem("still_fuel_bucket", new ArchitecturyBucketItem(STILL_FUEL, ItemContent.ITEMS.properties("still_fuel_bucket").stacksTo(1).craftRemainder(Items.BUCKET)));
-    
-    // biofuel
-    public static final RegistrySupplier<FlowingFluid> STILL_BIOFUEL = FLUIDS.register("still_biofuel", () -> cast(new ArchitecturyFlowingFluid.Source(BIOFUEL_ATTRIBUTES)));
-    public static final RegistrySupplier<FlowingFluid> FLOWING_BIOFUEL = FLUIDS.register("flowing_biofuel", () -> cast(new ArchitecturyFlowingFluid.Flowing(BIOFUEL_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_BIOFUEL_BLOCK = BLOCKS.register("still_biofuel_block", () -> new ArchitecturyLiquidBlock(STILL_BIOFUEL, BLOCKS.properties("still_biofuel_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))));
-    public static final RegistrySupplier<Item> STILL_BIOFUEL_BUCKET = ItemContent.registerItem("still_biofuel_bucket", new ArchitecturyBucketItem(STILL_BIOFUEL, ItemContent.ITEMS.properties("still_biofuel_bucket").stacksTo(1).craftRemainder(Items.BUCKET)));
-    
-    // steam
-    public static final RegistrySupplier<FlowingFluid> STILL_STEAM = FLUIDS.register("still_steam", () -> cast(new ArchitecturyFlowingFluid.Source(STEAM_ATTRIBUTES)));
-    public static final RegistrySupplier<FlowingFluid> FLOWING_STEAM = FLUIDS.register("flowing_steam", () -> cast(new ArchitecturyFlowingFluid.Flowing(STEAM_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_STEAM_BLOCK = BLOCKS.register("still_steam_block", () -> new ArchitecturyLiquidBlock(STILL_STEAM, BLOCKS.properties("still_steam_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))));
-    public static final RegistrySupplier<Item> STILL_STEAM_BUCKET = ItemContent.registerItem("still_steam_bucket", new ArchitecturyBucketItem(STILL_STEAM, ItemContent.ITEMS.properties("still_steam_bucket").stacksTo(1).craftRemainder(Items.BUCKET)));
-    
-    // heavy oil
-    public static final RegistrySupplier<FlowingFluid> STILL_HEAVY_OIL = FLUIDS.register("still_heavy_oil", () -> cast(new ArchitecturyFlowingFluid.Source(HEAVY_OIL_ATTRIBUTES)));
-    public static final RegistrySupplier<FlowingFluid> FLOWING_HEAVY_OIL = FLUIDS.register("flowing_heavy_oil", () -> cast(new ArchitecturyFlowingFluid.Flowing(HEAVY_OIL_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_HEAVY_OIL_BLOCK = BLOCKS.register("still_heavy_oil_block", () -> new ArchitecturyLiquidBlock(STILL_HEAVY_OIL, BLOCKS.properties("still_heavy_oil_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))));
-    public static final RegistrySupplier<Item> STILL_HEAVY_OIL_BUCKET = ItemContent.registerItem("still_heavy_oil_bucket", new ArchitecturyBucketItem(STILL_HEAVY_OIL, ItemContent.ITEMS.properties("still_heavy_oil_bucket").stacksTo(1).craftRemainder(Items.BUCKET)));
-    
-    // diesel
-    public static final RegistrySupplier<FlowingFluid> STILL_DIESEL = FLUIDS.register("still_diesel", () -> cast(new ArchitecturyFlowingFluid.Source(DIESEL_ATTRIBUTES)));
-    public static final RegistrySupplier<FlowingFluid> FLOWING_DIESEL = FLUIDS.register("flowing_diesel", () -> cast(new ArchitecturyFlowingFluid.Flowing(DIESEL_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_DIESEL_BLOCK = BLOCKS.register("still_diesel_block", () -> new ArchitecturyLiquidBlock(STILL_DIESEL, BLOCKS.properties("still_diesel_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))));
-    public static final RegistrySupplier<Item> STILL_DIESEL_BUCKET = ItemContent.registerItem("still_diesel_bucket", new ArchitecturyBucketItem(STILL_DIESEL, ItemContent.ITEMS.properties("still_diesel_bucket").stacksTo(1).craftRemainder(Items.BUCKET)));
-    
-    // naphtha
-    public static final RegistrySupplier<FlowingFluid> STILL_NAPHTHA = FLUIDS.register("still_naphtha", () -> cast(new ArchitecturyFlowingFluid.Source(NAPHTHA_ATTRIBUTES)));
-    public static final RegistrySupplier<FlowingFluid> FLOWING_NAPHTHA = FLUIDS.register("flowing_naphtha", () -> cast(new ArchitecturyFlowingFluid.Flowing(NAPHTHA_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_NAPHTHA_BLOCK = BLOCKS.register("still_naphtha_block", () -> new ArchitecturyLiquidBlock(STILL_NAPHTHA, BLOCKS.properties("still_naphtha_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))));
-    public static final RegistrySupplier<Item> STILL_NAPHTHA_BUCKET = ItemContent.registerItem("still_naphtha_bucket", new ArchitecturyBucketItem(STILL_NAPHTHA, ItemContent.ITEMS.properties("still_naphtha_bucket").stacksTo(1).craftRemainder(Items.BUCKET)));
-    
-    // sulfuric acid
-    public static final RegistrySupplier<FlowingFluid> STILL_SULFURIC_ACID = FLUIDS.register("still_sulfuric_acid", () -> cast(new ArchitecturyFlowingFluid.Source(SULFURIC_ACID_ATTRIBUTES)));
-    public static final RegistrySupplier<FlowingFluid> FLOWING_SULFURIC_ACID = FLUIDS.register("flowing_sulfuric_acid", () -> cast(new ArchitecturyFlowingFluid.Flowing(SULFURIC_ACID_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_SULFURIC_ACID_BLOCK = BLOCKS.register("still_sulfuric_acid_block", () -> new ArchitecturyLiquidBlock(STILL_SULFURIC_ACID, BLOCKS.properties("still_sulfuric_acid_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))));
-    public static final RegistrySupplier<Item> STILL_SULFURIC_ACID_BUCKET = ItemContent.registerItem("still_sulfuric_acid_bucket", new ArchitecturyBucketItem(STILL_SULFURIC_ACID, ItemContent.ITEMS.properties("still_sulfuric_acid_bucket").stacksTo(1).craftRemainder(Items.BUCKET)));
-    
-    // silicon wash
-    public static final RegistrySupplier<FlowingFluid> STILL_SILICON_WASH = FLUIDS.register("still_silicon_wash", () -> cast(new ArchitecturyFlowingFluid.Source(SILICON_WASH_ATTRIBUTES)));
-    public static final RegistrySupplier<FlowingFluid> FLOWING_SILICON_WASH = FLUIDS.register("flowing_silicon_wash", () -> cast(new ArchitecturyFlowingFluid.Flowing(SILICON_WASH_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_SILICON_WASH_BLOCK = BLOCKS.register("still_silicon_wash_block", () -> new ArchitecturyLiquidBlock(STILL_SILICON_WASH, BLOCKS.properties("still_silicon_wash_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))));
-    public static final RegistrySupplier<Item> STILL_SILICON_WASH_BUCKET = ItemContent.registerItem("still_silicon_wash_bucket", new ArchitecturyBucketItem(STILL_SILICON_WASH, ItemContent.ITEMS.properties("still_silicon_wash_bucket").stacksTo(1).craftRemainder(Items.BUCKET)));
-    
-    // mineral slurry
-    public static final RegistrySupplier<FlowingFluid> STILL_MINERAL_SLURRY = FLUIDS.register("still_mineral_slurry", () -> cast(new ArchitecturyFlowingFluid.Source(MINERAL_SLURRY_ATTRIBUTES)));
-    public static final RegistrySupplier<FlowingFluid> FLOWING_MINERAL_SLURRY = FLUIDS.register("flowing_mineral_slurry", () -> cast(new ArchitecturyFlowingFluid.Flowing(MINERAL_SLURRY_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_MINERAL_SLURRY_BLOCK = BLOCKS.register("still_mineral_slurry_block", () -> new ArchitecturyLiquidBlock(STILL_MINERAL_SLURRY, BLOCKS.properties("still_mineral_slurry_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))));
-    public static final RegistrySupplier<Item> STILL_MINERAL_SLURRY_BUCKET = ItemContent.registerItem("still_mineral_slurry_bucket", new ArchitecturyBucketItem(STILL_MINERAL_SLURRY, ItemContent.ITEMS.properties("still_mineral_slurry_bucket").stacksTo(1).craftRemainder(Items.BUCKET)));
-    
-    // sheol fire
-    public static final RegistrySupplier<FlowingFluid> STILL_SHEOL_FIRE = FLUIDS.register("still_sheol_fire", () -> cast(new ArchitecturyFlowingFluid.Source(SHEOL_FIRE_ATTRIBUTES)));
-    public static final RegistrySupplier<FlowingFluid> FLOWING_SHEOL_FIRE = FLUIDS.register("flowing_sheol_fire", () -> cast(new ArchitecturyFlowingFluid.Flowing(SHEOL_FIRE_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_SHEOL_FIRE_BLOCK = BLOCKS.register("still_sheol_fire_block", () -> new SheolFireFluidBlock(STILL_SHEOL_FIRE, BLOCKS.properties("still_sheol_fire_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.LAVA))));
-    public static final RegistrySupplier<Item> STILL_SHEOL_FIRE_BUCKET = ItemContent.registerItem("still_sheol_fire_bucket", new ArchitecturyBucketItem(STILL_SHEOL_FIRE, ItemContent.ITEMS.properties("still_sheol_fire_bucket").stacksTo(1).craftRemainder(Items.BUCKET)));
-    
-    // strange matter
-    public static final RegistrySupplier<FlowingFluid> STILL_STRANGE_MATTER = FLUIDS.register("still_strange_matter", () -> cast(new ArchitecturyFlowingFluid.Source(STRANGE_MATTER_ATTRIBUTES)));
-    public static final RegistrySupplier<FlowingFluid> FLOWING_STRANGE_MATTER = FLUIDS.register("flowing_strange_matter", () -> cast(new ArchitecturyFlowingFluid.Flowing(STRANGE_MATTER_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_STRANGE_MATTER_BLOCK = BLOCKS.register("still_strange_matter_block", () -> new ArchitecturyLiquidBlock(STILL_STRANGE_MATTER, BLOCKS.properties("still_strange_matter_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER))));
-    public static final RegistrySupplier<Item> STILL_STRANGE_MATTER_BUCKET = ItemContent.registerItem("still_strange_matter_bucket", new ArchitecturyBucketItem(STILL_STRANGE_MATTER, ItemContent.ITEMS.properties("still_strange_matter_bucket").stacksTo(1).craftRemainder(Items.BUCKET)));
-    
-    // adamant
-    public static final RegistrySupplier<FlowingFluid> STILL_MOLTEN_ADAMANT = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_adamant", () -> cast(new ArchitecturyFlowingFluid.Source(MOLTEN_ADAMANT_ATTRIBUTES))) : null;
-    public static final RegistrySupplier<FlowingFluid> FLOWING_MOLTEN_ADAMANT = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_adamant", () -> cast(new ArchitecturyFlowingFluid.Flowing(MOLTEN_ADAMANT_ATTRIBUTES))) : null;
-    public static final RegistrySupplier<LiquidBlock> STILL_MOLTEN_ADAMANT_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_adamant_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_ADAMANT, BLOCKS.properties("still_molten_adamant_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)))) : null;
-    public static final RegistrySupplier<Item> STILL_MOLTEN_ADAMANT_BUCKET = Platform.isModLoaded("productivemetalworks") ? ItemContent.registerItem("still_molten_adamant_bucket", new ArchitecturyBucketItem(STILL_MOLTEN_ADAMANT, ItemContent.ITEMS.properties("still_molten_adamant_bucket").stacksTo(1).craftRemainder(Items.BUCKET))) : null;
-    
-    // biosteel
-    public static final RegistrySupplier<FlowingFluid> STILL_MOLTEN_BIOSTEEL = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_biosteel", () -> cast(new ArchitecturyFlowingFluid.Source(MOLTEN_BIOSTEEL_ATTRIBUTES))) : null;
-    public static final RegistrySupplier<FlowingFluid> FLOWING_MOLTEN_BIOSTEEL = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_biosteel", () -> cast(new ArchitecturyFlowingFluid.Flowing(MOLTEN_BIOSTEEL_ATTRIBUTES))) : null;
-    public static final RegistrySupplier<LiquidBlock> STILL_MOLTEN_BIOSTEEL_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_biosteel_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_BIOSTEEL, BLOCKS.properties("still_molten_biosteel_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)))) : null;
-    public static final RegistrySupplier<Item> STILL_MOLTEN_BIOSTEEL_BUCKET = Platform.isModLoaded("productivemetalworks") ? ItemContent.registerItem("still_molten_biosteel_bucket", new ArchitecturyBucketItem(STILL_MOLTEN_BIOSTEEL, ItemContent.ITEMS.properties("still_molten_biosteel_bucket").stacksTo(1).craftRemainder(Items.BUCKET))) : null;
-    
-    // duratium
-    public static final RegistrySupplier<FlowingFluid> STILL_MOLTEN_DURATIUM = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_duratium", () -> cast(new ArchitecturyFlowingFluid.Source(MOLTEN_DURATIUM_ATTRIBUTES))) : null;
-    public static final RegistrySupplier<FlowingFluid> FLOWING_MOLTEN_DURATIUM = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_duratium", () -> cast(new ArchitecturyFlowingFluid.Flowing(MOLTEN_DURATIUM_ATTRIBUTES))) : null;
-    public static final RegistrySupplier<LiquidBlock> STILL_MOLTEN_DURATIUM_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_duratium_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_DURATIUM, BLOCKS.properties("still_molten_duratium_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)))) : null;
-    public static final RegistrySupplier<Item> STILL_MOLTEN_DURATIUM_BUCKET = Platform.isModLoaded("productivemetalworks") ? ItemContent.registerItem("still_molten_duratium_bucket", new ArchitecturyBucketItem(STILL_MOLTEN_DURATIUM, ItemContent.ITEMS.properties("still_molten_duratium_bucket").stacksTo(1).craftRemainder(Items.BUCKET))) : null;
-    
-    // energite
-    public static final RegistrySupplier<FlowingFluid> STILL_MOLTEN_ENERGITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_energite", () -> cast(new ArchitecturyFlowingFluid.Source(MOLTEN_ENERGITE_ATTRIBUTES))) : null;
-    public static final RegistrySupplier<FlowingFluid> FLOWING_MOLTEN_ENERGITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_energite", () -> cast(new ArchitecturyFlowingFluid.Flowing(MOLTEN_ENERGITE_ATTRIBUTES))) : null;
-    public static final RegistrySupplier<LiquidBlock> STILL_MOLTEN_ENERGITE_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_energite_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_ENERGITE, BLOCKS.properties("still_molten_energite_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)))) : null;
-    public static final RegistrySupplier<Item> STILL_MOLTEN_ENERGITE_BUCKET = Platform.isModLoaded("productivemetalworks") ? ItemContent.registerItem("still_molten_energite_bucket", new ArchitecturyBucketItem(STILL_MOLTEN_ENERGITE, ItemContent.ITEMS.properties("still_molten_energite_bucket").stacksTo(1).craftRemainder(Items.BUCKET))) : null;
-    
-    // fluxite
-    public static final RegistrySupplier<FlowingFluid> STILL_MOLTEN_FLUXITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("still_molten_fluxite", () -> cast(new ArchitecturyFlowingFluid.Source(MOLTEN_FLUXITE_ATTRIBUTES))) : null;
-    public static final RegistrySupplier<FlowingFluid> FLOWING_MOLTEN_FLUXITE = Platform.isModLoaded("productivemetalworks") ? FLUIDS.register("flowing_molten_fluxite", () -> cast(new ArchitecturyFlowingFluid.Flowing(MOLTEN_FLUXITE_ATTRIBUTES))) : null;
-    public static final RegistrySupplier<LiquidBlock> STILL_MOLTEN_FLUXITE_BLOCK = Platform.isModLoaded("productivemetalworks") ? BLOCKS.register("still_molten_fluxite_block", () -> new ArchitecturyLiquidBlock(STILL_MOLTEN_FLUXITE, BLOCKS.properties("still_molten_fluxite_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)))) : null;
-    public static final RegistrySupplier<Item> STILL_MOLTEN_FLUXITE_BUCKET = Platform.isModLoaded("productivemetalworks") ? ItemContent.registerItem("still_molten_fluxite_bucket", new ArchitecturyBucketItem(STILL_MOLTEN_FLUXITE, ItemContent.ITEMS.properties("still_molten_fluxite_bucket").stacksTo(1).craftRemainder(Items.BUCKET))) : null;
-    
-    @SuppressWarnings("unchecked")
-    private static <T> T cast(Object o) {
-        return (T) o;
-    }
-    
-    public static void registerFluids() {
-        FLUIDS.register();
-    }
-    
-    public static void registerBlocks() {
-        BLOCKS.register();
-    }
-    
-    public static void registerItems() {
-    }
-    
-    public static void registerItemsToGroups() {
-        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_OIL_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_FUEL_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_BIOFUEL_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_STEAM_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_HEAVY_OIL_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_DIESEL_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_NAPHTHA_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_SULFURIC_ACID_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_SILICON_WASH_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_MINERAL_SLURRY_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_SHEOL_FIRE_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_STRANGE_MATTER_BUCKET.get());
-        
-        if (Platform.isModLoaded("productivemetalworks")) {
-            ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_MOLTEN_ADAMANT_BUCKET.get());
-            ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_MOLTEN_BIOSTEEL_BUCKET.get());
-            ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_MOLTEN_DURATIUM_BUCKET.get());
-            ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_MOLTEN_ENERGITE_BUCKET.get());
-            ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_MOLTEN_FLUXITE_BUCKET.get());
-        }
-    }
-    
+
+    public static final DeferredRegister.Blocks FLUID_BLOCKS = DeferredRegister.createBlocks(Oritech.MOD_ID);
+    public static final DeferredRegister<FluidType> FLUID_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.FLUID_TYPES, Oritech.MOD_ID);
+    public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(Registries.FLUID, Oritech.MOD_ID);
+    public static final DeferredRegister.Items BUCKET_ITEMS = DeferredRegister.createItems(Oritech.MOD_ID);
+
+    public static final DeferredHolder<FluidType, FluidType> OIL_TYPE = FLUID_TYPES.register("oil_fluid_type", () -> new FluidType(FluidType.Properties.create().density(1050).temperature(315).viscosity(1800)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_OIL = FLUIDS.register("flowing_oil", () -> new BaseFlowingFluid.Flowing(new BaseFlowingFluid.Properties(OIL_TYPE, FluidContent.STILL_OIL, FluidContent.FLOWING_OIL).block(FluidContent.STILL_OIL_BLOCK).bucket(FluidContent.STILL_OIL_BUCKET)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STILL_OIL = FLUIDS.register("still_oil", () -> new BaseFlowingFluid.Source(new BaseFlowingFluid.Properties(OIL_TYPE, FluidContent.STILL_OIL, FluidContent.FLOWING_OIL).block(FluidContent.STILL_OIL_BLOCK).bucket(FluidContent.STILL_OIL_BUCKET)));
+    public static final DeferredHolder<Block, LiquidBlock> STILL_OIL_BLOCK = FLUID_BLOCKS.registerBlock("still_oil_block", props -> new LiquidBlock(STILL_OIL.get(), props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER));
+    public static final DeferredHolder<Item, BucketItem> STILL_OIL_BUCKET = BUCKET_ITEMS.registerItem("still_oil_bucket", props -> new BucketItem(STILL_OIL.get(), props), () -> new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+
+    public static final DeferredHolder<FluidType, FluidType> FUEL_TYPE = FLUID_TYPES.register("fuel_fluid_type", () -> new FluidType(FluidType.Properties.create().density(780).temperature(300).viscosity(850)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_FUEL = FLUIDS.register("flowing_fuel", () -> new BaseFlowingFluid.Flowing(new BaseFlowingFluid.Properties(FUEL_TYPE, FluidContent.STILL_FUEL, FluidContent.FLOWING_FUEL).block(FluidContent.STILL_FUEL_BLOCK).bucket(FluidContent.STILL_FUEL_BUCKET)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STILL_FUEL = FLUIDS.register("still_fuel", () -> new BaseFlowingFluid.Source(new BaseFlowingFluid.Properties(FUEL_TYPE, FluidContent.STILL_FUEL, FluidContent.FLOWING_FUEL).block(FluidContent.STILL_FUEL_BLOCK).bucket(FluidContent.STILL_FUEL_BUCKET)));
+    public static final DeferredHolder<Block, LiquidBlock> STILL_FUEL_BLOCK = FLUID_BLOCKS.registerBlock("still_fuel_block", props -> new LiquidBlock(STILL_FUEL.get(), props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER));
+    public static final DeferredHolder<Item, BucketItem> STILL_FUEL_BUCKET = BUCKET_ITEMS.registerItem("still_fuel_bucket", props -> new BucketItem(STILL_FUEL.get(), props), () -> new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+
+    public static final DeferredHolder<FluidType, FluidType> BIOFUEL_TYPE = FLUID_TYPES.register("biofuel_fluid_type", () -> new FluidType(FluidType.Properties.create().density(830).temperature(300).viscosity(950)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_BIOFUEL = FLUIDS.register("flowing_biofuel", () -> new BaseFlowingFluid.Flowing(new BaseFlowingFluid.Properties(BIOFUEL_TYPE, FluidContent.STILL_BIOFUEL, FluidContent.FLOWING_BIOFUEL).block(FluidContent.STILL_BIOFUEL_BLOCK).bucket(FluidContent.STILL_BIOFUEL_BUCKET)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STILL_BIOFUEL = FLUIDS.register("still_biofuel", () -> new BaseFlowingFluid.Source(new BaseFlowingFluid.Properties(BIOFUEL_TYPE, FluidContent.STILL_BIOFUEL, FluidContent.FLOWING_BIOFUEL).block(FluidContent.STILL_BIOFUEL_BLOCK).bucket(FluidContent.STILL_BIOFUEL_BUCKET)));
+    public static final DeferredHolder<Block, LiquidBlock> STILL_BIOFUEL_BLOCK = FLUID_BLOCKS.registerBlock("still_biofuel_block", props -> new LiquidBlock(STILL_BIOFUEL.get(), props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER));
+    public static final DeferredHolder<Item, BucketItem> STILL_BIOFUEL_BUCKET = BUCKET_ITEMS.registerItem("still_biofuel_bucket", props -> new BucketItem(STILL_BIOFUEL.get(), props), () -> new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+
+    public static final DeferredHolder<FluidType, FluidType> STEAM_TYPE = FLUID_TYPES.register("steam_fluid_type", () -> new FluidType(FluidType.Properties.create().motionScale(0.01D).canPushEntity(false).canSwim(false).canDrown(false).fallDistanceModifier(0.0F).density(-500).temperature(450).viscosity(100)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_STEAM = FLUIDS.register("flowing_steam", () -> new BaseFlowingFluid.Flowing(new BaseFlowingFluid.Properties(STEAM_TYPE, FluidContent.STILL_STEAM, FluidContent.FLOWING_STEAM).block(FluidContent.STILL_STEAM_BLOCK).bucket(FluidContent.STILL_STEAM_BUCKET)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STILL_STEAM = FLUIDS.register("still_steam", () -> new BaseFlowingFluid.Source(new BaseFlowingFluid.Properties(STEAM_TYPE, FluidContent.STILL_STEAM, FluidContent.FLOWING_STEAM).block(FluidContent.STILL_STEAM_BLOCK).bucket(FluidContent.STILL_STEAM_BUCKET)));
+    public static final DeferredHolder<Block, LiquidBlock> STILL_STEAM_BLOCK = FLUID_BLOCKS.registerBlock("still_steam_block", props -> new LiquidBlock(STILL_STEAM.get(), props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER));
+    public static final DeferredHolder<Item, BucketItem> STILL_STEAM_BUCKET = BUCKET_ITEMS.registerItem("still_steam_bucket", props -> new BucketItem(STILL_STEAM.get(), props), () -> new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+
+    public static final DeferredHolder<FluidType, FluidType> HEAVY_OIL_TYPE = FLUID_TYPES.register("heavy_oil_fluid_type", () -> new FluidType(FluidType.Properties.create().density(1250).temperature(330).viscosity(2400)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HEAVY_OIL = FLUIDS.register("flowing_heavy_oil", () -> new BaseFlowingFluid.Flowing(new BaseFlowingFluid.Properties(HEAVY_OIL_TYPE, FluidContent.STILL_HEAVY_OIL, FluidContent.FLOWING_HEAVY_OIL).block(FluidContent.STILL_HEAVY_OIL_BLOCK).bucket(FluidContent.STILL_HEAVY_OIL_BUCKET)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STILL_HEAVY_OIL = FLUIDS.register("still_heavy_oil", () -> new BaseFlowingFluid.Source(new BaseFlowingFluid.Properties(HEAVY_OIL_TYPE, FluidContent.STILL_HEAVY_OIL, FluidContent.FLOWING_HEAVY_OIL).block(FluidContent.STILL_HEAVY_OIL_BLOCK).bucket(FluidContent.STILL_HEAVY_OIL_BUCKET)));
+    public static final DeferredHolder<Block, LiquidBlock> STILL_HEAVY_OIL_BLOCK = FLUID_BLOCKS.registerBlock("still_heavy_oil_block", props -> new LiquidBlock(STILL_HEAVY_OIL.get(), props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER));
+    public static final DeferredHolder<Item, BucketItem> STILL_HEAVY_OIL_BUCKET = BUCKET_ITEMS.registerItem("still_heavy_oil_bucket", props -> new BucketItem(STILL_HEAVY_OIL.get(), props), () -> new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+
+    public static final DeferredHolder<FluidType, FluidType> DIESEL_TYPE = FLUID_TYPES.register("diesel_fluid_type", () -> new FluidType(FluidType.Properties.create().density(830).temperature(340).viscosity(1000)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_DIESEL = FLUIDS.register("flowing_diesel", () -> new BaseFlowingFluid.Flowing(new BaseFlowingFluid.Properties(DIESEL_TYPE, FluidContent.STILL_DIESEL, FluidContent.FLOWING_DIESEL).block(FluidContent.STILL_DIESEL_BLOCK).bucket(FluidContent.STILL_DIESEL_BUCKET)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STILL_DIESEL = FLUIDS.register("still_diesel", () -> new BaseFlowingFluid.Source(new BaseFlowingFluid.Properties(DIESEL_TYPE, FluidContent.STILL_DIESEL, FluidContent.FLOWING_DIESEL).block(FluidContent.STILL_DIESEL_BLOCK).bucket(FluidContent.STILL_DIESEL_BUCKET)));
+    public static final DeferredHolder<Block, LiquidBlock> STILL_DIESEL_BLOCK = FLUID_BLOCKS.registerBlock("still_diesel_block", props -> new LiquidBlock(STILL_DIESEL.get(), props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER));
+    public static final DeferredHolder<Item, BucketItem> STILL_DIESEL_BUCKET = BUCKET_ITEMS.registerItem("still_diesel_bucket", props -> new BucketItem(STILL_DIESEL.get(), props), () -> new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+
+    public static final DeferredHolder<FluidType, FluidType> NAPHTHA_TYPE = FLUID_TYPES.register("naphtha_fluid_type", () -> new FluidType(FluidType.Properties.create().density(720).temperature(335).viscosity(550)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_NAPHTHA = FLUIDS.register("flowing_naphtha", () -> new BaseFlowingFluid.Flowing(new BaseFlowingFluid.Properties(NAPHTHA_TYPE, FluidContent.STILL_NAPHTHA, FluidContent.FLOWING_NAPHTHA).block(FluidContent.STILL_NAPHTHA_BLOCK).bucket(FluidContent.STILL_NAPHTHA_BUCKET)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STILL_NAPHTHA = FLUIDS.register("still_naphtha", () -> new BaseFlowingFluid.Source(new BaseFlowingFluid.Properties(NAPHTHA_TYPE, FluidContent.STILL_NAPHTHA, FluidContent.FLOWING_NAPHTHA).block(FluidContent.STILL_NAPHTHA_BLOCK).bucket(FluidContent.STILL_NAPHTHA_BUCKET)));
+    public static final DeferredHolder<Block, LiquidBlock> STILL_NAPHTHA_BLOCK = FLUID_BLOCKS.registerBlock("still_naphtha_block", props -> new LiquidBlock(STILL_NAPHTHA.get(), props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER));
+    public static final DeferredHolder<Item, BucketItem> STILL_NAPHTHA_BUCKET = BUCKET_ITEMS.registerItem("still_naphtha_bucket", props -> new BucketItem(STILL_NAPHTHA.get(), props), () -> new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+
+    public static final DeferredHolder<FluidType, FluidType> SULFURIC_ACID_TYPE = FLUID_TYPES.register("sulfuric_acid_fluid_type", () -> new FluidType(FluidType.Properties.create().density(1800).temperature(320).viscosity(1400).rarity(Rarity.UNCOMMON)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SULFURIC_ACID = FLUIDS.register("flowing_sulfuric_acid", () -> new BaseFlowingFluid.Flowing(new BaseFlowingFluid.Properties(SULFURIC_ACID_TYPE, FluidContent.STILL_SULFURIC_ACID, FluidContent.FLOWING_SULFURIC_ACID).block(FluidContent.STILL_SULFURIC_ACID_BLOCK).bucket(FluidContent.STILL_SULFURIC_ACID_BUCKET)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STILL_SULFURIC_ACID = FLUIDS.register("still_sulfuric_acid", () -> new BaseFlowingFluid.Source(new BaseFlowingFluid.Properties(SULFURIC_ACID_TYPE, FluidContent.STILL_SULFURIC_ACID, FluidContent.FLOWING_SULFURIC_ACID).block(FluidContent.STILL_SULFURIC_ACID_BLOCK).bucket(FluidContent.STILL_SULFURIC_ACID_BUCKET)));
+    public static final DeferredHolder<Block, LiquidBlock> STILL_SULFURIC_ACID_BLOCK = FLUID_BLOCKS.registerBlock("still_sulfuric_acid_block", props -> new LiquidBlock(STILL_SULFURIC_ACID.get(), props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER));
+    public static final DeferredHolder<Item, BucketItem> STILL_SULFURIC_ACID_BUCKET = BUCKET_ITEMS.registerItem("still_sulfuric_acid_bucket", props -> new BucketItem(STILL_SULFURIC_ACID.get(), props), () -> new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+
+    public static final DeferredHolder<FluidType, FluidType> SILICON_WASH_TYPE = FLUID_TYPES.register("silicon_wash_fluid_type", () -> new FluidType(FluidType.Properties.create().density(1080).temperature(300).viscosity(1100)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SILICON_WASH = FLUIDS.register("flowing_silicon_wash", () -> new BaseFlowingFluid.Flowing(new BaseFlowingFluid.Properties(SILICON_WASH_TYPE, FluidContent.STILL_SILICON_WASH, FluidContent.FLOWING_SILICON_WASH).block(FluidContent.STILL_SILICON_WASH_BLOCK).bucket(FluidContent.STILL_SILICON_WASH_BUCKET)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STILL_SILICON_WASH = FLUIDS.register("still_silicon_wash", () -> new BaseFlowingFluid.Source(new BaseFlowingFluid.Properties(SILICON_WASH_TYPE, FluidContent.STILL_SILICON_WASH, FluidContent.FLOWING_SILICON_WASH).block(FluidContent.STILL_SILICON_WASH_BLOCK).bucket(FluidContent.STILL_SILICON_WASH_BUCKET)));
+    public static final DeferredHolder<Block, LiquidBlock> STILL_SILICON_WASH_BLOCK = FLUID_BLOCKS.registerBlock("still_silicon_wash_block", props -> new LiquidBlock(STILL_SILICON_WASH.get(), props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER));
+    public static final DeferredHolder<Item, BucketItem> STILL_SILICON_WASH_BUCKET = BUCKET_ITEMS.registerItem("still_silicon_wash_bucket", props -> new BucketItem(STILL_SILICON_WASH.get(), props), () -> new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+
+    public static final DeferredHolder<FluidType, FluidType> MINERAL_SLURRY_TYPE = FLUID_TYPES.register("mineral_slurry_fluid_type", () -> new FluidType(FluidType.Properties.create().density(1600).temperature(295).viscosity(2600)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_MINERAL_SLURRY = FLUIDS.register("flowing_mineral_slurry", () -> new BaseFlowingFluid.Flowing(new BaseFlowingFluid.Properties(MINERAL_SLURRY_TYPE, FluidContent.STILL_MINERAL_SLURRY, FluidContent.FLOWING_MINERAL_SLURRY).block(FluidContent.STILL_MINERAL_SLURRY_BLOCK).bucket(FluidContent.STILL_MINERAL_SLURRY_BUCKET)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STILL_MINERAL_SLURRY = FLUIDS.register("still_mineral_slurry", () -> new BaseFlowingFluid.Source(new BaseFlowingFluid.Properties(MINERAL_SLURRY_TYPE, FluidContent.STILL_MINERAL_SLURRY, FluidContent.FLOWING_MINERAL_SLURRY).block(FluidContent.STILL_MINERAL_SLURRY_BLOCK).bucket(FluidContent.STILL_MINERAL_SLURRY_BUCKET)));
+    public static final DeferredHolder<Block, LiquidBlock> STILL_MINERAL_SLURRY_BLOCK = FLUID_BLOCKS.registerBlock("still_mineral_slurry_block", props -> new LiquidBlock(STILL_MINERAL_SLURRY.get(), props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER));
+    public static final DeferredHolder<Item, BucketItem> STILL_MINERAL_SLURRY_BUCKET = BUCKET_ITEMS.registerItem("still_mineral_slurry_bucket", props -> new BucketItem(STILL_MINERAL_SLURRY.get(), props), () -> new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+
+    public static final DeferredHolder<FluidType, FluidType> SHEOL_FIRE_TYPE = FLUID_TYPES.register("sheol_fire_fluid_type", () -> new FluidType(FluidType.Properties.create().canSwim(false).canDrown(false).canPushEntity(false).fallDistanceModifier(0.1F).lightLevel(15).density(850).temperature(1400).viscosity(900).rarity(Rarity.RARE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SHEOL_FIRE = FLUIDS.register("flowing_sheol_fire", () -> new BaseFlowingFluid.Flowing(new BaseFlowingFluid.Properties(SHEOL_FIRE_TYPE, FluidContent.STILL_SHEOL_FIRE, FluidContent.FLOWING_SHEOL_FIRE).block(FluidContent.STILL_SHEOL_FIRE_BLOCK).bucket(FluidContent.STILL_SHEOL_FIRE_BUCKET)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STILL_SHEOL_FIRE = FLUIDS.register("still_sheol_fire", () -> new BaseFlowingFluid.Source(new BaseFlowingFluid.Properties(SHEOL_FIRE_TYPE, FluidContent.STILL_SHEOL_FIRE, FluidContent.FLOWING_SHEOL_FIRE).block(FluidContent.STILL_SHEOL_FIRE_BLOCK).bucket(FluidContent.STILL_SHEOL_FIRE_BUCKET)));
+    public static final DeferredHolder<Block, SheolFireFluidBlock> STILL_SHEOL_FIRE_BLOCK = FLUID_BLOCKS.registerBlock("still_sheol_fire_block", props -> new SheolFireFluidBlock(STILL_SHEOL_FIRE.get(), props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.LAVA));
+    public static final DeferredHolder<Item, BucketItem> STILL_SHEOL_FIRE_BUCKET = BUCKET_ITEMS.registerItem("still_sheol_fire_bucket", props -> new BucketItem(STILL_SHEOL_FIRE.get(), props), () -> new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+
+    public static final DeferredHolder<FluidType, FluidType> STRANGE_MATTER_TYPE = FLUID_TYPES.register("strange_matter_fluid_type", () -> new FluidType(FluidType.Properties.create().canSwim(false).canDrown(false).canPushEntity(false).lightLevel(7).density(1800).temperature(500).viscosity(1800).rarity(Rarity.EPIC)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_STRANGE_MATTER = FLUIDS.register("flowing_strange_matter", () -> new BaseFlowingFluid.Flowing(new BaseFlowingFluid.Properties(STRANGE_MATTER_TYPE, FluidContent.STILL_STRANGE_MATTER, FluidContent.FLOWING_STRANGE_MATTER).block(FluidContent.STILL_STRANGE_MATTER_BLOCK).bucket(FluidContent.STILL_STRANGE_MATTER_BUCKET)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STILL_STRANGE_MATTER = FLUIDS.register("still_strange_matter", () -> new BaseFlowingFluid.Source(new BaseFlowingFluid.Properties(STRANGE_MATTER_TYPE, FluidContent.STILL_STRANGE_MATTER, FluidContent.FLOWING_STRANGE_MATTER).block(FluidContent.STILL_STRANGE_MATTER_BLOCK).bucket(FluidContent.STILL_STRANGE_MATTER_BUCKET)));
+    public static final DeferredHolder<Block, LiquidBlock> STILL_STRANGE_MATTER_BLOCK = FLUID_BLOCKS.registerBlock("still_strange_matter_block", props -> new LiquidBlock(STILL_STRANGE_MATTER.get(), props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WATER));
+    public static final DeferredHolder<Item, BucketItem> STILL_STRANGE_MATTER_BUCKET = BUCKET_ITEMS.registerItem("still_strange_matter_bucket", props -> new BucketItem(STILL_STRANGE_MATTER.get(), props), () -> new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1));
+
 }
 
 

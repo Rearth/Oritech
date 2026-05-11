@@ -1,6 +1,5 @@
 package rearth.oritech.init;
 
-import dev.architectury.registry.CreativeTabRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -10,6 +9,8 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.lang.reflect.Modifier;
 import java.util.function.Supplier;
 
@@ -85,9 +86,21 @@ public class ItemGroups {
         }
         
         // load from blockitems
-        for (var blockData : ItemContent.BLOCK_ITEMS) {
+        for (var blockData : BlockContent.BLOCK_GROUPS) {
             if (targetGroup.equals(blockData.getB()))
                 output.accept(blockData.getA());
+        }
+        
+        // add fluid bucket items
+        for (var bucket : FluidContent.BUCKET_ITEMS.getEntries()) {
+            if (targetGroup.equals(ItemContent.Groups.COMPONENTS))
+                output.accept(bucket.value());
+        }
+        
+        // add tools
+        for (var tool : ToolsContent.EQUIPMENT.getEntries()) {
+            if (targetGroup.equals(ItemContent.Groups.EQUIPMENT))
+                output.accept(tool.value());
         }
     }
 }

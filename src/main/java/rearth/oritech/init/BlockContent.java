@@ -2,6 +2,7 @@ package rearth.oritech.init;
 
 import net.minecraft.core.dispenser.ShulkerBoxDispenseBehavior;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -11,6 +12,7 @@ import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import oshi.util.tuples.Pair;
 import rearth.oritech.Oritech;
@@ -44,11 +46,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("NullableProblems")
 public class BlockContent {
     
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Oritech.MOD_ID);
+    public static final DeferredRegister.Items BLOCK_ITEMS = DeferredRegister.createItems(Oritech.MOD_ID);
+    
+    // hints for item groups
+    public static final List<Pair<DeferredItem<BlockItem>, ItemContent.Groups>> BLOCK_GROUPS = new ArrayList<>();
     
     public static final DeferredBlock<Block> SPAWNER_CAGE_BLOCK = BLOCKS.registerBlock("spawner_cage_block", SpawnerCageBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion()); // sample 1
 
@@ -442,6 +451,37 @@ public class BlockContent {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
     public static final DeferredBlock<Block> URANIUM_DUST_BLOCK = BLOCKS.registerSimpleBlock("uranium_dust_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).lightLevel(state -> 2));
     //endregion
+    
+    @SuppressWarnings("unchecked")
+    public static void AddBlockItems() {
+        
+        for (var field : BlockContent.class.getDeclaredFields()) {
+            if (!Modifier.isStatic(field.getModifiers())) continue;
+            if (!Modifier.isPublic(field.getModifiers())) continue;
+            if (!DeferredBlock.class.isAssignableFrom(field.getType())) continue;
+            
+            try {
+                field.setAccessible(true);
+                var value = (DeferredBlock<Block>) field.get(null);
+                var identifier = field.getName().toLowerCase(java.util.Locale.ROOT);
+                
+                if (field.isAnnotationPresent(BlockContent.NoBlockItem.class)) continue;
+                
+                var fieldGroup = ItemContent.Groups.MACHINES;
+                
+                if (field.isAnnotationPresent(ItemContent.ItemGroupTarget.class)) {
+                    fieldGroup = field.getAnnotation(ItemContent.ItemGroupTarget.class).value();
+                }
+                
+                var blockItem = BLOCK_ITEMS.registerSimpleBlockItem(value);
+                BLOCK_GROUPS.add(new Pair<>(blockItem, fieldGroup));
+                
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to access field: " + field.getName(), e);
+            }
+        }
+        
+    }
     
     // todo figure this out
     @Retention(RetentionPolicy.RUNTIME)
