@@ -6,22 +6,18 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
 import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.init.ComponentContent;
-import rearth.oritech.init.LootContent;
 
 import java.util.List;
 
 public class NbtBlockLootFunction extends LootItemConditionalFunction {
-    public static final String NAME = "nbt_block_loot";
+    public static final String NAME = "nbt_block_loot_function";
     
     public NbtBlockLootFunction(List<LootItemCondition> conditions) {
         super(conditions);
@@ -29,6 +25,9 @@ public class NbtBlockLootFunction extends LootItemConditionalFunction {
     
     @Override
     public @NotNull ItemStack run(@NotNull ItemStack stack, LootContext context) {
+        
+        // todo
+        
         var blockEntity = context.getParamOrNull(LootContextParams.BLOCK_ENTITY);
         
         if (blockEntity instanceof SmallTankEntity tankEntity && tankEntity.fluidStorage.getAmount() > 0) {
@@ -43,13 +42,13 @@ public class NbtBlockLootFunction extends LootItemConditionalFunction {
         return stack;
     }
     
-    @Override
-    public LootItemFunctionType<NbtBlockLootFunction> getType() {
-        return LootContent.NBT_BLOCK_LOOT_FUNCTION;
-    }
-    
     public static Builder<?> builder() {
         return LootItemConditionalFunction.simpleBuilder(NbtBlockLootFunction::new);
+    }
+
+    @Override
+    public MapCodec<NbtBlockLootFunction> codec() {
+        return CODEC;
     }
     
     public static final MapCodec<NbtBlockLootFunction> CODEC = RecordCodecBuilder.mapCodec(

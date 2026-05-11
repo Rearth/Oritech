@@ -35,10 +35,7 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.ItemGroups;
-import rearth.oritech.init.ToolsContent;
+import rearth.oritech.init.*;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.util.ServerZiplineHandler;
@@ -78,6 +75,8 @@ public final class Oritech {
         BlockContent.BLOCKS.register(modEventBus);
         ToolsContent.EQUIPMENT.register(modEventBus);
         ItemGroups.TABS.register(modEventBus);
+        SoundContent.SOUND_EVENTS.register(modEventBus);
+        LootContent.LOOT_FUNCTIONS.register(modEventBus);
         
         // post processing / extra registrations
         ItemContent.AddBlockItems();
