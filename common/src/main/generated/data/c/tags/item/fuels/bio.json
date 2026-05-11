@@ -1,9 +1,0 @@
-{
-  "values": [
-    "oritech:biomass",
-    {
-      "id": "techreborn:plantball",
-      "required": false
-    }
-  ]
-}

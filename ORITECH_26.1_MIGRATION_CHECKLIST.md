@@ -86,7 +86,7 @@ Tasks:
 
 Files and areas:
 
-- `common/src/main/java/rearth/oritech/block/entity`
+- `common/src/main/java/rearth_neosample/oritech/block/entity`
 - `MachineAddonController`
 - `MultiblockMachineController`
 - `ColorableMachine`
@@ -109,11 +109,11 @@ Tasks:
 Files:
 
 - common energy/fluid/item API packages
-- `fabric/src/main/java/rearth/oritech/fabric/FabricItemApi.java`
+- `fabric/src/main/java/rearth_neosample/oritech/fabric/FabricItemApi.java`
 - Fabric fluid/energy adapters
-- `neoforge/src/main/java/rearth/oritech/neoforge/NeoforgeItemApiImpl.java`
-- `neoforge/src/main/java/rearth/oritech/neoforge/NeoforgeFluidApiImpl.java`
-- `neoforge/src/main/java/rearth/oritech/neoforge/NeoforgeEnergyApiImpl.java`
+- `neoforge/src/main/java/rearth_neosample/oritech/neoforge/NeoforgeItemApiImpl.java`
+- `neoforge/src/main/java/rearth_neosample/oritech/neoforge/NeoforgeFluidApiImpl.java`
+- `neoforge/src/main/java/rearth_neosample/oritech/neoforge/NeoforgeEnergyApiImpl.java`
 
 Tasks:
 
@@ -134,9 +134,9 @@ Tasks:
 
 Files:
 
-- `common/src/main/java/rearth/oritech/init/recipes`
-- `common/src/main/java/rearth/oritech/api/recipe`
-- `fabric/src/data/java/rearth/oritech/generator`
+- `common/src/main/java/rearth_neosample/oritech/init/recipes`
+- `common/src/main/java/rearth_neosample/oritech/api/recipe`
+- `fabric/src/data/java/rearth_neosample/oritech/generator`
 - compat recipe generators
 
 Tasks:
@@ -182,8 +182,8 @@ Tasks:
 
 Files:
 
-- `common/src/main/java/rearth/oritech/api/screen`
-- `common/src/main/java/rearth/oritech/client/ui`
+- `common/src/main/java/rearth_neosample/oritech/api/screen`
+- `common/src/main/java/rearth_neosample/oritech/client/ui`
 - EMI drag/drop screen integration
 
 Tasks:

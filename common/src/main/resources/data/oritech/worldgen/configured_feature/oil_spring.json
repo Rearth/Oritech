@@ -1,7 +1,0 @@
-{
-  "type": "oritech:oil_spring",
-  "config": {
-    "number": 7,
-    "blockId": "oritech:still_oil_block"
-  }
-}

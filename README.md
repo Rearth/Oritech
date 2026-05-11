@@ -125,9 +125,9 @@ artifact, so it can be properly remapped. This will also work with yarn mappings
 ```groovy
 dependencies {
     // Mojmaps - ModDevGradle
-    implementation "rearth.oritech:oritech-common-<minecraft-version>:<oritech-version>"
+    implementation "rearth_neosample.oritech:oritech-common-<minecraft-version>:<oritech-version>"
     // Intermediary - Architectury Loom
-    modImplementation "rearth.oritech:oritech-common-<minecraft-version>-intermediary:<oritech-version>"
+    modImplementation "rearth_neosample.oritech:oritech-common-<minecraft-version>-intermediary:<oritech-version>"
 }
 ```
 
@@ -138,7 +138,7 @@ The Fabric module is published in intermediary mappings.
 ```groovy
 dependencies {
     // Fabric Loom or Architectury Loom
-    modImplementation "rearth.oritech:oritech-fabric-<minecraft-version>:<oritech-version>"
+    modImplementation "rearth_neosample.oritech:oritech-fabric-<minecraft-version>:<oritech-version>"
 }
 ```
 
@@ -151,7 +151,7 @@ common code, though.
 ```groovy
 dependencies {
     // ModDevGradle or Architectury Loom
-    implementation "rearth.oritech:oritech-neoforge-<minecraft-version>:<oritech-version>"
+    implementation "rearth_neosample.oritech:oritech-neoforge-<minecraft-version>:<oritech-version>"
 }
 ```
 

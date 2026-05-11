@@ -1,8 +1,0 @@
-{
-  "schemaVersion": 1,
-  "id": "oritech-data",
-  "version": "1",
-  "entrypoints": {
-    "fabric-datagen": ["rearth.oritech.OritechDataGenerator"]
-  }
-}

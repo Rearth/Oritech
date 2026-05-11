@@ -1,8 +1,0 @@
-{
-  "values": [
-    "minecraft:repeater",
-    "minecraft:comparator",
-    "minecraft:redstone_torch",
-    "minecraft:target"
-  ]
-}

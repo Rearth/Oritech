@@ -195,7 +195,7 @@ Tasks:
 
 Primary targets:
 
-- Machine base classes and all block entities under `common/src/main/java/rearth/oritech/block/entity`
+- Machine base classes and all block entities under `common/src/main/java/rearth_neosample/oritech/block/entity`
 - `MachineAddonController`
 - `MultiblockMachineController`
 - `ColorableMachine`
@@ -212,10 +212,10 @@ Tasks:
 Primary targets:
 
 - `common` energy/fluid/item API packages
-- `fabric/src/main/java/rearth/oritech/fabric/FabricItemApi.java` and related Fabric transfer adapters
-- `neoforge/src/main/java/rearth/oritech/neoforge/NeoforgeItemApiImpl.java`
-- `neoforge/src/main/java/rearth/oritech/neoforge/NeoforgeFluidApiImpl.java`
-- `neoforge/src/main/java/rearth/oritech/neoforge/NeoforgeEnergyApiImpl.java`
+- `fabric/src/main/java/rearth_neosample/oritech/fabric/FabricItemApi.java` and related Fabric transfer adapters
+- `neoforge/src/main/java/rearth_neosample/oritech/neoforge/NeoforgeItemApiImpl.java`
+- `neoforge/src/main/java/rearth_neosample/oritech/neoforge/NeoforgeFluidApiImpl.java`
+- `neoforge/src/main/java/rearth_neosample/oritech/neoforge/NeoforgeEnergyApiImpl.java`
 
 Tasks:
 
@@ -228,9 +228,9 @@ Tasks:
 
 Primary targets:
 
-- `common/src/main/java/rearth/oritech/init/recipes`
-- `common/src/main/java/rearth/oritech/api/recipe`
-- `fabric/src/data/java/rearth/oritech/generator`
+- `common/src/main/java/rearth_neosample/oritech/init/recipes`
+- `common/src/main/java/rearth_neosample/oritech/api/recipe`
+- `fabric/src/data/java/rearth_neosample/oritech/generator`
 - compat recipe generators under `fabric/src/data/java`
 
 Tasks:
@@ -265,8 +265,8 @@ Tasks:
 
 Primary targets:
 
-- `common/src/main/java/rearth/oritech/api/screen`
-- `common/src/main/java/rearth/oritech/client/ui`
+- `common/src/main/java/rearth_neosample/oritech/api/screen`
+- `common/src/main/java/rearth_neosample/oritech/client/ui`
 - `EmiItemFilterDragDropHandler`
 
 Tasks:
@@ -303,7 +303,7 @@ Tasks:
 
 Primary targets:
 
-- powered tools and armor under `common/src/main/java/rearth/oritech/item/tools`
+- powered tools and armor under `common/src/main/java/rearth_neosample/oritech/item/tools`
 - `OritechEnergyItem`
 - `JetpackItem` and `JetpackElytraItem`
 - `PortableLaserItem`
@@ -322,9 +322,9 @@ Tasks:
 
 Primary targets:
 
-- `common/src/main/java/rearth/oritech/mixin`
-- `fabric/src/main/java/rearth/oritech/fabric/mixin`
-- `neoforge/src/main/java/rearth/oritech/neoforge/mixin`
+- `common/src/main/java/rearth_neosample/oritech/mixin`
+- `fabric/src/main/java/rearth_neosample/oritech/fabric/mixin`
+- `neoforge/src/main/java/rearth_neosample/oritech/neoforge/mixin`
 - Fabric access widener files
 - NeoForge access transformers
 

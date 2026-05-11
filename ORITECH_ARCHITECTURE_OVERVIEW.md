@@ -17,13 +17,13 @@ The build is a Java 21 multi-project Gradle setup using Architectury-style commo
 
 Important platform files:
 
-- `common/src/main/java/rearth/oritech/OritechPlatform.java`
-- `fabric/src/main/java/rearth/oritech/fabric/OritechPlatformFabric.java`
-- `neoforge/src/main/java/rearth/oritech/neoforge/OritechPlatformNeoForge.java`
-- `fabric/src/main/java/rearth/oritech/fabric/OritechFabricMod.java`
-- `fabric/src/main/java/rearth/oritech/fabric/client/OritechFabricModClient.java`
-- `neoforge/src/main/java/rearth/oritech/neoforge/OritechModNeoForge.java`
-- `neoforge/src/main/java/rearth/oritech/neoforge/client/OritechClientNeoForge.java`
+- `common/src/main/java/rearth_neosample/oritech/OritechPlatform.java`
+- `fabric/src/main/java/rearth_neosample/oritech/fabric/OritechPlatformFabric.java`
+- `neoforge/src/main/java/rearth_neosample/oritech/neoforge/OritechPlatformNeoForge.java`
+- `fabric/src/main/java/rearth_neosample/oritech/fabric/OritechFabricMod.java`
+- `fabric/src/main/java/rearth_neosample/oritech/fabric/client/OritechFabricModClient.java`
+- `neoforge/src/main/java/rearth_neosample/oritech/neoforge/OritechModNeoForge.java`
+- `neoforge/src/main/java/rearth_neosample/oritech/neoforge/client/OritechClientNeoForge.java`
 
 The platform split is real and important. Migration work should keep common behavior in `common` and isolate loader API churn in the Fabric/NeoForge modules where possible.
 
@@ -48,7 +48,7 @@ Oritech touches a broad set of Minecraft systems:
 
 ### Registration and Initialization
 
-Central init classes under `common/src/main/java/rearth/oritech/init` register the mod content: blocks, items, block entities, components, menu types, particles, recipes, tags, sounds, and compat hooks. `ArchitecturyRegistryContainer` and the `*Content` classes are the main places to audit for registration API changes.
+Central init classes under `common/src/main/java/rearth_neosample/oritech/init` register the mod content: blocks, items, block entities, components, menu types, particles, recipes, tags, sounds, and compat hooks. `ArchitecturyRegistryContainer` and the `*Content` classes are the main places to audit for registration API changes.
 
 High-risk files include `BlockContent`, `ItemContent`, `BlockEntitiesContent`, `ComponentContent`, and `RecipeContent`.
 
@@ -66,13 +66,13 @@ This layer is strategically valuable: if it is updated cleanly, most machines an
 
 ### Recipes and Datagen
 
-Oritech has a custom machine recipe model and many datagen builders. The important files are under `common/src/main/java/rearth/oritech/api/recipe`, `common/src/main/java/rearth/oritech/init/recipes`, and `fabric/src/data/java/rearth/oritech/generator`.
+Oritech has a custom machine recipe model and many datagen builders. The important files are under `common/src/main/java/rearth_neosample/oritech/api/recipe`, `common/src/main/java/rearth_neosample/oritech/init/recipes`, and `fabric/src/data/java/rearth_neosample/oritech/generator`.
 
 The recipe stack is migration-sensitive because later 1.21.x and 26.1 rework recipe IDs, recipe displays, ingredient structure, recipe serializers, and recipe result stack representation.
 
 ### Screens and Widgets
 
-Oritech has a custom screen/widget layer under `common/src/main/java/rearth/oritech/api/screen` and `common/src/main/java/rearth/oritech/client/ui`. Machine screens are not just vanilla container screens; they compose custom widgets, previews, labels, item widgets, overlays, scroll areas, progress bars, and reactor-specific views.
+Oritech has a custom screen/widget layer under `common/src/main/java/rearth_neosample/oritech/api/screen` and `common/src/main/java/rearth_neosample/oritech/client/ui`. Machine screens are not just vanilla container screens; they compose custom widgets, previews, labels, item widgets, overlays, scroll areas, progress bars, and reactor-specific views.
 
 That makes the GUI rendering changes in 1.21.6+ and 26.1 one of the largest client-side migration risks.
 
