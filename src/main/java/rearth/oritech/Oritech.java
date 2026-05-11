@@ -38,6 +38,7 @@ import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ItemGroups;
+import rearth.oritech.init.ToolsContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.util.ServerZiplineHandler;
@@ -75,7 +76,7 @@ public final class Oritech {
         // registrations
         ItemContent.ITEMS.register(modEventBus);
         BlockContent.BLOCKS.register(modEventBus);
-        
+        ToolsContent.EQUIPMENT.register(modEventBus);
         ItemGroups.TABS.register(modEventBus);
         
         // post processing / extra registrations

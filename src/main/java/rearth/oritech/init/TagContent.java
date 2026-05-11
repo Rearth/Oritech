@@ -3,6 +3,7 @@ package rearth.oritech.init;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -92,6 +93,9 @@ public class TagContent {
     
     // wrenches
     public static final TagKey<Item> WRENCHES = cItemTag("tools/wrench");
+
+    // These items are currently unbreakable, so these only satisfy the required material API shape.
+    public static final TagKey<Item> UNBREAKABLE_REPAIRS = oritechItemTag("ignored");
     
     // wrenches
     public static final TagKey<Item> MACHINE_PAINTS = oritechItemTag("paint");

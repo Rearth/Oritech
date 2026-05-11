@@ -1,97 +1,159 @@
 package rearth.oritech.init;
 
-import dev.architectury.event.EventResult;
-import dev.architectury.event.events.common.BlockEvent;
-import dev.architectury.event.events.common.EntityEvent;
-import dev.architectury.event.events.common.TickEvent;
-import dev.architectury.registry.registries.RegistrySupplier;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Util;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.component.Unbreakable;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.fluid.FluidApi;
+import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.EquipmentAssets;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import rearth.oritech.Oritech;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.*;
 import rearth.oritech.item.tools.harvesting.*;
-import rearth.oritech.item.tools.util.OritechEnergyItem;
-import rearth.oritech.util.registry.OritechItemRegistry;
 
+import java.util.EnumMap;
+
+@SuppressWarnings("NullableProblems")
 public class ToolsContent {
     
-    public static final OritechItemRegistry ITEMS = ItemContent.ITEMS;
+    public static final DeferredRegister.Items EQUIPMENT = DeferredRegister.createItems(Oritech.MOD_ID);
     
-    public static final Holder<ArmorMaterial> EXOSUIT_MATERIAL = ArmorMaterials.IRON;
-    public static final Holder<ArmorMaterial> JETPACK_MATERIAL = ArmorMaterials.LEATHER;
-    public static final Tier ELECTRIC_MATERIAL = new ElectricToolMaterial();
-    public static final Tier PROMETHIUM_MATERIAL = new PromethiumToolMaterial();
+    public static final ResourceKey<EquipmentAsset> EXOSUIT_ASSET = ResourceKey.create(EquipmentAssets.ROOT_ID, Oritech.id("exosuit"));
     
-    public static final RegistrySupplier<Item> EXO_HELMET = registerTool("exo_helmet", new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.HELMET, unbreakingSettings("exo_helmet")));
-    public static final RegistrySupplier<Item> EXO_CHESTPLATE = registerTool("exo_chestplate", new BackstorageExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, electricSettings("exo_chestplate")));
-    public static final RegistrySupplier<Item> EXO_LEGGINGS = registerTool("exo_leggings", new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.LEGGINGS, unbreakingSettings("exo_leggings")));
-    public static final RegistrySupplier<Item> EXO_BOOTS = registerTool("exo_boots", new ExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.BOOTS, unbreakingSettings("exo_boots")));
+    public static final ArmorMaterial EXOSUIT_MATERIAL = new ArmorMaterial(
+      100,   // doesnt really matter here
+      Util.make(new EnumMap<>(ArmorType.class), map -> {    // protection values
+          map.put(ArmorType.BOOTS, 3);
+          map.put(ArmorType.LEGGINGS, 6);
+          map.put(ArmorType.CHESTPLATE, 8);
+          map.put(ArmorType.HELMET, 3);
+          map.put(ArmorType.BODY, 4);
+      }),
+      20,
+      SoundContent.SHORT_SERVO,
+      0,
+      0,
+      TagContent.UNBREAKABLE_REPAIRS,
+      EXOSUIT_ASSET
+    );
     
-    public static final RegistrySupplier<Item> JETPACK = registerTool("jetpack", new JetpackItem(JETPACK_MATERIAL, ArmorItem.Type.CHESTPLATE, jetpackSettings("jetpack")));
-    public static final RegistrySupplier<Item> EXO_JETPACK = registerTool("exo_jetpack", new JetpackExoArmorItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, jetpackSettings("exo_jetpack")));
-    public static final RegistrySupplier<Item> JETPACK_ELYTRA = registerTool("jetpack_elytra", new JetpackElytraItem(JETPACK_MATERIAL, ArmorItem.Type.CHESTPLATE, jetpackSettings("jetpack_elytra")));
-    public static final RegistrySupplier<Item> JETPACK_EXO_ELYTRA = registerTool("jetpack_exo_elytra", new JetpackExoElytraItem(EXOSUIT_MATERIAL, ArmorItem.Type.CHESTPLATE, jetpackSettings("jetpack_exo_elytra")));
+    public static final ToolMaterial ELECTRIC_MATERIAL = new ToolMaterial(
+      BlockTags.INCORRECT_FOR_NETHERITE_TOOL,
+      2000,
+      9f,
+      3,
+      20,
+      TagContent.UNBREAKABLE_REPAIRS
+    );
+    public static final ToolMaterial PROMETHIUM_MATERIAL = new ToolMaterial(
+      BlockTags.INCORRECT_FOR_NETHERITE_TOOL,
+      2000,
+      24f,
+      5,
+      28,
+      TagContent.UNBREAKABLE_REPAIRS
+    );
     
-    public static final RegistrySupplier<Item> PORTABLE_LASER = registerTool("portable_laser", new PortableLaserItem(unbreakingSettings("portable_laser").rarity(Rarity.EPIC)));
-    public static final RegistrySupplier<Item> ELECTRIC_MACE = registerTool("electric_mace", new ElectricMaceItem(unbreakingSettings("electric_mace").attributes(ElectricMaceItem.createAttributes()).rarity(Rarity.EPIC)));
+    public static final DeferredItem<Item> EXO_HELMET = EQUIPMENT.registerItem(
+      "exo_helmet",
+      props -> new ExoArmorItem(EXOSUIT_MATERIAL, ArmorType.HELMET,
+        props.humanoidArmor(EXOSUIT_MATERIAL, ArmorType.HELMET)
+          .component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
+    public static final DeferredItem<Item> EXO_CHESTPLATE = EQUIPMENT.registerItem(
+      "exo_chestplate",
+      props -> new BackstorageExoArmorItem(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE,
+        props.humanoidArmor(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE)
+          .component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
+    public static final DeferredItem<Item> EXO_LEGGINGS = EQUIPMENT.registerItem(
+      "exo_leggings",
+      props -> new ExoArmorItem(EXOSUIT_MATERIAL, ArmorType.LEGGINGS,
+        props.humanoidArmor(EXOSUIT_MATERIAL, ArmorType.LEGGINGS)
+          .component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
+    public static final DeferredItem<Item> EXO_BOOTS = EQUIPMENT.registerItem(
+      "exo_boots",
+      props -> new ExoArmorItem(EXOSUIT_MATERIAL, ArmorType.BOOTS,
+        props.humanoidArmor(EXOSUIT_MATERIAL, ArmorType.BOOTS)
+          .component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
     
-    public static final RegistrySupplier<Item> CHAINSAW = registerTool("chainsaw", new ChainsawItem(ELECTRIC_MATERIAL, electricSettings("chainsaw").attributes(AxeItem.createAttributes(ELECTRIC_MATERIAL, 5f, -2.4f))));
-    public static final RegistrySupplier<Item> HAND_DRILL = registerTool("hand_drill", new DrillItem(ELECTRIC_MATERIAL, TagContent.DRILL_MINEABLE, electricSettings("hand_drill").attributes(PickaxeItem.createAttributes(ELECTRIC_MATERIAL, 1f, -2.4f))));
+    public static final DeferredItem<Item> JETPACK = EQUIPMENT.registerItem(
+      "jetpack",
+      props -> new JetpackItem(JETPACK_MATERIAL, ArmorType.CHESTPLATE,
+        props.humanoidArmor(JETPACK_MATERIAL, ArmorType.CHESTPLATE)
+          .component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
+    public static final DeferredItem<Item> EXO_JETPACK = EQUIPMENT.registerItem(
+      "exo_jetpack",
+      props -> new JetpackExoArmorItem(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE,
+        props.humanoidArmor(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE)
+          .component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
+    public static final DeferredItem<Item> JETPACK_ELYTRA = EQUIPMENT.registerItem(
+      "jetpack_elytra",
+      props -> new JetpackElytraItem(JETPACK_MATERIAL, ArmorType.CHESTPLATE,
+        props.humanoidArmor(JETPACK_MATERIAL, ArmorType.CHESTPLATE)
+          .component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
+    public static final DeferredItem<Item> JETPACK_EXO_ELYTRA = EQUIPMENT.registerItem(
+      "jetpack_exo_elytra",
+      props -> new JetpackExoElytraItem(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE,
+        props.humanoidArmor(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE)
+          .component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
     
-    public static final RegistrySupplier<Item> PROMETHIUM_AXE = registerTool("promethium_axe", new PromethiumAxeItem(PROMETHIUM_MATERIAL, unbreakingSettings("promethium_axe").rarity(Rarity.EPIC).attributes(PromethiumPickaxeItem.createPromethiumAttributes(PROMETHIUM_MATERIAL, 12f, -2.1f, 2))));
-    public static final RegistrySupplier<Item> PROMETHIUM_PICKAXE = registerTool("promethium_pickaxe", new PromethiumPickaxeItem(PROMETHIUM_MATERIAL, TagContent.DRILL_MINEABLE, unbreakingSettings("promethium_pickaxe").rarity(Rarity.EPIC).attributes(PromethiumPickaxeItem.createPromethiumAttributes(PROMETHIUM_MATERIAL, 3f, -2.4f, 2))));
+    public static final DeferredItem<Item> PORTABLE_LASER = EQUIPMENT.registerItem(
+      "portable_laser",
+      props -> new PortableLaserItem(props.stacksTo(1).rarity(Rarity.EPIC).component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
+    public static final DeferredItem<Item> ELECTRIC_MACE = EQUIPMENT.registerItem(
+      "electric_mace",
+      props -> new ElectricMaceItem(props.stacksTo(1).attributes(ElectricMaceItem.createAttributes()).rarity(Rarity.EPIC).component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
     
-    private static RegistrySupplier<Item> registerTool(String path, Item value) {
-        var supplier = ItemContent.registerItem(path, value);
-        postProcessField(value, supplier);
-        return supplier;
-    }
-
-    private static Item.Properties unbreakingSettings(String path) {
-        return ITEMS.properties(path)
-          .stacksTo(1)
-          .durability(0)
-          .component(DataComponents.UNBREAKABLE, new Unbreakable(true));
-    }
-
-    private static Item.Properties electricSettings(String path) {
-        return unbreakingSettings(path);
-    }
-
-    private static Item.Properties jetpackSettings(String path) {
-        return unbreakingSettings(path);
-    }
-
-    private static void postProcessField(Item value, RegistrySupplier<Item> supplier) {
-        
-        var targetGroup = ItemContent.Groups.equipment;
-        ItemGroups.add(targetGroup, value);
-        
-        if (EnergyApi.ITEM != null && value instanceof OritechEnergyItem energyItem) {
-            var variantStack = new ItemStack(value);
-            variantStack.set(EnergyApi.ITEM.getEnergyComponent(), energyItem.getEnergyCapacity(variantStack));
-            ItemGroups.add(targetGroup, variantStack);
-            
-            EnergyApi.ITEM.registerForItem(() -> value);
-        }
-        
-        if (FluidApi.ITEM != null && value instanceof FluidApi.ItemProvider) {
-            FluidApi.ITEM.registerForItem(() -> value);
-        }
-        
-    }
+    public static final DeferredItem<Item> CHAINSAW = EQUIPMENT.registerItem(
+      "chainsaw",
+      props -> new ChainsawItem(ELECTRIC_MATERIAL, props.axe(ELECTRIC_MATERIAL, 5f, -2.4f).component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
+    public static final DeferredItem<Item> HAND_DRILL = EQUIPMENT.registerItem(
+      "hand_drill",
+      props -> new DrillItem(ELECTRIC_MATERIAL, TagContent.DRILL_MINEABLE,
+        props.pickaxe(ELECTRIC_MATERIAL, 1f, -2.4f).component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
+    
+    public static final DeferredItem<Item> PROMETHIUM_AXE = EQUIPMENT.registerItem(
+      "promethium_axe",
+      props -> new PromethiumAxeItem(PROMETHIUM_MATERIAL,
+        props.axe(PROMETHIUM_MATERIAL, 12f, -2.1f)
+          .attributes(PromethiumPickaxeItem.createPromethiumAttributes(PROMETHIUM_MATERIAL, 12f, -2.1f, 2))
+          .rarity(Rarity.EPIC)
+          .component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
+    public static final DeferredItem<Item> PROMETHIUM_PICKAXE = EQUIPMENT.registerItem(
+      "promethium_pickaxe",
+      props -> new PromethiumPickaxeItem(PROMETHIUM_MATERIAL, TagContent.DRILL_MINEABLE,
+        props.pickaxe(PROMETHIUM_MATERIAL, 3f, -2.4f)
+          .attributes(PromethiumPickaxeItem.createPromethiumAttributes(PROMETHIUM_MATERIAL, 3f, -2.4f, 2))
+          .rarity(Rarity.EPIC)
+          .component(DataComponents.UNBREAKABLE, new Unbreakable(true)))
+    );
+    
+    // TODO: Move equipment-tab population to registry/annotation scanning so these direct registrations show up without manual post-processing.
+    // TODO: Revisit energy/fluid item hookup under NeoForge's current capability/data-component APIs instead of relying on the deleted bridge registration.
     
     public static void registerEventHandlers() {
         
@@ -116,8 +178,4 @@ public class ToolsContent {
         });
         
     }
-
-    public static void register() {
-    }
-    
 }

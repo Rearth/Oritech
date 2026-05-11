@@ -9,6 +9,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -23,7 +24,7 @@ public class DrillItem extends DiggerItem implements OritechEnergyItem {
     
     public static final int BAR_STEP_COUNT = 13;
     
-    public DrillItem(Tier toolMaterial, TagKey<Block> effectiveBlocks, Item.Properties settings) {
+    public DrillItem(ToolMaterial toolMaterial, TagKey<Block> effectiveBlocks, Item.Properties settings) {
         super(toolMaterial, effectiveBlocks, settings);
     }
     

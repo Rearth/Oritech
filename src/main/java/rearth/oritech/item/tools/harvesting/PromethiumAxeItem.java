@@ -13,7 +13,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.component.Tool.Rule;
@@ -42,14 +42,14 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
-    public PromethiumAxeItem(Tier toolMaterial, Properties settings) {
+    public PromethiumAxeItem(ToolMaterial toolMaterial, Properties settings) {
         super(toolMaterial, settings);
         // a bit of a hack, but set tool components again after super()
         // this lets PromethiumAxeItem extend AxeItem (for the right-click actions) and still ignore
         // the default tool components set up by AxeItem
         var toolComponent = new Tool(List.of(
-            Rule.deniesDrops(toolMaterial.getIncorrectBlocksForDrops()),
-            Rule.minesAndDrops(BlockTags.MINEABLE_WITH_AXE, toolMaterial.getSpeed()),
+            Rule.deniesDrops(toolMaterial.incorrectBlocksForDrops()),
+            Rule.minesAndDrops(BlockTags.MINEABLE_WITH_AXE, toolMaterial.speed()),
             Rule.overrideSpeed(BlockTags.SWORD_EFFICIENT, 1.5F),
             Rule.minesAndDrops(List.of(Blocks.COBWEB), 15.0F)),
             1.0F, 1);

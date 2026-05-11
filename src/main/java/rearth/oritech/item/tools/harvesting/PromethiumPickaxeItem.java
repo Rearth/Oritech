@@ -24,7 +24,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -63,7 +63,7 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
     private static final ThreadLocal<Boolean> CHECKING_OFFSET_BREAK_PERMISSION = ThreadLocal.withInitial(() -> false);
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
-    public PromethiumPickaxeItem(Tier toolMaterial, TagKey<Block> effectiveBlocks, Properties settings) {
+    public PromethiumPickaxeItem(ToolMaterial toolMaterial, TagKey<Block> effectiveBlocks, Properties settings) {
         super(toolMaterial, effectiveBlocks, settings);
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
@@ -201,11 +201,11 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
         }
     }
     
-    public static ItemAttributeModifiers createPromethiumAttributes(Tier tier, float attackDamage, float attackSpeed, float range) {
+        public static ItemAttributeModifiers createPromethiumAttributes(ToolMaterial toolMaterial, float attackDamage, float attackSpeed, float range) {
         return ItemAttributeModifiers.builder()
                  .add(
                    Attributes.ATTACK_DAMAGE,
-                   new AttributeModifier(BASE_ATTACK_DAMAGE_ID, attackDamage + tier.getAttackDamageBonus(), AttributeModifier.Operation.ADD_VALUE),
+                                     new AttributeModifier(BASE_ATTACK_DAMAGE_ID, attackDamage + toolMaterial.attackDamageBonus(), AttributeModifier.Operation.ADD_VALUE),
                    EquipmentSlotGroup.MAINHAND
                  )
                  .add(
