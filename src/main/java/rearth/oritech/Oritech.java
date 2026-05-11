@@ -37,15 +37,15 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.ItemGroups;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.util.ServerZiplineHandler;
-import rearth_neosample.oritech.OritechNeo;
 
 // todos: compostables
 
 
-@Mod(OritechNeo.MODID)
+@Mod(Oritech.MOD_ID)
 public final class Oritech {
     
     public static final String MOD_ID = "oritech";
@@ -75,6 +75,11 @@ public final class Oritech {
         // registrations
         ItemContent.ITEMS.register(modEventBus);
         BlockContent.BLOCKS.register(modEventBus);
+        
+        ItemGroups.TABS.register(modEventBus);
+        
+        // post processing / extra registrations
+        ItemContent.AddBlockItems();
     }
     
     private void commonSetup(FMLCommonSetupEvent event) {

@@ -1,11 +1,13 @@
 package rearth.oritech.init;
 
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.food.Foods;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import oshi.util.tuples.Pair;
@@ -14,6 +16,7 @@ import rearth.oritech.item.UnstableContainerItem;
 import rearth.oritech.item.other.ColorCartridgeItem;
 import rearth.oritech.item.other.CustomTooltipItem;
 import rearth.oritech.item.other.MobCaptureItem;
+import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 import rearth.oritech.item.tools.WeedKiller;
 import rearth.oritech.item.tools.Wrench;
@@ -23,7 +26,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 @SuppressWarnings("NullableProblems")
@@ -31,14 +34,14 @@ public class ItemContent {
     
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Oritech.MOD_ID);
     
-    @ItemGroupTarget(Groups.components)
+    @ItemGroupTarget(Groups.COMPONENTS)
     @Compostable(0.65F)
     public static final DeferredItem<Item> BANANA = ITEMS.registerItem("banana", Item::new, props -> props.food(Foods.APPLE));
-    @ItemGroupTarget(Groups.equipment)
+    @ItemGroupTarget(Groups.EQUIPMENT)
     public static final DeferredItem<Item> TARGET_DESIGNATOR = ITEMS.registerItem("target_designator", LaserTargetDesignator::new, props -> props.stacksTo(1));
-    @ItemGroupTarget(Groups.equipment)
+    @ItemGroupTarget(Groups.EQUIPMENT)
     public static final DeferredItem<Item> WEED_KILLER = ITEMS.registerItem("weed_killer", WeedKiller::new, props -> props.stacksTo(1));
-    @ItemGroupTarget(Groups.equipment)
+    @ItemGroupTarget(Groups.EQUIPMENT)
     public static final DeferredItem<Item> WRENCH = ITEMS.registerItem("wrench", Wrench::new, props -> props.stacksTo(1).component(DataComponents.TOOL, Wrench.createToolComponent()));
 
     // region metals
@@ -155,9 +158,45 @@ public class ItemContent {
     public static final DeferredItem<Item> NETHERITE_PAINT = ITEMS.registerItem("netherite_paint", props -> new ColorCartridgeItem(props, ColorableMachine.ColorVariant.NETHERITE));
     public static final DeferredItem<Item> SCULK_PAINT = ITEMS.registerItem("sculk_paint", props -> new ColorCartridgeItem(props, ColorableMachine.ColorVariant.SCULK));
 
+    // tank items (with custom item class)
+    public static final DeferredItem<Item> SMALL_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.SMALL_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
+    public static final DeferredItem<Item> CREATIVE_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.CREATIVE_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
+    
+    public static final List<Pair<DeferredItem<BlockItem>, Groups>> BLOCK_ITEMS = new ArrayList<>();
+    
+    @SuppressWarnings("unchecked")
+    public static void AddBlockItems() {
+        
+        for (var field : BlockContent.class.getDeclaredFields()) {
+            if (!Modifier.isStatic(field.getModifiers())) continue;
+            if (!Modifier.isPublic(field.getModifiers())) continue;
+            if (!DeferredBlock.class.isAssignableFrom(field.getType())) continue;
+            
+            try {
+                field.setAccessible(true);
+                var value = (DeferredBlock<Block>) field.get(null);
+                var identifier = field.getName().toLowerCase(java.util.Locale.ROOT);
+                
+                if (field.isAnnotationPresent(BlockContent.NoBlockItem.class)) continue;
+                
+                var fieldGroup = Groups.MACHINES;
+                
+                if (field.isAnnotationPresent(ItemContent.ItemGroupTarget.class)) {
+                    fieldGroup = field.getAnnotation(ItemContent.ItemGroupTarget.class).value();
+                }
+                
+                var blockItem = ITEMS.registerSimpleBlockItem(value);
+                BLOCK_ITEMS.add(new Pair<>(blockItem, fieldGroup));
+                
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to access field: " + field.getName(), e);
+            }
+        }
+        
+    }
     
     public enum Groups {
-        machines, components, equipment, decorative, none
+        MACHINES, COMPONENTS, EQUIPMENT, DECORATIVE, NONE
     }
     
     @Retention(RetentionPolicy.RUNTIME)
@@ -171,6 +210,7 @@ public class ItemContent {
         Groups value();
     }
 
+    // todo (both here and in blockcontent)
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface Compostable {

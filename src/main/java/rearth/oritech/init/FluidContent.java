@@ -328,25 +328,25 @@ public class FluidContent {
     }
     
     public static void registerItemsToGroups() {
-        ItemGroups.add(ItemContent.Groups.components, STILL_OIL_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_FUEL_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_BIOFUEL_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_STEAM_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_HEAVY_OIL_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_DIESEL_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_NAPHTHA_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_SULFURIC_ACID_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_SILICON_WASH_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_MINERAL_SLURRY_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_SHEOL_FIRE_BUCKET.get());
-        ItemGroups.add(ItemContent.Groups.components, STILL_STRANGE_MATTER_BUCKET.get());
+        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_OIL_BUCKET.get());
+        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_FUEL_BUCKET.get());
+        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_BIOFUEL_BUCKET.get());
+        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_STEAM_BUCKET.get());
+        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_HEAVY_OIL_BUCKET.get());
+        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_DIESEL_BUCKET.get());
+        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_NAPHTHA_BUCKET.get());
+        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_SULFURIC_ACID_BUCKET.get());
+        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_SILICON_WASH_BUCKET.get());
+        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_MINERAL_SLURRY_BUCKET.get());
+        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_SHEOL_FIRE_BUCKET.get());
+        ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_STRANGE_MATTER_BUCKET.get());
         
         if (Platform.isModLoaded("productivemetalworks")) {
-            ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_ADAMANT_BUCKET.get());
-            ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_BIOSTEEL_BUCKET.get());
-            ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_DURATIUM_BUCKET.get());
-            ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_ENERGITE_BUCKET.get());
-            ItemGroups.add(ItemContent.Groups.components, STILL_MOLTEN_FLUXITE_BUCKET.get());
+            ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_MOLTEN_ADAMANT_BUCKET.get());
+            ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_MOLTEN_BIOSTEEL_BUCKET.get());
+            ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_MOLTEN_DURATIUM_BUCKET.get());
+            ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_MOLTEN_ENERGITE_BUCKET.get());
+            ItemGroups.add(ItemContent.Groups.COMPONENTS, STILL_MOLTEN_FLUXITE_BUCKET.get());
         }
     }
     
