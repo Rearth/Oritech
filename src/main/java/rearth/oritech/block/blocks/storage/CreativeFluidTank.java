@@ -1,6 +1,5 @@
 package rearth.oritech.block.blocks.storage;
 
-import dev.architectury.fluid.FluidStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -40,9 +39,9 @@ public class CreativeFluidTank extends SmallFluidTank {
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if(world.isClientSide || !(world.getBlockEntity(pos) instanceof SmallTankEntity blockEntity)) return super.useWithoutItem(state, world, pos, player, hit);
+        if(level.isClientSide || !(level.getBlockEntity(pos) instanceof SmallTankEntity blockEntity)) return super.useWithoutItem(state, level, pos, player, hit);
         
         // todo use proper api here
         var mainHandStack = player.getMainHandItem();
@@ -56,7 +55,7 @@ public class CreativeFluidTank extends SmallFluidTank {
             return InteractionResult.SUCCESS_NO_ITEM_USED;
         }
         
-        return super.useWithoutItem(state, world, pos, player, hit);
+        return super.useWithoutItem(state, level, pos, player, hit);
         
     }
     

@@ -23,8 +23,8 @@ public abstract class EntityLaserDropsMixin {
     @Shadow public abstract boolean isAlive();
 
     @Inject(
-            method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
-            at = @At(value = "NEW", args = "class=net/minecraft/world/entity/item/ItemEntity"),
+            method = "spawnAtLocation(Lnet/minecraft/level/item/ItemStack;F)Lnet/minecraft/level/entity/item/ItemEntity;",
+            at = @At(value = "NEW", args = "class=net/minecraft/level/entity/item/ItemEntity"),
             cancellable = true
     )
     @SuppressWarnings("ConstantValue") // this is mixin

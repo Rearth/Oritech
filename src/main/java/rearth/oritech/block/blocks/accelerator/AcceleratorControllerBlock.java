@@ -1,7 +1,6 @@
 package rearth.oritech.block.blocks.accelerator;
 
 import com.mojang.serialization.MapCodec;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -66,9 +65,9 @@ public class AcceleratorControllerBlock extends HorizontalDirectionalBlock imple
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide && world.getBlockEntity(pos) instanceof AcceleratorControllerBlockEntity accelerator) {
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof AcceleratorControllerBlockEntity accelerator) {
             MenuRegistry.openExtendedMenu((ServerPlayer) player, accelerator);
         }
         
@@ -78,7 +77,7 @@ public class AcceleratorControllerBlock extends HorizontalDirectionalBlock imple
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

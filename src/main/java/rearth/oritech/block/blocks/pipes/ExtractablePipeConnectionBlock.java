@@ -33,22 +33,22 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (player.isHolding(ItemContent.WRENCH)) return InteractionResult.PASS;
-        if (world.isClientSide()) return InteractionResult.SUCCESS;
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
         
         var interactDir = getInteractDirection(state, pos, player);
-        if (!hasMachineInDirection(interactDir, world, pos, apiValidationFunction()))
+        if (!hasMachineInDirection(interactDir, level, pos, apiValidationFunction()))
             return InteractionResult.PASS;
         
         var property = directionToProperty(interactDir);
         var connection = state.getValue(property);
-        world.setBlock(pos, state.setValue(property, connection != EXTRACT ? EXTRACT : CONNECTION), Block.UPDATE_KNOWN_SHAPE, 0);
+        level.setBlock(pos, state.setValue(property, connection != EXTRACT ? EXTRACT : CONNECTION), Block.UPDATE_KNOWN_SHAPE, 0);
         
-        world.playSound(null, pos, SoundEvents.BAMBOO_WOOD_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.9f, 1.2f);
+        level.playSound(null, pos, SoundEvents.BAMBOO_WOOD_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.9f, 1.2f);
         
         // Invalidate cache
-        invalidateTargetCache(world, pos);
+        invalidateTargetCache(level, pos);
         
         return InteractionResult.SUCCESS;
     }
@@ -65,11 +65,11 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
     /**
      * Invalidates the target cache of the block entity at the given position
      *
-     * @param world the world
+     * @param level the level
      * @param pos   the position
      */
-    protected void invalidateTargetCache(Level world, BlockPos pos) {
-        var data = getNetworkData(world);
+    protected void invalidateTargetCache(Level level, BlockPos pos) {
+        var data = getNetworkData(level);
         var network = data.pipeNetworkLinks.getOrDefault(pos, null);
         if (network != null) {
             var checked = new HashSet<BlockPos>();
@@ -81,7 +81,7 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
                 if (checked.contains(pipePos)) continue;
                 
                 checked.add(pipePos);
-                var pipeEntity = world.getBlockEntity(pipePos);
+                var pipeEntity = level.getBlockEntity(pipePos);
                 if (pipeEntity instanceof ExtractablePipeInterfaceEntity)
                     ((ExtractablePipeInterfaceEntity) pipeEntity).invalidateTargetCache();
             }
@@ -89,13 +89,13 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
     }
     
     @Override
-    public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, boolean createConnection) {
+    public BlockState addConnectionStates(BlockState state, Level level, BlockPos pos, boolean createConnection) {
         
-        state = addFluidState(state, pos, world);
+        state = addFluidState(state, pos, level);
         
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
-            var connection = shouldConnect(state, direction, pos, world, createConnection);
+            var connection = shouldConnect(state, direction, pos, level, createConnection);
             
             if (connection && state.getValue(property) == EXTRACT) continue; // don't override extractable connections
             state = state.setValue(property, connection ? CONNECTION : NO_CONNECTION);
@@ -105,13 +105,13 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
     }
     
     @Override
-    public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, Direction createDirection) {
+    public BlockState addConnectionStates(BlockState state, Level level, BlockPos pos, Direction createDirection) {
         
-        state = addFluidState(state, pos, world);
+        state = addFluidState(state, pos, level);
         
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
-            var connection = shouldConnect(state, direction, pos, world, direction.equals(createDirection));
+            var connection = shouldConnect(state, direction, pos, level, direction.equals(createDirection));
             var newValue = connection ? isSideExtractable(state, direction) ? EXTRACT : CONNECTION : NO_CONNECTION;
             state = state.setValue(property, newValue);
         }

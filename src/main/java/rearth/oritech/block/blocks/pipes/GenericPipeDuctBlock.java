@@ -37,41 +37,41 @@ public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements 
 	}
 
 	@Override
-	public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+	public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean notify) {
 		if (oldState.getBlock().equals(state.getBlock())) return;
 
-		updateNeighbors(world, pos, true);
+		updateNeighbors(level, pos, true);
 		// no states need to be added (see getPlacementState)
-		GenericPipeInterfaceEntity.addNode(world, pos, false, state, getNetworkData(world));
+		GenericPipeInterfaceEntity.addNode(level, pos, false, state, getNetworkData(level));
 	}
 
 	@Override
-	public void updateNeighbors(Level world, BlockPos pos, boolean neighborToggled) {
+	public void updateNeighbors(Level level, BlockPos pos, boolean neighborToggled) {
 		for (var direction : Direction.values()) {
 			var neighborPos = pos.relative(direction);
-			var neighborState = world.getBlockState(neighborPos);
+			var neighborState = level.getBlockState(neighborPos);
 			// Only update pipes
 			if (neighborState.getBlock() instanceof AbstractPipeBlock pipeBlock) {
-				var updatedState = pipeBlock.addConnectionStates(neighborState, world, neighborPos, neighborToggled);
-				world.setBlockAndUpdate(neighborPos, updatedState);
+				var updatedState = pipeBlock.addConnectionStates(neighborState, level, neighborPos, neighborToggled);
+				level.setBlockAndUpdate(neighborPos, updatedState);
 
 				// Update network data if the state was changed
 				if (!neighborState.equals(updatedState)) {
 					boolean interfaceBlock = updatedState.is(getConnectionBlock().getBlock());
 					//if (neighborToggled)
-						//GenericPipeInterfaceEntity.addNode(world, neighborPos, interfaceBlock, updatedState, getNetworkData(world));
+						//GenericPipeInterfaceEntity.addNode(level, neighborPos, interfaceBlock, updatedState, getNetworkData(level));
 				}
 			}
 		}
 	}
 
 	@Override
-	public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, boolean createConnection) {
+	public BlockState addConnectionStates(BlockState state, Level level, BlockPos pos, boolean createConnection) {
 		return state;
 	}
 
 	@Override
-	public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, Direction createDirection) {
+	public BlockState addConnectionStates(BlockState state, Level level, BlockPos pos, Direction createDirection) {
 		return state;
 	}
 
@@ -81,20 +81,20 @@ public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements 
 	}
 
 	@Override
-	public boolean shouldConnect(BlockState current, Direction direction, BlockPos currentPos, Level world, boolean createConnection) {
+	public boolean shouldConnect(BlockState current, Direction direction, BlockPos currentPos, Level level, boolean createConnection) {
 		return true;
 	}
 
 	@Override
-	public boolean isConnectingInDirection(BlockState current, Direction direction, BlockPos currentPos, Level world, boolean createConnection) {
+	public boolean isConnectingInDirection(BlockState current, Direction direction, BlockPos currentPos, Level level, boolean createConnection) {
 		var neighborPos = currentPos.relative(direction);
-		var neighborState = world.getBlockState(neighborPos);
+		var neighborState = level.getBlockState(neighborPos);
 		if (neighborState.isAir()) {
 			return false;
 		} else if (neighborState.getBlock() instanceof GenericPipeDuctBlock pipeBlock) {
 			return true;
 		} else if (neighborState.getBlock() instanceof AbstractPipeBlock pipeBlock) {
-			return pipeBlock.isConnectingInDirection(neighborState, direction.getOpposite(), neighborPos, world, createConnection);
+			return pipeBlock.isConnectingInDirection(neighborState, direction.getOpposite(), neighborPos, level, createConnection);
 		}
 
 		return true;
@@ -102,19 +102,19 @@ public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements 
 
 	@Override
 	public TriFunction<Level, BlockPos, Direction, Boolean> apiValidationFunction() {
-		return ((world, pos, direction) -> false);
+		return ((level, pos, direction) -> false);
 	}
 
 	@Override
-	protected void onBlockRemoved(BlockPos pos, BlockState oldState, Level world) {
-		updateNeighbors(world, pos, false);
-		GenericPipeInterfaceEntity.removeNode(world, pos, false, oldState, getNetworkData(world));
+	protected void onBlockRemoved(BlockPos pos, BlockState oldState, Level level) {
+		updateNeighbors(level, pos, false);
+		GenericPipeInterfaceEntity.removeNode(level, pos, false, oldState, getNetworkData(level));
 	}
 
 	@Override
-	public InteractionResult onWrenchUse(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand) {
+	public InteractionResult onWrenchUse(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand) {
 		if (player.isShiftKeyDown()) {
-			world.destroyBlock(pos, true, player);
+			level.destroyBlock(pos, true, player);
 			return InteractionResult.SUCCESS;
 		}
 
@@ -128,7 +128,7 @@ public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements 
 	}
 	
 	@Override
-	public InteractionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, Level world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, Player player, InteractionHand hand) {
+	public InteractionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, Level level, BlockPos pos, BlockPos neighborPos, Direction neighborFace, Player player, InteractionHand hand) {
 		return InteractionResult.PASS;
 	}
 }

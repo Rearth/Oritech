@@ -57,41 +57,41 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
     }
     
     @Override
-    public boolean mineBlock(ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity miner) {
+    public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity miner) {
         
-        if (!world.isClientSide && miner.isShiftKeyDown()) {
+        if (!level.isClientSide && miner.isShiftKeyDown()) {
             var startPos = pos.above();
-            var startState = world.getBlockState(startPos);
+            var startState = level.getBlockState(startPos);
             if (startState.is(BlockTags.LOGS)) {
-                var treeBlocks = TreefellerBlockEntity.getTreeBlocks(startPos, world);
-                pendingBlocks.addAll(treeBlocks.stream().map(elem -> new PendingBlock(world, elem, stack)).toList());
+                var treeBlocks = TreefellerBlockEntity.getTreeBlocks(startPos, level);
+                pendingBlocks.addAll(treeBlocks.stream().map(elem -> new PendingBlock(level, elem, stack)).toList());
             }
         }
         
         return true;
     }
     
-    public static void processPendingBlocks(Level world) {
+    public static void processPendingBlocks(Level level) {
         if (pendingBlocks.isEmpty()) return;
         
         var topWorld = pendingBlocks.getFirst().level();
-        if (topWorld != world) return;
+        if (topWorld != level) return;
         
         for (int i = 0; i < 8 && !pendingBlocks.isEmpty(); i++) {
             var candidate = pendingBlocks.pollFirst();
             var candidatePos = candidate.pos();
-            var candidateState = world.getBlockState(candidatePos);
+            var candidateState = level.getBlockState(candidatePos);
             if (!candidateState.is(BlockTags.LOGS) && !candidateState.is(BlockTags.LEAVES)) return;
             
-            var dropped = Block.getDrops(candidateState, (ServerLevel) world, candidatePos, null, null, candidate.tool());
-            world.setBlockAndUpdate(candidatePos, Blocks.AIR.defaultBlockState());
+            var dropped = Block.getDrops(candidateState, (ServerLevel) level, candidatePos, null, null, candidate.tool());
+            level.setBlockAndUpdate(candidatePos, Blocks.AIR.defaultBlockState());
             
-            dropped.forEach(elem -> world.addFreshEntity(new ItemEntity(world, candidatePos.getX(), candidatePos.getY(), candidatePos.getZ(), elem)));
+            dropped.forEach(elem -> level.addFreshEntity(new ItemEntity(level, candidatePos.getX(), candidatePos.getY(), candidatePos.getZ(), elem)));
             
-            world.playSound(null, candidatePos, candidateState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.5f, 1f);
-            world.addDestroyBlockEffect(candidatePos, candidateState);
+            level.playSound(null, candidatePos, candidateState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.5f, 1f);
+            level.addDestroyBlockEffect(candidatePos, candidateState);
             
-            if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, candidatePos.getX() + 0.5, candidatePos.getY() + 0.5, candidatePos.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
+            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, candidatePos.getX() + 0.5, candidatePos.getY() + 0.5, candidatePos.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
             
             if (candidateState.is(BlockTags.LOGS)) break;
         }

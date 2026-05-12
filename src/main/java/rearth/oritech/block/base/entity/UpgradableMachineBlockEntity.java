@@ -63,8 +63,8 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        super.serverTick(world, pos, state, blockEntity);
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        super.serverTick(level, pos, state, blockEntity);
         
         addBurstTicks();
     }

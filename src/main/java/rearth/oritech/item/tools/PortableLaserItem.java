@@ -93,14 +93,14 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     }
     
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         
         var stack = player.getItemInHand(hand);
         var energyUsed = OritechStartupConfig.portableLaserConfig.energyPerBoom.get();
         
-        if (world.isClientSide()) {
+        if (level.isClientSide()) {
             if (getStoredEnergy(stack) > energyUsed && !player.isShiftKeyDown() && !isMiningEnabled(stack))
-                lastSingleShot = world.getGameTime();
+                lastSingleShot = level.getGameTime();
             
             return InteractionResultHolder.consume(stack);
         }
@@ -135,10 +135,10 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         if (hit != null) {
             var targetBlockPos = BlockPos.containing(hit.getLocation());
-            var canInteract = OritechPlatform.INSTANCE.canPlayerBreakBlock(world, targetBlockPos, world.getBlockState(targetBlockPos), player);
+            var canInteract = OritechPlatform.INSTANCE.canPlayerBreakBlock(level, targetBlockPos, level.getBlockState(targetBlockPos), player);
             
             if (canInteract)
-                world.explode(null, new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player),
+                level.explode(null, new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player),
                   null, hit.getLocation(), OritechStartupConfig.portableLaserConfig.explosionStrength.get(), false, Level.ExplosionInteraction.MOB);
             
             endPos = hit.getLocation();
@@ -150,16 +150,16 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         if (hit instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
             
-            var source = new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player);
-            var canInteract = OritechPlatform.INSTANCE.canAttackBeDone(world, livingEntity, 20f, source);
+            var source = new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player);
+            var canInteract = OritechPlatform.INSTANCE.canAttackBeDone(level, livingEntity, 20f, source);
             
             if (canInteract)
-                processEntityTarget(player, livingEntity, 20, stack, world);
+                processEntityTarget(player, livingEntity, 20, stack, level);
         }
         
         triggerAnim(player, GeoItem.getId(stack), "laser", "singleshot");
         
-        world.playSound(null, player.blockPosition(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 0.8f, 1f);
+        level.playSound(null, player.blockPosition(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 0.8f, 1f);
         
         // Calculate the "right" direction based on the player's yaw
         float yawRadians = (player.getYRot() + 90) * (float) Math.PI / 180;
@@ -168,17 +168,17 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         Vec3 rightDir = new Vec3(rightX, 0, rightZ).normalize();
         
         var startPos = player.getEyePosition().add(endPos.subtract(player.getEyePosition()).scale(0.4f)).add(0, -0.5f, 0).add(rightDir.scale(0.3f));
-        ParticleContent.LaserBoom(world, startPos, endPos);
-        if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, endPos.x, endPos.y, endPos.z, 6, 1, 1, 1, 0);
+        ParticleContent.LaserBoom(level, startPos, endPos);
+        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, endPos.x, endPos.y, endPos.z, 6, 1, 1, 1, 0);
         
         return InteractionResultHolder.consume(stack);
     }
     
     public static void onUseTick(Player player) {
-        var world = player.level();
+        var level = player.level();
         var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
         
-        if (!(stack.getItem() instanceof PortableLaserItem laserItem) || world == null) return;
+        if (!(stack.getItem() instanceof PortableLaserItem laserItem) || level == null) return;
         
         var rfUsage = OritechStartupConfig.portableLaserConfig.energyPerTick.get();
         
@@ -192,27 +192,27 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         if (finalHit instanceof BlockHitResult blockHitResult && laserItem.isMiningEnabled(stack)) {
             var blockPos = blockHitResult.getBlockPos();
-            var blockState = world.getBlockState(blockPos);
+            var blockState = level.getBlockState(blockPos);
             if (blockState.isAir() || blockState.is(TagContent.LASER_PASSTHROUGH)) return;
             
-            var canInteract = OritechPlatform.INSTANCE.canPlayerBreakBlock(world, blockPos, blockState, player);
+            var canInteract = OritechPlatform.INSTANCE.canPlayerBreakBlock(level, blockPos, blockState, player);
             
             if (canInteract)
-                processBlockBreaking(blockPos, blockState, world, player, stack, rfUsage);
+                processBlockBreaking(blockPos, blockState, level, player, stack, rfUsage);
         } else if (finalHit instanceof EntityHitResult entityHitResult) {
             
             var target = entityHitResult.getEntity();
             if (!(target instanceof LivingEntity livingEntity)) return;
             
-            var source = new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player);
-            var canInteract = OritechPlatform.INSTANCE.canAttackBeDone(world, livingEntity, 20f, source);
+            var source = new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player);
+            var canInteract = OritechPlatform.INSTANCE.canAttackBeDone(level, livingEntity, 20f, source);
             
             if (canInteract)
-                processEntityTarget(player, livingEntity, OritechStartupConfig.portableLaserConfig.damageBase.get(), stack, world);
+                processEntityTarget(player, livingEntity, OritechStartupConfig.portableLaserConfig.damageBase.get(), stack, level);
         }
         
         if (finalHit != null && finalHit.getType() != HitResult.Type.MISS && laserItem.isMiningEnabled(stack)) {
-            if (world instanceof ServerLevel sl) { var loc = finalHit.getLocation(); sl.sendParticles(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z, 1, 0.4, 0.3, 0.4, 0); }
+            if (level instanceof ServerLevel sl) { var loc = finalHit.getLocation(); sl.sendParticles(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z, 1, 0.4, 0.3, 0.4, 0); }
         }
         
     }
@@ -249,10 +249,10 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         return finalHit;
     }
     
-    private static void processBlockBreaking(BlockPos blockPos, BlockState blockState, Level world, Player player, ItemStack tool, int energyUsed) {
+    private static void processBlockBreaking(BlockPos blockPos, BlockState blockState, Level level, Player player, ItemStack tool, int energyUsed) {
         
         // skip unbreakable blocks
-        if (blockState.getDestroySpeed(world, blockPos) < 0) return;
+        if (blockState.getDestroySpeed(level, blockPos) < 0) return;
         
         var stats = blockBreakStats.getOrDefault(player, new Tuple<>(BlockPos.ZERO, 0));
         if (!blockPos.equals(stats.getA())) {
@@ -262,17 +262,17 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         }
         
         if (blockState.is(TagContent.LASER_ACCELERATED)) {
-            blockState.randomTick((ServerLevel) world, blockPos, world.random);
-            ParticleContent.Accelerating(world, Vec3.atLowerCornerOf(blockPos));
+            blockState.randomTick((ServerLevel) level, blockPos, level.random);
+            ParticleContent.Accelerating(level, Vec3.atLowerCornerOf(blockPos));
             stats = new Tuple<>(blockPos, -1);
         }
         
-        var blockEntity = world.getBlockEntity(blockPos);
+        var blockEntity = level.getBlockEntity(blockPos);
         if (blockEntity instanceof MachineCoreEntity coreBlock && coreBlock.isEnabled()) {
             blockEntity = (BlockEntity) coreBlock.getCachedController();
         }
         if (blockEntity != null) {
-            var storageCandidate = EnergyApi.BLOCK.find(world, blockPos, blockState, null, null);
+            var storageCandidate = EnergyApi.BLOCK.find(level, blockPos, blockState, null, null);
             if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockProvider provider) {
                 storageCandidate = provider.getEnergyStorage(null);
             }
@@ -293,53 +293,53 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         }
         
         var currentInvestedEnergy = stats.getB();
-        var requiredBreakingEnergy = (int) (Math.sqrt(blockState.getDestroySpeed(world, blockPos)) * OritechConfig.laserArmConfig.blockBreakEnergyBase.get() / OritechStartupConfig.portableLaserConfig.blockBreakSpeed.get());
+        var requiredBreakingEnergy = (int) (Math.sqrt(blockState.getDestroySpeed(level, blockPos)) * OritechConfig.laserArmConfig.blockBreakEnergyBase.get() / OritechStartupConfig.portableLaserConfig.blockBreakSpeed.get());
         var efficiencyLevel = getEnchantmentLevel(tool, Enchantments.EFFICIENCY);
         if (efficiencyLevel > 0) requiredBreakingEnergy = requiredBreakingEnergy / (efficiencyLevel + 1);
         
         var currentProgress = currentInvestedEnergy / (float) requiredBreakingEnergy;
-        if (world instanceof ServerLevel serverLevel)
+        if (level instanceof ServerLevel serverLevel)
             serverLevel.destroyBlockProgress(0, blockPos, (int) (currentProgress * 10));
         
         if (currentInvestedEnergy > requiredBreakingEnergy) {
             stats = new Tuple<>(blockPos, 0);
-            finishBlockBreaking(blockPos, blockState, world, player, tool);
+            finishBlockBreaking(blockPos, blockState, level, player, tool);
         }
         
         blockBreakStats.put(player, stats);
     }
     
-    private static void finishBlockBreaking(BlockPos targetPos, BlockState targetBlockState, Level world, Player player, ItemStack tool) {
+    private static void finishBlockBreaking(BlockPos targetPos, BlockState targetBlockState, Level level, Player player, ItemStack tool) {
         
-        var targetEntity = world.getBlockEntity(targetPos);
+        var targetEntity = level.getBlockEntity(targetPos);
         List<ItemStack> dropped;
-        dropped = Block.getDrops(targetBlockState, (ServerLevel) world, targetPos, targetEntity, player, tool);
+        dropped = Block.getDrops(targetBlockState, (ServerLevel) level, targetPos, targetEntity, player, tool);
         
-        var blockRecipe = LaserArmBlockEntity.tryGetRecipeOfBlock(targetBlockState, world);
+        var blockRecipe = LaserArmBlockEntity.tryGetRecipeOfBlock(targetBlockState, level);
         if (blockRecipe != null) {
             var recipe = blockRecipe.value();
             var farmedCount = 1;
             dropped = List.of(new ItemStack(recipe.getResults().get(0).getItem(), farmedCount));
-            if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
+            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
         
         // add stack to player inv, or spawn at block pos
         for (var stack : dropped) {
             if (!player.getInventory().add(stack))
-                world.addFreshEntity(new ItemEntity(world, targetPos.getCenter().x, targetPos.getCenter().y, targetPos.getCenter().z, stack));
+                level.addFreshEntity(new ItemEntity(level, targetPos.getCenter().x, targetPos.getCenter().y, targetPos.getCenter().z, stack));
         }
         
         try {
-            targetBlockState.getBlock().playerWillDestroy(world, targetPos, targetBlockState, player);
+            targetBlockState.getBlock().playerWillDestroy(level, targetPos, targetBlockState, player);
         } catch (Exception exception) {
             Oritech.LOGGER.warn("Laser arm block break event failure when breaking " + targetBlockState + " at " + targetPos + ": " + exception.getLocalizedMessage());
         }
-        world.addDestroyBlockEffect(targetPos, world.getBlockState(targetPos));
-        world.playSound(null, targetPos, targetBlockState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 1f, 1f);
-        world.destroyBlock(targetPos, false);
+        level.addDestroyBlockEffect(targetPos, level.getBlockState(targetPos));
+        level.playSound(null, targetPos, targetBlockState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 1f, 1f);
+        level.destroyBlock(targetPos, false);
     }
     
-    private static void processEntityTarget(Player player, LivingEntity target, int damage, ItemStack tool, Level world) {
+    private static void processEntityTarget(Player player, LivingEntity target, int damage, ItemStack tool, Level level) {
         
         // make creepers charged
         if (target.getType().equals(EntityType.CREEPER) && !target.getEntityData().get(Creeper.DATA_IS_POWERED)) {
@@ -351,7 +351,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         damage = (int) (damage * Math.sqrt(sharpnessLevel + 1));
         
         target.hurt(
-          new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player),
+          new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player),
           damage);
         
     }

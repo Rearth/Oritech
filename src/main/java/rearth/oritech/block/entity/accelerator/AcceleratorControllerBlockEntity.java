@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.accelerator;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleTypes;
@@ -69,8 +68,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, AcceleratorControllerBlockEntity blockEntity) {
-        if (world.isClientSide()) return;
+    public void tick(Level level, BlockPos pos, BlockState state, AcceleratorControllerBlockEntity blockEntity) {
+        if (level.isClientSide()) return;
         initParticleLogic();
         
         // try insert item as particle
@@ -481,8 +480,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     public static void receiveTrail(ParticleRenderTrail packet, IPayloadContext context) {
-        Level world = context.player().level();
-        if (world.getBlockEntity(packet.position) instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
+        Level level = context.player().level();
+        if (level.getBlockEntity(packet.position) instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
             var displayTrail = packet.particleTrail;
             acceleratorBlock.displayTrail = displayTrail;
             if (displayTrail.size() < 2) return;
@@ -501,21 +500,21 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             }
             
             var pitch = Math.pow(acceleratorBlock.lastEvent.lastEventSpeed, 0.1);
-            world.playLocalSound(soundPos.x, soundPos.y, soundPos.z, SoundContent.PARTICLE_MOVING, SoundSource.BLOCKS, 2f, (float) pitch, true);
+            level.playLocalSound(soundPos.x, soundPos.y, soundPos.z, SoundContent.PARTICLE_MOVING, SoundSource.BLOCKS, 2f, (float) pitch, true);
             
         }
     }
     
     public static void receiveEvent(LastEventPacket packet, IPayloadContext context) {
-        Level world = context.player().level();
-        if (world.getBlockEntity(packet.position) instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
+        Level level = context.player().level();
+        if (level.getBlockEntity(packet.position) instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
             acceleratorBlock.lastEvent = packet;
             
             var soundPos = packet.lastEventPosition.getCenter();
             if (packet.lastEvent.equals(ParticleEvent.COLLIDED)) {
-                world.playLocalSound(soundPos.x, soundPos.y, soundPos.z, SoundEvents.WARDEN_SONIC_BOOM, SoundSource.BLOCKS, 5f, 1, true);
+                level.playLocalSound(soundPos.x, soundPos.y, soundPos.z, SoundEvents.WARDEN_SONIC_BOOM, SoundSource.BLOCKS, 5f, 1, true);
             } else if (packet.lastEvent.equals(ParticleEvent.EXITED_FAST) || packet.lastEvent.equals(ParticleEvent.EXITED_NO_GATE)) {
-                world.playLocalSound(soundPos.x, soundPos.y, soundPos.z, SoundEvents.WIND_CHARGE_BURST.value(), SoundSource.BLOCKS, 3f, 1, true);
+                level.playLocalSound(soundPos.x, soundPos.y, soundPos.z, SoundEvents.WIND_CHARGE_BURST.value(), SoundSource.BLOCKS, 3f, 1, true);
             }
         }
     }

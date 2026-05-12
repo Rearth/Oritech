@@ -140,7 +140,7 @@ public class ClientCableFinder {
     
     private record RayResult(double distSq, Vec3 hitPos) {}
     
-    private static RayResult raycastCable(Vec3 p1, Vec3 p2, Vec3 eyePos, Vec3 lookDir, float reach, net.minecraft.world.level.Level level) {
+    private static RayResult raycastCable(Vec3 p1, Vec3 p2, Vec3 eyePos, Vec3 lookDir, float reach, net.minecraft.level.level.Level level) {
         double cableLength = p1.distanceTo(p2);
         int segments = Mth.clamp((int)(cableLength), 8, 128);
         

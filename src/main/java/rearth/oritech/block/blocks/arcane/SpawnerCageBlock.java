@@ -39,34 +39,34 @@ public class SpawnerCageBlock extends Block {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        var world = ctx.getLevel();
+        var level = ctx.getLevel();
         var pos = ctx.getClickedPos();
-        return getTargetState(world, pos);
+        return getTargetState(level, pos);
     }
     
-    private BlockState getTargetState(LevelAccessor world, BlockPos pos) {
+    private BlockState getTargetState(LevelAccessor level, BlockPos pos) {
         
         var state = defaultBlockState();
         
-        if (world.getBlockState(pos.above()).is(this.asBlock()))
+        if (level.getBlockState(pos.above()).is(this.asBlock()))
             state = state.setValue(UP, true);
-        if (world.getBlockState(pos.below()).is(this.asBlock()))
+        if (level.getBlockState(pos.below()).is(this.asBlock()))
             state = state.setValue(DOWN, true);
-        if (world.getBlockState(pos.north()).is(this.asBlock()))
+        if (level.getBlockState(pos.north()).is(this.asBlock()))
             state = state.setValue(NORTH, true);
-        if (world.getBlockState(pos.east()).is(this.asBlock()))
+        if (level.getBlockState(pos.east()).is(this.asBlock()))
             state = state.setValue(EAST, true);
-        if (world.getBlockState(pos.south()).is(this.asBlock()))
+        if (level.getBlockState(pos.south()).is(this.asBlock()))
             state = state.setValue(SOUTH, true);
-        if (world.getBlockState(pos.west()).is(this.asBlock()))
+        if (level.getBlockState(pos.west()).is(this.asBlock()))
             state = state.setValue(WEST, true);
         
         return state;
     }
     
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
-        return getTargetState(world, pos);
+    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        return getTargetState(level, pos);
     }
     
     @Override

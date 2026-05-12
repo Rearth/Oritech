@@ -26,8 +26,8 @@ public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements
     }
     
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, PassiveGeneratorBlockEntity blockEntity) {
-        if (world.isClientSide()) return;
+    public void tick(Level level, BlockPos pos, BlockState state, PassiveGeneratorBlockEntity blockEntity) {
+        if (level.isClientSide()) return;
         
         if (isProducing()) {
             var producedAmount = getProductionRate();
@@ -77,5 +77,5 @@ public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements
         return energyStorage;
     }
     
-    protected abstract Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level world);
+    protected abstract Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level level);
 }

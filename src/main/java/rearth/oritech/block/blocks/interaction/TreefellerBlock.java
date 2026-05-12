@@ -1,8 +1,6 @@
 package rearth.oritech.block.blocks.interaction;
 
 import com.mojang.serialization.MapCodec;
-import dev.architectury.registry.menu.ExtendedMenuProvider;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -69,10 +67,10 @@ public class TreefellerBlock extends HorizontalDirectionalBlock implements Entit
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
-            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+        if (!level.isClientSide()) {
+            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
             MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
@@ -80,15 +78,15 @@ public class TreefellerBlock extends HorizontalDirectionalBlock implements Entit
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide()) {
-            var entity = (TreefellerBlockEntity) world.getBlockEntity(pos);
+        if (!level.isClientSide()) {
+            var entity = (TreefellerBlockEntity) level.getBlockEntity(pos);
             var stacks = entity.inventory.heldStacks;
             for (var stack : stacks) {
                 if (!stack.isEmpty()) {
-                    var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
-                    world.addFreshEntity(itemEntity);
+                    var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+                    level.addFreshEntity(itemEntity);
                 }
             }
             
@@ -96,13 +94,13 @@ public class TreefellerBlock extends HorizontalDirectionalBlock implements Entit
             entity.inventory.setChanged();
         }
         
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

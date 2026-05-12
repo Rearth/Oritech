@@ -58,17 +58,17 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     }
     
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
+    public void tick(Level level, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
         // if energy is available
         // gather all connection targets supporting insertion
         // shuffle em
         // insert until no more energy is available
         
-        if (world.isClientSide || energyStorage.getAmount() <= 0) return;
+        if (level.isClientSide || energyStorage.getAmount() <= 0) return;
         
         var dataSource = isSuperConductor ? SuperConductorBlock.SUPERCONDUCTOR_DATA : EnergyPipeBlock.ENERGY_PIPE_DATA;
         
-        var data = dataSource.getOrDefault(world.dimension().location(), new PipeNetworkData());
+        var data = dataSource.getOrDefault(level.dimension().location(), new PipeNetworkData());
         var targets = findNetworkTargets(pos, data);
         
         if (targets == null) return;    // this should never happen
@@ -77,7 +77,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
 
         if (this.cacheHash != targetHash) {
             this.cachedTargets = targets.stream()
-                                   .map(target -> new ExtractablePipeInterfaceEntity.CachedTarget<>(target.getA(), target.getB(), EnergyApi.BLOCK.createCache(world, target.getA(), target.getB())))
+                                   .map(target -> new ExtractablePipeInterfaceEntity.CachedTarget<>(target.getA(), target.getB(), EnergyApi.BLOCK.createCache(level, target.getA(), target.getB())))
                                    .collect(Collectors.toList());
             this.cacheHash = targetHash;
         }

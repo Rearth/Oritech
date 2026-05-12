@@ -134,57 +134,57 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
     }
     
     @Override
-    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean notify) {
         if (oldState.getBlock().equals(state.getBlock())) return;
         else if (oldState.is(getConnectionBlock().getBlock())) {
-            GenericPipeInterfaceEntity.addNode(world, pos, false, state, getNetworkData(world));
+            GenericPipeInterfaceEntity.addNode(level, pos, false, state, getNetworkData(level));
             return;
         }
         
         // transform to interface block on placement when machine is neighbor
-        if (hasNeighboringMachine(state, world, pos, true)) {
+        if (hasNeighboringMachine(state, level, pos, true)) {
             var connectionBlock = getConnectionBlock();
-            var interfaceState = ((GenericPipeBlock) connectionBlock.getBlock()).addConnectionStates(connectionBlock, world, pos, true);
-            world.setBlockAndUpdate(pos, interfaceState);
+            var interfaceState = ((GenericPipeBlock) connectionBlock.getBlock()).addConnectionStates(connectionBlock, level, pos, true);
+            level.setBlockAndUpdate(pos, interfaceState);
         } else {
             // no states need to be added (see getPlacementState)
-            GenericPipeInterfaceEntity.addNode(world, pos, false, state, getNetworkData(world));
+            GenericPipeInterfaceEntity.addNode(level, pos, false, state, getNetworkData(level));
         }
         
-        updateNeighbors(world, pos, false);
+        updateNeighbors(level, pos, false);
     }
     
     // also known as 'getStateForNeighborUpdate'
     @Override
     public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor worldAccess, BlockPos pos, BlockPos neighborPos) {
         
-        if (!(worldAccess instanceof ServerLevel world)) return state;
+        if (!(worldAccess instanceof ServerLevel level)) return state;
         
         if (state.getValue(BlockStateProperties.WATERLOGGED))
-            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         
         // transform to interface when machine is placed as neighbor
-        if (hasMachineInDirection(direction, world, pos, apiValidationFunction())) {
+        if (hasMachineInDirection(direction, level, pos, apiValidationFunction())) {
             // Only update if the neighbor is a new machine
-            var hasMachine = getNetworkData(world).machinePipeNeighbors.getOrDefault(neighborPos, HashSet.newHashSet(0)).contains(direction.getOpposite());
+            var hasMachine = getNetworkData(level).machinePipeNeighbors.getOrDefault(neighborPos, HashSet.newHashSet(0)).contains(direction.getOpposite());
             if (hasMachine) return state;
             
             var connectionBlock = getConnectionBlock();
-            return ((GenericPipeBlock) connectionBlock.getBlock()).addConnectionStates(connectionBlock, world, pos, direction);
+            return ((GenericPipeBlock) connectionBlock.getBlock()).addConnectionStates(connectionBlock, level, pos, direction);
         } else if (neighborState.is(Blocks.AIR))
             // remove potential stale machine -> neighboring pipes mapping
-            getNetworkData(world).machinePipeNeighbors.remove(neighborPos);
+            getNetworkData(level).machinePipeNeighbors.remove(neighborPos);
         
         return state;
     }
     
     @Override
-    public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
-        super.onRemove(state, world, pos, newState, moved);
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
+        super.onRemove(state, level, pos, newState, moved);
         
         if (!state.is(newState.getBlock()) && !(newState.getBlock() instanceof GenericPipeBlock)) {
             // block was removed/replaced instead of updated
-            onBlockRemoved(pos, state, world);
+            onBlockRemoved(pos, state, level);
         }
         
     }
@@ -197,35 +197,35 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
     /**
      * Updates all the neighboring pipes of the target position.
      *
-     * @param world           The target world
+     * @param level           The target level
      * @param pos             The target position
      * @param neighborToggled Whether the neighbor was toggled
      */
-    public void updateNeighbors(Level world, BlockPos pos, boolean neighborToggled) {
+    public void updateNeighbors(Level level, BlockPos pos, boolean neighborToggled) {
         for (var direction : Direction.values()) {
             var neighborPos = pos.relative(direction);
-            var neighborState = world.getBlockState(neighborPos);
+            var neighborState = level.getBlockState(neighborPos);
             // Only update pipes
             if (neighborState.getBlock() instanceof AbstractPipeBlock pipeBlock) {
-                var updatedState = pipeBlock.addConnectionStates(neighborState, world, neighborPos, false);
-                world.setBlockAndUpdate(neighborPos, updatedState);
+                var updatedState = pipeBlock.addConnectionStates(neighborState, level, neighborPos, false);
+                level.setBlockAndUpdate(neighborPos, updatedState);
                 
                 // Update network data if the state was changed
                 if (!neighborState.equals(updatedState) || pipeBlock instanceof GenericPipeDuctBlock) {
                     boolean interfaceBlock = updatedState.is(getConnectionBlock().getBlock());
                     if (neighborToggled)
-                        GenericPipeInterfaceEntity.addNode(world, neighborPos, interfaceBlock, updatedState, getNetworkData(world));
+                        GenericPipeInterfaceEntity.addNode(level, neighborPos, interfaceBlock, updatedState, getNetworkData(level));
                 }
             }
         }
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        if (!player.isCreative() && !world.isClientSide()) {
-            onBlockRemoved(pos, state, world);
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!player.isCreative() && !level.isClientSide()) {
+            onBlockRemoved(pos, state, level);
         }
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override
@@ -240,19 +240,19 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
     }
     
     @Override
-    public InteractionResult onWrenchUse(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand) {
+    public InteractionResult onWrenchUse(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand) {
         if (player.isShiftKeyDown()) {
-            this.playerWillDestroy(world, pos, state, player);
-            world.destroyBlock(pos, true, player);
+            this.playerWillDestroy(level, pos, state, player);
+            level.destroyBlock(pos, true, player);
             return InteractionResult.SUCCESS;
         }
         
-        return toggleSideConnection(state, getInteractDirection(state, pos, player), world, pos) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+        return toggleSideConnection(state, getInteractDirection(state, pos, player), level, pos) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
     }
     
     @Override
-    public InteractionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, Level world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, Player player, InteractionHand hand) {
-        return toggleSideConnection(state, neighborFace.getOpposite(), world, pos) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+    public InteractionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, Level level, BlockPos pos, BlockPos neighborPos, Direction neighborFace, Player player, InteractionHand hand) {
+        return toggleSideConnection(state, neighborFace.getOpposite(), level, pos) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
     }
     
     protected Direction getInteractDirection(BlockState state, BlockPos pos, Player player) {
@@ -314,39 +314,39 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      *
      * @param state The current pipe block-state
      * @param side  The side to toggle the connection state
-     * @param world The target world
+     * @param level The target level
      * @param pos   The target pipe position
      */
-    protected boolean toggleSideConnection(BlockState state, Direction side, Level world, BlockPos pos) {
+    protected boolean toggleSideConnection(BlockState state, Direction side, Level level, BlockPos pos) {
         var property = directionToProperty(side);
         var createConnection = state.getValue(property) == NO_CONNECTION;
         
         // check if connection would be valid if state is toggled
         var targetPos = pos.relative(side);
-        if (createConnection && !isValidConnectionTarget(world.getBlockState(targetPos).getBlock(), world, side.getOpposite(), targetPos))
+        if (createConnection && !isValidConnectionTarget(level.getBlockState(targetPos).getBlock(), level, side.getOpposite(), targetPos))
             return false;
         
         // toggle connection state
-        int nextConnectionState = getNextConnectionState(state, side, world, pos, state.getValue(property));
+        int nextConnectionState = getNextConnectionState(state, side, level, pos, state.getValue(property));
         var newState = addStraightState(state.setValue(property, nextConnectionState));
         
         // transform to interface block if side is being enabled and machine is connected
-        if (!newState.is(getConnectionBlock().getBlock()) && createConnection && hasMachineInDirection(side, world, pos, apiValidationFunction())) {
+        if (!newState.is(getConnectionBlock().getBlock()) && createConnection && hasMachineInDirection(side, level, pos, apiValidationFunction())) {
             var connectionState = getConnectionBlock();
-            var interfaceState = ((GenericPipeBlock) connectionState.getBlock()).addConnectionStates(connectionState, world, pos, side);
-            interfaceState = addFluidState(interfaceState, pos, world);
-            world.setBlockAndUpdate(pos, interfaceState);
+            var interfaceState = ((GenericPipeBlock) connectionState.getBlock()).addConnectionStates(connectionState, level, pos, side);
+            interfaceState = addFluidState(interfaceState, pos, level);
+            level.setBlockAndUpdate(pos, interfaceState);
         } else {
-            world.setBlockAndUpdate(pos, newState);
-            GenericPipeInterfaceEntity.addNode(world, pos, false, newState, getNetworkData(world));
+            level.setBlockAndUpdate(pos, newState);
+            GenericPipeInterfaceEntity.addNode(level, pos, false, newState, getNetworkData(level));
             
             // update neighbor if it's a pipe
-            updateNeighbors(world, pos, true);
+            updateNeighbors(level, pos, true);
         }
         
         // play sound
         var soundGroup = getSoundType(state);
-        world.playSound(null, pos, soundGroup.getPlaceSound(), SoundSource.BLOCKS, soundGroup.getVolume() * .5f, soundGroup.getPitch());
+        level.playSound(null, pos, soundGroup.getPlaceSound(), SoundSource.BLOCKS, soundGroup.getVolume() * .5f, soundGroup.getPitch());
         
         return true;
     }
@@ -355,18 +355,18 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * Adds the connection states to the pipe block-state.
      *
      * @param state            The current pipe block-state
-     * @param world            The target world
+     * @param level            The target level
      * @param pos              The target pipe position
      * @param createConnection Whether to create a connection
      * @return The updated block-state
      */
-    public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, boolean createConnection) {
+    public BlockState addConnectionStates(BlockState state, Level level, BlockPos pos, boolean createConnection) {
         
-        state = addFluidState(state, pos, world);
+        state = addFluidState(state, pos, level);
         
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
-            var connection = shouldConnect(state, direction, pos, world, createConnection);
+            var connection = shouldConnect(state, direction, pos, level, createConnection);
             state = state.setValue(property, connection ? CONNECTION : NO_CONNECTION);
         }
         
@@ -379,18 +379,18 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * Useful for when only one connection needs to be created.
      *
      * @param state           The current pipe block-state
-     * @param world           The target world
+     * @param level           The target level
      * @param pos             The target pipe position
      * @param createDirection The direction to create a connection in
      * @return The updated block-state
      */
-    public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, Direction createDirection) {
+    public BlockState addConnectionStates(BlockState state, Level level, BlockPos pos, Direction createDirection) {
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
-            var connection = shouldConnect(state, direction, pos, world, direction.equals(createDirection));
+            var connection = shouldConnect(state, direction, pos, level, direction.equals(createDirection));
             state = state.setValue(property, connection ? CONNECTION : NO_CONNECTION);
         }
-        return addFluidState(addStraightState(state), pos, world);
+        return addFluidState(addStraightState(state), pos, level);
     }
     
     /**
@@ -424,22 +424,22 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * @param current          The current pipe block-state
      * @param direction        The direction to check
      * @param currentPos       The current pipe position
-     * @param world            The target world
+     * @param level            The target level
      * @param createConnection Whether to create a connection
      * @return Boolean whether the pipe should connect
      */
-    public boolean shouldConnect(BlockState current, Direction direction, BlockPos currentPos, Level world, boolean createConnection) {
+    public boolean shouldConnect(BlockState current, Direction direction, BlockPos currentPos, Level level, boolean createConnection) {
         var targetPos = currentPos.relative(direction);
-        var targetState = world.getBlockState(targetPos);
+        var targetState = level.getBlockState(targetPos);
         
         // If creating a connection we don't check the other pipe's connection state, force the connection
         // Otherwise we check if the other pipe is connecting in the opposite direction
         if (createConnection) {
-            return isValidConnectionTarget(targetState.getBlock(), world, direction.getOpposite(), targetPos);
+            return isValidConnectionTarget(targetState.getBlock(), level, direction.getOpposite(), targetPos);
         } else if (targetState.getBlock() instanceof AbstractPipeBlock pipeBlock) {
-            return pipeBlock.isConnectingInDirection(targetState, direction.getOpposite(), targetPos, world, false);
+            return pipeBlock.isConnectingInDirection(targetState, direction.getOpposite(), targetPos, level, false);
         } else
-            return isConnectingInDirection(current, direction, currentPos, world, false) && isValidInterfaceTarget(targetState.getBlock(), world, direction.getOpposite(), targetPos);
+            return isConnectingInDirection(current, direction, currentPos, level, false) && isValidInterfaceTarget(targetState.getBlock(), level, direction.getOpposite(), targetPos);
     }
     
     /**
@@ -450,7 +450,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * @param createConnection Whether to create a connection
      * @return Boolean whether the pipe is connecting
      */
-    public boolean isConnectingInDirection(BlockState current, Direction direction, BlockPos currentPos, Level world, boolean createConnection) {
+    public boolean isConnectingInDirection(BlockState current, Direction direction, BlockPos currentPos, Level level, boolean createConnection) {
         var block = current.getBlock();
         if (!(block instanceof GenericPipeBlock pipeBlock)) return false;
         var property = pipeBlock.directionToProperty(direction);
@@ -498,17 +498,17 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         else return getDownProperty();
     }
     
-    protected int getNextConnectionState(BlockState state, Direction side, Level world, BlockPos pos, int current) {
+    protected int getNextConnectionState(BlockState state, Direction side, Level level, BlockPos pos, int current) {
         return current == NO_CONNECTION ? CONNECTION : NO_CONNECTION;
     }
     
-    protected void onBlockRemoved(BlockPos pos, BlockState oldState, Level world) {
-        updateNeighbors(world, pos, false);
-        GenericPipeInterfaceEntity.removeNode(world, pos, false, oldState, getNetworkData(world));
+    protected void onBlockRemoved(BlockPos pos, BlockState oldState, Level level) {
+        updateNeighbors(level, pos, false);
+        GenericPipeInterfaceEntity.removeNode(level, pos, false, oldState, getNetworkData(level));
     }
     
     @Override
-    protected float getShadeBrightness(BlockState state, BlockGetter world, BlockPos pos) {
+    protected float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) {
         return 1.0f;
     }
     

@@ -1,7 +1,5 @@
 package rearth.oritech.block.blocks.addons;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,37 +44,37 @@ public class RedstoneAddonBlock extends MachineAddonBlock {
     }
     
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
-        return ((ComparatorOutputProvider) world.getBlockEntity(pos)).getComparatorOutput();
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        return ((ComparatorOutputProvider) level.getBlockEntity(pos)).getComparatorOutput();
     }
     
     @Override
-    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
         
-        if (world.isClientSide()) return;
+        if (level.isClientSide()) return;
         
-        var isPowered = world.hasNeighborSignal(pos);
+        var isPowered = level.hasNeighborSignal(pos);
         
-        var addonEntity = (RedstoneAddonBlockEntity) world.getBlockEntity(pos);
+        var addonEntity = (RedstoneAddonBlockEntity) level.getBlockEntity(pos);
         addonEntity.setRedstonePowered(isPowered);
         
     }
     
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         
-        var isPowered = world.hasNeighborSignal(pos);
+        var isPowered = level.hasNeighborSignal(pos);
         var poweredState = state.setValue(BlockStateProperties.POWERED, isPowered);
         
-        return super.updateShape(poweredState, direction, neighborState, world, pos, neighborPos);
+        return super.updateShape(poweredState, direction, neighborState, level, pos, neighborPos);
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
-            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+        if (!level.isClientSide()) {
+            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
                 MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
             
         }
@@ -92,7 +90,7 @@ public class RedstoneAddonBlock extends MachineAddonBlock {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

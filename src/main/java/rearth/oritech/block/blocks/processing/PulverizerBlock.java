@@ -27,16 +27,16 @@ public class PulverizerBlock extends UpgradableMachineBlock implements EntityBlo
     }
     
     @Override
-    public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
+    public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
         
-        if (!world.isClientSide && entity instanceof LivingEntity livingEntity) {
+        if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
             var targetPos = pos.getCenter().add(0, 0.5f, 0);
             var entityDist = entity.distanceToSqr(targetPos);
             if (entityDist > 0.7) return;
-            var isWorking = world.getBlockEntity(pos, BlockEntitiesContent.PULVERIZER_ENTITY).get().progress > 0;
+            var isWorking = level.getBlockEntity(pos, BlockEntitiesContent.PULVERIZER_ENTITY).get().progress > 0;
             if (isWorking)
-                livingEntity.hurt(new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolder(DamageTypes.CRAMMING).get()), 1f);
+                livingEntity.hurt(new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolder(DamageTypes.CRAMMING).get()), 1f);
         }
-        super.stepOn(world, pos, state, entity);
+        super.stepOn(level, pos, state, entity);
     }
 }

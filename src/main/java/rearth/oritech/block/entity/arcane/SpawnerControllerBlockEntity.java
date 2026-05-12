@@ -57,8 +57,8 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     }
     
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, SpawnerControllerBlockEntity blockEntity) {
-        if (world.isClientSide()) return;
+    public void tick(Level level, BlockPos pos, BlockState state, SpawnerControllerBlockEntity blockEntity) {
+        if (level.isClientSide()) return;
 
         if (networkDirty) {
             updateNetwork();
@@ -67,7 +67,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
 
         if (mobNbt.isEmpty() || !hasCage || redstonePowered) return;
         
-        if (collectedSouls >= maxSouls && world.getGameTime() % 4 == 0) {
+        if (collectedSouls >= maxSouls && level.getGameTime() % 4 == 0) {
             spawnMob();
             updateComparator();
         }
@@ -152,9 +152,9 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     }
     
     public static void receiveUpdatePacket(SpawnerSyncPacket message, IPayloadContext context) {
-        var world = context.player().level();
+        var level = context.player().level();
         
-        if (world.getBlockEntity(message.position) instanceof SpawnerControllerBlockEntity spawnerEntity) {
+        if (level.getBlockEntity(message.position) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.mobNbt = message.spawnedMob;
             spawnerEntity.hasCage = message.hasCage;
             spawnerEntity.collectedSouls = message.collectedSouls;

@@ -1,9 +1,6 @@
 package rearth.oritech.api.recipe;
 
 import com.google.common.base.Optional;
-import dev.architectury.fluid.FluidStack;
-import dev.architectury.hooks.fluid.FluidStackHooks;
-import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;

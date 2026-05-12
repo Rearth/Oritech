@@ -1,7 +1,5 @@
 package rearth.oritech.client.init;
 
-import dev.architectury.registry.menu.MenuRegistry;
-import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
 import rearth.oritech.client.ui.*;

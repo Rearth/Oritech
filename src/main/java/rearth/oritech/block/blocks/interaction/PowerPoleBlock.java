@@ -1,7 +1,5 @@
 package rearth.oritech.block.blocks.interaction;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -58,11 +56,11 @@ public class PowerPoleBlock extends Block implements EntityBlock {
     }
     
     @Override
-    public @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, Level world, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hit) {
+    public @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
+        if (!level.isClientSide()) {
             
-            var entity = world.getBlockEntity(pos);
+            var entity = level.getBlockEntity(pos);
             
             if (!(entity instanceof PowerPoleEntity powerPole)) {
                 return InteractionResult.SUCCESS;
@@ -88,7 +86,7 @@ public class PowerPoleBlock extends Block implements EntityBlock {
                 return InteractionResult.SUCCESS;
             }
             
-            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
             MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
             
         }
@@ -97,11 +95,11 @@ public class PowerPoleBlock extends Block implements EntityBlock {
     }
     
     @Override
-    public @NotNull BlockState playerWillDestroy(Level world, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Player player) {
+    public @NotNull BlockState playerWillDestroy(Level level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Player player) {
         
-        if (!world.isClientSide() && state.getValue(ASSEMBLED)) {
+        if (!level.isClientSide() && state.getValue(ASSEMBLED)) {
             
-            var entity = world.getBlockEntity(pos);
+            var entity = level.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
@@ -111,7 +109,7 @@ public class PowerPoleBlock extends Block implements EntityBlock {
             }
         }
         
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override
@@ -127,7 +125,7 @@ public class PowerPoleBlock extends Block implements EntityBlock {
     
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level world, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

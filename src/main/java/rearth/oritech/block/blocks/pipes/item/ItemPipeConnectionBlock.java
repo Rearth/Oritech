@@ -48,35 +48,35 @@ public class ItemPipeConnectionBlock extends ExtractablePipeConnectionBlock {
     }
     
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         
-        if (world.isClientSide || !hasExtractingSide(state) || state.getValue(HAS_MOTOR))
-            return super.useItemOn(stack, state, world, pos, player, hand, hit);
+        if (level.isClientSide || !hasExtractingSide(state) || state.getValue(HAS_MOTOR))
+            return super.useItemOn(stack, state, level, pos, player, hand, hit);
         
-        var ownEntity = world.getBlockEntity(pos);
+        var ownEntity = level.getBlockEntity(pos);
         if (ownEntity instanceof ItemPipeInterfaceEntity && stack.getItem().equals(ItemContent.MOTOR)) {
-            world.setBlock(pos, state.setValue(HAS_MOTOR, true), Block.UPDATE_KNOWN_SHAPE, 0);
+            level.setBlock(pos, state.setValue(HAS_MOTOR, true), Block.UPDATE_KNOWN_SHAPE, 0);
             stack.shrink(1);
-            world.playSound(null, pos, SoundContent.SHORT_SERVO, SoundSource.BLOCKS, 0.9f, 1.2f);
+            level.playSound(null, pos, SoundContent.SHORT_SERVO, SoundSource.BLOCKS, 0.9f, 1.2f);
             return ItemInteractionResult.CONSUME;
         }
         
-        return super.useItemOn(stack, state, world, pos, player, hand, hit);
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide && state.getValue(HAS_MOTOR)) {
-            world.addFreshEntity(new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(ItemContent.MOTOR)));
+        if (!level.isClientSide && state.getValue(HAS_MOTOR)) {
+            level.addFreshEntity(new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(ItemContent.MOTOR)));
         }
         
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override
     public TriFunction<Level, BlockPos, Direction, Boolean> apiValidationFunction() {
-        return ((world, pos, direction) -> ItemApi.BLOCK.find(world, pos, direction) != null);
+        return ((level, pos, direction) -> ItemApi.BLOCK.find(level, pos, direction) != null);
     }
     
     @Nullable
@@ -111,8 +111,8 @@ public class ItemPipeConnectionBlock extends ExtractablePipeConnectionBlock {
     }
     
     @Override
-    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level world) {
-        return ITEM_PIPE_DATA.computeIfAbsent(world.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level) {
+        return ITEM_PIPE_DATA.computeIfAbsent(level.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 
     public static class FramedItemPipeConnectionBlock extends ItemPipeConnectionBlock {
@@ -122,13 +122,13 @@ public class ItemPipeConnectionBlock extends ExtractablePipeConnectionBlock {
         }
 
         @Override
-        public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
             return Shapes.block();
         }
 
         @Override
-        public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-            return state.getShape(world, pos);
+        public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+            return state.getShape(level, pos);
         }
 
         @Override

@@ -35,50 +35,50 @@ public class NukeBlock extends Block {
         this.small = small;
     }
     
-    protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean notify) {
         if (!oldState.is(state.getBlock())) {
-            if (world.hasNeighborSignal(pos)) {
-                primeTnt(world, pos);
+            if (level.hasNeighborSignal(pos)) {
+                primeTnt(level, pos);
             }
             
         }
     }
     
-    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        if (world.hasNeighborSignal(pos)) {
-            primeTnt(world, pos);
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        if (level.hasNeighborSignal(pos)) {
+            primeTnt(level, pos);
         }
         
     }
     
-    public void wasExploded(Level world, BlockPos pos, Explosion explosion) {
-        if (!world.isClientSide()) {
-            primeTnt(world, pos);
+    public void wasExploded(Level level, BlockPos pos, Explosion explosion) {
+        if (!level.isClientSide()) {
+            primeTnt(level, pos);
         }
     }
     
-    private void primeTnt(Level world, BlockPos pos) {
-        if (!world.isClientSide()) {
+    private void primeTnt(Level level, BlockPos pos) {
+        if (!level.isClientSide()) {
             
             if (OritechConfig.boringNukes.get()) {
                 var center = pos.getCenter();
-                world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-                world.explode(null, center.x, center.y, center.z, 3, true, Level.ExplosionInteraction.TNT);
-                world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.LAVA_POP, SoundSource.BLOCKS, 1.0F, 1.0F);
+                level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                level.explode(null, center.x, center.y, center.z, 3, true, Level.ExplosionInteraction.TNT);
+                level.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.LAVA_POP, SoundSource.BLOCKS, 1.0F, 1.0F);
                 return;
             }
             
             var target = small ? BlockContent.REACTOR_EXPLOSION_MEDIUM : BlockContent.REACTOR_EXPLOSION_LARGE;
-            world.setBlockAndUpdate(pos, target.defaultBlockState());
-            world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.setBlockAndUpdate(pos, target.defaultBlockState());
+            level.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
         }
     }
     
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!stack.is(Items.FLINT_AND_STEEL) && !stack.is(Items.FIRE_CHARGE)) {
-            return super.useItemOn(stack, state, world, pos, player, hand, hit);
+            return super.useItemOn(stack, state, level, pos, player, hand, hit);
         } else {
-            primeTnt(world, pos);
+            primeTnt(level, pos);
             var item = stack.getItem();
             if (stack.is(Items.FLINT_AND_STEEL)) {
                 stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
@@ -87,15 +87,15 @@ public class NukeBlock extends Block {
             }
             
             player.awardStat(Stats.ITEM_USED.get(item));
-            return ItemInteractionResult.sidedSuccess(world.isClientSide());
+            return ItemInteractionResult.sidedSuccess(level.isClientSide());
         }
     }
     
-    protected void onProjectileHit(Level world, BlockState state, BlockHitResult hit, Projectile projectile) {
-        if (!world.isClientSide()) {
+    protected void onProjectileHit(Level level, BlockState state, BlockHitResult hit, Projectile projectile) {
+        if (!level.isClientSide()) {
             var blockPos = hit.getBlockPos();
-            if (projectile.isOnFire() && projectile.mayInteract(world, blockPos)) {
-                primeTnt(world, blockPos);
+            if (projectile.isOnFire() && projectile.mayInteract(level, blockPos)) {
+                primeTnt(level, blockPos);
             }
         }
         

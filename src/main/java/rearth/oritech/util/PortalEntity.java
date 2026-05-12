@@ -31,8 +31,8 @@ public class PortalEntity extends Entity implements GeoEntity {
     protected static final RawAnimation PORTAL = RawAnimation.begin().thenPlay("create").thenLoop("idle");
     
     
-    public PortalEntity(EntityType<?> type, Level world) {
-        super(type, world);
+    public PortalEntity(EntityType<?> type, Level level) {
+        super(type, level);
         
     }
     
@@ -71,8 +71,8 @@ public class PortalEntity extends Entity implements GeoEntity {
     
     @Override
     public void tick() {
-        var world = this.level();
-        if (world.isClientSide()) return;
+        var level = this.level();
+        if (level.isClientSide()) return;
         
         tickCount++;
         

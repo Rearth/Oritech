@@ -62,11 +62,11 @@ public class AugmentResearchStationBlock extends DirectionalBlock implements Ent
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
+        if (!level.isClientSide()) {
             
-            var entity = world.getBlockEntity(pos);
+            var entity = level.getBlockEntity(pos);
             if (!(entity instanceof MultiblockMachineController machineEntity)) {
                 return InteractionResult.SUCCESS;
             }
@@ -96,17 +96,17 @@ public class AugmentResearchStationBlock extends DirectionalBlock implements Ent
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide() && state.getValue(ASSEMBLED)) {
+        if (!level.isClientSide() && state.getValue(ASSEMBLED)) {
             
-            var entity = world.getBlockEntity(pos);
+            var entity = level.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
         }
         
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Nullable

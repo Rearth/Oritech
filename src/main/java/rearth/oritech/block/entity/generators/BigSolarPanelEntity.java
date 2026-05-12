@@ -87,7 +87,7 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     
     // output only to north, down and south
     @Override
-    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level world) {
+    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level level) {
         
         var res = new HashSet<Tuple<BlockPos, Direction>>();
         res.add(new Tuple<>(pos.below(), Direction.DOWN));

@@ -1,6 +1,5 @@
 package rearth.oritech.block.base.entity;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -88,7 +87,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         if (!isActive(state) || disabledViaRedstone) return;
         
@@ -106,7 +105,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             if (hasEnoughEnergy()) {
                 var activeRecipe = recipeCandidate.get().value();
                 currentRecipe = activeRecipe;
-                lastWorkedAt = world.getGameTime();
+                lastWorkedAt = level.getGameTime();
                 
                 useEnergy();
                 

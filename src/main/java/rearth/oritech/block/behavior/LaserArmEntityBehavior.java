@@ -23,16 +23,16 @@ public class LaserArmEntityBehavior {
     // and the laser could respect the attackable TargetPredicate to avoid attacking "friendly" mobs or to attack players
     // instead of trying to charge their energy storage chestplates
     
-    public boolean fireAtEntity(Level world, LaserArmBlockEntity laserEntity, LivingEntity entity) {
+    public boolean fireAtEntity(Level level, LaserArmBlockEntity laserEntity, LivingEntity entity) {
         // Don't kill baby animals if the crop filter addon is applied
         if (laserEntity.hasCropFilterAddon && entity instanceof Animal && entity.isBaby()) {
             return false;
         }
         
-        if (world.getGameTime() % 10 != 0) return true; // entities can only be damaged twice per second?
+        if (level.getGameTime() % 10 != 0) return true; // entities can only be damaged twice per second?
         
         entity.hurt(
-          new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), laserEntity.getLaserPlayerEntity()),
+          new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), laserEntity.getLaserPlayerEntity()),
           laserEntity.getDamageTick());
         
         
@@ -42,7 +42,7 @@ public class LaserArmEntityBehavior {
     public static void registerDefaults() {
         transferPowerBehavior = new LaserArmEntityBehavior() {
             @Override
-            public boolean fireAtEntity(Level world, LaserArmBlockEntity laserEntity, LivingEntity entity) {
+            public boolean fireAtEntity(Level level, LaserArmBlockEntity laserEntity, LivingEntity entity) {
                 if (!(entity instanceof Player player))
                     return false;
                 
@@ -61,11 +61,11 @@ public class LaserArmEntityBehavior {
         
         chargeEntityBehavior = new LaserArmEntityBehavior() {
             @Override
-            public boolean fireAtEntity(Level world, LaserArmBlockEntity laserEntity, LivingEntity entity) {
+            public boolean fireAtEntity(Level level, LaserArmBlockEntity laserEntity, LivingEntity entity) {
                 entity.getEntityData().set(Creeper.DATA_IS_POWERED, true);
                 
                 // still do the default mob behavior after setting the creeper to charged
-                return super.fireAtEntity(world, laserEntity, entity);
+                return super.fireAtEntity(level, laserEntity, entity);
             }
         };
         LaserArmBlock.registerEntityBehavior(EntityType.CREEPER, chargeEntityBehavior);

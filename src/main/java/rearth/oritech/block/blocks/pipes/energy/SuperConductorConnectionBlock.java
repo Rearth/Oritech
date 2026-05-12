@@ -28,7 +28,7 @@ public class SuperConductorConnectionBlock extends GenericPipeConnectionBlock {
     
     @Override
     public TriFunction<Level, BlockPos, Direction, Boolean> apiValidationFunction() {
-        return ((world, pos, direction) -> EnergyApi.BLOCK.find(world, pos, direction) != null);
+        return ((level, pos, direction) -> EnergyApi.BLOCK.find(level, pos, direction) != null);
     }
     
     @Nullable
@@ -68,8 +68,8 @@ public class SuperConductorConnectionBlock extends GenericPipeConnectionBlock {
     }
     
     @Override
-    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level world) {
-        return SUPERCONDUCTOR_DATA.computeIfAbsent(world.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level) {
+        return SUPERCONDUCTOR_DATA.computeIfAbsent(level.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 
 	public static class FramedSuperConductorConnectionBlock extends SuperConductorConnectionBlock {
@@ -79,13 +79,13 @@ public class SuperConductorConnectionBlock extends GenericPipeConnectionBlock {
 		}
 
 		@Override
-		public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+		public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 			return Shapes.block();
 		}
 
 		@Override
-		public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-			return state.getShape(world, pos);
+		public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+			return state.getShape(level, pos);
 		}
 
 		@Override

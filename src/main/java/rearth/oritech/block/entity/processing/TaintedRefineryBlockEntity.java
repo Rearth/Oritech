@@ -2,8 +2,6 @@ package rearth.oritech.block.entity.processing;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.architectury.fluid.FluidStack;
-import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -70,7 +68,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         // enabled later in this method if working
         energyStorage.setMaxInsert(0);
@@ -98,7 +96,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
             if (energyStorage.getAmount() > OritechConfig.processingMachines.refineryData.energyPerTick.get()) {   // needs a min energy amount to work at all
                 var activeRecipe = recipeCandidate.get().value();
                 currentRecipe = activeRecipe;
-                lastWorkedAt = world.getGameTime();
+                lastWorkedAt = level.getGameTime();
                 
                 // use all energy, calculate progression based on amount (and arcane factor)
                 var steps = getAndDrainProgress();

@@ -91,6 +91,9 @@ public final class Oritech {
         FluidContent.FLUID_BLOCKS.register(modEventBus);
         FluidContent.BUCKET_ITEMS.register(modEventBus);
         
+        // register networking
+        modEventBus.addListener(this::addNetworkHandlers);
+        
         // post processing / extra registrations
         BlockContent.AddBlockItems();
     }
@@ -106,7 +109,6 @@ public final class Oritech {
         
         // todo
         LOGGER.info("Begin Oritech initialization");
-        NetworkManager.init();
         FeatureContent.initialize();
         
     }
@@ -159,28 +161,30 @@ public final class Oritech {
     
     private void addNetworkHandlers(RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar("1");
+        NetworkManager.initClientBound(registrar);
+        NetworkManager.initServerBound(registrar);
     }
     
-    private void loadLevelPipeData(ServerLevel world) {
-        var dimId = world.dimension().identifier();
+    private void loadLevelPipeData(ServerLevel level) {
+        var dimId = level.dimension().identifier();
         var dataId = "energy_" + dimId + "_" + dimId.getPath();
-        var result = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, dataId);
+        var result = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, dataId);
         EnergyPipeBlock.ENERGY_PIPE_DATA.put(dimId, result);
         
         var fluidDataId = "fluid_" + dimId.getNamespace() + "_" + dimId.getPath();
-        var fluidResult = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, fluidDataId);
+        var fluidResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, fluidDataId);
         FluidPipeBlock.FLUID_PIPE_DATA.put(dimId, fluidResult);
         
         var itemDataId = "item_" + dimId.getNamespace() + "_" + dimId.getPath();
-        var itemResult = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, itemDataId);
+        var itemResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, itemDataId);
         ItemPipeBlock.ITEM_PIPE_DATA.put(dimId, itemResult);
         
         var superConductorDataId = "superconductor_" + dimId.getNamespace() + "_" + dimId.getPath();
-        var superConductorResult = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, superConductorDataId);
+        var superConductorResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, superConductorDataId);
         SuperConductorBlock.SUPERCONDUCTOR_DATA.put(dimId, superConductorResult);
         
         var powerPoleId = "pole_" + dimId.getNamespace() + "_" + dimId.getPath();
-        var powerPoleResult = world.getDataStorage().computeIfAbsent(PowerPoleEntity.PoleNetworkData.TYPE, powerPoleId);
+        var powerPoleResult = level.getDataStorage().computeIfAbsent(PowerPoleEntity.PoleNetworkData.TYPE, powerPoleId);
         PowerPoleEntity.POLE_NETWORK_DATA.put(dimId, powerPoleResult);
     }
 }

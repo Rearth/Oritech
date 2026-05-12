@@ -16,7 +16,7 @@ import java.util.Objects;
 public class ReactorScreenHandler extends AbstractContainerMenu {
     
     public final ReactorControllerBlockEntity reactorEntity;
-    public final Level world;
+    public final Level level;
     
     // this calls the second version
     public ReactorScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
@@ -28,7 +28,7 @@ public class ReactorScreenHandler extends AbstractContainerMenu {
         super(ModScreens.REACTOR_SCREEN, syncId);
         
         reactorEntity = (ReactorControllerBlockEntity) blockEntity;
-        world = blockEntity.getLevel();
+        level = blockEntity.getLevel();
     }
     
     @Override

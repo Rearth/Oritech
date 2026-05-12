@@ -25,7 +25,7 @@ public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     }
     
     @Override
-    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level world) {
+    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level level) {
         
         var res = new HashSet<Tuple<BlockPos, Direction>>();
         res.add(new Tuple<>(pos.above(2), Direction.DOWN));

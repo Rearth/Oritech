@@ -35,7 +35,7 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
         combineSmallDusts(outputInventory, level);
     }
     
-    public static void combineSmallDusts(List<ItemStack> outputInventory, Level world) {
+    public static void combineSmallDusts(List<ItemStack> outputInventory, Level level) {
         // try compacting
         var smallDustStack = outputInventory.get(1);
         var baseResult = outputInventory.get(0);
@@ -48,7 +48,7 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
         }
         var craftingInv = CraftingInput.of(3, 3, recipeInputStacks);
         
-        var matches = world.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, craftingInv, world);
+        var matches = level.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, craftingInv, level);
         
         if (matches.isEmpty()) return;
         

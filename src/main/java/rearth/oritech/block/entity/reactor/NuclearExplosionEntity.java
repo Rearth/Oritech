@@ -51,18 +51,18 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
     }
 
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, NuclearExplosionEntity blockEntity) {
-        if (world.isClientSide()) return;
+    public void tick(Level level, BlockPos pos, BlockState state, NuclearExplosionEntity blockEntity) {
+        if (level.isClientSide()) return;
 
         var initialRadius = size;
 
         if (startTime == -1) {
-            startTime = world.getGameTime();
+            startTime = level.getGameTime();
             explosionSphere(initialRadius + 7, 200, pos);
-            world.playSound(null, pos, SoundContent.NUKE_EXPLOSION, SoundSource.BLOCKS, 30f, 1f);
+            level.playSound(null, pos, SoundContent.NUKE_EXPLOSION, SoundSource.BLOCKS, 30f, 1f);
         }
 
-        var age = world.getGameTime() - startTime;
+        var age = level.getGameTime() - startTime;
 
         if (age == 1) {
             createExplosionWaves(initialRadius);
@@ -75,7 +75,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
 
         if (age > initialRadius * 2) {
             // done
-            world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         }
 
     }

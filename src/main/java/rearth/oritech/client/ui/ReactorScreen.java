@@ -192,7 +192,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
 
         int stackHeight = menu.reactorEntity.areaMax.getY() - menu.reactorEntity.areaMin.getY() - 1;
         var portPosition = pos.offset(0, stackHeight, 0);
-        var portEntity = menu.world.getBlockEntity(portPosition);
+        var portEntity = menu.level.getBlockEntity(portPosition);
         if (portEntity != null && portEntity.isRemoved()) return tooltip;
 
         if (state.getBlock() instanceof ReactorRodBlock rodBlock) {
@@ -288,7 +288,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
                 var offset = pos.subtract(menu.reactorEntity.areaMin);
                 blockEntries.add(entry);
 
-                var state = menu.world.getBlockState(pos);
+                var state = menu.level.getBlockState(pos);
                 if (state.getBlock() instanceof ReactorRodBlock || state.getBlock() instanceof ReactorHeatPipeBlock) {
                     heatEntries.add(new PreviewEntry(pos.immutable(), null, entry.zIndex() + 0.5f, entry.drawX(), entry.drawY()));
                 }
@@ -316,7 +316,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             if (hoveredEntry != null) {
                 renderBlock(graphics, hoveredEntry.drawX(), hoveredEntry.drawY(), blockSize, hoveredEntry.zIndex() + 0.6f,
                     BlockContent.ADDON_INDICATOR_BLOCK.defaultBlockState(), null, hoveredEntry.pos(), delta);
-                renderTooltipPanel(graphics, hoveredEntry.drawX(), hoveredEntry.drawY(), getStatsTooltip(hoveredEntry.pos(), menu.world.getBlockState(hoveredEntry.pos())));
+                renderTooltipPanel(graphics, hoveredEntry.drawX(), hoveredEntry.drawY(), getStatsTooltip(hoveredEntry.pos(), menu.level.getBlockState(hoveredEntry.pos())));
             }
         }
 
@@ -341,7 +341,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         }
 
         private @Nullable PreviewEntry createPreviewEntry(BlockPos pos, float xOffset) {
-            var state = menu.world.getBlockState(pos);
+            var state = menu.level.getBlockState(pos);
             if (state.isAir()) {
                 return null;
             }
@@ -355,7 +355,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
 
             return new PreviewEntry(
                 pos.immutable(),
-                menu.world.getBlockEntity(pos),
+                menu.level.getBlockEntity(pos),
                 zIndex,
                 drawX,
                 drawY
@@ -412,7 +412,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
                                  @Nullable BlockState overrideState, @Nullable BlockEntity overrideEntity,
                                  BlockPos worldPos, float delta) {
             var client = Minecraft.getInstance();
-            var usedState = overrideState != null ? overrideState : menu.world.getBlockState(worldPos);
+            var usedState = overrideState != null ? overrideState : menu.level.getBlockState(worldPos);
             var usedEntity = overrideEntity;
 
             graphics.pose().pushPose();

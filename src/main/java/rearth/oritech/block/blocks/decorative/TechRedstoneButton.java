@@ -26,7 +26,7 @@ public class TechRedstoneButton extends ButtonBlock {
     
     // copied from lever block
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return switch (state.getValue(FACE)) {
             case FLOOR -> switch (state.getValue(FACING).getAxis()) {
                 case X -> FLOOR_AABB_X;

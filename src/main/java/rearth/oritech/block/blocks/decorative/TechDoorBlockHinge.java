@@ -40,36 +40,36 @@ public class TechDoorBlockHinge extends HorizontalDirectionalBlock {
     }
     
     @Override
-    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
         
         // forward the event to bottom block
-        if (world.isClientSide()) return;
-        world.neighborChanged(pos.below(), sourceBlock, sourcePos);
+        if (level.isClientSide()) return;
+        level.neighborChanged(pos.below(), sourceBlock, sourcePos);
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        if (!world.isClientSide()) {
-            var belowState = world.getBlockState(pos.below());
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide()) {
+            var belowState = level.getBlockState(pos.below());
             if (!player.isCreative())
-                Block.dropResources(belowState, world, pos.below());
-            world.setBlockAndUpdate(pos.below(), Blocks.AIR.defaultBlockState());
+                Block.dropResources(belowState, level, pos.below());
+            level.setBlockAndUpdate(pos.below(), Blocks.AIR.defaultBlockState());
         }
         
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return TechDoorBlock.getClosedShape(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
     }
     
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (state.getValue(OPENED))
             return Shapes.empty();
-        return super.getCollisionShape(state, world, pos, context);
+        return super.getCollisionShape(state, level, pos, context);
     }
     
     @Override

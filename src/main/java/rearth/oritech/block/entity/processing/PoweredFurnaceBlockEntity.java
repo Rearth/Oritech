@@ -52,28 +52,28 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         if (!isActive(state)) return;
         
-        var recipeCandidate = world.getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), world);
+        var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), level);
         
-        if (recipeCandidate.isPresent() && canAddToSlot(recipeCandidate.get().value().getResultItem(world.registryAccess()), inventory.heldStacks.get(1))) {
+        if (recipeCandidate.isPresent() && canAddToSlot(recipeCandidate.get().value().getResultItem(level.registryAccess()), inventory.heldStacks.get(1))) {
             if (hasEnoughEnergy()) {
                 
                 var activeRecipe = recipeCandidate.get().value();
                 useEnergy();
                 progress++;
-                lastWorkedAt = world.getGameTime();
+                lastWorkedAt = level.getGameTime();
                 
-                if (world.random.nextFloat() > 0.8)
-                    if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
+                if (level.random.nextFloat() > 0.8)
+                    if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
                 
                 if (furnaceCraftingFinished(activeRecipe)) {
                     craftFurnaceItem(activeRecipe);
                     
                     for (int i = 0; i < this.getBaseAddonData().extraChambers(); i++) {
-                        if (!canAddToSlot(recipeCandidate.get().value().getResultItem(world.registryAccess()), inventory.heldStacks.get(1)) || inventory.heldStacks.get(0).isEmpty()) break;
+                        if (!canAddToSlot(recipeCandidate.get().value().getResultItem(level.registryAccess()), inventory.heldStacks.get(1)) || inventory.heldStacks.get(0).isEmpty()) break;
                         craftFurnaceItem(activeRecipe);
                     }
                     
@@ -90,7 +90,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
         
         addBurstTicks();
         
-        if (world.getGameTime() % 18 == 0)
+        if (level.getGameTime() % 18 == 0)
             updateFurnaceState(state);
         
     }

@@ -41,9 +41,9 @@ public class ReactorRedstonePortBlock extends BaseReactorBlock {
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (world.isClientSide()) return InteractionResult.SUCCESS;
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
         
         var lastMode = state.getValue(PORT_MODE);
         var cycledMode = (lastMode + 1) % 3;
@@ -51,7 +51,7 @@ public class ReactorRedstonePortBlock extends BaseReactorBlock {
         player.sendSystemMessage(Component.translatable("tooltip.oritech.reactor_port_mode." + cycledMode));
         
         var newState = state.setValue(PORT_MODE, cycledMode);
-        world.setBlockAndUpdate(pos, newState);
+        level.setBlockAndUpdate(pos, newState);
         
         return InteractionResult.SUCCESS;
         
@@ -63,7 +63,7 @@ public class ReactorRedstonePortBlock extends BaseReactorBlock {
     }
     
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         return state.getValue(BlockStateProperties.POWER);
     }
     

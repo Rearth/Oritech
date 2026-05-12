@@ -31,8 +31,8 @@ public class MetalBeamBlock extends Block {
     }
     
     @Override
-    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        super.setPlacedBy(world, pos, state, placer, itemStack);
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.setPlacedBy(level, pos, state, placer, itemStack);
     }
     
     @Override
@@ -41,28 +41,28 @@ public class MetalBeamBlock extends Block {
     }
     
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return BEAM_SHAPE;
     }
     
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return BEAM_SHAPE;
     }
     
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        var world = ctx.getLevel();
+        var level = ctx.getLevel();
         var pos = ctx.getClickedPos();
-        return getTargetState(world, pos);
+        return getTargetState(level, pos);
     }
     
-    private BlockState getTargetState(LevelAccessor world, BlockPos pos) {
-        var isFrameSupport = world.getBlockState(pos).is(TagContent.MACHINE_FRAME_SUPPORT);
-        var blockBelow = world.getBlockState(pos.below()).getBlock();
+    private BlockState getTargetState(LevelAccessor level, BlockPos pos) {
+        var isFrameSupport = level.getBlockState(pos).is(TagContent.MACHINE_FRAME_SUPPORT);
+        var blockBelow = level.getBlockState(pos.below()).getBlock();
         var beamBelow = blockBelow.equals(BlockContent.METAL_BEAM_BLOCK) || (isFrameSupport && blockBelow.equals(BlockContent.MACHINE_FRAME_BLOCK));
-        var blockAbove = world.getBlockState(pos.above()).getBlock();
+        var blockAbove = level.getBlockState(pos.above()).getBlock();
         var beamAbove = blockAbove.equals(BlockContent.METAL_BEAM_BLOCK) || (isFrameSupport && blockAbove.equals(BlockContent.MACHINE_FRAME_BLOCK));
         
         var state = defaultBlockState();
@@ -77,7 +77,7 @@ public class MetalBeamBlock extends Block {
     }
     
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
-        return getTargetState(world, pos);
+    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        return getTargetState(level, pos);
     }
 }

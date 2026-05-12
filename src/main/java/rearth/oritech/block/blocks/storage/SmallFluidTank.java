@@ -1,7 +1,5 @@
 package rearth.oritech.block.blocks.storage;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
@@ -69,15 +67,15 @@ public class SmallFluidTank extends Block implements EntityBlock {
     }
     
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
-        return ((ComparatorOutputProvider) world.getBlockEntity(pos)).getComparatorOutput();
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        return ((ComparatorOutputProvider) level.getBlockEntity(pos)).getComparatorOutput();
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
-            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+        if (!level.isClientSide()) {
+            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
             MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
             
         }
@@ -86,9 +84,9 @@ public class SmallFluidTank extends Block implements EntityBlock {
     }
     
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         
-        var blockEntity = world.getBlockEntity(pos);
+        var blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof SmallTankEntity tankEntity) {
             var usedStack = stack;
             if (stack.getCount() > 1) {
@@ -108,7 +106,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
             var candidate = FluidApi.ITEM.find(stackRef);
             if (candidate != null) {
                 
-                if (!world.isClientSide()) {
+                if (!level.isClientSide()) {
                     if (candidate.getContent().getFirst().isEmpty()) { // from tank to item
                         var moved = FluidApi.transferFirst(tankEntity.fluidStorage, candidate, tankEntity.fluidStorage.getCapacity(), false);
                         Oritech.LOGGER.debug("moved to item {} {}", moved, stackRef.getValue());
@@ -118,13 +116,13 @@ public class SmallFluidTank extends Block implements EntityBlock {
                     }
                 }
                 
-                world.playLocalSound(pos, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 0.8f, 1.4f, true);
+                level.playLocalSound(pos, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 0.8f, 1.4f, true);
                 
                 return ItemInteractionResult.sidedSuccess(true);
             }
         }
         
-        return super.useItemOn(stack, state, world, pos, player, hand, hit);
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
     
     @Override
@@ -141,13 +139,13 @@ public class SmallFluidTank extends Block implements EntityBlock {
     }
     
     @Override
-    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
-        return getStackWithData(world, pos);
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+        return getStackWithData(level, pos);
     }
     
     @NotNull
-    private static ItemStack getStackWithData(LevelReader world, BlockPos pos) {
-        var tankEntity = (SmallTankEntity) world.getBlockEntity(pos);
+    private static ItemStack getStackWithData(LevelReader level, BlockPos pos) {
+        var tankEntity = (SmallTankEntity) level.getBlockEntity(pos);
         var stack = getBasePickStack(tankEntity.isCreative);
         
         if (tankEntity.fluidStorage.getAmount() > 0) {
@@ -164,11 +162,11 @@ public class SmallFluidTank extends Block implements EntityBlock {
     }
     
     @Override
-    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        super.setPlacedBy(world, pos, state, placer, itemStack);
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.setPlacedBy(level, pos, state, placer, itemStack);
         
         if (itemStack.has(FluidApi.ITEM.getFluidComponent())) {
-            var tankEntity = (SmallTankEntity) world.getBlockEntity(pos);
+            var tankEntity = (SmallTankEntity) level.getBlockEntity(pos);
             tankEntity.fluidStorage.setStack(itemStack.get(FluidApi.ITEM.getFluidComponent()).copy());
             tankEntity.setChanged();
         }
@@ -177,7 +175,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

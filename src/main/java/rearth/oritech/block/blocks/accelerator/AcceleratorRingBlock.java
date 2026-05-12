@@ -48,7 +48,7 @@ public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
     }
     
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return Block.box(2, 0, 2, 14, 12, 14);
     }
     
@@ -59,12 +59,12 @@ public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
     }
     
     @Override
-    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
         
-        if (world.isClientSide()) return;
+        if (level.isClientSide()) return;
         
-        var isPowered = world.hasNeighborSignal(pos);
+        var isPowered = level.hasNeighborSignal(pos);
         var lastRedstone = state.getValue(REDSTONE_STATE);
         var lastBent = state.getValue(BENT);
         
@@ -74,21 +74,21 @@ public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
         // on new redstone signal (redstone stored is not bent)
         if (isPowered && (lastRedstone == 0 || lastRedstone == 3)) {
             // store bent state and set straight
-            world.setBlock(pos, state.setValue(REDSTONE_STATE, lastBent).setValue(BENT, 0), Block.UPDATE_CLIENTS, 1);
+            level.setBlock(pos, state.setValue(REDSTONE_STATE, lastBent).setValue(BENT, 0), Block.UPDATE_CLIENTS, 1);
             AcceleratorParticleLogic.resetCachedGate(pos);
         } else if (!isPowered && lastRedstone != 3 && lastRedstone != 0) {   // on redstone disabled
             // set bent to lastbent, set redstone to straight
-            world.setBlock(pos, state.setValue(REDSTONE_STATE, 0).setValue(BENT, lastRedstone), Block.UPDATE_CLIENTS, 1);
+            level.setBlock(pos, state.setValue(REDSTONE_STATE, 0).setValue(BENT, lastRedstone), Block.UPDATE_CLIENTS, 1);
             AcceleratorParticleLogic.resetCachedGate(pos);
         }
         
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
         var newBent = (state.getValue(BENT) + 1) % 3;
-        world.setBlockAndUpdate(pos, state.setValue(BENT, newBent).setValue(REDSTONE_STATE, 3));
+        level.setBlockAndUpdate(pos, state.setValue(BENT, newBent).setValue(REDSTONE_STATE, 3));
         AcceleratorParticleLogic.resetCachedGate(pos);
         
         return InteractionResult.SUCCESS;

@@ -1,7 +1,5 @@
-package rearth.oritech.init.world;
+package rearth.oritech.init.level;
 
-import dev.architectury.registry.level.biome.BiomeModifications;
-import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BiomeTags;

@@ -36,7 +36,7 @@ public class WeedKiller extends Item {
         return InteractionResult.SUCCESS;
     }
     
-    private void doWeedKilling(Level world, BlockPos startPos) {
+    private void doWeedKilling(Level level, BlockPos startPos) {
         
         var maxRange = 20;
         var spreadRange = 3;
@@ -56,11 +56,11 @@ public class WeedKiller extends Item {
                         if (visited.contains(target)) continue;
                         var distance = target.distManhattan(startPos);
                         
-                        if (isWeedBlock(target, world) && distance < maxRange) {
+                        if (isWeedBlock(target, level) && distance < maxRange) {
                             open.add(target);
-                            world.setBlockAndUpdate(target, Blocks.AIR.defaultBlockState());
+                            level.setBlockAndUpdate(target, Blocks.AIR.defaultBlockState());
                             
-                            ParticleContent.WeedKiller(world, candidate.getCenter(), target.getCenter());
+                            ParticleContent.WeedKiller(level, candidate.getCenter(), target.getCenter());
                             
                             try {
                                 Thread.sleep(50);
@@ -86,8 +86,8 @@ public class WeedKiller extends Item {
         tooltip.add(Component.translatable("tooltip.oritech.weed_killer").withStyle(ChatFormatting.GRAY));
     }
     
-    private boolean isWeedBlock(BlockPos pos, Level world) {
-        var state = world.getBlockState(pos);
+    private boolean isWeedBlock(BlockPos pos, Level level) {
+        var state = level.getBlockState(pos);
         if (state.isAir() || state.getFluidState().isSource()) return false;
         return state.canBeReplaced() || state.is(BlockTags.FLOWERS);
     }

@@ -29,7 +29,7 @@ public class FluidPipeBlock extends GenericPipeBlock {
     
     @Override
     public TriFunction<Level, BlockPos, Direction, Boolean> apiValidationFunction() {
-        return ((world, pos, direction) -> FluidApi.BLOCK.find(world, pos, direction) != null);
+        return ((level, pos, direction) -> FluidApi.BLOCK.find(level, pos, direction) != null);
     }
     
     @Override
@@ -49,10 +49,10 @@ public class FluidPipeBlock extends GenericPipeBlock {
     
     // to connect when a neighboring block emits a block update (e.g. the centrifuge getting a fluid addon)
     @Override
-    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
 
-        world.setBlock(pos, updateShape(state, Direction.getNearest(Vec3.atLowerCornerOf(sourcePos.subtract(pos))), world.getBlockState(sourcePos), world, pos, sourcePos), Block.UPDATE_CLIENTS, 0);
+        level.setBlock(pos, updateShape(state, Direction.getNearest(Vec3.atLowerCornerOf(sourcePos.subtract(pos))), level.getBlockState(sourcePos), level, pos, sourcePos), Block.UPDATE_CLIENTS, 0);
     }
     
     @Override
@@ -61,8 +61,8 @@ public class FluidPipeBlock extends GenericPipeBlock {
     }
     
     @Override
-    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level world) {
-        return FLUID_PIPE_DATA.computeIfAbsent(world.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level) {
+        return FLUID_PIPE_DATA.computeIfAbsent(level.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 
 	public static class FramedFluidPipeBlock extends FluidPipeBlock {
@@ -72,13 +72,13 @@ public class FluidPipeBlock extends GenericPipeBlock {
 		}
 
 		@Override
-		public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+		public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 			return Shapes.block();
 		}
 
 		@Override
-		public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-			return state.getShape(world, pos);
+		public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+			return state.getShape(level, pos);
 		}
 
 		@Override

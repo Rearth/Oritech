@@ -176,7 +176,7 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (!isActive(state) || !state.getValue(FrameInteractionBlock.HAS_FRAME) || getAreaMin() == null)
             return;
         
@@ -212,7 +212,7 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
         
         doProgress(moving);
         currentProgress++;
-        lastWorkedAt = world.getGameTime();
+        lastWorkedAt = level.getGameTime();
     }
     
     @Override

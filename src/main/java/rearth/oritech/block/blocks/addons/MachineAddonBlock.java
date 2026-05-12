@@ -97,14 +97,14 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
     }
     
     @Override
-    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        super.setPlacedBy(world, pos, state, placer, itemStack);
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.setPlacedBy(level, pos, state, placer, itemStack);
         
         // search for addon extender or machine at neighbor
         // if addon extender, check if its connected to a machine, if so then init it
         // if machine then init it
         
-        if (world.isClientSide()) return;
+        if (level.isClientSide()) return;
         
         var directions = new ArrayList<>(List.of(Direction.values()));
         
@@ -117,7 +117,7 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
         
         for (var direction : directions) {
             var checkPos = pos.offset(direction.getNormal());
-            var checkEntity = world.getBlockEntity(checkPos);
+            var checkEntity = level.getBlockEntity(checkPos);
             if (checkEntity instanceof MachineAddonController machineEntity) {
                 AddonBlockEntity.pendingInits.add(machineEntity);
                 break;
@@ -134,7 +134,7 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
                 var addonConnected = addonState.getValue(ADDON_USED);
                 if (!addonConnected) continue;
                 var controllerPos = addonEntity.getControllerPos();
-                if (world.getBlockEntity(controllerPos) instanceof MachineAddonController controllerEntity) {
+                if (level.getBlockEntity(controllerPos) instanceof MachineAddonController controllerEntity) {
                     AddonBlockEntity.pendingInits.add(controllerEntity);
                     break;
                 }
@@ -173,17 +173,17 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
     }
     
     @Override
-    public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         if (addonSettings.needsSupport)
-            return super.canSurvive(state, world, pos);
+            return super.canSurvive(state, level, pos);
         return true;
     }
     
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         
         if (addonSettings.needsSupport) {
-            return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
+            return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
         } else {
             return state;
         }
@@ -200,16 +200,16 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
     }
     
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (!OritechStartupConfig.tightMachineAddonHitboxes.get() || !addonSettings.needsSupport() || addonSettings.boundingShape() == null)
-            return super.getShape(state, world, pos, context);
+            return super.getShape(state, level, pos, context);
         
         return addonSettings.boundingShape()[state.getValue(FACING).ordinal()][state.getValue(FACE).ordinal()];
     }
     
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        return getShape(state, world, pos, context);
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return getShape(state, level, pos, context);
     }
     
     @Nullable
@@ -230,20 +230,20 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide() && state.getValue(ADDON_USED)) {
+        if (!level.isClientSide() && state.getValue(ADDON_USED)) {
             
-            var ownEntity = (AddonBlockEntity) world.getBlockEntity(pos);
+            var ownEntity = (AddonBlockEntity) level.getBlockEntity(pos);
             
-            var controllerEntity = world.getBlockEntity(Objects.requireNonNull(ownEntity).getControllerPos());
+            var controllerEntity = level.getBlockEntity(Objects.requireNonNull(ownEntity).getControllerPos());
             
             if (controllerEntity instanceof MachineAddonController machineEntity) {
                 machineEntity.initAddons(pos);
             }
         }
         
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     public AddonSettings getAddonSettings() {

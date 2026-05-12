@@ -55,15 +55,15 @@ public class SteamEngineBlock extends MultiblockMachine {
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
+        if (!level.isClientSide()) {
             
-            var entity = world.getBlockEntity(pos, BlockEntitiesContent.STEAM_ENGINE_ENTITY);
+            var entity = level.getBlockEntity(pos, BlockEntitiesContent.STEAM_ENGINE_ENTITY);
             if (entity.isPresent() && entity.get().inSlaveMode()) {
                 // working in slave mode. Don't open UI, just highlight controller
                 player.sendSystemMessage(Component.translatable("message.oritech.steamengine.controller_link"));
-                ParticleContent.HighlightBlock(world, Vec3.atLowerCornerOf(entity.get().master.getBlockPos()));
+                ParticleContent.HighlightBlock(level, Vec3.atLowerCornerOf(entity.get().master.getBlockPos()));
                 return InteractionResult.SUCCESS;
             }
             
@@ -71,6 +71,6 @@ public class SteamEngineBlock extends MultiblockMachine {
             
         }
         
-        return super.useWithoutItem(state, world, pos, player, hit);
+        return super.useWithoutItem(state, level, pos, player, hit);
     }
 }

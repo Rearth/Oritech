@@ -39,8 +39,8 @@ import rearth.oritech.util.MultiblockMachineController;
 import java.util.ArrayList;
 
 public class BlockOutlineRenderer {
-    public static void render(ClientLevel world, Camera camera, PoseStack matrixStack, MultiBufferSource consumer) {
-        if (world == null) return;
+    public static void render(ClientLevel level, Camera camera, PoseStack matrixStack, MultiBufferSource consumer) {
+        if (level == null) return;
         
         var client = Minecraft.getInstance();
         var player = client.player;
@@ -51,14 +51,14 @@ public class BlockOutlineRenderer {
         var blockPos = ((BlockHitResult) client.hitResult).getBlockPos();
         
         if (OritechClientConfig.showMachinePreview.get()) {
-            renderBlockPlacementPreviewOutline(world, camera, matrixStack, consumer, itemStack, player, blockPos);
-            renderParticlePlacementHelper(world, camera, matrixStack, consumer, itemStack, player, blockPos);
+            renderBlockPlacementPreviewOutline(level, camera, matrixStack, consumer, itemStack, player, blockPos);
+            renderParticlePlacementHelper(level, camera, matrixStack, consumer, itemStack, player, blockPos);
         }
         
-        renderPromethiumPickaxeOutline(world, camera, matrixStack, consumer, itemStack, player, blockPos);
+        renderPromethiumPickaxeOutline(level, camera, matrixStack, consumer, itemStack, player, blockPos);
     }
     
-    private static void renderBlockPlacementPreviewOutline(ClientLevel world, Camera camera, PoseStack matrixStack, MultiBufferSource consumer, ItemStack itemStack, LocalPlayer player, BlockPos blockPos) {
+    private static void renderBlockPlacementPreviewOutline(ClientLevel level, Camera camera, PoseStack matrixStack, MultiBufferSource consumer, ItemStack itemStack, LocalPlayer player, BlockPos blockPos) {
         
         var hasBlockItem = itemStack.getItem() instanceof BlockItem || itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER);
         
@@ -77,7 +77,7 @@ public class BlockOutlineRenderer {
         if (!(entity instanceof MultiblockMachineController multiblockController)) return;
         
         if (itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER)) {
-            var blockState = world.getBlockState(machinePos);
+            var blockState = level.getBlockState(machinePos);
             var isValid = blockState.is(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW) || blockState.is(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM) || blockState.is(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH);
             if (!isValid) return;
         }
@@ -125,18 +125,18 @@ public class BlockOutlineRenderer {
         return Direction.NORTH;
     }
     
-    private static void renderPromethiumPickaxeOutline(ClientLevel world, Camera camera, PoseStack matrixStack, MultiBufferSource consumer, ItemStack itemStack, LocalPlayer player, BlockPos blockPos) {
+    private static void renderPromethiumPickaxeOutline(ClientLevel level, Camera camera, PoseStack matrixStack, MultiBufferSource consumer, ItemStack itemStack, LocalPlayer player, BlockPos blockPos) {
         if (!itemStack.is(ToolsContent.PROMETHIUM_PICKAXE)) return;
         
-        var offsetBlocks = PromethiumPickaxeItem.getOffsetBlocks(world, player, blockPos);
+        var offsetBlocks = PromethiumPickaxeItem.getOffsetBlocks(level, player, blockPos);
         
         matrixStack.pushPose();
         var cameraPos = camera.getPosition();
         matrixStack.translate(-cameraPos.x(), -cameraPos.y(), -cameraPos.z());
         
         for (var offsetPos : offsetBlocks) {
-            var offsetState = world.getBlockState(offsetPos);
-            var renderShape = offsetState.getShape(world, offsetPos);
+            var offsetState = level.getBlockState(offsetPos);
+            var renderShape = offsetState.getShape(level, offsetPos);
             
             matrixStack.pushPose();
             matrixStack.translate(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ());
@@ -147,7 +147,7 @@ public class BlockOutlineRenderer {
         matrixStack.popPose();
     }
     
-    private static void renderParticlePlacementHelper(ClientLevel world, Camera camera, PoseStack matrixStack, MultiBufferSource consumer, ItemStack itemStack, LocalPlayer player, BlockPos blockPos) {
+    private static void renderParticlePlacementHelper(ClientLevel level, Camera camera, PoseStack matrixStack, MultiBufferSource consumer, ItemStack itemStack, LocalPlayer player, BlockPos blockPos) {
         
         var isRing = itemStack.is(BlockContent.ACCELERATOR_RING.asItem());
         var isMotor = itemStack.is(BlockContent.ACCELERATOR_MOTOR.asItem());

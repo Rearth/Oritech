@@ -1,7 +1,5 @@
 package rearth.oritech.block.blocks.addons;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -25,10 +23,10 @@ public class InventoryProxyAddonBlock extends MachineAddonBlock {
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide && state.getValue(ADDON_USED)) {
-            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+        if (!level.isClientSide && state.getValue(ADDON_USED)) {
+            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
                 MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         

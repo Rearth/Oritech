@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.storage;
 
-import dev.architectury.hooks.fluid.FluidStackHooks;
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -71,7 +69,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         // fills/drains buckets
         
         // in creative, set tank fill level
@@ -89,7 +87,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
         if (fluidStorage.getAmount() > 0)
             outputToBelow();
         
-        updateComparators(world, pos, state);
+        updateComparators(level, pos, state);
     }
     
     private void outputToBelow() {
@@ -108,12 +106,12 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
         SimpleFluidStorage.transfer(ownTank, belowTank, ownTank.getCapacity(), false);
     }
     
-    private void updateComparators(Level world, BlockPos pos, BlockState state) {
+    private void updateComparators(Level level, BlockPos pos, BlockState state) {
         var previous = lastComparatorOutput;
         lastComparatorOutput = getComparatorOutput();
         
         if (previous != lastComparatorOutput) {
-            world.updateNeighbourForOutputSignal(pos, state.getBlock());
+            level.updateNeighbourForOutputSignal(pos, state.getBlock());
         }
     }
     

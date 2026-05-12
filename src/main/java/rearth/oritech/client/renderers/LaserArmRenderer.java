@@ -86,9 +86,9 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         
         var forward = targetPos.subtract(startPos).normalize();
         if (!laserEntity.isTargetingEnergyContainer() && !laserEntity.isTargetingBuddingAmethyst() && laserEntity.getLevel().random.nextFloat() > 0.7) {
-            var world = laserEntity.getLevel();
+            var level = laserEntity.getLevel();
             var p = targetPos.add(0.5, 0, 0.5).subtract(forward.scale(0.6));
-            world.addParticle(ParticleTypes.SMALL_FLAME, p.x + (world.random.nextDouble() - 0.5) * 0.8, p.y + (world.random.nextDouble() - 0.5) * 0.6, p.z + (world.random.nextDouble() - 0.5) * 0.8, 0, 0, 0);
+            level.addParticle(ParticleTypes.SMALL_FLAME, p.x + (level.random.nextDouble() - 0.5) * 0.8, p.y + (level.random.nextDouble() - 0.5) * 0.6, p.z + (level.random.nextDouble() - 0.5) * 0.8, 0, 0, 0);
         }
         
         
@@ -126,9 +126,9 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         matrices.popPose();
     }
     
-    public static Vec3 idToOffset(BlockPos source, float range, Level world, BlockPos targetPos) {
+    public static Vec3 idToOffset(BlockPos source, float range, Level level, BlockPos targetPos) {
         
-        var drillFacing = world.getBlockState(targetPos).getValue(BlockStateProperties.HORIZONTAL_FACING);
+        var drillFacing = level.getBlockState(targetPos).getValue(BlockStateProperties.HORIZONTAL_FACING);
         var drillCenter = Geometry.rotatePosition(new Vec3(1, 1.4, 0), drillFacing);
         
         var random = RandomSource.create(source.asLong());

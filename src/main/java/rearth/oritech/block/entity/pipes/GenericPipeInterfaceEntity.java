@@ -73,7 +73,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
 		}
 	}
 
-    public static void addNode(Level world, BlockPos pos, boolean isInterface, BlockState newState, PipeNetworkData data) {
+    public static void addNode(Level level, BlockPos pos, boolean isInterface, BlockState newState, PipeNetworkData data) {
         Oritech.LOGGER.debug("registering/updating node: " + pos);
 
         data.pipes.add(pos);
@@ -82,8 +82,8 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         for (var neighbor : Direction.values()) {
             var neighborPos = pos.relative(neighbor);
             var neighborMap = data.machinePipeNeighbors.getOrDefault(neighborPos, new HashSet<>());
-            if (block.hasMachineInDirection(neighbor, world, pos, block.apiValidationFunction())) {
-                if (block.isConnectingInDirection(newState, neighbor, pos, world, false))
+            if (block.hasMachineInDirection(neighbor, level, pos, block.apiValidationFunction())) {
+                if (block.isConnectingInDirection(newState, neighbor, pos, level, false))
                     connectedMachines.add(pos.relative(neighbor));
 
                 neighborMap.add(neighbor.getOpposite());
@@ -101,10 +101,10 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
             data.machineInterfaces.remove(pos);
         }
 
-        updateFromNode(world, pos, data);
+        updateFromNode(level, pos, data);
     }
 
-    public static void removeNode(Level world, BlockPos pos, boolean wasInterface, BlockState oldState, PipeNetworkData data) {
+    public static void removeNode(Level level, BlockPos pos, boolean wasInterface, BlockState oldState, PipeNetworkData data) {
         Oritech.LOGGER.debug("removing node: " + pos + " | " + wasInterface);
 
         var oldNetwork = data.pipeNetworkLinks.getOrDefault(pos, -1);
@@ -126,16 +126,16 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                     continue;
                 }
 
-                updateFromNode(world, pos.relative(direction), data);
+                updateFromNode(level, pos.relative(direction), data);
             }
         }
 
         data.setDirty();
     }
 
-    private static void updateFromNode(Level world, BlockPos pos, PipeNetworkData data) {
+    private static void updateFromNode(Level level, BlockPos pos, PipeNetworkData data) {
 
-        var searchInstance = new FloodFillSearch(pos, data.pipes, world);
+        var searchInstance = new FloodFillSearch(pos, data.pipes, level);
         var foundNetwork = new HashSet<>(searchInstance.complete());
         var foundMachines = findConnectedMachines(foundNetwork, data);
 
@@ -213,11 +213,11 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         final HashSet<BlockPos> nextTargets = new HashSet<>();
         final Deque<BlockPos> foundTargets = new ArrayDeque<>();
         final HashSet<BlockPos> pipes;
-        final Level world;
+        final Level level;
 
-        public FloodFillSearch(BlockPos startPosition, HashSet<BlockPos> pipes, Level world) {
+        public FloodFillSearch(BlockPos startPosition, HashSet<BlockPos> pipes, Level level) {
             this.pipes = pipes;
-            this.world = world;
+            this.level = level;
             nextTargets.add(startPosition);
         }
 
@@ -260,7 +260,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         }
 
         private void addNeighborsToQueue(BlockPos self) {
-            var targetState = world.getBlockState(self);
+            var targetState = level.getBlockState(self);
 
             if (!(targetState.getBlock() instanceof AbstractPipeBlock targetBlock)) return;
             for (var direction : Direction.values()) {
@@ -272,7 +272,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
                 }
 
                 // check if the target can connect to the neighbor
-                if (!targetBlock.isConnectingInDirection(targetState, direction, self, world, false)) continue;
+                if (!targetBlock.isConnectingInDirection(targetState, direction, self, level, false)) continue;
 
                 nextTargets.add(neighbor);
             }

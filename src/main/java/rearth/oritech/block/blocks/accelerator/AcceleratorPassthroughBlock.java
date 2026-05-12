@@ -36,27 +36,27 @@ public class AcceleratorPassthroughBlock extends HorizontalDirectionalBlock {
     }
     
     @Override
-    protected void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
-        super.onRemove(state, world, pos, newState, moved);
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
+        super.onRemove(state, level, pos, newState, moved);
         AcceleratorParticleLogic.resetCachedGate(pos);
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         AcceleratorParticleLogic.resetCachedGate(pos);
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override
-    protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
-        if (!world.isClientSide()) {
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean notify) {
+        if (!level.isClientSide()) {
             AcceleratorParticleLogic.resetNearbyCache(pos);
         }
     }
     
     @Override
-    public void wasExploded(Level world, BlockPos pos, Explosion explosion) {
-        super.wasExploded(world, pos, explosion);
+    public void wasExploded(Level level, BlockPos pos, Explosion explosion) {
+        super.wasExploded(level, pos, explosion);
         AcceleratorParticleLogic.resetCachedGate(pos);
     }
     

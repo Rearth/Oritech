@@ -35,7 +35,7 @@ public class EnergyPipeDuctBlock extends GenericPipeDuctBlock {
 	}
 
 	@Override
-	public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level world) {
-		return ENERGY_PIPE_DATA.computeIfAbsent(world.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+	public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level) {
+		return ENERGY_PIPE_DATA.computeIfAbsent(level.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
 	}
 }

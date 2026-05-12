@@ -49,11 +49,11 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     }
     
     @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        super.inventoryTick(stack, world, entity, slot, selected);
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        super.inventoryTick(stack, level, entity, slot, selected);
         
-        if (world.isClientSide && Minecraft.getInstance().player.isFallFlying()) {
-            tickJetpack(stack, entity, world);
+        if (level.isClientSide && Minecraft.getInstance().player.isFallFlying()) {
+            tickJetpack(stack, entity, level);
         }
     }
     

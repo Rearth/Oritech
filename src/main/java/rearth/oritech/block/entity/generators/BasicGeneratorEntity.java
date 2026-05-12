@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.generators;
 
-import dev.architectury.registry.fuel.FuelRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -57,7 +56,7 @@ public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
     }
     
     @Override
-    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level world) {
+    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level level) {
         
         var res = new HashSet<Tuple<BlockPos, Direction>>();
         res.add(new Tuple<>(pos.above(), Direction.DOWN));

@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.interaction;
 
 import com.mojang.authlib.GameProfile;
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -154,47 +153,47 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (!isActive(state))
             return;
         
         if (!redstonePowered && energyStorage.getAmount() >= energyRequiredToFire()) {
             if (hunterAddons > 0) {
-                fireAtLivingEntities(world, pos, state, this);
+                fireAtLivingEntities(level, pos, state, this);
             } else if (currentTarget != null && !currentTarget.equals(BlockPos.ZERO)) {
-                fireAtBlocks(world, pos, state, this);
-            } else if (targetDirection != null && !targetDirection.equals(BlockPos.ZERO) && (world.getGameTime() + pos.getZ()) % 40 == 0) {
+                fireAtBlocks(level, pos, state, this);
+            } else if (targetDirection != null && !targetDirection.equals(BlockPos.ZERO) && (level.getGameTime() + pos.getZ()) % 40 == 0) {
                 // target pos is set, but no target is found (e.g. all blocks already mined). Periodically scan again for new blocks.
                 findNextBlockBreakTarget();
             }
         }
     }
     
-    private void fireAtBlocks(Level world, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
+    private void fireAtBlocks(Level level, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
         var targetBlockPos = currentTarget;
-        var targetBlockState = world.getBlockState(targetBlockPos);
+        var targetBlockState = level.getBlockState(targetBlockPos);
         var targetBlock = targetBlockState.getBlock();
-        var targetBlockEntity = world.getBlockEntity(targetBlockPos);
+        var targetBlockEntity = level.getBlockEntity(targetBlockPos);
         
         LaserArmBlockBehavior behavior = LaserArmBlock.getBehaviorForBlock(targetBlock);
         boolean fired = false;
-        if (behavior.fireAtBlock(world, this, targetBlock, targetBlockPos, targetBlockState, targetBlockEntity)) {
+        if (behavior.fireAtBlock(level, this, targetBlock, targetBlockPos, targetBlockState, targetBlockEntity)) {
             energyStorage.amount -= energyRequiredToFire();
-            lastFiredAt = world.getGameTime();
+            lastFiredAt = level.getGameTime();
         } else {
             findNextBlockBreakTarget();
         }
     }
     
-    private void fireAtLivingEntities(Level world, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
+    private void fireAtLivingEntities(Level level, BlockPos pos, BlockState state, LaserArmBlockEntity blockEntity) {
         // check that there is a target, that is still alive and still in range
         if (currentLivingTarget != null && validTarget(currentLivingTarget)) {
             
             var behavior = LaserArmBlock.getBehaviorForEntity(currentLivingTarget.getType());
-            if (behavior.fireAtEntity(world, this, currentLivingTarget)) {
+            if (behavior.fireAtEntity(level, this, currentLivingTarget)) {
                 energyStorage.amount -= energyRequiredToFire();
                 this.targetDirection = currentLivingTarget.blockPosition();
-                lastFiredAt = world.getGameTime();
+                lastFiredAt = level.getGameTime();
             } else {
                 pendingLivingTargets.remove(currentLivingTarget);
                 currentLivingTarget = null;
@@ -263,10 +262,10 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         findNextBlockBreakTarget();
     }
     
-    public static RecipeHolder<OritechRecipe> tryGetRecipeOfBlock(BlockState destroyed, Level world) {
+    public static RecipeHolder<OritechRecipe> tryGetRecipeOfBlock(BlockState destroyed, Level level) {
         var inputItem = destroyed.getBlock().asItem();
         var inputInv = new SimpleCraftingInventory(new ItemStack(inputItem));
-        var candidate = world.getRecipeManager().getRecipeFor(RecipeContent.LASER, inputInv, world);
+        var candidate = level.getRecipeManager().getRecipeFor(RecipeContent.LASER, inputInv, level);
         return candidate.orElse(null);
     }
     
@@ -1042,11 +1041,11 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     
     public static LevelPacketCodec<RegistryFriendlyByteBuf, LivingEntity> LASER_TARGET_PACKET_CODEC = new LevelPacketCodec<>() {
         @Override
-        public LivingEntity decode(RegistryFriendlyByteBuf buf, @Nullable Level world) {
+        public LivingEntity decode(RegistryFriendlyByteBuf buf, @Nullable Level level) {
             
             var id = buf.readInt();
-            if (world != null && id >= 0) {
-                var candidate = world.getEntity(id);
+            if (level != null && id >= 0) {
+                var candidate = level.getEntity(id);
                 if (candidate instanceof LivingEntity livingEntity) {
                     return livingEntity;
                 }
@@ -1056,7 +1055,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         }
         
         @Override
-        public void encode(RegistryFriendlyByteBuf buf, LivingEntity value, @Nullable Level world) {
+        public void encode(RegistryFriendlyByteBuf buf, LivingEntity value, @Nullable Level level) {
             var id = value != null ? value.getId() : -1;
             buf.writeInt(id);
         }

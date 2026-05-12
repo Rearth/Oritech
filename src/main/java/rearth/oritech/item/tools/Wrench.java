@@ -64,11 +64,11 @@ public class Wrench extends Item {
     }
     
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player user, InteractionHand hand) {
         
         var stack = user.getItemInHand(hand);
         
-        if (world.isClientSide()) {
+        if (level.isClientSide()) {
             var hit = ClientCableFinder.findLookedAtCable(user, 6f);
             if (hit != null) {
                 ClientZiplineHandler.start(hit.selectedStart(), hit.selectedEnd(), hit.parallelStart(), hit.parallelEnd(), user.getSpeed() * 3);
@@ -91,15 +91,15 @@ public class Wrench extends Item {
         
         if (!(player instanceof ServerPlayer)) return false;
         
-        var world = player.level();
-        var result = getPlayerPOVHitResult(world, player, ClipContext.Fluid.NONE);
+        var level = player.level();
+        var result = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
         if (result.getType() != HitResult.Type.BLOCK) return false;
         
         var blockPos = result.getBlockPos();
-        var blockState = world.getBlockState(blockPos);
+        var blockState = level.getBlockState(blockPos);
         if (blockState.getBlock() instanceof Wrenchable wrenchable) {
             // Wrench used on a wrenchable block
-            var resultAction = wrenchable.onWrenchUse(blockState, world, blockPos, player, hand);
+            var resultAction = wrenchable.onWrenchUse(blockState, level, blockPos, player, hand);
             if (resultAction == InteractionResult.SUCCESS) {
                 onUsed(item, player, hand);
                 return true;
@@ -108,11 +108,11 @@ public class Wrench extends Item {
             // Wrench used on block
             var direction = result.getDirection();
             var neighborPos = blockPos.relative(direction);
-            var neighborState = world.getBlockState(neighborPos);
+            var neighborState = level.getBlockState(neighborPos);
             
             // If the neighbor block is wrenchable, call the onWrenchUseNeighbor method
             if (neighborState.getBlock() instanceof Wrenchable wrenchable) {
-                var resultAction = wrenchable.onWrenchUseNeighbor(neighborState, blockState, world, neighborPos, blockPos, direction, player, hand);
+                var resultAction = wrenchable.onWrenchUseNeighbor(neighborState, blockState, level, neighborPos, blockPos, direction, player, hand);
                 if (resultAction == InteractionResult.SUCCESS) {
                     onUsed(item, player, hand);
                     return true;
@@ -133,8 +133,8 @@ public class Wrench extends Item {
         playSound(player.level(), player);
     }
     
-    protected void playSound(Level world, Player player) {
-        world.playSound(null, player.blockPosition(), SoundContent.WRENCH_TURN, SoundSource.PLAYERS, 1.0f, 1.0f);
+    protected void playSound(Level level, Player player) {
+        level.playSound(null, player.blockPosition(), SoundContent.WRENCH_TURN, SoundSource.PLAYERS, 1.0f, 1.0f);
     }
     
     /**
@@ -145,19 +145,19 @@ public class Wrench extends Item {
          * Called when a wrench is used on the block
          *
          * @param state  the block state
-         * @param world  the world
+         * @param level  the level
          * @param pos    the block position
          * @param player the player using the wrench
          * @return the result of the wrench use
          */
-        InteractionResult onWrenchUse(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand);
+        InteractionResult onWrenchUse(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand);
         
         /**
          * Called when a wrench is used on a neighbor block
          *
          * @param state         The wrenchable block state
          * @param neighborState The neighbor block state
-         * @param world         The world
+         * @param level         The level
          * @param pos           The wrenchable block position
          * @param neighborPos   The neighbor block position
          * @param neighborFace  The face of the neighbor block that was clicked
@@ -165,6 +165,6 @@ public class Wrench extends Item {
          * @param hand          The hand the wrench is being used in
          * @return the result of the wrench use
          */
-        InteractionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, Level world, BlockPos pos, BlockPos neighborPos, Direction neighborFace, Player player, InteractionHand hand);
+        InteractionResult onWrenchUseNeighbor(BlockState state, BlockState neighborState, Level level, BlockPos pos, BlockPos neighborPos, Direction neighborFace, Player player, InteractionHand hand);
     }
 }

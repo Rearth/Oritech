@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.interaction;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -76,15 +75,15 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (energyStorage.amount >= LOG_COST) {
-            if (pendingBlocks.isEmpty() && world.getGameTime() % 20 == 0) {
+            if (pendingBlocks.isEmpty() && level.getGameTime() % 20 == 0) {
                 findTarget();
             }
             
             for (int i = 0; i < 6 && !pendingBlocks.isEmpty(); i++) {
                 var candidate = pendingBlocks.peekLast();
-                var candidateState = world.getBlockState(candidate);
+                var candidateState = level.getBlockState(candidate);
                 var isLog = candidateState.is(TagContent.CUTTER_LOGS_MINEABLE);
 
                 var energyCost = isLog ? LOG_COST : LEAF_COST;
@@ -94,7 +93,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
                 if (actionResult == InteractionResult.FAIL) break;
                 pendingBlocks.pollLast();
                 if (actionResult == InteractionResult.PASS) continue;
-                lastWorkedAt = world.getGameTime();
+                lastWorkedAt = level.getGameTime();
 
                 energyStorage.amount -= energyCost;
                 setChanged();
@@ -103,8 +102,8 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
             }
         }
         
-        if (world.getGameTime() % 10 == 0) {
-            var idleTicks = world.getGameTime() - lastWorkedAt;
+        if (level.getGameTime() % 10 == 0) {
+            var idleTicks = level.getGameTime() - lastWorkedAt;
             var isWorking = idleTicks < 20;
             var animName = isWorking ? "work" : "idle";
             playWorkAnimation(animName);
@@ -114,7 +113,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
     private InteractionResult breakTreeBlock(BlockState candidateState, BlockPos candidate) {
         if (!candidateState.is(TagContent.CUTTER_LOGS_MINEABLE) && !candidateState.is(TagContent.CUTTER_LEAVES_MINEABLE)) return InteractionResult.PASS;
         
-        var dropped = net.minecraft.world.level.block.Block.getDrops(candidateState, (ServerLevel) level, candidate, null);
+        var dropped = net.minecraft.level.level.block.Block.getDrops(candidateState, (ServerLevel) level, candidate, null);
         if (dropped.stream().anyMatch((itemStack) -> !(itemStack.isEmpty() || canInsert(itemStack)))) return InteractionResult.FAIL;
 
         level.addDestroyBlockEffect(candidate, candidateState);
@@ -144,9 +143,9 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
         
     }
     
-    public static Deque<BlockPos> getTreeBlocks(BlockPos startPos, Level world) {
+    public static Deque<BlockPos> getTreeBlocks(BlockPos startPos, Level level) {
         
-        var startState = world.getBlockState(startPos);
+        var startState = level.getBlockState(startPos);
         if (!startState.is(TagContent.CUTTER_LOGS_MINEABLE)) return new ArrayDeque<>();
         
         var checkedPositions = new HashSet<BlockPos>();
@@ -166,7 +165,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
             
             if (checkedPositions.contains(candidate)) continue;
             
-            var candidateState = world.getBlockState(candidate);
+            var candidateState = level.getBlockState(candidate);
             checkedPositions.add(candidate);
             
             var isLog = candidateState.is(TagContent.CUTTER_LOGS_MINEABLE);

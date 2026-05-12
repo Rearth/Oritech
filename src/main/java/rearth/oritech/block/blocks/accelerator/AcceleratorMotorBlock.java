@@ -26,7 +26,7 @@ public class AcceleratorMotorBlock extends AcceleratorPassthroughBlock implement
     }
     
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return box(0, 0, 0, 16, 11, 16);
     }
     

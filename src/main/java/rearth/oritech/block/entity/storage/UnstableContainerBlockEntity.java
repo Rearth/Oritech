@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.storage;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -95,14 +94,14 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         age++;
         if (age > 10 && !state.getValue(UnstableContainerBlock.SETUP_DONE)) {
-            world.setBlockAndUpdate(pos, state.setValue(UnstableContainerBlock.SETUP_DONE, true));
+            level.setBlockAndUpdate(pos, state.setValue(UnstableContainerBlock.SETUP_DONE, true));
         }
         
-        energyStorage.tick((int) world.getGameTime());
+        energyStorage.tick((int) level.getGameTime());
         
         adjustEnergyStorageSize();
         

@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.interaction;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -94,20 +93,20 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         outputEnergy();
         
-        energyStorage.tick(world.getGameTime());
+        energyStorage.tick(level.getGameTime());
         
-        if (world.random.nextFloat() > 0.95f) {
+        if (level.random.nextFloat() > 0.95f) {
             
-            var stats = this.energyStorage.getCurrentStatistics(world.getGameTime());
+            var stats = this.energyStorage.getCurrentStatistics(level.getGameTime());
             var moved = stats.insertedLastTickTotal() + stats.extractedLastTickTotal();
             
-            if (moved > 10 && world instanceof ServerLevel serverLevel) {
-                var at = worldPosition.getCenter().add(world.random.nextFloat() * 0.4, world.random.nextFloat() * 0.4, world.random.nextFloat() * 0.4);
-                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 2, world.random.nextFloat(), world.random.nextFloat(), world.random.nextFloat(), 0.15f);
+            if (moved > 10 && level instanceof ServerLevel serverLevel) {
+                var at = worldPosition.getCenter().add(level.random.nextFloat() * 0.4, level.random.nextFloat() * 0.4, level.random.nextFloat() * 0.4);
+                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 2, level.random.nextFloat(), level.random.nextFloat(), level.random.nextFloat(), 0.15f);
             }
         }
         

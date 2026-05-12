@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.arcane;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -89,9 +88,9 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, EnchantmentCatalystBlockEntity blockEntity) {
+    public void tick(Level level, BlockPos pos, BlockState state, EnchantmentCatalystBlockEntity blockEntity) {
         
-        if (world.isClientSide()) return;
+        if (level.isClientSide()) return;
         
         // check if powered, and adjust soul capacity
         if (energyStorage.getAmount() > 0) {
@@ -108,7 +107,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         if (collectedSouls > maxSouls) {
             unstableTicks++;
             
-            if (world instanceof ServerLevel sl) { var c = pos.getCenter(); sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, unstableTicks / 4, 1, 1, 1, 0); }
+            if (level instanceof ServerLevel sl) { var c = pos.getCenter(); sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, unstableTicks / 4, 1, 1, 1, 0); }
             
             if (unstableTicks > 60)
                 doExplosion();
@@ -124,11 +123,11 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             networkDirty = true;
             progress++;
             
-            if (world instanceof ServerLevel sl) { var c = pos.getCenter().add(0, 0.3, 0); sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, c.x, c.y, c.z, isHyperEnchanting ? 15 : 3, 1.2, 1.2, 1.2, 0); }
+            if (level instanceof ServerLevel sl) { var c = pos.getCenter().add(0, 0.3, 0); sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, c.x, c.y, c.z, isHyperEnchanting ? 15 : 3, 1.2, 1.2, 1.2, 0); }
             
             if (progress >= maxProgress) {
                 enchantInput();
-                if (world instanceof ServerLevel sl) { var c = pos.getCenter(); sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, maxProgress + 10, 0.6, 0.6, 0.6, 0); }
+                if (level instanceof ServerLevel sl) { var c = pos.getCenter(); sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, maxProgress + 10, 0.6, 0.6, 0.6, 0); }
                 
                 progress = 0;
                 isHyperEnchanting = false;
@@ -146,13 +145,13 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             var level = calculateComparatorLevel();
             if (level != lastComparatorOutput) {
                 lastComparatorOutput = level;
-                world.updateNeighbourForOutputSignal(pos, state.getBlock());
+                level.updateNeighbourForOutputSignal(pos, state.getBlock());
             }
             
         }
         
         // periodically re-trigger animation updates
-        if (world.getGameTime() % 60 == 0) {
+        if (level.getGameTime() % 60 == 0) {
             lastAnimation = "invalid";
             updateAnimation();
         }
@@ -422,8 +421,8 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     public static void receiveUpdatePacket(CatalystSyncPacket packet, IPayloadContext context) {
-        var world = context.player().level();
-        if (world.getBlockEntity(packet.position) instanceof EnchantmentCatalystBlockEntity catalystBlock) {
+        var level = context.player().level();
+        if (level.getBlockEntity(packet.position) instanceof EnchantmentCatalystBlockEntity catalystBlock) {
             catalystBlock.isHyperEnchanting = packet.isHyperEnchanting();
             catalystBlock.progress = packet.progress();
             catalystBlock.collectedSouls = packet.storedSouls();

@@ -1,6 +1,5 @@
 package rearth.oritech.init.recipes;
 
-import dev.architectury.fluid.FluidStack;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 import org.jetbrains.annotations.NotNull;

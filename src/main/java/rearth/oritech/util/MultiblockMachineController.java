@@ -104,7 +104,7 @@ public interface MultiblockMachineController {
     
     default BlockPos getNextMissingCore() {
         
-        var world = getWorldForMultiblock();
+        var level = getWorldForMultiblock();
         var pos = getPosForMultiblock();
         
         var ownFacing = getFacingForMultiblock();
@@ -113,7 +113,7 @@ public interface MultiblockMachineController {
         for (var targetMachinePosition : targetMachinePositions) {
             var rotatedPos = Geometry.rotatePosition(targetMachinePosition, ownFacing);
             var checkPos = pos.offset(rotatedPos);
-            var checkState = Objects.requireNonNull(world).getBlockState(checkPos);
+            var checkState = Objects.requireNonNull(level).getBlockState(checkPos);
             
             if (checkState.is(Blocks.AIR) || checkState.is(TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("minecraft", "replaceable")))) {
                 return checkPos;
@@ -134,7 +134,7 @@ public interface MultiblockMachineController {
         // update all multiblocks state to USED=true, write controller position to block state
         
         if (state.getValue(MultiblockMachine.ASSEMBLED)) return true;
-        var world = getWorldForMultiblock();
+        var level = getWorldForMultiblock();
         var pos = getPosForMultiblock();
         var coreBlocksConnected = getConnectedCores();
         
@@ -148,14 +148,14 @@ public interface MultiblockMachineController {
         for (var targetMachinePosition : targetMachinePositions) {
             var rotatedPos = Geometry.rotatePosition(targetMachinePosition, ownFacing);
             var checkPos = pos.offset(rotatedPos);
-            var checkState = Objects.requireNonNull(world).getBlockState(checkPos);
+            var checkState = Objects.requireNonNull(level).getBlockState(checkPos);
             
             var blockType = checkState.getBlock();
             if (blockType instanceof MachineCoreBlock coreBlock && !checkState.getValue(MachineCoreBlock.USED)) {
                 coreBlocks.add(new MultiBlockElement(checkState, coreBlock, checkPos));
                 sumCoreQuality += coreBlock.getCoreQuality();
             } else {
-                highlightBlock(checkPos, world);
+                highlightBlock(checkPos, level);
             }
         }
         
@@ -163,16 +163,16 @@ public interface MultiblockMachineController {
             // valid
             for (var core : coreBlocks) {
                 var newState = core.state.setValue(MachineCoreBlock.USED, true);
-                var coreEntity = (MachineCoreEntity) world.getBlockEntity(core.pos());
+                var coreEntity = (MachineCoreEntity) level.getBlockEntity(core.pos());
                 coreEntity.setControllerPos(pos);
-                world.setBlockAndUpdate(core.pos, newState);
+                level.setBlockAndUpdate(core.pos, newState);
                 coreBlocksConnected.add(core.pos);
             }
             
             var quality = sumCoreQuality / coreBlocks.size();
             setCoreQuality(quality);
             
-            Objects.requireNonNull(world).setBlockAndUpdate(pos, state.setValue(MultiblockMachine.ASSEMBLED, true));
+            Objects.requireNonNull(level).setBlockAndUpdate(pos, state.setValue(MultiblockMachine.ASSEMBLED, true));
             return true;
         } else {
             // invalid
@@ -182,18 +182,18 @@ public interface MultiblockMachineController {
     
     default void onCoreBroken(BlockPos corePos) {
         
-        var world = getWorldForMultiblock();
+        var level = getWorldForMultiblock();
         var pos = getPosForMultiblock();
         var coreBlocksConnected = getConnectedCores();
         
-        Objects.requireNonNull(world).setBlockAndUpdate(pos, world.getBlockState(pos).setValue(MultiblockMachine.ASSEMBLED, false));
+        Objects.requireNonNull(level).setBlockAndUpdate(pos, level.getBlockState(pos).setValue(MultiblockMachine.ASSEMBLED, false));
         
         for (var core : coreBlocksConnected) {
             if (core.equals(corePos)) continue;
             
-            var state = world.getBlockState(core);
+            var state = level.getBlockState(core);
             if (state.getBlock() instanceof MachineCoreBlock) {
-                world.setBlockAndUpdate(core, state.setValue(MachineCoreBlock.USED, false));
+                level.setBlockAndUpdate(core, state.setValue(MachineCoreBlock.USED, false));
             }
         }
         
@@ -202,21 +202,21 @@ public interface MultiblockMachineController {
     
     default void onControllerBroken() {
         
-        var world = getWorldForMultiblock();
+        var level = getWorldForMultiblock();
         var coreBlocksConnected = getConnectedCores();
         
         for (var core : coreBlocksConnected) {
-            var state = Objects.requireNonNull(world).getBlockState(core);
+            var state = Objects.requireNonNull(level).getBlockState(core);
             if (state.getBlock() instanceof MachineCoreBlock) {
-                world.setBlockAndUpdate(core, state.setValue(MachineCoreBlock.USED, false));
+                level.setBlockAndUpdate(core, state.setValue(MachineCoreBlock.USED, false));
             }
         }
         
         coreBlocksConnected.clear();
     }
     
-    private void highlightBlock(BlockPos block, Level world) {
-        ParticleContent.HighlightBlock(world, Vec3.atLowerCornerOf(block));
+    private void highlightBlock(BlockPos block, Level level) {
+        ParticleContent.HighlightBlock(level, Vec3.atLowerCornerOf(block));
     }
     
     // this should be called on the server

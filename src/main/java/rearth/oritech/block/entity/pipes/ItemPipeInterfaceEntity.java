@@ -47,26 +47,26 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     
     @SuppressWarnings("DataFlowIssue")
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
+    public void tick(Level level, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
         var block = (ExtractablePipeConnectionBlock) state.getBlock();
-        if (world.isClientSide || !block.isExtractable(state))
+        if (level.isClientSide || !block.isExtractable(state))
             return;
         
         // boosted pipe works every tick, otherwise only every N tick
-        if ((world.getGameTime() + this.worldPosition.asLong()) % TRANSFER_PERIOD != 0 && !isBoostAvailable())
+        if ((level.getGameTime() + this.worldPosition.asLong()) % TRANSFER_PERIOD != 0 && !isBoostAvailable())
             return;
         
         // find first itemstack from connected invs (that can be extracted)
         // try to move it to one of the destinations
         
-        var data = ItemPipeBlock.ITEM_PIPE_DATA.getOrDefault(world.dimension().location(), new PipeNetworkData());
+        var data = ItemPipeBlock.ITEM_PIPE_DATA.getOrDefault(level.dimension().location(), new PipeNetworkData());
         var targets = findNetworkTargets(pos, data);
         if (targets == null) {
             System.err.println("Yeah your pipe network likely is too long. At: " + this.getBlockPos());
             return;
         }
 
-        refreshTargetCaches(world, pos, targets);
+        refreshTargetCaches(level, pos, targets);
         
         var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
         var stackToMove = ItemStack.EMPTY;
@@ -78,7 +78,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
         for (var sourcePos : sources) {
             var blockedTimer = blockedUntil.getOrDefault(sourcePos, 0L);
-            if (world.getGameTime() < blockedTimer) continue;
+            if (level.getGameTime() < blockedTimer) continue;
             
             if (blockedTimer > 0)   // if timer has expired but was set
                 blockedUntil.remove(sourcePos);
@@ -86,7 +86,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             var offset = pos.subtract(sourcePos);
             var direction = Direction.fromDelta(offset.getX(), offset.getY(), offset.getZ());
             if (!block.isSideExtractable(state, direction.getOpposite())) continue;
-            var inventory = ItemApi.BLOCK.find(world, sourcePos, direction);
+            var inventory = ItemApi.BLOCK.find(level, sourcePos, direction);
             if (inventory == null || !inventory.supportsExtraction()) continue;
             
             for (int i = 0; i < inventory.getSlotCount(); i++) {
@@ -122,7 +122,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                     moved += inserted;
                     
                     if (inserted > 0) {
-                        onItemMoved(this.worldPosition, takenFrom, cachedTarget.pos(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.worldPosition, 0), new HashSet<>()), world, stackToMove.getItem(), inserted, wasEmptyStorage);
+                        onItemMoved(this.worldPosition, takenFrom, cachedTarget.pos(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.worldPosition, 0), new HashSet<>()), level, stackToMove.getItem(), inserted, wasEmptyStorage);
                     }
                     
                     if (remainingToMove <= 0) break;  // target has been found for all items
@@ -147,7 +147,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
     }
 
-    private void refreshTargetCaches(Level world, BlockPos pos, Set<Tuple<BlockPos, Direction>> targets) {
+    private void refreshTargetCaches(Level level, BlockPos pos, Set<Tuple<BlockPos, Direction>> targets) {
         var netHash = targets.hashCode();
         if (netHash == filteredTargetsNetHash && filteredTargetItemStorages != null) {
             return;
@@ -157,13 +157,13 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                                        .filter(target -> {
                                            var targetDir = target.getB();
                                            var pipePos = target.getA().offset(targetDir.getNormal());
-                                           var pipeState = world.getBlockState(pipePos);
+                                           var pipeState = level.getBlockState(pipePos);
                                            if (!(pipeState.getBlock() instanceof ItemPipeConnectionBlock itemBlock))
                                                return true;
                                            var extracting = itemBlock.isSideExtractable(pipeState, targetDir.getOpposite());
                                            return !extracting;
                                        })
-                                       .map(target -> new CachedTarget<>(target.getA(), target.getB(), ItemApi.BLOCK.createCache(world, target.getA(), target.getB())))
+                                       .map(target -> new CachedTarget<>(target.getA(), target.getB(), ItemApi.BLOCK.createCache(level, target.getA(), target.getB())))
                                        .sorted(Comparator.comparingInt(target -> target.pos().distManhattan(pos)))
                                        .toList();
 
@@ -171,9 +171,9 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         cachedTransferPaths.clear();
     }
     
-    private void onItemMoved(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, Level world, Item moved, int movedCount, boolean wasEmpty) {
+    private void onItemMoved(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, Level level, Item moved, int movedCount, boolean wasEmpty) {
         if (!renderItems) return;
-        var path = cachedTransferPaths.computeIfAbsent(to, ignored -> calculatePath(startPos, from, to, network, world));
+        var path = cachedTransferPaths.computeIfAbsent(to, ignored -> calculatePath(startPos, from, to, network, level));
         if (path == null) return;
         
         var codedPath = path.getA();
@@ -183,11 +183,11 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             var nextPathPos = codedPath.get(i + 1);
             pathLength += nextPathPos.distManhattan(pathPos);
         }
-        var packet = new RenderStackData(worldPosition, new ItemStack(moved, movedCount), codedPath, world.getGameTime(), pathLength);
+        var packet = new RenderStackData(worldPosition, new ItemStack(moved, movedCount), codedPath, level.getGameTime(), pathLength);
         NetworkManager.sendBlockHandle(this, packet);
         
         if (wasEmpty) {
-            var arrivalTime = world.getGameTime() + (int) calculatePathLength(path.getB());
+            var arrivalTime = level.getGameTime() + (int) calculatePathLength(path.getB());
             blockedUntil.putIfAbsent(to, arrivalTime);
         }
         
@@ -198,7 +198,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     }
     
     // return pair is optimized path and total path length
-    private static Tuple<ArrayList<BlockPos>, Integer> calculatePath(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, Level world) {
+    private static Tuple<ArrayList<BlockPos>, Integer> calculatePath(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, Level level) {
         
         if (network.isEmpty() || !network.contains(startPos)) {
             Oritech.LOGGER.warn("tried to calculate invalid item pipe from: {} to {} with network size: {}", startPos, to, network.size());
@@ -225,14 +225,14 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             
             visited.add(currentPos);
             
-            var currentPosState = world.getBlockState(currentPos);
+            var currentPosState = level.getBlockState(currentPos);
             if (!(currentPosState.getBlock() instanceof AbstractPipeBlock pipeBlock)) break;
             
             // collect potential edges in graph, ordered by basic cost heuristic (manhattan dist to target)
             var openEdges = getNeighbors(currentPos).stream()
                               .filter(network::contains)
                               .filter(candidate -> !visited.contains(candidate))
-                              .filter(candidate -> pipeBlock.isConnectingInDirection(currentPosState, getDirectionFromOffset(currentPos, candidate), currentPos, world, false))
+                              .filter(candidate -> pipeBlock.isConnectingInDirection(currentPosState, getDirectionFromOffset(currentPos, candidate), currentPos, level, false))
                               .sorted(Comparator.comparingInt(a -> a.distManhattan(to)))
                               .toArray(BlockPos[]::new);
             
@@ -301,12 +301,12 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     }
     
     public static void receiveVisualItemsPacket(RenderStackData message, IPayloadContext context) {
-        var world = context.player().level();
-        var blockEntity = world.getBlockEntity(message.self, BlockEntitiesContent.ITEM_PIPE_ENTITY);
+        var level = context.player().level();
+        var blockEntity = level.getBlockEntity(message.self, BlockEntitiesContent.ITEM_PIPE_ENTITY);
         if (blockEntity.isPresent()) {
             var pipeEntity = blockEntity.get();
             // use local time for moved item to avoid rendering issues caused by lag
-            pipeEntity.activeStacks.add(new RenderStackData(pipeEntity.worldPosition, message.rendered, message.path, world.getGameTime(), message.pathLength));
+            pipeEntity.activeStacks.add(new RenderStackData(pipeEntity.worldPosition, message.rendered, message.path, level.getGameTime(), message.pathLength));
         }
     }
     

@@ -49,8 +49,8 @@ public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEnti
     }
 
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         energyStorage.amount = (long) (Integer.MAX_VALUE * 0.9f);
-        super.serverTick(world, pos, state, blockEntity);
+        super.serverTick(level, pos, state, blockEntity);
     }
 }

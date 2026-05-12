@@ -21,15 +21,15 @@ import java.util.*;
 // move this into a second class to keep the entity class smaller and focus on recipe handling, work interaction, etc.
 public class AcceleratorParticleLogic {
     private final BlockPos pos;
-    private final ServerLevel world;
+    private final ServerLevel level;
     private final AcceleratorControllerBlockEntity entity;
     
     private static final Map<CompPair<BlockPos, Vec3i>, BlockPos> cachedGates = new HashMap<>();    // stores the next gate for a combo of source gate and direction
     private static final Map<BlockPos, BlockPos> activeParticles = new HashMap<>(); // stores relations between position of particle -> position of controller
     
-    public AcceleratorParticleLogic(BlockPos pos, ServerLevel world, AcceleratorControllerBlockEntity entity) {
+    public AcceleratorParticleLogic(BlockPos pos, ServerLevel level, AcceleratorControllerBlockEntity entity) {
         this.pos = pos;
-        this.world = world;
+        this.level = level;
         this.entity = entity;
     }
     
@@ -121,10 +121,10 @@ public class AcceleratorParticleLogic {
                 }
                 
                 // handle gate interaction (e.g. motor or sensor)
-                var gateBlock = world.getBlockState(reachedGate).getBlock();
+                var gateBlock = level.getBlockState(reachedGate).getBlock();
                 if (gateBlock.equals(BlockContent.ACCELERATOR_MOTOR)) {
                     entity.handleParticleMotorInteraction(reachedGate);
-                } else if (gateBlock.equals(BlockContent.ACCELERATOR_SENSOR) && world.getBlockEntity(reachedGate) instanceof AcceleratorSensorBlockEntity sensorEntity) {
+                } else if (gateBlock.equals(BlockContent.ACCELERATOR_SENSOR) && level.getBlockEntity(reachedGate) instanceof AcceleratorSensorBlockEntity sensorEntity) {
                     sensorEntity.measureParticle(particle);
                 }
                 
@@ -163,7 +163,7 @@ public class AcceleratorParticleLogic {
         if (alreadyChecked.contains(blockPos)) return;
         alreadyChecked.add(blockPos);
         
-        var targets = world.getEntitiesOfClass(LivingEntity.class, new AABB(blockPos), elem -> elem.isAlive() && elem.isAttackable() && !elem.isSpectator());
+        var targets = level.getEntitiesOfClass(LivingEntity.class, new AABB(blockPos), elem -> elem.isAlive() && elem.isAttackable() && !elem.isSpectator());
         var remainingMomentum = particle.velocity;
         for (var mob : targets) {
             var usedMomentum = entity.handleParticleEntityCollision(blockPos, particle, remainingMomentum, mob);
@@ -194,7 +194,7 @@ public class AcceleratorParticleLogic {
         for (int i = 1; i <= searchDist; i++) {
             var checkPos = searchStart.offset(searchDirection.multiply(i));
             
-            var targets = world.getEntitiesOfClass(LivingEntity.class, new AABB(checkPos), elem -> elem.isAlive() && elem.isAttackable() && !elem.isSpectator());
+            var targets = level.getEntitiesOfClass(LivingEntity.class, new AABB(checkPos), elem -> elem.isAlive() && elem.isAttackable() && !elem.isSpectator());
             
             for (var mob : targets) {
                 var usedMomentum = entity.handleParticleEntityCollision(checkPos, particle, remainingMomentum, mob);
@@ -203,7 +203,7 @@ public class AcceleratorParticleLogic {
                 if (remainingMomentum <= 0.1f) return;
             }
             
-            var block = world.getBlockState(checkPos);
+            var block = level.getBlockState(checkPos);
             var targetableBlock = !block.isAir() && !(block.getBlock() instanceof AcceleratorPassthroughBlock);
             if (targetableBlock) {
                 var usedMomentum = entity.handleParticleBlockCollision(checkPos, particle, remainingMomentum, block);
@@ -224,7 +224,7 @@ public class AcceleratorParticleLogic {
             // found collision
             var secondControllerPos = activeParticles.get(blockPos);
             
-            if (!(world.getBlockEntity(secondControllerPos) instanceof AcceleratorControllerBlockEntity secondAccelerator))
+            if (!(level.getBlockEntity(secondControllerPos) instanceof AcceleratorControllerBlockEntity secondAccelerator))
                 return Optional.empty();
             
             var secondParticle = secondAccelerator.getParticle();
@@ -249,7 +249,7 @@ public class AcceleratorParticleLogic {
         var incomingStraight = incomingPath.getX() == 0 || incomingPath.getZ() == 0;
         var incomingDir = new Vec3i(Math.clamp(incomingPath.getX(), -1, 1), 0, Math.clamp(incomingPath.getZ(), -1, 1));
         
-        var targetState = world.getBlockState(nextGate);
+        var targetState = level.getBlockState(nextGate);
         var targetBlock = targetState.getBlock();
         
         // go straight through motors and sensors
@@ -330,7 +330,7 @@ public class AcceleratorParticleLogic {
         
         for (int i = 1; i <= maxDist; i++) {
             var candidatePos = from.offset(direction.multiply(i));
-            var candidateState = world.getBlockState(candidatePos);
+            var candidateState = level.getBlockState(candidatePos);
             if (candidateState.isAir()) continue;
             
             if (candidateState.getBlock().equals(BlockContent.ACCELERATOR_MOTOR) || candidateState.getBlock().equals(BlockContent.ACCELERATOR_SENSOR))

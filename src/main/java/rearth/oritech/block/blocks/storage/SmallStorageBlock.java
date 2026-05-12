@@ -1,7 +1,5 @@
 package rearth.oritech.block.blocks.storage;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -79,8 +77,8 @@ public class SmallStorageBlock extends Block implements EntityBlock {
     }
     
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
-        return ((ComparatorOutputProvider) world.getBlockEntity(pos)).getComparatorOutput();
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        return ((ComparatorOutputProvider) level.getBlockEntity(pos)).getComparatorOutput();
     }
     
     @Override
@@ -89,31 +87,31 @@ public class SmallStorageBlock extends Block implements EntityBlock {
     }
     
     @Override
-    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
         
-        if (world.isClientSide()) return;
+        if (level.isClientSide()) return;
         
-        var isPowered = world.hasNeighborSignal(pos);
+        var isPowered = level.hasNeighborSignal(pos);
         
-        var storageEntity = (ExpandableEnergyStorageBlockEntity) world.getBlockEntity(pos);
+        var storageEntity = (ExpandableEnergyStorageBlockEntity) level.getBlockEntity(pos);
         storageEntity.setRedstonePowered(isPowered);
         
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
+        if (!level.isClientSide()) {
             
-            var entity = world.getBlockEntity(pos);
+            var entity = level.getBlockEntity(pos);
             if (!(entity instanceof MachineAddonController machineEntity)) {
                 return InteractionResult.SUCCESS;
             }
             
             machineEntity.initAddons();
             
-            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
                 MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
             
         }
@@ -135,15 +133,15 @@ public class SmallStorageBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
-        return getStackWithData(world, pos);
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+        return getStackWithData(level, pos);
     }
     
     @NotNull
-    private static ItemStack getStackWithData(LevelReader world, BlockPos pos) {
+    private static ItemStack getStackWithData(LevelReader level, BlockPos pos) {
         var stack = new ItemStack(BlockContent.SMALL_STORAGE_BLOCK.asItem());
         
-        var storageEntity = (SmallStorageBlockEntity) world.getBlockEntity(pos);
+        var storageEntity = (SmallStorageBlockEntity) level.getBlockEntity(pos);
         if (storageEntity.getEnergyStorage(null).getAmount() > 0) {
             stack.set(EnergyApi.ITEM.getEnergyComponent(), storageEntity.getEnergyStorage(null).getAmount());
         }
@@ -152,13 +150,13 @@ public class SmallStorageBlock extends Block implements EntityBlock {
     }
     
     @Override
-    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        super.setPlacedBy(world, pos, state, placer, itemStack);
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.setPlacedBy(level, pos, state, placer, itemStack);
         
         var storedEnergyInStack = itemStack.getOrDefault(EnergyApi.ITEM.getEnergyComponent(), 0L);
         
         if (storedEnergyInStack > 0) {
-            var storageEntity = (ExpandableEnergyStorageBlockEntity) world.getBlockEntity(pos);
+            var storageEntity = (ExpandableEnergyStorageBlockEntity) level.getBlockEntity(pos);
             storageEntity.energyStorage.setAmount(storedEnergyInStack);
         }
         
@@ -167,7 +165,7 @@ public class SmallStorageBlock extends Block implements EntityBlock {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
@@ -175,16 +173,16 @@ public class SmallStorageBlock extends Block implements EntityBlock {
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide()) {
-            var entity = world.getBlockEntity(pos);
+        if (!level.isClientSide()) {
+            var entity = level.getBlockEntity(pos);
             if (entity instanceof MachineAddonController machineEntity) {
                 machineEntity.resetAddons();
             }
         }
         
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override

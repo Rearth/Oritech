@@ -115,9 +115,9 @@ public interface MachineAddonController {
         //   go through all slots
         //   check if slot is occupied by MachineAddonBlock, check if block is not used
         //   if valid and extender: add all neighboring positions to search set
-        var world = getWorldForAddon();
+        var level = getWorldForAddon();
         var pos = getPosForAddon();
-        assert world != null;
+        assert level != null;
         
         var openSlots = getOpenAddonSlots();
         openSlots.clear();
@@ -138,7 +138,7 @@ public interface MachineAddonController {
         var toAdd = new HashSet<BlockPos>();
         var toRemove = new HashSet<BlockPos>();
         
-        //everything done in world space
+        //everything done in level space
         for (int i = 0; i < maxIterationCount; i++) {
             if (queuedPositions.isEmpty()) break;
             
@@ -147,8 +147,8 @@ public interface MachineAddonController {
                 searchedPositions.add(candidatePos);
                 toRemove.add(candidatePos);
                 
-                var candidate = world.getBlockState(candidatePos);
-                var candidateEntity = world.getBlockEntity(candidatePos);
+                var candidate = level.getBlockState(candidatePos);
+                var candidateEntity = level.getBlockEntity(candidatePos);
                 
                 // if the candidate is the broken addon, skip it
                 if (candidatePos.equals(brokenAddon)) {
@@ -268,9 +268,9 @@ public interface MachineAddonController {
     // update state of the found addons
     default void writeAddons(List<AddonBlock> addons) {
         
-        var world = getWorldForAddon();
+        var level = getWorldForAddon();
         var pos = getPosForAddon();
-        assert world != null;
+        assert level != null;
         
         for (var addon : addons) {
             var newState = addon.state()
@@ -278,7 +278,7 @@ public interface MachineAddonController {
             // Set controller before setting block state, otherwise the addon will think
             // it's not connected to a machine the first time neighbor blocks are being updated.
             addon.addonEntity().setControllerPos(pos);
-            world.setBlockAndUpdate(addon.pos(), newState);
+            level.setBlockAndUpdate(addon.pos(), newState);
         }
     }
     

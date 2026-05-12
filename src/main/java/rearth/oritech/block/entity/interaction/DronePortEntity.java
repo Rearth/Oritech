@@ -1,8 +1,5 @@
 package rearth.oritech.block.entity.interaction;
 
-import dev.architectury.fluid.FluidStack;
-import dev.architectury.hooks.fluid.FluidStackHooks;
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -133,13 +130,13 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         checkPositionCard();
         
         if (incomingPacket != null)
             checkIncomingAnimation();
         
-        if (world.getGameTime() % 20 == 0) {
+        if (level.getGameTime() % 20 == 0) {
             if (incomingPacket != null) {
                 tryReceivePacket();
             } else if (canSend()) {

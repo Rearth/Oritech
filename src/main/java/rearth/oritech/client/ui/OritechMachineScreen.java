@@ -1,6 +1,5 @@
 package rearth.oritech.client.ui;
 
-import dev.architectury.platform.Platform;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;

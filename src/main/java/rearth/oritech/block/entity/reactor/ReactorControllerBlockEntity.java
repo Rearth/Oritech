@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.reactor;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -85,7 +84,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     // absorbers remove fixed heat amount from all neighboring blocks
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         if (!active && doAutoInit) {
             doAutoInit = false;

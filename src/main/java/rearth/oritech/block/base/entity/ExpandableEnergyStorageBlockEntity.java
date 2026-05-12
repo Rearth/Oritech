@@ -1,6 +1,5 @@
 package rearth.oritech.block.base.entity;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -111,10 +110,10 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        if (world.isClientSide()) return;
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        if (level.isClientSide()) return;
         
-        energyStorage.tick((int) world.getGameTime());
+        energyStorage.tick((int) level.getGameTime());
         
         if (!redstonePowered)
             outputEnergy();

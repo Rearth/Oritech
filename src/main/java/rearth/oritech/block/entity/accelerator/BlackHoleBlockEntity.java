@@ -41,10 +41,10 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (waitTicks-- > 0) return;
         
-        if (currentlyPullingFrom != null && pullingStartedAt + pullTime - 5 < world.getGameTime()) {
+        if (currentlyPullingFrom != null && pullingStartedAt + pullTime - 5 < level.getGameTime()) {
             onPullingFinished();
             currentlyPullingFrom = null;
         }
@@ -54,15 +54,15 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
         int pullRange = OritechConfig.pullRange.get();
         
         for (var candidate : BlockPos.withinManhattan(pos, pullRange, pullRange, pullRange)) {
-            var candidateState = world.getBlockState(candidate);
+            var candidateState = level.getBlockState(candidate);
             if (candidate.equals(pos) || candidateState.isAir() || candidateState.is(TagContent.BLACK_HOLE_BLACKLIST) || !candidateState.getFluidState().isEmpty() || candidateState.getBlock().equals(Blocks.MOVING_PISTON) || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK))
                 continue;
             
             currentlyPullingFrom = candidate;
             currentlyPulling = candidateState;
-            pullingStartedAt = world.getGameTime();
+            pullingStartedAt = level.getGameTime();
             pullTime = (long) candidate.distManhattan(pos) * OritechConfig.pullTimeMultiplier.get();
-            world.setBlockAndUpdate(candidate, Blocks.AIR.defaultBlockState());
+            level.setBlockAndUpdate(candidate, Blocks.AIR.defaultBlockState());
             setChanged();
             
             return;
@@ -130,7 +130,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
         return cachedResult;
     }
     
-    public static BlockPos basicRaycast(Vec3 from, Vec3 direction, int range, Level world) {
+    public static BlockPos basicRaycast(Vec3 from, Vec3 direction, int range, Level level) {
         
         var checkedPositions = new HashSet<BlockPos>();
         
@@ -142,7 +142,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
             if (checkedPositions.contains(targetBlockPos)) continue;
             checkedPositions.add(targetBlockPos);
             
-            var targetState = world.getBlockState(targetBlockPos);
+            var targetState = level.getBlockState(targetBlockPos);
             if (!canPassThrough(targetState, targetBlockPos)) return targetBlockPos;
         }
         

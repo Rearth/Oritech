@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 
 public class CustomAugmentsCollection {
     
-    // for other modders: If you want to use a custom augment from a recipe, you need to add it to this map before world load!
+    // for other modders: If you want to use a custom augment from a recipe, you need to add it to this map before level load!
     public static final Map<Identifier, Augment> CUSTOM_AUGMENTS = new HashMap<>();
     
     public static final Attachment<GlobalPos> PORTAL_TARGET_TYPE = new Attachment<>() {
@@ -124,14 +124,14 @@ public class CustomAugmentsCollection {
         
         @Override
         public void refreshServer(Player player) {
-            var world = player.level();
+            var level = player.level();
             var target = player.getEyePosition();
             
             var range = 8;
             var speed = 0.3;
             
             var box = new AABB(target.x - range, target.y - range, target.z - range, target.x + range, target.y + range, target.z + range);
-            var items = world.getEntitiesOfClass(ItemEntity.class, box, itemEntity -> !itemEntity.hasPickUpDelay());
+            var items = level.getEntitiesOfClass(ItemEntity.class, box, itemEntity -> !itemEntity.hasPickUpDelay());
             
             for (var item : items) {
                 var direction = target.subtract(item.position()).normalize().scale(speed);
@@ -161,7 +161,7 @@ public class CustomAugmentsCollection {
         
         @Override
         public void refreshClient(Player player) {
-            var world = player.level();
+            var level = player.level();
             var target = BlockPos.containing(player.getEyePosition());
             
             var range = 16;
@@ -169,7 +169,7 @@ public class CustomAugmentsCollection {
             var highlightPositions = new ArrayList<BlockPos>();
             BlockPos.betweenClosed(target.getX() - range, target.getY() - range, target.getZ() - range, target.getX() + range, target.getY() + range, target.getZ() + range)
               .forEach(pos -> {
-                  var state = world.getBlockState(pos);
+                  var state = level.getBlockState(pos);
                   var isOre = state.is(TagContent.CONVENTIONAL_ORES);
                   if (isOre) highlightPositions.add(pos.immutable());
               });
@@ -190,8 +190,8 @@ public class CustomAugmentsCollection {
         
         @Override
         public void toggle(Player player) {
-            var world = player.level();
-            if (world.isClientSide()) return;
+            var level = player.level();
+            if (level.isClientSide()) return;
             
             var hitResult = player.pick(6, 0, false);
             var spawnPos = hitResult.getLocation();
@@ -201,7 +201,7 @@ public class CustomAugmentsCollection {
             var targetPos = AttachmentApi.getAttachmentValue(player, PORTAL_TARGET_TYPE);
             if (targetPos == null) return;
             
-            var portalEntity = EntitiesContent.PORTAL_ENTITY.create((ServerLevel) world, spawner -> {},
+            var portalEntity = EntitiesContent.PORTAL_ENTITY.create((ServerLevel) level, spawner -> {},
               BlockPos.containing(spawnPos),
               MobSpawnType.EVENT,
               false,
@@ -210,9 +210,9 @@ public class CustomAugmentsCollection {
             if (portalEntity != null) {
                 portalEntity.setPos(spawnPos);
                 portalEntity.setYRot(-player.getYRot() + 90);
-                world.addFreshEntity(portalEntity);
+                level.addFreshEntity(portalEntity);
                 portalEntity.target = targetPos;
-                world.playSound(null, BlockPos.containing(spawnPos), SoundEvents.AMBIENT_CAVE.value(), SoundSource.BLOCKS, 2, 1.2f);
+                level.playSound(null, BlockPos.containing(spawnPos), SoundEvents.AMBIENT_CAVE.value(), SoundSource.BLOCKS, 2, 1.2f);
                 
             }
         }

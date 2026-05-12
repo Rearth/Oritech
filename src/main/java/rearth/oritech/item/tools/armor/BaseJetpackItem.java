@@ -1,7 +1,5 @@
 package rearth.oritech.item.tools.armor;
 
-import dev.architectury.fluid.FluidStack;
-import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleTypes;
@@ -38,7 +36,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
     
     default boolean requireTakeoff() {return true;}
     
-    default void tickJetpack(ItemStack stack, Entity entity, Level world) {
+    default void tickJetpack(ItemStack stack, Entity entity, Level level) {
         
         if (!(entity instanceof Player player)) return;
         
@@ -59,7 +57,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         var isActive = up;
         if (!requireUpward()) isActive = up || horizontal;
         
-        if (requireTakeoff() && !isJetpackStarted(player, world, up)) return;
+        if (requireTakeoff() && !isJetpackStarted(player, level, up)) return;
         
         if (!isActive || player.onGround() || player.isUnderWater()) return;
         
@@ -99,28 +97,28 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         var direction = new Vec3(0, -1, 0);
         if (forward) direction = playerForward.normalize().scale(-1).add(0, -1, 0);
         
-        world.addParticle(ParticleTypes.SMOKE,
-            particlePosA.x + (world.random.nextDouble() - 0.5) * 0.2,
-            particlePosA.y + (world.random.nextDouble() - 0.5) * 0.2,
-            particlePosA.z + (world.random.nextDouble() - 0.5) * 0.2,
+        level.addParticle(ParticleTypes.SMOKE,
+            particlePosA.x + (level.random.nextDouble() - 0.5) * 0.2,
+            particlePosA.y + (level.random.nextDouble() - 0.5) * 0.2,
+            particlePosA.z + (level.random.nextDouble() - 0.5) * 0.2,
             direction.x, direction.y, direction.z);
-        world.addParticle(ParticleTypes.SMOKE,
-            particlePosB.x + (world.random.nextDouble() - 0.5) * 0.2,
-            particlePosB.y + (world.random.nextDouble() - 0.5) * 0.2,
-            particlePosB.z + (world.random.nextDouble() - 0.5) * 0.2,
+        level.addParticle(ParticleTypes.SMOKE,
+            particlePosB.x + (level.random.nextDouble() - 0.5) * 0.2,
+            particlePosB.y + (level.random.nextDouble() - 0.5) * 0.2,
+            particlePosB.z + (level.random.nextDouble() - 0.5) * 0.2,
             direction.x, direction.y, direction.z);
     }
     
-    private static boolean isJetpackStarted(Player player, Level world, boolean up) {
+    private static boolean isJetpackStarted(Player player, Level level, boolean up) {
         
         var grounded = player.onGround() || player.isUnderWater();
         
         if (grounded) {
-            JetpackItem.LAST_GROUND_CONTACT = world.getGameTime();
+            JetpackItem.LAST_GROUND_CONTACT = level.getGameTime();
             JetpackItem.PRESSED_SPACE = false;
             return false;
         } else {
-            var flightTime = world.getGameTime() - JetpackItem.LAST_GROUND_CONTACT;
+            var flightTime = level.getGameTime() - JetpackItem.LAST_GROUND_CONTACT;
             
             if (flightTime < 5) return false;
             if (up) JetpackItem.PRESSED_SPACE = true;

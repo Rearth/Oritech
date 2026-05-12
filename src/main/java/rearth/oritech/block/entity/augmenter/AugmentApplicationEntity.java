@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.augmenter;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -88,7 +87,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         screenInvOverride = false;
         
         // update research stations
@@ -96,7 +95,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             var station = availableStations.getOrDefault(i, null);
             if (station == null) continue;
             if (station.working) {
-                var isDone = world.getGameTime() > station.researchStartedAt + station.workTime;
+                var isDone = level.getGameTime() > station.researchStartedAt + station.workTime;
                 if (!isDone) continue;
                 
                 researchedAugments.add(station.selectedResearch);

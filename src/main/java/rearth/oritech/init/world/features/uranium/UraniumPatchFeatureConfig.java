@@ -1,4 +1,4 @@
-package rearth.oritech.init.world.features.uranium;
+package rearth.oritech.init.level.features.uranium;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

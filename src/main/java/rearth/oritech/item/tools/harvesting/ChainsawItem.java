@@ -66,7 +66,7 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
     }
     
     @Override
-    public boolean mineBlock(ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity miner) {
+    public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity miner) {
         
         if (!(miner instanceof Player player)) return true;
         
@@ -75,12 +75,12 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
         
         var energySuccess = this.tryUseEnergy(stack, (long) amount, player);
         
-        if (!world.isClientSide && miner.isShiftKeyDown() && energySuccess && OritechConfig.chainsawTreeCutting.get()) {
+        if (!level.isClientSide && miner.isShiftKeyDown() && energySuccess && OritechConfig.chainsawTreeCutting.get()) {
             var startPos = pos.above();
-            var startState = world.getBlockState(startPos);
+            var startState = level.getBlockState(startPos);
             if (startState.is(BlockTags.LOGS)) {
-                var treeBlocks = TreefellerBlockEntity.getTreeBlocks(startPos, world);
-                PromethiumAxeItem.pendingBlocks.addAll(treeBlocks.stream().map(elem -> new PromethiumAxeItem.PendingBlock(world, elem, stack)).toList());
+                var treeBlocks = TreefellerBlockEntity.getTreeBlocks(startPos, level);
+                PromethiumAxeItem.pendingBlocks.addAll(treeBlocks.stream().map(elem -> new PromethiumAxeItem.PendingBlock(level, elem, stack)).toList());
                 
                 var extraEnergyUsed = treeBlocks.size() * getEnergyUsageMultiplier() / 2;
                 this.tryUseEnergy(stack, (long) extraEnergyUsed, player);

@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.interaction;
 
-import dev.architectury.hooks.fluid.FluidStackHooks;
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -58,8 +56,8 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        if (world.isClientSide()) return;
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        if (level.isClientSide()) return;
         
         // stop if no input is given, or it's a stackable item
         if (inventory.getItem(0).isEmpty() || inventory.getItem(0).getCount() > 1) return;
@@ -84,7 +82,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
         }
         
         if (fluidStorage.getAmount() != startFluid || energyStorage.amount != startEnergy) {
-            if (world instanceof ServerLevel sl) { var c = pos.getCenter().add(0.1, 0.1, 0); sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 1, 0.6, 0.6, 0.6, 0); }
+            if (level instanceof ServerLevel sl) { var c = pos.getCenter().add(0.1, 0.1, 0); sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 1, 0.6, 0.6, 0.6, 0); }
         }
         
     }

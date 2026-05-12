@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.addons;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -35,8 +34,8 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     }
     
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, RedstoneAddonBlockEntity blockEntity) {
-        if (world.isClientSide || !isConnected() || activeMode == RedstoneMode.INPUT_CONTROL) return;
+    public void tick(Level level, BlockPos pos, BlockState state, RedstoneAddonBlockEntity blockEntity) {
+        if (level.isClientSide || !isConnected() || activeMode == RedstoneMode.INPUT_CONTROL) return;
         
         var lastOutput = currentOutput;
         
@@ -133,8 +132,8 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     }
     
     public static void receiveOnClient(RedstoneAddonClientUpdate message, IPayloadContext context) {
-        var world = context.player().level();
-        if (world.getBlockEntity(message.position) instanceof RedstoneAddonBlockEntity addonEntity) {
+        var level = context.player().level();
+        if (level.getBlockEntity(message.position) instanceof RedstoneAddonBlockEntity addonEntity) {
             addonEntity.currentOutput = message.currentOutput();
             addonEntity.activeMode = RedstoneMode.values()[message.targetMode()];
             addonEntity.monitoredSlot = message.targetSlot();

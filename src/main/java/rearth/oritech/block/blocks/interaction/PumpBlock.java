@@ -67,34 +67,34 @@ public class PumpBlock extends Block implements EntityBlock {
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
-            var pumpEntity = world.getBlockEntity(pos, BlockEntitiesContent.PUMP_BLOCK);
+        if (!level.isClientSide()) {
+            var pumpEntity = level.getBlockEntity(pos, BlockEntitiesContent.PUMP_BLOCK);
             pumpEntity.ifPresent(pumpBlockEntity -> pumpBlockEntity.onUsed(player));
         }
         return InteractionResult.SUCCESS;
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide()) {
+        if (!level.isClientSide()) {
             // break all trunk blocks below
             var checkPos = pos.below();
-            while (world.getBlockState(checkPos).getBlock().equals(BlockContent.PUMP_TRUNK_BLOCK)) {
-                world.destroyBlock(checkPos, false);
+            while (level.getBlockState(checkPos).getBlock().equals(BlockContent.PUMP_TRUNK_BLOCK)) {
+                level.destroyBlock(checkPos, false);
                 checkPos = checkPos.below();
             }
         }
         
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

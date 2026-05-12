@@ -1,4 +1,4 @@
-package rearth.oritech.init.world.features.oil;
+package rearth.oritech.init.level.features.oil;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

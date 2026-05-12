@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.pipes;
 
-import dev.architectury.platform.Platform;
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -116,7 +114,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         // if non-empty and inventory in target, move it
         if (inventory.isEmpty()) return;
@@ -124,7 +122,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
         if (cachedTargetInventory == null) {
             var targetDirection = getBlockState().getValue(ItemFilterBlock.TARGET_DIR);
             var targetPos = pos.offset(targetDirection.getNormal());
-            cachedTargetInventory = ItemApi.BLOCK.createCache(world, targetPos, targetDirection);
+            cachedTargetInventory = ItemApi.BLOCK.createCache(level, targetPos, targetDirection);
         }
 
         var targetInv = cachedTargetInventory.find();

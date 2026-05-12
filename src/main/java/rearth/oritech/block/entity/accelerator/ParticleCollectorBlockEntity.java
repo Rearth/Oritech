@@ -44,15 +44,15 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
     }
     
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, ParticleCollectorBlockEntity blockEntity) {
-        if (world.isClientSide()) return;
+    public void tick(Level level, BlockPos pos, BlockState state, ParticleCollectorBlockEntity blockEntity) {
+        if (level.isClientSide()) return;
         
         
         if (energyStorage.amount <= 0) return;
         
         // output energy to back
         var target = getOutputPosition(pos, getBlockState().getValue(DirectionalBlock.FACING).getOpposite());
-        var candidate = EnergyApi.BLOCK.find(world, target.getB(), target.getA());
+        var candidate = EnergyApi.BLOCK.find(level, target.getB(), target.getA());
         if (candidate != null) {
             EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }

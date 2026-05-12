@@ -2,8 +2,6 @@ package rearth.oritech.item.tools.harvesting;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import dev.architectury.event.EventResult;
-import dev.architectury.utils.value.IntValue;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -79,8 +77,8 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
     }
     
     @Override
-    public boolean mineBlock(ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity miner) {
-        if (!world.isClientSide && stack.has(DataComponents.INTANGIBLE_PROJECTILE)) {
+    public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity miner) {
+        if (!level.isClientSide && stack.has(DataComponents.INTANGIBLE_PROJECTILE)) {
             var enchantments = stack.getEnchantments();
             var builder = new ItemEnchantments.Mutable(enchantments);
             builder.removeIf(elem -> elem.is(Enchantments.SILK_TOUCH));
@@ -100,9 +98,9 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
     }
     
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player user, InteractionHand hand) {
         
-        if (!world.isClientSide && user.isShiftKeyDown()) {
+        if (!level.isClientSide && user.isShiftKeyDown()) {
             var stack = user.getItemInHand(hand);
             
             var wasArea = isAreaEnabled(stack);
@@ -112,10 +110,10 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
             user.sendSystemMessage(isArea ? Component.translatable("message.oritech.tool_mode.area_effect") : Component.translatable("message.oritech.tool_mode.silk_touch"));
         }
         
-        return super.use(world, user, hand);
+        return super.use(level, user, hand);
     }
     
-    public static List<BlockPos> getOffsetBlocks(Level world, Player player, BlockPos pos) {
+    public static List<BlockPos> getOffsetBlocks(Level level, Player player, BlockPos pos) {
         var handStack = player.getMainHandItem();
         if (handStack == null || !handStack.is(ToolsContent.PROMETHIUM_PICKAXE)) return List.of();
         
@@ -143,7 +141,7 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
                     }
                 }
                 
-                return ImmutableList.copyOf(Iterables.filter(breakBlocks, p -> world.getBlockState(p).is(TagContent.DRILL_MINEABLE)));
+                return ImmutableList.copyOf(Iterables.filter(breakBlocks, p -> level.getBlockState(p).is(TagContent.DRILL_MINEABLE)));
             }
         }
         
@@ -153,7 +151,7 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
     // called as event in Oritech initializer
     // area mode: breaks 3x3 blocks unless player is sneaking
     // silk touch mode: adds a temporary silk touch, which is then removed in the after break event
-    public static EventResult preMine(Level world, BlockPos pos, BlockState state, ServerPlayer player, @Nullable IntValue xp) {
+    public static EventResult preMine(Level level, BlockPos pos, BlockState state, ServerPlayer player, @Nullable IntValue xp) {
         if (CHECKING_OFFSET_BREAK_PERMISSION.get()) return EventResult.pass();
         
         var handStack = player.getMainHandItem();
@@ -163,25 +161,25 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
         // so that the block still exists when determining which face of the block the player was looking at
         if (isAreaEnabled(handStack)) {
             // break additional blocks
-            for (var offsetPos : getOffsetBlocks(world, player, pos)) {
-                // drop itemStacks before breaking additional block, because world.breakBlock doesn't apply item enchantments if drop is enabled
+            for (var offsetPos : getOffsetBlocks(level, player, pos)) {
+                // drop itemStacks before breaking additional block, because level.breakBlock doesn't apply item enchantments if drop is enabled
                 // this will ONLY apply item enchantments that affect block drops, and will not apply enchants like vein mining
-                var offsetState = world.getBlockState(offsetPos);
+                var offsetState = level.getBlockState(offsetPos);
                 
-                var canInteract = canBreakOffsetBlock(world, offsetPos, offsetState, player);
+                var canInteract = canBreakOffsetBlock(level, offsetPos, offsetState, player);
                 if (!canInteract) continue;
                 
-                var offsetEntity = world.getBlockEntity(offsetPos);
-                Block.dropResources(offsetState, world, offsetPos, offsetEntity, player, handStack);
-                offsetState.getBlock().playerWillDestroy(world, offsetPos, offsetState, player);
-                world.destroyBlock(offsetPos, false, player);
+                var offsetEntity = level.getBlockEntity(offsetPos);
+                Block.dropResources(offsetState, level, offsetPos, offsetEntity, player, handStack);
+                offsetState.getBlock().playerWillDestroy(level, offsetPos, offsetState, player);
+                level.destroyBlock(offsetPos, false, player);
             }
         } else {
             // do silk touch
             var hasExistingSilkTouch = EnchantmentHelper.getEnchantmentsForCrafting(handStack).keySet().stream().anyMatch(elem -> elem.is(Enchantments.SILK_TOUCH));
             
             if (!hasExistingSilkTouch) {
-                var registryEntry = world.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(Enchantments.SILK_TOUCH).get();
+                var registryEntry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(Enchantments.SILK_TOUCH).get();
                 handStack.enchant(registryEntry, 1);
                 handStack.set(DataComponents.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
             }
@@ -191,11 +189,11 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
     }
 
     // to avoid recusion on neoforge
-    private static boolean canBreakOffsetBlock(Level world, BlockPos offsetPos, BlockState offsetState, ServerPlayer player) {
+    private static boolean canBreakOffsetBlock(Level level, BlockPos offsetPos, BlockState offsetState, ServerPlayer player) {
         var wasCheckingOffsetBreakPermission = CHECKING_OFFSET_BREAK_PERMISSION.get();
         CHECKING_OFFSET_BREAK_PERMISSION.set(true);
         try {
-            return OritechPlatform.INSTANCE.canPlayerBreakBlock(world, offsetPos, offsetState, player);
+            return OritechPlatform.INSTANCE.canPlayerBreakBlock(level, offsetPos, offsetState, player);
         } finally {
             CHECKING_OFFSET_BREAK_PERMISSION.set(wasCheckingOffsetBreakPermission);
         }
@@ -260,9 +258,9 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
     }
     
     // client only
-    public void onHeldTick(ItemStack stack, Player player, ClientLevel world) {
+    public void onHeldTick(ItemStack stack, Player player, ClientLevel level) {
         
-        if (world.getGameTime() % 20 != 0) return;
+        if (level.getGameTime() % 20 != 0) return;
         
         var area = isAreaEnabled(stack);
         triggerAnim(player, GeoItem.getId(stack), "Pickaxe", area ? "area" : "silk");

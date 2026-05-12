@@ -55,7 +55,7 @@ public record AugmentDataRecipe(boolean toggleable, List<SizedIngredient> resear
     );
     
     @Override
-    public boolean matches(AugmentDataRecipeInput input, Level world) {
+    public boolean matches(AugmentDataRecipeInput input, Level level) {
         return switch (input.mode()) {
             case RESEARCH -> matchesResearchCost(input);
             case APPLY -> matchesApplyCost(input);

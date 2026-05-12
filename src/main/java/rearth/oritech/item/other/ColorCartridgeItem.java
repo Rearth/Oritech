@@ -49,7 +49,7 @@ public class ColorCartridgeItem extends Item {
         var targetEntity = context.getLevel().getBlockEntity(targetBlock);
         
         if (targetEntity instanceof MachineCoreEntity machineCore && machineCore.getCachedController() != null) {
-            targetEntity = (net.minecraft.world.level.block.entity.BlockEntity) machineCore.getCachedController();
+            targetEntity = (net.minecraft.level.level.block.entity.BlockEntity) machineCore.getCachedController();
             targetBlock = targetEntity.getBlockPos();
         }
         

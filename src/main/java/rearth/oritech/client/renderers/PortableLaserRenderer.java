@@ -39,11 +39,11 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         if (player == null) return;
         
         var heldStack = client.player.getMainHandItem();
-        var world = client.level;
+        var level = client.level;
         
         if (isReRender || !this.renderPerspective.firstPerson()) return;
         
-        var singleShotAge = world.getGameTime() - PortableLaserItem.lastSingleShot;
+        var singleShotAge = level.getGameTime() - PortableLaserItem.lastSingleShot;
         
         if (!OritechClient.laserActive && singleShotAge > 10) return;
         
@@ -70,7 +70,7 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         
         var beamConsumer = bufferSource.getBuffer(RenderType.eyes(BEAM_TEXTURE));
         
-        float baseThickness = (float) (0.03f + Math.sin((world.getGameTime() + partialTick) * 1.1f) * 0.01f);
+        float baseThickness = (float) (0.03f + Math.sin((level.getGameTime() + partialTick) * 1.1f) * 0.01f);
         
         BeamRenderer.renderStraightBeam(
           matrices, beamConsumer, localStart, deltaVec,

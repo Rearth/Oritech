@@ -1,7 +1,5 @@
 package rearth.oritech.block.blocks.storage;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -60,10 +58,10 @@ public class CreativeStorageBlock extends Block implements EntityBlock {
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
-            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+        if (!level.isClientSide()) {
+            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
                 MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
@@ -73,7 +71,7 @@ public class CreativeStorageBlock extends Block implements EntityBlock {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

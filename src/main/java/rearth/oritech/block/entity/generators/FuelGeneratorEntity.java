@@ -25,7 +25,7 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level world) {
+    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level level) {
         
         // because facing blocks make rotations and relative offsets a nightmare...
         var posA = new Vec3i(1, 0, -1);

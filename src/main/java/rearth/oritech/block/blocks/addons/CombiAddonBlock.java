@@ -33,10 +33,10 @@ public class CombiAddonBlock extends MachineAddonBlock {
     }
     
     @Override
-    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        super.setPlacedBy(world, pos, state, placer, itemStack);
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.setPlacedBy(level, pos, state, placer, itemStack);
         
-        if (!world.isClientSide() && itemStack.has(ComponentContent.ADDON_DATA.get()) && world.getBlockEntity(pos) instanceof CombiAddonEntity combiAddonEntity) {
+        if (!level.isClientSide() && itemStack.has(ComponentContent.ADDON_DATA.get()) && level.getBlockEntity(pos) instanceof CombiAddonEntity combiAddonEntity) {
             combiAddonEntity.storedData = itemStack.get(ComponentContent.ADDON_DATA.get());
         }
     }

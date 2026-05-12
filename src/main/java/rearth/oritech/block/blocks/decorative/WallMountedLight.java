@@ -43,7 +43,7 @@ public class WallMountedLight extends FaceAttachedHorizontalDirectionalBlock {
     
     // copied from LeverBlock
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         switch (state.getValue(FACE)) {
             case FLOOR: {
                 return switch (state.getValue(FACING).getAxis()) {

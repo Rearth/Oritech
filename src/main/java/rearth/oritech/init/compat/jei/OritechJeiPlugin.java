@@ -118,8 +118,8 @@ public class OritechJeiPlugin implements IModPlugin {
     
     public void registerRecipe(IRecipeRegistration registration, OritechRecipeType type) {
         // this feels incredibly hacky, but seems to be the way to go?
-        var world = Minecraft.getInstance().level;
-        var data = world.getRecipeManager().getAllRecipesFor(type).stream().map(RecipeHolder::value).toList();
+        var level = Minecraft.getInstance().level;
+        var data = level.getRecipeManager().getAllRecipesFor(type).stream().map(RecipeHolder::value).toList();
         registration.addRecipes(RecipeType.create(type.getIdentifier().getNamespace(), type.getIdentifier().getPath(), OritechRecipe.class), data);
     }
     

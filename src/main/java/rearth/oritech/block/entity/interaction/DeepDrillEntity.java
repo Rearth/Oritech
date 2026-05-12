@@ -93,13 +93,13 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (isActive(state) && !initialized && (world.getGameTime() + pos.asLong()) % 60 == 0) {
+        if (isActive(state) && !initialized && (level.getGameTime() + pos.asLong()) % 60 == 0) {
             init(false);
         }
         
-        if (world.isClientSide() || !initialized || targetedOre.isEmpty()) return;
+        if (level.isClientSide() || !initialized || targetedOre.isEmpty()) return;
         if (!inventory.isEmpty() && inventory.heldStacks.get(0).getCount() >= inventory.heldStacks.get(0).getMaxStackSize())
             return;    // inv full
         
@@ -108,11 +108,11 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         if (energyStorage.amount >= energyPerStep) {
             progress++;
             energyStorage.amount -= energyPerStep;
-            lastWorkTime = world.getGameTime();
+            lastWorkTime = level.getGameTime();
             setChanged();
             
             var particlePos = getCenter(0);
-            if (world instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, particlePos.getX() + 0.5, particlePos.getY() + 0.5, particlePos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
+            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, particlePos.getX() + 0.5, particlePos.getY() + 0.5, particlePos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
         
         // try increasing faster if too much energy is provided
@@ -126,7 +126,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         }
         
         if (progress >= OritechConfig.deepDrillConfig.stepsPerOre.get()) {
-            craftResult(world, pos);
+            craftResult(level, pos);
             progress -= OritechConfig.deepDrillConfig.stepsPerOre.get();
             this.setChanged();
         }
@@ -158,12 +158,12 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         }  
     }
     
-    private void craftResult(Level world, BlockPos pos) {
-        var usedOre = targetedOre.get(world.random.nextInt(0, targetedOre.size()));
+    private void craftResult(Level level, BlockPos pos) {
+        var usedOre = targetedOre.get(level.random.nextInt(0, targetedOre.size()));
         var nodeOreBlockItem = usedOre.asItem();
         var sampleInv = new SimpleCraftingInventory(new ItemStack(nodeOreBlockItem, 1));
         
-        var recipeCandidate = world.getRecipeManager().getRecipeFor(RecipeContent.DEEP_DRILL, sampleInv, world);
+        var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeContent.DEEP_DRILL, sampleInv, level);
         if (recipeCandidate.isEmpty())
             return;
         

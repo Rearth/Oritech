@@ -25,12 +25,12 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     }
     
     @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         
-        if (world.isClientSide && Minecraft.getInstance().player.isFallFlying()) {
-            tickJetpack(stack, entity, world);
+        if (level.isClientSide && Minecraft.getInstance().player.isFallFlying()) {
+            tickJetpack(stack, entity, level);
         } else {
-            super.inventoryTick(stack, world, entity, slot, selected);
+            super.inventoryTick(stack, level, entity, slot, selected);
         }
     }
     

@@ -1,7 +1,5 @@
 package rearth.oritech.block.base.entity;
 
-import dev.architectury.fluid.FluidStack;
-import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -58,13 +56,13 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         // check remaining burn time
         // if burn time is zero, try to consume item thus adding burn time
         // if burn time is remaining, use up one tick of it
         
-        if (world.isClientSide || !isActive(state) || disabledViaRedstone) return;
+        if (level.isClientSide || !isActive(state) || disabledViaRedstone) return;
         
         if (progress == 0 && canFitEnergy())
             tryConsumeInput();
@@ -75,7 +73,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
                 
                 progress--;
                 produceEnergy();
-                lastWorkedAt = world.getGameTime();
+                lastWorkedAt = level.getGameTime();
                 
                 if (progress == 0) {
                     burningFinished();
@@ -230,7 +228,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         }
     }
     
-    protected abstract Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level world);
+    protected abstract Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level level);
     
     protected void outputEnergy() {
         if (energyStorage.getAmount() <= 0) return;

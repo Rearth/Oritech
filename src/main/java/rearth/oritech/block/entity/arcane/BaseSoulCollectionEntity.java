@@ -68,7 +68,7 @@ public abstract class BaseSoulCollectionEntity extends BlockEntity implements Ga
         }
         
         @Override
-        public boolean handleGameEvent(ServerLevel world, Holder<GameEvent> event, GameEvent.Context emitter, Vec3 emitterPos) {
+        public boolean handleGameEvent(ServerLevel level, Holder<GameEvent> event, GameEvent.Context emitter, Vec3 emitterPos) {
             if (event.is(GameEvent.ENTITY_DIE.key()) && isValidEntity(emitter.sourceEntity()) && canAcceptSoul() && !consumedEvents.contains(emitterPos)) {
                 onSoulIncoming(emitterPos);
                 consumedEvents.add(emitterPos);

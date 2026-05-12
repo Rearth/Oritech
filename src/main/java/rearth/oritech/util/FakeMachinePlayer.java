@@ -8,7 +8,7 @@ import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 
 public abstract class FakeMachinePlayer {
 
-    public static ServerPlayer create(ServerLevel world, GameProfile profile, SimpleInventoryStorage inventory) {
-        return OritechPlatform.INSTANCE.create(world, profile, inventory);
+    public static ServerPlayer create(ServerLevel level, GameProfile profile, SimpleInventoryStorage inventory) {
+        return OritechPlatform.INSTANCE.create(level, profile, inventory);
     }
 }

@@ -1,4 +1,4 @@
-package rearth.oritech.init.world.features.oil;
+package rearth.oritech.init.level.features.oil;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
@@ -18,18 +18,18 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
     @Override
     public boolean place(FeaturePlaceContext<OilSpringFeatureConfig> context) {
         
-        var world = context.level();
+        var level = context.level();
         var origin = context.origin();
         
-        if (world.isClientSide()) return false;
+        if (level.isClientSide()) return false;
         
         
         var testPos = new BlockPos(origin);
-        for (int y = 0; y < world.getHeight(); y++) {
+        for (int y = 0; y < level.getHeight(); y++) {
             testPos = testPos.above();
             
-            if (world.getBlockState(testPos).is(BlockTags.DIRT) || world.getBlockState(testPos).is(BlockTags.SAND)) {
-                if (world.getBlockState(testPos.above()).is(Blocks.AIR)) {
+            if (level.getBlockState(testPos).is(BlockTags.DIRT) || level.getBlockState(testPos).is(BlockTags.SAND)) {
+                if (level.getBlockState(testPos.above()).is(Blocks.AIR)) {
                     placeStructure(testPos, context);
                     return true;
                 }
@@ -45,7 +45,7 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
         var random = context.random();
         var config = context.config();
         var state = BuiltInRegistries.BLOCK.get(config.blockId()).defaultBlockState();
-        var world = context.level();
+        var level = context.level();
         
         var variation = random.nextIntBetweenInclusive((int) (-config.number() * 0.5f), config.number());
         var height = Math.max(config.number() + variation, 13);
@@ -64,9 +64,9 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
                     var distance = Math.sqrt(point.distSqr(center));
                     var noiseOffset = perlinSampler.noise(x, y, z);
                     if (distance <= height + noiseOffset - 2) {
-                        world.setBlock(point, state, 0x10);
+                        level.setBlock(point, state, 0x10);
                     } else if (distance <= height + noiseOffset) {
-                        world.setBlock(point, Blocks.STONE.defaultBlockState(), 0x10);
+                        level.setBlock(point, Blocks.STONE.defaultBlockState(), 0x10);
                     }
                 }
             }
@@ -75,13 +75,13 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
         // fountain up
         if (OritechConfig.easyFindFeatures.get()) {
             for (int i = 0; i < height; i++) {
-                world.setBlock(surfacePos.above(i), state, 0x10);
+                level.setBlock(surfacePos.above(i), state, 0x10);
             }
         }
         
         // down
         for (int i = 1; i < depth + 5; i++) {
-            world.setBlock(surfacePos.below(i), state, 0x10);
+            level.setBlock(surfacePos.below(i), state, 0x10);
         }
         
     }

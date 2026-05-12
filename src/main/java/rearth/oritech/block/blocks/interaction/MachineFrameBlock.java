@@ -78,14 +78,14 @@ public class MachineFrameBlock extends Block {
     }
     
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (!OritechStartupConfig.tightMachineFrameHitboxes.get())
-            return super.getShape(state, world, pos, context);
+            return super.getShape(state, level, pos, context);
         return getShape(state);
     }
     
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return getShape(state);
     }
     
@@ -117,14 +117,14 @@ public class MachineFrameBlock extends Block {
     }
     
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         
-        var northConnected = world.getBlockState(pos.north()).getBlock() == this;
-        var eastConnected = world.getBlockState(pos.east()).getBlock() == this;
-        var southConnected = world.getBlockState(pos.south()).getBlock() == this;
-        var westConnected = world.getBlockState(pos.west()).getBlock() == this;
-        var upConnected = world.getBlockState(pos.above()).is(TagContent.MACHINE_FRAME_SUPPORT);
-        var downConnected = world.getBlockState(pos.below()).is(TagContent.MACHINE_FRAME_SUPPORT);
+        var northConnected = level.getBlockState(pos.north()).getBlock() == this;
+        var eastConnected = level.getBlockState(pos.east()).getBlock() == this;
+        var southConnected = level.getBlockState(pos.south()).getBlock() == this;
+        var westConnected = level.getBlockState(pos.west()).getBlock() == this;
+        var upConnected = level.getBlockState(pos.above()).is(TagContent.MACHINE_FRAME_SUPPORT);
+        var downConnected = level.getBlockState(pos.below()).is(TagContent.MACHINE_FRAME_SUPPORT);
         
         return state.setValue(NORTH, northConnected).setValue(EAST, eastConnected).setValue(SOUTH, southConnected).setValue(WEST, westConnected).setValue(UP, upConnected).setValue(DOWN, downConnected);
         

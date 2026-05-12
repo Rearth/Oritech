@@ -47,37 +47,37 @@ public class WitheredCropBlock extends CropBlock {
     }
     
     @Override
-    protected boolean mayPlaceOn(BlockState floor, BlockGetter world, BlockPos pos) {
+    protected boolean mayPlaceOn(BlockState floor, BlockGetter level, BlockPos pos) {
         return floor.is(Blocks.SOUL_SOIL);
     }
     
     @Override
-    protected int getBonemealAgeIncrease(Level world) {
-        return Mth.nextInt(world.random, 1, 2);
+    protected int getBonemealAgeIncrease(Level level) {
+        return Mth.nextInt(level.random, 1, 2);
     }
     
     @Override
-    protected void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
-        if (world.getRawBrightness(pos, 0) >= 9) {
+    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (level.getRawBrightness(pos, 0) >= 9) {
             int age = this.getAge(state);
             if (age < this.getMaxAge()) {
                 if (random.nextInt(5) == 0) {
-                    world.setBlock(pos, this.getStateForAge(age + 1), Block.UPDATE_CLIENTS);
+                    level.setBlock(pos, this.getStateForAge(age + 1), Block.UPDATE_CLIENTS);
                 }
             }
         }
     }
     
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return AGE_TO_SHAPE[state.getValue(this.getAgeProperty())];
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (this.getAge(state) == this.getMaxAge())
-            world.gameEvent(GameEvent.ENTITY_DIE.key(), pos, GameEvent.Context.of(state));
-        return super.playerWillDestroy(world, pos, state, player);
+            level.gameEvent(GameEvent.ENTITY_DIE.key(), pos, GameEvent.Context.of(state));
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override

@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.interaction;
 
-import dev.architectury.fluid.FluidStack;
-import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -88,9 +86,9 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if ((initialized && pendingLiquidPositions.isEmpty() && world.getGameTime() % 62 == 0) || (!initialized && toolheadLowered && !searchActive && world.getGameTime() % 62 == 0)) {
+        if ((initialized && pendingLiquidPositions.isEmpty() && level.getGameTime() % 62 == 0) || (!initialized && toolheadLowered && !searchActive && level.getGameTime() % 62 == 0)) {
             // reset
             initialized = false;
             toolheadLowered = false;
@@ -103,19 +101,19 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
             return;
         }
         
-        if (world.getGameTime() % PUMP_RATE == 0 && hasEnoughEnergy() && world.getBestNeighborSignal(pos) <= 0) {
+        if (level.getGameTime() % PUMP_RATE == 0 && hasEnoughEnergy() && level.getBestNeighborSignal(pos) <= 0) {
             
             if (pendingLiquidPositions.isEmpty() || tankIsFull()) return;
             
             var targetBlock = pendingLiquidPositions.peekLast();
             
             // Only drain the source (still) fluid, so it doesn't keep pumping infinitely
-            if (!world.getBlockState(targetBlock).getFluidState().isSource()) {
+            if (!level.getBlockState(targetBlock).getFluidState().isSource()) {
                 pendingLiquidPositions.pollLast();
                 return;
             }
             
-            var targetState = world.getFluidState(targetBlock);
+            var targetState = level.getFluidState(targetBlock);
             if (!targetState.getType().isSame(Fluids.WATER)) {
                 drainSourceBlock(targetBlock);
                 pendingLiquidPositions.pollLast();
@@ -124,13 +122,13 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
             addLiquidToTank(targetState);
             useEnergy();
             this.setChanged();
-            lastWorkTime = world.getGameTime();
+            lastWorkTime = level.getGameTime();
             
             
-            var targetPos = pos.getCenter().offsetRandom(world.random, 0.5f);
+            var targetPos = pos.getCenter().offsetRandom(level.random, 0.5f);
             var targetType = targetState.getDripParticle();
             
-            if (targetType != null && world instanceof ServerLevel serverWorld)
+            if (targetType != null && level instanceof ServerLevel serverWorld)
                 serverWorld.sendParticles(targetType, targetPos.x(), targetPos.y(), targetPos.z(), 1, 0, 0, 0, 1);
         }
         
@@ -307,11 +305,11 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         final HashSet<BlockPos> checkedPositions = new HashSet<>();
         final HashSet<BlockPos> nextTargets = new HashSet<>();
         final Deque<BlockPos> foundTargets = new ArrayDeque<>();
-        final Level world;
+        final Level level;
         final Fluid fluidType;
         
-        public FloodFillSearch(BlockPos startPosition, Level world, Fluid fluidType) {
-            this.world = world;
+        public FloodFillSearch(BlockPos startPosition, Level level, Fluid fluidType) {
+            this.level = level;
             this.fluidType = fluidType;
             nextTargets.add(startPosition);
         }
@@ -341,7 +339,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         }
         
         private boolean checkForEarlyStop(BlockPos target) {
-            return world.getFluidState(target).getType().isSame(Fluids.WATER);
+            return level.getFluidState(target).getType().isSame(Fluids.WATER);
         }
         
         private boolean cutoffSearch() {
@@ -349,7 +347,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         }
         
         private boolean isValidTarget(BlockPos target) {
-            var state = world.getFluidState(target);
+            var state = level.getFluidState(target);
             return !state.isEmpty() && state.is(fluidType);
         }
         

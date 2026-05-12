@@ -19,11 +19,11 @@ public abstract class UpgradableMachineBlock extends MachineBlock {
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
+        if (!level.isClientSide()) {
             
-            var entity = world.getBlockEntity(pos);
+            var entity = level.getBlockEntity(pos);
             if (!(entity instanceof MachineAddonController machineEntity)) {
                 return InteractionResult.SUCCESS;
             }
@@ -32,32 +32,32 @@ public abstract class UpgradableMachineBlock extends MachineBlock {
             
         }
         
-        return super.useWithoutItem(state, world, pos, player, hit);
+        return super.useWithoutItem(state, level, pos, player, hit);
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
 
-        if (!world.isClientSide()) {
-            var entity = world.getBlockEntity(pos);
+        if (!level.isClientSide()) {
+            var entity = level.getBlockEntity(pos);
             if (entity instanceof MachineAddonController machineEntity) {
                 machineEntity.resetAddons();
             }
         }
 
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override
-    protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
         
-        if (!world.isClientSide()) {
-            var entity = world.getBlockEntity(pos);
+        if (!level.isClientSide()) {
+            var entity = level.getBlockEntity(pos);
             if (entity instanceof MachineAddonController machineEntity) {
                 machineEntity.resetAddons();
             }
         }
         
-        super.onExplosionHit(state, world, pos, explosion, stackMerger);
+        super.onExplosionHit(state, level, pos, explosion, stackMerger);
     }
 }

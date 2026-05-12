@@ -246,14 +246,14 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         }
     }
     
-    public static List<ItemStack> getLootDrops(BlockState state, ServerLevel world, BlockPos pos, @Nullable BlockEntity blockEntity, int yieldAddons, @Nullable Player entity) {
+    public static List<ItemStack> getLootDrops(BlockState state, ServerLevel level, BlockPos pos, @Nullable BlockEntity blockEntity, int yieldAddons, @Nullable Player entity) {
         
         var sampleTool = new ItemStack(Items.NETHERITE_PICKAXE);
         sampleTool.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
-        var fortuneEntry = world.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(Enchantments.FORTUNE).get();
+        var fortuneEntry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(Enchantments.FORTUNE).get();
         sampleTool.enchant(fortuneEntry, Math.min(yieldAddons, 3));
         
-        var builder = new LootParams.Builder(world).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
+        var builder = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
                         .withParameter(LootContextParams.TOOL, sampleTool)
                         .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
         if (entity != null)
@@ -261,13 +261,13 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         return state.getDrops(builder);
     }
     
-    public static List<ItemStack> getSilkTouchDrops(BlockState state, ServerLevel world, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Player entity) {
+    public static List<ItemStack> getSilkTouchDrops(BlockState state, ServerLevel level, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Player entity) {
         var sampleTool = new ItemStack(Items.NETHERITE_PICKAXE);
         sampleTool.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
-        var silkTouchEntry = world.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(Enchantments.SILK_TOUCH).get();
+        var silkTouchEntry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(Enchantments.SILK_TOUCH).get();
         sampleTool.enchant(silkTouchEntry, 1);
         
-        var builder = new LootParams.Builder(world).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
+        var builder = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
                         .withParameter(LootContextParams.TOOL, sampleTool)
                         .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
         if (entity != null)

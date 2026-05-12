@@ -45,14 +45,14 @@ public class OreFinderRenderer {
         .createCompositeState(false));
     
     public static void doRender(PoseStack matrices, Camera camera, MultiBufferSource vertexConsumers) {
-        var world = Minecraft.getInstance().level;
-        if (world == null || renderedBlocks == null) return;
-        var age = world.getGameTime() - receivedAt;
+        var level = Minecraft.getInstance().level;
+        if (level == null || renderedBlocks == null) return;
+        var age = level.getGameTime() - receivedAt;
         
         if (age > 15) return;
         
         for (var pos : renderedBlocks) {
-            var state = world.getBlockState(pos);
+            var state = level.getBlockState(pos);
             
             matrices.pushPose();
             //Offset by the camera position so that the render is relative to the camera
@@ -62,7 +62,7 @@ public class OreFinderRenderer {
             var renderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
             var vertexProvider = vertexConsumers.getBuffer(OVERLAY);
             
-            OreFinderRenderer.tesselateWithoutAO(renderer, world, Minecraft.getInstance().getBlockRenderer().getBlockModel(state), state, pos, matrices, vertexProvider, false, world.random, 0, 0);
+            OreFinderRenderer.tesselateWithoutAO(renderer, level, Minecraft.getInstance().getBlockRenderer().getBlockModel(state), state, pos, matrices, vertexProvider, false, level.random, 0, 0);
             
             matrices.popPose();
         }

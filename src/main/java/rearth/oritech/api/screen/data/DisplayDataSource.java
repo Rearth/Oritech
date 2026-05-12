@@ -1,7 +1,5 @@
 package rearth.oritech.api.screen.data;
 
-import dev.architectury.fluid.FluidStack;
-import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import rearth.oritech.api.energy.EnergyApi;

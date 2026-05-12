@@ -2,7 +2,6 @@ package rearth.oritech.block.entity.interaction;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -99,9 +98,9 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
     
-        var currentRedstone = world.hasNeighborSignal(pos);
+        var currentRedstone = level.hasNeighborSignal(pos);
         
         if (currentRedstone && !wasRedstoneActive) {
             // recently enabled redstone
@@ -422,8 +421,8 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     
     public static void onPlayerUse(ShrinkerPlayerUsePacket packet, IPayloadContext context) {
         
-        var world = context.player().level();
-        var candidate = world.getBlockEntity(packet.pos(), BlockEntitiesContent.SHRINKER_BLOCK_ENTITY);
+        var level = context.player().level();
+        var candidate = level.getBlockEntity(packet.pos(), BlockEntitiesContent.SHRINKER_BLOCK_ENTITY);
         candidate.ifPresent(ShrinkerBlockEntity::doShrink);
         
     }

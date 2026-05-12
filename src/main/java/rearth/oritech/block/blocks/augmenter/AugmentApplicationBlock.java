@@ -1,8 +1,6 @@
 package rearth.oritech.block.blocks.augmenter;
 
 import com.mojang.serialization.MapCodec;
-import dev.architectury.registry.menu.ExtendedMenuProvider;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -66,10 +64,10 @@ public class AugmentApplicationBlock extends HorizontalDirectionalBlock implemen
     }
     
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         
         if (!state.getValue(ASSEMBLED)) {
-            return super.getShape(state, world, pos, context);
+            return super.getShape(state, level, pos, context);
         }
         
         var facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
@@ -114,14 +112,14 @@ public class AugmentApplicationBlock extends HorizontalDirectionalBlock implemen
     }
     
     @Override
-    protected void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         
-        if (world.isClientSide || !state.getValue(ASSEMBLED)) return;
+        if (level.isClientSide || !state.getValue(ASSEMBLED)) return;
         
         if (!(entity instanceof Player player)) return;
         
         if (lastTeleportedPlayer != null) {
-            var age = world.getGameTime() - lastTeleportedPlayer.getA();
+            var age = level.getGameTime() - lastTeleportedPlayer.getA();
             if (age < 20) {
                 return;
             }
@@ -133,18 +131,18 @@ public class AugmentApplicationBlock extends HorizontalDirectionalBlock implemen
         
         if (dist < 0.45) {
             
-            var ageWithoutContact = world.getGameTime() - lastContact.getOrDefault(player, 0L);
+            var ageWithoutContact = level.getGameTime() - lastContact.getOrDefault(player, 0L);
             
-            var time = world.getGameTime();
+            var time = level.getGameTime();
             lastContact.put(player, time);
             
             if (ageWithoutContact > 15) {
                 var locked = lockPlayer(player, centerPos, state);
                 if (locked) {
-                    var blockEntity = (AugmentApplicationEntity) world.getBlockEntity(pos);
+                    var blockEntity = (AugmentApplicationEntity) level.getBlockEntity(pos);
                     blockEntity.loadAvailableStations(player);
                     
-                    var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+                    var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
                     MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
                 }
             }
@@ -176,12 +174,12 @@ public class AugmentApplicationBlock extends HorizontalDirectionalBlock implemen
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (world.isClientSide())
+        if (level.isClientSide())
             return InteractionResult.SUCCESS;
         
-        var entity = world.getBlockEntity(pos);
+        var entity = level.getBlockEntity(pos);
         if (!(entity instanceof AugmentApplicationEntity modifierEntity)) {
             return InteractionResult.SUCCESS;
         }
@@ -206,29 +204,29 @@ public class AugmentApplicationBlock extends HorizontalDirectionalBlock implemen
             return InteractionResult.SUCCESS;
         }
         
-        var blockEntity = (AugmentApplicationEntity) world.getBlockEntity(pos);
+        var blockEntity = (AugmentApplicationEntity) level.getBlockEntity(pos);
         blockEntity.loadAvailableStations(player);
         
-        var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+        var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
         MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         
         return InteractionResult.SUCCESS;
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide()) {
+        if (!level.isClientSide()) {
             
-            var entity = world.getBlockEntity(pos);
+            var entity = level.getBlockEntity(pos);
             
             if (entity instanceof AugmentApplicationEntity storageBlock) {
                 storageBlock.onControllerBroken();
                 var stacks = storageBlock.inventory.heldStacks;
                 for (var heldStack : stacks) {
                     if (!heldStack.isEmpty()) {
-                        var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
-                        world.addFreshEntity(itemEntity);
+                        var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), heldStack);
+                        level.addFreshEntity(itemEntity);
                     }
                 }
                 
@@ -237,7 +235,7 @@ public class AugmentApplicationBlock extends HorizontalDirectionalBlock implemen
             }
         }
         
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Nullable
@@ -248,7 +246,7 @@ public class AugmentApplicationBlock extends HorizontalDirectionalBlock implemen
     
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

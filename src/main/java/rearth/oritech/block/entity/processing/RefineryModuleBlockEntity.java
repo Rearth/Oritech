@@ -192,7 +192,7 @@ public class RefineryModuleBlockEntity extends NetworkedBlockEntity implements M
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
     
     }
 }

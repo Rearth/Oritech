@@ -30,11 +30,11 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEner
     }
     
     @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        if (world.isClientSide()) return;
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        if (level.isClientSide()) return;
         
         var tickPeriod = 10;
-        if (world.getGameTime() % tickPeriod != 0) return;
+        if (level.getGameTime() % tickPeriod != 0) return;
         
         var isPlayer = entity instanceof Player;
         var isEquipped = ((Player) entity).getItemBySlot(EquipmentSlot.CHEST).equals(stack);

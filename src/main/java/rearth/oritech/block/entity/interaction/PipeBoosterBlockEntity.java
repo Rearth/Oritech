@@ -44,13 +44,13 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
     }
     
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, PipeBoosterBlockEntity blockEntity) {
-        if (world.isClientSide()) return;
+    public void tick(Level level, BlockPos pos, BlockState state, PipeBoosterBlockEntity blockEntity) {
+        if (level.isClientSide()) return;
         
-        if (!setPipe && (world.getGameTime() & 25) == 0) {
+        if (!setPipe && (level.getGameTime() & 25) == 0) {
             // try find pipe entity behind
             var targetPos = pos.offset(Geometry.getBackward(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
-            var candidate = world.getBlockEntity(targetPos);
+            var candidate = level.getBlockEntity(targetPos);
             if (candidate instanceof GenericPipeInterfaceEntity pipe) {
                 pipe.connectedBooster = pos;
                 setPipe = true;
@@ -59,7 +59,7 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
         }
         
         // occasionally set the correct pipe anim state
-        if (world.getGameTime() % 42 == 0) {
+        if (level.getGameTime() % 42 == 0) {
             if (setPipe) {
                 triggerAnim("machine", "extended");
             } else {

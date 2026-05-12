@@ -1,7 +1,5 @@
 package rearth.oritech.block.blocks.reactor;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -32,10 +30,10 @@ public class ReactorAbsorberPortBlock extends BaseReactorBlock implements Entity
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide && world.getBlockEntity(pos) instanceof ReactorAbsorberPortEntity) {
-            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof ReactorAbsorberPortEntity) {
+            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
                 MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
@@ -43,15 +41,15 @@ public class ReactorAbsorberPortBlock extends BaseReactorBlock implements Entity
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide()) {
-            var entity = (ReactorAbsorberPortEntity) world.getBlockEntity(pos);
+        if (!level.isClientSide()) {
+            var entity = (ReactorAbsorberPortEntity) level.getBlockEntity(pos);
             var stacks = entity.inventory.heldStacks;
             for (var stack : stacks) {
                 if (!stack.isEmpty()) {
-                    var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
-                    world.addFreshEntity(itemEntity);
+                    var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+                    level.addFreshEntity(itemEntity);
                 }
             }
             
@@ -59,6 +57,6 @@ public class ReactorAbsorberPortBlock extends BaseReactorBlock implements Entity
             entity.inventory.setChanged();
         }
         
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
 }

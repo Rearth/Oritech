@@ -1,6 +1,5 @@
 package rearth.oritech.block.blocks.interaction;
 
-import dev.architectury.registry.menu.MenuRegistry;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -88,24 +87,24 @@ public class LaserArmBlock extends Block implements EntityBlock {
     }
     
     @Override
-    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
         
-        if (world.isClientSide()) return;
+        if (level.isClientSide()) return;
         
-        var isPowered = world.hasNeighborSignal(pos);
+        var isPowered = level.hasNeighborSignal(pos);
         
-        var laserEntity = (LaserArmBlockEntity) world.getBlockEntity(pos);
+        var laserEntity = (LaserArmBlockEntity) level.getBlockEntity(pos);
         laserEntity.setRedstonePowered(isPowered);
         
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
+        if (!level.isClientSide()) {
             
-            var entity = world.getBlockEntity(pos);
+            var entity = level.getBlockEntity(pos);
             if (!(entity instanceof LaserArmBlockEntity laserArm)) {
                 return InteractionResult.SUCCESS;
             }
@@ -140,11 +139,11 @@ public class LaserArmBlock extends Block implements EntityBlock {
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide()) {
+        if (!level.isClientSide()) {
             
-            var entity = world.getBlockEntity(pos);
+            var entity = level.getBlockEntity(pos);
             if (state.getValue(ASSEMBLED) && entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
@@ -157,8 +156,8 @@ public class LaserArmBlock extends Block implements EntityBlock {
                 var stacks = storageBlock.inventory.heldStacks;
                 for (var heldStack : stacks) {
                     if (!heldStack.isEmpty()) {
-                        var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
-                        world.addFreshEntity(itemEntity);
+                        var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), heldStack);
+                        level.addFreshEntity(itemEntity);
                     }
                 }
                 
@@ -167,7 +166,7 @@ public class LaserArmBlock extends Block implements EntityBlock {
             }
         }
         
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override
@@ -184,7 +183,7 @@ public class LaserArmBlock extends Block implements EntityBlock {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

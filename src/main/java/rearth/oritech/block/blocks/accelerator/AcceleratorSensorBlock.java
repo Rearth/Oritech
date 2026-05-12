@@ -31,8 +31,8 @@ public class AcceleratorSensorBlock extends AcceleratorPassthroughBlock implemen
     }
     
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
-        return ((ComparatorOutputProvider) world.getBlockEntity(pos)).getComparatorOutput();
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        return ((ComparatorOutputProvider) level.getBlockEntity(pos)).getComparatorOutput();
     }
     
     @Nullable
@@ -44,7 +44,7 @@ public class AcceleratorSensorBlock extends AcceleratorPassthroughBlock implemen
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

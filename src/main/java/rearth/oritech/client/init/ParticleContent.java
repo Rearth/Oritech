@@ -25,43 +25,43 @@ public class ParticleContent {
     
     // public stuff
     
-    public static void HighlightBlock(Level world, Vec3 pos) {
-        sendParticle(world, new Payload(EffectType.HIGHLIGHT_BLOCK, pos, Vec3.ZERO, Vec3.ZERO, 0));
+    public static void HighlightBlock(Level level, Vec3 pos) {
+        sendParticle(level, new Payload(EffectType.HIGHLIGHT_BLOCK, pos, Vec3.ZERO, Vec3.ZERO, 0));
     }
     
-    public static void DebugBlock(Level world, Vec3 pos) {
-        sendParticle(world, new Payload(EffectType.DEBUG_BLOCK, pos, Vec3.ZERO, Vec3.ZERO, 0));
+    public static void DebugBlock(Level level, Vec3 pos) {
+        sendParticle(level, new Payload(EffectType.DEBUG_BLOCK, pos, Vec3.ZERO, Vec3.ZERO, 0));
     }
     
-    public static void Accelerating(Level world, Vec3 pos) {
-        sendParticle(world, new Payload(EffectType.ACCELERATING, pos, Vec3.ZERO, Vec3.ZERO, 0));
+    public static void Accelerating(Level level, Vec3 pos) {
+        sendParticle(level, new Payload(EffectType.ACCELERATING, pos, Vec3.ZERO, Vec3.ZERO, 0));
     }
     
-    public static void WeedKiller(Level world, Vec3 start, Vec3 end) {
-        sendParticle(world, new Payload(EffectType.WEED_KILLER, start, start, end, 0));
+    public static void WeedKiller(Level level, Vec3 start, Vec3 end) {
+        sendParticle(level, new Payload(EffectType.WEED_KILLER, start, start, end, 0));
     }
     
-    public static void WanderingSoul(Level world, Vec3 pos, Vec3 offset, int duration) {
-        sendParticle(world, new Payload(EffectType.WANDERING_SOUL, pos, offset, Vec3.ZERO, duration));
+    public static void WanderingSoul(Level level, Vec3 pos, Vec3 offset, int duration) {
+        sendParticle(level, new Payload(EffectType.WANDERING_SOUL, pos, offset, Vec3.ZERO, duration));
     }
     
-    public static void LaserBoom(Level world, Vec3 start, Vec3 end) {
-        sendParticle(world, new Payload(EffectType.LASER_BOOM, start, end, Vec3.ZERO, 0));
+    public static void LaserBoom(Level level, Vec3 start, Vec3 end) {
+        sendParticle(level, new Payload(EffectType.LASER_BOOM, start, end, Vec3.ZERO, 0));
     }
     
-    public static void CatalystConnection(Level world, Vec3 source, Vec3 dest) {
-        sendParticle(world, new Payload(EffectType.CATALYST_CONNECTION, source, source, dest, 0));
+    public static void CatalystConnection(Level level, Vec3 source, Vec3 dest) {
+        sendParticle(level, new Payload(EffectType.CATALYST_CONNECTION, source, source, dest, 0));
     }
     
-    public static void BlackHoleEmission(Level world, Vec3 origin, Vec3 target) {
-        sendParticle(world, new Payload(EffectType.BLACK_HOLE_EMISSION, origin, target, Vec3.ZERO, 0));
+    public static void BlackHoleEmission(Level level, Vec3 origin, Vec3 target) {
+        sendParticle(level, new Payload(EffectType.BLACK_HOLE_EMISSION, origin, target, Vec3.ZERO, 0));
     }
     
-    private static void sendParticle(Level world, Payload payload) {
-        if (world instanceof ServerLevel sl) {
+    private static void sendParticle(Level level, Payload payload) {
+        if (level instanceof ServerLevel sl) {
             NetworkManager.sendNearby(sl, payload.pos, 64, payload);
-        } else if (world.isClientSide()) {
-            handleOnClient(payload, world, null);
+        } else if (level.isClientSide()) {
+            handleOnClient(payload, level, null);
         }
     }
     
@@ -71,7 +71,7 @@ public class ParticleContent {
         context.enqueueWork(() -> handleOnClient(payload, context.player().level(), context.player().registryAccess()));
     }
     
-    public static void handleOnClient(Payload payload, Level world, RegistryAccess access) {
+    public static void handleOnClient(Payload payload, Level level, RegistryAccess access) {
         var type = EffectType.values()[payload.effectId];
         switch (type) {
             case HIGHLIGHT_BLOCK -> spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, payload.pos, 1, 120, 6);
@@ -79,7 +79,7 @@ public class ParticleContent {
             case ACCELERATING -> spawnCubeOutline(ParticleTypes.SCULK_CHARGE_POP, payload.pos, 1, 5, 3);
             case WEED_KILLER -> {
                 var dist = (int) payload.data2.distanceTo(payload.data1);
-                spawnLine(ParticleTypes.DRAGON_BREATH, world, payload.data1, payload.data2, dist * 4 + world.random.nextInt(3), 0.2f);
+                spawnLine(ParticleTypes.DRAGON_BREATH, level, payload.data1, payload.data2, dist * 4 + level.random.nextInt(3), 0.2f);
             }
             case WANDERING_SOUL -> {
                 var velocity = payload.data1.scale((1f / payload.extraInt) * 1.5f);
@@ -87,12 +87,12 @@ public class ParticleContent {
             }
             case LASER_BOOM -> {
                 var count = Math.min((int) (payload.pos.distanceTo(payload.data1) * 0.6f + 1), 12);
-                spawnLineStaggered(ParticleTypes.SONIC_BOOM, world, payload.pos, payload.data1, count, 20);
+                spawnLineStaggered(ParticleTypes.SONIC_BOOM, level, payload.pos, payload.data1, count, 20);
             }
-            case CATALYST_CONNECTION -> spawnEnchantParticles(world, payload.data2, payload.data1.add(0, 0.3f, 0), 0.3f);
+            case CATALYST_CONNECTION -> spawnEnchantParticles(level, payload.data2, payload.data1.add(0, 0.3f, 0), 0.3f);
             case BLACK_HOLE_EMISSION -> {
                 var dist = (int) payload.data1.distanceTo(payload.pos);
-                spawnLine(ParticleTypes.SCULK_CHARGE_POP, world, payload.pos, payload.data1, dist + world.random.nextInt(3), 0.2f);
+                spawnLine(ParticleTypes.SCULK_CHARGE_POP, level, payload.pos, payload.data1, dist + level.random.nextInt(3), 0.2f);
             }
         }
     }
@@ -133,34 +133,34 @@ public class ParticleContent {
         if (p != null) p.setLifetime(maxAge);
     }
     
-    private static void spawnLine(ParticleOptions particle, Level world, Vec3 start, Vec3 end, int count, float spread) {
+    private static void spawnLine(ParticleOptions particle, Level level, Vec3 start, Vec3 end, int count, float spread) {
         Vec3 diff = end.subtract(start);
         for (int i = 0; i < count; i++) {
             double t = count > 1 ? (double) i / (count - 1) : 0;
             Vec3 pos = start.add(diff.scale(t));
-            world.addParticle(particle,
-                pos.x + (world.random.nextDouble() - 0.5) * 2 * spread,
-                pos.y + (world.random.nextDouble() - 0.5) * 2 * spread,
-                pos.z + (world.random.nextDouble() - 0.5) * 2 * spread,
+            level.addParticle(particle,
+                pos.x + (level.random.nextDouble() - 0.5) * 2 * spread,
+                pos.y + (level.random.nextDouble() - 0.5) * 2 * spread,
+                pos.z + (level.random.nextDouble() - 0.5) * 2 * spread,
                 0, 0, 0);
         }
     }
     
-    private static void spawnEnchantParticles(Level world, Vec3 source, Vec3 dest, float spread) {
+    private static void spawnEnchantParticles(Level level, Vec3 source, Vec3 dest, float spread) {
         Vec3 diff = dest.subtract(source);
-        world.addParticle(ParticleTypes.ENCHANT,
-            source.x + (world.random.nextDouble() - 0.3) * 2 * spread,
-            source.y + (world.random.nextDouble() - 0.3) * 2 * spread,
-            source.z + (world.random.nextDouble() - 0.3) * 2 * spread,
+        level.addParticle(ParticleTypes.ENCHANT,
+            source.x + (level.random.nextDouble() - 0.3) * 2 * spread,
+            source.y + (level.random.nextDouble() - 0.3) * 2 * spread,
+            source.z + (level.random.nextDouble() - 0.3) * 2 * spread,
             diff.x, diff.y, diff.z);
     }
     
-    private static void spawnLineStaggered(ParticleOptions particle, Level world, Vec3 start, Vec3 end, float count, long pauseMillis) {
+    private static void spawnLineStaggered(ParticleOptions particle, Level level, Vec3 start, Vec3 end, float count, long pauseMillis) {
         var step = end.subtract(start).scale(1f / count);
         CompletableFuture.runAsync(() -> {
             for (int i = 0; i < count; i++) {
                 var pos = start.add(step.scale(i));
-                world.addParticle(particle, pos.x(), pos.y(), pos.z(), 0, 0, 0);
+                level.addParticle(particle, pos.x(), pos.y(), pos.z(), 0, 0, 0);
                 try {
                     Thread.sleep(pauseMillis);
                 } catch (InterruptedException e) {

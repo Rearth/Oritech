@@ -48,16 +48,16 @@ public class LargeStorageBlock extends SmallStorageBlock {
     }
     
     @Override
-    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
         return new ItemStack(this);
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
+        if (!level.isClientSide()) {
             
-            var entity = world.getBlockEntity(pos);
+            var entity = level.getBlockEntity(pos);
             if (!(entity instanceof MultiblockMachineController machineEntity)) {
                 return InteractionResult.SUCCESS;
             }
@@ -84,15 +84,15 @@ public class LargeStorageBlock extends SmallStorageBlock {
             
         }
         
-        return super.useWithoutItem(state, world, pos, player, hit);
+        return super.useWithoutItem(state, level, pos, player, hit);
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         
-        if (!world.isClientSide() && state.getValue(ASSEMBLED)) {
+        if (!level.isClientSide() && state.getValue(ASSEMBLED)) {
             
-            var entity = world.getBlockEntity(pos);
+            var entity = level.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
@@ -101,8 +101,8 @@ public class LargeStorageBlock extends SmallStorageBlock {
                 var stacks = storageBlock.inventory.heldStacks;
                 for (var heldStack : stacks) {
                     if (!heldStack.isEmpty()) {
-                        var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), heldStack);
-                        world.addFreshEntity(itemEntity);
+                        var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), heldStack);
+                        level.addFreshEntity(itemEntity);
                     }
                 }
                 
@@ -111,6 +111,6 @@ public class LargeStorageBlock extends SmallStorageBlock {
             }
         }
         
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
 }

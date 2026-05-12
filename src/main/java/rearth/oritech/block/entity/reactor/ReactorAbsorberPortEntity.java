@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.reactor;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

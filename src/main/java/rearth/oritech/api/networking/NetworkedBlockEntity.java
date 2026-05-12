@@ -28,15 +28,15 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     
     // this should never be used in child classes, always use serverTick / clientTick
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        if (world.isClientSide()) {
-            clientTick(world, pos, state, blockEntity);
+    public void tick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        if (level.isClientSide()) {
+            clientTick(level, pos, state, blockEntity);
             return;
         }
         
-        serverTick(world, pos, state, blockEntity);
+        serverTick(level, pos, state, blockEntity);
         
-        var time = world.getGameTime();
+        var time = level.getGameTime();
         
         if ((time + this.worldPosition.asLong()) % getSparseUpdateInterval() == 0)
             sendUpdate(SyncType.SPARSE_TICK);
@@ -52,8 +52,8 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         }
     }
     
-    public abstract void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity);
-    public void clientTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {};
+    public abstract void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity);
+    public void clientTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {};
     
     public int getSparseUpdateInterval() {return 100;}
     
@@ -78,7 +78,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     
     public void sendUpdate(SyncType type) {
         if (level == null) {
-            Oritech.LOGGER.warn("unable to send update: World is null.");
+              Oritech.LOGGER.warn("unable to send update: Level is null.");
             return;
         }
         
@@ -93,7 +93,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     
     public void sendUpdate(SyncType type, ServerPlayer player) {
         if (level == null) {
-            Oritech.LOGGER.warn("unable to send player update: World is null.");
+            Oritech.LOGGER.warn("unable to send player update: Level is null.");
             return;
         }
         

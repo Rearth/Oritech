@@ -33,7 +33,7 @@ public class ReactorRodBlock extends BaseReactorBlock {
     }
     
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return switch (rodCount) {
             case 1 -> SOLO_SHAPE;
             case 2 -> DUO_SHAPE;

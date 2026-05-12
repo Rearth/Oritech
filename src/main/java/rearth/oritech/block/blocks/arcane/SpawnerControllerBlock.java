@@ -32,10 +32,10 @@ public class SpawnerControllerBlock extends HorizontalDirectionalBlock implement
     }
     
     @Override
-    public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
-        super.stepOn(world, pos, state, entity);
+    public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
+        super.stepOn(level, pos, state, entity);
         
-        if (!world.isClientSide && world.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.onEntitySteppedOn(entity);
         }
         
@@ -47,14 +47,14 @@ public class SpawnerControllerBlock extends HorizontalDirectionalBlock implement
     }
     
     @Override
-    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
         
-        if (world.isClientSide()) return;
+        if (level.isClientSide()) return;
         
-        var isPowered = world.hasNeighborSignal(pos);
+        var isPowered = level.hasNeighborSignal(pos);
         
-        var entity = (SpawnerControllerBlockEntity) world.getBlockEntity(pos);
+        var entity = (SpawnerControllerBlockEntity) level.getBlockEntity(pos);
         entity.setRedstonePowered(isPowered);
         
     }
@@ -65,8 +65,8 @@ public class SpawnerControllerBlock extends HorizontalDirectionalBlock implement
     }
     
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
-        return ((SpawnerControllerBlockEntity) world.getBlockEntity(pos)).getComparatorOutput();
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        return ((SpawnerControllerBlockEntity) level.getBlockEntity(pos)).getComparatorOutput();
     }
     
     @Override
@@ -80,9 +80,9 @@ public class SpawnerControllerBlock extends HorizontalDirectionalBlock implement
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 
-        if (!world.isClientSide && world.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.onBlockInteracted(player);
         }
 
@@ -98,7 +98,7 @@ public class SpawnerControllerBlock extends HorizontalDirectionalBlock implement
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

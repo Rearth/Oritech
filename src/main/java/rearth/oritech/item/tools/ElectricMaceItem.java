@@ -78,7 +78,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
         }
     }
     
-    private void createLightningAttack(ServerLevel world, Player attacker, LivingEntity target, ItemStack stack, int damage) {
+    private void createLightningAttack(ServerLevel level, Player attacker, LivingEntity target, ItemStack stack, int damage) {
         
         var usedEnergy = tryUseEnergy(stack, OritechStartupConfig.electricMace.energyUsage.get() * OritechStartupConfig.electricMace.lightningCostMultiplier.get(), null);
         if (usedEnergy && attacker.level() instanceof ServerLevel serverWorld) {
@@ -103,11 +103,11 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
         }
     }
     
-    public static void processLightningEvents(Level world) {
+    public static void processLightningEvents(Level level) {
         var toRemove = new ArrayList<Long>();
         for (var entry : PENDING_LIGHTNING_HITS.entrySet()) {
             var key = entry.getKey();
-            if (world.getGameTime() > key) {
+            if (level.getGameTime() > key) {
                 var event = entry.getValue();
                 event.run();
                 toRemove.add(key);
@@ -135,8 +135,8 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
                     damage = getAttackDamage() * 6 + fallDist - 8.0F;
                 }
                 
-                var world = livingEntity.level();
-                if (world instanceof ServerLevel serverWorld) {
+                var level = livingEntity.level();
+                if (level instanceof ServerLevel serverWorld) {
                     return damage + EnchantmentHelper.modifyFallBasedDamage(serverWorld, livingEntity.getWeaponItem(), target, damageSource, 2.0F) * fallDist;
                 } else {
                     return damage;

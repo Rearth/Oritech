@@ -1,4 +1,4 @@
-package rearth.oritech.init.world.features.uranium;
+package rearth.oritech.init.level.features.uranium;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
@@ -31,13 +31,13 @@ public class UraniumPatchFeature extends Feature<UraniumPatchFeatureConfig> {
     @Override
     public boolean place(FeaturePlaceContext<UraniumPatchFeatureConfig> context) {
         
-        var world = context.level();
+        var level = context.level();
         var origin = context.origin();
         
-        if (world.isClientSide()) return false;
+        if (level.isClientSide()) return false;
         
         var testPos = new BlockPos(origin.below(3));
-        if (isAirOrWater(world.getBlockState(testPos)))
+        if (isAirOrWater(level.getBlockState(testPos)))
             placeStructure(testPos, context);
         
         return false;
@@ -49,14 +49,14 @@ public class UraniumPatchFeature extends Feature<UraniumPatchFeatureConfig> {
         var config = context.config();
         var state = BuiltInRegistries.BLOCK.get(config.blockId()).defaultBlockState();
         var crystalBlock = BuiltInRegistries.BLOCK.get(config.crystalId());
-        var world = context.level();
+        var level = context.level();
         
         var range = config.number();
         var closestWall = pos;
         
         // find closest wall
         for (var candidate : BlockPos.withinManhattan(pos, range, range, range)) {
-            var candidateState = world.getBlockState(candidate);
+            var candidateState = level.getBlockState(candidate);
             if (isAirOrWater(candidateState)) continue;
             closestWall = candidate;
             break;
@@ -87,15 +87,15 @@ public class UraniumPatchFeature extends Feature<UraniumPatchFeatureConfig> {
                 for (int k = 0; k < 5; k++) {
                     var projected = test.offset(forward.multiply(k));
                     var projected2 = test2.offset(forward.multiply(k));
-                    var testState = world.getBlockState(projected);
-                    var testState2 = world.getBlockState(projected2);
+                    var testState = level.getBlockState(projected);
+                    var testState2 = level.getBlockState(projected2);
                     if (isValidReplacementBloc(testState)) {
-                        createCrystals(projected, world, random, crystalBlock);
-                        world.setBlock(projected, state, Block.UPDATE_CLIENTS, 0);
+                        createCrystals(projected, level, random, crystalBlock);
+                        level.setBlock(projected, state, Block.UPDATE_CLIENTS, 0);
                         break;
                     }
                     if (isValidReplacementBloc(testState2)) {
-                        world.setBlock(projected2, state, Block.UPDATE_CLIENTS, 0);
+                        level.setBlock(projected2, state, Block.UPDATE_CLIENTS, 0);
                         break;
                     }
                     
@@ -111,9 +111,9 @@ public class UraniumPatchFeature extends Feature<UraniumPatchFeatureConfig> {
         return state.is(BlockTags.DEEPSLATE_ORE_REPLACEABLES) || state.is(BlockTags.STONE_ORE_REPLACEABLES);
     }
     
-    private void createCrystals(BlockPos pos, WorldGenLevel world, RandomSource random, Block crystal) {
+    private void createCrystals(BlockPos pos, WorldGenLevel level, RandomSource random, Block crystal) {
         for (var neighborPos : getNeighbors(pos)) {
-            var neighborState = world.getBlockState(neighborPos);
+            var neighborState = level.getBlockState(neighborPos);
             
             var isValid = neighborState.isAir() || neighborState.is(Blocks.WATER);
             if (!isValid || random.nextFloat() < 0.7) continue;
@@ -124,7 +124,7 @@ public class UraniumPatchFeature extends Feature<UraniumPatchFeatureConfig> {
             var targetState = crystal.defaultBlockState()
                                 .setValue(AmethystClusterBlock.WATERLOGGED, waterLogged)
                                 .setValue(AmethystClusterBlock.FACING, facing);
-            world.setBlock(neighborPos, targetState, Block.UPDATE_CLIENTS, 0);
+            level.setBlock(neighborPos, targetState, Block.UPDATE_CLIENTS, 0);
         }
     }
     

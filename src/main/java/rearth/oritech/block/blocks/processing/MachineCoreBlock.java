@@ -65,9 +65,9 @@ public class MachineCoreBlock extends Block implements EntityBlock {
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        onBlockRemoved(state, world, pos);
-        return super.playerWillDestroy(world, pos, state, player);
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        onBlockRemoved(state, level, pos);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override
@@ -83,55 +83,55 @@ public class MachineCoreBlock extends Block implements EntityBlock {
     }
     
     @Override
-    protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
         
         // forward explosion to refinery
         if (state.getValue(USED)) {
-            var controller = getControllerPos(world, pos);
-            var controllerState = world.getBlockState(controller);
+            var controller = getControllerPos(level, pos);
+            var controllerState = level.getBlockState(controller);
             if (controllerState.getBlock() instanceof RefineryBlock refineryBlock) {
-                refineryBlock.onExplosionHit(controllerState, world, controller, explosion, stackMerger);
+                refineryBlock.onExplosionHit(controllerState, level, controller, explosion, stackMerger);
                 return;
             }
         }
         
-        super.onExplosionHit(state, world, pos, explosion, stackMerger);
+        super.onExplosionHit(state, level, pos, explosion, stackMerger);
     }
     
-    private static void onBlockRemoved(BlockState state, LevelAccessor world, BlockPos pos) {
-        if (!world.isClientSide() && state.getValue(USED) && world.getBlockEntity(pos) instanceof MachineCoreEntity coreEntity) {
+    private static void onBlockRemoved(BlockState state, LevelAccessor level, BlockPos pos) {
+        if (!level.isClientSide() && state.getValue(USED) && level.getBlockEntity(pos) instanceof MachineCoreEntity coreEntity) {
             var controllerPos = coreEntity.getControllerPos();
-            if (controllerPos != null && world.getBlockEntity(controllerPos) instanceof MultiblockMachineController machineEntity) {
+            if (controllerPos != null && level.getBlockEntity(controllerPos) instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onCoreBroken(pos);
             }
         }
     }
     
     @NotNull
-    public static BlockPos getControllerPos(LevelAccessor world, BlockPos pos) {
-        var coreEntity = (MachineCoreEntity) world.getBlockEntity(pos);
+    public static BlockPos getControllerPos(LevelAccessor level, BlockPos pos) {
+        var coreEntity = (MachineCoreEntity) level.getBlockEntity(pos);
         return Objects.requireNonNull(coreEntity).getControllerPos();
     }
     
     @Nullable
-    public static BlockEntity getControllerEntity(LevelAccessor world, BlockPos pos) {
-        return world.getBlockEntity(getControllerPos(world, pos));
+    public static BlockEntity getControllerEntity(LevelAccessor level, BlockPos pos) {
+        return level.getBlockEntity(getControllerPos(level, pos));
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
         if (!state.getValue(USED)) return InteractionResult.PASS;
         
-        if (!world.isClientSide()) {
-            var controllerPos = getControllerPos(world, pos);
-            var controllerBlock = world.getBlockState(controllerPos);
-            var controllerEntity = world.getBlockEntity(controllerPos);
+        if (!level.isClientSide()) {
+            var controllerPos = getControllerPos(level, pos);
+            var controllerBlock = level.getBlockState(controllerPos);
+            var controllerEntity = level.getBlockEntity(controllerPos);
             if (controllerEntity instanceof DeepDrillEntity deepDrill && !deepDrill.init(true)) {
                 player.sendSystemMessage(Component.translatable("message.oritech.deep_drill.ore_placement"));
                 return InteractionResult.SUCCESS;
             } else {
-                return controllerBlock.useWithoutItem(world, player, new BlockHitResult(hit.getLocation(), hit.getDirection(), controllerPos, hit.isInside()));
+                return controllerBlock.useWithoutItem(level, player, new BlockHitResult(hit.getLocation(), hit.getDirection(), controllerPos, hit.isInside()));
             }
         }
         
@@ -140,21 +140,21 @@ public class MachineCoreBlock extends Block implements EntityBlock {
     }
     
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         
-        if (!state.getValue(USED)) super.useItemOn(stack, state, world, pos, player, hand, hit);
+        if (!state.getValue(USED)) super.useItemOn(stack, state, level, pos, player, hand, hit);
         
-        if (!world.isClientSide()) {
-            var controllerPos = getControllerPos(world, pos);
-            var controllerBlock = world.getBlockState(controllerPos);
+        if (!level.isClientSide()) {
+            var controllerPos = getControllerPos(level, pos);
+            var controllerBlock = level.getBlockState(controllerPos);
             if (controllerBlock.getBlock() instanceof MachineBlock machineBlock) {
-                return machineBlock.useItemOn(stack, state, world, pos, player, hand, hit);
+                return machineBlock.useItemOn(stack, state, level, pos, player, hand, hit);
             } else if (controllerBlock.getBlock() instanceof RefineryModuleBlock machineBlock) {
-                return machineBlock.useItemOn(stack, state, world, pos, player, hand, hit);
+                return machineBlock.useItemOn(stack, state, level, pos, player, hand, hit);
             }
         }
         
-        return super.useItemOn(stack, state, world, pos, player, hand, hit);
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
     
     @Nullable

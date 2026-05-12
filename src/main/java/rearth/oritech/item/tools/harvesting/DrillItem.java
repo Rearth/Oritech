@@ -51,7 +51,7 @@ public class DrillItem extends DiggerItem implements OritechEnergyItem {
     }
     
     @Override
-    public boolean mineBlock(ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity miner) {
+    public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity miner) {
         
         if (!(miner instanceof Player player)) return true;
         

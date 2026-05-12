@@ -34,33 +34,33 @@ public class HangarDoorHelperBlock extends Block {
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return HangarDoorBlock.getClosedShape(state.getValue(SURFACE), state.getValue(ROTATED));
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return state.getValue(OPENED) ? Shapes.empty() : HangarDoorBlock.getClosedShape(state.getValue(SURFACE), state.getValue(ROTATED));
     }
 
     @Override
-    public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         var anchorPos = HangarDoorBlock.getAnchorPos(pos, state);
-        var anchorState = world.getBlockState(anchorPos);
+        var anchorState = level.getBlockState(anchorPos);
         return anchorState.is(BlockContent.HANGAR_DOOR);
     }
 
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        if (!world.isClientSide()) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide()) {
             var anchorPos = HangarDoorBlock.getAnchorPos(pos, state);
-            var anchorState = world.getBlockState(anchorPos);
+            var anchorState = level.getBlockState(anchorPos);
             if (anchorState.is(BlockContent.HANGAR_DOOR)) {
-                HangarDoorBlock.removeFullStructure(world, anchorPos, anchorState, !player.isCreative());
+                HangarDoorBlock.removeFullStructure(level, anchorPos, anchorState, !player.isCreative());
             }
         }
 
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package rearth.oritech.block.blocks.storage;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -53,28 +51,28 @@ public class UnstableContainerBlock extends Block implements EntityBlock {
     }
     
     @Override
-    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         
-        super.setPlacedBy(world, pos, state, placer, itemStack);
+        super.setPlacedBy(level, pos, state, placer, itemStack);
         
-        if (world.isClientSide()) {
+        if (level.isClientSide()) {
             return;
         }
         
-        var machineCandidate = world.getBlockEntity(pos, BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY);
+        var machineCandidate = level.getBlockEntity(pos, BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY);
         if (machineCandidate.isEmpty()) return;
         var machine = machineCandidate.get();
         var corePositions = machine.getCorePositions();
         
         for (var coreOffset : corePositions) {
             var coreWorldPos = pos.offset(coreOffset);
-            var coreState = world.getBlockState(coreWorldPos);
+            var coreState = level.getBlockState(coreWorldPos);
             if (!coreState.isAir()) {
                 var breakingPlayer = placer instanceof Player ? (Player) placer : null;
-                coreState.getBlock().playerWillDestroy(world, coreWorldPos, coreState, breakingPlayer);
-                world.destroyBlock(coreWorldPos, true, placer, 1);
+                coreState.getBlock().playerWillDestroy(level, coreWorldPos, coreState, breakingPlayer);
+                level.destroyBlock(coreWorldPos, true, placer, 1);
             }
-            world.setBlockAndUpdate(coreWorldPos, BlockContent.MACHINE_CORE_HIDDEN.defaultBlockState());
+            level.setBlockAndUpdate(coreWorldPos, BlockContent.MACHINE_CORE_HIDDEN.defaultBlockState());
         }
         
         machine.initMultiblock(state);
@@ -82,10 +80,10 @@ public class UnstableContainerBlock extends Block implements EntityBlock {
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
-            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+        if (!level.isClientSide()) {
+            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
                 MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
@@ -95,7 +93,7 @@ public class UnstableContainerBlock extends Block implements EntityBlock {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);

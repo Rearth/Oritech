@@ -1,4 +1,4 @@
-package rearth.oritech.init.world.features.resourcenode;
+package rearth.oritech.init.level.features.resourcenode;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
@@ -25,23 +25,23 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
     @Override
     public boolean place(FeaturePlaceContext<ResourceNodeFeatureConfig> context) {
 
-        var world = context.level();
+        var level = context.level();
         var origin = context.origin();
         
-        if (world.isClientSide()) return false;
+        if (level.isClientSide()) return false;
         
         var solidBlockFound = false;
         var testPos = new BlockPos(origin);
         var deepNodePos = testPos;
         var boulderPos = testPos;
 
-        for (int y = origin.getY(); y > world.getMinBuildHeight(); y--) {
+        for (int y = origin.getY(); y > level.getMinBuildHeight(); y--) {
             var downPos = testPos.below();
-            var testState = world.getBlockState(downPos);
+            var testState = level.getBlockState(downPos);
             if (testState.is(Blocks.BEDROCK)) {
                 deepNodePos = testPos;
                 break;
-            } else if (testState.isRedstoneConductor(world, downPos) && !solidBlockFound) {
+            } else if (testState.isRedstoneConductor(level, downPos) && !solidBlockFound) {
                 boulderPos = testPos = downPos;
                 solidBlockFound = true;
             } else {
@@ -71,7 +71,7 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
     
     private void placeBedrockNode(BlockPos startPos, FeaturePlaceContext<ResourceNodeFeatureConfig> context) {
         
-        var world = context.level();
+        var level = context.level();
         var random = context.random();
         var ores = context.config().nodeOres();
         
@@ -90,20 +90,20 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
                 || pos.getY() >= startPos.getY() + overlayHeight + 3 + noise.noise(pos.getX(), pos.getY() + 2, pos.getZ())) continue;
             // randomly replace some blocks below bedrock level with resource nodes
             if (pos.getY() <= startPos.getY() + 1 && random.nextDouble() <= context.config().nodeOreChance()) {
-                world.setBlock(pos, getRandomBlockFromList(ores, random), 0x10);
+                level.setBlock(pos, getRandomBlockFromList(ores, random), 0x10);
             // set blocks between bedrock and bedrock + overlayHeight to overlayBlock
             } else if (pos.getY() > startPos.getY() + 1 && pos.getY() <= startPos.getY() + overlayHeight + 1) {
-                world.setBlock(pos, overlayBlock, 0x10);
+                level.setBlock(pos, overlayBlock, 0x10);
             // set anything between overlay and vertical cutoff to air
             } else if (pos.getY() > startPos.getY() + 1) {
-                world.setBlock(pos, Blocks.AIR.defaultBlockState(), 0x10);
+                level.setBlock(pos, Blocks.AIR.defaultBlockState(), 0x10);
             }
         }
     }
     
     private void placeSurfaceBoulder(BlockPos startPos, FeaturePlaceContext<ResourceNodeFeatureConfig> context) {
         
-        var world = context.level();
+        var level = context.level();
         var random = context.random();
         var radius = context.config().boulderRadius();
         var movedCenter = startPos.relative(Axis.getRandom(random), random.nextIntBetweenInclusive(0, radius-1));
@@ -112,7 +112,7 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
         
         for (BlockPos pos : BlockPos.withinManhattan(movedCenter, radius, radius, radius)) {
             if (Math.sqrt(pos.distSqr(movedCenter)) > radius + noise.noise(pos.getX(), pos.getY(), pos.getZ())) continue;
-            world.setBlock(pos, getRandomBlockFromList(ores, random), 0x10);
+            level.setBlock(pos, getRandomBlockFromList(ores, random), 0x10);
         }
     }
 }

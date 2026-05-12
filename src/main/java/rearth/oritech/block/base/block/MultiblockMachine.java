@@ -37,11 +37,11 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if (!world.isClientSide()) {
+        if (!level.isClientSide()) {
             
-            var entity = world.getBlockEntity(pos);
+            var entity = level.getBlockEntity(pos);
             if (!(entity instanceof MultiblockMachineController machineEntity)) {
                 return InteractionResult.SUCCESS;
             }
@@ -70,13 +70,13 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
             
         }
         
-        return super.useWithoutItem(state, world, pos, player, hit);
+        return super.useWithoutItem(state, level, pos, player, hit);
     }
     
     @Override
-    public @NotNull BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        resetMultiblock(state, world, pos);
-        return super.playerWillDestroy(world, pos, state, player);
+    public @NotNull BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        resetMultiblock(state, level, pos);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override
@@ -92,14 +92,14 @@ public abstract class MultiblockMachine extends UpgradableMachineBlock {
     }
     
     @Override
-    protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
-        resetMultiblock(state, world, pos);
-        super.onExplosionHit(state, world, pos, explosion, stackMerger);
+    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+        resetMultiblock(state, level, pos);
+        super.onExplosionHit(state, level, pos, explosion, stackMerger);
     }
     
-    private void resetMultiblock(BlockState state, LevelAccessor world, BlockPos pos) {
-        if (!world.isClientSide() && state.getValue(ASSEMBLED)) {
-            var entity = world.getBlockEntity(pos);
+    private void resetMultiblock(BlockState state, LevelAccessor level, BlockPos pos) {
+        if (!level.isClientSide() && state.getValue(ASSEMBLED)) {
+            var entity = level.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }

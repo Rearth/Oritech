@@ -30,29 +30,29 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     }
     
     @Override
-    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean notify) {
         if (oldState.getBlock().equals(state.getBlock())) return;
-        GenericPipeInterfaceEntity.addNode(world, pos, true, state, getNetworkData(world));
+        GenericPipeInterfaceEntity.addNode(level, pos, true, state, getNetworkData(level));
         
-        var regKey = world.dimension().location();
+        var regKey = level.dimension().location();
         var dataId = getPipeTypeName() + "_" + regKey.getNamespace() + "_" + regKey.getPath();
         Oritech.LOGGER.debug("saving for: " + dataId);
-        ((ServerLevel) world).getDataStorage().set(dataId, getNetworkData(world));
+        ((ServerLevel) level).getDataStorage().set(dataId, getNetworkData(level));
     }
     
     @Override
-    protected void onBlockRemoved(BlockPos pos, BlockState oldState, Level world) {
-        updateNeighbors(world, pos, false);
-        GenericPipeInterfaceEntity.removeNode(world, pos, true, oldState, getNetworkData(world));
+    protected void onBlockRemoved(BlockPos pos, BlockState oldState, Level level) {
+        updateNeighbors(level, pos, false);
+        GenericPipeInterfaceEntity.removeNode(level, pos, true, oldState, getNetworkData(level));
     }
     
     @Override
-    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         
-        if (!(world instanceof ServerLevel serverLevel)) return state;
+        if (!(level instanceof ServerLevel serverLevel)) return state;
         
         if (state.getValue(BlockStateProperties.WATERLOGGED))
-            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         
         if (!hasNeighboringMachine(state, serverLevel, pos, false)) {
             // remove stale machine -> neighboring pipes mapping
@@ -80,36 +80,36 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     }
     
     @Override
-    protected boolean toggleSideConnection(BlockState state, Direction side, Level world, BlockPos pos) {
+    protected boolean toggleSideConnection(BlockState state, Direction side, Level level, BlockPos pos) {
         var property = directionToProperty(side);
         var createConnection = state.getValue(property) == NO_CONNECTION;
         
         // check if connection would be valid if state is toggled
         var targetPos = pos.relative(side);
-        if (createConnection && !isValidConnectionTarget(world.getBlockState(targetPos).getBlock(), world, side.getOpposite(), targetPos))
+        if (createConnection && !isValidConnectionTarget(level.getBlockState(targetPos).getBlock(), level, side.getOpposite(), targetPos))
             return false;
         
         // toggle connection state
-        int nextConnectionState = getNextConnectionState(state, side, world, pos, state.getValue(property));
+        int nextConnectionState = getNextConnectionState(state, side, level, pos, state.getValue(property));
         var newState = addStraightState(state.setValue(property, nextConnectionState));
         
         // transform to interface block if side is being enabled and machine is connected
-        if (!hasNeighboringMachine(newState, world, pos, false)) {
+        if (!hasNeighboringMachine(newState, level, pos, false)) {
             var normalBlock = (GenericPipeBlock) getNormalBlock().getBlock();
-            var interfaceState = normalBlock.addConnectionStates(normalBlock.defaultBlockState(), world, pos, false);
+            var interfaceState = normalBlock.addConnectionStates(normalBlock.defaultBlockState(), level, pos, false);
             interfaceState = interfaceState.setValue(normalBlock.directionToProperty(side), newState.getValue(property)); // Hacky way to copy connection state
-            world.setBlockAndUpdate(pos, normalBlock.addStraightState(interfaceState));
+            level.setBlockAndUpdate(pos, normalBlock.addStraightState(interfaceState));
         } else {
-            world.setBlockAndUpdate(pos, newState);
-            GenericPipeInterfaceEntity.addNode(world, pos, true, newState, getNetworkData(world));
+            level.setBlockAndUpdate(pos, newState);
+            GenericPipeInterfaceEntity.addNode(level, pos, true, newState, getNetworkData(level));
             
             // update neighbor if it's a pipe
-            updateNeighbors(world, pos, true);
+            updateNeighbors(level, pos, true);
         }
         
         // play sound
         var soundGroup = getSoundType(state);
-        world.playSound(null, pos, soundGroup.getPlaceSound(), SoundSource.BLOCKS, soundGroup.getVolume() * .5f, soundGroup.getPitch());
+        level.playSound(null, pos, soundGroup.getPlaceSound(), SoundSource.BLOCKS, soundGroup.getVolume() * .5f, soundGroup.getPitch());
         
         return true;
     }
@@ -117,7 +117,7 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     @SuppressWarnings("rawtypes")
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
@@ -125,7 +125,7 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     }
     
     @Override
-    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
         return new ItemStack(getNormalBlock().getBlock());
     }
 }

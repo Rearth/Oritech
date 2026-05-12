@@ -22,7 +22,7 @@ public class HumanoidModelMixin<T extends LivingEntity> {
     @Shadow public ModelPart head;
     @Shadow public ModelPart body;
     
-    @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("TAIL"))
+    @Inject(method = "setupAnim(Lnet/minecraft/level/entity/LivingEntity;FFFFF)V", at = @At("TAIL"))
     public void oritech$ziplineAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
         
         if (entity instanceof Player player) {

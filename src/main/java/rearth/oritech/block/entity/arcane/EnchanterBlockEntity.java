@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.arcane;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -91,11 +90,11 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
         activeAnimation = "idle";
         
-        if (world.getGameTime() % 80 == 0)
+        if (level.getGameTime() % 80 == 0)
             triggerAnim("machine", activeAnimation);
         
         // return early if there is no work to do
@@ -118,21 +117,21 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         
         maxProgress = getEnchantmentCost(getSelectedEnchantment().value(), existingLevel + 1);
         
-        if (canProgress(existingLevel + 1) && world.getGameTime() % 5 == 0) {
+        if (canProgress(existingLevel + 1) && level.getGameTime() % 5 == 0) {
             this.setChanged();
             energyStorage.amount -= (long) getDisplayedEnergyUsage();
             progress++;
             activeAnimation = "working";
             
             var center = pos.getCenter();
-            var r = world.random;
+            var r = level.random;
             var offset = center.add(r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f);
-            ParticleContent.WeedKiller(world, center, offset);
+            ParticleContent.WeedKiller(level, center, offset);
             
             if (progress >= maxProgress) {
                 progress = 0;
                 finishEnchanting();
-                if (world instanceof ServerLevel sl) {
+                if (level instanceof ServerLevel sl) {
                     var target = pos.getCenter();
                     sl.sendParticles(ParticleTypes.ENCHANTED_HIT, target.x, target.y, target.z, maxProgress + 10, 0.6, 0.6, 0.6, 0);
                 }

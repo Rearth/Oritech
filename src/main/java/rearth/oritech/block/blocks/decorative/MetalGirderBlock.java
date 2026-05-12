@@ -37,23 +37,23 @@ public class MetalGirderBlock extends HorizontalDirectionalBlock {
     }
     
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         var facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
         if (facing.getAxis().equals(Direction.Axis.X)) return NORTH_SHAPE;
         return EAST_SHAPE;
     }
     
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        return getCollisionShape(state, world, pos, context);
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return getCollisionShape(state, level, pos, context);
     }
     
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         
         var facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
-        var blockInBack = world.getBlockState(pos.offset(facing.getNormal())).is(BlockContent.METAL_GIRDER_BLOCK);
-        var blockInFront = world.getBlockState(pos.offset(facing.getOpposite().getNormal())).is(BlockContent.METAL_GIRDER_BLOCK);
+        var blockInBack = level.getBlockState(pos.offset(facing.getNormal())).is(BlockContent.METAL_GIRDER_BLOCK);
+        var blockInFront = level.getBlockState(pos.offset(facing.getOpposite().getNormal())).is(BlockContent.METAL_GIRDER_BLOCK);
         var straight = false;
         if (blockInFront && !blockInBack) {
             facing = facing.getOpposite();
@@ -68,7 +68,7 @@ public class MetalGirderBlock extends HorizontalDirectionalBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        var world = ctx.getLevel();
+        var level = ctx.getLevel();
         var pos = ctx.getClickedPos();
         
         // if placed on ceiling/wall, rotate with player facing. Otherwise get surface facing.
@@ -80,8 +80,8 @@ public class MetalGirderBlock extends HorizontalDirectionalBlock {
             facing = ctx.getHorizontalDirection().getOpposite();
         }
         
-        var blockInBack = world.getBlockState(pos.offset(facing.getNormal())).is(BlockContent.METAL_GIRDER_BLOCK);
-        var blockInFront = world.getBlockState(pos.offset(facing.getOpposite().getNormal())).is(BlockContent.METAL_GIRDER_BLOCK);
+        var blockInBack = level.getBlockState(pos.offset(facing.getNormal())).is(BlockContent.METAL_GIRDER_BLOCK);
+        var blockInFront = level.getBlockState(pos.offset(facing.getOpposite().getNormal())).is(BlockContent.METAL_GIRDER_BLOCK);
         var straight = false;
         if (blockInFront && !blockInBack) {
             facing = facing.getOpposite();

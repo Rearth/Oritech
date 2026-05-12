@@ -1,6 +1,5 @@
 package rearth.oritech.item.tools.armor;
 
-import dev.architectury.fluid.FluidStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.Holder;
@@ -41,7 +40,7 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
     // these are shared between all jetpacks
-    // set to the world time where last ground contact was recorded
+    // set to the level time where last ground contact was recorded
     public static long LAST_GROUND_CONTACT = Long.MAX_VALUE;
     // set to true if space has been pressed at least once AFTER loosing ground contact (to avoid flying forwards when dropping of a cliff
     public static boolean PRESSED_SPACE = false;
@@ -51,11 +50,11 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     }
     
     @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        super.inventoryTick(stack, world, entity, slot, selected);
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        super.inventoryTick(stack, level, entity, slot, selected);
         
-        if (world.isClientSide())
-            tickJetpack(stack, entity, world);
+        if (level.isClientSide())
+            tickJetpack(stack, entity, level);
     }
     
     @Override

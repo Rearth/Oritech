@@ -1,6 +1,5 @@
 package rearth.oritech.api.recipe;
 
-import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;

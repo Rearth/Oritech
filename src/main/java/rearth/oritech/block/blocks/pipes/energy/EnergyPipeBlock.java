@@ -35,7 +35,7 @@ public class EnergyPipeBlock extends GenericPipeBlock {
     
     @Override
     public TriFunction<Level, BlockPos, Direction, Boolean> apiValidationFunction() {
-        return ((world, pos, direction) -> EnergyApi.BLOCK.find(world, pos, direction) != null);
+        return ((level, pos, direction) -> EnergyApi.BLOCK.find(level, pos, direction) != null);
     }
     
     @Override
@@ -69,8 +69,8 @@ public class EnergyPipeBlock extends GenericPipeBlock {
     }
     
     @Override
-    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level world) {
-        return ENERGY_PIPE_DATA.computeIfAbsent(world.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+    public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level) {
+        return ENERGY_PIPE_DATA.computeIfAbsent(level.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
     
     @Override
@@ -88,13 +88,13 @@ public class EnergyPipeBlock extends GenericPipeBlock {
 		}
 
 		@Override
-		public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+		public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 			return Shapes.block();
 		}
 
 		@Override
-		public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-			return state.getShape(world, pos);
+		public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+			return state.getShape(level, pos);
 		}
 
 		@Override

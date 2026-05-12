@@ -50,18 +50,18 @@ public class RefineryBlock extends MultiblockMachine implements EntityBlock {
     }
     
     @Override
-    public void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+    public void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
         
-        var refineryEntity = world.getBlockEntity(pos, BlockEntitiesContent.REFINERY_ENTITY);
+        var refineryEntity = level.getBlockEntity(pos, BlockEntitiesContent.REFINERY_ENTITY);
         
-        if (world.isClientSide() || refineryEntity.isEmpty()) {
-            super.onExplosionHit(state, world, pos, explosion, stackMerger);
+        if (level.isClientSide() || refineryEntity.isEmpty()) {
+            super.onExplosionHit(state, level, pos, explosion, stackMerger);
             return;
         }
         
         var crystalCandidate = refineryEntity.get().getNearbyNonEmptyCatalyst();
         if (crystalCandidate.isEmpty()) {
-            super.onExplosionHit(state, world, pos, explosion, stackMerger);
+            super.onExplosionHit(state, level, pos, explosion, stackMerger);
             return;
         }
         
@@ -69,7 +69,7 @@ public class RefineryBlock extends MultiblockMachine implements EntityBlock {
         var color = refineryEntity.get().currentColor;
         
         // custom merger to void refinery self drop
-        super.onExplosionHit(state, world, pos, explosion, ((itemStack, blockPos) -> {}));
+        super.onExplosionHit(state, level, pos, explosion, ((itemStack, blockPos) -> {}));
         
         // explode crystal
         crystalCandidate.get().doExplosion();
@@ -79,12 +79,12 @@ public class RefineryBlock extends MultiblockMachine implements EntityBlock {
         // run in next tick to avoid explosion block weirdness
         DELAYED_TAINT_EVENTS.add(() -> {
             // create + init refinery
-            world.setBlockAndUpdate(targetPos,
+            level.setBlockAndUpdate(targetPos,
               BlockContent.TAINTED_REFINERY_BLOCK.defaultBlockState()
                 .setValue(BlockStateProperties.HORIZONTAL_FACING, state.getValue(BlockStateProperties.HORIZONTAL_FACING))
             );
             
-            if (world.getBlockEntity(targetPos) instanceof TaintedRefineryBlockEntity taintedRefinery) {
+            if (level.getBlockEntity(targetPos) instanceof TaintedRefineryBlockEntity taintedRefinery) {
                 taintedRefinery.afterCreation();
                 taintedRefinery.assignColor(color);
             }

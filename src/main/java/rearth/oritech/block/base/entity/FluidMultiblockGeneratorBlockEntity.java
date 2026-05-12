@@ -1,7 +1,5 @@
 package rearth.oritech.block.base.entity;
 
-import dev.architectury.fluid.FluidStack;
-import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -42,13 +40,13 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (bucketInputAllowed() && !world.isClientSide && isActive(state)) {
+        if (bucketInputAllowed() && !level.isClientSide && isActive(state)) {
             processBuckets();
         }
         
-        super.serverTick(world, pos, state, blockEntity);
+        super.serverTick(level, pos, state, blockEntity);
     }
     
     private void processBuckets() {
@@ -124,11 +122,11 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
         return getRecipe(checkedTank, level, getOwnRecipeType());
     }
     
-    public static Optional<RecipeHolder<OritechRecipe>> getRecipe(FluidApi.SingleSlotStorage checkedTank, Level world, OritechRecipeType ownType) {
+    public static Optional<RecipeHolder<OritechRecipe>> getRecipe(FluidApi.SingleSlotStorage checkedTank, Level level, OritechRecipeType ownType) {
         
         if (checkedTank.getStack().isEmpty()) return Optional.empty();
         
-        var availableRecipes = world.getRecipeManager().getAllRecipesFor(ownType);
+        var availableRecipes = level.getRecipeManager().getAllRecipesFor(ownType);
         for (var recipeEntry : availableRecipes) {
             var recipe = recipeEntry.value();
             var recipeFluid = recipe.getFluidInput();

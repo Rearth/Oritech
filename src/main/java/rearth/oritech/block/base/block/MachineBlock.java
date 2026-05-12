@@ -1,8 +1,6 @@
 package rearth.oritech.block.base.block;
 
 import com.mojang.serialization.MapCodec;
-import dev.architectury.registry.menu.ExtendedMenuProvider;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -84,24 +82,24 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
     }
     
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        onBlockRemoved(world, pos);
-        return super.playerWillDestroy(world, pos, state, player);
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        onBlockRemoved(level, pos);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override
-    protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
-        onBlockRemoved(world, pos);
-        super.onExplosionHit(state, world, pos, explosion, stackMerger);
+    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+        onBlockRemoved(level, pos);
+        super.onExplosionHit(state, level, pos, explosion, stackMerger);
     }
     
-    private static void onBlockRemoved(Level world, BlockPos pos) {
-        if (!world.isClientSide && world.getBlockEntity(pos) instanceof MachineBlockEntity entity) {
+    private static void onBlockRemoved(Level level, BlockPos pos) {
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof MachineBlockEntity entity) {
             var stacks = entity.inventory.heldStacks;
             for (var stack : stacks) {
                 if (!stack.isEmpty()) {
-                    var itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
-                    world.addFreshEntity(itemEntity);
+                    var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+                    level.addFreshEntity(itemEntity);
                 }
             }
             
@@ -116,7 +114,7 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> {
             if (blockEntity instanceof BlockEntityTicker ticker)
                 ticker.tick(world1, pos, state1, blockEntity);
@@ -124,9 +122,9 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
     }
     
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!world.isClientSide()) {
-            var handler = (ExtendedMenuProvider) world.getBlockEntity(pos);
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!level.isClientSide()) {
+            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
                 MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
@@ -134,11 +132,11 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
     }
     
     @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         
-        if (ItemFluidApi.tryFluidBlockItemInteraction(stack, world, pos, player, hand)) return ItemInteractionResult.sidedSuccess(true);
+        if (ItemFluidApi.tryFluidBlockItemInteraction(stack, level, pos, player, hand)) return ItemInteractionResult.sidedSuccess(true);
         
-        return super.useItemOn(stack, state, world, pos, player, hand, hit);
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
     
     @Override

@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity.processing;
 
-import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -47,12 +46,12 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        super.serverTick(world, pos, state, blockEntity);
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        super.serverTick(level, pos, state, blockEntity);
         
         if (!initialized) {
             initialized = true;
-            var biome = world.getBiome(pos);
+            var biome = level.getBiome(pos);
             inColdArea = biome.is(TagContent.CONVENTIONAL_COLD);
         }
         

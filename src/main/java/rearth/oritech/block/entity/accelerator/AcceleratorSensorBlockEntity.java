@@ -20,11 +20,11 @@ public class AcceleratorSensorBlockEntity extends BlockEntity implements BlockEn
     }
     
     @Override
-    public void tick(Level world, BlockPos pos, BlockState state, AcceleratorSensorBlockEntity blockEntity) {
-        if (world.isClientSide()) return;
+    public void tick(Level level, BlockPos pos, BlockState state, AcceleratorSensorBlockEntity blockEntity) {
+        if (level.isClientSide()) return;
         
         if (measuredSpeed != 0) {
-            var age = world.getGameTime() - measuredTime;
+            var age = level.getGameTime() - measuredTime;
             
             if (age > 8) {
                 measuredSpeed = 0;
@@ -34,7 +34,7 @@ public class AcceleratorSensorBlockEntity extends BlockEntity implements BlockEn
         
         if (dirty) {
             dirty = false;
-            world.updateNeighbourForOutputSignal(pos, getBlockState().getBlock());
+            level.updateNeighbourForOutputSignal(pos, getBlockState().getBlock());
         }
     }
     

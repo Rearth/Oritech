@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.generators;
 
-import dev.architectury.fluid.FluidStack;
-import dev.architectury.platform.Platform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -77,13 +75,13 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (world.isClientSide || !isActive(state)) return;
+        if (level.isClientSide || !isActive(state)) return;
         
         var slaved = inSlaveMode();
         var hasInput = !boilerStorage.getInStack().isEmpty();
-        if (world.getGameTime() % 80 == 0 && !slaved && hasInput)
+        if (level.getGameTime() % 80 == 0 && !slaved && hasInput)
             setupMaster();
         
         if (!slaved && hasInput) tickMaster();
@@ -275,7 +273,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level world) {
+    protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level level) {
         
         var res = new HashSet<Tuple<BlockPos, Direction>>();
         

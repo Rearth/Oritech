@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity.processing;
 
-import dev.architectury.fluid.FluidStack;
-import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -64,10 +62,10 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
     
     @Override
-    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        super.serverTick(world, pos, state, blockEntity);
+    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        super.serverTick(level, pos, state, blockEntity);
         
-        if (world.getGameTime() % 25 == 0) {
+        if (level.getGameTime() % 25 == 0) {
             refreshModules();
         }
     }
