@@ -81,7 +81,7 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     }
     
     @Override
-    public boolean isActive(BlockState state) {
+    public boolean isAssembled(BlockState state) {
         return state.getValue(MultiblockMachine.ASSEMBLED);
     }
     

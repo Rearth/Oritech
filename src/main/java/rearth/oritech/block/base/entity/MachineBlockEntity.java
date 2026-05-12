@@ -1,5 +1,9 @@
 package rearth.oritech.block.base.entity;
 
+import com.geckolib.animatable.GeoBlockEntity;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animation.RawAnimation;
+import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -7,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
@@ -14,37 +19,37 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.DelegatingInventoryStorage;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.util.*;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.*;
-import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
 
 public abstract class MachineBlockEntity extends NetworkedBlockEntity
-  implements ExtendedMenuProvider, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable, ColorableMachine {
+  implements GeoBlockEntity, ScreenProvider, RedstoneAddonBlockEntity.RedstoneControllable, ColorableMachine, EnergyProvider {
     
     // animations
     public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
@@ -56,15 +61,15 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     // synced data
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK})
-    public int progress;
+    public final ProgressStorage progress = new ProgressStorage();
     @SyncField({SyncType.GUI_TICK})
-    protected OritechRecipe currentRecipe = OritechRecipe.DUMMY;
+    protected OritechRecipe currentRecipe = OritechRecipe.EMPTY;
     @SyncField({SyncType.GUI_TICK})
     protected InventoryInputMode inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
     @SyncField({SyncType.GUI_TICK})
     protected boolean disabledViaRedstone = false;
     @SyncField({SyncType.TICK})
-    public long lastWorkedAt;
+    public long lastWorkedAt;   // used for animation sync
     
     @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
     public ColorVariant currentColor = getDefaultColor();
@@ -72,86 +77,107 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     // static data
     protected int energyPerTick;
     
+    private long lastChangedAt = 0;  // used to check if anything happened in the last tick, to avoid unneeded calculations and updates
+    
     // own storages
     public final FilteringInventory inventory = new FilteringInventory(getInventorySize(), this::setChanged, getSlotAssignments());
-    private final Map<Direction, ItemApi.InventoryStorage> sidedInventories = new HashMap<>(); // only for sided input mode
+    private final Map<Direction, ResourceHandler<ItemResource>> sidedInventories = new HashMap<>(); // only for sided input mode
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::setChanged, this.canEnergyStorageChangeWhileGUIOpen());
+    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), 0, this::setChanged, this.canEnergyStorageChangeWhileGUIOpen());
     
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state);
         this.energyPerTick = energyPerTick;
         
-        if (level != null)
+        if (level != null) {
             lastWorkedAt = level.getGameTime();
+            lastChangedAt = level.getGameTime();
+        }
     }
     
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (!isActive(state) || disabledViaRedstone) return;
+        if (!isAssembled(state) || disabledViaRedstone) return;
         
-        // if a recipe is found, this means the input items are all available
-        var recipeCandidate = getRecipe();
-        if (recipeCandidate.isEmpty())
-            currentRecipe = OritechRecipe.DUMMY;     // reset recipe when invalid or no input is given
+        var lastRecipe = currentRecipe;
+        currentRecipe = findActiveRecipe();
+        if (currentRecipe.isEmpty()) {
+            resetProgress();
+            return;
+        }
         
-        if (recipeCandidate.isPresent() && canOutputRecipe(recipeCandidate.get().value()) && canProceed(recipeCandidate.get().value())) {
+        if (lastRecipe != currentRecipe || !canOutputRecipe(currentRecipe)) resetProgress();
+        
+        // at this point, we have a valid recipe (items+fluid verified), and could output the results.
+        // we work with one big transaction. Everything is taken directly, and if a part doesnt work we just don't commit the transaction
+        try (var transaction = Transaction.openRoot()) {
             
-            // reset when recipe was switched while running
-            if (currentRecipe != recipeCandidate.get().value()) resetProgress();
+            var energyNeeded = (int) calculateEnergyUsage();
+            var energyTaken = energyStorage.internalExtract(energyNeeded, transaction);
             
-            // this is separate so that progress is not reset when out of energy
-            if (hasEnoughEnergy()) {
-                var activeRecipe = recipeCandidate.get().value();
-                currentRecipe = activeRecipe;
-                lastWorkedAt = level.getGameTime();
-                
-                useEnergy();
-                
-                // increase progress
-                progress++;
-                
-                if (checkCraftingFinished(activeRecipe)) {
-                    craftItem(activeRecipe, getOutputView(), getInputView());
-                    resetProgress();
-                }
-                
-                setChanged();
+            // abort if not enough energy
+            if (energyTaken != energyNeeded) return;
+            
+            progress.increment(transaction);
+            
+            if (checkCraftingFinished(currentRecipe)) {
+                finishCrafting(transaction);
+                progress.reset(transaction);
             }
             
-        } else {
-            // this happens if either the input slot is empty, or the output slot is blocked
-            if (progress > 0) resetProgress();
+            transaction.commit();
+            setChanged();
+            
         }
     }
     
-    // used to do additional checks, if the recipe match is not enough
-    protected boolean canProceed(OritechRecipe value) {
-        return true;
+    // performance optimized recipe lookup. Verified that both item and fluid inputs match the recipe.
+    private OritechRecipe findActiveRecipe() {
+        
+        if (!(level instanceof ServerLevel serverLevel)) return currentRecipe;
+        
+        var recentlyChanged = (level.getGameTime() - lastChangedAt) <= 1;
+        
+        // if no active recipe and nothing changed recently, dont do anything
+        if (currentRecipe.isEmpty() && !recentlyChanged) return currentRecipe;
+        
+        // at this point: Either machine inputs were changed, or we have a current recipe
+        
+        var recipeInput = getRecipeInput();
+        if (recipeInput.isEmpty()) return OritechRecipe.EMPTY;
+        
+        // existing recipe matches (if non-empty)
+        if (!currentRecipe.isEmpty() && currentRecipe.matches(recipeInput, level)) return currentRecipe;
+        
+        // return a potential match, or empty
+        var recipeCandidate = serverLevel.recipeAccess().getRecipeFor(getOwnRecipeType(), recipeInput, level);
+        return recipeCandidate.map(RecipeHolder::value).orElse(OritechRecipe.EMPTY);
     }
     
-    protected boolean hasEnoughEnergy() {
-        return energyStorage.amount >= calculateEnergyUsage();
+    protected OritechRecipeInput getRecipeInput() {
+        return new OritechRecipeInput(getInputView(), FluidStack.EMPTY);
     }
     
-    @SuppressWarnings("lossy-conversions")
-    protected void useEnergy() {
-        energyStorage.amount -= calculateEnergyUsage();
+    @Override
+    public void setChanged() {
+        super.setChanged();
+        lastChangedAt = level.getGameTime();
     }
     
     protected float calculateEnergyUsage() {
         return energyPerTick * getEfficiencyMultiplier() * (1 / getSpeedMultiplier());
     }
     
-    public List<ItemStack> getCraftingResults(OritechRecipe activeRecipe) {
-        return activeRecipe.getResults();
+    public List<ItemStackTemplate> getCraftingResults(OritechRecipe activeRecipe) {
+        return activeRecipe.itemResults();
     }
     
-    protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
+    // transaction could be used to verify output contents matched, but progress is already reset and the machine doesnt work if it wouldn't, so its not really needed here
+    protected void finishCrafting(Transaction transaction) {
         
-        var results = getCraftingResults(activeRecipe);
-        var inputs = activeRecipe.getInputs();
+        var results = getCraftingResults(currentRecipe);
+        var inputs = currentRecipe.itemInputs();
         
         // create outputs
         for (int i = 0; i < results.size(); i++) {
@@ -185,11 +211,11 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
     
     protected boolean checkCraftingFinished(OritechRecipe activeRecipe) {
-        return progress >= activeRecipe.getTime() * getSpeedMultiplier();
+        return progress.get() >= activeRecipe.time() * getSpeedMultiplier();
     }
     
     protected void resetProgress() {
-        progress = 0;
+        progress.set(0);
     }
     
     // check if output slots are valid, meaning: each slot is either empty, or of the same type and can add the target amount without overfilling
@@ -225,8 +251,9 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             return Optional.empty();
         
         // check if old recipe fits
-        if (currentRecipe != null && currentRecipe != OritechRecipe.DUMMY) {
-            if (currentRecipe.matches(getInputInventory(), level)) return Optional.of(new RecipeHolder<>(currentRecipe.getOriType().getIdentifier(), currentRecipe));
+        if (currentRecipe != null && currentRecipe != OritechRecipe.EMPTY) {
+            if (currentRecipe.matches(getInputInventory(), level))
+                return Optional.of(new RecipeHolder<>(currentRecipe.getOriType().getIdentifier(), currentRecipe));
         }
         
         return level.getRecipeManager().getRecipeFor(getOwnRecipeType(), getInputInventory(), level);
@@ -236,7 +263,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         return getInputView().isEmpty() || getInputView().stream().allMatch(ItemStack::isEmpty);
     }
     
-    protected abstract OritechRecipeType getOwnRecipeType();
+    protected abstract RecipeType<OritechRecipe> getOwnRecipeType();
     
     public abstract InventorySlotAssignment getSlotAssignments();
     
@@ -263,7 +290,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         
         ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putInt("oritech.machine_progress", progress);
-        nbt.putLong("oritech.machine_energy", energyStorage.amount);
+        nbt.putLong("oritech.machine_energy", energyStorage.energy);
         nbt.putShort("oritech.machine_input_mode", (short) inventoryInputMode.ordinal());
         nbt.putBoolean("oritech.redstone", disabledViaRedstone);
         
@@ -274,7 +301,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
         progress = nbt.getInt("oritech.machine_progress");
-        energyStorage.amount = nbt.getLong("oritech.machine_energy");
+        energyStorage.energy = nbt.getLong("oritech.machine_energy");
         inventoryInputMode = InventoryInputMode.values()[nbt.getShort("oritech.machine_input_mode")];
         disabledViaRedstone = nbt.getBoolean("oritech.redstone");
         
@@ -313,7 +340,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         
         if (state.getController().isPlayingTriggeredAnimation()) return PlayState.CONTINUE;
         
-        if (isActive(getBlockState())) {
+        if (isAssembled(getBlockState())) {
             if (isActivelyWorking()) {
                 return state.setAndContinue(WORKING);
             } else {
@@ -430,12 +457,12 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     public abstract int getInventorySize();
     
-    public boolean isActive(BlockState state) {
+    public boolean isAssembled(BlockState state) {
         return true;
     }
     
     public void setEnergyStored(long amount) {
-        energyStorage.amount = amount;
+        energyStorage.energy = amount;
     }
     
     @Override
@@ -479,7 +506,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     @Override
     public int getComparatorEnergyAmount() {
-        return (int) ((energyStorage.amount / (float) energyStorage.capacity) * 15);
+        return (int) ((energyStorage.energy / (float) energyStorage.capacity) * 15);
     }
     
     @Override
@@ -598,6 +625,11 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         }
     }
     
+    @Override
+    public EnergyHandler getHandler(@Nullable Direction direction) {
+        return energyStorage;
+    }
+    
     public class FilteringInventory extends InOutInventoryStorage {
         
         public FilteringInventory(int size, Runnable onUpdate, InventorySlotAssignment slotAssignment) {
@@ -661,4 +693,5 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             return PACKET_ID;
         }
     }
+    
 }

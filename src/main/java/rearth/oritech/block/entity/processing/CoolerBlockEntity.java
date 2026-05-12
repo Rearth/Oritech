@@ -107,7 +107,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     }
     
     @Override
-    protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
+    protected void finishCrafting(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
         
         if (!processCraftInstance(activeRecipe)) return;
         

@@ -122,14 +122,14 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
     
     @Override
-    protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
+    protected void finishCrafting(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
         
         var chamberCount = getBaseAddonData().extraChambers() + 1;
         
         for (int i = 0; i < chamberCount; i++) {
             var newRecipe = getRecipe();
             if (newRecipe.isEmpty() || !newRecipe.get().value().equals(currentRecipe) || !canOutputRecipe(activeRecipe) || !canProceed(activeRecipe)) break;
-            super.craftItem(activeRecipe, outputInventory, inputInventory);
+            super.finishCrafting(activeRecipe, outputInventory, inputInventory);
             
             if (hasFluidAddon) {
                 craftFluids(activeRecipe);

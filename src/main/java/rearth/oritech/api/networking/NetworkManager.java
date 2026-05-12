@@ -45,6 +45,7 @@ import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.JetpackItem;
+import rearth.oritech.util.ProgressStorage;
 import rearth.oritech.util.ServerZiplineHandler;
 
 import java.lang.reflect.Field;
@@ -73,6 +74,7 @@ public class NetworkManager {
         registerCodec(ItemStack.OPTIONAL_STREAM_CODEC, ItemStack.class);
         registerCodec(VEC2I_PACKED_CODEC, Vector2i.class);
         registerCodec(VEC3D_PACKET_CODEC, Vec3.class);
+        registerCodec(ProgressStorage.STREAM_CODEC, ProgressStorage.class);
         registerCodec(SIMPLE_BLOCK_STATE_PACKET_CODEC, BlockState.class);
         registerCodec(FluidStack.OPTIONAL_STREAM_CODEC, FluidStack.class);
         registerCodec(ByteBufCodecs.COMPOUND_TAG, CompoundTag.class);

@@ -131,8 +131,8 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
     
     @Override
-    protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
-        super.craftItem(activeRecipe, outputInventory, inputInventory);
+    protected void finishCrafting(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
+        super.finishCrafting(activeRecipe, outputInventory, inputInventory);
         craftFluids(activeRecipe);
     }
     

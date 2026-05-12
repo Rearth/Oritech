@@ -54,7 +54,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (!isActive(state)) return;
+        if (!isAssembled(state)) return;
         
         var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), level);
         

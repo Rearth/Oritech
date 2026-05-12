@@ -70,7 +70,7 @@ public abstract class MultiblockGeneratorBlockEntity extends UpgradableGenerator
     }
     
     @Override
-    public boolean isActive(BlockState state) {
+    public boolean isAssembled(BlockState state) {
         return state.getValue(MultiblockMachine.ASSEMBLED);
     }
     

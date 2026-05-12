@@ -62,7 +62,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         // if burn time is zero, try to consume item thus adding burn time
         // if burn time is remaining, use up one tick of it
         
-        if (level.isClientSide || !isActive(state) || disabledViaRedstone) return;
+        if (level.isClientSide || !isAssembled(state) || disabledViaRedstone) return;
         
         if (progress == 0 && canFitEnergy())
             tryConsumeInput();
@@ -92,7 +92,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty())
-            currentRecipe = OritechRecipe.DUMMY;     // reset recipe when invalid or no input is given
+            currentRecipe = OritechRecipe.EMPTY;     // reset recipe when invalid or no input is given
         
         
         if (recipeCandidate.isPresent()) {
@@ -160,7 +160,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     protected boolean canFitEnergy() {
         if (isProducingSteam) return true;
         var produced = calculateEnergyUsage();
-        return energyStorage.capacity >= energyStorage.amount + produced;
+        return energyStorage.capacity >= energyStorage.energy + produced;
     }
     
     // gives energy in this case
@@ -176,7 +176,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             var extracted = boilerStorage.getInputContainer().extract(FluidStack.create(Fluids.WATER.getSource(), Math.round(produced)), false);
             boilerStorage.getOutputContainer().insert(FluidStack.create(SteamEngineEntity.getUsedSteamFluid(), extracted), false);
         } else {
-            energyStorage.amount += produced;
+            energyStorage.energy += produced;
         }
     }
     

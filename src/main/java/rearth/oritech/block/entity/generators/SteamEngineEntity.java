@@ -77,7 +77,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (level.isClientSide || !isActive(state)) return;
+        if (level.isClientSide || !isAssembled(state)) return;
         
         var slaved = inSlaveMode();
         var hasInput = !boilerStorage.getInStack().isEmpty();
@@ -105,7 +105,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
             return;
         
         // if not recipe is currently set, or it does not match the steam tank, search for a recipe
-        if (currentRecipe == OritechRecipe.DUMMY || !currentRecipe.getFluidInput().matchesFluid(steamTank.getStack())) {
+        if (currentRecipe == OritechRecipe.EMPTY || !currentRecipe.getFluidInput().matchesFluid(steamTank.getStack())) {
             var candidate = FluidMultiblockGeneratorBlockEntity.getRecipe(steamTank, level, getOwnRecipeType());
             candidate.ifPresent(recipe -> currentRecipe = recipe.value());
             if (candidate.isEmpty()) return;

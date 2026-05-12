@@ -44,7 +44,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     protected void useEnergy() {
-        energyStorage.amount = 0;
+        energyStorage.energy = 0;
     }
     
     @Override

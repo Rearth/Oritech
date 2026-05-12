@@ -30,8 +30,8 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     }
     
     @Override
-    protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
-        super.craftItem(activeRecipe, outputInventory, inputInventory);
+    protected void finishCrafting(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
+        super.finishCrafting(activeRecipe, outputInventory, inputInventory);
         combineSmallDusts(outputInventory, level);
     }
     

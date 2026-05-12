@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -30,7 +29,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
 
@@ -62,11 +60,6 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
     @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;
-    }
-    
-    @Override
-    public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
     
     @Nullable

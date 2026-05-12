@@ -42,7 +42,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (bucketInputAllowed() && !level.isClientSide && isActive(state)) {
+        if (bucketInputAllowed() && !level.isClientSide && isAssembled(state)) {
             processBuckets();
         }
         
@@ -82,7 +82,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
         
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty())
-            currentRecipe = OritechRecipe.DUMMY;     // reset recipe when invalid or no input is given
+            currentRecipe = OritechRecipe.EMPTY;     // reset recipe when invalid or no input is given
         
         
         if (recipeCandidate.isPresent()) {

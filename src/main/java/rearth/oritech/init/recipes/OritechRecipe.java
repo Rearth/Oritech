@@ -16,13 +16,15 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import rearth.oritech.Oritech;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate> itemResults,
                             FluidIngredient fluidInput, List<FluidStack> fluidOutputs,
                             int time, RecipeType<OritechRecipe> recipeType) implements Recipe<OritechRecipeInput> {
+    
+    public static final OritechRecipe EMPTY = new OritechRecipe(List.of(), List.of(), FluidIngredient.of(FluidStack.EMPTY), List.of(), 0, RecipeContent.PULVERIZER.get());
+    
     
     public static final MapCodec<OritechRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
       Ingredient.CODEC.listOf().fieldOf("itemInputs").forGetter(OritechRecipe::itemInputs),
@@ -57,7 +59,7 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
     
     @Override
     public boolean matches(OritechRecipeInput input, Level level) {
-        // compare items and fluids
+        // compare items and fluids. This will not modify any inputs.
         
         var itemsMatching = itemInputs.isEmpty() || itemsMatch(itemInputs, input);
         var fluidsMatching = fluidInput.fluids().isEmpty() || fluidsMatch(input, level);
@@ -65,7 +67,7 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
         return itemsMatching && fluidsMatching;
     }
     
-    public static boolean itemsMatch(List<Ingredient> itemInputs, RecipeInput input) {
+    public static boolean itemsMatch(List<Ingredient> itemInputs, OritechRecipeInput input) {
         if (itemInputs.isEmpty()) return true;
         
         if (input.isEmpty()) return false;
@@ -84,16 +86,11 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
         return fluidInput.test(input.fluidStack());
     }
     
-    private static boolean fuzzyItemMatches(List<Ingredient> itemInputs, RecipeInput input) {
+    private static boolean fuzzyItemMatches(List<Ingredient> itemInputs, OritechRecipeInput input) {
         
         // Input does not need to be in the correct slots / split into different slots.
-        // We just check if we can remove all ingredients from the inventory, and fail is any input is not able to be removed.
-        
-        var sourceItems = new ArrayList<ItemStack>();
-        for (int slot = 0; slot < input.size(); slot++) {
-            var stack = input.getItem(slot);
-            if (!stack.isEmpty()) sourceItems.add(stack.copy());
-        }
+        // We just check if we can remove all ingredients from the inventory, and fail if any input is not able to be removed.
+        var sourceItems = input.itemStacks().stream().filter(stack -> !stack.isEmpty()).toList();
         
         for (var ingredient : itemInputs) {
             var found = false;
@@ -153,5 +150,9 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
     @Override
     public RecipeBookCategory recipeBookCategory() {
         return RecipeBookCategories.CRAFTING_MISC;
+    }
+    
+    public boolean isEmpty() {
+        return this.equals(EMPTY);
     }
 }

@@ -75,8 +75,8 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     }
     
     @Override
-    protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
-        super.craftItem(activeRecipe, outputInventory, inputInventory);
+    protected void finishCrafting(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
+        super.finishCrafting(activeRecipe, outputInventory, inputInventory);
         
         if (supportExtraChambersAuto()) {
             var chamberCount = addonData.extraChambers();
@@ -86,7 +86,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
                 var newRecipe = getRecipe();
                 if (newRecipe.isEmpty() || !newRecipe.get().value().equals(currentRecipe) || !canOutputRecipe(activeRecipe) || !canProceed(activeRecipe))
                     break;
-                super.craftItem(activeRecipe, outputInventory, inputInventory);
+                super.finishCrafting(activeRecipe, outputInventory, inputInventory);
             }
         }
         

@@ -75,12 +75,12 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         
         lastTickRFUsed = 0;
         
-        if (!isActive(state) || disabledViaRedstone) return;
+        if (!isAssembled(state) || disabledViaRedstone) return;
         
         // if a recipe is found, this means the input items are all available
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty())
-            currentRecipe = OritechRecipe.DUMMY;     // reset recipe when invalid or no input is given
+            currentRecipe = OritechRecipe.EMPTY;     // reset recipe when invalid or no input is given
         
         
         if (recipeCandidate.isPresent() && canOutputRecipe(recipeCandidate.get().value()) && canProceed(recipeCandidate.get().value())) {
@@ -110,7 +110,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
                 
                 var recipeTime = activeRecipe.getTime() * 2;
                 while (progress > recipeTime && canOutputRecipe(activeRecipe) && getRecipe().isPresent() && getRecipe().get().value().equals(activeRecipe)) {
-                    craftItem(activeRecipe, getOutputView(), getInputView());
+                    finishCrafting(activeRecipe, getOutputView(), getInputView());
                     progress -= recipeTime;
                     craftCount++;
                 }
@@ -157,8 +157,8 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     }
     
     @Override
-    protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
-        super.craftItem(activeRecipe, outputInventory, inputInventory);
+    protected void finishCrafting(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
+        super.finishCrafting(activeRecipe, outputInventory, inputInventory);
         craftFluids(activeRecipe);
     }
     
