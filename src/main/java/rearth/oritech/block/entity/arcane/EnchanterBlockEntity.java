@@ -21,6 +21,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -337,8 +338,8 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         return inventory;
     }
     
-    public static void receiveEnchantmentSelection(SelectEnchantingPacket packet, Player player, RegistryAccess dynamicRegistryManager) {
-        var blockEntity = player.level().getBlockEntity(packet.self);
+    public static void receiveEnchantmentSelection(SelectEnchantingPacket packet, IPayloadContext context) {
+        var blockEntity = context.player().level().getBlockEntity(packet.self);
         if (blockEntity instanceof EnchanterBlockEntity enchanterBlock) {
             enchanterBlock.selectedEnchantment = packet.enchantmentId;
             enchanterBlock.setChanged();

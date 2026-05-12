@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
@@ -479,7 +480,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         return false;
     }
     
-    public static void receiveTrail(ParticleRenderTrail packet, Level world, RegistryAccess dynamicRegistryManager) {
+    public static void receiveTrail(ParticleRenderTrail packet, IPayloadContext context) {
+        Level world = context.player().level();
         if (world.getBlockEntity(packet.position) instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
             var displayTrail = packet.particleTrail;
             acceleratorBlock.displayTrail = displayTrail;
@@ -504,7 +506,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         }
     }
     
-    public static void receiveEvent(LastEventPacket packet, Level world, RegistryAccess dynamicRegistryManager) {
+    public static void receiveEvent(LastEventPacket packet, IPayloadContext context) {
+        Level world = context.player().level();
         if (world.getBlockEntity(packet.position) instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
             acceleratorBlock.lastEvent = packet;
             

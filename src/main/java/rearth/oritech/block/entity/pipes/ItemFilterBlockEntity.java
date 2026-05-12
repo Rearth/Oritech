@@ -23,6 +23,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
@@ -150,8 +151,8 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
             level.blockEntityChanged(worldPosition);
     }
     
-    public static void handleClientUpdate(ItemFilterPayload message, Player player, RegistryAccess registryAccess) {
-        var blockEntity = player.level().getBlockEntity(message.pos(), BlockEntitiesContent.ITEM_FILTER_ENTITY);
+    public static void handleClientUpdate(ItemFilterPayload message, IPayloadContext context) {
+        var blockEntity = context.player().level().getBlockEntity(message.pos(), BlockEntitiesContent.ITEM_FILTER_ENTITY.get());
         if (blockEntity.isPresent()) {
             blockEntity.get().setFilterSettings(message.data);
         }

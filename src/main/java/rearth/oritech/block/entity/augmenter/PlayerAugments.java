@@ -2,11 +2,10 @@ package rearth.oritech.block.entity.augmenter;
 
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeManager;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.AttachmentApi;
@@ -49,7 +48,8 @@ public class PlayerAugments {
         }
     }
     
-    public static void receiveInstallTrigger(AugmentInstallTriggerPacket packet, Player player, RegistryAccess dynamicRegistryManager) {
+    public static void receiveInstallTrigger(AugmentInstallTriggerPacket packet, IPayloadContext context) {
+        var player = context.player();
         var entity = player.level().getBlockEntity(packet.position);
         
         if (entity instanceof AugmentApplicationEntity modifierEntity) {
@@ -68,7 +68,8 @@ public class PlayerAugments {
         }
     }
     
-    public static void receivePlayerLoadMachine(LoadPlayerAugmentsToMachinePacket packet, Player player, RegistryAccess dynamicRegistryManager) {
+    public static void receivePlayerLoadMachine(LoadPlayerAugmentsToMachinePacket packet, IPayloadContext context) {
+        var player = context.player();
         var entity = player.level().getBlockEntity(packet.position);
         
         if (entity instanceof AugmentApplicationEntity modifierEntity) {
@@ -76,7 +77,8 @@ public class PlayerAugments {
         }
     }
     
-    public static void receiveOpenAugmentScreen(OpenAugmentScreenPacket packet, Player player, RegistryAccess dynamicRegistryManager) {
+    public static void receiveOpenAugmentScreen(OpenAugmentScreenPacket packet, IPayloadContext context) {
+        var player = context.player();
         var entity = player.level().getBlockEntity(packet.position);
         
         if (entity instanceof AugmentApplicationEntity modifierEntity && player instanceof ServerPlayer serverPlayer) {
@@ -85,8 +87,8 @@ public class PlayerAugments {
         }
     }
     
-    public static void receiveToggleAugment(AugmentPlayerTogglePacket packet, Player player, RegistryAccess dynamicRegistryManager) {
-        AugmentApplicationEntity.toggleAugmentForPlayer(packet.id, player);
+    public static void receiveToggleAugment(AugmentPlayerTogglePacket packet, IPayloadContext context) {
+        AugmentApplicationEntity.toggleAugmentForPlayer(packet.id, context.player());
     }
     
     public enum AugmentApplicatorOperation {

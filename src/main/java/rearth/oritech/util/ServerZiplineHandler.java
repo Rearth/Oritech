@@ -2,13 +2,13 @@ package rearth.oritech.util;
 
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.Attachment;
 import rearth.oritech.api.attachment.AttachmentApi;
@@ -48,7 +48,8 @@ public class ServerZiplineHandler {
         AttachmentApi.register(ZIPLINING_STATE);
     }
     
-    public static void onZipLineTickUseEvent(ZiplinePlayerUsePacket packet, Player player, RegistryAccess dynamicRegistryManager) {
+    public static void onZipLineTickUseEvent(ZiplinePlayerUsePacket packet, IPayloadContext context) {
+        var player = context.player();
         LAST_ZIPLINED_AT.put(player.getUUID(), player.level().getGameTime());
     }
     

@@ -11,6 +11,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -419,9 +420,9 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         return false;
     }
     
-    public static void onPlayerUse(ShrinkerPlayerUsePacket packet, Player player, RegistryAccess registryAccess) {
+    public static void onPlayerUse(ShrinkerPlayerUsePacket packet, IPayloadContext context) {
         
-        var world = player.level();
+        var world = context.player().level();
         var candidate = world.getBlockEntity(packet.pos(), BlockEntitiesContent.SHRINKER_BLOCK_ENTITY);
         candidate.ifPresent(ShrinkerBlockEntity::doShrink);
         

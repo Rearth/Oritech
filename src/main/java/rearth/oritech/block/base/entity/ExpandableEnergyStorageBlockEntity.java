@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -373,8 +374,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
         return new BarConfiguration(8, 24, 17, 54 + 20);
     }
     
-    public static void handleLimitPacket(StorageLimitPacket payload, Player user, RegistryAccess registryAccess) {
-        var level = user.level();
+    public static void handleLimitPacket(StorageLimitPacket payload, IPayloadContext context) {
+        var level = context.player().level();
         if (level == null) return;
         var storageCandidate = level.getBlockEntity(payload.position());
         if (!(storageCandidate instanceof ExpandableEnergyStorageBlockEntity storageEntity)) return;

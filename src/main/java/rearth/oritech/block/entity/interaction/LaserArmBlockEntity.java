@@ -50,7 +50,7 @@ import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.api.networking.WorldPacketCodec;
+import rearth.oritech.api.networking.LevelPacketCodec;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
@@ -1040,7 +1040,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         }
     }
     
-    public static WorldPacketCodec<RegistryFriendlyByteBuf, LivingEntity> LASER_TARGET_PACKET_CODEC = new WorldPacketCodec<>() {
+    public static LevelPacketCodec<RegistryFriendlyByteBuf, LivingEntity> LASER_TARGET_PACKET_CODEC = new LevelPacketCodec<>() {
         @Override
         public LivingEntity decode(RegistryFriendlyByteBuf buf, @Nullable Level world) {
             

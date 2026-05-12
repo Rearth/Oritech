@@ -4,7 +4,6 @@ import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -22,6 +21,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
@@ -529,8 +529,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         }
     }
     
-    public static void receiveCycleModePacket(InventoryInputModeSelectorPacket packet, Player player, RegistryAccess dynamicRegistryManager) {
-        if (player.level().getBlockEntity(packet.position()) instanceof MachineBlockEntity machineBlock)
+    public static void receiveCycleModePacket(InventoryInputModeSelectorPacket packet, IPayloadContext context) {
+        if (context.player().level().getBlockEntity(packet.position()) instanceof MachineBlockEntity machineBlock)
             machineBlock.cycleInputMode();
     }
     

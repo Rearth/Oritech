@@ -10,6 +10,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkManager;
 
@@ -65,6 +66,10 @@ public class ParticleContent {
     }
     
     // client handler
+
+    public static void handleOnClient(Payload payload, IPayloadContext context) {
+        context.enqueueWork(() -> handleOnClient(payload, context.player().level(), context.player().registryAccess()));
+    }
     
     public static void handleOnClient(Payload payload, Level world, RegistryAccess access) {
         var type = EffectType.values()[payload.effectId];
@@ -203,8 +208,7 @@ public class ParticleContent {
     }
     
     public static void registerParticles() {
-        NetworkManager.registerToClient(Payload.PACKET_ID, Payload.PACKET_CODEC, ParticleContent::handleOnClient);
-        Oritech.LOGGER.debug("Registering Oritech particles");
+        Oritech.LOGGER.debug("Oritech particles are registered via clientbound payload handlers");
     }
     
 }

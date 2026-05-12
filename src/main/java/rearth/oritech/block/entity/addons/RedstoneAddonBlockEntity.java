@@ -3,7 +3,6 @@ package rearth.oritech.block.entity.addons;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -14,6 +13,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkManager;
@@ -125,14 +125,15 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
         return Component.literal("");
     }
     
-    public static void receiveOnServer(RedstoneAddonServerUpdate message, Player player, RegistryAccess dynamicRegistryManager) {
-        if (player.level().getBlockEntity(message.position) instanceof RedstoneAddonBlockEntity addonEntity) {
+    public static void receiveOnServer(RedstoneAddonServerUpdate message, IPayloadContext context) {
+        if (context.player().level().getBlockEntity(message.position) instanceof RedstoneAddonBlockEntity addonEntity) {
             addonEntity.activeMode = RedstoneMode.values()[message.targetMode()];
             addonEntity.monitoredSlot = message.targetSlot();
         }
     }
     
-    public static void receiveOnClient(RedstoneAddonClientUpdate message, Level world, RegistryAccess dynamicRegistryManager) {
+    public static void receiveOnClient(RedstoneAddonClientUpdate message, IPayloadContext context) {
+        var world = context.player().level();
         if (world.getBlockEntity(message.position) instanceof RedstoneAddonBlockEntity addonEntity) {
             addonEntity.currentOutput = message.currentOutput();
             addonEntity.activeMode = RedstoneMode.values()[message.targetMode()];

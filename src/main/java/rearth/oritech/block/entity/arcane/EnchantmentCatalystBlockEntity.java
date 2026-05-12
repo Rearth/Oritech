@@ -4,13 +4,13 @@ import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -421,7 +421,8 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         return true;
     }
     
-    public static void receiveUpdatePacket(CatalystSyncPacket packet, Level world, RegistryAccess dynamicRegistryManager) {
+    public static void receiveUpdatePacket(CatalystSyncPacket packet, IPayloadContext context) {
+        var world = context.player().level();
         if (world.getBlockEntity(packet.position) instanceof EnchantmentCatalystBlockEntity catalystBlock) {
             catalystBlock.isHyperEnchanting = packet.isHyperEnchanting();
             catalystBlock.progress = packet.progress();

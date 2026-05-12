@@ -18,6 +18,8 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.resource.NeoForgeReloadListeners;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -32,7 +34,6 @@ import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.*;
@@ -70,6 +71,9 @@ public final class Oritech {
         modContainer.registerConfig(ModConfig.Type.COMMON, OritechConfig.COMMON_SPEC);
         modContainer.registerConfig(ModConfig.Type.STARTUP, OritechStartupConfig.STARTUP_SPEC);
         
+        // codecs for reflective builders
+        NetworkManager.loadDefaultCodecs();
+        
         // registrations
         ItemContent.ITEMS.register(modEventBus);
         BlockContent.BLOCKS.register(modEventBus);
@@ -103,8 +107,6 @@ public final class Oritech {
         // todo
         LOGGER.info("Begin Oritech initialization");
         NetworkManager.init();
-        NetworkManager.registerDefaultCodecs();
-        ParticleContent.registerParticles();
         FeatureContent.initialize();
         
     }
@@ -153,6 +155,10 @@ public final class Oritech {
             }
         });
         event.addDependency(NeoForgeReloadListeners.RECIPE_PRIORITIES, id);
+    }
+    
+    private void addNetworkHandlers(RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar("1");
     }
     
     private void loadLevelPipeData(ServerLevel world) {

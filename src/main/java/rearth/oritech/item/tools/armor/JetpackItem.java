@@ -4,7 +4,6 @@ import dev.architectury.fluid.FluidStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -13,9 +12,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
@@ -156,7 +155,8 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
         return OritechStartupConfig.basicJetpack.chargeSpeed.get();
     }
     
-    public static void receiveUsagePacket(JetpackUsageUpdatePacket packet, Player player, RegistryAccess dynamicRegistryManager) {
+    public static void receiveUsagePacket(JetpackUsageUpdatePacket packet, IPayloadContext context) {
+        var player = context.player();
         var stack = player.getItemBySlot(EquipmentSlot.CHEST);
         if (!(stack.getItem() instanceof BaseJetpackItem)) return;
         

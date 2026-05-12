@@ -5,7 +5,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 
-public interface WorldPacketCodec<I, T> extends StreamCodec<I, T> {
+public interface LevelPacketCodec<I, T> extends StreamCodec<I, T> {
     
     default T decode(I buf) {
         Oritech.LOGGER.warn("Using non-world variant of world packet codec for decode");

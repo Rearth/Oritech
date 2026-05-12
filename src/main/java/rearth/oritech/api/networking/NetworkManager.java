@@ -1,11 +1,8 @@
 package rearth.oritech.api.networking;
 
-import com.mojang.serialization.Codec;
-import dev.architectury.fluid.FluidStack;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -14,22 +11,20 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.network.connection.ConnectionType;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
-import rearth.oritech.OritechPlatform;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
@@ -45,6 +40,7 @@ import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.item.tools.PortableLaserItem;
@@ -56,42 +52,13 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 
+@SuppressWarnings("unchecked")
 public class NetworkManager {
     
     private static final Map<Type, StreamCodec<? extends ByteBuf, ?>> AUTO_CODECS = new HashMap<>();
     private static final Map<Integer, List<Field>> CACHED_FIELDS = new HashMap<Integer, List<Field>>();
     
-    
-    public static void sendBlockHandle(BlockEntity blockEntity, CustomPacketPayload message) {
-        OritechPlatform.INSTANCE.sendBlockHandle(blockEntity, message);
-    }
-    
-    public static void sendPlayerHandle(CustomPacketPayload message, ServerPlayer player) {
-        OritechPlatform.INSTANCE.sendPlayerHandle(message, player);
-    }
-    
-    public static void sendToServer(CustomPacketPayload message) {
-        OritechPlatform.INSTANCE.sendToServer(message);
-    }
-    
-    public static void sendNearby(ServerLevel level, Vec3 pos, double radius, CustomPacketPayload message) {
-        double rSq = radius * radius;
-        for (var player : level.players()) {
-            if (player.distanceToSqr(pos.x, pos.y, pos.z) < rSq) {
-                sendPlayerHandle(message, player);
-            }
-        }
-    }
-    
-    public static <T extends CustomPacketPayload> void registerToClient(CustomPacketPayload.Type<T> id, StreamCodec<RegistryFriendlyByteBuf, T> packetCodec, TriConsumer<T, Level, RegistryAccess> consumer) {
-        OritechPlatform.INSTANCE.registerToClient(id, packetCodec, consumer);
-    }
-    
-    public static <T extends CustomPacketPayload> void registerToServer(CustomPacketPayload.Type<T> id, StreamCodec<RegistryFriendlyByteBuf, T> packetCodec, TriConsumer<T, Player, RegistryAccess> consumer) {
-        OritechPlatform.INSTANCE.registerToServer(id, packetCodec, consumer);
-    }
-    
-    public static void registerDefaultCodecs() {
+    public static void loadDefaultCodecs() {
         
         registerCodec(ByteBufCodecs.INT, Integer.class, int.class);
         registerCodec(ByteBufCodecs.VAR_LONG, Long.class, long.class);
@@ -107,7 +74,7 @@ public class NetworkManager {
         registerCodec(VEC2I_PACKED_CODEC, Vector2i.class);
         registerCodec(VEC3D_PACKET_CODEC, Vec3.class);
         registerCodec(SIMPLE_BLOCK_STATE_PACKET_CODEC, BlockState.class);
-        registerCodec(FLUID_STACK_STREAM_CODEC, FluidStack.class);
+        registerCodec(FluidStack.OPTIONAL_STREAM_CODEC, FluidStack.class);
         registerCodec(ByteBufCodecs.COMPOUND_TAG, CompoundTag.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
         registerCodec(OritechRecipe.STREAM_CODEC, OritechRecipe.class);
@@ -121,43 +88,47 @@ public class NetworkManager {
             AUTO_CODECS.put(clazz, codec);
     }
     
-    @SuppressWarnings("unchecked")
-    public static void init() {
-        registerDefaultCodecs();
+    public static void initServerBound(PayloadRegistrar registrar) {
+        registrar.playToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
+        registrar.playToServer(EnchanterBlockEntity.SelectEnchantingPacket.PACKET_ID, getAutoCodec(EnchanterBlockEntity.SelectEnchantingPacket.class), EnchanterBlockEntity::receiveEnchantmentSelection);
+        registrar.playToServer(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.class), RedstoneAddonBlockEntity::receiveOnServer);
+        registrar.playToServer(PortableLaserItem.LaserPlayerUsePacket.PACKET_ID, getAutoCodec(PortableLaserItem.LaserPlayerUsePacket.class), PortableLaserItem::receiveUsePacket);
+        registrar.playToServer(ServerZiplineHandler.ZiplinePlayerUsePacket.PACKET_ID, getAutoCodec(ServerZiplineHandler.ZiplinePlayerUsePacket.class), ServerZiplineHandler::onZipLineTickUseEvent);
+        registrar.playToServer(MachineBlockEntity.InventoryInputModeSelectorPacket.PACKET_ID, getAutoCodec(MachineBlockEntity.InventoryInputModeSelectorPacket.class), MachineBlockEntity::receiveCycleModePacket);
+        registrar.playToServer(InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket.PACKET_ID, getAutoCodec(InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket.class), InventoryProxyAddonBlockEntity::receiveSlotSelection);
+        registrar.playToServer(JetpackItem.JetpackUsageUpdatePacket.PACKET_ID, getAutoCodec(JetpackItem.JetpackUsageUpdatePacket.class), JetpackItem::receiveUsagePacket);
+        registrar.playToServer(PlayerAugments.AugmentInstallTriggerPacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentInstallTriggerPacket.class), PlayerAugments::receiveInstallTrigger);
+        registrar.playToServer(PlayerAugments.LoadPlayerAugmentsToMachinePacket.PACKET_ID, getAutoCodec(PlayerAugments.LoadPlayerAugmentsToMachinePacket.class), PlayerAugments::receivePlayerLoadMachine);
+        registrar.playToServer(PlayerAugments.OpenAugmentScreenPacket.PACKET_ID, getAutoCodec(PlayerAugments.OpenAugmentScreenPacket.class), PlayerAugments::receiveOpenAugmentScreen);
+        registrar.playToServer(PlayerAugments.AugmentPlayerTogglePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerTogglePacket.class), PlayerAugments::receiveToggleAugment);
+        registrar.playToServer(ShrinkerBlockEntity.ShrinkerPlayerUsePacket.PACKET_ID, getAutoCodec(ShrinkerBlockEntity.ShrinkerPlayerUsePacket.class), ShrinkerBlockEntity::onPlayerUse);
+        registrar.playToServer(OritechScreenHandler.FluidContainerInteractionPacket.PACKET_ID, getAutoCodec(OritechScreenHandler.FluidContainerInteractionPacket.class), OritechScreenHandler::handleFluidContainerInteraction);
+        registrar.playToServer(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.PACKET_ID, getAutoCodec(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.class), TaintedRefineryBlockEntity::handleTankPacket);
+        registrar.playToServer(ExpandableEnergyStorageBlockEntity.StorageLimitPacket.PACKET_ID, getAutoCodec(ExpandableEnergyStorageBlockEntity.StorageLimitPacket.class), ExpandableEnergyStorageBlockEntity::handleLimitPacket);
         
-        registerToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
-        registerToServer(EnchanterBlockEntity.SelectEnchantingPacket.PACKET_ID, getAutoCodec(EnchanterBlockEntity.SelectEnchantingPacket.class), EnchanterBlockEntity::receiveEnchantmentSelection);
-        registerToServer(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.class), RedstoneAddonBlockEntity::receiveOnServer);
-        registerToServer(PortableLaserItem.LaserPlayerUsePacket.PACKET_ID, getAutoCodec(PortableLaserItem.LaserPlayerUsePacket.class), PortableLaserItem::receiveUsePacket);
-        registerToServer(ServerZiplineHandler.ZiplinePlayerUsePacket.PACKET_ID, getAutoCodec(ServerZiplineHandler.ZiplinePlayerUsePacket.class), ServerZiplineHandler::onZipLineTickUseEvent);
-        registerToServer(MachineBlockEntity.InventoryInputModeSelectorPacket.PACKET_ID, getAutoCodec(MachineBlockEntity.InventoryInputModeSelectorPacket.class), MachineBlockEntity::receiveCycleModePacket);
-        registerToServer(InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket.PACKET_ID, getAutoCodec(InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket.class), InventoryProxyAddonBlockEntity::receiveSlotSelection);
-        registerToServer(JetpackItem.JetpackUsageUpdatePacket.PACKET_ID, getAutoCodec(JetpackItem.JetpackUsageUpdatePacket.class), JetpackItem::receiveUsagePacket);
-        registerToServer(PlayerAugments.AugmentInstallTriggerPacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentInstallTriggerPacket.class), PlayerAugments::receiveInstallTrigger);
-        registerToServer(PlayerAugments.LoadPlayerAugmentsToMachinePacket.PACKET_ID, getAutoCodec(PlayerAugments.LoadPlayerAugmentsToMachinePacket.class), PlayerAugments::receivePlayerLoadMachine);
-        registerToServer(PlayerAugments.OpenAugmentScreenPacket.PACKET_ID, getAutoCodec(PlayerAugments.OpenAugmentScreenPacket.class), PlayerAugments::receiveOpenAugmentScreen);
-        registerToServer(PlayerAugments.AugmentPlayerTogglePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerTogglePacket.class), PlayerAugments::receiveToggleAugment);
-        registerToServer(ShrinkerBlockEntity.ShrinkerPlayerUsePacket.PACKET_ID, getAutoCodec(ShrinkerBlockEntity.ShrinkerPlayerUsePacket.class), ShrinkerBlockEntity::onPlayerUse);
-        registerToServer(OritechScreenHandler.FluidContainerInteractionPacket.PACKET_ID, getAutoCodec(OritechScreenHandler.FluidContainerInteractionPacket.class), OritechScreenHandler::handleFluidContainerInteraction);
-        registerToServer(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.PACKET_ID, getAutoCodec(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.class), TaintedRefineryBlockEntity::handleTankPacket);
-        registerToServer(ExpandableEnergyStorageBlockEntity.StorageLimitPacket.PACKET_ID, getAutoCodec(ExpandableEnergyStorageBlockEntity.StorageLimitPacket.class), ExpandableEnergyStorageBlockEntity::handleLimitPacket);
-        
-        
-        registerToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);
-        registerToClient(ItemPipeInterfaceEntity.RenderStackData.PIPE_ITEMS_ID, getAutoCodec(ItemPipeInterfaceEntity.RenderStackData.class), ItemPipeInterfaceEntity::receiveVisualItemsPacket);
-        registerToClient(EnchantmentCatalystBlockEntity.CatalystSyncPacket.PACKET_ID, getAutoCodec(EnchantmentCatalystBlockEntity.CatalystSyncPacket.class), EnchantmentCatalystBlockEntity::receiveUpdatePacket);
-        registerToClient(SpawnerControllerBlockEntity.SpawnerSyncPacket.PACKET_ID, getAutoCodec(SpawnerControllerBlockEntity.SpawnerSyncPacket.class), SpawnerControllerBlockEntity::receiveUpdatePacket);
-        registerToClient(RedstoneAddonBlockEntity.RedstoneAddonClientUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonClientUpdate.class), RedstoneAddonBlockEntity::receiveOnClient);
-        registerToClient(AcceleratorControllerBlockEntity.ParticleRenderTrail.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.ParticleRenderTrail.class), AcceleratorControllerBlockEntity::receiveTrail);
-        registerToClient(AcceleratorControllerBlockEntity.LastEventPacket.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.LastEventPacket.class), AcceleratorControllerBlockEntity::receiveEvent);
     }
     
-    public static void receiveMessage(MessagePayload message, Level world, RegistryAccess registryAccess) {
-        var receivedBuf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(message.message), registryAccess);
-        var receiverEntity = world.getBlockEntity(message.pos);
-        var receiverType = registryAccess.registryOrThrow(Registries.BLOCK_ENTITY_TYPE).get(message.targetEntityType);
-        if (receiverEntity != null && receiverType != null && receiverType.equals(receiverEntity.getType())) {
-            decodeFields(receiverEntity, message.syncType, receivedBuf, world);
+    public static void initClientBound(PayloadRegistrar registrar) {
+        registrar.playToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);
+        registrar.playToClient(ParticleContent.Payload.PACKET_ID, ParticleContent.Payload.PACKET_CODEC, ParticleContent::handleOnClient);
+        registrar.playToClient(ItemPipeInterfaceEntity.RenderStackData.PIPE_ITEMS_ID, getAutoCodec(ItemPipeInterfaceEntity.RenderStackData.class), ItemPipeInterfaceEntity::receiveVisualItemsPacket);
+        registrar.playToClient(EnchantmentCatalystBlockEntity.CatalystSyncPacket.PACKET_ID, getAutoCodec(EnchantmentCatalystBlockEntity.CatalystSyncPacket.class), EnchantmentCatalystBlockEntity::receiveUpdatePacket);
+        registrar.playToClient(SpawnerControllerBlockEntity.SpawnerSyncPacket.PACKET_ID, getAutoCodec(SpawnerControllerBlockEntity.SpawnerSyncPacket.class), SpawnerControllerBlockEntity::receiveUpdatePacket);
+        registrar.playToClient(RedstoneAddonBlockEntity.RedstoneAddonClientUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonClientUpdate.class), RedstoneAddonBlockEntity::receiveOnClient);
+        registrar.playToClient(AcceleratorControllerBlockEntity.ParticleRenderTrail.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.ParticleRenderTrail.class), AcceleratorControllerBlockEntity::receiveTrail);
+        registrar.playToClient(AcceleratorControllerBlockEntity.LastEventPacket.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.LastEventPacket.class), AcceleratorControllerBlockEntity::receiveEvent);
+    }
+    
+    public static void receiveMessage(MessagePayload message, IPayloadContext context) {
+        
+        var level = context.player().level();
+        var registryAccess = context.player().registryAccess();
+        
+        var receivedBuf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(message.message), registryAccess, ConnectionType.NEOFORGE);
+        var receiverEntity = level.getBlockEntity(message.pos);
+        var receiverType = registryAccess.lookupOrThrow(Registries.BLOCK_ENTITY_TYPE).get(message.targetEntityType);
+        if (receiverEntity != null && receiverType.isPresent() && receiverType.get().value().equals(receiverEntity.getType())) {
+            decodeFields(receiverEntity, message.syncType, receivedBuf, level);
             if (receiverEntity instanceof NetworkedEventHandler networkedBlock) {
                 networkedBlock.onNetworkUpdated();
             }
@@ -168,7 +139,7 @@ public class NetworkManager {
     
     // returns the number of encoded fields
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static int encodeFields(Object target, SyncType type, ByteBuf byteBuf, @Nullable Level world) {
+    public static int encodeFields(Object target, SyncType type, ByteBuf byteBuf, @Nullable Level level) {
         
         var fields = getCachedFields(target, type);
         
@@ -180,16 +151,16 @@ public class NetworkManager {
                     var deltaOnly = fieldInstance.useDeltaOnly(type);
                     var dataToSend = deltaOnly ? fieldInstance.getDeltaData() : fieldInstance;
                     var codec = deltaOnly ? fieldInstance.getDeltaCodec() : fieldInstance.getFullCodec();
-                    if (codec instanceof WorldPacketCodec worldPacketCodec) {
-                        worldPacketCodec.encode(byteBuf, dataToSend, world);
+                    if (codec instanceof LevelPacketCodec levelPacketCodec) {
+                        levelPacketCodec.encode(byteBuf, dataToSend, level);
                     } else {
                         codec.encode(byteBuf, dataToSend);
                     }
                 } else {
                     var codec = getAutoCodec(field);
                     var value = field.get(target);
-                    if (codec instanceof WorldPacketCodec worldPacketCodec) {
-                        worldPacketCodec.encode(byteBuf, value, world);
+                    if (codec instanceof LevelPacketCodec levelPacketCodec) {
+                        levelPacketCodec.encode(byteBuf, value, level);
                     } else {
                         codec.encode(byteBuf, value);
                     }
@@ -206,7 +177,7 @@ public class NetworkManager {
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void decodeFields(Object target, SyncType type, ByteBuf byteBuf, Level world) {
+    public static void decodeFields(Object target, SyncType type, ByteBuf byteBuf, Level level) {
         
         var fields = getCachedFields(target, type);
         
@@ -218,8 +189,8 @@ public class NetworkManager {
                     var deltaOnly = fieldInstance.useDeltaOnly(type);
                     var codec = deltaOnly ? fieldInstance.getDeltaCodec() : fieldInstance.getFullCodec();
                     Object value;
-                    if (codec instanceof WorldPacketCodec worldPacketCodec) {
-                        value = worldPacketCodec.decode(byteBuf, world);
+                    if (codec instanceof LevelPacketCodec levelPacketCodec) {
+                        value = levelPacketCodec.decode(byteBuf, level);
                     } else {
                         value = codec.decode(byteBuf);
                     }
@@ -231,8 +202,8 @@ public class NetworkManager {
                 } else {
                     var codec = getAutoCodec(field);
                     Object value;
-                    if (codec instanceof WorldPacketCodec worldPacketCodec) {
-                        value = worldPacketCodec.decode(byteBuf, world);
+                    if (codec instanceof LevelPacketCodec levelPacketCodec) {
+                        value = levelPacketCodec.decode(byteBuf, level);
                     } else {
                         value = codec.decode(byteBuf);
                     }
@@ -404,7 +375,7 @@ public class NetworkManager {
     public static StreamCodec<RegistryFriendlyByteBuf, BlockState> SIMPLE_BLOCK_STATE_PACKET_CODEC = new StreamCodec<>() {
         @Override
         public BlockState decode(RegistryFriendlyByteBuf buf) {
-            return BuiltInRegistries.BLOCK.get(Identifier.STREAM_CODEC.decode(buf)).defaultBlockState();
+            return BuiltInRegistries.BLOCK.get(Identifier.STREAM_CODEC.decode(buf)).get().value().defaultBlockState();
         }
         
         @Override

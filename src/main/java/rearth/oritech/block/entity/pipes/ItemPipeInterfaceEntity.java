@@ -2,7 +2,7 @@ package rearth.oritech.block.entity.pipes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.RegistryAccess;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
@@ -300,7 +300,8 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         return Direction.fromDelta(offset.getX(), offset.getY(), offset.getZ());
     }
     
-    public static void receiveVisualItemsPacket(RenderStackData message, Level world, RegistryAccess registryAccess) {
+    public static void receiveVisualItemsPacket(RenderStackData message, IPayloadContext context) {
+        var world = context.player().level();
         var blockEntity = world.getBlockEntity(message.self, BlockEntitiesContent.ITEM_PIPE_ENTITY);
         if (blockEntity.isPresent()) {
             var pipeEntity = blockEntity.get();

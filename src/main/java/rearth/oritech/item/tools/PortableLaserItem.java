@@ -4,10 +4,10 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
@@ -491,8 +491,8 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         return cache;
     }
     
-    public static void receiveUsePacket(LaserPlayerUsePacket packet, Player player, RegistryAccess dynamicRegistryManager) {
-        PortableLaserItem.onUseTick(player);
+    public static void receiveUsePacket(LaserPlayerUsePacket packet, IPayloadContext context) {
+        PortableLaserItem.onUseTick(context.player());
     }
     
     public record LaserPlayerUsePacket() implements CustomPacketPayload {

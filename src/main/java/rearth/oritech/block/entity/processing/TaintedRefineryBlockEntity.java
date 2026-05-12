@@ -23,6 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechPlatform;
@@ -516,8 +517,8 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         return List.of(ownStorage.getInputContainer(), ownStorage.getOutputContainer());
     }
     
-    public static void handleTankPacket(RefineryTankSelectorPacket payload, Player user, RegistryAccess registryAccess) {
-        var level = user.level();
+    public static void handleTankPacket(RefineryTankSelectorPacket payload, IPayloadContext context) {
+        var level = context.player().level();
         if (level == null) return;
         var refineryCandidate = level.getBlockEntity(payload.position(), BlockEntitiesContent.TAINTED_REFINERY_ENTITY);
         if (refineryCandidate.isEmpty()) return;

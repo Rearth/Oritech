@@ -1,9 +1,9 @@
 package rearth.oritech.client.ui;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -275,7 +275,8 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         }
     }
     
-    public static void handleFluidContainerInteraction(FluidContainerInteractionPacket packet, Player player, RegistryAccess registryAccess) {
+    public static void handleFluidContainerInteraction(FluidContainerInteractionPacket packet, IPayloadContext context) {
+        var player = context.player();
         if (!(player.containerMenu instanceof OritechScreenHandler handler)) return;
         if (packet.tankIndex() < 0 || packet.tankIndex() >= handler.fluidStorages.size()) return;
         

@@ -4,7 +4,6 @@ import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -14,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
@@ -121,8 +121,8 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
         return inventory;
     }
     
-    public static void receiveSlotSelection(InventoryProxySlotSelectorPacket packet, Player player, RegistryAccess dynamicRegistryManager) {
-        if (player.level().getBlockEntity(packet.position) instanceof InventoryProxyAddonBlockEntity addonBlock)
+    public static void receiveSlotSelection(InventoryProxySlotSelectorPacket packet, IPayloadContext context) {
+        if (context.player().level().getBlockEntity(packet.position) instanceof InventoryProxyAddonBlockEntity addonBlock)
             addonBlock.setTargetSlot(packet.slot);
     }
     

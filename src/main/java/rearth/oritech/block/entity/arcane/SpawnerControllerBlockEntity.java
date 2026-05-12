@@ -2,12 +2,12 @@ package rearth.oritech.block.entity.arcane;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -151,7 +151,8 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
             NetworkManager.sendBlockHandle(this, new SpawnerSyncPacket(worldPosition, mobNbt, hasCage, collectedSouls, maxSouls));
     }
     
-    public static void receiveUpdatePacket(SpawnerSyncPacket message, Level world, RegistryAccess dynamicRegistryManager) {
+    public static void receiveUpdatePacket(SpawnerSyncPacket message, IPayloadContext context) {
+        var world = context.player().level();
         
         if (world.getBlockEntity(message.position) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.mobNbt = message.spawnedMob;
