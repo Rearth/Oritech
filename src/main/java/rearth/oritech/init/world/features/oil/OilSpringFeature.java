@@ -1,4 +1,4 @@
-package rearth.oritech.init.level.features.oil;
+package rearth.oritech.init.world.features.oil;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
@@ -44,7 +44,7 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
         
         var random = context.random();
         var config = context.config();
-        var state = BuiltInRegistries.BLOCK.get(config.blockId()).defaultBlockState();
+        var state = BuiltInRegistries.BLOCK.get(config.blockId()).get().value().defaultBlockState();
         var level = context.level();
         
         var variation = random.nextIntBetweenInclusive((int) (-config.number() * 0.5f), config.number());

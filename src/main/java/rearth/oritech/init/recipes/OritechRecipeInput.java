@@ -2,6 +2,7 @@ package rearth.oritech.init.recipes;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -10,7 +11,7 @@ public record OritechRecipeInput(@NotNull List<ItemStack> itemStacks, @NotNull F
     
     @Override
     public ItemStack getItem(int slot) {
-        if (itemStacks == null || itemStacks.isEmpty()) return ItemStack.EMPTY;
+        if (itemStacks.isEmpty()) return ItemStack.EMPTY;
         return itemStacks.get(slot);
     }
     

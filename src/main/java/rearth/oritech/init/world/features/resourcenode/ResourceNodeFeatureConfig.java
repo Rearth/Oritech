@@ -1,4 +1,4 @@
-package rearth.oritech.init.level.features.resourcenode;
+package rearth.oritech.init.world.features.resourcenode;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

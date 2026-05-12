@@ -4,44 +4,41 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
-import rearth.oritech.util.registry.OritechDeferredRegistry;
+
+import java.util.function.Supplier;
 
 public class RecipeContent {
     
-    public static final OritechDeferredRegistry<RecipeType<?>> RECIPE_TYPES = OritechDeferredRegistry.create(Registries.RECIPE_TYPE);
-    public static final OritechDeferredRegistry<RecipeSerializer<?>> RECIPE_SERIALIZERS = OritechDeferredRegistry.create(Registries.RECIPE_SERIALIZER);
+    public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, Oritech.MOD_ID);
+    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, Oritech.MOD_ID);
     
-    public static final RegistrySupplier<RecipeSerializer<OritechRecipe>> ORITECH_SERIALIZER = RECIPE_SERIALIZERS.register("machine_recipe", () -> new RecipeSerializer<>(OritechRecipe.CODEC, OritechRecipe.STREAM_CODEC));
-    public static final RegistrySupplier<RecipeSerializer<AugmentDataRecipe>> AUGMENT_DATA_SERIALIZER = RECIPE_SERIALIZERS.register("augment_data", () -> new RecipeSerializer<>(AugmentDataRecipe.CODEC, AugmentDataRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<OritechRecipe>> ORITECH_SERIALIZER =
+      RECIPE_SERIALIZERS.register("machine_recipe", () -> new RecipeSerializer<>(OritechRecipe.CODEC, OritechRecipe.STREAM_CODEC));
     
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> PULVERIZER = RECIPE_TYPES.register("pulverizer", () -> recipeType("pulverizer"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> GRINDER = RECIPE_TYPES.register("grinder", () -> recipeType("grinder"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> ASSEMBLER = RECIPE_TYPES.register("assembler", () -> recipeType("assembler"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> REFINERY = RECIPE_TYPES.register("refinery", () -> recipeType("refinery"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> FOUNDRY = RECIPE_TYPES.register("foundry", () -> recipeType("foundry"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> CENTRIFUGE = RECIPE_TYPES.register("centrifuge", () -> recipeType("centrifuge"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> CENTRIFUGE_FLUID = RECIPE_TYPES.register("centrifuge_fluid", () -> recipeType("centrifuge_fluid"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> ATOMIC_FORGE = RECIPE_TYPES.register("atomic_forge", () -> recipeType("atomic_forge"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> BIO_GENERATOR = RECIPE_TYPES.register("bio_generator", () -> recipeType("bio_generator"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> FUEL_GENERATOR = RECIPE_TYPES.register("fuel_generator", () -> recipeType("fuel_generator"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> LAVA_GENERATOR = RECIPE_TYPES.register("lava_generator", () -> recipeType("lava_generator"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> STEAM_ENGINE = RECIPE_TYPES.register("steam_engine", () -> recipeType("steam_engine"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> DEEP_DRILL = RECIPE_TYPES.register("deep_drill", () -> recipeType("deep_drill"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> PARTICLE_COLLISION = RECIPE_TYPES.register("particle_collision", () -> recipeType("particle_collision"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> COOLER = RECIPE_TYPES.register("cooler", () -> recipeType("cooler"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> REACTOR = RECIPE_TYPES.register("reactor", () -> recipeType("reactor"));
-    public static final RegistrySupplier<RecipeType<OritechRecipe>> LASER = RECIPE_TYPES.register("laser", () -> recipeType("laser"));
+    public static final Supplier<RecipeSerializer<AugmentDataRecipe>> AUGMENT_DATA_SERIALIZER =
+      RECIPE_SERIALIZERS.register("augment_data", () -> new RecipeSerializer<>(AugmentDataRecipe.CODEC, AugmentDataRecipe.STREAM_CODEC));
     
-    public static final RegistrySupplier<RecipeType<AugmentDataRecipe>> AUGMENT_DATA = RECIPE_TYPES.register("augment_data", () -> recipeType("augment_data"));
+    public static final Supplier<RecipeType<OritechRecipe>> PULVERIZER = RECIPE_TYPES.register("pulverizer", () -> recipeType("pulverizer"));
+    public static final Supplier<RecipeType<OritechRecipe>> GRINDER = RECIPE_TYPES.register("grinder", () -> recipeType("grinder"));
+    public static final Supplier<RecipeType<OritechRecipe>> ASSEMBLER = RECIPE_TYPES.register("assembler", () -> recipeType("assembler"));
+    public static final Supplier<RecipeType<OritechRecipe>> REFINERY = RECIPE_TYPES.register("refinery", () -> recipeType("refinery"));
+    public static final Supplier<RecipeType<OritechRecipe>> FOUNDRY = RECIPE_TYPES.register("foundry", () -> recipeType("foundry"));
+    public static final Supplier<RecipeType<OritechRecipe>> CENTRIFUGE = RECIPE_TYPES.register("centrifuge", () -> recipeType("centrifuge"));
+    public static final Supplier<RecipeType<OritechRecipe>> CENTRIFUGE_FLUID = RECIPE_TYPES.register("centrifuge_fluid", () -> recipeType("centrifuge_fluid"));
+    public static final Supplier<RecipeType<OritechRecipe>> ATOMIC_FORGE = RECIPE_TYPES.register("atomic_forge", () -> recipeType("atomic_forge"));
+    public static final Supplier<RecipeType<OritechRecipe>> BIO_GENERATOR = RECIPE_TYPES.register("bio_generator", () -> recipeType("bio_generator"));
+    public static final Supplier<RecipeType<OritechRecipe>> FUEL_GENERATOR = RECIPE_TYPES.register("fuel_generator", () -> recipeType("fuel_generator"));
+    public static final Supplier<RecipeType<OritechRecipe>> LAVA_GENERATOR = RECIPE_TYPES.register("lava_generator", () -> recipeType("lava_generator"));
+    public static final Supplier<RecipeType<OritechRecipe>> STEAM_ENGINE = RECIPE_TYPES.register("steam_engine", () -> recipeType("steam_engine"));
+    public static final Supplier<RecipeType<OritechRecipe>> DEEP_DRILL = RECIPE_TYPES.register("deep_drill", () -> recipeType("deep_drill"));
+    public static final Supplier<RecipeType<OritechRecipe>> PARTICLE_COLLISION = RECIPE_TYPES.register("particle_collision", () -> recipeType("particle_collision"));
+    public static final Supplier<RecipeType<OritechRecipe>> COOLER = RECIPE_TYPES.register("cooler", () -> recipeType("cooler"));
+    public static final Supplier<RecipeType<OritechRecipe>> REACTOR = RECIPE_TYPES.register("reactor", () -> recipeType("reactor"));
+    public static final Supplier<RecipeType<OritechRecipe>> LASER = RECIPE_TYPES.register("laser", () -> recipeType("laser"));
     
-    public static void registerTypes() {
-        RECIPE_TYPES.register();
-    }
-    
-    public static void registerSerializers() {
-        RECIPE_SERIALIZERS.register();
-    }
+    public static final Supplier<RecipeType<AugmentDataRecipe>> AUGMENT_DATA = RECIPE_TYPES.register("augment_data", () -> recipeType("augment_data"));
     
     private static <T extends Recipe<?>> RecipeType<T> recipeType(String path) {
         return new RecipeType<>() {

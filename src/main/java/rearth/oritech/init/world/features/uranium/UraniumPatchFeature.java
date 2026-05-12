@@ -1,4 +1,4 @@
-package rearth.oritech.init.level.features.uranium;
+package rearth.oritech.init.world.features.uranium;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
@@ -47,8 +47,8 @@ public class UraniumPatchFeature extends Feature<UraniumPatchFeatureConfig> {
         
         var random = context.random();
         var config = context.config();
-        var state = BuiltInRegistries.BLOCK.get(config.blockId()).defaultBlockState();
-        var crystalBlock = BuiltInRegistries.BLOCK.get(config.crystalId());
+        var state = BuiltInRegistries.BLOCK.get(config.blockId()).get().value().defaultBlockState();
+        var crystalBlock = BuiltInRegistries.BLOCK.get(config.crystalId()).get().value();
         var level = context.level();
         
         var range = config.number();
@@ -66,9 +66,7 @@ public class UraniumPatchFeature extends Feature<UraniumPatchFeatureConfig> {
         
         var closestWallDir = closestWall.subtract(pos);
         var forward = getBiggestDirection(closestWallDir);
-        var facing = Direction.fromDelta(forward.getX(), forward.getY(), forward.getZ());
-        
-        if (facing == null) return;
+        var facing = Direction.getNearest(forward.getX(), forward.getY(), forward.getZ(), Direction.UP);
         
         var right = Geometry.getRight(facing);
         var up = Geometry.getUp(facing);

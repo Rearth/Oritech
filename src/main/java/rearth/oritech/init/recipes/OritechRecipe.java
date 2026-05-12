@@ -12,9 +12,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.networking.NetworkManager;
-import rearth.oritech.util.FluidIngredient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,8 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
     public static final MapCodec<OritechRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
       Ingredient.CODEC.listOf().fieldOf("itemInputs").forGetter(OritechRecipe::itemInputs),
       ItemStackTemplate.CODEC.listOf().fieldOf("itemResults").forGetter(OritechRecipe::itemResults),
-      FluidIngredient.CODEC.optionalFieldOf("fluidInput", FluidIngredient.EMPTY).forGetter(OritechRecipe::fluidInput),
-      NetworkManager.FLUID_STACK_CODEC.listOf().optionalFieldOf("fluidOutputs", List.of()).forGetter(OritechRecipe::fluidOutputs),
+      FluidIngredient.CODEC.optionalFieldOf("fluidInput", FluidIngredient.of(FluidStack.EMPTY)).forGetter(OritechRecipe::fluidInput),
+      FluidStack.OPTIONAL_CODEC.listOf().optionalFieldOf("fluidOutputs", List.of()).forGetter(OritechRecipe::fluidOutputs),
       Codec.INT.optionalFieldOf("time", 60).forGetter(OritechRecipe::time),
       Identifier.CODEC.xmap(OritechRecipe::recipeTypeFromId, OritechRecipe::idFromRecipeType).fieldOf("recipeType").forGetter(OritechRecipe::recipeType)
     ).apply(instance, OritechRecipe::new));
@@ -36,8 +36,8 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
     public static final StreamCodec<RegistryFriendlyByteBuf, OritechRecipe> STREAM_CODEC = StreamCodec.composite(
       Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::itemInputs,
       ItemStackTemplate.STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::itemResults,
-      FluidIngredient.PACKET_CODEC, OritechRecipe::fluidInput,
-      NetworkManager.FLUID_STACK_STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::fluidOutputs,
+      FluidIngredient.STREAM_CODEC, OritechRecipe::fluidInput,
+      FluidStack.OPTIONAL_STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::fluidOutputs,
       ByteBufCodecs.INT, OritechRecipe::time,
       StreamCodec.of(
         (buf, recipeType) -> Identifier.STREAM_CODEC.encode(buf, idFromRecipeType(recipeType)),
@@ -60,7 +60,7 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
         // compare items and fluids
         
         var itemsMatching = itemInputs.isEmpty() || itemsMatch(itemInputs, input);
-        var fluidsMatching = fluidInput.isEmpty() || fluidsMatch(input, level);
+        var fluidsMatching = fluidInput.fluids().isEmpty() || fluidsMatch(input, level);
         
         return itemsMatching && fluidsMatching;
     }

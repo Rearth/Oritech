@@ -56,6 +56,8 @@ public final class Oritech {
     
     public Oritech(IEventBus modEventBus, ModContainer modContainer) {
         
+        LOGGER.info("Hello from Oritech!");
+        
         // runtime events
         var neoEventBus = NeoForge.EVENT_BUS;
         neoEventBus.addListener(this::onServerStarted);
@@ -85,6 +87,7 @@ public final class Oritech {
         LootContent.LOOT_FUNCTIONS.register(modEventBus);
         EntitiesContent.ENTITY_TYPES.register(modEventBus);
         ComponentContent.COMPONENTS.register(modEventBus);
+        FeatureContent.FEATURES.register(modEventBus);
         
         FluidContent.FLUID_TYPES.register(modEventBus);
         FluidContent.FLUIDS.register(modEventBus);
@@ -96,20 +99,13 @@ public final class Oritech {
         
         // post processing / extra registrations
         BlockContent.AddBlockItems();
+        
+        LOGGER.info("All events registered to the event busses");
     }
     
     private void commonSetup(FMLCommonSetupEvent event) {
         // Some common setup code
         LOGGER.info("HELLO FROM COMMON SETUP");
-        
-    }
-    
-    // old
-    public static void initialize() {
-        
-        // todo
-        LOGGER.info("Begin Oritech initialization");
-        FeatureContent.initialize();
         
     }
     

@@ -10,7 +10,7 @@ public record AugmentDataRecipeInput(@NotNull List<ItemStack> itemStacks, @NotNu
     
     @Override
     public ItemStack getItem(int slot) {
-        if (itemStacks == null || itemStacks.isEmpty()) return ItemStack.EMPTY;
+        if (itemStacks.isEmpty()) return ItemStack.EMPTY;
         return itemStacks.get(slot);
     }
     

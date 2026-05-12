@@ -1,4 +1,4 @@
-package rearth.oritech.init.level.features.resourcenode;
+package rearth.oritech.init.world.features.resourcenode;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
@@ -35,7 +35,7 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
         var deepNodePos = testPos;
         var boulderPos = testPos;
 
-        for (int y = origin.getY(); y > level.getMinBuildHeight(); y--) {
+        for (int y = origin.getY(); y > level.getMinY(); y--) { // todo validate that minY is actually bedrock start
             var downPos = testPos.below();
             var testState = level.getBlockState(downPos);
             if (testState.is(Blocks.BEDROCK)) {
@@ -62,7 +62,7 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
     }
     
     private BlockState getRandomBlockFromList(List<Identifier> list, RandomSource random) {
-        return BuiltInRegistries.BLOCK.get(getRandomFromList(list, random)).defaultBlockState();
+        return BuiltInRegistries.BLOCK.get(getRandomFromList(list, random)).get().value().defaultBlockState();
     }
     
     private Identifier getRandomFromList(List<Identifier> list, RandomSource random) {
@@ -76,7 +76,7 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
         var ores = context.config().nodeOres();
         
         var radius = context.config().nodeSize();
-        var overlayBlock = BuiltInRegistries.BLOCK.get(context.config().overlayBlock()).defaultBlockState();
+        var overlayBlock = BuiltInRegistries.BLOCK.get(context.config().overlayBlock()).get().value().defaultBlockState();
         var overlayHeight = context.config().overlayHeight();
 
         var noise = new ImprovedNoise(random);
