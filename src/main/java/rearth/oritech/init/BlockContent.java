@@ -1,10 +1,6 @@
 package rearth.oritech.init;
 
-import net.minecraft.core.dispenser.ShulkerBoxDispenseBehavior;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -38,14 +34,11 @@ import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ItemContent.Compostable;
-import rearth.oritech.item.other.SmallEnergyStorageBlockItem;
-import rearth.oritech.item.other.SmallFluidTankBlockItem;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;

@@ -79,6 +79,8 @@ public final class Oritech {
         ItemGroups.TABS.register(modEventBus);
         SoundContent.SOUND_EVENTS.register(modEventBus);
         LootContent.LOOT_FUNCTIONS.register(modEventBus);
+        EntitiesContent.ENTITY_TYPES.register(modEventBus);
+        ComponentContent.COMPONENTS.register(modEventBus);
         
         FluidContent.FLUID_TYPES.register(modEventBus);
         FluidContent.FLUIDS.register(modEventBus);

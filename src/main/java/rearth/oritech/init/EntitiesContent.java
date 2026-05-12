@@ -1,21 +1,23 @@
 package rearth.oritech.init;
 
-import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import rearth.oritech.Oritech;
 import rearth.oritech.util.PortalEntity;
-import rearth.oritech.util.registry.OritechDeferredRegistry;
+
+import java.util.function.Supplier;
 
 public class EntitiesContent {
 
-    public static final OritechDeferredRegistry<EntityType<?>> ENTITIES = OritechDeferredRegistry.create(Registries.ENTITY_TYPE);
+    public static final DeferredRegister.Entities ENTITY_TYPES = DeferredRegister.createEntities(Oritech.MOD_ID);
     
-    public static final RegistrySupplier<EntityType<?>> PORTAL_ENTITY = ENTITIES.register("portal_entity", () -> EntityType.Builder.of(PortalEntity::new, MobCategory.MISC)
+    public static final Supplier<EntityType<?>> PORTAL_ENTITY = ENTITY_TYPES.register("portal_entity", () -> EntityType.Builder.of(PortalEntity::new, MobCategory.MISC)
                                                                                                             .sized(1, 2)
-                                                                                                            .build("portal_entity"));
+                                                                                                               .noSave()
+                                                                                                               .noSummon()
+                                                                                                            .build(ResourceKey.create(Registries.ENTITY_TYPE, Oritech.id("portal_entity"))));
 
-    public static void register() {
-        ENTITIES.register();
-    }
 }

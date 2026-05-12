@@ -61,10 +61,6 @@ public class NetworkManager {
     private static final Map<Type, StreamCodec<? extends ByteBuf, ?>> AUTO_CODECS = new HashMap<>();
     private static final Map<Integer, List<Field>> CACHED_FIELDS = new HashMap<Integer, List<Field>>();
     
-    // these two are basically copies of the architectury built-in fluid stack codecs, but using the OPTIONAL_STREAM_CODEC to allow for empty fluid itemStacks
-    // todo check if this is still needed with the update
-    public static Codec<FluidStack> FLUID_STACK_CODEC;
-    public static StreamCodec<RegistryFriendlyByteBuf, FluidStack> FLUID_STACK_STREAM_CODEC;
     
     public static void sendBlockHandle(BlockEntity blockEntity, CustomPacketPayload message) {
         OritechPlatform.INSTANCE.sendBlockHandle(blockEntity, message);
