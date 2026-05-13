@@ -6,8 +6,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 
@@ -49,7 +52,7 @@ public interface ScreenProvider {
     
     InventoryInputMode getInventoryInputMode();
     
-    Container getDisplayedInventory();
+    StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory();
     
     MenuType<?> getScreenHandlerType();
     

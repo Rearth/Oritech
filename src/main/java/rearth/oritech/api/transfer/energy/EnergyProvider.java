@@ -6,6 +6,6 @@ import org.jetbrains.annotations.Nullable;
 
 public interface EnergyProvider {
 
-    EnergyHandler getHandler(@Nullable Direction direction);
+    EnergyHandler getEnergyLookup(@Nullable Direction direction);
 
 }

@@ -2,18 +2,21 @@ package rearth.oritech.block.base.entity;
 
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
+import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -21,18 +24,22 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.transfer.DelegatingResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
@@ -40,16 +47,21 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.item.InOutInventoryStorage;
+import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.util.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public abstract class MachineBlockEntity extends NetworkedBlockEntity
-  implements GeoBlockEntity, ScreenProvider, RedstoneAddonBlockEntity.RedstoneControllable, ColorableMachine, EnergyProvider {
+  implements GeoBlockEntity, ScreenProvider, MenuProvider, RedstoneAddonBlockEntity.RedstoneControllable, ColorableMachine, EnergyProvider, ItemProvider {
     
     // animations
     public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
@@ -79,9 +91,11 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     private long lastChangedAt = 0;  // used to check if anything happened in the last tick, to avoid unneeded calculations and updates
     
-    // own storages
-    public final FilteringInventory inventory = new FilteringInventory(getInventorySize(), this::setChanged, getSlotAssignments());
+    // cache for sided inventory access
     private final Map<Direction, ResourceHandler<ItemResource>> sidedInventories = new HashMap<>(); // only for sided input mode
+    
+    // own storages
+    public final MachineInventoryStorage inventory = new MachineInventoryStorage(getInventorySize(), this::setChanged, getSlotAssignments());
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), 0, this::setChanged, this.canEnergyStorageChangeWhileGUIOpen());
     
@@ -173,20 +187,22 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         return activeRecipe.itemResults();
     }
     
-    // transaction could be used to verify output contents matched, but progress is already reset and the machine doesnt work if it wouldn't, so its not really needed here
+    // transaction could be used to verify output contents can be fully output, but progress is already reset and the machine doesnt work if it wouldn't, so its not really needed here
     protected void finishCrafting(Transaction transaction) {
         
         var results = getCraftingResults(currentRecipe);
         var inputs = currentRecipe.itemInputs();
+        var outputInv = getOutputView();
+        var inputInv = getInputView();
         
         // create outputs
         for (int i = 0; i < results.size(); i++) {
             var result = results.get(i);
-            var slot = outputInventory.get(i);
+            var slot = outputInv.get(i);
             
-            var newCount = slot.getCount() + result.getCount();
+            var newCount = slot.getCount() + result.count();
             if (slot.isEmpty()) {
-                outputInventory.set(i, result.copy());
+                outputInv.set(i, result.create());
             } else {
                 slot.setCount(newCount);
             }
@@ -196,16 +212,14 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         var startOffset = 0;    // used so when multiple matching itemStacks are available, they're drained somewhat evenly
         for (var removedIng : inputs) {
             // try to find current ingredient
-            for (int i = 0; i < inputInventory.size(); i++) {
-                var inputStack = inputInventory.get((i + startOffset) % inputInventory.size());
+            for (int i = 0; i < inputInv.size(); i++) {
+                var inputStack = inputInv.get((i + startOffset) % inputInv.size());
                 if (removedIng.test(inputStack)) {
                     inputStack.shrink(1);
                     startOffset++;
                     break;
                 }
             }
-            
-            
         }
         
     }
@@ -225,15 +239,14 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         
         if (outInv.isEmpty()) return true;
         
-        List<ItemStack> results = recipe.getResults();
+        var results = recipe.itemResults();
         for (int i = 0; i < results.size(); i++) {
             var result = results.get(i);
             var outSlot = outInv.getItem(i);
             
             if (outSlot.isEmpty()) continue;
             
-            if (!canAddToSlot(result, outSlot)) return false;
-            
+            if (!canAddToSlot(result.create(), outSlot)) return false;
         }
         
         return true;
@@ -245,87 +258,50 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         return slot.getCount() + input.getCount() <= slot.getMaxStackSize();  // count too high
     }
     
-    protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
-        
-        if (inputEmpty())
-            return Optional.empty();
-        
-        // check if old recipe fits
-        if (currentRecipe != null && currentRecipe != OritechRecipe.EMPTY) {
-            if (currentRecipe.matches(getInputInventory(), level))
-                return Optional.of(new RecipeHolder<>(currentRecipe.getOriType().getIdentifier(), currentRecipe));
-        }
-        
-        return level.getRecipeManager().getRecipeFor(getOwnRecipeType(), getInputInventory(), level);
-    }
-    
-    protected boolean inputEmpty() {
-        return getInputView().isEmpty() || getInputView().stream().allMatch(ItemStack::isEmpty);
-    }
-    
     protected abstract RecipeType<OritechRecipe> getOwnRecipeType();
     
     public abstract InventorySlotAssignment getSlotAssignments();
     
     protected List<ItemStack> getInputView() {
         var slots = getSlotAssignments();
-        return this.inventory.heldStacks.subList(slots.inputStart(), slots.inputStart() + slots.inputCount());
+        return this.inventory.getStacks().subList(slots.inputStart(), slots.inputStart() + slots.inputCount());
     }
     
     protected List<ItemStack> getOutputView() {
         var slots = getSlotAssignments();
-        return this.inventory.heldStacks.subList(slots.outputStart(), slots.outputStart() + slots.outputCount());
-    }
-    
-    protected RecipeInput getInputInventory() {
-        return new SimpleCraftingInventory(getInputView().toArray(ItemStack[]::new));
+        return this.inventory.getStacks().subList(slots.outputStart(), slots.outputStart() + slots.outputCount());
     }
     
     protected Container getOutputInventory() {
         return new SimpleContainer(getOutputView().toArray(ItemStack[]::new));
     }
     
+    // new:
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-        nbt.putInt("oritech.machine_progress", progress);
-        nbt.putLong("oritech.machine_energy", energyStorage.energy);
-        nbt.putShort("oritech.machine_input_mode", (short) inventoryInputMode.ordinal());
-        nbt.putBoolean("oritech.redstone", disabledViaRedstone);
+        ContainerHelper.saveAllItems(output, inventory.getStacks());
+        serializeColor(output);
         
-        addColorToNbt(nbt);
+        progress.serialize(output);
+        energyStorage.serialize(output);
+        output.putShort("input_mode", (short) inventoryInputMode.ordinal());
+        output.putBoolean("redstone", disabledViaRedstone);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
-        progress = nbt.getInt("oritech.machine_progress");
-        energyStorage.energy = nbt.getLong("oritech.machine_energy");
-        inventoryInputMode = InventoryInputMode.values()[nbt.getShort("oritech.machine_input_mode")];
-        disabledViaRedstone = nbt.getBoolean("oritech.redstone");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
         
-        loadColorFromNbt(nbt);
-    }
-    
-    private int findLowestMatchingSlot(ItemStack stack, List<ItemStack> inv, boolean allowEmpty) {
+        ContainerHelper.loadAllItems(input, inventory.getStacks());
+        deserializeColor(input);
         
-        var lowestMatchingIndex = -1;
-        var lowestMatchingCount = 64;
+        progress.deserialize(input);
+        energyStorage.deserialize(input);
         
-        for (int i = 0; i < inv.size(); i++) {
-            var invSlot = inv.get(i);
-            
-            // if a slot is empty, is it automatically the lowest
-            if (invSlot.isEmpty() && allowEmpty) return i;
-            
-            if (invSlot.getItem().equals(stack.getItem()) && invSlot.getCount() < lowestMatchingCount) {
-                lowestMatchingIndex = i;
-                lowestMatchingCount = invSlot.getCount();
-            }
-        }
-        
-        return lowestMatchingIndex;
+        inventoryInputMode = InventoryInputMode.values()[input.getShortOr("input_mode", (short) 0)];
+        disabledViaRedstone = input.getBooleanOr("redstone", false);
     }
     
     @Override
@@ -366,7 +342,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
     
     public int getRecipeDuration() {
-        return getCurrentRecipe().getTime();
+        return getCurrentRecipe().time();
     }
     
     @Override
@@ -375,10 +351,9 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public void saveExtraData(FriendlyByteBuf buf) {
+    public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
+        MenuProvider.super.writeClientSideData(menu, buffer);
         this.sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(worldPosition);
-        
     }
     
     protected Direction getFacing() {
@@ -397,20 +372,11 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
-        return energyStorage;
-    }
-    
-    @Override
     public abstract List<GuiSlot> getGuiSlots();
     
     @Override
     public float getProgress() {
-        return (float) progress / (getRecipeDuration() * getSpeedMultiplier());
-    }
-    
-    public void setProgress(int progress) {
-        this.progress = progress;
+        return (float) progress.get() / (getRecipeDuration() * getSpeedMultiplier());
     }
     
     public DynamicEnergyStorage getEnergyStorage() {
@@ -419,10 +385,6 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     public OritechRecipe getCurrentRecipe() {
         return currentRecipe;
-    }
-    
-    public void setCurrentRecipe(OritechRecipe currentRecipe) {
-        this.currentRecipe = currentRecipe;
     }
     
     // lower = better for both (speed and efficiency)
@@ -461,10 +423,6 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         return true;
     }
     
-    public void setEnergyStored(long amount) {
-        energyStorage.energy = amount;
-    }
-    
     @Override
     public float getDisplayedEnergyUsage() {
         return calculateEnergyUsage();
@@ -492,15 +450,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public Container getDisplayedInventory() {
-        return inventory;
-    }
-    
-    @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
-        if (inventoryInputMode.equals(InventoryInputMode.SIDED)) {
-            return sidedInventories.computeIfAbsent(direction, this::getDirectedStorage);
-        }
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
         return inventory;
     }
     
@@ -511,9 +461,9 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     @Override
     public int getComparatorSlotAmount(int slot) {
-        if (inventory.heldStacks.size() <= slot) return 0;
+        if (inventory.getStacks().size() <= slot) return 0;
         
-        var stack = inventory.getItem(slot);
+        var stack = inventory.getStacks().get(slot);
         if (stack.isEmpty()) return 0;
         
         return (int) ((stack.getCount() / (float) stack.getMaxStackSize()) * 15);
@@ -521,8 +471,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     @Override
     public int getComparatorProgress() {
-        if (currentRecipe.getTime() <= 0) return 0;
-        return (int) ((progress / (float) currentRecipe.getTime() * getSpeedMultiplier()) * 15);
+        if (currentRecipe.time() <= 0) return 0;
+        return (int) ((progress.get() / (float) currentRecipe.time() * getSpeedMultiplier()) * 15);
     }
     
     @Override
@@ -560,46 +510,52 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             machineBlock.cycleInputMode();
     }
     
-    public ItemApi.InventoryStorage getDirectedStorage(Direction direction) {
+    @Override
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
+        return energyStorage;
+    }
+    
+    @Override
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
+        if (inventoryInputMode.equals(InventoryInputMode.SIDED)) {
+            return sidedInventories.computeIfAbsent(direction, this::getDirectedStorage);
+        }
+        return inventory;
+    }
+    
+    // needed for sided inventory mode
+    public ResourceHandler<ItemResource> getDirectedStorage(Direction direction) {
         
         var slots = getSlotAssignments();
         if (slots.inputCount() <= 1) return inventory;
         
         if (direction == null) return inventory;
         
-        // input only, disable output
         if (direction.equals(Direction.UP)) {
-            return new DelegatingInventoryStorage(inventory, () -> true) {
+            // input only, disable output
+            return new DelegatingResourceHandler<>(inventory) {
                 @Override
-                public int extract(ItemStack extracted, boolean simulate) {
+                public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
                     return 0;
                 }
                 
                 @Override
-                public int extractFromSlot(ItemStack extracted, int slot, boolean simulate) {
+                public int extract(ItemResource resource, int amount, TransactionContext transaction) {
                     return 0;
-                }
-                
-                @Override
-                public boolean supportsExtraction() {
-                    return false;
                 }
             };
+            
         } else if (direction.equals(Direction.DOWN)) {
-            return new DelegatingInventoryStorage(inventory, () -> true) {
+            // output only, disable input
+            return new DelegatingResourceHandler<>(inventory) {
                 @Override
-                public int insert(ItemStack inserted, boolean simulate) {
+                public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
                     return 0;
                 }
                 
                 @Override
-                public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
+                public int insert(ItemResource resource, int amount, TransactionContext transaction) {
                     return 0;
-                }
-                
-                @Override
-                public boolean supportsInsertion() {
-                    return false;
                 }
             };
         } else {
@@ -610,46 +566,43 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             if (direction.equals(Direction.WEST)) horizontalOrdinal = 3;
             var inputSlotIndex = slots.inputStart() + horizontalOrdinal % slots.inputCount();
             
-            return new DelegatingInventoryStorage(inventory, () -> true) {
+            return new DelegatingResourceHandler<>(inventory) {
                 @Override
-                public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
-                    if (slot != inputSlotIndex) return 0;
-                    return super.insertToSlot(inserted, slot, simulate);
+                public int insert(ItemResource resource, int amount, TransactionContext transaction) {
+                    return insert(inputSlotIndex, resource, amount, transaction);
                 }
                 
                 @Override
-                public int insert(ItemStack inserted, boolean simulate) {
-                    return insertToSlot(inserted, inputSlotIndex, simulate);
+                public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+                    if (index != inputSlotIndex) return 0;
+                    return super.insert(index, resource, amount, transaction);
                 }
             };
         }
     }
     
-    @Override
-    public EnergyHandler getHandler(@Nullable Direction direction) {
-        return energyStorage;
-    }
-    
-    public class FilteringInventory extends InOutInventoryStorage {
+    // basic in out storage, but with option for sided / fill even input mode
+    public class MachineInventoryStorage extends InOutInventoryStorage {
         
-        public FilteringInventory(int size, Runnable onUpdate, InventorySlotAssignment slotAssignment) {
+        public MachineInventoryStorage(int size, Runnable onUpdate, InventorySlotAssignment slotAssignment) {
             super(size, onUpdate, slotAssignment);
         }
         
+        // fill evenly tries to insert it in the best matching slots (fills the lowest ones evenly)
         @Override
-        public int insert(ItemStack toInsert, boolean simulate) {
+        public int insert(ItemResource resource, int amount, TransactionContext transaction) {
             
             if (inventoryInputMode.equals(InventoryInputMode.FILL_EVENLY)) {
-                var remaining = toInsert.getCount();
-                var slotCountTarget = toInsert.getCount() / getSlotAssignments().inputCount();
-                slotCountTarget = Math.clamp(slotCountTarget, 1, remaining);
+                var remaining = amount;
+                var amountPerSlot = amount / getSlotAssignments().inputCount();
+                amountPerSlot = Math.clamp(amountPerSlot, 1, remaining);
                 
                 // start at slot with fewest items
                 var lowestSlot = 0;
                 var lowestSlotCount = Integer.MAX_VALUE;
                 for (int i = getSlotAssignments().inputStart(); i < getSlotAssignments().inputStart() + getSlotAssignments().inputCount(); i++) {
-                    var content = this.getItem(i);
-                    if (!content.isEmpty() && !content.getItem().equals(toInsert.getItem()))
+                    var content = stacks.get(i);
+                    if (!content.isEmpty() && !resource.is(content.getItem()))
                         continue;    // skip slots containing other items
                     if (content.getCount() < lowestSlotCount) {
                         lowestSlotCount = content.getCount();
@@ -657,29 +610,26 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
                     }
                 }
                 
-                for (var slot = 0; slot < getContainerSize() && remaining > 0; slot++) {
-                    remaining -= customSlotInsert(toInsert.copyWithCount(slotCountTarget), (slot + lowestSlot) % getContainerSize(), simulate);
+                // actually fill slots, starting with most empty one
+                for (var slot = 0; slot < this.size() && remaining > 0; slot++) {
+                    remaining -= super.insert((slot + lowestSlot) % this.size(), resource, amountPerSlot, transaction);
                 }
                 
-                return toInsert.getCount() - remaining;
+                return amount - remaining;
             }
             
-            
-            return super.insert(toInsert, simulate);
+            return super.insert(resource, amount, transaction);
         }
         
+        // specific slot insert in even mode forwards to non-specific slot variant
         @Override
-        public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
+        public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
             
             if (inventoryInputMode.equals(InventoryInputMode.FILL_EVENLY)) {
-                return insert(addedStack, simulate);
+                return insert(resource, amount, transaction);
             }
             
-            return customSlotInsert(addedStack, slot, simulate);
-        }
-        
-        private int customSlotInsert(ItemStack toInsert, int slot, boolean simulate) {
-            return super.insertToSlot(toInsert, slot, simulate);
+            return super.insert(index, resource, amount, transaction);
         }
     }
     

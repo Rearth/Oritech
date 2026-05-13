@@ -1,6 +1,7 @@
 package rearth.oritech.util;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public interface ColorableMachine {
     
@@ -14,6 +15,7 @@ public interface ColorableMachine {
         NETHERITE,
         REDSTONE,
         SCULK
+        
     }
     
     default boolean supportRecoloring() {
@@ -28,14 +30,13 @@ public interface ColorableMachine {
         return ColorVariant.ORANGE;
     }
     
-    default void addColorToNbt(CompoundTag tag) {
-        tag.putShort("color", (short) this.getCurrentColor().ordinal());
+    default void serializeColor(ValueOutput output) {
+        output.putShort("color", (short) this.getCurrentColor().ordinal());
     }
     
-    default void loadColorFromNbt(CompoundTag tag) {
-        if (tag.contains("color")) {
-            var color = tag.getShort("color");
-            this.assignColor(ColorVariant.values()[color]);
-        }
+    default void deserializeColor(ValueInput input) {
+        var loaded = input.getShortOr("color", Short.MAX_VALUE);
+        if (loaded != Short.MAX_VALUE)
+            this.assignColor(ColorVariant.values()[loaded]);
     }
 }

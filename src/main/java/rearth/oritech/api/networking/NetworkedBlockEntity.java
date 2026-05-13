@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.Oritech;
 
-// important: when implementing this class and the block has a GUI, make sure to call `this.sendUpdate(SyncType.GUI_OPEN);` in the `saveExtraData()` method.
+// important: when implementing this class and the block has a GUI, make sure to call `this.sendUpdate(SyncType.GUI_OPEN);` in the `writeClientSideData()` method.
 // also ensure the `gui_tick` event type is sent from the screenhandler `sendContentUpdates` call, e.g. `blockEntity.sendUpdate(SyncType.GUI_TICK);`
 public abstract class NetworkedBlockEntity extends BlockEntity implements BlockEntityTicker<NetworkedBlockEntity> {
     
