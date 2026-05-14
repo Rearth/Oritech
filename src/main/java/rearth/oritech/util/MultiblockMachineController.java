@@ -4,9 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
@@ -17,9 +14,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.item.ItemApi;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
@@ -45,39 +45,29 @@ public interface MultiblockMachineController {
     
     float getCoreQuality();
     
-    ItemApi.InventoryStorage getInventoryForMultiblock();
+    StacksResourceHandler<ItemStack, ItemResource> getInventoryForMultiblock();
     
-    EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction);
+    DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction);
     
-    default void addMultiblockToNbt(CompoundTag nbt) {
+    default void saveMultiblockAdditional(ValueOutput output) {
         
-        var posList = new ListTag();
+        var list = output.childrenList("cores");
         for (var pos : getConnectedCores()) {
-            var posTag = new CompoundTag();
-            posTag.putInt("x", pos.getX());
-            posTag.putInt("y", pos.getY());
-            posTag.putInt("z", pos.getZ());
-            posList.add(posTag);
+            list.addChild().store("pos", BlockPos.CODEC, pos);
         }
-        nbt.put("connectedCores", posList);
-        nbt.putFloat("coreQuality", getCoreQuality());
+        
+        output.putFloat("quality", getCoreQuality());
     }
     
-    default void loadMultiblockNbtData(CompoundTag nbt) {
+    default void loadMultiblockAdditional(ValueInput input) {
         
-        var posList = nbt.getList("connectedCores", Tag.TAG_COMPOUND);
-        var coreBlocksConnected = getConnectedCores();
-        
-        for (var posTag : posList) {
-            var posCompound = (CompoundTag) posTag;
-            var x = posCompound.getInt("x");
-            var y = posCompound.getInt("y");
-            var z = posCompound.getInt("z");
-            var pos = new BlockPos(x, y, z);
-            coreBlocksConnected.add(pos);
+        var coreBlockConnected = getConnectedCores();
+        for (var posData : input.childrenListOrEmpty("cores")) {
+            var pos = posData.read("pos", BlockPos.CODEC);
+            pos.ifPresent(coreBlockConnected::add);
         }
         
-        setCoreQuality(nbt.getFloat("coreQuality"));
+        setCoreQuality(input.getFloatOr("quality", 1f));
     }
     
     default Boolean tryPlaceNextCore(Player player) {

@@ -2,9 +2,7 @@ package rearth.oritech.block.base.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -13,15 +11,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.config.OritechConfig;
-import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ScreenProvider;
 
@@ -45,11 +46,9 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     }
     
     @Override
-    protected void useEnergy() {
-        super.useEnergy();
-        
+    protected void onProgressed() {
+        super.onProgressed();
         consumeBurstTicks();
-        
     }
     
     public void consumeBurstTicks() {
@@ -65,7 +64,6 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         super.serverTick(level, pos, state, blockEntity);
-        
         addBurstTicks();
     }
     
@@ -75,39 +73,44 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     }
     
     @Override
-    protected void finishCrafting(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
-        super.finishCrafting(activeRecipe, outputInventory, inputInventory);
+    protected boolean finishCrafting(Transaction transaction) {
+        var initialSuccess = super.finishCrafting(transaction);
         
-        if (supportExtraChambersAuto()) {
-            var chamberCount = addonData.extraChambers();
-            
-            // craft N extra items if we have extra chambers
-            for (int i = 0; i < chamberCount; i++) {
-                var newRecipe = getRecipe();
-                if (newRecipe.isEmpty() || !newRecipe.get().value().equals(currentRecipe) || !canOutputRecipe(activeRecipe) || !canProceed(activeRecipe))
-                    break;
-                super.finishCrafting(activeRecipe, outputInventory, inputInventory);
+        if (!initialSuccess) return false;
+        
+        var chamberCount = addonData.extraChambers();
+        if (chamberCount >= 1) craftChamberResults(chamberCount, transaction);
+        
+        // extra chamber crafts are attempted with a sub-transaction for each, but they don't all have to work
+        return true;
+        
+    }
+    
+    protected void craftChamberResults(int chambers, Transaction transaction) {
+        
+        for (int i = 0; i < chambers; i++) {
+            // try to craft the current recipe N times, with a nested transaction for each
+            try (var nested = Transaction.open(transaction)) {
+                
+                var success = super.finishCrafting(nested);
+                
+                if (!success) break;    // dont commit transaction, dont try again
+                nested.commit();    // succeed nested transaction
             }
         }
         
     }
     
-    // this should return false if the default craftItem implementation should not handle extra chambers
-    public boolean supportExtraChambersAuto() {
-        return true;
+    @Override
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        saveAddonAdditional(output);
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        writeAddonToNbt(nbt);
-    }
-    
-    @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        loadAddonNbtData(nbt);
-        
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        loadAddonAdditional(input);
         updateEnergyContainer();
     }
     
@@ -160,7 +163,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryForAddon() {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryForAddon() {
         return inventory;
     }
     

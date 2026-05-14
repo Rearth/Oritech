@@ -128,7 +128,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     // main work is done here. At this point, we have a valid recipe (items+fluid verified), and could output the results.
     // we work with one big transaction. Everything is taken directly, and if a part doesnt work we just don't commit the transaction
-    private void workTick() {
+    protected void workTick() {
         try (var transaction = Transaction.openRoot()) {
             
             var energyNeeded = (int) calculateEnergyUsage();
@@ -140,7 +140,13 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             progress.increment(transaction);
             
             if (checkCraftingFinished(currentRecipe)) {
-                finishCrafting(transaction);
+                var crafted = finishCrafting(transaction);
+                
+                if (!crafted) {
+                    Oritech.LOGGER.warn("crafting results failed! This should never happen. At: {}", worldPosition.toShortString());
+                    return;
+                }
+                
                 progress.reset(transaction);
             }
             
@@ -149,6 +155,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             
         }
     }
+    
+    protected void onProgressed() {}
     
     // performance optimized recipe lookup. Verified that both item and fluid inputs match the recipe.
     private OritechRecipe findActiveRecipe() {
@@ -191,40 +199,36 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         return activeRecipe.itemResults();
     }
     
-    // transaction could be used to verify output contents can be fully output, but progress is already reset and the machine doesnt work if it wouldn't, so its not really needed here
-    protected void finishCrafting(Transaction transaction) {
+    // uses the transaction and tries to do all steps. If input is missing or output doesn't match, return false.
+    protected boolean finishCrafting(Transaction transaction) {
         
         var results = getCraftingResults(currentRecipe);
-        var inputs = currentRecipe.itemInputs();
-        var outputInv = getOutputView();
-        var inputInv = getInputView();
+        var recipeIngredients = currentRecipe.itemInputs();
+        var outputInv = getDirectOutput();
+        var inputInv = getDirectInput();
         
         // create outputs
-        for (int i = 0; i < results.size(); i++) {
-            var result = results.get(i);
-            var slot = outputInv.get(i);
-            
-            var newCount = slot.getCount() + result.count();
-            if (slot.isEmpty()) {
-                outputInv.set(i, result.create());
-            } else {
-                slot.setCount(newCount);
-            }
+        for (var result : results) {
+            var added = outputInv.insert(ItemResource.of(result), result.count(), transaction);
+            if (added != result.count()) return false;
         }
         
         // remove inputs. Each input is 1 ingredient.
         var startOffset = 0;    // used so when multiple matching itemStacks are available, they're drained somewhat evenly
-        for (var removedIng : inputs) {
+        for (var removedIng : recipeIngredients) {
             // try to find current ingredient
             for (int i = 0; i < inputInv.size(); i++) {
-                var inputStack = inputInv.get((i + startOffset) % inputInv.size());
-                if (removedIng.test(inputStack)) {
-                    inputStack.shrink(1);
+                var inputResource = inputInv.getResource((i + startOffset) % inputInv.size());
+                if (removedIng.test(inputResource.toStack())) {
+                    var taken = inputInv.extract(i, inputResource, 1, transaction);
+                    if (taken != 1) return false;
                     startOffset++;
                     break;
                 }
             }
         }
+        
+        return true;
         
     }
     
@@ -239,7 +243,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     // check if output slots are valid, meaning: each slot is either empty, or of the same type and can add the target amount without overfilling
     public boolean canOutputRecipe(OritechRecipe recipe) {
         
-        var outInv = getOutputInventory();
+        var outInv = getOutputCopy();
         
         if (outInv.isEmpty()) return true;
         
@@ -276,8 +280,50 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         return this.inventory.getStacks().subList(slots.outputStart(), slots.outputStart() + slots.outputCount());
     }
     
-    protected Container getOutputInventory() {
+    protected Container getOutputCopy() {
         return new SimpleContainer(getOutputView().toArray(ItemStack[]::new));
+    }
+    
+    // gives a freely insertable and extractable view of the input container
+    protected ResourceHandler<ItemResource> getDirectInput() {
+        var slots = getSlotAssignments();
+        
+        return new DelegatingResourceHandler<>(inventory) {
+            
+            @Override
+            public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+                if (slots.isInput(index)) return inventory.directInsert(index, resource, amount, transaction);
+                return super.insert(index, resource, amount, transaction);
+            }
+            
+            @Override
+            public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
+                if (slots.isInput(index)) return inventory.directExtract(index, resource, amount, transaction);
+                return super.extract(index, resource, amount, transaction);
+            }
+        };
+        
+    }
+    
+    // gives a freely insertable and extractable view of the output container
+    protected ResourceHandler<ItemResource> getDirectOutput() {
+        var slots = getSlotAssignments();
+        
+        return new DelegatingResourceHandler<>(inventory) {
+            
+            @Override
+            public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+                if (slots.isOutput(index)) return inventory.directInsert(index, resource, amount, transaction);
+                return super.insert(index, resource, amount, transaction);
+            }
+            
+            @Override
+            public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
+                if (slots.isOutput(index)) return inventory.directExtract(index, resource, amount, transaction);
+                return super.extract(index, resource, amount, transaction);
+            }
+        };
+        
     }
     
     // new:

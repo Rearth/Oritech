@@ -5,13 +5,14 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.addons.CombiAddonEntity;
@@ -35,7 +36,7 @@ public interface MachineAddonController {
     
     DynamicEnergyStorage getStorageForAddon();
     
-    ItemApi.InventoryStorage getInventoryForAddon();
+    StacksResourceHandler<ItemStack, ItemResource> getInventoryForAddon();
     
     ScreenProvider getScreenProvider();
     
@@ -288,50 +289,26 @@ public interface MachineAddonController {
         var addonData = getBaseAddonData();
         energyStorage.capacity = getDefaultCapacity() + addonData.energyBonusCapacity;
         energyStorage.maxInsert = getDefaultInsertRate() + addonData.energyBonusTransfer;
-        energyStorage.amount = Math.min(energyStorage.amount, energyStorage.capacity);
+        energyStorage.energy = Math.min(energyStorage.energy, energyStorage.capacity);
     }
     
-    default void writeAddonToNbt(CompoundTag nbt) {
-        var data = getBaseAddonData();
-        nbt.putFloat("speed", data.speed);
-        nbt.putFloat("efficiency", data.efficiency);
-        nbt.putLong("energyBonusCapacity", data.energyBonusCapacity);
-        nbt.putLong("energyBonusTransfer", data.energyBonusTransfer);
-        nbt.putInt("extraChambers", data.extraChambers);
-        nbt.putInt("maxBurst", data.maxBurstTicks);
+    default void saveAddonAdditional(ValueOutput output) {
+        output.store("addonData", BaseAddonData.CODEC, getBaseAddonData());
         
-        var posList = new ListTag();
+        var listValue = output.childrenList("connectedAddons");
         for (var pos : getConnectedAddons()) {
-            var posTag = new CompoundTag();
-            posTag.putInt("x", pos.getX());
-            posTag.putInt("y", pos.getY());
-            posTag.putInt("z", pos.getZ());
-            posList.add(posTag);
+            listValue.addChild().store("pos", BlockPos.CODEC, pos);
         }
-        nbt.put("connectedAddons", posList);
     }
     
-    default void loadAddonNbtData(CompoundTag nbt) {
-        var data = new BaseAddonData(
-          nbt.getFloat("speed"),
-          nbt.getFloat("efficiency"),
-          nbt.getLong("energyBonusCapacity"),
-          nbt.getLong("energyBonusTransfer"),
-          nbt.getInt("extraChambers"),
-          nbt.getInt("maxBurst")
-        );
+    default void loadAddonAdditional(ValueInput input) {
+        var data = input.read("addonData", BaseAddonData.CODEC).orElse(BaseAddonData.DEFAULT_ADDON_DATA);
         setBaseAddonData(data);
         
-        var posList = nbt.getList("connectedAddons", Tag.TAG_COMPOUND);
         var connectedAddons = getConnectedAddons();
-        
-        for (var posTag : posList) {
-            var posCompound = (CompoundTag) posTag;
-            var x = posCompound.getInt("x");
-            var y = posCompound.getInt("y");
-            var z = posCompound.getInt("z");
-            var pos = new BlockPos(x, y, z);
-            connectedAddons.add(pos);
+        for (var posData : input.childrenListOrEmpty("connectedAddons")) {
+            var pos = posData.read("pos", BlockPos.CODEC);
+            pos.ifPresent(connectedAddons::add);
         }
     }
     
