@@ -14,7 +14,7 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
+import rearth.oritech.util.MachineSoundHandler;
 import rearth.oritech.util.Geometry;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -101,7 +101,7 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
                           .triggerableAnim("retracted", RETRACTED)
                           .triggerableAnim("expand", EXPAND)
                           .triggerableAnim("retract", RETRACT)
-                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+                          .setSoundKeyframeHandler(new MachineSoundHandler<>()));
     }
     
     @Override

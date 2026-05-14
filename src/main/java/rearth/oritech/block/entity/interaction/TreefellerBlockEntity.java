@@ -248,7 +248,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
         controllers.add(new AnimationController<>(this, "machine", 5, state -> PlayState.CONTINUE)
                           .triggerableAnim("work", MachineBlockEntity.WORKING)
                           .triggerableAnim("idle", MachineBlockEntity.IDLE)
-                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+                          .setSoundKeyframeHandler(new MachineSoundHandler<>()));
     }
     
     @Override

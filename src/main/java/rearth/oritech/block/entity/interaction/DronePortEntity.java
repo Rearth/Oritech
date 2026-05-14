@@ -561,7 +561,7 @@ public class DronePortEntity extends NetworkedBlockEntity
                           .triggerableAnim("takeoff", TAKEOFF)
                           .triggerableAnim("landing", LANDING)
                           .triggerableAnim("deploy", MachineBlockEntity.SETUP)
-                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+                          .setSoundKeyframeHandler(new MachineSoundHandler<>()));
     }
     
     @Override

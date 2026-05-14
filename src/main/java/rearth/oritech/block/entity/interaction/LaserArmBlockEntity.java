@@ -756,7 +756,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
             } else {
                 return state.setAndContinue(MachineBlockEntity.PACKAGED);
             }
-        }).triggerableAnim("setup", MachineBlockEntity.SETUP).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>());
+        }).triggerableAnim("setup", MachineBlockEntity.SETUP).setSoundKeyframeHandler(new MachineSoundHandler<>());
     }
     
     @Override

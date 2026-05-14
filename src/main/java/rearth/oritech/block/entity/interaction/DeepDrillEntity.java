@@ -333,7 +333,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
             } else {
                 return state.setAndContinue(PACKAGED);
             }
-        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()).triggerableAnim("setup", SETUP);
+        }).setSoundKeyframeHandler(new MachineSoundHandler<>()).triggerableAnim("setup", SETUP);
     }
     
     public void setLastWorkTime(long lastWorkTime) {

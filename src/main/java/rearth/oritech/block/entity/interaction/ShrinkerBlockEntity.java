@@ -234,7 +234,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         })
                           .triggerableAnim("work", SHRINK)
                           .triggerableAnim("deploy", MachineBlockEntity.SETUP)
-                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+                          .setSoundKeyframeHandler(new MachineSoundHandler<>()));
     }
     
     @Override

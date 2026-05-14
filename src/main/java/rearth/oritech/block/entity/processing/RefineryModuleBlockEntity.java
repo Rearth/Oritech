@@ -17,7 +17,7 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
+import rearth.oritech.util.MachineSoundHandler;
 import rearth.oritech.util.ColorableMachine;
 import rearth.oritech.util.MultiblockMachineController;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -180,7 +180,7 @@ public class RefineryModuleBlockEntity extends NetworkedBlockEntity implements M
             } else {
                 return state.setAndContinue(PACKAGED);
             }
-        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()).triggerableAnim("setup", SETUP);
+        }).setSoundKeyframeHandler(new MachineSoundHandler<>()).triggerableAnim("setup", SETUP);
     }
     
     public boolean isActive(BlockState state) {

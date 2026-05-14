@@ -36,7 +36,7 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.EnchanterScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
-import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
+import rearth.oritech.util.MachineSoundHandler;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
@@ -225,7 +225,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
                           .triggerableAnim("working", WORKING)
                           .triggerableAnim("idle", IDLE)
                           .triggerableAnim("unpowered", UNPOWERED)
-                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+                          .setSoundKeyframeHandler(new MachineSoundHandler<>()));
     }
     
     @Override

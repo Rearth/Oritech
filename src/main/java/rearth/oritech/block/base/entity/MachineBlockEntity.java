@@ -6,10 +6,10 @@ import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
+import com.geckolib.animation.state.AnimationTest;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -123,8 +123,12 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         
         if (lastRecipe != currentRecipe || !canOutputRecipe(currentRecipe)) resetProgress();
         
-        // at this point, we have a valid recipe (items+fluid verified), and could output the results.
-        // we work with one big transaction. Everything is taken directly, and if a part doesnt work we just don't commit the transaction
+        workTick();
+    }
+    
+    // main work is done here. At this point, we have a valid recipe (items+fluid verified), and could output the results.
+    // we work with one big transaction. Everything is taken directly, and if a part doesnt work we just don't commit the transaction
+    private void workTick() {
         try (var transaction = Transaction.openRoot()) {
             
             var energyNeeded = (int) calculateEnergyUsage();
@@ -306,15 +310,16 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, this::onAnimationUpdate)
+        controllers.add(new AnimationController<>("machine", this::onAnimationUpdate)
                           .triggerableAnim("setup", SETUP)
-                          .setAnimationSpeedHandler(animatable -> (double) getAnimationSpeed())
-                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>(this::getAnimationSpeed)));
+                          .setSoundKeyframeHandler(new MachineSoundHandler<>(this::getAnimationSpeed)));
     }
     
-    public PlayState onAnimationUpdate(final AnimationState<MachineBlockEntity> state) {
+    public PlayState onAnimationUpdate(AnimationTest<MachineBlockEntity> state) {
         
-        if (state.getController().isPlayingTriggeredAnimation()) return PlayState.CONTINUE;
+        state.setControllerSpeed(getAnimationSpeed());
+        
+        if (state.controller().isPlayingTriggeredAnimation()) return PlayState.CONTINUE;
         
         if (isAssembled(getBlockState())) {
             if (isActivelyWorking()) {

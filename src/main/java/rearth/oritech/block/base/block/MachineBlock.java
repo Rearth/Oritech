@@ -125,12 +125,18 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
     }
     
     @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        
-        if (ItemFluidApi.tryFluidBlockItemInteraction(stack, level, pos, player, hand)) return ItemInteractionResult.sidedSuccess(true);
-        
-        return super.useItemOn(stack, state, level, pos, player, hand, hit);
+    protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
     }
+    
+    // todo
+    //    @Override
+//    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+//
+//        if (ItemFluidApi.tryFluidBlockItemInteraction(stack, level, pos, player, hand)) return ItemInteractionResult.sidedSuccess(true);
+//
+//        return super.useItemOn(stack, state, level, pos, player, hand, hit);
+//    }
     
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {

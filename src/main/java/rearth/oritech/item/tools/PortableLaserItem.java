@@ -52,7 +52,7 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
-import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
+import rearth.oritech.util.MachineSoundHandler;
 import rearth.oritech.util.TooltipHelper;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
@@ -469,7 +469,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
           })
                           .triggerableAnim("idle", IDLE)
                           .triggerableAnim("singleshot", SINGLE_SHOT)
-                          .triggerableAnim("shooting", SHOOTING).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+                          .triggerableAnim("shooting", SHOOTING).setSoundKeyframeHandler(new MachineSoundHandler<>()));
     }
     
     @Override

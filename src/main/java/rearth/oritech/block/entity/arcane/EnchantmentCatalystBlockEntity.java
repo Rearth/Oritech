@@ -37,7 +37,7 @@ import rearth.oritech.client.ui.CatalystScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
+import rearth.oritech.util.MachineSoundHandler;
 import rearth.oritech.util.ComparatorOutputProvider;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
@@ -360,7 +360,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
                           .triggerableAnim("idle", IDLE)
                           .triggerableAnim("unstable", UNSTABLE)
                           .triggerableAnim("empty", EMPTY)
-                          .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+                          .setSoundKeyframeHandler(new MachineSoundHandler<>()));
     }
     
     private void updateAnimation() {

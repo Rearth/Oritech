@@ -415,7 +415,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             } else {
                 return state.setAndContinue(MachineBlockEntity.PACKAGED);
             }
-        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()).triggerableAnim("setup", MachineBlockEntity.SETUP));
+        }).setSoundKeyframeHandler(new MachineSoundHandler<>()).triggerableAnim("setup", MachineBlockEntity.SETUP));
     }
     
     @Override

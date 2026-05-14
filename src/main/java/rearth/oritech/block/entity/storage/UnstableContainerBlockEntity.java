@@ -210,7 +210,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
                 }
             }
             return PlayState.CONTINUE;
-        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
+        }).setSoundKeyframeHandler(new MachineSoundHandler<>()));
     }
     
     @Override
