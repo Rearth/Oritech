@@ -158,8 +158,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     protected void onProgressed() {}
     
-    // performance optimized recipe lookup. Verified that both item and fluid inputs match the recipe.
-    private OritechRecipe findActiveRecipe() {
+    // performance optimized recipe lookup. Verifies that both item and fluid inputs match the recipe.
+    protected OritechRecipe findActiveRecipe() {
         
         if (!(level instanceof ServerLevel serverLevel)) return currentRecipe;
         
@@ -204,8 +204,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         
         var results = getCraftingResults(currentRecipe);
         var recipeIngredients = currentRecipe.itemInputs();
-        var outputInv = getDirectOutput();
-        var inputInv = getDirectInput();
+        var outputInv = inventory.getOutputContainer();
+        var inputInv = inventory.getInputContainer();
         
         // create outputs
         for (var result : results) {
@@ -217,15 +217,21 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         var startOffset = 0;    // used so when multiple matching itemStacks are available, they're drained somewhat evenly
         for (var removedIng : recipeIngredients) {
             // try to find current ingredient
+            
+            var found = false;
+            
             for (int i = 0; i < inputInv.size(); i++) {
                 var inputResource = inputInv.getResource((i + startOffset) % inputInv.size());
                 if (removedIng.test(inputResource.toStack())) {
                     var taken = inputInv.extract(i, inputResource, 1, transaction);
                     if (taken != 1) return false;
                     startOffset++;
+                    found = true;
                     break;
                 }
             }
+            
+            if (!found) return false;
         }
         
         return true;
@@ -268,7 +274,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     protected abstract RecipeType<OritechRecipe> getOwnRecipeType();
     
-    public abstract InventorySlotAssignment getSlotAssignments();
+    public abstract ContainerSlotAssignment getSlotAssignments();
     
     protected List<ItemStack> getInputView() {
         var slots = getSlotAssignments();
@@ -282,48 +288,6 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     protected Container getOutputCopy() {
         return new SimpleContainer(getOutputView().toArray(ItemStack[]::new));
-    }
-    
-    // gives a freely insertable and extractable view of the input container
-    protected ResourceHandler<ItemResource> getDirectInput() {
-        var slots = getSlotAssignments();
-        
-        return new DelegatingResourceHandler<>(inventory) {
-            
-            @Override
-            public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
-                if (slots.isInput(index)) return inventory.directInsert(index, resource, amount, transaction);
-                return super.insert(index, resource, amount, transaction);
-            }
-            
-            @Override
-            public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
-                if (slots.isInput(index)) return inventory.directExtract(index, resource, amount, transaction);
-                return super.extract(index, resource, amount, transaction);
-            }
-        };
-        
-    }
-    
-    // gives a freely insertable and extractable view of the output container
-    protected ResourceHandler<ItemResource> getDirectOutput() {
-        var slots = getSlotAssignments();
-        
-        return new DelegatingResourceHandler<>(inventory) {
-            
-            @Override
-            public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
-                if (slots.isOutput(index)) return inventory.directInsert(index, resource, amount, transaction);
-                return super.insert(index, resource, amount, transaction);
-            }
-            
-            @Override
-            public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
-                if (slots.isOutput(index)) return inventory.directExtract(index, resource, amount, transaction);
-                return super.extract(index, resource, amount, transaction);
-            }
-        };
-        
     }
     
     // new:
@@ -635,7 +599,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     // basic in out storage, but with option for sided / fill even input mode
     public class MachineInventoryStorage extends InOutInventoryStorage {
         
-        public MachineInventoryStorage(int size, Runnable onUpdate, InventorySlotAssignment slotAssignment) {
+        public MachineInventoryStorage(int size, Runnable onUpdate, ContainerSlotAssignment slotAssignment) {
             super(size, onUpdate, slotAssignment);
         }
         

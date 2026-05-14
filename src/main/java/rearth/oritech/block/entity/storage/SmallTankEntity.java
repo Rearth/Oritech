@@ -43,7 +43,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     
     private BlockLookupCache<FluidApi.FluidStorage> cachedOutputTarget;
     
-    public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::setChanged, new InventorySlotAssignment(0, 2, 2, 1));
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::setChanged, new ContainerSlotAssignment(0, 2, 2, 1));
     
     @SyncField({SyncType.TICK, SyncType.INITIAL})
     public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(OritechConfig.portableTankCapacityBuckets.get() * FluidStackHooks.bucketAmount(), this::setChanged);

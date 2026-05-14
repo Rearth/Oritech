@@ -31,14 +31,14 @@ import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.util.InventoryInputMode;
-import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
 
 public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMenuProvider, ScreenProvider, ItemApi.BlockProvider {
     
-    public final InOutInventoryStorage inventory = new InOutInventoryStorage(1, this::setChanged, new InventorySlotAssignment(0, 1, 1, 0)) {
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(1, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 0)) {
         @Override
         public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
             if (!addedStack.is(TagContent.REACTOR_COOLANT)) return 0;

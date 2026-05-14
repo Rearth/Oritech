@@ -25,7 +25,7 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
@@ -58,7 +58,7 @@ public class OritechEMIPlugin implements EmiPlugin {
         registerOritechCategory(registry, manager, RecipeContent.STEAM_ENGINE, SteamEngineEntity.class, BlockContent.STEAM_ENGINE_BLOCK);
         
         // reactor
-        registerCustom(registry, manager, RecipeContent.REACTOR, BlockContent.REACTOR_CONTROLLER, List.of(new ScreenProvider.GuiSlot(0, 55, 35)), new InventorySlotAssignment(0, 1, 1, 0));
+        registerCustom(registry, manager, RecipeContent.REACTOR, BlockContent.REACTOR_CONTROLLER, List.of(new ScreenProvider.GuiSlot(0, 55, 35)), new ContainerSlotAssignment(0, 1, 1, 0));
         
         // others
         registerParticleAccelerator(registry, manager, RecipeContent.PARTICLE_COLLISION);
@@ -113,7 +113,7 @@ public class OritechEMIPlugin implements EmiPlugin {
         
     }
     
-    private void registerCustom(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType, ItemLike machine, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment assignments) {
+    private void registerCustom(EmiRegistry registry, RecipeManager manager, OritechRecipeType recipeType, ItemLike machine, List<ScreenProvider.GuiSlot> slots, ContainerSlotAssignment assignments) {
         
         var icon = EmiStack.of(machine);
         var category = new EmiRecipeCategory(recipeType.getIdentifier(), icon);

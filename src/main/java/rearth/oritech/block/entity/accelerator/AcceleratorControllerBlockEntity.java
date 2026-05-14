@@ -57,7 +57,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     
     private AcceleratorParticleLogic particleLogic;
     
-    public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new InventorySlotAssignment(0, 1, 1, 1));
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1));
     
     // client data
     public List<Vec3> displayTrail;

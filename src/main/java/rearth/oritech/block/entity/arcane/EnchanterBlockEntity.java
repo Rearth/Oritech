@@ -38,7 +38,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.MachineSoundHandler;
 import rearth.oritech.util.InventoryInputMode;
-import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -66,7 +66,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 1000, 0, this::setChanged);
     
-    public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new InventorySlotAssignment(0, 1, 1, 1));
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1));
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     

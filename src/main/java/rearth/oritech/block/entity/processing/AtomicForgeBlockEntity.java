@@ -15,7 +15,7 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ContainerSlotAssignment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,8 +107,8 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public InventorySlotAssignment getSlotAssignments() {
-        return new InventorySlotAssignment(0, 3, 3, 1);
+    public ContainerSlotAssignment getSlotAssignments() {
+        return new ContainerSlotAssignment(0, 3, 3, 1);
     }
     
     @Override

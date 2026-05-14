@@ -32,6 +32,11 @@ public class ProgressStorage implements ValueIOSerializable {
         this.progress = value;
     }
     
+    public void set(int value, TransactionContext transaction) {
+        journal.updateSnapshots(transaction);
+        this.progress = value;
+    }
+    
     public int get() {
         return progress;
     }
@@ -39,6 +44,11 @@ public class ProgressStorage implements ValueIOSerializable {
     public void increment(TransactionContext transaction) {
         journal.updateSnapshots(transaction);
         progress++;
+    }
+    
+    public void decrement(TransactionContext transaction) {
+        journal.updateSnapshots(transaction);
+        progress--;
     }
     
     public void reset(TransactionContext transaction) {
@@ -54,6 +64,10 @@ public class ProgressStorage implements ValueIOSerializable {
     @Override
     public void deserialize(ValueInput input) {
         progress = input.getIntOr("progress", 0);
+    }
+    
+    public boolean isEmpty() {
+        return progress <= 0;
     }
     
     private class ProgressJournal extends SnapshotJournal<Integer> {

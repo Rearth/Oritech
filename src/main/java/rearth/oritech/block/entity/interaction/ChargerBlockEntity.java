@@ -32,7 +32,7 @@ import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.InventoryInputMode;
-import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.StackContext;
 
@@ -48,7 +48,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
     private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::setChanged);
     
     // 0 = bucket/item to be charged/filled, 1 = empty bucket/charged/fill item
-    public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new InventorySlotAssignment(0, 1, 1, 1));
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1));
     
     
     public ChargerBlockEntity(BlockPos pos, BlockState state) {

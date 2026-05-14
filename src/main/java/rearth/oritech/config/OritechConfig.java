@@ -509,7 +509,7 @@ public class OritechConfig {
         public final ModConfigSpec.IntValue steamToRfRatio;
         public final ModConfigSpec.BooleanValue stopOnEnergyFull;
         public final ModConfigSpec.BooleanValue stopOnWaterFull;
-        public final ModConfigSpec.DoubleValue steamBoilerCapacityBuckets;
+        public final ModConfigSpec.IntValue steamBoilerCapacityBuckets;
         
         SteamEngineConfig(ModConfigSpec.Builder b) {
             b.push("steamEngineData");
@@ -519,7 +519,7 @@ public class OritechConfig {
             steamToRfRatio = b.comment("Energy per steam unit in the steam engine").defineInRange("steamToRfRatio", 1, 0, Integer.MAX_VALUE);
             stopOnEnergyFull = b.comment("When enabled, the steam engine stops when energy storage is full").define("stopOnEnergyFull", false);
             stopOnWaterFull = b.comment("When enabled, the steam engine stops when the water tank is full. Must be pumped out to resume.").define("stopOnWaterFull", true);
-            steamBoilerCapacityBuckets = b.comment("Steam capacity of steam-boiler generators and the steam engine, in buckets").defineInRange("steamBoilerCapacityBuckets", 8.0, 0.0, 1000.0);
+            steamBoilerCapacityBuckets = b.comment("Steam capacity of steam-boiler generators and the steam engine, in buckets").defineInRange("steamBoilerCapacityBuckets", 8, 0, 1000);
             b.pop();
         }
     }

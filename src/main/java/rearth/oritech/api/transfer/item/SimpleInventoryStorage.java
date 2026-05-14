@@ -4,9 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.networking.UpdatableField;
 
@@ -24,15 +22,6 @@ public class SimpleInventoryStorage extends ItemStacksResourceHandler implements
     public SimpleInventoryStorage(NonNullList<ItemStack> stacks, Runnable onUpdate) {
         super(stacks);
         this.onUpdate = onUpdate;
-    }
-    
-    // skips the slot assignments and any other logic. Used for delegating input or output container views
-    public int directInsert(int index, ItemResource resource, int amount, TransactionContext transaction) {
-        return super.insert(index, resource, amount, transaction);
-    }
-    
-    public int directExtract(int index, ItemResource resource, int amount, TransactionContext transaction) {
-        return super.extract(index, resource, amount, transaction);
     }
     
     @Override

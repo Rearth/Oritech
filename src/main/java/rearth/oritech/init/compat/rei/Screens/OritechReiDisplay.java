@@ -22,7 +22,7 @@ import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.client.ui.OritechMachineScreen;
 import rearth.oritech.init.compat.rei.OritechDisplay;
 import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 
 import java.lang.reflect.InvocationTargetException;
@@ -34,7 +34,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
     protected final OritechRecipeType recipeType;
     private final boolean isGenerator;
     private final List<ScreenProvider.GuiSlot> slots;
-    private final InventorySlotAssignment slotOffsets;
+    private final ContainerSlotAssignment slotOffsets;
     protected final ItemLike icon;
     private final ScreenProvider.ArrowConfiguration indicatorConfig;
     
@@ -59,7 +59,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         }
     }
     
-    public OritechReiDisplay(OritechRecipeType recipeType, ItemLike icon, boolean isGenerator, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment assignments) {
+    public OritechReiDisplay(OritechRecipeType recipeType, ItemLike icon, boolean isGenerator, List<ScreenProvider.GuiSlot> slots, ContainerSlotAssignment assignments) {
         this.recipeType = recipeType;
         this.icon = icon;
         this.isGenerator = isGenerator;

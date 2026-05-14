@@ -18,7 +18,7 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.StackContext;
 
 import java.util.List;
@@ -76,7 +76,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
-    protected void tryConsumeInput() {
+    protected void consumeInput() {
         
         if (isProducingSteam && (boilerStorage.getInStack().getAmount() == 0 || boilerStorage.getOutStack().getAmount() >= boilerStorage.getCapacity())) return;
         
@@ -162,8 +162,8 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
-    public InventorySlotAssignment getSlotAssignments() {
-        return new InventorySlotAssignment(0, 1, 1, 1);
+    public ContainerSlotAssignment getSlotAssignments() {
+        return new ContainerSlotAssignment(0, 1, 1, 1);
     }
     
     public boolean bucketInputAllowed() {

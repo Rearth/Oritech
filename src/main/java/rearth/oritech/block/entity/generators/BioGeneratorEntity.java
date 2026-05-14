@@ -13,7 +13,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ContainerSlotAssignment;
 
 import java.util.HashSet;
 import java.util.List;
@@ -49,8 +49,8 @@ public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     }
     
     @Override
-    public InventorySlotAssignment getSlotAssignments() {
-        return new InventorySlotAssignment(0, 1, 1, 0);
+    public ContainerSlotAssignment getSlotAssignments() {
+        return new ContainerSlotAssignment(0, 1, 1, 0);
     }
     
     @Override

@@ -10,7 +10,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ContainerSlotAssignment;
 
 import java.util.List;
 
@@ -36,8 +36,8 @@ public class FoundryBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public InventorySlotAssignment getSlotAssignments() {
-        return new InventorySlotAssignment(0, 2, 2, 1);
+    public ContainerSlotAssignment getSlotAssignments() {
+        return new ContainerSlotAssignment(0, 2, 2, 1);
     }
     
     @Override

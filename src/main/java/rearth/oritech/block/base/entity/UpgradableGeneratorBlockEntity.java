@@ -9,22 +9,26 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
-import rearth.oritech.api.lookup.BlockLookupCache;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.fluid.InOutFluidStorage;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.config.OritechConfig;
-import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.recipes.OritechRecipeInput;
+import rearth.oritech.util.ContainerSlotAssignment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,21 +37,21 @@ import java.util.Set;
 public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBlockEntity {
     @SyncField
     public int currentMaxBurnTime; // needed only for progress display and animation speed
-    private List<ItemStack> pendingOutputs = new ArrayList<>(); // used if a recipe produces a byproduct at the end
     
     // this is used just for steam
     @SyncField(SyncType.GUI_OPEN)
     public boolean isProducingSteam = false;
     @SyncField(SyncType.GUI_TICK)
-    public final SimpleInOutFluidStorage boilerStorage = new SimpleInOutFluidStorage((long) (OritechConfig.generators.steamEngineData.steamBoilerCapacityBuckets.get() * FluidStackHooks.bucketAmount()), this::setChanged) {
+    public final InOutFluidStorage boilerStorage = new InOutFluidStorage((int) (OritechConfig.generators.steamEngineData.steamBoilerCapacityBuckets.get() * 1000), this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1)) {
+        
         @Override
-        public long insert(FluidStack toInsert, boolean simulate) {
-            if (!boilerAcceptsInput(toInsert.getFluid())) return 0L;
-            return super.insert(toInsert, simulate);
+        public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
+            if (!boilerAcceptsInput(resource)) return 0;
+            return super.insert(index, resource, amount, transaction);
         }
     };
     
-    private List<BlockLookupCache<EnergyApi.EnergyStorage>> cachedOutputTargets = List.of();
+    private List<BlockCapabilityCache<EnergyHandler, Direction>> cachedOutputTargets = List.of();
     
     // speed multiplier increases output rate and reduces burn time by same percentage
     // efficiency multiplier only increases burn time
@@ -62,72 +66,111 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         // if burn time is zero, try to consume item thus adding burn time
         // if burn time is remaining, use up one tick of it
         
-        if (level.isClientSide || !isAssembled(state) || disabledViaRedstone) return;
+        if (!isAssembled(state) || disabledViaRedstone) return;
         
-        if (progress == 0 && canFitEnergy())
-            tryConsumeInput();
-        
-        // progress var is used as remaining burn time
-        if (progress > 0) {
-            if (canFitEnergy()) {
-                
-                progress--;
-                produceEnergy();
-                lastWorkedAt = level.getGameTime();
-                
-                if (progress == 0) {
-                    burningFinished();
-                }
-                setChanged();
-            }
-        }
+        workTick();
         
         outputEnergy();
     }
     
-    protected void tryConsumeInput() {
-        
-        if (isProducingSteam && (boilerStorage.getInStack().getAmount() == 0 || boilerStorage.getOutStack().getAmount() >= boilerStorage.getCapacity()))
-            return;
-        
-        var recipeCandidate = getRecipe();
-        if (recipeCandidate.isEmpty())
-            currentRecipe = OritechRecipe.EMPTY;     // reset recipe when invalid or no input is given
-        
-        
-        if (recipeCandidate.isPresent()) {
-            // this is separate so that progress is not reset when out of energy
-            var activeRecipe = recipeCandidate.get().value();
-            currentRecipe = activeRecipe;
+    @Override
+    protected void workTick() {
+        try (var transaction = Transaction.openRoot()) {
             
-            // speed -> lower = faster, efficiency -> lower = better
-            var recipeTime = (int) (currentRecipe.getTime() * getSpeedMultiplier() * (1 / getEfficiencyMultiplier()));
-            progress = recipeTime;
-            currentMaxBurnTime = recipeTime;
-            
-            // remove inputs
-            for (int i = 0; i < activeRecipe.getInputs().size(); i++) {
-                var taken = ContainerHelper.removeItem(getInputView(), i, 1);  // amount is not configurable, because ingredient doesn't parse amount in recipe
+            // if not burning anything, try start new burn
+            if (progress.isEmpty()) {
+                if (!consumeInput(transaction)) return;
             }
-            pendingOutputs = new ArrayList<>(activeRecipe.getResults());
             
+            // produce energy
+            if (!produceEnergy(transaction)) return;
+            
+            // use up stored burn progress
+            progress.decrement(transaction);
+            
+            if (progress.isEmpty()) {
+                if (!burningFinished(transaction)) return;
+            }
+            
+            transaction.commit();
             setChanged();
             
         }
     }
     
-    protected void burningFinished() {
-        produceResultItems();
+    @SuppressWarnings("RedundantIfStatement")
+    protected boolean consumeInput(Transaction transaction) {
+        
+        // steam input empty or output full
+        if (isProducingSteam && (boilerStorage.getAmountAsInt(0) <= 0 || boilerStorage.getAmountAsInt(1) >= boilerStorage.getCapacity()))
+            return false;
+        
+        currentRecipe = this.findActiveRecipe();
+        
+        if (currentRecipe.isEmpty()) return false;
+        
+        // speed -> lower = faster, efficiency -> lower = better
+        var recipeTime = (int) (currentRecipe.time() * getSpeedMultiplier() * (1 / getEfficiencyMultiplier()));
+        progress.set(recipeTime, transaction);
+        currentMaxBurnTime = recipeTime;
+        
+        // take recipe inputs (could also be fluids)
+        if (!removeRecipeInputs(transaction)) return false;
+        
+        return true;
     }
     
-    protected void produceResultItems() {
-        if (!pendingOutputs.isEmpty()) {
-            for (var stack : pendingOutputs) {
-                this.inventory.insert(stack, false);
+    private boolean removeRecipeInputs(Transaction transaction) {
+        
+        // remove items from input
+        var inputInv = inventory.getInputContainer();
+        for (var ingredient : currentRecipe.itemInputs()) {
+            
+            var found = false;
+            
+            for (int i = 0; i < inputInv.size(); i++) {
+                var slotItem = inputInv.getResource(i);
+                if (ingredient.test(slotItem.toStack())) {
+                    var taken = inputInv.extract(i, slotItem, 1, transaction);
+                    if (taken != 1) return false;   // this should never happen
+                    found = true;
+                    break;
+                }
             }
+            
+            if (!found) return false;
+            
         }
         
-        pendingOutputs.clear();
+        return true;
+    }
+    
+    // gives energy in this case
+    @SuppressWarnings("lossy-conversions")
+    protected boolean produceEnergy(Transaction transaction) {
+        var produced = (int) calculateEnergyUsage();
+        if (isProducingSteam) {
+            
+            // yes this will void excess steam. Generators will only stop producing when the RF storage is full, not the steam storage
+            // this is by design and supposed to be one of the negatives of steam production
+            
+            produced *= OritechConfig.generators.steamEngineData.rfToSteamRatio.get();
+            produced *= SteamEngineEntity.STEAM_AMOUNT_MULTIPLIER;
+            
+            var extracted = boilerStorage.getInputContainer().extract(FluidStack.create(Fluids.WATER.getSource(), Math.round(produced)), false);
+            boilerStorage.getOutputContainer().insert(FluidStack.create(SteamEngineEntity.getUsedSteamFluid(), extracted), false);
+            
+        } else {
+            var inserted = energyStorage.internalInsert(produced, transaction);
+            if (inserted < 1) return false; // allows it to fully fill, potentially loosing some RF, but failing if nothing was inserted
+        }
+        
+        return true;
+    }
+    
+    protected boolean burningFinished(Transaction transaction) {
+        progress.reset(transaction);
+        return true;
     }
     
     @Override
@@ -154,30 +197,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         energyStorage.maxExtract = getDefaultExtractionRate() + insert;
         energyStorage.maxInsert = 0;
         
-    }
-    
-    // check if the energy can fit
-    protected boolean canFitEnergy() {
-        if (isProducingSteam) return true;
-        var produced = calculateEnergyUsage();
-        return energyStorage.capacity >= energyStorage.energy + produced;
-    }
-    
-    // gives energy in this case
-    @SuppressWarnings("lossy-conversions")
-    protected void produceEnergy() {
-        var produced = calculateEnergyUsage();
-        if (isProducingSteam) {
-            // yes this will void excess steam. Generators will only stop producing when the RF storage is full, not the steam storage
-            // this is by design and supposed to be one of the negatives of steam production
-            produced *= OritechConfig.generators.steamEngineData.rfToSteamRatio.get();
-            produced *= SteamEngineEntity.STEAM_AMOUNT_MULTIPLIER;
-            
-            var extracted = boilerStorage.getInputContainer().extract(FluidStack.create(Fluids.WATER.getSource(), Math.round(produced)), false);
-            boilerStorage.getOutputContainer().insert(FluidStack.create(SteamEngineEntity.getUsedSteamFluid(), extracted), false);
-        } else {
-            energyStorage.energy += produced;
-        }
     }
     
     @Override
@@ -228,6 +247,11 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         }
     }
     
+    @Override
+    protected OritechRecipeInput getRecipeInput() {
+        return super.getRecipeInput();
+    }
+    
     protected abstract Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level level);
     
     protected void outputEnergy() {
@@ -252,8 +276,8 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         
     }
     
-    public boolean boilerAcceptsInput(Fluid fluid) {
-        return fluid.equals(Fluids.WATER);
+    public boolean boilerAcceptsInput(FluidResource fluid) {
+        return fluid.is(Fluids.WATER);
     }
     
     @Override

@@ -24,7 +24,7 @@ import rearth.oritech.init.compat.rei.Screens.*;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
@@ -55,7 +55,7 @@ public class OritechREIPlugin implements REIClientPlugin {
         // other
         registerOritechCategory(registry, RecipeContent.PARTICLE_COLLISION, BlockContent.ACCELERATOR_CONTROLLER, OritechReiParticleCollisionDisplay::new);
         registerOritechCategory(registry, RecipeContent.LASER, BlockContent.LASER_ARM_BLOCK, OritechReiLaserDisplay::new);
-        registerOritechCategory(registry, RecipeContent.REACTOR, BlockContent.REACTOR_CONTROLLER, (recipeType, icon) -> new OritechReiDisplay(recipeType, icon, false, List.of(new ScreenProvider.GuiSlot(0, 55, 35)), new InventorySlotAssignment(0, 1, 1, 0)));
+        registerOritechCategory(registry, RecipeContent.REACTOR, BlockContent.REACTOR_CONTROLLER, (recipeType, icon) -> new OritechReiDisplay(recipeType, icon, false, List.of(new ScreenProvider.GuiSlot(0, 55, 35)), new ContainerSlotAssignment(0, 1, 1, 0)));
         
         // tainted refinery info categories
         var creationCategoryId = CategoryIdentifier.of(Oritech.id("tainted_refinery_creation"));

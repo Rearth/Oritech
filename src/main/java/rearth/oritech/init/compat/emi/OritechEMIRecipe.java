@@ -17,7 +17,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.client.ui.OritechMachineScreen;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 
 import java.lang.reflect.InvocationTargetException;
@@ -28,7 +28,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
     
     private final Boolean isGenerator;
     private final List<ScreenProvider.GuiSlot> slots;
-    private final InventorySlotAssignment slotOffsets;
+    private final ContainerSlotAssignment slotOffsets;
     private final OritechRecipe recipe;
     private final ScreenProvider.ArrowConfiguration indicatorConfig;
     
@@ -63,7 +63,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         
     }
     
-    public OritechEMIRecipe(RecipeHolder<OritechRecipe> entry, EmiRecipeCategory category, Boolean isGenerator, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment slotOffsets) {
+    public OritechEMIRecipe(RecipeHolder<OritechRecipe> entry, EmiRecipeCategory category, Boolean isGenerator, List<ScreenProvider.GuiSlot> slots, ContainerSlotAssignment slotOffsets) {
         super(category, entry.id(), 150, 69);
         
         this.isGenerator = isGenerator;

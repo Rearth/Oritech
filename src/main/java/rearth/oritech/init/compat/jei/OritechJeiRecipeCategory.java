@@ -23,7 +23,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.ui.OritechMachineScreen;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 
 import java.lang.reflect.InvocationTargetException;
@@ -34,7 +34,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
     
     public final OritechRecipeType type;
     private final List<ScreenProvider.GuiSlot> slots;
-    private final InventorySlotAssignment slotOffsets;
+    private final ContainerSlotAssignment slotOffsets;
     public final IDrawable icon;
     public final IDrawableAnimated arrow;
     public final IDrawableStatic background;
@@ -62,7 +62,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
         
     }
     
-    public OritechJeiRecipeCategory(OritechRecipeType type, Block machine, IGuiHelper helper, Boolean isGenerator, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment slotOffsets) {
+    public OritechJeiRecipeCategory(OritechRecipeType type, Block machine, IGuiHelper helper, Boolean isGenerator, List<ScreenProvider.GuiSlot> slots, ContainerSlotAssignment slotOffsets) {
         this.type = type;
         this.icon = helper.createDrawableItemStack(new ItemStack(machine.asItem()));
         
