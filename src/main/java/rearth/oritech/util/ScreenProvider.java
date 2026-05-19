@@ -4,15 +4,16 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Tuple;
-import net.minecraft.world.Container;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
 
 import java.util.List;
 import java.util.Optional;
@@ -120,13 +121,13 @@ public interface ScreenProvider {
      * (e.g. by clicking with a bucket or portable tank on the fluid display).
      * <p>
      * The default implementation returns the main fluid storage if the block entity
-     * implements {@link FluidApi.BlockProvider} and has a single-slot storage.
+     * implements {@link FluidProvider} and has a single-slot storage.
      * Override for multi-tank machines to return all interactable tanks.
      */
-    default List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
-        if (this instanceof FluidApi.BlockProvider bp) {
-            var storage = bp.getFluidStorage(null);
-            if (storage instanceof FluidApi.SingleSlotStorage single) return List.of(single);
+    default List<ResourceHandler<FluidResource>> getInteractableFluidStorages() {
+        if (this instanceof FluidProvider bp) {
+            var storage = bp.getFluidHandler(null);
+            if (storage instanceof ResourceHandler<FluidResource> single) return List.of(single);
         }
         return List.of();
     }

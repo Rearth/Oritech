@@ -150,8 +150,7 @@ public class DynamicEnergyStorage implements EnergyHandler, ValueIOSerializable,
     }
     
     // same as insert, but ignoring insertion limits
-    public int internalInsert(int amount, TransactionContext transaction) {
-        TransferPreconditions.checkNonNegative(amount);
+    public long internalInsert(long amount, TransactionContext transaction) {
         
         var inserted = Math.min(capacity - energy, amount);
         if (inserted > 0) {
@@ -177,8 +176,7 @@ public class DynamicEnergyStorage implements EnergyHandler, ValueIOSerializable,
     }
     
     // same as extract, but ignoring extraction limits
-    public int internalExtract(int amount, TransactionContext transaction) {
-        TransferPreconditions.checkNonNegative(amount);
+    public long internalExtract(long amount, TransactionContext transaction) {
         
         var extracted = Math.min(energy, amount);
         if (extracted > 0) {

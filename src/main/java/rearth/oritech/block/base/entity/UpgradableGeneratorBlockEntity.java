@@ -2,20 +2,17 @@ package rearth.oritech.block.base.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
@@ -35,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBlockEntity {
+    
     @SyncField
     public int currentMaxBurnTime; // needed only for progress display and animation speed
     
@@ -42,7 +40,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     @SyncField(SyncType.GUI_OPEN)
     public boolean isProducingSteam = false;
     @SyncField(SyncType.GUI_TICK)
-    public final InOutFluidStorage boilerStorage = new InOutFluidStorage((int) (OritechConfig.generators.steamEngineData.steamBoilerCapacityBuckets.get() * 1000), this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1)) {
+    public final InOutFluidStorage boilerStorage = new InOutFluidStorage(OritechConfig.generators.steamEngineData.steamBoilerCapacityBuckets.get() * 1000, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1)) {
         
         @Override
         public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
@@ -149,20 +147,21 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     @SuppressWarnings("lossy-conversions")
     protected boolean produceEnergy(Transaction transaction) {
         var produced = (int) calculateEnergyUsage();
+        
+        
         if (isProducingSteam) {
-            
             // yes this will void excess steam. Generators will only stop producing when the RF storage is full, not the steam storage
             // this is by design and supposed to be one of the negatives of steam production
             
             produced *= OritechConfig.generators.steamEngineData.rfToSteamRatio.get();
             produced *= SteamEngineEntity.STEAM_AMOUNT_MULTIPLIER;
             
-            var extracted = boilerStorage.getInputContainer().extract(FluidStack.create(Fluids.WATER.getSource(), Math.round(produced)), false);
-            boilerStorage.getOutputContainer().insert(FluidStack.create(SteamEngineEntity.getUsedSteamFluid(), extracted), false);
+            var extracted = boilerStorage.getInputContainer().extract(FluidResource.of(Fluids.WATER), Math.round(produced), transaction);
+            boilerStorage.getOutputContainer().insert(SteamEngineEntity.getUsedSteamFluid(), extracted, transaction);
             
         } else {
             var inserted = energyStorage.internalInsert(produced, transaction);
-            if (inserted < 1) return false; // allows it to fully fill, potentially loosing some RF, but failing if nothing was inserted
+            if (inserted < 1) return false; // allows it to fully fill, potentially loosing some RF, but failing if nothing was inserted (e.g. inserted doesnt have to equal produced)
         }
         
         return true;
@@ -182,7 +181,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
         super.getAdditionalStatFromAddon(addonBlock);
-        if (addonBlock.state().getBlock() == BlockContent.STEAM_BOILER_ADDON) {
+        if (addonBlock.state().getBlock() == BlockContent.STEAM_BOILER_ADDON.get()) {
             isProducingSteam = true;
             level.updateNeighborsAt(addonBlock.pos(), addonBlock.state().getBlock());
         }
@@ -200,7 +199,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     }
     
     @Override
-    public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+    public List<ResourceHandler<FluidResource>> getInteractableFluidStorages() {
         if (!isProducingSteam)
             return super.getInteractableFluidStorages();
         
@@ -218,33 +217,24 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        nbt.putInt("storedBurn", currentMaxBurnTime);
-        boilerStorage.writeNbt(nbt, "");
-        nbt.putBoolean("steamAddon", isProducingSteam);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         
-        var resList = new ListTag();
-        for (var stack : pendingOutputs) {
-            var data = stack.save(registryLookup);
-            resList.add(data);
-        }
-        nbt.put("pendingResults", resList);
+        output.putInt("storedBurn", currentMaxBurnTime);
+        output.putBoolean("steamed", isProducingSteam);
+        
+        boilerStorage.serialize(output);
+        
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        currentMaxBurnTime = nbt.getInt("storedBurn");
-        boilerStorage.readNbt(nbt, "");
-        isProducingSteam = nbt.getBoolean("steamAddon");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
         
-        var storedResults = nbt.getList("pendingResults", Tag.TAG_COMPOUND);
-        for (var elem : storedResults) {
-            var compound = (CompoundTag) elem;
-            var stack = ItemStack.parse(registryLookup, compound).get();
-            pendingOutputs.add(stack);
-        }
+        currentMaxBurnTime = input.getIntOr("storedBurn", 0);
+        isProducingSteam = input.getBooleanOr("steamed", false);
+        boilerStorage.deserialize(input);
+        
     }
     
     @Override
@@ -255,24 +245,35 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     protected abstract Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level level);
     
     protected void outputEnergy() {
-        if (energyStorage.getAmount() <= 0) return;
+        if (energyStorage.getAmountAsLong() <= 0 || !(level instanceof ServerLevel serverLevel)) return;
         
         var moved = 0L;
         
         if (cachedOutputTargets.isEmpty()) {
             cachedOutputTargets = getOutputTargets(worldPosition, level).stream()
-                                    .map(target -> EnergyApi.BLOCK.createCache(level, target.getA(), target.getB()))
+                                    .map(target -> BlockCapabilityCache.create(Capabilities.Energy.BLOCK, serverLevel, target.getA(), target.getB()))
                                     .toList();
         }
         
-        for (var target : cachedOutputTargets) {
-            var candidate = target.find();
-            if (candidate != null)
-                moved += EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
-        }
+        var available = energyStorage.getAmountAsLong();
         
-        if (moved > 0)
-            this.setChanged();
+        try (var transaction = Transaction.openRoot()) {
+            for (var target : cachedOutputTargets) {
+                var candidate = target.getCapability();
+                if (candidate != null) {
+                    moved += candidate.insert((int) available, transaction);
+                    available -= moved;
+                }
+                
+                if (available <= 0) break;
+            }
+            
+            if (moved > 0) {
+                energyStorage.internalExtract((int) moved, transaction);
+                transaction.commit();
+                this.setChanged();
+            }
+        }
         
     }
     
@@ -282,11 +283,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     
     @Override
     public float getProgress() {
-        return 1 - ((float) progress / currentMaxBurnTime);
-    }
-    
-    public int getCurrentMaxBurnTime() {
-        return currentMaxBurnTime;
+        return 1 - ((float) progress.get() / currentMaxBurnTime);
     }
     
     public void setCurrentMaxBurnTime(int currentMaxBurnTime) {

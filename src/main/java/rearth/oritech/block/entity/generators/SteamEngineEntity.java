@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
@@ -47,7 +48,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     // use lower amounts of steam on neo, because on fabric a bucket is 81000 droplets, and on neo its only 1000
     // due to this, the pipe capacities would be reached super fast.
     // So on neo, we reduce the amount of steam/water used/produced by X, and then increase the energy amount by X again
-    public static float STEAM_AMOUNT_MULTIPLIER = Platform.isNeoForge() ? 0.05f : 4f;
+    public static float STEAM_AMOUNT_MULTIPLIER = 0.05f;
     
     
     // how chaining works:
@@ -58,7 +59,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     // progress is used to store/sync animation speed
     
-    private static Fluid USED_STEAM_FLUID;
+    private static FluidResource USED_STEAM_FLUID;
     
     public long masterHeartbeat; // set from master, used by slave
     public SteamEngineEntity master;
@@ -336,9 +337,9 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
                                         long steamConsumed, int slaves) {
     }
     
-    public static Fluid getUsedSteamFluid() {
+    public static FluidResource getUsedSteamFluid() {
         if (USED_STEAM_FLUID == null) {
-            USED_STEAM_FLUID = BuiltInRegistries.FLUID.get(Identifier.parse(OritechConfig.generators.steamId.get()));
+            USED_STEAM_FLUID = FluidResource.of(BuiltInRegistries.FLUID.get(Identifier.parse(OritechConfig.generators.steamId.get())).get().value());
         }
         
         return USED_STEAM_FLUID;
