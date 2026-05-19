@@ -215,7 +215,7 @@
   "title.oritech.chambers": "🥣: +%s",
   "title.oritech.power_pole_connection_enabled": "🔌：%s",
   "title.oritech.power_pole_connection_disabled": "关",
-  "tooltip.oritech.chambers": "每个附加的处理室会使机器每个周期多处理X个物品。",
+  "tooltip.oritech.chambers": "每个额外的加工室会使机器每个周期多处理X个物品。",
   "tooltip.oritech.item_filter.whitelist": "只允许列表中的物品通过",
   "tooltip.oritech.item_filter.blacklist": "不允许列表中的物品通过",
   "tooltip.oritech.item_filter.nbt": "当前仅检查列出物品的自定义NBT数据",
