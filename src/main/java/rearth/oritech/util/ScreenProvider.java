@@ -126,7 +126,7 @@ public interface ScreenProvider {
      */
     default List<ResourceHandler<FluidResource>> getInteractableFluidStorages() {
         if (this instanceof FluidProvider bp) {
-            var storage = bp.getFluidHandler(null);
+            var storage = bp.getFluidLookup(null);
             if (storage instanceof ResourceHandler<FluidResource> single) return List.of(single);
         }
         return List.of();

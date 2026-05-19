@@ -7,6 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 public interface FluidProvider {
 
-    ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction direction);
+    ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction);
 
 }

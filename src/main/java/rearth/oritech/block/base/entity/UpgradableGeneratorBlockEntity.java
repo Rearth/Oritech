@@ -24,7 +24,6 @@ import rearth.oritech.api.transfer.fluid.InOutFluidStorage;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.util.ContainerSlotAssignment;
 
 import java.util.ArrayList;
@@ -118,7 +117,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         return true;
     }
     
-    private boolean removeRecipeInputs(Transaction transaction) {
+    protected boolean removeRecipeInputs(Transaction transaction) {
         
         // remove items from input
         var inputInv = inventory.getInputContainer();
@@ -235,11 +234,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         isProducingSteam = input.getBooleanOr("steamed", false);
         boilerStorage.deserialize(input);
         
-    }
-    
-    @Override
-    protected OritechRecipeInput getRecipeInput() {
-        return super.getRecipeInput();
     }
     
     protected abstract Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level level);

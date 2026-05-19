@@ -2,36 +2,37 @@ package rearth.oritech.block.base.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
-import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
+import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
+import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.util.ContainerSlotAssignment;
-import rearth.oritech.util.StackContext;
 
 import java.util.List;
-import java.util.Optional;
 
-public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGeneratorBlockEntity implements FluidApi.BlockProvider {
+public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGeneratorBlockEntity implements FluidProvider {
     
     @SyncField
-    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged) {
+    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * 1000, this::setChanged) {
+        
         @Override
-        public long insert(FluidStack toInsert, boolean simulate) {
-            if (toInsert.getFluid().equals(Fluids.WATER)) return 0L;    // to avoid mixups with players inserting water for boiler into main storage
-            return super.insert(toInsert, simulate);
+        public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
+            if (resource.is(Fluids.WATER)) return 0;
+            return super.insert(index, resource, amount, transaction); // to avoid mixups with players inserting water for boiler into main storage (which should contain oil/lava/whatever)
         }
     };
     
@@ -40,115 +41,72 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
+    protected OritechRecipeInput getRecipeInput() {
+        return new OritechRecipeInput(getInputView(), fluidStorage.getContent());
+    }
+    
+    @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (bucketInputAllowed() && !level.isClientSide && isAssembled(state)) {
+        if (bucketInputAllowed() && !level.isClientSide() && isAssembled(state)) {
             processBuckets();
         }
         
         super.serverTick(level, pos, state, blockEntity);
     }
     
+    // tries to load content from buckets / fluid containers
     private void processBuckets() {
         
-        var inStack = inventory.getItem(0);
-        var canFill = this.fluidStorage.getAmount() < this.fluidStorage.getCapacity();
+        var inStorage = inventory.getInputContainer();
+        var canFill = this.fluidStorage.getContent().amount() < this.fluidStorage.getCapacity();
         
-        if (!canFill || inStack.isEmpty() || inStack.getCount() > 1) return;
+        if (!canFill) return;
         
-        var stackRef = new StackContext(inStack, updated -> inventory.setItem(0, updated));
-        var candidate = FluidApi.ITEM.find(stackRef);
-        if (candidate == null || !candidate.supportsExtraction()) return;
-        
-        var moved = FluidApi.transferFirst(candidate, fluidStorage, fluidStorage.getCapacity(), false);
-        
-        if (moved == 0) {
-            // move stack
-            var outStack = inventory.getItem(1);
-            if (outStack.isEmpty()) {
-                inventory.setItem(1, stackRef.getValue());
-                inventory.setItem(0, ItemStack.EMPTY);
-            } else if (outStack.getItem().equals(stackRef.getValue().getItem()) && outStack.getCount() < outStack.getMaxStackSize()) {
-                outStack.grow(1);
-                inventory.setItem(0, ItemStack.EMPTY);
+        try (var transaction = Transaction.openRoot()) {
+            
+            var inResource = inStorage.getResource(0);
+            var inStack = inResource.toStack();
+            
+            var candidate = inStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forHandlerIndexStrict(inStorage, 0));
+            if (candidate == null) return;
+            
+            var resource = candidate.getResource(0);
+            if (resource.isEmpty()) return;
+            
+            var maxTaken = Math.min(1000, fluidStorage.getCapacity() - fluidStorage.getAmountAsLong(0));
+            var taken = candidate.extract(0, resource, (int) maxTaken, transaction);
+            if (taken <= 0) return;
+            
+            var inserted = fluidStorage.insert(resource, taken, transaction);
+            if (inserted == taken) {
+                transaction.commit();
             }
         }
+        
     }
     
     @Override
-    protected void consumeInput() {
+    protected boolean removeRecipeInputs(Transaction transaction) {
+        var itemsTaken = super.removeRecipeInputs(transaction);
+        if (!itemsTaken) return false;
         
-        if (isProducingSteam && (boilerStorage.getInStack().getAmount() == 0 || boilerStorage.getOutStack().getAmount() >= boilerStorage.getCapacity())) return;
-        
-        var recipeCandidate = getRecipe();
-        if (recipeCandidate.isEmpty())
-            currentRecipe = OritechRecipe.EMPTY;     // reset recipe when invalid or no input is given
-        
-        
-        if (recipeCandidate.isPresent()) {
-            // this is separate so that progress is not reset when out of energy
-            var activeRecipe = recipeCandidate.get().value();
-            currentRecipe = activeRecipe;
-            consumeFluidRecipeInput(activeRecipe);
-            
-        }
-    }
-    
-    protected void consumeFluidRecipeInput(OritechRecipe activeRecipe) {
-        var recipeTime = (int) (currentRecipe.getTime() * getSpeedMultiplier() * (1 / getEfficiencyMultiplier()));
-        progress = recipeTime;
-        setCurrentMaxBurnTime(recipeTime);
-        
-        // remove inputs
-        // correct amount and variant is already validated in getRecipe, so we can directly remove it
-        var fluidStack = fluidStorage.getStack().copyWithAmount(activeRecipe.getFluidInput().amount());
-        fluidStorage.extract(fluidStack, false);
-    }
-    
-    // gets all recipe of target type, and only checks for matching liquids
-    @Override
-    protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
-        if (inputEmpty()) return Optional.empty();
-        return getRecipe(fluidStorage);
+        // we assume the fluid matches the ingredient, so we just remove the needed amount;
+        var fluidInput = currentRecipe.fluidInput();
+        var taken = fluidStorage.extract(0, fluidStorage.getResource(0), fluidInput.amount(), transaction);
+        return taken == fluidInput.amount();
     }
     
     @Override
-    protected boolean inputEmpty() {
-        var fluidEmpty = fluidStorage.getStack().isEmpty();
-        return fluidEmpty && super.inputEmpty();
-    }
-    
-    protected Optional<RecipeHolder<OritechRecipe>> getRecipe(SimpleFluidStorage checkedTank) {
-        return getRecipe(checkedTank, level, getOwnRecipeType());
-    }
-    
-    public static Optional<RecipeHolder<OritechRecipe>> getRecipe(FluidApi.SingleSlotStorage checkedTank, Level level, OritechRecipeType ownType) {
-        
-        if (checkedTank.getStack().isEmpty()) return Optional.empty();
-        
-        var availableRecipes = level.getRecipeManager().getAllRecipesFor(ownType);
-        for (var recipeEntry : availableRecipes) {
-            var recipe = recipeEntry.value();
-            var recipeFluid = recipe.getFluidInput();
-            if (recipeFluid.matchesFluid(checkedTank.getStack()) && checkedTank.getStack().getAmount() >= recipeFluid.amount())
-                return Optional.of(recipeEntry);
-        }
-        
-        return Optional.empty();
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        fluidStorage.serialize(output);
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        fluidStorage.writeNbt(nbt, "");
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-    }
-    
-    @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        fluidStorage.readNbt(nbt, "");
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        fluidStorage.deserialize(input);
     }
     
     @Override
@@ -176,7 +134,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
-    public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
+    public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
         return fluidStorage;
     }
 }

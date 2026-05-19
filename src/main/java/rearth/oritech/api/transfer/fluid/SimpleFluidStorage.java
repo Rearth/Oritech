@@ -18,6 +18,14 @@ public class SimpleFluidStorage extends FluidStacksResourceHandler implements Up
         this.onUpdate = onUpdate;
     }
     
+    public FluidStack getContent() {
+        return this.stacks.get(0);
+    }
+    
+    public long getCapacity() {
+        return super.capacity;
+    }
+    
     @Override
     protected void onContentsChanged(int index, FluidStack previousContents) {
         super.onContentsChanged(index, previousContents);

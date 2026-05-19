@@ -12,24 +12,25 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import rearth.oritech.Oritech;
 
 import java.util.List;
 import java.util.Objects;
 
 public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate> itemResults,
-                            FluidIngredient fluidInput, List<FluidStack> fluidOutputs,
+                            SizedFluidIngredient fluidInput, List<FluidStack> fluidOutputs,
                             int time, RecipeType<OritechRecipe> recipeType) implements Recipe<OritechRecipeInput> {
     
-    public static final OritechRecipe EMPTY = new OritechRecipe(List.of(), List.of(), FluidIngredient.of(FluidStack.EMPTY), List.of(), 0, RecipeContent.PULVERIZER.get());
+    public static final OritechRecipe EMPTY = new OritechRecipe(List.of(), List.of(), SizedFluidIngredient.of(Fluids.EMPTY, 0), List.of(), 0, RecipeContent.PULVERIZER.get());
     
     
     public static final MapCodec<OritechRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
       Ingredient.CODEC.listOf().fieldOf("itemInputs").forGetter(OritechRecipe::itemInputs),
       ItemStackTemplate.CODEC.listOf().fieldOf("itemResults").forGetter(OritechRecipe::itemResults),
-      FluidIngredient.CODEC.optionalFieldOf("fluidInput", FluidIngredient.of(FluidStack.EMPTY)).forGetter(OritechRecipe::fluidInput),
+      SizedFluidIngredient.CODEC.optionalFieldOf("fluidInput", SizedFluidIngredient.of(Fluids.EMPTY, 0)).forGetter(OritechRecipe::fluidInput),
       FluidStack.OPTIONAL_CODEC.listOf().optionalFieldOf("fluidOutputs", List.of()).forGetter(OritechRecipe::fluidOutputs),
       Codec.INT.optionalFieldOf("time", 60).forGetter(OritechRecipe::time),
       Identifier.CODEC.xmap(OritechRecipe::recipeTypeFromId, OritechRecipe::idFromRecipeType).fieldOf("recipeType").forGetter(OritechRecipe::recipeType)
@@ -38,7 +39,7 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
     public static final StreamCodec<RegistryFriendlyByteBuf, OritechRecipe> STREAM_CODEC = StreamCodec.composite(
       Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::itemInputs,
       ItemStackTemplate.STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::itemResults,
-      FluidIngredient.STREAM_CODEC, OritechRecipe::fluidInput,
+      SizedFluidIngredient.STREAM_CODEC, OritechRecipe::fluidInput,
       FluidStack.OPTIONAL_STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::fluidOutputs,
       ByteBufCodecs.INT, OritechRecipe::time,
       StreamCodec.of(
@@ -62,7 +63,7 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
         // compare items and fluids. This will not modify any inputs.
         
         var itemsMatching = itemInputs.isEmpty() || itemsMatch(itemInputs, input);
-        var fluidsMatching = fluidInput.fluids().isEmpty() || fluidsMatch(input, level);
+        var fluidsMatching = fluidInput.amount() <= 0 || fluidsMatch(input, level);
         
         return itemsMatching && fluidsMatching;
     }
