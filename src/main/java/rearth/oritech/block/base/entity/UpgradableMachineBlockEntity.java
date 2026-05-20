@@ -104,13 +104,13 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        saveAddonAdditional(output);
+        serializeAddonData(output);
     }
     
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        loadAddonAdditional(input);
+        deserializeAddonData(input);
         updateEnergyContainer();
     }
     

@@ -292,7 +292,7 @@ public interface MachineAddonController {
         energyStorage.energy = Math.min(energyStorage.energy, energyStorage.capacity);
     }
     
-    default void saveAddonAdditional(ValueOutput output) {
+    default void serializeAddonData(ValueOutput output) {
         output.store("addonData", BaseAddonData.CODEC, getBaseAddonData());
         
         var listValue = output.childrenList("connectedAddons");
@@ -301,7 +301,7 @@ public interface MachineAddonController {
         }
     }
     
-    default void loadAddonAdditional(ValueInput input) {
+    default void deserializeAddonData(ValueInput input) {
         var data = input.read("addonData", BaseAddonData.CODEC).orElse(BaseAddonData.DEFAULT_ADDON_DATA);
         setBaseAddonData(data);
         

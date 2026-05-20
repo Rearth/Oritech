@@ -1,47 +1,64 @@
 package rearth.oritech.block.base.entity;
 
-import net.minecraft.core.*;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
-import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.DynamicStatisticEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
+import rearth.oritech.api.transfer.item.ItemProvider;
+import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.blocks.storage.SmallStorageBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
-import rearth.oritech.init.ItemContent;
 import rearth.oritech.config.OritechConfig;
-import rearth.oritech.util.*;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.util.Geometry;
+import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.MachineAddonController;
+import rearth.oritech.util.ScreenProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockEntity implements EnergyApi.BlockProvider, ItemApi.BlockProvider, MachineAddonController,
-                                                                                          ScreenProvider, ExtendedMenuProvider {
+public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockEntity implements ItemProvider, FluidProvider, EnergyProvider, MachineAddonController,
+                                                                                                   ScreenProvider, MenuProvider {
     
     @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> connectedAddons = new ArrayList<>();
@@ -69,41 +86,15 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
       getDefaultExtractionRate(),
       this::setChanged) {
         @Override
-        public long extract(long amount, boolean simulate) {
-            
+        public int extract(int amount, TransactionContext transaction) {
             if (rfOutputOverride > 0) {
                 amount = Math.min(rfOutputOverride, amount);
             }
-            
-            return super.extract(amount, simulate);
+            return super.extract(amount, transaction);
         }
     };
     
-    private final EnergyApi.EnergyStorage outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
-        @Override
-        public boolean supportsInsertion() {
-            return false;
-        }
-        
-        @Override
-        public long insert(long amount, boolean simulate) {
-            return 0L;
-        }
-    };
-    
-    private final EnergyApi.EnergyStorage inputStorage = new DelegatingEnergyStorage(energyStorage, null) {
-        @Override
-        public boolean supportsExtraction() {
-            return false;
-        }
-        
-        @Override
-        public long extract(long amount, boolean simulate) {
-            return 0L;
-        }
-    };
-
-    private BlockLookupCache<EnergyApi.EnergyStorage> cachedOutputTarget;
+    private BlockCapabilityCache<EnergyHandler, Direction> cachedOutputTarget;
     
     public ExpandableEnergyStorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -122,68 +113,94 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     }
     
     private void inputFromCrystal() {
-        if (energyStorage.amount >= energyStorage.capacity || inventory.isEmpty()) return;
+        if (energyStorage.energy >= energyStorage.capacity || inventory.getResource(0).isEmpty()) return;
         
-        if (!inventory.getItem(0).getItem().equals(ItemContent.OVERCHARGED_CRYSTAL)) return;
+        if (!inventory.getResource(0).getItem().equals(ItemContent.OVERCHARGED_CRYSTAL.get())) return;
         
-        energyStorage.amount = Math.min(energyStorage.capacity, energyStorage.amount + OritechConfig.overchargedCrystalChargeRate.get());
+        try (var transaction = Transaction.openRoot()) {
+            var inserted = energyStorage.insert(OritechConfig.overchargedCrystalChargeRate.get(), transaction);
+            if (inserted > 0) transaction.commit();
+        }
     }
     
     private void outputEnergy() {
-        if (energyStorage.amount <= 0) return;
+        
+        if (energyStorage.getAmountAsLong() <= 0 || !(level instanceof ServerLevel serverLevel)) return;
         
         chargeItems();
-
+        
         if (cachedOutputTarget == null) {
             var target = getOutputPosition(worldPosition, getFacing());
-            cachedOutputTarget = EnergyApi.BLOCK.createCache(level, target.getB(), target.getA().getOpposite());
+            cachedOutputTarget = BlockCapabilityCache.create(Capabilities.Energy.BLOCK, serverLevel, target.getB(), target.getA().getOpposite());
         }
-
-        var candidate = cachedOutputTarget.find();
-        if (candidate != null && candidate.supportsInsertion()) {
-            EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
+        
+        var available = Math.min(energyStorage.getAmountAsLong(), energyStorage.getMaxExtract());
+        
+        try (var transaction = Transaction.openRoot()) {
+            var candidate = cachedOutputTarget.getCapability();
+            if (candidate != null) {
+                var inserted = candidate.insert((int) available, transaction);
+                if (inserted <= 0) return;
+                
+                energyStorage.internalExtract(inserted, transaction);
+                transaction.commit();
+            }
         }
     }
     
     private void chargeItems() {
         
-        var heldStack = inventory.heldStacks.get(0);
+        var heldStack = inventory.getStacks().get(0);
         if (heldStack.isEmpty() || heldStack.getCount() > 1) return;
         
-        var stackRef = new StackContext(heldStack, updated -> inventory.heldStacks.set(0, updated));
-        var slotEnergyContainer = EnergyApi.ITEM.find(stackRef);
-        if (slotEnergyContainer != null) {
-            EnergyApi.transfer(energyStorage, slotEnergyContainer, Long.MAX_VALUE, false);
+        try (var transaction = Transaction.openRoot()) {
+            
+            var candidate = heldStack.getCapability(Capabilities.Energy.ITEM, ItemAccess.forHandlerIndexStrict(inventory, 0));
+            if (candidate == null) return;
+            
+            var available = Math.min(energyStorage.getAmountAsLong(), energyStorage.getMaxExtract());
+            var inserted = candidate.insert((int) available, transaction);
+            if (inserted <= 0) return;
+            
+            energyStorage.internalExtract(inserted, transaction);
+            
+            transaction.commit();
+            
         }
     }
     
     public static Tuple<Direction, BlockPos> getOutputPosition(BlockPos pos, Direction facing) {
         var blockInFront = (BlockPos) Geometry.offsetToWorldPosition(facing, new Vec3i(-1, 0, 0), pos);
         var worldOffset = blockInFront.subtract(pos);
-        var direction = Direction.fromDelta(worldOffset.getX(), worldOffset.getY(), worldOffset.getZ());
+        var direction = Direction.getApproximateNearest(worldOffset.getX(), worldOffset.getY(), worldOffset.getZ());
         
         return new Tuple<>(direction, blockInFront);
     }
     
     @Override
-    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        writeAddonToNbt(nbt);
-        nbt.putLong("energy_stored", energyStorage.amount);
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-        nbt.putBoolean("redstone", redstonePowered);
-        nbt.putInt("rfOutputOverride", rfOutputOverride);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        
+        serializeAddonData(output);
+        
+        energyStorage.serialize(output);
+        inventory.serialize(output);
+        
+        output.putBoolean("redstone", redstonePowered);
+        output.putInt("rfOutputOverride", rfOutputOverride);
     }
     
     @Override
-    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        loadAddonNbtData(nbt);
-        updateEnergyContainer();
-        energyStorage.amount = nbt.getLong("energy_stored");
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
-        redstonePowered = nbt.getBoolean("redstone");
-        rfOutputOverride = nbt.getInt("rfOutputOverride");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        
+        deserializeAddonData(input);
+        
+        energyStorage.deserialize(input);
+        inventory.deserialize(input);
+        
+        redstonePowered = input.getBooleanOr("redstone", false);
+        rfOutputOverride = input.getIntOr("rfOutputOverride", -1);
     }
     
     @Override
@@ -192,26 +209,24 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
         currentStats = energyStorage.getCurrentStatistics(level.getGameTime());
     }
     
-    @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
-        return inventory;
-    }
-    
     public Direction getFacing() {
         return getBlockState().getValue(SmallStorageBlock.TARGET_DIR);
     }
     
+    @Override
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
+        return inventory;
+    }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
-        
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         if (direction == null)
             return energyStorage;
         
         if (direction.equals(getFacing())) {
-            return outputStorage;
+            return energyStorage.getOutputStorage();
         } else {
-            return inputStorage;
+            return energyStorage.getInputStorage();
         }
     }
     
@@ -241,7 +256,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryForAddon() {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryForAddon() {
         return inventory;
     }
     
@@ -274,10 +289,11 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     
     public abstract long getDefaultExtractionRate();
     
+    
     @Override
-    public void saveExtraData(FriendlyByteBuf buf) {
-        sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(worldPosition);
+    public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
+        this.sendUpdate(SyncType.GUI_OPEN);
+        MenuProvider.super.writeClientSideData(menu, buffer);
     }
     
     @Override
@@ -328,7 +344,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     }
     
     @Override
-    public Container getDisplayedInventory() {
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
         return inventory;
     }
     

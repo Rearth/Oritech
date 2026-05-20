@@ -21,13 +21,13 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
 import rearth.oritech.init.BlockContent;
@@ -42,7 +42,7 @@ import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 public class SmallStorageBlock extends Block implements EntityBlock {
     
-    public static final DirectionProperty TARGET_DIR = DirectionProperty.create("target_dir");
+    public static final EnumProperty<Direction> TARGET_DIR = BlockStateProperties.FACING;
     
     public SmallStorageBlock(Properties settings) {
         super(settings);

@@ -1,72 +1,117 @@
 package rearth.oritech.api.transfer.energy;
 
+import net.neoforged.neoforge.transfer.energy.DelegatingEnergyHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.api.networking.SyncType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class DynamicStatisticEnergyStorage extends DynamicEnergyStorage {
     
-    private final List<Long> inserted = new ArrayList<>();  // just for this tick
-    private final List<Long> extracted = new ArrayList<>();
-    private final Long[] historicInsert = new Long[20];
-    private final Long[] historicExtract = new Long[20];
+    private long insertedThisTick;
+    private long extractedThisTick;
+    private int insertOperationsThisTick;
+    private final long[] historicInsert = new long[20];
+    private final long[] historicExtract = new long[20];
     private int currentInsertSources = 0;
+    private final StatisticsJournal statisticsJournal = new StatisticsJournal();
+    private final EnergyHandler inputStorage;
+    private final EnergyHandler outputStorage;
     
     public DynamicStatisticEnergyStorage(long capacity, long maxInsert, long maxExtract, Runnable onUpdate) {
-        super(capacity, maxInsert, maxExtract, onUpdate);
+        super(capacity, maxInsert, maxExtract, 0, onUpdate, false);
         
         Arrays.fill(historicInsert, 0L);
         Arrays.fill(historicExtract, 0L);
+        
+        inputStorage = new DelegatingEnergyHandler(this) {
+            @Override
+            public int extract(int amount, TransactionContext transaction) {
+                return 0;
+            }
+        };
+        outputStorage = new DelegatingEnergyHandler(this) {
+            @Override
+            public int insert(int amount, TransactionContext transaction) {
+                return 0;
+            }
+        };
+        
+    }
+    
+    public EnergyHandler getInputStorage() {
+        return inputStorage;
+    }
+    
+    public EnergyHandler getOutputStorage() {
+        return outputStorage;
     }
     
     @Override
-    public long insert(long amount, boolean simulate) {
-        
-        var inserted = super.insert(amount, simulate);
-        if (!simulate && inserted > 0) {
-            this.inserted.add(inserted);
+    public int insert(int amount, TransactionContext transaction) {
+        var inserted = super.insert(amount, transaction);
+        if (inserted > 0) {
+            statisticsJournal.updateSnapshots(transaction);
+            insertedThisTick += inserted;
+            insertOperationsThisTick++;
         }
-        
         return inserted;
     }
     
     @Override
-    public long extract(long amount, boolean simulate) {
-        
-        var extracted = super.extract(amount, simulate);
-        if (!simulate && extracted > 0) {
-            this.extracted.add(extracted);
+    public int extract(int amount, TransactionContext transaction) {
+        var extracted = super.extract(amount, transaction);
+        if (extracted > 0) {
+            statisticsJournal.updateSnapshots(transaction);
+            extractedThisTick += extracted;
         }
-        
         return extracted;
     }
     
     public void tick(long worldTicks) {
         var index = (int) (worldTicks % 20);
-        historicInsert[index] = inserted.stream().mapToLong(Long::longValue).sum();
-        historicExtract[index] = extracted.stream().mapToLong(Long::longValue).sum();
-        currentInsertSources = inserted.size();
+        historicInsert[index] = insertedThisTick;
+        historicExtract[index] = extractedThisTick;
+        currentInsertSources = insertOperationsThisTick;
         
-        inserted.clear();
-        extracted.clear();
+        insertedThisTick = 0;
+        extractedThisTick = 0;
+        insertOperationsThisTick = 0;
     }
     
     public EnergyStatistics getCurrentStatistics(long worldTicks) {
         var index = (int) (worldTicks % 20);
         
         return new EnergyStatistics(
-          (float) Arrays.stream(historicInsert).mapToLong(Long::longValue).average().orElse(0),
-          (float) Arrays.stream(historicExtract).mapToLong(Long::longValue).average().orElse(0),
+          (float) Arrays.stream(historicInsert).average().orElse(0),
+          (float) Arrays.stream(historicExtract).average().orElse(0),
           historicInsert[index],
           historicExtract[index],
           currentInsertSources,
-          Arrays.stream(historicInsert).mapToLong(Long::longValue).max().orElse(0),
-          Arrays.stream(historicExtract).mapToLong(Long::longValue).max().orElse(0)
+          Arrays.stream(historicInsert).max().orElse(0),
+          Arrays.stream(historicExtract).max().orElse(0)
         );
         
+    }
+    
+    private class StatisticsJournal extends SnapshotJournal<StatisticSnapshot> {
+        @Override
+        protected StatisticSnapshot createSnapshot() {
+            return new StatisticSnapshot(insertedThisTick, extractedThisTick, insertOperationsThisTick);
+        }
+        
+        @Override
+        protected void revertToSnapshot(StatisticSnapshot snapshot) {
+            insertedThisTick = snapshot.insertedThisTick();
+            extractedThisTick = snapshot.extractedThisTick();
+            insertOperationsThisTick = snapshot.insertOperationsThisTick();
+        }
+    }
+    
+    private record StatisticSnapshot(long insertedThisTick, long extractedThisTick, int insertOperationsThisTick) {
     }
     
     public record EnergyStatistics(

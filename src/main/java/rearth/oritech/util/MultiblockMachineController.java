@@ -49,7 +49,7 @@ public interface MultiblockMachineController {
     
     DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction);
     
-    default void saveMultiblockAdditional(ValueOutput output) {
+    default void serializeMultiblock(ValueOutput output) {
         
         var list = output.childrenList("cores");
         for (var pos : getConnectedCores()) {
@@ -59,7 +59,7 @@ public interface MultiblockMachineController {
         output.putFloat("quality", getCoreQuality());
     }
     
-    default void loadMultiblockAdditional(ValueInput input) {
+    default void deserializeMultiblock(ValueInput input) {
         
         var coreBlockConnected = getConnectedCores();
         for (var posData : input.childrenListOrEmpty("cores")) {

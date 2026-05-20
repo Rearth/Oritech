@@ -47,13 +47,13 @@ public abstract class MultiblockGeneratorBlockEntity extends UpgradableGenerator
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        saveMultiblockAdditional(output);
+        serializeMultiblock(output);
     }
     
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        loadMultiblockAdditional(input);
+        deserializeMultiblock(input);
     }
     
     @Override

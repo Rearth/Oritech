@@ -255,7 +255,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             for (var target : cachedOutputTargets) {
                 var candidate = target.getCapability();
                 if (candidate != null) {
-                    moved += candidate.insert((int) available, transaction);
+                    moved += candidate.insert((int) Math.min(available, energyStorage.maxExtract), transaction);
                     available -= moved;
                 }
                 

@@ -295,7 +295,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         
-        ContainerHelper.saveAllItems(output, inventory.getStacks());
+        inventory.serialize(output);
         serializeColor(output);
         
         progress.serialize(output);
@@ -367,8 +367,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        MenuProvider.super.writeClientSideData(menu, buffer);
         this.sendUpdate(SyncType.GUI_OPEN);
+        MenuProvider.super.writeClientSideData(menu, buffer);
     }
     
     protected Direction getFacing() {
